@@ -2,6 +2,7 @@ package io.github.vhorvath2010.missilewars;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+/** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
 
     /** Singleton instance of this class. */

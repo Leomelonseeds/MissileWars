@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+/** A class to handle loading/placing of NBT and WorldEdit schematics */
 public class SchematicManager {
 
     /**
