@@ -1,6 +1,12 @@
 name: MissileWars
-version: '${project.version}'
+version: 1.0.0
 main: io.github.vhorvath2010.missilewars.MissileWarsPlugin
 api-version: 1.18
 authors: [ Vhbob ]
 description: A MissileWars plugin for UltimaMC
+commands:
+  MissileWars:
+    description: The core Missile Wars command
+    aliases:
+      - mw
+      - umw
