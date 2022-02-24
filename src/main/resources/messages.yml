@@ -4,6 +4,7 @@
 messages:
   prefix: "&d&lM&5&lW &8&l» &7"
   join-arena: "Joining %umw_arena%..."
+  joined-arena: "Welcome! Use &a/queue &7to join a team, and &a/spawn &7to return to main lobby."
   leave-arena: "You left %umw_arena%"
   queue-waiting: "You are now queued for %umw_team% in position %umw_position%"
   queue-join: "You joined the game as %umw_team%"
