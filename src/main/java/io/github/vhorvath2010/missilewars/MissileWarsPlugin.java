@@ -19,7 +19,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Save data files
         saveDefaultConfig();
-        saveResource("schematics.yml", false);
+        saveResource("structures.yml", false);
+        saveResource("maps.yml", false);
 
         // Startup schematic management
 

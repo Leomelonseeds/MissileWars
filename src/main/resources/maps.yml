@@ -1,0 +1,6 @@
+lobby:
+  file: "WaitingLobby.schem"
+  pos:
+    x: 0
+    y: 70
+    z: 0

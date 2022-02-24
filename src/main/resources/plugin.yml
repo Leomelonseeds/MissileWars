@@ -10,3 +10,5 @@ commands:
     aliases:
       - mw
       - umw
+depend:
+  - WorldEdit

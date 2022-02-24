@@ -1,9 +1,11 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
@@ -54,10 +56,13 @@ public class ArenaManager {
         creator.sendMessage(ChatColor.GREEN + "Generating arena world...");
         WorldCreator arenaCreator = new WorldCreator("arena_" + name);
         arenaCreator.generator(new VoidChunkGenerator());
-        arenaCreator.createWorld();
+        World arenaWorld = arenaCreator.createWorld();
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
         // Create Arena lobby
+        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld)) {
+            creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
+        }
 
         // Register Arena
         loadedArenas.add(new Arena(name, MissileWarsPlugin.getPlugin().getConfig().getInt("default-arena-cap")));

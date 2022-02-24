@@ -70,7 +70,7 @@ public class SchematicManager {
         if (!structureConfig.contains(structureName + ".file")) {
             return false;
         }
-        File structureFile = new File(plugin.getDataFolder() + File.pathSeparator + "structures",
+        File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
                 structureConfig.getString(structureName + ".file"));
 
         // Load structure data
@@ -107,14 +107,16 @@ public class SchematicManager {
         try {
             schematicConfig.load(schematicsFile);
         } catch (IOException | InvalidConfigurationException e) {
+            System.out.println("no schem config found");
             return false;
         }
 
         // Acquire WE clipboard
         if (!schematicConfig.contains(schematicName + ".file")) {
+            System.out.println("no schem file found");
             return false;
         }
-        File schematicFile = new File(plugin.getDataFolder() + File.pathSeparator + "maps",
+        File schematicFile = new File(plugin.getDataFolder() + File.separator + "maps",
                 schematicConfig.getString(schematicName + ".file"));
         Clipboard clipboard;
         ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
@@ -122,6 +124,7 @@ public class SchematicManager {
             ClipboardReader reader = format.getReader(new FileInputStream(schematicFile));
             clipboard = reader.read();
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
 
