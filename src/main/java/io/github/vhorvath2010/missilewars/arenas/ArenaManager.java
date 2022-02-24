@@ -4,10 +4,8 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -65,9 +63,19 @@ public class ArenaManager {
             creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
         }
 
+        // Spawn barrier wall
+        FileConfiguration settings = ConfigUtils.getConfigFile("default-settings.yml");
+        int length = settings.getInt("barrier.length");
+        int x = settings.getInt("barrier.center.x");
+        int zCenter = settings.getInt("barrier.center.z");
+        for (int y = 0; y <= 256; ++y) {
+            for (int z = zCenter - length / 2; z < zCenter + length / 2; z++) {
+                arenaWorld.getBlockAt(x, y, z).setType(Material.BARRIER);
+            }
+        }
+
         // Register Arena
-        loadedArenas.add(new Arena(name,
-                ConfigUtils.getConfigFile("default-settings.yml").getInt("arena-cap")));
+        loadedArenas.add(new Arena(name, settings.getInt("arena-cap")));
         return true;
     }
 
