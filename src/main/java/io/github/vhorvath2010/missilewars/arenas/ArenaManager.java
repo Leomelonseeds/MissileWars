@@ -48,14 +48,14 @@ public class ArenaManager {
      */
     public boolean createArena(String name, Player creator) {
         // Ensure arena world doesn't exist
-        if (Bukkit.getWorld("arena_" + name) != null) {
+        if (Bukkit.getWorld("mwarena_" + name) != null) {
             creator.sendMessage(ChatColor.RED + "A world already exists for that arena!");
             return false;
         }
 
         // Create Arena world
         creator.sendMessage(ChatColor.GREEN + "Generating arena world...");
-        WorldCreator arenaCreator = new WorldCreator("arena_" + name);
+        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator());
         World arenaWorld = arenaCreator.createWorld();
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
