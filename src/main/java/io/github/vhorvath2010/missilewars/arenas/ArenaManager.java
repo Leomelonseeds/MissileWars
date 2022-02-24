@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.arenas;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -65,7 +66,8 @@ public class ArenaManager {
         }
 
         // Register Arena
-        loadedArenas.add(new Arena(name, MissileWarsPlugin.getPlugin().getConfig().getInt("default-arena-cap")));
+        loadedArenas.add(new Arena(name,
+                ConfigUtils.getConfigFile("default-settings.yml").getInt("arena-cap")));
         return true;
     }
 

@@ -1,0 +1,41 @@
+# The player capacity. 10 means 5 players per team.
+# Additional players can still join the arena, but they can only spectate.  
+arena-cap: 10
+  
+# Length of game before a tie is declared, in minutes  
+game-length: 30
+
+# Frequency of giving items, based on how many players are on a team.
+item-frequency:
+  # ex. for 1 player on a team, give items every 10 seconds
+  1: 10
+  2: 15
+  # 3 and above
+  3: 20
+  
+# Give items faster as game time nears end   
+chaos-mode:
+  # Activates when this many minutes are left in the game
+  time-left: 10
+  # Multiply item-frequency by this amount
+  multiplier: 2
+  
+# Min number of players to start countdown for a game  
+minimum-players: 2
+
+# square worldborder with width radius*2
+worldborder:
+  center:
+    x: 0
+    z: 0
+  radius: 250
+
+# Barrier between the lobby and the map in each world
+# Note: center is relative to the lobby location
+barrier:
+  length: 100
+  height: 100
+  center:
+    x: -40
+    y: 75
+    z: 0

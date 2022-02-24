@@ -1,2 +1,25 @@
-# The default capacity for arenas
-default-arena-cap: 10
+# Blocks that cannot intersect bounding boxes of schematics
+# Players also cannot right click on these blocks with items.
+cancel-schematic:
+  - BARRIER
+  - OBSIDIAN
+  - CRYING_OBSIDIAN
+  - NETHER_PORTAL
+    
+# When min player requirements met for each arena, 
+# how long do players wait for to start game (s)
+lobby-wait-time: 60
+
+# When lobby is full, how long do players wait for (s)
+lobby-wait-time-full: 10
+
+# When victory, how long is the screen displayed before world resets
+# and players kicked to main lobby.
+victory-wait-time: 15
+
+# When player falls past this level, it is counted as a death
+# and players respawn instantly
+void-y-level: -20
+
+# At what point should the countdown send messages and play sounds
+lobby-countdown-near: 5

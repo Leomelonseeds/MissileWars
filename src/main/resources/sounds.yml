@@ -1,0 +1,20 @@
+victory:
+  sound: UI_TOAST_CHALLENGE_COMPLETE
+  volume: 1.0
+  pitch: 1.0
+defeat:
+  sound: ENTITY_WITHER_DEATH
+  volume: 0.5
+  pitch: 0.0
+countdown_near:
+  sound: BLOCK_NOTE_BLOCK_PLING
+  volume: 1.0
+  pitch: 1.0
+game_start:
+  sound: ENTITY_PLAYER_LEVELUP
+  volume: 1.0
+  pitch: 0.5
+game_end_reminder:
+  sound: ENTITY_CHICKEN_EGG
+  volume: 1.0
+  pitch: 1.0

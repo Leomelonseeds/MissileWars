@@ -1,0 +1,87 @@
+# Messages! Everything related to the text!
+# Blank messages should be ignored.
+
+messages:
+  prefix: "&d&lM&5&lW &8&l» &7"
+  join-arena: "Joining %arena%..."
+  leave-arena: "You left %arena%"
+  queue-waiting: "You are now queued for %team% in position %position%"
+  queue-join: "You joined the game as %team%"
+  queue-join-others: "%player% has joined %team%!"
+  queue-join-error: "You cannot join %team% as the teams would be unbalanced."
+  lobby-countdown-start: "Minimum player requirements met. The game will start in %time% seconds."
+  lobby-countdown-full: "The lobby is full! The game will start in %time% seconds."
+  lobby-countdown-near: "Starting in %time%..."
+  game-end-reminder: "The game will end in %time_remaining% minutes!"
+  chaos-mode: "There are %chaos_time% minutes until the game ends. Items will now be given 2x faster."
+  game-end-near: "Game ending in %time_remaining% minutes!"
+  # When a player on your team leaves and changes the arena item-frequency
+  # setting, so the team recieves items quicker.
+  buff-team: "You will recieve items faster because a teammate left."
+  nerf-team: "You will recieve items slower since a teammate joined."
+  # All lines sent simultaneously, with prefix included
+  classic_start:
+    - "Welcome to &dMissile &5Wars &7- &aClassic"
+    - "&bBlow up your opponents' nether portals to win!"
+    - "&aRight-click &7your items to use them."
+    - "&aType /leave &7to go back to the lobby."
+  classic_end:
+    # mvps - players who blew up portals
+    - "&5MVPs: %mvps%"
+    # If tied for top killer/deaths, list both
+    - "&cMost Kills: %top_killer%"
+    - "&eMost Deaths: %top_deaths%"
+    - "&aThanks for playing!"
+    
+titles:
+  # Should be sent to players who join in the middle of a game as well
+  game-start:
+    title: "&a&lClassic"
+    subtitle: "Blow up opponent portals!"
+  victory:
+    title: "&a&lVictory"
+    # pick random one to show to all players in game
+    subtitle:
+      - "You did it"
+      - "*Slow clap*"
+      - "gg"
+      - "Not even close"
+      - "Built different"
+      - "Bomb expert!"
+      - "easy"
+  defeat:
+    title: "&c&lDefeat"
+    subtitle:
+      - "get good"
+      - "L + ratio"
+      - "gg"
+      - "Unfortunate"
+      - "Crippling depression"
+      - "Almost there"
+      - "[insert joke here]"
+      - "How!?"
+    
+  
+scoreboard:
+  title: "&d&lMissile &5&lWars"
+  lines_classic:
+    - "&7&m－－－－－－－－－－－－"
+    - "&fGamemode: &aClassic"
+    - ""
+    - "&cRed Shield: %shield_health_red%"
+    - "&9Blue Shield: %shield_health_blue%"
+    - ""
+    - "&fTime left: %time_remaining%"
+    - "&7&m－－－－－－－－－－－－"
+    - "&5play.ultimamc.net"
+  #For future use
+  lines_ctf: []
+  
+# For customizing placeholderAPI placeholders
+# All placeholders prefixed with umw_  
+placeholders:
+  status:
+    waiting: "&aWaiting for players..."
+    active: "&eIn-game"
+    full: "&cFull - spectators only"
+    finished: "&9Resetting..."

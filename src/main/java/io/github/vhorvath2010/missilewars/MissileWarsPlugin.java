@@ -19,6 +19,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Save data files
         saveDefaultConfig();
+        saveResource("default-settings.yml", false);
+        saveResource("messages.yml", false);
+        saveResource("sounds.yml", false);
         saveResource("structures.yml", false);
         saveResource("maps.yml", false);
 
