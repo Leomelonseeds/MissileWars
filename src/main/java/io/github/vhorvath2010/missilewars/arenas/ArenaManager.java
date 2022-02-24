@@ -57,6 +57,8 @@ public class ArenaManager {
         arenaCreator.createWorld();
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
+        // Create Arena lobby
+
         // Register Arena
         loadedArenas.add(new Arena(name, MissileWarsPlugin.getPlugin().getConfig().getInt("default-arena-cap")));
         return true;

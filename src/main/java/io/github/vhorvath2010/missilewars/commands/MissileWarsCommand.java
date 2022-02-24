@@ -48,8 +48,9 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Create new arena
-            arenaManager.createArena(arenaName, player);
-            sendSuccessMsg(player, "New arena created!");
+            if (arenaManager.createArena(arenaName, player)) {
+                sendSuccessMsg(player, "New arena created!");
+            }
         }
         return true;
     }
