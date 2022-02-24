@@ -4,6 +4,8 @@ import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+
 /** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
 
@@ -19,11 +21,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Save data files
         saveDefaultConfig();
-        saveResource("default-settings.yml", false);
-        saveResource("messages.yml", false);
-        saveResource("sounds.yml", false);
-        saveResource("structures.yml", false);
-        saveResource("maps.yml", false);
+        saveIfNotPresent("default-settings.yml");
+        saveIfNotPresent("messages.yml");
+        saveIfNotPresent("sounds.yml");
+        saveIfNotPresent("structures.yml");
+        saveIfNotPresent("maps.yml");
 
         // Startup schematic management
 
@@ -32,6 +34,18 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Load arenas
         arenaManager = new ArenaManager();
+    }
+
+    /**
+     * Save a resource if it is not present
+     *
+     * @param resourcePath the path to the resource
+     */
+    private void saveIfNotPresent(String resourcePath) {
+        File file = new File(getDataFolder(), resourcePath);
+        if (!file.exists()) {
+            saveResource(resourcePath, false);
+        }
     }
 
     @Override

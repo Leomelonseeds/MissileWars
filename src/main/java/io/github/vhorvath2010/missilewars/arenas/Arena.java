@@ -1,7 +1,10 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.util.List;
 import java.util.Queue;
@@ -47,4 +50,24 @@ public class Arena {
     public String getName() {
         return name;
     }
+
+    /**
+     * Get the World for this Arena.
+     *
+     * @return the world this Arena lies in
+     */
+    private World getWorld() {
+        return Bukkit.getWorld("mwarena_" + name);
+    }
+
+    /**
+     * Generate a map given the map name.
+     *
+     * @param mapName the name of the map
+     * @return true if the map successfully generated, otherwise false
+     */
+    public boolean generateMap(String mapName) {
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld());
+    }
+
 }

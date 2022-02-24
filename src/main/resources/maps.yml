@@ -1,6 +1,15 @@
+# Settings for the lobby
 lobby:
   file: "WaitingLobby.schem"
   pos:
-    x: 0
-    y: 68
+    x: 85
+    y: 63
     z: 0
+
+# Settings for the Default map
+default-map:
+  file: "DefaultMap.schem"
+  pos:
+    x: 0
+    y: 77
+    z: -66

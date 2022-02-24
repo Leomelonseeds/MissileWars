@@ -1,6 +1,5 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
@@ -59,8 +58,11 @@ public class ArenaManager {
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
         // Create Arena lobby
+        creator.sendMessage(ChatColor.GREEN + "Generating lobby...");
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld)) {
             creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
+        } else {
+            creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
         }
 
         // Spawn barrier wall
@@ -74,8 +76,17 @@ public class ArenaManager {
             }
         }
 
+        // Spawn arena with default map
+        Arena arena = new Arena(name, settings.getInt("arena-cap"));
+        creator.sendMessage(ChatColor.GREEN + "Generating default map...");
+        if (arena.generateMap("default-map")) {
+            creator.sendMessage(ChatColor.GREEN + "Default map generated!");
+        } else {
+            creator.sendMessage(ChatColor.RED + "Error generating default map! Are schematic files present?");
+        }
+
         // Register Arena
-        loadedArenas.add(new Arena(name, settings.getInt("arena-cap")));
+        loadedArenas.add(arena);
         return true;
     }
 

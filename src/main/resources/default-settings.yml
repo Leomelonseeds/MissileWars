@@ -36,5 +36,5 @@ worldborder:
 barrier:
   length: 256
   center:
-    x: -40
+    x: 52
     z: 0
