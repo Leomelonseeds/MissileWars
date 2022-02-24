@@ -3,18 +3,18 @@
 
 messages:
   prefix: "&d&lM&5&lW &8&l» &7"
-  join-arena: "Joining %arena%..."
-  leave-arena: "You left %arena%"
-  queue-waiting: "You are now queued for %team% in position %position%"
-  queue-join: "You joined the game as %team%"
-  queue-join-others: "%player% has joined %team%!"
-  queue-join-error: "You cannot join %team% as the teams would be unbalanced."
-  lobby-countdown-start: "Minimum player requirements met. The game will start in %time% seconds."
-  lobby-countdown-full: "The lobby is full! The game will start in %time% seconds."
-  lobby-countdown-near: "Starting in %time%..."
-  game-end-reminder: "The game will end in %time_remaining% minutes!"
-  chaos-mode: "There are %chaos_time% minutes until the game ends. Items will now be given 2x faster."
-  game-end-near: "Game ending in %time_remaining% minutes!"
+  join-arena: "Joining %umw_arena%..."
+  leave-arena: "You left %umw_arena%"
+  queue-waiting: "You are now queued for %umw_team% in position %umw_position%"
+  queue-join: "You joined the game as %umw_team%"
+  queue-join-others: "%player% has joined %umw_team%!"
+  queue-join-error: "You cannot join %umw_team% as the teams would be unbalanced."
+  lobby-countdown-start: "Minimum player requirements met. The game will start in %umw_time% seconds."
+  lobby-countdown-full: "The lobby is full! The game will start in %umw_time% seconds."
+  lobby-countdown-near: "Starting in %umw_time%..."
+  game-end-reminder: "The game will end in %umw_time_remaining% minutes!"
+  chaos-mode: "There are %umw_chaos_time% minutes until the game ends. Items will now be given 2x faster."
+  game-end-near: "Game ending in %umw_time_remaining% minutes!"
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
   buff-team: "You will recieve items faster because a teammate left."
@@ -27,10 +27,10 @@ messages:
     - "&aType /leave &7to go back to the lobby."
   classic_end:
     # mvps - players who blew up portals
-    - "&5MVPs: %mvps%"
+    - "&5MVPs: %umw_mvps%"
     # If tied for top killer/deaths, list both
-    - "&cMost Kills: %top_killer%"
-    - "&eMost Deaths: %top_deaths%"
+    - "&cMost Kills: %umw_top_killer%"
+    - "&eMost Deaths: %umw_top_deaths%"
     - "&aThanks for playing!"
     
 titles:
@@ -68,10 +68,10 @@ scoreboard:
     - "&7&m－－－－－－－－－－－－"
     - "&fGamemode: &aClassic"
     - ""
-    - "&cRed Shield: %shield_health_red%"
-    - "&9Blue Shield: %shield_health_blue%"
+    - "&cRed Shield: %umw_shield_health_red%"
+    - "&9Blue Shield: %umw_shield_health_blue%"
     - ""
-    - "&fTime left: %time_remaining%"
+    - "&fTime left: %umw_time_remaining%"
     - "&7&m－－－－－－－－－－－－"
     - "&5play.ultimamc.net"
   #For future use
