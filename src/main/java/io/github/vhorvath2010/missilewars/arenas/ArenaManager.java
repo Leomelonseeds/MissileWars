@@ -46,6 +46,7 @@ public class ArenaManager {
         // Load worlds for arenas
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
             new WorldCreator("mwarena_" + arena.getName()).createWorld();
         }
     }

@@ -1,6 +1,7 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -32,18 +33,39 @@ public class ConfigUtils {
     }
 
     /**
+     * Set placeholders onto a message.
+     *
+     * @param msg the message to parse
+     * @param player the player to set placeholders with
+     * @param arena the arena to associate the placeholders with
+     */
+    private static String setPlaceholders(String msg, Player player, Arena arena) {
+        String parsedMsg = PlaceholderAPI.setPlaceholders(player, msg);
+        return ChatColor.translateAlternateColorCodes('&', parsedMsg);
+    }
+
+    /**
      * Send a configurable message with placeholders set for player.
      *
      * @param path the path to the message in the messages.yml file
      * @param player the player to set placeholders with
+     * @param arena the arena to associate the placeholders with
      */
-    public void sendConfigMessage(String path, Player player) {
+    public static void sendConfigMessage(String path, Player player, Arena arena) {
         FileConfiguration messagesConfig = getConfigFile("messages.yml");
         String prefix = messagesConfig.getString("messages.prefix");
-        for (String msg : messagesConfig.getStringList(path)) {
-            String parsedMsg = prefix + PlaceholderAPI.setPlaceholders(player, msg);
-            String coloredMsg = ChatColor.translateAlternateColorCodes('&', parsedMsg);
-            player.sendMessage(coloredMsg);
+
+        // Check for multi line message
+        if (!messagesConfig.getStringList(path).isEmpty()) {
+            for (String msg : messagesConfig.getStringList(path)) {
+                player.sendMessage(setPlaceholders(prefix + msg, player, arena));
+            }
+        }
+
+        // Send single line message
+        else {
+            String msg = messagesConfig.getString(path);
+            player.sendMessage(setPlaceholders(prefix + msg, player, arena));
         }
     }
 

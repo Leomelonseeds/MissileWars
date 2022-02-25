@@ -8,6 +8,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
 
+    /** Events to handle creature spawns. */
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
         // Cancel natural spawns in arena worlds
@@ -18,6 +19,7 @@ public class ArenaGameruleEvents implements Listener {
         }
     }
 
+    /** Event to ignore hunger. */
     @EventHandler
     public void onHunger(FoodLevelChangeEvent event) {
         if (event.getEntity().getWorld().getName().contains("mwarena_")) {
