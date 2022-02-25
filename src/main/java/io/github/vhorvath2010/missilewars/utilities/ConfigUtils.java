@@ -40,6 +40,27 @@ public class ConfigUtils {
      * @param arena the arena to associate the placeholders with
      */
     private static String setPlaceholders(String msg, Player player, Arena arena) {
+        // Set umw arena placeholders
+        if (arena != null) {
+            msg = msg.replaceAll("%umw_arena%", arena.getName());
+            msg = msg.replaceAll("%umw_arena_players%", "" + arena.getNumPlayers());
+            msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
+            msg = msg.replaceAll("%umw_team%", arena.getTeam(player.getUniqueId()));
+            msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
+            msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
+            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
+            // TODO: Implement placeholders for during game and end of game
+        }
+
+        // Set umw arena-less placeholders
+        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime());
+        FileConfiguration messageConfig = getConfigFile("messages.yml");
+        msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
+        msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));
+        msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
+        msg = msg.replaceAll("umw_finished", messageConfig.getString("placeholders.status.finished"));
+
+        // Set PAPI placeholders and color
         String parsedMsg = PlaceholderAPI.setPlaceholders(player, msg);
         return ChatColor.translateAlternateColorCodes('&', parsedMsg);
     }

@@ -3,15 +3,15 @@ package io.github.vhorvath2010.missilewars.arenas;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
@@ -34,6 +34,8 @@ public class Arena implements ConfigurationSerializable {
     private MissileWarsTeam redTeam;
     /** The blue team. */
     private MissileWarsTeam blueTeam;
+    /** The start time of the game. In the future if game is yet to start, otherwise, in the past. */
+    private LocalDateTime startTime;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -87,6 +89,15 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
+     * Get the number of minutes remaining when chaos time activates.
+     *
+     * @return the number of minutes remaining when chaos time activates
+     */
+    public static int getChaosTime() {
+        return ConfigUtils.getConfigFile("default-settings.yml").getInt("chaos-mode.time-left");
+    }
+
+    /**
      * Generate a map given the map name.
      *
      * @param mapName the name of the map
@@ -94,6 +105,101 @@ public class Arena implements ConfigurationSerializable {
      */
     public boolean generateMap(String mapName) {
         return SchematicManager.spawnFAWESchematic(mapName, getWorld());
+    }
+
+    /**
+     * Get the team a player with a given UUID is on.
+     *
+     * @param uuid the UUID to check for
+     * @return the team that the player with uuid is on
+     */
+    public String getTeam(UUID uuid) {
+        if (redTeam.containsPlayer(uuid)) {
+            return ChatColor.RED + "red";
+        }
+        if (blueTeam.containsPlayer(uuid)) {
+            return ChatColor.BLUE + "blue";
+        }
+        for (MissileWarsPlayer missileWarsPlayer : redQueue) {
+            if (uuid.equals(missileWarsPlayer.getMCPlayerId())) {
+                return ChatColor.RED + "red";
+            }
+        }
+        for (MissileWarsPlayer missileWarsPlayer : blueQueue) {
+            if (uuid.equals(missileWarsPlayer.getMCPlayerId())) {
+                return ChatColor.BLUE + "blue";
+            }
+        }
+        return "no team";
+    }
+
+    /**
+     * Get the position in queue of a certain player with a given UUID.
+     *
+     * @param uuid the uuid to check for
+     * @return the position in queue of a certain player with a given UUID or -1 if they are not in a queue
+     */
+    public int getPositionInQueue(UUID uuid) {
+        // Check red queue
+        int pos = 1;
+        for (MissileWarsPlayer player : redQueue) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return pos;
+            }
+            pos++;
+        }
+
+        // Check blue queue
+        pos = 1;
+        for (MissileWarsPlayer player : blueQueue) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return pos;
+            }
+            pos++;
+        }
+        return -1;
+    }
+
+    /**
+     * Get the number of seconds until the game starts.
+     *
+     * @return the number of seconds until the game starts
+     */
+    public long getSecondsUntilStart() {
+        // Ensure arena is set to start
+        if (startTime == null) {
+            return 0;
+        }
+        return Duration.between(LocalDateTime.now(), startTime).toSeconds();
+    }
+
+    /**
+     * Get the number of minutes remaining in the game.
+     *
+     * @return the number of minutes remaining in the game
+     */
+    public long getMinutesRemaining() {
+        int totalMins = ConfigUtils.getConfigFile("default-settings.yml").getInt("game-length");
+        long minsTaken = Duration.between(startTime, LocalDateTime.now()).toMinutes();
+        return totalMins - minsTaken;
+    }
+
+    /**
+     * Get the number of player currently in the game.
+     *
+     * @return the number of player currently in the game
+     */
+    public int getNumPlayers() {
+        return players.size();
+    }
+
+    /**
+     * Get the max number of players allowed in the game.
+     *
+     * @return the max number of players allowed in the game
+     */
+    public int getCapacity() {
+        return capacity;
     }
 
 }
