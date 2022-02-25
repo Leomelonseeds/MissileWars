@@ -18,3 +18,19 @@ game_end_reminder:
   sound: ENTITY_CHICKEN_EGG
   volume: 1.0
   pitch: 1.0
+join_arena:
+  sound: ENTITY_ENDERMAN_TELEPORT
+  volume: 0.5
+  pitch: 1.0
+spawn_shield:
+  sound: BLOCK_GLASS_BREAK
+  volume: 2.0
+  pitch: 0.5
+player_kill:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 1.0
+  pitch: 1.0
+dropped_item_warning:
+  sound: BLOCK_NOTE_BLOCK_BASS
+  volume: 1.0
+  pitch: 0.0
