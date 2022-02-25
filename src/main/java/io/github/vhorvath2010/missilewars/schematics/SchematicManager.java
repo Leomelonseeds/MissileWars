@@ -9,12 +9,15 @@ import com.sk89q.worldedit.math.Vector3;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.Vector;
@@ -49,9 +52,11 @@ public class SchematicManager {
      * @param structureName the name of the structure
      * @param loc the location to spawn the structure (pre-offset)
      * @param rotation the rotation to be applied to the structure after the offset
+     * @param blueMissile if the NBT structure is a blue missile
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, StructureRotation rotation) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, StructureRotation rotation,
+                                            boolean blueMissile) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         File offsetDataFile = new File(plugin.getDataFolder(), "items.yml");
@@ -85,6 +90,20 @@ public class SchematicManager {
         // Apply offset
         Location spawnLoc = loc;
         loc.add(getVector(structureConfig, structureName + ".offset"));
+
+        // Replace convert red blocks to blue blocks if needed
+        if (blueMissile) {
+            Palette blockPalette = structure.getPalettes().get(0);
+            for (BlockState data : blockPalette.getBlocks()) {
+                String type = data.getType().toString();
+                if (type.contains("RED_")) {
+                    Material newMat = Material.getMaterial(type.replace("RED_", "BLUE_"));
+                    if (newMat != null) {
+                        data.setType(newMat);
+                    }
+                }
+            }
+        }
 
         // Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
