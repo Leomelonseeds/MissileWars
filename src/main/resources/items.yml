@@ -1,0 +1,206 @@
+# yay item lol epic gamer
+# file, item, name, lore, offset (i think that's it?)
+# file and offset not exist for items without schematic
+# Unicode symbols: item ☢ ⚔ ★ ; kit ⚡ ⚜ &l☣ ⚒
+
+# Vanguard missiles
+
+lightning:
+  file: 'lightning.nbt'
+  item: OCELOT_SPAWN_EGG
+  name: "&e☢ Lightning ⚡"
+  lore:
+  - ""
+  - "&7The classic, speedy missile."
+  - ""
+  - "&aSpeed: &f3.3m/s"
+  - "&cTNT: &f10"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+hurricane: {}
+
+cruiser: {}
+thunderbolt: {}
+
+hilt: {}
+dagger: {}
+
+supersonic: {}
+hypersonic: {}
+
+tomahawk:
+  file: 'tomahawk.nbt'
+  item: ZOMBIE_SPAWN_EGG
+  name: "&a☢ Tomahawk ⚡"
+  lore:
+  - ""
+  - "&7The first missile to ever be designed."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f12"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+tomatwo: {}
+
+
+# Sentinel missiles
+
+guardian:
+  file: 'guardian.nbt'
+  item: GUARDIAN_SPAWN_EGG
+  name: "&3☢ Guardian ⚜"
+  lore:
+  - ""
+  - "&7A simple, defensive missile."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f5"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+elder_guardian: {}
+
+gemini: {}
+gemini_warrior: {}
+
+cronullifier: {}
+aeonullifier: {}
+
+sword: {}
+blade: {}
+
+piranha: {}
+anglerfish: {}
+
+
+# Berserker missiles
+
+supporter: {}
+auxiliary: {}
+
+warhead: {}
+bullet: {}
+
+juggernaut:
+  file: 'juggernaut.nbt'
+  item: CHICKEN_SPAWN_EGG
+  name: "&c☢ Juggernaut &c&l☣"
+  lore:
+  - ""
+  - "&7This classic missile packs a punch."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f23"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+juggerbuster: {}
+
+breaker: {}
+rifter: {}
+
+shieldbuster:
+  file: 'shieldbuster.nbt'
+  item: WITCH_SPAWN_EGG
+  name: "&2☢ Shieldbuster &c&l☣"
+  lore:
+  - ""
+  - "&7This classic missile is able to"
+  - "&7bust through a thin layer of blocks."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f17"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+shark: {}
+
+
+# Architect missiles
+
+shipper: {}
+slasher: {}
+
+slingshot: {}
+catapult: {}
+
+citadel: {}
+fortress: {}
+
+pisces: {}
+aries: {}
+
+ant: {}
+lifter: {}
+
+
+# Utility items
+
+splash: {}
+
+nova_rocket: {}
+
+shield_1: {}
+shield_2:
+  file: 'shield_2.nbt'
+  item: SNOWBALL
+  name: "&f★ Shield ⚒"
+  lore:
+  - ""
+  - "&7Creates a barrier that is able"
+  - "&7to block most missiles."
+  - ""
+  - "&9Size: &f2"
+  offset:
+    x: 0
+    y: 0
+    z: 0
+shield_3: {}
+
+platform_1: {}
+platform_2: {}
+platform_3: {}
+
+torpedo_1: {}
+torpedo_2: {}
+
+obsidian_shield_1: {}
+obsidian_shield_2: {}
+
+canopy: {}
+
+spawn_creeper: {}
+spawn_creeper_charged: {}
+
+fireball:
+  item: FIRE_CHARGE
+  name: "&4★ Fireball &4&l☣"
+  lore:
+  - ""
+  - "&7*Ghast noises*"
+  - ""
+  - "&4Power: &f0"
+
+leaves: {}
+
+
+# Gear items (just used for names and lores i guess)
+
+vanguard_sword: {}
+sentinel_bow:
+  item: BOW
+  name: "&b⚔ Bow ⚜"
+  lore:
+  - ""
+  - "&7Could this be the legendary Gunblade?"
+berserker_crossbow: {}
+architect_shears: {}
+
+

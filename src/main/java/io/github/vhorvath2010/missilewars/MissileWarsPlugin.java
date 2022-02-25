@@ -24,7 +24,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         saveIfNotPresent("default-settings.yml");
         saveIfNotPresent("messages.yml");
         saveIfNotPresent("sounds.yml");
-        saveIfNotPresent("structures.yml");
+        saveIfNotPresent("items.yml");
         saveIfNotPresent("maps.yml");
 
         // Startup schematic management

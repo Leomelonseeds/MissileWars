@@ -54,7 +54,7 @@ public class SchematicManager {
     public static boolean spawnNBTStructure(String structureName, Location loc, StructureRotation rotation) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        File offsetDataFile = new File(plugin.getDataFolder(), "structures.yml");
+        File offsetDataFile = new File(plugin.getDataFolder(), "items.yml");
         FileConfiguration structureConfig = new YamlConfiguration();
         if (offsetDataFile.exists()) {
             try {
