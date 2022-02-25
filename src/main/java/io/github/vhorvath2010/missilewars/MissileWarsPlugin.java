@@ -1,7 +1,9 @@
 package io.github.vhorvath2010.missilewars;
 
+import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,6 +21,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
         // Load instance
         plugin = this;
 
+        // Register serializable data
+        ConfigurationSerialization.registerClass(Arena.class);
+
         // Save data files
         saveDefaultConfig();
         saveIfNotPresent("default-settings.yml");
@@ -34,6 +39,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Load arenas
         arenaManager = new ArenaManager();
+        arenaManager.loadArenas();
     }
 
     /**
@@ -50,7 +56,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        // Save arenas to data file
+        arenaManager.saveArenas();
     }
 
     /**

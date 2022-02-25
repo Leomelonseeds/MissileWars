@@ -5,12 +5,16 @@ import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 /** Represents a MissileWarsArena where the game will be played. */
-public class Arena {
+public class Arena implements ConfigurationSerializable {
 
     /** The arena name. */
     private String name;
@@ -40,6 +44,28 @@ public class Arena {
     public Arena(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
+    }
+
+    /**
+     * Serialize the Arena for yml storage.
+     *
+     * @return a map mapping the variables as string to their objects
+     */
+    public Map<String, Object> serialize() {
+        Map<String, Object> serializedArena = new HashMap<>();
+        serializedArena.put("name", name);
+        serializedArena.put("capacity", capacity);
+        return serializedArena;
+    }
+
+    /**
+     * Constructor from a serialized Arena.
+     *
+     * @param serializedArena the yml serialized Arena
+     */
+    public Arena(Map<String, Object> serializedArena) {
+        name = (String) serializedArena.get("name");
+        capacity = (int) serializedArena.get("capacity");
     }
 
     /**

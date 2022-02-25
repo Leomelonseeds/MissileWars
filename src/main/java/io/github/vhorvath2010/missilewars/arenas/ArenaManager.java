@@ -1,12 +1,17 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +24,42 @@ public class ArenaManager {
     /** Default constructor */
     public ArenaManager() {
         loadedArenas = new ArrayList<>();
+    }
+
+    /** Load arenas from data file */
+    public void loadArenas() {
+        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+
+        // Acquire arenas from data file
+        if (arenaFile.exists()) {
+            FileConfiguration arenaConfig = new YamlConfiguration();
+            try {
+                arenaConfig.load(arenaFile);
+                if (arenaConfig.contains("arenas")) {
+                    loadedArenas = (List<Arena>) arenaConfig.get("arenas");
+                }
+            } catch (IOException | InvalidConfigurationException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Load worlds for arenas
+        assert loadedArenas != null;
+        for (Arena arena : loadedArenas) {
+            new WorldCreator("mwarena_" + arena.getName()).createWorld();
+        }
+    }
+
+    /** Save arenas from data file */
+    public void saveArenas() {
+        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+        FileConfiguration arenaConfig = new YamlConfiguration();
+        arenaConfig.set("arenas", loadedArenas);
+        try {
+            arenaConfig.save(arenaFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -61,8 +102,10 @@ public class ArenaManager {
         creator.sendMessage(ChatColor.GREEN + "Generating lobby...");
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld)) {
             creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
+            return false;
         } else {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
+            assert arenaWorld != null;
         }
 
         // Spawn barrier wall
@@ -83,6 +126,7 @@ public class ArenaManager {
             creator.sendMessage(ChatColor.GREEN + "Default map generated!");
         } else {
             creator.sendMessage(ChatColor.RED + "Error generating default map! Are schematic files present?");
+            return false;
         }
 
         // Register Arena
