@@ -51,12 +51,10 @@ public class SchematicManager {
      *
      * @param structureName the name of the structure
      * @param loc the location to spawn the structure (pre-offset)
-     * @param rotation the rotation to be applied to the structure after the offset
-     * @param blueMissile if the NBT structure is a blue missile
+     * @param redMissile if the NBT structure is a red missile
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, StructureRotation rotation,
-                                            boolean blueMissile) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         File offsetDataFile = new File(plugin.getDataFolder(), "items.yml");
@@ -88,16 +86,18 @@ public class SchematicManager {
         }
 
         // Apply offset
-        Location spawnLoc = loc;
-        loc.add(getVector(structureConfig, structureName + ".offset"));
+        Location spawnLoc = loc.clone();
+        spawnLoc.add(getVector(structureConfig, structureName + ".offset"));
 
-        // Replace convert red blocks to blue blocks if needed
-        if (blueMissile) {
+        // Replace convert blue blocks to red blocks and apply rotation if needed
+        StructureRotation rotation = StructureRotation.NONE;
+        if (redMissile) {
+            rotation = StructureRotation.CLOCKWISE_180;
             Palette blockPalette = structure.getPalettes().get(0);
             for (BlockState data : blockPalette.getBlocks()) {
                 String type = data.getType().toString();
-                if (type.contains("RED_")) {
-                    Material newMat = Material.getMaterial(type.replace("RED_", "BLUE_"));
+                if (type.contains("BLUE_")) {
+                    Material newMat = Material.getMaterial(type.replace("BLUE_", "RED_"));
                     if (newMat != null) {
                         data.setType(newMat);
                     }
