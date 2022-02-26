@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -204,7 +205,7 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of player currently in the game
      */
     public int getNumPlayers() {
-        return players.size();
+        return players.size() - spectators.size();
     }
 
     /**
@@ -214,6 +215,21 @@ public class Arena implements ConfigurationSerializable {
      */
     public int getCapacity() {
         return capacity;
+    }
+
+    /**
+     * Attempt to add a player to the Arena.
+     *
+     * @param player the player
+     * @return true if the player joined the Arena, otherwise false
+     */
+    public boolean joinPlayer(Player player) {
+        if (getNumPlayers() >= capacity) {
+            return false;
+        }
+        players.add(new MissileWarsPlayer(player));
+        player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
+        return true;
     }
 
 }

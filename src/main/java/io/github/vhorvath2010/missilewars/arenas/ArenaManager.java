@@ -1,6 +1,7 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
@@ -82,6 +83,19 @@ public class ArenaManager {
     }
 
     /**
+     * Get an Arena by index.
+     *
+     * @param index the index of the Arena
+     * @return the Arena, or null if it doesn't exist
+     */
+    public Arena getArena(int index) {
+        if (index < 0 || index >= loadedArenas.size()) {
+            return null;
+        }
+        return loadedArenas.get(index);
+    }
+
+    /**
      * Create a new Arena given a name with default player capacity.
      *
      * @param name the name of the Arena
@@ -159,6 +173,7 @@ public class ArenaManager {
             arenaItem.setItemMeta(arenaItemMeta);
             selector.addItem(arenaItem);
         }
+        ArenaInventoryEvents.selectingArena.add(player);
         player.openInventory(selector);
     }
 

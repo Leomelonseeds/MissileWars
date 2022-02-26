@@ -12,3 +12,4 @@ commands:
       - umw
 depend:
   - WorldEdit
+  - PlaceholderAPI
