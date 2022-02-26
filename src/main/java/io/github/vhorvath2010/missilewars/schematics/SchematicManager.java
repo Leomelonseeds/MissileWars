@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.Vector3;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,17 +58,8 @@ public class SchematicManager {
     public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        File offsetDataFile = new File(plugin.getDataFolder(), "items.yml");
-        FileConfiguration structureConfig = new YamlConfiguration();
-        if (offsetDataFile.exists()) {
-            try {
-                structureConfig.load(offsetDataFile);
-            } catch (IOException | InvalidConfigurationException e) {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "items.yml");
 
         // Attempt to get structure file
         if (!structureConfig.contains(structureName + ".file")) {
@@ -121,18 +113,12 @@ public class SchematicManager {
     public static boolean spawnFAWESchematic(String schematicName, World world) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        File schematicsFile = new File(plugin.getDataFolder(), "maps.yml");
-        FileConfiguration schematicConfig = new YamlConfiguration();
-        try {
-            schematicConfig.load(schematicsFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            System.out.println("no schem config found");
-            return false;
-        }
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                        .toString(), "maps.yml");
 
         // Acquire WE clipboard
         if (!schematicConfig.contains(schematicName + ".file")) {
-            System.out.println("no schem file found");
+            System.out.println("no schem file found!");
             return false;
         }
         File schematicFile = new File(plugin.getDataFolder() + File.separator + "maps",

@@ -127,7 +127,8 @@ public class ArenaManager {
         }
 
         // Spawn barrier wall
-        FileConfiguration settings = ConfigUtils.getConfigFile("default-settings.yml");
+        FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml");
         int length = settings.getInt("barrier.length");
         int x = settings.getInt("barrier.center.x");
         int zCenter = settings.getInt("barrier.center.z");

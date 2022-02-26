@@ -20,11 +20,12 @@ public class ConfigUtils {
     /**
      * Method to get a config file from its yml name.
      *
-     * @param name the name of the file
+     * @param dir the directory of the config file
+     * @param configName the name of the config file
      * @return the config
      */
-    public static FileConfiguration getConfigFile(String name) {
-        File file = new File(MissileWarsPlugin.getPlugin().getDataFolder(), name);
+    public static FileConfiguration getConfigFile(String dir, String configName) {
+        File file = new File(dir, configName);
         FileConfiguration config = new YamlConfiguration();
         try {
             config.load(file);
@@ -56,7 +57,8 @@ public class ConfigUtils {
 
         // Set umw arena-less placeholders
         msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime());
-        FileConfiguration messageConfig = getConfigFile("messages.yml");
+        FileConfiguration messageConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "messages.yml");
         msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
         msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));
         msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
@@ -76,7 +78,8 @@ public class ConfigUtils {
      * @return the parsed String
      */
     public static String getConfigText(String path, Player player, Arena arena) {
-        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "messages.yml");
         return setPlaceholders(messagesConfig.getString(path), player, arena);
     }
 
@@ -90,7 +93,8 @@ public class ConfigUtils {
      */
     public static List<String> getConfigTextList(String path, Player player, Arena arena) {
         List<String> list = new ArrayList<>();
-        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "messages.yml");
         for (String msg : messagesConfig.getStringList(path)) {
             list.add(setPlaceholders(msg, player, arena));
         }
@@ -105,7 +109,8 @@ public class ConfigUtils {
      * @param arena the arena to associate the placeholders with
      */
     public static void sendConfigMessage(String path, Player player, Arena arena) {
-        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "messages.yml");
         String prefix = messagesConfig.getString("messages.prefix");
 
         // Check for multi line message

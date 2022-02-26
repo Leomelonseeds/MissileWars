@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
@@ -103,7 +104,8 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of minutes remaining when chaos time activates
      */
     public static int getChaosTime() {
-        return ConfigUtils.getConfigFile("default-settings.yml").getInt("chaos-mode.time-left");
+        return ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml").getInt("chaos-mode.time-left");
     }
 
     /**
@@ -194,7 +196,8 @@ public class Arena implements ConfigurationSerializable {
         if (startTime == null) {
             return 0;
         }
-        int totalMins = ConfigUtils.getConfigFile("default-settings.yml").getInt("game-length");
+        int totalMins = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml").getInt("game-length");
         long minsTaken = Duration.between(startTime, LocalDateTime.now()).toMinutes();
         return totalMins - minsTaken;
     }
