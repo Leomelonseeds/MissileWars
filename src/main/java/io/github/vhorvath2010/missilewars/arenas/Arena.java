@@ -46,6 +46,10 @@ public class Arena implements ConfigurationSerializable {
     public Arena(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
+        players = new ArrayList<>();
+        spectators = new ArrayList<>();
+        redQueue = new LinkedList<>();
+        blueQueue = new LinkedList<>();
     }
 
     /**
@@ -68,6 +72,10 @@ public class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
+        players = new ArrayList<>();
+        spectators = new ArrayList<>();
+        redQueue = new LinkedList<>();
+        blueQueue = new LinkedList<>();
     }
 
     /**
@@ -114,6 +122,9 @@ public class Arena implements ConfigurationSerializable {
      * @return the team that the player with uuid is on
      */
     public String getTeam(UUID uuid) {
+        if (redTeam == null || blueTeam == null) {
+            return "no team";
+        }
         if (redTeam.containsPlayer(uuid)) {
             return ChatColor.RED + "red";
         }
@@ -179,6 +190,9 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of minutes remaining in the game
      */
     public long getMinutesRemaining() {
+        if (startTime == null) {
+            return 0;
+        }
         int totalMins = ConfigUtils.getConfigFile("default-settings.yml").getInt("game-length");
         long minsTaken = Duration.between(startTime, LocalDateTime.now()).toMinutes();
         return totalMins - minsTaken;

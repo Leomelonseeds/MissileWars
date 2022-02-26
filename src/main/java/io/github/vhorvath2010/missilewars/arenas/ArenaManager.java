@@ -9,6 +9,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,6 +136,30 @@ public class ArenaManager {
         // Register Arena
         loadedArenas.add(arena);
         return true;
+    }
+
+    /**
+     * Open the arena selector for a given player.
+     *
+     * @param player the player
+     */
+    public void openArenaSelector(Player player) {
+        Inventory selector = Bukkit.createInventory(null, 27,
+                ConfigUtils.getConfigText("inventories.game-selector.title", player, null));
+
+        // Add Arena items
+        for (Arena arena : loadedArenas) {
+            ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
+            ItemMeta arenaItemMeta = arenaItem.getItemMeta();
+            assert arenaItemMeta != null;
+            arenaItemMeta.setDisplayName(ConfigUtils.getConfigText("inventories.game-selector.game-item.name",
+                    player, arena));
+            arenaItemMeta.setLore(ConfigUtils.getConfigTextList("inventories.game-selector.game-item.lore",
+                    player, arena));
+            arenaItem.setItemMeta(arenaItemMeta);
+            selector.addItem(arenaItem);
+        }
+        player.openInventory(selector);
     }
 
 }

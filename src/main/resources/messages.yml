@@ -22,12 +22,12 @@ messages:
   buff-team: "You will recieve items faster because a teammate left."
   nerf-team: "You will recieve items slower since a teammate joined."
   # All lines sent simultaneously, with prefix included
-  classic_start:
+  classic-start:
     - "Welcome to &dMissile &5Wars &7- &aClassic"
     - "&bBlow up your opponents' nether portals to win!"
     - "&aRight-click &7your items to use them."
     - "&aType /leave &7to go back to the lobby."
-  classic_end:
+  classic-end:
     # mvps - players who blew up portals
     - "&5MVPs: %umw_mvps%"
     # If tied for top killer/deaths, list both
@@ -66,7 +66,7 @@ titles:
   
 scoreboard:
   title: "&d&lMissile &5&lWars"
-  lines_main_lobby:
+  lines-main-lobby:
     - "&7&m－－－－－－－－－－－－"
     - "&bWelcome %displayname%&f!"
     - ""
@@ -74,7 +74,7 @@ scoreboard:
     - "&fto join a game!"
     - "&7&m－－－－－－－－－－－－"
     - "&5play.ultimamc.net"
-  lines_waiting:
+  lines-waiting:
     - "&7&m－－－－－－－－－－－－"
     - "&fGamemode: &a%umw_gamemode%"
     - "&fMap: &a%umw_map%"
@@ -82,7 +82,7 @@ scoreboard:
     - "&fStarting in: %umw_time%"
     - "&7&m－－－－－－－－－－－－"
     - "&5play.ultimamc.net"
-  lines_classic:
+  lines-classic:
     - "&7&m－－－－－－－－－－－－"
     - "&fGamemode: &aClassic"
     - ""
@@ -93,7 +93,7 @@ scoreboard:
     - "&7&m－－－－－－－－－－－－"
     - "&5play.ultimamc.net"
   #For future use
-  lines_ctf: []
+  lines-ctf: []
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  
@@ -103,3 +103,13 @@ placeholders:
     active: "&eIn-game"
     full: "&cFull - spectators only"
     finished: "&9Resetting..."
+
+# For GUI inventory customization
+inventories:
+  game-selector:
+    title: "&c&lSelect a game!"
+    game-item:
+      name: "&c%umw_arena%"
+      lore:
+        - "&7Players: %umw_arena_players%/%umw_arena_cap%"
+        - "&7Click to join, %player_name%!"

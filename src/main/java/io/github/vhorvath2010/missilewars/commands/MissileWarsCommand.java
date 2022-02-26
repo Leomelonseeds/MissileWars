@@ -2,6 +2,7 @@ package io.github.vhorvath2010.missilewars.commands;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +22,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(player, "You must specify an action!");
+            sendErrorMsg(player, "Usage: /umw <CreateArena/OpenGameMenu>");
             return true;
         }
 
@@ -50,7 +51,32 @@ public class MissileWarsCommand implements CommandExecutor {
             // Create new arena
             if (arenaManager.createArena(arenaName, player)) {
                 sendSuccessMsg(player, "New arena created!");
+                return true;
             }
+        }
+
+        // Open game selector
+        if (action.equalsIgnoreCase("OpenGameMenu")) {
+            // Ensure player is allowed to open game menu
+            if (!player.hasPermission("umw.create-arena")) {
+                sendErrorMsg(player, "You do not have permission to do that!");
+                return true;
+            }
+
+            // Check if opening for another player
+            Player target = player;
+            if (args.length == 2) {
+                Player possibleTarget = Bukkit.getPlayer(args[1]);
+                if (possibleTarget != null) {
+                    target = possibleTarget;
+                } else {
+                    sendErrorMsg(player, "Targeted player not found!");
+                    return true;
+                }
+            }
+            arenaManager.openArenaSelector(target);
+            sendSuccessMsg(player, "Game selector opened!");
+            return true;
         }
         return true;
     }

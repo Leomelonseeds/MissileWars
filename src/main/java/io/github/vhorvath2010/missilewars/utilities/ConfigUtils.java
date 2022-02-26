@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
@@ -63,6 +65,36 @@ public class ConfigUtils {
         // Set PAPI placeholders and color
         String parsedMsg = PlaceholderAPI.setPlaceholders(player, msg);
         return ChatColor.translateAlternateColorCodes('&', parsedMsg);
+    }
+
+    /**
+     * Get a parsed String from the messages.yml file.
+     *
+     * @param path the path to the String
+     * @param player the player to set placeholders with
+     * @param arena the arena to associate the placeholders with
+     * @return the parsed String
+     */
+    public static String getConfigText(String path, Player player, Arena arena) {
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        return setPlaceholders(messagesConfig.getString(path), player, arena);
+    }
+
+    /**
+     * Get a list of parsed Strings from the messages.yml file.
+     *
+     * @param path the path to the String list
+     * @param player the player to set placeholders with
+     * @param arena the arena to associate placeholders with
+     * @return the list of parsed Strings
+     */
+    public static List<String> getConfigTextList(String path, Player player, Arena arena) {
+        List<String> list = new ArrayList<>();
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        for (String msg : messagesConfig.getStringList(path)) {
+            list.add(setPlaceholders(msg, player, arena));
+        }
+        return list;
     }
 
     /**
