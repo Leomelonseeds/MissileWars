@@ -15,9 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
@@ -38,7 +36,7 @@ public class SchematicManager {
      * @param path the path to the x, y, z offset data
      * @return the x, y, z offset as a vector
      */
-    private static Vector getVector(FileConfiguration config, String path) {
+    public static Vector getVector(FileConfiguration config, String path) {
         Vector vector = new Vector();
         if (config.contains(path)) {
             vector = new Vector(config.getDouble(path + ".x"), config.getDouble(path + ".y"),

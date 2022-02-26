@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,6 +126,12 @@ public class ArenaManager {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
             assert arenaWorld != null;
         }
+
+        // Setup world spawn to lobby center
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        Vector spawnVector = SchematicManager.getVector(schematicConfig, "lobby.pos");
+        arenaWorld.setSpawnLocation(spawnVector.getBlockX(), spawnVector.getBlockY(), spawnVector.getBlockZ());
 
         // Spawn barrier wall
         FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
