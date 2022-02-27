@@ -1,6 +1,7 @@
 package io.github.vhorvath2010.missilewars.commands;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,16 +14,9 @@ public class MissileWarsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Ensure user is a player
-        if (!(sender instanceof Player)) {
-            sendErrorMsg(sender, "You must be a player to do that!");
-            return true;
-        }
-        Player player = (Player) sender;
-
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(player, "Usage: /umw <CreateArena/OpenGameMenu>");
+            sendErrorMsg(sender, "Usage: /umw <CreateArena/OpenGameMenu/EnqueueRed/EnqueueBlue>");
             return true;
         }
 
@@ -32,25 +26,25 @@ public class MissileWarsCommand implements CommandExecutor {
         ArenaManager arenaManager = plugin.getArenaManager();
         if (action.equalsIgnoreCase("CreateArena")) {
             // Ensure player is allowed to create an arena
-            if (!player.hasPermission("umw.create-arena")) {
-                sendErrorMsg(player, "You do not have permission to do that!");
+            if (!sender.hasPermission("umw.create-arena")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
             }
 
             // Validate given arena name
             if (args.length < 2) {
-                sendErrorMsg(player, "Usage: /umw CreateArena <arena-name>");
+                sendErrorMsg(sender, "Usage: /umw CreateArena <arena-name>");
                 return true;
             }
             String arenaName = args[1];
             if (arenaManager.getArena(arenaName) != null) {
-                sendErrorMsg(player, "An arena with that name already exists!");
+                sendErrorMsg(sender, "An arena with that name already exists!");
                 return true;
             }
 
             // Create new arena
-            if (arenaManager.createArena(arenaName, player)) {
-                sendSuccessMsg(player, "New arena created!");
+            if (arenaManager.createArena(arenaName, sender)) {
+                sendSuccessMsg(sender, "New arena created!");
                 return true;
             }
         }
@@ -58,26 +52,108 @@ public class MissileWarsCommand implements CommandExecutor {
         // Open game selector
         if (action.equalsIgnoreCase("OpenGameMenu")) {
             // Ensure player is allowed to open game menu
-            if (!player.hasPermission("umw.open-arena-menu")) {
-                sendErrorMsg(player, "You do not have permission to do that!");
+            if (!sender.hasPermission("umw.open-arena-menu")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
             }
 
             // Check if opening for another player
-            Player target = player;
+            if (args.length == 2) {
+                Player possibleTarget = Bukkit.getPlayer(args[1]);
+                if (possibleTarget != null) {
+                    arenaManager.openArenaSelector(possibleTarget);
+                } else {
+                    sendErrorMsg(sender, "Targeted player not found!");
+                    return true;
+                }
+            } else {
+                if (!(sender instanceof Player)) {
+                    sendErrorMsg(sender, "You are not a player!");
+                }
+                arenaManager.openArenaSelector((Player) sender);
+            }
+            sendSuccessMsg(sender, "Game selector opened!");
+            return true;
+        }
+
+        // Queue for red team
+        if (action.equalsIgnoreCase("EnqueueRed")) {
+            // Ensure player is allowed to open team menu
+            if (!sender.hasPermission("umw.enqueue")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            // Check if opening for another player
+            Player target = null;
             if (args.length == 2) {
                 Player possibleTarget = Bukkit.getPlayer(args[1]);
                 if (possibleTarget != null) {
                     target = possibleTarget;
                 } else {
-                    sendErrorMsg(player, "Targeted player not found!");
+                    sendErrorMsg(sender, "Targeted player not found!");
                     return true;
                 }
+            } else {
+                if (!(sender instanceof Player)) {
+                    sendErrorMsg(sender, "You are not a player!");
+                }
+                target = (Player) sender;
             }
-            arenaManager.openArenaSelector(target);
-            sendSuccessMsg(player, "Game selector opened!");
+
+            // Check if player is in arena
+            Arena arena = arenaManager.getArena(target.getUniqueId());
+            if (arena == null) {
+                sendErrorMsg(sender, "Target is not in an arena");
+                return true;
+            }
+
+            // Enqueue for red team
+            arena.enqueueRed(target.getUniqueId());
+
+            sendSuccessMsg(sender, "Enqueued player for red team!");
             return true;
         }
+
+        // Queue for blue team
+        if (action.equalsIgnoreCase("EnqueueBlue")) {
+            // Ensure player is allowed to open team menu
+            if (!sender.hasPermission("umw.enqueue")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            // Check if opening for another player
+            Player target = null;
+            if (args.length == 2) {
+                Player possibleTarget = Bukkit.getPlayer(args[1]);
+                if (possibleTarget != null) {
+                    target = possibleTarget;
+                } else {
+                    sendErrorMsg(sender, "Targeted player not found!");
+                    return true;
+                }
+            } else {
+                if (!(sender instanceof Player)) {
+                    sendErrorMsg(sender, "You are not a player!");
+                }
+                target = (Player) sender;
+            }
+
+            // Check if player is in arena
+            Arena arena = arenaManager.getArena(target.getUniqueId());
+            if (arena == null) {
+                sendErrorMsg(sender, "Target is not in an arena");
+                return true;
+            }
+
+            // Enqueue for red team
+            arena.enqueueBlue(target.getUniqueId());
+
+            sendSuccessMsg(sender, "Enqueued player for blue team!");
+            return true;
+        }
+
         return true;
     }
 

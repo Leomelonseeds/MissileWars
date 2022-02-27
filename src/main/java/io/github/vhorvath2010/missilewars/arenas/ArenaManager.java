@@ -6,6 +6,7 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -119,7 +120,7 @@ public class ArenaManager {
      * @param creator the creator of the world
      * @return true if the Arena was created, otherwise false
      */
-    public boolean createArena(String name, Player creator) {
+    public boolean createArena(String name, CommandSender creator) {
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
             creator.sendMessage(ChatColor.RED + "A world already exists for that arena!");

@@ -261,10 +261,38 @@ public class Arena implements ConfigurationSerializable {
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
         spectators.remove(toRemove);
+        blueQueue.remove(toRemove);
+        redQueue.remove(toRemove);
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             mcPlayer.getInventory().clear();
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
+        }
+    }
+
+    /**
+     * Enqueue a player with a given UUID to the red team.
+     *
+     * @param uuid the Player's UUID
+     */
+    public void enqueueRed(UUID uuid) {
+        MissileWarsPlayer player = new MissileWarsPlayer(uuid);
+        if (!redQueue.contains(player)) {
+            blueQueue.remove(player);
+            redQueue.add(player);
+        }
+    }
+
+    /**
+     * Enqueue a player with a given UUID to the blue team.
+     *
+     * @param uuid the Player's UUID
+     */
+    public void enqueueBlue(UUID uuid) {
+        MissileWarsPlayer player = new MissileWarsPlayer(uuid);
+        if (!blueQueue.contains(player)) {
+            redQueue.remove(player);
+            blueQueue.add(player);
         }
     }
 
