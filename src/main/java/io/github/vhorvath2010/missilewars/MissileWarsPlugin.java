@@ -8,6 +8,7 @@ import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -63,6 +64,14 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Remove players from arenas
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Arena playerArena = arenaManager.getArena(player.getUniqueId());
+            if (playerArena == null) {
+                continue;
+            }
+            playerArena.removePlayer(player.getUniqueId());
+        }
         // Save arenas to data file
         arenaManager.saveArenas();
     }
