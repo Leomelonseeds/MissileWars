@@ -7,6 +7,7 @@ import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -230,9 +231,41 @@ public class Arena implements ConfigurationSerializable {
         if (getNumPlayers() >= capacity) {
             return false;
         }
-        players.add(new MissileWarsPlayer(player));
+        players.add(new MissileWarsPlayer(player.getUniqueId()));
         player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
+        player.setGameMode(GameMode.ADVENTURE);
         return true;
+    }
+
+    /**
+     * Check if a player with a given UUID is in this Arena.
+     *
+     * @param uuid the UUID of the player
+     * @return true if the player is in this Arena, otherwise false
+     */
+    public boolean isInArena(UUID uuid) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove a player with a given UUID from the game.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void removePlayer(UUID uuid) {
+        MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
+        players.remove(toRemove);
+        spectators.remove(toRemove);
+        Player mcPlayer = toRemove.getMCPlayer();
+        if (mcPlayer != null) {
+            mcPlayer.getInventory().clear();
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
+        }
     }
 
 }

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -97,6 +98,21 @@ public class ArenaManager {
     }
 
     /**
+     * Get the Arena that a player with a given UUID is in.
+     *
+     * @param id the UUID of the player
+     * @return the Arena that the player is in, or null
+     */
+    public Arena getArena(UUID id) {
+        for (Arena arena : loadedArenas) {
+            if (arena.isInArena(id)) {
+                return arena;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Create a new Arena given a name with default player capacity.
      *
      * @param name the name of the Arena
@@ -166,6 +182,11 @@ public class ArenaManager {
      * @param player the player
      */
     public void openArenaSelector(Player player) {
+        // Stop if player is already in an arena
+        if (getArena(player.getUniqueId()) != null) {
+            player.sendMessage(ChatColor.RED + "You are already in a game!");
+            return;
+        }
         Inventory selector = Bukkit.createInventory(null, 27,
                 ConfigUtils.getConfigText("inventories.game-selector.title", player, null));
 

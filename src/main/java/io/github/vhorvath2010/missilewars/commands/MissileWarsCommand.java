@@ -58,7 +58,7 @@ public class MissileWarsCommand implements CommandExecutor {
         // Open game selector
         if (action.equalsIgnoreCase("OpenGameMenu")) {
             // Ensure player is allowed to open game menu
-            if (!player.hasPermission("umw.create-arena")) {
+            if (!player.hasPermission("umw.open-arena-menu")) {
                 sendErrorMsg(player, "You do not have permission to do that!");
                 return true;
             }
