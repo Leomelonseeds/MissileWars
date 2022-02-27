@@ -58,20 +58,13 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Check if opening for another player
-            if (args.length == 2) {
-                Player possibleTarget = Bukkit.getPlayer(args[1]);
-                if (possibleTarget != null) {
-                    arenaManager.openArenaSelector(possibleTarget);
-                } else {
-                    sendErrorMsg(sender, "Targeted player not found!");
-                    return true;
-                }
-            } else {
-                if (!(sender instanceof Player)) {
-                    sendErrorMsg(sender, "You are not a player!");
-                }
-                arenaManager.openArenaSelector((Player) sender);
+            Player target = getCommandTarget(args, sender);
+            if (target == null) {
+                sendErrorMsg(sender, "No target found!");
+                return true;
             }
+            arenaManager.openArenaSelector(target);
+
             sendSuccessMsg(sender, "Game selector opened!");
             return true;
         }
@@ -85,20 +78,10 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Check if opening for another player
-            Player target = null;
-            if (args.length == 2) {
-                Player possibleTarget = Bukkit.getPlayer(args[1]);
-                if (possibleTarget != null) {
-                    target = possibleTarget;
-                } else {
-                    sendErrorMsg(sender, "Targeted player not found!");
-                    return true;
-                }
-            } else {
-                if (!(sender instanceof Player)) {
-                    sendErrorMsg(sender, "You are not a player!");
-                }
-                target = (Player) sender;
+            Player target = getCommandTarget(args, sender);
+            if (target == null) {
+                sendErrorMsg(sender, "No target found!");
+                return true;
             }
 
             // Check if player is in arena
@@ -124,20 +107,10 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Check if opening for another player
-            Player target = null;
-            if (args.length == 2) {
-                Player possibleTarget = Bukkit.getPlayer(args[1]);
-                if (possibleTarget != null) {
-                    target = possibleTarget;
-                } else {
-                    sendErrorMsg(sender, "Targeted player not found!");
-                    return true;
-                }
-            } else {
-                if (!(sender instanceof Player)) {
-                    sendErrorMsg(sender, "You are not a player!");
-                }
-                target = (Player) sender;
+            Player target = getCommandTarget(args, sender);
+            if (target == null) {
+                sendErrorMsg(sender, "No target found!");
+                return true;
             }
 
             // Check if player is in arena
@@ -175,6 +148,33 @@ public class MissileWarsCommand implements CommandExecutor {
      */
     private void sendSuccessMsg(CommandSender target, String msg) {
         target.sendMessage(ChatColor.GREEN + "Success! " + ChatColor.GRAY + msg);
+    }
+
+    /**
+     * Get the targeted player of a command.
+     *
+     * @param args the commands arguments
+     * @param sender the sender of the command
+     * @return the player to be targeted by the command. Null if there is no viable player
+     */
+    private Player getCommandTarget(String[] args, CommandSender sender) {
+        Player target = null;
+        if (args.length == 2) {
+            Player possibleTarget = Bukkit.getPlayer(args[1]);
+            if (possibleTarget != null) {
+                target = possibleTarget;
+            } else {
+                sendErrorMsg(sender, "Targeted player not found!");
+                return null;
+            }
+        } else {
+            if (!(sender instanceof Player)) {
+                sendErrorMsg(sender, "You are not a player!");
+                return null;
+            }
+            target = (Player) sender;
+        }
+        return target;
     }
 
 }
