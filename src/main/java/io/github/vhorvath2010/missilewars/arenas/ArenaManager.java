@@ -132,6 +132,7 @@ public class ArenaManager {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator());
         World arenaWorld = arenaCreator.createWorld();
+        assert arenaWorld != null;
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
         // Create Arena lobby
@@ -141,7 +142,6 @@ public class ArenaManager {
             return false;
         } else {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
-            assert arenaWorld != null;
         }
 
         // Setup world spawn to lobby center

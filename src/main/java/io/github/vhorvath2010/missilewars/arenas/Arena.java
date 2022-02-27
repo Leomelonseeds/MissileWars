@@ -39,6 +39,8 @@ public class Arena implements ConfigurationSerializable {
     private MissileWarsTeam blueTeam;
     /** The start time of the game. In the future if game is yet to start, otherwise, in the past. */
     private LocalDateTime startTime;
+    /** Whether a game is currently running */
+    private boolean running;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -97,6 +99,15 @@ public class Arena implements ConfigurationSerializable {
      */
     private World getWorld() {
         return Bukkit.getWorld("mwarena_" + name);
+    }
+
+    /**
+     * Check if the game is currently running.
+     *
+     * @return whether a game is currently running
+     */
+    public boolean isRunning() {
+        return running;
     }
 
     /**
@@ -231,6 +242,8 @@ public class Arena implements ConfigurationSerializable {
         if (getNumPlayers() >= capacity) {
             return false;
         }
+        player.setHealth(20);
+        player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
         player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
         player.setGameMode(GameMode.ADVENTURE);
@@ -267,6 +280,7 @@ public class Arena implements ConfigurationSerializable {
         if (mcPlayer != null) {
             mcPlayer.getInventory().clear();
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
+            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this);
         }
     }
 
@@ -280,7 +294,9 @@ public class Arena implements ConfigurationSerializable {
         if (!redQueue.contains(player)) {
             blueQueue.remove(player);
             redQueue.add(player);
+            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this);
         }
+        // TODO: Join team if balanced and joining while game is running
     }
 
     /**
@@ -293,7 +309,9 @@ public class Arena implements ConfigurationSerializable {
         if (!blueQueue.contains(player)) {
             redQueue.remove(player);
             blueQueue.add(player);
+            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this);
         }
+        // TODO: Join team if balanced and joining while game is running
     }
 
 }
