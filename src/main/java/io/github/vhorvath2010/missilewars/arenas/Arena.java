@@ -137,24 +137,24 @@ public class Arena implements ConfigurationSerializable {
      * @return the team that the player with uuid is on
      */
     public String getTeam(UUID uuid) {
+        for (MissileWarsPlayer player : redQueue) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return ChatColor.RED + "red" + ChatColor.RESET;
+            }
+        }
+        for (MissileWarsPlayer player : blueQueue) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return ChatColor.BLUE + "blue" + ChatColor.RESET;
+            }
+        }
         if (redTeam == null || blueTeam == null) {
             return "no team";
         }
         if (redTeam.containsPlayer(uuid)) {
-            return ChatColor.RED + "red";
+            return ChatColor.RED + "red" + ChatColor.RESET;
         }
         if (blueTeam.containsPlayer(uuid)) {
-            return ChatColor.BLUE + "blue";
-        }
-        for (MissileWarsPlayer missileWarsPlayer : redQueue) {
-            if (uuid.equals(missileWarsPlayer.getMCPlayerId())) {
-                return ChatColor.RED + "red";
-            }
-        }
-        for (MissileWarsPlayer missileWarsPlayer : blueQueue) {
-            if (uuid.equals(missileWarsPlayer.getMCPlayerId())) {
-                return ChatColor.BLUE + "blue";
-            }
+            return ChatColor.BLUE + "blue" + ChatColor.RESET;
         }
         return "no team";
     }

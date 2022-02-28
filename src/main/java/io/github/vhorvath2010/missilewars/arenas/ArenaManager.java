@@ -5,12 +5,20 @@ import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.SheepTrait;
+import net.citizensnpcs.trait.VillagerProfession;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -144,9 +152,59 @@ public class ArenaManager {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
         }
 
-        // Setup world spawn to lobby center
+        // Spawn lobby NPCs
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "maps.yml");
+
+        // Spawn red NPC
+        Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red");
+        Location redLoc = new Location(arenaWorld, redVec.getX(), redVec.getY(), redVec.getZ());
+        redLoc.setYaw(90);
+        NPC redNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
+                ChatColor.RED + "" + ChatColor.BOLD + "Red Team");
+        CommandTrait enqueueRed = new CommandTrait();
+        enqueueRed.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueuered %player%",
+                CommandTrait.Hand.BOTH));
+        redNPC.addTrait(enqueueRed);
+        SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
+        redSheepTrait.setColor(DyeColor.RED);
+        redLoc.getWorld().loadChunk(redLoc.getChunk());
+        redNPC.spawn(redLoc);
+
+        // Spawn blue NPC
+        Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue");
+        Location blueLoc = new Location(arenaWorld, blueVec.getX(), blueVec.getY(), blueVec.getZ());
+        blueLoc.setYaw(90);
+        NPC blueNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
+                ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team");
+        CommandTrait enqueueBlue = new CommandTrait();
+        enqueueBlue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueueblue %player%",
+                CommandTrait.Hand.BOTH));
+        blueNPC.addTrait(enqueueBlue);
+        SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
+        blueSheepTrait.setColor(DyeColor.BLUE);
+        blueLoc.getWorld().loadChunk(blueLoc.getChunk());
+        blueNPC.spawn(blueLoc);
+
+
+        // Spawn bar NPC
+        Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
+        Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ());
+        barLoc.setYaw(-90);
+        NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER,
+                ChatColor.GOLD + "" + ChatColor.BOLD + "Bartender");
+        // Add command
+        CommandTrait openBar = new CommandTrait();
+        openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
+                CommandTrait.Hand.BOTH));
+        bartender.addTrait(openBar);
+        // Setup Villager Profession
+        VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
+        barLoc.getWorld().loadChunk(barLoc.getChunk());
+        bartender.spawn(barLoc);
+        profession.setProfession(Villager.Profession.NITWIT);
+
+        // Setup world spawn to lobby center
         Vector spawnVector = SchematicManager.getVector(schematicConfig, "lobby.pos");
         arenaWorld.setSpawnLocation(spawnVector.getBlockX(), spawnVector.getBlockY(), spawnVector.getBlockZ());
 

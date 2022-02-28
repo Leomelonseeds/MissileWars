@@ -13,3 +13,4 @@ commands:
 depend:
   - WorldEdit
   - PlaceholderAPI
+  - Citizens
