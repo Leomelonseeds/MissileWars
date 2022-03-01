@@ -8,6 +8,7 @@ import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.VillagerProfession;
 import org.bukkit.*;
@@ -192,12 +193,15 @@ public class ArenaManager {
         Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ());
         barLoc.setYaw(-90);
         NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER,
-                ChatColor.GOLD + "" + ChatColor.BOLD + "Bartender");
+                ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Bartender");
         // Add command
         CommandTrait openBar = new CommandTrait();
         openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
                 CommandTrait.Hand.BOTH));
         bartender.addTrait(openBar);
+        // Make him look at players TODO: Fix
+        LookClose lookPlayerTrait = bartender.getOrAddTrait(LookClose.class);
+        lookPlayerTrait.setRange(10);
         // Setup Villager Profession
         VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
         barLoc.getWorld().loadChunk(barLoc.getChunk());
