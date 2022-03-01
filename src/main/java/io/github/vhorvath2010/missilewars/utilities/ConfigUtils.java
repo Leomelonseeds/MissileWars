@@ -39,10 +39,11 @@ public class ConfigUtils {
      * Set placeholders onto a message.
      *
      * @param msg the message to parse
-     * @param player the player to set placeholders with
+     * @param player the player to send the message to and set placeholder using
      * @param arena the arena to associate the placeholders with
+     * @param focus a separate player that is the focus of the message, but not receiving it
      */
-    private static String setPlaceholders(String msg, Player player, Arena arena) {
+    private static String setPlaceholders(String msg, Player player, Arena arena, Player focus) {
         // Set umw arena placeholders
         if (arena != null) {
             msg = msg.replaceAll("%umw_arena%", arena.getName());
@@ -63,6 +64,9 @@ public class ConfigUtils {
         msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));
         msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
         msg = msg.replaceAll("umw_finished", messageConfig.getString("placeholders.status.finished"));
+        if (focus != null) {
+            msg = msg.replaceAll("%umw_focus%", focus.getDisplayName());
+        }
 
         // Set PAPI placeholders and color
         String parsedMsg = PlaceholderAPI.setPlaceholders(player, msg);
@@ -75,12 +79,13 @@ public class ConfigUtils {
      * @param path the path to the String
      * @param player the player to set placeholders with
      * @param arena the arena to associate the placeholders with
+     * @param focus a separate player that is the focus of the message, but not receiving it
      * @return the parsed String
      */
-    public static String getConfigText(String path, Player player, Arena arena) {
+    public static String getConfigText(String path, Player player, Arena arena, Player focus) {
         FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "messages.yml");
-        return setPlaceholders(messagesConfig.getString(path), player, arena);
+        return setPlaceholders(messagesConfig.getString(path), player, arena, focus);
     }
 
     /**
@@ -89,14 +94,15 @@ public class ConfigUtils {
      * @param path the path to the String list
      * @param player the player to set placeholders with
      * @param arena the arena to associate placeholders with
+     * @param focus a separate player that is the focus of the message, but not receiving it
      * @return the list of parsed Strings
      */
-    public static List<String> getConfigTextList(String path, Player player, Arena arena) {
+    public static List<String> getConfigTextList(String path, Player player, Arena arena, Player focus) {
         List<String> list = new ArrayList<>();
         FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "messages.yml");
         for (String msg : messagesConfig.getStringList(path)) {
-            list.add(setPlaceholders(msg, player, arena));
+            list.add(setPlaceholders(msg, player, arena, focus));
         }
         return list;
     }
@@ -105,10 +111,11 @@ public class ConfigUtils {
      * Send a configurable message with placeholders set for player.
      *
      * @param path the path to the message in the messages.yml file
-     * @param player the player to set placeholders with
+     * @param player the player to send the message to and set placeholder using
      * @param arena the arena to associate the placeholders with
+     * @param focus a separate player that is the focus of the message, but not receiving it
      */
-    public static void sendConfigMessage(String path, Player player, Arena arena) {
+    public static void sendConfigMessage(String path, Player player, Arena arena, Player focus) {
         FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "messages.yml");
         String prefix = messagesConfig.getString("messages.prefix");
@@ -116,14 +123,14 @@ public class ConfigUtils {
         // Check for multi line message
         if (!messagesConfig.getStringList(path).isEmpty()) {
             for (String msg : messagesConfig.getStringList(path)) {
-                player.sendMessage(setPlaceholders(prefix + msg, player, arena));
+                player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
             }
         }
 
         // Send single line message
         else {
             String msg = messagesConfig.getString(path);
-            player.sendMessage(setPlaceholders(prefix + msg, player, arena));
+            player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
         }
     }
 

@@ -199,8 +199,9 @@ public class ArenaManager {
         openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
                 CommandTrait.Hand.BOTH));
         bartender.addTrait(openBar);
-        // Make him look at players TODO: Fix
+        // Make him look at players
         LookClose lookPlayerTrait = bartender.getOrAddTrait(LookClose.class);
+        lookPlayerTrait.lookClose(true);
         lookPlayerTrait.setRange(10);
         // Setup Villager Profession
         VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
@@ -251,7 +252,7 @@ public class ArenaManager {
             return;
         }
         Inventory selector = Bukkit.createInventory(null, 27,
-                ConfigUtils.getConfigText("inventories.game-selector.title", player, null));
+                ConfigUtils.getConfigText("inventories.game-selector.title", player, null, null));
 
         // Add Arena items
         for (Arena arena : loadedArenas) {
@@ -259,9 +260,9 @@ public class ArenaManager {
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
             assert arenaItemMeta != null;
             arenaItemMeta.setDisplayName(ConfigUtils.getConfigText("inventories.game-selector.game-item.name",
-                    player, arena));
+                    player, arena,null));
             arenaItemMeta.setLore(ConfigUtils.getConfigTextList("inventories.game-selector.game-item.lore",
-                    player, arena));
+                    player, arena, null));
             arenaItem.setItemMeta(arenaItemMeta);
             selector.addItem(arenaItem);
         }

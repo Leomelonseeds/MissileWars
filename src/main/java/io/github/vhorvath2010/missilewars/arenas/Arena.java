@@ -5,12 +5,12 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -23,12 +23,10 @@ public class Arena implements ConfigurationSerializable {
     private String name;
     /** The max number of players for this arena. */
     private int capacity;
-    /** The current selected map for the arena. */
-    private GameMap map;
     /** The list of all players currently in the arena. */
-    private List<MissileWarsPlayer> players;
+    private Set<MissileWarsPlayer> players;
     /** The list of all spectators currently in the arena. */
-    private List<MissileWarsPlayer> spectators;
+    private Set<MissileWarsPlayer> spectators;
     /** The queue to join the red team. Active before the game. */
     private Queue<MissileWarsPlayer> redQueue;
     /** The queue to join the blue team. Active before the game. */
@@ -51,8 +49,8 @@ public class Arena implements ConfigurationSerializable {
     public Arena(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
-        players = new ArrayList<>();
-        spectators = new ArrayList<>();
+        players = new HashSet<>();
+        spectators = new HashSet<>();
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
     }
@@ -77,8 +75,8 @@ public class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
-        players = new ArrayList<>();
-        spectators = new ArrayList<>();
+        players = new HashSet<>();
+        spectators = new HashSet<>();
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
     }
@@ -247,6 +245,7 @@ public class Arena implements ConfigurationSerializable {
         players.add(new MissileWarsPlayer(player.getUniqueId()));
         player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
         player.setGameMode(GameMode.ADVENTURE);
+        player.getInventory().addItem(new ItemStack(Material.BOW));
         return true;
     }
 
@@ -280,7 +279,7 @@ public class Arena implements ConfigurationSerializable {
         if (mcPlayer != null) {
             mcPlayer.getInventory().clear();
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
-            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this);
+            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
     }
 
@@ -294,7 +293,7 @@ public class Arena implements ConfigurationSerializable {
         if (!redQueue.contains(player)) {
             blueQueue.remove(player);
             redQueue.add(player);
-            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this);
+            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
         }
         // TODO: Join team if balanced and joining while game is running
     }
@@ -309,9 +308,56 @@ public class Arena implements ConfigurationSerializable {
         if (!blueQueue.contains(player)) {
             redQueue.remove(player);
             blueQueue.add(player);
-            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this);
+            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
         }
         // TODO: Join team if balanced and joining while game is running
+    }
+
+    /**
+     * Starts a game in the arena with the classic arena. Different gamemodes and maps coming soon.
+     *
+     * @return true if the game started. Otherwise false
+     */
+    public boolean start() {
+        if (running) {
+            return false;
+        }
+        // Acquire red and blue spawns
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "default-map.blue-spawn");
+        Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
+        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "default-map.red-spawn");
+        Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
+        redSpawn.setYaw(180);
+
+        // Assign players to teams based on queue
+        blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
+        redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
+        Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
+        do {
+            if (!redQueue.isEmpty()) {
+                MissileWarsPlayer toAdd = redQueue.remove();
+                redTeam.addPlayer(toAdd);
+                toAssign.remove(toAdd);
+            }
+            if (!blueQueue.isEmpty()) {
+                MissileWarsPlayer toAdd = blueQueue.remove();
+                blueTeam.addPlayer(toAdd);
+                toAssign.remove(toAdd);
+            }
+        } while (!blueQueue.isEmpty() && !redQueue.isEmpty());
+
+        // Assign remaining players
+        for (MissileWarsPlayer player : toAssign) {
+            if (blueTeam.getSize() <= redTeam.getSize()) {
+                blueTeam.addPlayer(player);
+            } else {
+                redTeam.addPlayer(player);
+            }
+        }
+        running = true;
+        return true;
     }
 
 }

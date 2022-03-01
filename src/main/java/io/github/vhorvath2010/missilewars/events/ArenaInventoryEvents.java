@@ -44,12 +44,12 @@ public class ArenaInventoryEvents implements Listener {
         }
 
         // Attempt to send player to arena
-        ConfigUtils.sendConfigMessage("messages.join-arena", player, selectedArena);
+        ConfigUtils.sendConfigMessage("messages.join-arena", player, selectedArena, null);
         if (selectedArena.joinPlayer(player)) {
             player.closeInventory();
-            ConfigUtils.sendConfigMessage("messages.joined-arena", player, selectedArena);
+            ConfigUtils.sendConfigMessage("messages.joined-arena", player, selectedArena, null);
         } else {
-            ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena);
+            ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
     }
 

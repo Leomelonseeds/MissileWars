@@ -16,7 +16,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <CreateArena/OpenGameMenu/EnqueueRed/EnqueueBlue>");
+            sendErrorMsg(sender, "Usage: /umw <CreateArena/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
             return true;
         }
 
@@ -127,6 +127,31 @@ public class MissileWarsCommand implements CommandExecutor {
             return true;
         }
 
+        // Force start an arena
+        if (action.equalsIgnoreCase("ForceStart")) {
+            // Ensure sender has permission
+            if (!sender.hasPermission("umw.force-start")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            // Check for arena and start it
+            if (args.length < 2) {
+                sendErrorMsg(sender, "You must specify an arena name!");
+                return true;
+            }
+            Arena target = arenaManager.getArena(args[1]);
+            if (target == null) {
+                sendErrorMsg(sender, "Arena not found!");
+                return true;
+            }
+            if (target.start()) {
+                sendSuccessMsg(sender, "Arena started!");
+            } else {
+                sendErrorMsg(sender, "Arena is already running!");
+            }
+            return true;
+        }
         return true;
     }
 

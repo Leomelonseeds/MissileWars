@@ -9,7 +9,7 @@ messages:
   leave-arena: "You left %umw_arena%"
   queue-waiting: "You are now queued for %umw_team%&7 in position %umw_position%"
   queue-join: "You joined the game as %umw_team%&7"
-  queue-join-others: "%player% has joined %umw_team%&7!"
+  queue-join-others: "%umw_focus% has joined %umw_team%&7!"
   queue-join-error: "You cannot join %umw_team%&7 as the teams would be unbalanced."
   lobby-countdown-start: "Minimum player requirements met. The game will start in %umw_time% seconds."
   lobby-countdown-full: "The lobby is full! The game will start in %umw_time% seconds."
@@ -32,8 +32,8 @@ messages:
     # mvps - players who blew up portals
     - "&5MVPs: %umw_mvps%"
     # If tied for top killer/deaths, list both
-    - "&cMost Kills: %umw_top_killer%"
-    - "&eMost Deaths: %umw_top_deaths%"
+    - "&cMost Kills: %umw_focus%"
+    - "&eMost Deaths: %umw_focus%"
     - "&aThanks for playing!"
     
 titles:

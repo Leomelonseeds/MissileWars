@@ -27,10 +27,10 @@ default-map:
     y: 77
     z: -66
   blue-spawn:
-    x: 0
+    x: 0.5
     y: 77
-    z: -66
+    z: -65.5
   red-spawn:
-    x: 0
+    x: 0.5
     y: 77
-    z: 66
+    z: 64.5
