@@ -18,6 +18,33 @@ lobby:
       x: 85.5
       y: 56
       z: 0.5
+  main-region:
+    min:
+      x: 100
+      y: 0
+      z: -15
+    max:
+      x: 53
+      y: 255
+      z: 15
+  red-lobby-region:
+    min:
+      x: 78
+      y: 54
+      z: 8
+    max:
+      x: 98
+      y: 65
+      z: 13
+  blue-lobby-region:
+    min:
+      x: 78
+      y: 54
+      z: -8
+    max:
+      x: 98
+      y: 65
+      z: -13
 
 # Settings for the Default map
 default-map:

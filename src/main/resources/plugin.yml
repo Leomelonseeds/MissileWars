@@ -14,3 +14,4 @@ depend:
   - WorldEdit
   - PlaceholderAPI
   - Citizens
+  - WorldGuardExtraFlags

@@ -1,5 +1,13 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
@@ -11,6 +19,7 @@ import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.VillagerProfession;
+import net.goldtreeservers.worldguardextraflags.WorldGuardExtraFlagsPlugin;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -23,13 +32,13 @@ import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -120,6 +129,48 @@ public class ArenaManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Create the waiting lobby region for a specific team.
+     *
+     * @param team the team to create the waiting lobby for
+     * @param arena the arena to create the lobby for
+     * @param parent the general lobby area
+     */
+    private void createWaitingLobby(String team, Arena arena, ProtectedRegion parent) {
+        // Setup region
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        WorldGuard wg = WorldGuard.getInstance();
+        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min");
+        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max");
+        ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(arena.getName() + "-" + team + "-lobby",
+                BlockVector3.at(minLobby.getX(), minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(),
+                maxLobby.getY(), maxLobby.getZ()));
+
+        // Adds flags
+        Set<String> enterCommands = new HashSet<>();
+        enterCommands.add("/kit " + team + "waitinglobby %username%");
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_ENTRY, enterCommands);
+        Set<PotionEffect> effects = new HashSet<>();
+        effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999999, 5));
+        effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 99999999, 5));
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
+        lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.DENY);
+        lobbyRegion.setFlag(Flags.PVP, StateFlag.State.ALLOW);
+        Set<String> leaveCommands = new HashSet<>();
+        leaveCommands.add("/minecraft:item replace entity %username% armor.legs with air");
+        leaveCommands.add("/minecraft:item replace entity %username% armor.chest with air");
+        leaveCommands.add("/minecraft:item replace entity %username% armor.feet with air");
+        leaveCommands.add("/clear %username%");
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_EXIT, leaveCommands);
+        try {
+            lobbyRegion.setParent(parent);
+        } catch (ProtectedRegion.CircularInheritanceException e) {
+            e.printStackTrace();
+        }
+        wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arena.getWorld())).addRegion(lobbyRegion);
     }
 
     /**
@@ -237,6 +288,23 @@ public class ArenaManager {
 
         // Register Arena
         loadedArenas.add(arena);
+
+        // Setup regions
+        WorldGuard wg = WorldGuard.getInstance();
+        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min");
+        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max");
+        ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
+                minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(), maxLobby.getY(), maxLobby.getZ()));
+        lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);
+        lobbyRegion.setFlag(Flags.PVP, StateFlag.State.DENY);
+        lobbyRegion.setFlag(Flags.TNT, StateFlag.State.DENY);
+        lobbyRegion.setFlag(Flags.GAME_MODE, GameMode.REGISTRY.get("adventure"));
+        lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
+        lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
+        wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld)).addRegion(lobbyRegion);
+        createWaitingLobby("red", arena, lobbyRegion);
+        createWaitingLobby("blue", arena, lobbyRegion);
+
         return true;
     }
 

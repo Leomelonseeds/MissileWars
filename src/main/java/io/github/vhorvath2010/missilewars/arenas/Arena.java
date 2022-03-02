@@ -95,7 +95,7 @@ public class Arena implements ConfigurationSerializable {
      *
      * @return the world this Arena lies in
      */
-    private World getWorld() {
+    public World getWorld() {
         return Bukkit.getWorld("mwarena_" + name);
     }
 
