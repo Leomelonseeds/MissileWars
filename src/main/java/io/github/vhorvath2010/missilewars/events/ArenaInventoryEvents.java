@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,28 @@ public class ArenaInventoryEvents implements Listener {
         }
         Player player = (Player) event.getPlayer();
         selectingArena.remove(player);
+    }
+
+    /** Stop players from changing their armor/bow items. */
+    @EventHandler
+    public void stopItemMoving(InventoryClickEvent event) {
+        // Obtain player
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getWhoClicked();
+
+        // Check if player is in an active arena
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena == null || !arena.isRunning()) {
+            return;
+        }
+
+        // Stop armor removals and first slot changes
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR || event.getSlot() == 0) {
+            event.setCancelled(true);
+        }
     }
 
 }

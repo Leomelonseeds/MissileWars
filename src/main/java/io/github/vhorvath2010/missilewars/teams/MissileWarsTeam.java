@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.teams;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Colorable;
@@ -73,11 +74,13 @@ public class MissileWarsTeam {
         ConfigUtils.sendConfigMessage("messages.queue-join", player.getMCPlayer(), arena, null);
 
         // TP to team spawn and give armor
-        player.getMCPlayer().getInventory().clear();
-        player.getMCPlayer().getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        player.getMCPlayer().getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        player.getMCPlayer().getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
-        player.getMCPlayer().teleport(spawn);
+        Player mcPlayer = player.getMCPlayer();
+        mcPlayer.getInventory().clear();
+        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
+        mcPlayer.teleport(spawn);
+        mcPlayer.setHealth(20);
     }
 
     /**
