@@ -2,7 +2,10 @@ package io.github.vhorvath2010.missilewars.teams;
 
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.material.Colorable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,9 +67,16 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
+        // Send messages
         broadcastConfigMsg("messages.queue-join-others", player);
         members.add(player);
         ConfigUtils.sendConfigMessage("messages.queue-join", player.getMCPlayer(), arena, null);
+
+        // TP to team spawn and give armor
+        player.getMCPlayer().getInventory().clear();
+        player.getMCPlayer().getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+        player.getMCPlayer().getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        player.getMCPlayer().getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
         player.getMCPlayer().teleport(spawn);
     }
 
@@ -80,6 +90,20 @@ public class MissileWarsTeam {
         for (MissileWarsPlayer player : members) {
             ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus.getMCPlayer());
         }
+    }
+
+    /**
+     * Create a piece of team-colored leather armor.
+     *
+     * @param type the item type
+     * @return an item of type value with this team's color
+     */
+    private ItemStack createColoredArmor(Material type) {
+        ItemStack item = new ItemStack(type);
+        LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+        meta.setColor(DyeColor.valueOf(ChatColor.stripColor(name).toUpperCase()).getColor());
+        item.setItemMeta(meta);
+        return item;
     }
 
 }

@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.teams;
 
+import io.github.vhorvath2010.missilewars.decks.Deck;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -11,6 +12,8 @@ public class MissileWarsPlayer {
 
     /** The UUID of the Spigot player this player represents. */
     private UUID playerId;
+    /** The current deck the player has selected. */
+    private Deck deck;
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -19,6 +22,16 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
+    }
+
+    /**
+     * Set the user's current Deck.
+     *
+     * @param deck the deck to let this MissileWarsPlayer use
+     */
+    public void setDeck(Deck deck) {
+        deck.giveGear(getMCPlayer());
+        this.deck = deck;
     }
 
     /**

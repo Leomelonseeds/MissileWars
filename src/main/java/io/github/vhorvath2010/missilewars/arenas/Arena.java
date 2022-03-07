@@ -331,7 +331,7 @@ public class Arena implements ConfigurationSerializable {
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
 
-        // Assign players to teams based on queue
+        // Assign players to teams based on queue (which removes their items)
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
@@ -355,6 +355,11 @@ public class Arena implements ConfigurationSerializable {
             } else {
                 redTeam.addPlayer(player);
             }
+        }
+
+        // Assign decks to players and start game
+        for (MissileWarsPlayer player : players) {
+            player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
         }
         running = true;
         return true;
