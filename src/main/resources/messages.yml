@@ -2,11 +2,15 @@
 # Blank messages should be ignored.
 
 messages:
-  prefix: "&d&lM&5&lW &8&l» &7"
+  prefix: "&7"
   join-arena: "Joining %umw_arena%..."
   arena-full: "&cThat arena is full!"
   joined-arena: "Welcome! Use &a/queue &7to join a team, and &a/spawn &7to return to main lobby."
+  joined-arena-others: "%umw_focus% &7joined the arena."
   leave-arena: "You left %umw_arena%"
+  leave-arena-others: "%umw_focus% &7left the arena."
+  spectate-join-others: "%umw_focus% &7is now spectating."
+  spectate-leave-others: "%umw_focus% &7is no longer spectating."
   queue-waiting: "You are now queued for %umw_team%&7 in position %umw_position%"
   queue-join: "You joined the game as %umw_team%&7"
   queue-join-others: "%umw_focus% has joined %umw_team%&7!"
@@ -15,9 +19,11 @@ messages:
   lobby-countdown-full: "The lobby is full! The game will start in %umw_time% seconds."
   lobby-countdown-near: "Starting in %umw_time%..."
   game-end-reminder: "The game will end in %umw_time_remaining% minutes!"
-  chaos-mode: "There are %umw_chaos_time% minutes until the game ends. Items will now be given 2x faster."
-  drop-item: "Dropped items will despawn in &c10 seconds!"
+  chaos-mode: "&a&l[!] There are %umw_chaos_time% minutes until the game ends. Items will now be given 2x faster."
+  drop-item: "&c&l[!] Dropped items will despawn in &c10 seconds!"
+  inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
   game-end-near: "Game ending in %umw_time_remaining% minutes!"
+  team-empty: "All players on %umw_team% have left."
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
   buff-team: "You will recieve items faster because a teammate left."
