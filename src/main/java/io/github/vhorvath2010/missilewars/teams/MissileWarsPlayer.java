@@ -70,4 +70,11 @@ public class MissileWarsPlayer {
     public int hashCode() {
         return Objects.hash(playerId);
     }
+
+    /** Give the MC player an item from their Deck. */
+    public void givePoolItem() {
+        if (deck != null && getMCPlayer() != null) {
+            deck.givePoolItem(getMCPlayer());
+        }
+    }
 }

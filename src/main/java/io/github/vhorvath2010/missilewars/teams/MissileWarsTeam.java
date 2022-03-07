@@ -1,12 +1,14 @@
 package io.github.vhorvath2010.missilewars.teams;
 
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.material.Colorable;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +25,8 @@ public class MissileWarsTeam {
     private Set<MissileWarsPlayer> members;
     /** The spawn location for the team. */
     private Location spawn;
+    /** The current task for Deck pool item distribution. */
+    private BukkitTask poolItemRunnable;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -107,6 +111,24 @@ public class MissileWarsTeam {
         meta.setColor(DyeColor.valueOf(ChatColor.stripColor(name).toUpperCase()).getColor());
         item.setItemMeta(meta);
         return item;
+    }
+
+
+    /** Schedule the distribution of in-game Deck items. */
+    public void scheduleDeckItems() {
+        int timeBetween = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml").getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
+        poolItemRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Distribute items
+                for (MissileWarsPlayer player : members) {
+                    player.givePoolItem();
+                }
+                // Enqueue next distribution
+                scheduleDeckItems();
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), timeBetween * 20L);
     }
 
 }

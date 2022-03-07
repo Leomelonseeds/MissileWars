@@ -12,7 +12,10 @@ item-frequency:
   2: 15
   # 3 and above
   3: 20
-  
+
+# Maximum number of items available to players by default
+inventory-limit: 6
+
 # Give items faster as game time nears end   
 chaos-mode:
   # Activates when this many minutes are left in the game

@@ -361,6 +361,11 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
         }
+
+        // Start deck distribution for each team
+        redTeam.scheduleDeckItems();
+        blueTeam.scheduleDeckItems();
+
         running = true;
         return true;
     }
