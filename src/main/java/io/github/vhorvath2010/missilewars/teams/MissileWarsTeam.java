@@ -4,6 +4,7 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -27,6 +28,8 @@ public class MissileWarsTeam {
     private Location spawn;
     /** The current task for Deck pool item distribution. */
     private BukkitTask poolItemRunnable;
+    /** Whether the team's decks should be distributing items in chaos-mode. */
+    private boolean chaosMode;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -49,6 +52,15 @@ public class MissileWarsTeam {
      */
     public int getSize() {
         return members.size();
+    }
+
+    /**
+     * Set the status of chaos mode.
+     *
+     * @param chaosMode the new status of chaos mode
+     */
+    public void setChaosMode(boolean chaosMode) {
+        this.chaosMode = chaosMode;
     }
 
     /**
@@ -94,8 +106,14 @@ public class MissileWarsTeam {
      * @param focus the key player that is the focus of the message
      */
     public void broadcastConfigMsg(String path, MissileWarsPlayer focus) {
-        for (MissileWarsPlayer player : members) {
-            ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus.getMCPlayer());
+        if (focus != null) {
+            for (MissileWarsPlayer player : members) {
+                ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus.getMCPlayer());
+            }
+        } else {
+            for (MissileWarsPlayer player : members) {
+                ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, null);
+            }
         }
     }
 
@@ -116,8 +134,12 @@ public class MissileWarsTeam {
 
     /** Schedule the distribution of in-game Deck items. */
     public void scheduleDeckItems() {
-        int timeBetween = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "default-settings.yml").getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
+        FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml");
+        double timeBetween = settings.getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
+        if (chaosMode) {
+            timeBetween /= settings.getInt("chaos-mode.multiplier");
+        }
         poolItemRunnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -128,7 +150,12 @@ public class MissileWarsTeam {
                 // Enqueue next distribution
                 scheduleDeckItems();
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), timeBetween * 20L);
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), (int) Math.floor(timeBetween * 20L));
+    }
+
+    /** Stop the distribution of in-game Deck items. */
+    public void stopDeckItems() {
+        poolItemRunnable.cancel();
     }
 
 }

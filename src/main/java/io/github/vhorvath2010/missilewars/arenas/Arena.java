@@ -10,6 +10,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.time.Duration;
@@ -39,6 +41,10 @@ public class Arena implements ConfigurationSerializable {
     private LocalDateTime startTime;
     /** Whether a game is currently running */
     private boolean running;
+    /** List of currently running tasks. */
+    private List<BukkitTask> tasks;
+    /** Whether the arena is in chaos mode. */
+    private boolean inChaos;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -53,6 +59,7 @@ public class Arena implements ConfigurationSerializable {
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
+        tasks = new LinkedList<>();
     }
 
     /**
@@ -79,6 +86,7 @@ public class Arena implements ConfigurationSerializable {
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
+        tasks = new LinkedList<>();
     }
 
     /**
@@ -322,8 +330,10 @@ public class Arena implements ConfigurationSerializable {
         if (running) {
             return false;
         }
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+
         // Acquire red and blue spawns
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
         Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "default-map.blue-spawn");
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
@@ -359,15 +369,73 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign decks to players and start game
         for (MissileWarsPlayer player : players) {
-            player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
+            player.setDeck(plugin.getDeckManager().getDefaultDeck());
         }
 
-        // Start deck distribution for each team
+        // Start deck distribution for each team and send messages
         redTeam.scheduleDeckItems();
+        redTeam.broadcastConfigMsg("messages.classic-start", null);
         blueTeam.scheduleDeckItems();
+        blueTeam.broadcastConfigMsg("messages.classic-start", null);
+
+        // Setup game timers
+        // Game start
+        startTime = LocalDateTime.now();
+        long gameLength = getMinutesRemaining();
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                // End game in a tie
+                endGame(null);
+            }
+        }.runTaskLater(plugin, gameLength * 20 * 60));
+
+        // Chaos time start
+        int chaosStart = getChaosTime();
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                inChaos = true;
+                blueTeam.setChaosMode(true);
+                redTeam.setChaosMode(true);
+                redTeam.broadcastConfigMsg("messages.chaos-mode", null);
+                blueTeam.broadcastConfigMsg("messages.chaos-mode", null);
+            }
+        }.runTaskLater(plugin, (gameLength - chaosStart) * 20 * 60));
 
         running = true;
         return true;
+    }
+
+    /**
+     * End a MissileWars game with a winning team
+     *
+     * @param winningTeam the winning team
+     */
+    public void endGame(MissileWarsTeam winningTeam) {
+        // Cancel all tasks
+        for (BukkitTask task : tasks) {
+            task.cancel();
+        }
+        redTeam.stopDeckItems();
+        blueTeam.stopDeckItems();
+
+        // Stop game and send messages
+        redTeam.broadcastConfigMsg("messages.classic-end", null);
+        blueTeam.broadcastConfigMsg("messages.classic-classic", null);
+
+        // Remove all players after a short time
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (MissileWarsPlayer player : players) {
+                    removePlayer(player.getMCPlayerId());
+                }
+                for (MissileWarsPlayer player : spectators) {
+                    removePlayer(player.getMCPlayerId());
+                }
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 100);
     }
 
 }
