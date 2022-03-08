@@ -62,7 +62,7 @@ public class Deck {
         // Count multiples of item in inventory
         for (ItemStack poolItem : pool) {
             int numOfItem = 1;
-            while (player.getInventory().containsAtLeast(poolItem, numOfItem * poolItem.getAmount())) {
+            while (player.getInventory().containsAtLeast(poolItem, 1 + (numOfItem - 1) * poolItem.getAmount())) {
                 numOfItem++;
             }
             limit -= (numOfItem - 1);
