@@ -422,7 +422,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Stop game and send messages
         redTeam.broadcastConfigMsg("messages.classic-end", null);
-        blueTeam.broadcastConfigMsg("messages.classic-classic", null);
+        blueTeam.broadcastConfigMsg("messages.classic-end", null);
 
         // Remove all players after a short time
         new BukkitRunnable() {
