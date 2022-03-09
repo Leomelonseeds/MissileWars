@@ -58,6 +58,7 @@ titles:
       - "Built different"
       - "Bomb expert!"
       - "easy"
+      - "┬─┬ ノ( ゜-゜ノ)"
   defeat:
     title: "&c&lDefeat"
     subtitle:
@@ -69,6 +70,13 @@ titles:
       - "Almost there"
       - "[insert joke here]"
       - "How!?"
+      - "(╯°□°)╯︵ ┻━┻"
+  enemy-portal-destroyed:
+    title: "&5Enemy Portal Destroyed"
+    subtitle: "&71 portal remains"
+  own-portal-destroyed:
+    title: "&4Portal Destroyed"
+    subtitle: "&71 portal remaining"
     
   
 scoreboard:
