@@ -33,6 +33,11 @@ public class StructureItemEvents implements Listener {
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), PersistentDataType.STRING);
         event.setCancelled(true);
 
+        // Stop if not left-click
+        if (!event.getAction().toString().contains("RIGHT")) {
+            return;
+        }
+
         // Find player's team (Default to blue)
         boolean redTeam = false;
         ArenaManager manager = plugin.getArenaManager();

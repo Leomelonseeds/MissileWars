@@ -424,6 +424,7 @@ public class Arena implements ConfigurationSerializable {
 
     /** Reset the arena world. */
     public void resetWorld() {
+        Bukkit.unloadWorld(getWorld(), false);
         new WorldCreator("mwarena_" + name).createWorld().setAutoSave(false);
     }
 
@@ -437,6 +438,7 @@ public class Arena implements ConfigurationSerializable {
         for (BukkitTask task : tasks) {
             task.cancel();
         }
+        running = false;
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
 

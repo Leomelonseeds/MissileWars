@@ -144,6 +144,7 @@ public class MissileWarsTeam {
             @Override
             public void run() {
                 // Distribute items
+                System.out.println("Giving items");
                 for (MissileWarsPlayer player : members) {
                     player.givePoolItem();
                 }
