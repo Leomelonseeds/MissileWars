@@ -76,7 +76,7 @@ public class DeckManager {
             lore.add(ChatColor.translateAlternateColorCodes('&', loreString));
         }
         itemMeta.setLore(lore);
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-schematic"),
+        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"),
                 PersistentDataType.STRING, schematicName);
         item.setItemMeta(itemMeta);
         return item;

@@ -77,7 +77,7 @@ public class SchematicManager {
 
         // Apply offset
         Location spawnLoc = loc.clone();
-        spawnLoc.add(getVector(structureConfig, structureName + ".offset"));
+        spawnLoc = spawnLoc.add(getVector(structureConfig, structureName + ".offset"));
 
         // Replace convert blue blocks to red blocks and apply rotation if needed
         StructureRotation rotation = StructureRotation.NONE;

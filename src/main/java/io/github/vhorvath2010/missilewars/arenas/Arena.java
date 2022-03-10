@@ -330,7 +330,9 @@ public class Arena implements ConfigurationSerializable {
         if (running) {
             return false;
         }
+        // Generate map
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        generateMap("default-map");
 
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()

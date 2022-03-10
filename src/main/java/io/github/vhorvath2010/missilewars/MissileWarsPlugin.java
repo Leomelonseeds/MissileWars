@@ -3,11 +3,11 @@ package io.github.vhorvath2010.missilewars;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
-import io.github.vhorvath2010.missilewars.decks.Deck;
 import io.github.vhorvath2010.missilewars.decks.DeckManager;
 import io.github.vhorvath2010.missilewars.events.ArenaGameruleEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
+import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -46,6 +46,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new StructureItemEvents(), this);
 
         // Load decks
         deckManager = new DeckManager();
