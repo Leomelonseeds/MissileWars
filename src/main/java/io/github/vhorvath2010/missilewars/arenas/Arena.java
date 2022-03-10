@@ -334,6 +334,9 @@ public class Arena implements ConfigurationSerializable {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         generateMap("default-map");
 
+        // Save clean world to disk
+        getWorld().save();
+
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
@@ -409,6 +412,21 @@ public class Arena implements ConfigurationSerializable {
         return true;
     }
 
+    /** Remove Players from the map. */
+    public void removePlayers() {
+        for (MissileWarsPlayer player : players) {
+            removePlayer(player.getMCPlayerId());
+        }
+        for (MissileWarsPlayer player : spectators) {
+            removePlayer(player.getMCPlayerId());
+        }
+    }
+
+    /** Reset the arena world. */
+    public void resetWorld() {
+        new WorldCreator("mwarena_" + name).createWorld().setAutoSave(false);
+    }
+
     /**
      * End a MissileWars game with a winning team
      *
@@ -430,12 +448,8 @@ public class Arena implements ConfigurationSerializable {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (MissileWarsPlayer player : players) {
-                    removePlayer(player.getMCPlayerId());
-                }
-                for (MissileWarsPlayer player : spectators) {
-                    removePlayer(player.getMCPlayerId());
-                }
+                removePlayers();
+                resetWorld();
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 100);
     }

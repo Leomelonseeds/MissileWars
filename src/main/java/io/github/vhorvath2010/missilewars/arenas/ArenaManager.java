@@ -5,7 +5,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.*;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -19,7 +18,6 @@ import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.VillagerProfession;
-import net.goldtreeservers.worldguardextraflags.WorldGuardExtraFlagsPlugin;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -27,7 +25,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -72,12 +69,19 @@ public class ArenaManager {
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
-            new WorldCreator("mwarena_" + arena.getName()).createWorld();
+            new WorldCreator("mwarena_" + arena.getName()).createWorld().setAutoSave(false);
         }
     }
 
-    /** Save arenas from data file */
+    /** Reset and save arenas from data file. */
     public void saveArenas() {
+        // Unload each Arena
+        for (Arena arena : loadedArenas) {
+            arena.removePlayers();
+            arena.resetWorld();
+        }
+
+        // Save Arenas to file
         File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
         FileConfiguration arenaConfig = new YamlConfiguration();
         arenaConfig.set("arenas", loadedArenas);
@@ -193,6 +197,7 @@ public class ArenaManager {
         arenaCreator.generator(new VoidChunkGenerator());
         World arenaWorld = arenaCreator.createWorld();
         assert arenaWorld != null;
+        arenaWorld.setAutoSave(false);
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
         // Create Arena lobby

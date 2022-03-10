@@ -70,14 +70,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Remove players from arenas
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Arena playerArena = arenaManager.getArena(player.getUniqueId());
-            if (playerArena == null) {
-                continue;
-            }
-            playerArena.removePlayer(player.getUniqueId());
-        }
         // Save arenas to data file
         arenaManager.saveArenas();
     }
