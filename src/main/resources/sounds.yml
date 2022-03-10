@@ -6,6 +6,14 @@ defeat:
   sound: ENTITY_WITHER_DEATH
   volume: 0.5
   pitch: 0.0
+enemy-portal-destroyed:
+  sound: ENTITY_ZOMBIE_VILLAGER_CURE
+  volume: 1.0
+  pitch: 0.8
+own-portal-destroyed:
+  sound: ENTITY_LIGHTNING_BOLT_THUNDER
+  volume: 1.0
+  pitch: 1.0
 countdown_near:
   sound: BLOCK_NOTE_BLOCK_PLING
   volume: 1.0
@@ -34,3 +42,11 @@ dropped_item_warning:
   sound: BLOCK_NOTE_BLOCK_BASS
   volume: 1.0
   pitch: 0.0
+spawn_fireball:
+  sound: ENTITY_GHAST_SHOOT
+  volume: 1.0
+  pitch: 1.0
+chaos_start:
+  sound: ENTITY_GHAST_SCREAM
+  volume: 1.0
+  pitch: 0.5
