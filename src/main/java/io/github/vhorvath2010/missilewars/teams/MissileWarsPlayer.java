@@ -25,12 +25,21 @@ public class MissileWarsPlayer {
     }
 
     /**
-     * Set the user's current Deck.
+     * Set the user's current {@link Deck}.
      *
      * @param deck the deck to let this MissileWarsPlayer use
      */
     public void setDeck(Deck deck) {
         this.deck = deck;
+    }
+
+    /**
+     * Get the user's currently selected {@link Deck}.
+     *
+     * @return the user's currently selected {@link Deck}
+     */
+    public Deck getDeck() {
+        return deck;
     }
 
     /**

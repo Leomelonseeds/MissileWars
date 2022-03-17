@@ -34,6 +34,15 @@ public class Deck {
     }
 
     /**
+     * Get the gear for this {@link Deck}.
+     *
+     * @return the gear for this {@link Deck}.
+     */
+    public List<ItemStack> getGear() {
+        return gear;
+    }
+
+    /**
      * Give this Deck's gear to a given player.
      *
      * @param player the player to give the gear to

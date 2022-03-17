@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.events;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,9 +84,40 @@ public class ArenaInventoryEvents implements Listener {
         }
 
         // Stop armor removals and first slot changes
-        if (event.getSlotType() == InventoryType.SlotType.ARMOR || event.getSlot() == 0) {
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
             event.setCancelled(true);
         }
+    }
+
+    /** Manage item dropping. */
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent event) {
+        // Check if player is in Arena
+        Player player = event.getPlayer();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+
+        // Stop drops entirely if game not running
+        if (!arena.isRunning()) {
+            event.setCancelled(true);
+        }
+
+        // Stop drops of gear items
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        if (mwPlayer.getDeck().getGear().contains(event.getItemDrop().getItemStack())) {
+            event.setCancelled(true);
+        }
+
+        // Delete drop after 10 seconds if still on ground
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                event.getItemDrop().remove();
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 10*20);
     }
 
 }

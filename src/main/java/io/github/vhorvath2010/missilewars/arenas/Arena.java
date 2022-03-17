@@ -137,6 +137,21 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
+     * Get a {@link MissileWarsPlayer} in this arena from a given UUID.
+     *
+     * @param uuid the Player's UUID
+     * @return the {@link MissileWarsPlayer} with the given UUID in this Arena, otherwise null
+     */
+    public MissileWarsPlayer getPlayerInArena(UUID uuid) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the team a player with a given UUID is on.
      *
      * @param uuid the UUID to check for
@@ -297,11 +312,14 @@ public class Arena implements ConfigurationSerializable {
      * @param uuid the Player's UUID
      */
     public void enqueueRed(UUID uuid) {
-        MissileWarsPlayer player = new MissileWarsPlayer(uuid);
-        if (!redQueue.contains(player)) {
-            blueQueue.remove(player);
-            redQueue.add(player);
-            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                if (!redQueue.contains(player)) {
+                    blueQueue.remove(player);
+                    redQueue.add(player);
+                    ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                }
+            }
         }
         // TODO: Join team if balanced and joining while game is running
     }
@@ -312,11 +330,14 @@ public class Arena implements ConfigurationSerializable {
      * @param uuid the Player's UUID
      */
     public void enqueueBlue(UUID uuid) {
-        MissileWarsPlayer player = new MissileWarsPlayer(uuid);
-        if (!blueQueue.contains(player)) {
-            redQueue.remove(player);
-            blueQueue.add(player);
-            ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                if (!blueQueue.contains(player)) {
+                    redQueue.remove(player);
+                    blueQueue.add(player);
+                    ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                }
+            }
         }
         // TODO: Join team if balanced and joining while game is running
     }
