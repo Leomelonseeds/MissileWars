@@ -33,8 +33,8 @@ public class SchematicManager {
      * Get the vector for a given structure/schematic path in a given config.
      *
      * @param config the config to get data from
-     * @param path the path to the x, y, z offset data
-     * @return the x, y, z offset as a vector
+     * @param path the path to the x, y, z vector data
+     * @return the x, y, z as a vector
      */
     public static Vector getVector(FileConfiguration config, String path) {
         Vector vector = new Vector();
@@ -77,7 +77,12 @@ public class SchematicManager {
 
         // Apply offset
         Location spawnLoc = loc.clone();
-        spawnLoc = spawnLoc.add(getVector(structureConfig, structureName + ".offset"));
+        Vector offset = getVector(structureConfig, structureName + ".offset");
+        // Flip z if on red team
+        if (redMissile) {
+            offset.setZ(offset.getZ() * -1);
+        }
+        spawnLoc = spawnLoc.add(offset);
 
         // Replace convert blue blocks to red blocks and apply rotation if needed
         StructureRotation rotation = StructureRotation.NONE;
@@ -116,7 +121,7 @@ public class SchematicManager {
 
         // Acquire WE clipboard
         if (!schematicConfig.contains(schematicName + ".file")) {
-            System.out.println("no schem file found!");
+            System.out.println("No schem file found!");
             return false;
         }
         File schematicFile = new File(plugin.getDataFolder() + File.separator + "maps",

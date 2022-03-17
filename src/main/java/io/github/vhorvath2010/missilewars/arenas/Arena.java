@@ -372,15 +372,12 @@ public class Arena implements ConfigurationSerializable {
             }
         }
 
-        // Assign decks to players and start game
-        for (MissileWarsPlayer player : players) {
-            player.setDeck(plugin.getDeckManager().getDefaultDeck());
-        }
-
         // Start deck distribution for each team and send messages
         redTeam.scheduleDeckItems();
         redTeam.broadcastConfigMsg("messages.classic-start", null);
+        redTeam.distributeGear();
         blueTeam.scheduleDeckItems();
+        blueTeam.distributeGear();
         blueTeam.broadcastConfigMsg("messages.classic-start", null);
 
         // Setup game timers

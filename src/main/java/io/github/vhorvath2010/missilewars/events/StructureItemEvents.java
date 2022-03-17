@@ -6,6 +6,7 @@ import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ public class StructureItemEvents implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
         ItemStack hand = player.getInventory().getItemInMainHand();
+        Block clicked = event.getClickedBlock();
         if (hand.getItemMeta() == null) {
             return;
         }
@@ -33,8 +35,8 @@ public class StructureItemEvents implements Listener {
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), PersistentDataType.STRING);
         event.setCancelled(true);
 
-        // Stop if not left-click
-        if (!event.getAction().toString().contains("RIGHT")) {
+        // Stop if not left-click on block
+        if (!event.getAction().toString().contains("RIGHT") || clicked == null) {
             return;
         }
 
@@ -48,7 +50,7 @@ public class StructureItemEvents implements Listener {
         }
 
         // Place structure
-        SchematicManager.spawnNBTStructure(structureName, player.getLocation(), redTeam);
+        SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), redTeam);
         hand.setAmount(hand.getAmount() - 1);
     }
 

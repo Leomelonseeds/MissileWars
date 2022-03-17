@@ -17,8 +17,8 @@ lightning:
   - "&cTNT: &f10"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 hurricane: {}
 
 cruiser: {}
@@ -42,8 +42,8 @@ tomahawk:
   - "&cTNT: &f12"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 tomatwo: {}
 
 
@@ -61,8 +61,8 @@ guardian:
   - "&cTNT: &f5"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 elder_guardian: {}
 
 gemini: {}
@@ -98,8 +98,8 @@ juggernaut:
   - "&cTNT: &f23"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 juggerbuster: {}
 
 breaker: {}
@@ -118,8 +118,8 @@ shieldbuster:
   - "&cTNT: &f17"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 shark: {}
 
 
@@ -160,8 +160,8 @@ shield_2:
   - "&9Size: &f2"
   offset:
     x: 0
-    y: 0
-    z: 0
+    y: -4
+    z: 3
 shield_3: {}
 
 platform_1: {}

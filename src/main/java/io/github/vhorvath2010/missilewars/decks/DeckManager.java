@@ -24,7 +24,7 @@ public class DeckManager {
     public DeckManager() {
         // Setup gear items
         List<ItemStack> gear = new ArrayList<>();
-        ItemStack bow = new ItemStack(Material.BOW);
+        ItemStack bow = createUtilityItem("sentinel_bow");
         bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);

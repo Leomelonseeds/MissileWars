@@ -89,6 +89,9 @@ public class MissileWarsTeam {
         members.add(player);
         ConfigUtils.sendConfigMessage("messages.queue-join", player.getMCPlayer(), arena, null);
 
+        // Assign default deck
+        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
+
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         mcPlayer.getInventory().clear();
@@ -131,6 +134,12 @@ public class MissileWarsTeam {
         return item;
     }
 
+    /** Give each {@link MissileWarsPlayer} their gear. */
+    public void distributeGear() {
+        for (MissileWarsPlayer player : members) {
+            player.giveDeckGear();
+        }
+    }
 
     /** Schedule the distribution of in-game Deck items. */
     public void scheduleDeckItems() {
@@ -144,7 +153,6 @@ public class MissileWarsTeam {
             @Override
             public void run() {
                 // Distribute items
-                System.out.println("Giving items");
                 for (MissileWarsPlayer player : members) {
                     player.givePoolItem();
                 }

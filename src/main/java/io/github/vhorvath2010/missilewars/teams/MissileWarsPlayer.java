@@ -30,7 +30,6 @@ public class MissileWarsPlayer {
      * @param deck the deck to let this MissileWarsPlayer use
      */
     public void setDeck(Deck deck) {
-        deck.giveGear(getMCPlayer());
         this.deck = deck;
     }
 
@@ -77,4 +76,12 @@ public class MissileWarsPlayer {
             deck.givePoolItem(getMCPlayer());
         }
     }
+
+    /** Give the MC player their Deck gear. */
+    public void giveDeckGear() {
+        if (deck != null && getMCPlayer() != null) {
+            deck.giveGear(getMCPlayer());
+        }
+    }
+
 }
