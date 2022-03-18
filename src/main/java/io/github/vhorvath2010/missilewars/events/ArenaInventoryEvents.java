@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -139,6 +140,16 @@ public class ArenaInventoryEvents implements Listener {
 
         // Cancel event if player cannot pick up item based on their given deck
         if (mwPlayer.getDeck() != null && !mwPlayer.getDeck().hasInventorySpace(mwPlayer.getMCPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    /** Stop swapping to offhand if in arena. */
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent event) {
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(event.getPlayer().getUniqueId());
+        if (arena != null) {
             event.setCancelled(true);
         }
     }
