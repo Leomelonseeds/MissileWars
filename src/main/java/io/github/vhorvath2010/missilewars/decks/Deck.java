@@ -54,17 +54,12 @@ public class Deck {
     }
 
     /**
-     * Give a random item from the pool to a given player if they have space.
+     * Check if a given player with this deck has inventory space for more items.
      *
-     * @param player the player to give the pool item too
+     * @param player the player to check space for
+     * @return true if player has inventory space
      */
-    public void givePoolItem(Player player) {
-        // Ensure Deck has pool items
-        if (pool.isEmpty()) {
-            return;
-        }
-
-        // Ensure they have inventory space
+    public boolean hasInventorySpace(Player player) {
         int limit = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("inventory-limit");
 
@@ -78,7 +73,21 @@ public class Deck {
         }
 
         // Give random item if under limit
-        if (limit > 0) {
+        return limit > 0;
+    }
+
+    /**
+     * Give a random item from the pool to a given player if they have space.
+     *
+     * @param player the player to give the pool item too
+     */
+    public void givePoolItem(Player player) {
+        // Ensure Deck has pool items
+        if (pool.isEmpty()) {
+            return;
+        }
+        // Give random item if under limit
+        if (hasInventorySpace(player)) {
             player.getInventory().addItem(pool.get(rand.nextInt(pool.size())));
         }
     }

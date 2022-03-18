@@ -8,10 +8,12 @@ import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -118,6 +120,27 @@ public class ArenaInventoryEvents implements Listener {
                 event.getItemDrop().remove();
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 10*20);
+    }
+
+    /** Manage item pickups. */
+    @EventHandler
+    public void onItemPickup(EntityPickupItemEvent event) {
+        // Check if player is in Arena
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+
+        // Cancel event if player cannot pick up item based on their given deck
+        if (mwPlayer.getDeck() != null && !mwPlayer.getDeck().hasInventorySpace(mwPlayer.getMCPlayer())) {
+            event.setCancelled(true);
+        }
     }
 
 }
