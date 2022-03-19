@@ -343,6 +343,24 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
+     * Add the player with a given UUID to the spectators.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void addSpectator(UUID uuid) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                spectators.add(player);
+                Player mcPlayer = player.getMCPlayer();
+                mcPlayer.setGameMode(GameMode.SPECTATOR);
+                String joinMsg = ConfigUtils.getConfigText("spectate-join-others", mcPlayer, this, mcPlayer);
+                announceMessage(joinMsg);
+                break;
+            }
+        }
+    }
+
+    /**
      * Starts a game in the arena with the classic arena. Different gamemodes and maps coming soon.
      *
      * @return true if the game started. Otherwise false
@@ -386,6 +404,10 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign remaining players
         for (MissileWarsPlayer player : toAssign) {
+            // Ignore if player is a spectator
+            if (spectators.contains(player)) {
+                continue;
+            }
             if (blueTeam.getSize() <= redTeam.getSize()) {
                 blueTeam.addPlayer(player);
             } else {
@@ -504,6 +526,20 @@ public class Arena implements ConfigurationSerializable {
                 blueTeam.giveItems(player);
             }
             player.giveDeckGear();
+        }
+    }
+
+    /**
+     * Send a message to all players in the arena.
+     *
+     * @param msg the message
+     */
+    public void announceMessage(String msg) {
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().sendMessage(msg);
+        }
+        for (MissileWarsPlayer player : spectators) {
+            player.getMCPlayer().sendMessage(msg);
         }
     }
 

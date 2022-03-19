@@ -10,6 +10,8 @@ commands:
     aliases:
       - mw
       - umw
+  Spectate:
+    description: Spectate the MissileWarsGame
 depend:
   - WorldEdit
   - PlaceholderAPI

@@ -118,6 +118,7 @@ public class MissileWarsTeam {
         mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
+        mcPlayer.setGameMode(GameMode.SURVIVAL);
     }
 
     /**

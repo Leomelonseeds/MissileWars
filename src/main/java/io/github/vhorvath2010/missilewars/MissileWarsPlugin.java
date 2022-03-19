@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
+import io.github.vhorvath2010.missilewars.commands.SpectateCommand;
 import io.github.vhorvath2010.missilewars.decks.DeckManager;
 import io.github.vhorvath2010.missilewars.events.ArenaGameruleEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
@@ -43,6 +44,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Load commands and events
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
+        getCommand("Spectate").setExecutor(new SpectateCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);
