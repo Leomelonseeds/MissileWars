@@ -7,6 +7,8 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -52,6 +54,35 @@ public class StructureItemEvents implements Listener {
         // Place structure
         SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), redTeam);
         hand.setAmount(hand.getAmount() - 1);
+    }
+
+    /** Handle utilities utilization. */
+    @EventHandler
+    public void useFireball(PlayerInteractEvent event) {
+        // Check if player is trying to place a utility item
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        Player player = event.getPlayer();
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        Block clicked = event.getClickedBlock();
+        if (hand.getItemMeta() == null) {
+            return;
+        }
+        if (!hand.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
+                PersistentDataType.STRING)) {
+            return;
+        }
+        String utility = hand.getItemMeta().getPersistentDataContainer().get(
+                new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
+        event.setCancelled(true);
+
+        // Do proper action based on utility type
+        hand.setAmount(hand.getAmount() - 1);
+        assert utility != null;
+        if (utility.equalsIgnoreCase("fireball")) {
+            Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.FIREBALL);
+            fireball.setYield(0);
+            fireball.setDirection(player.getEyeLocation().getDirection());
+        }
     }
 
 }
