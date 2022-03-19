@@ -4,6 +4,7 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,6 +55,25 @@ public class ArenaGameruleEvents implements Listener {
         }
     }
 
+    /** Handle player deaths. */
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        // Check if player was killed in an Arena
+        Player player = event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena == null) {
+            return;
+        }
+
+        // Find killer and increment kills
+        if (player.getKiller() == null) {
+            MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
+            killer.incrementKills();
+        }
+    }
+
+    /** Handle player respawns. */
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         // Check if player is in Arena

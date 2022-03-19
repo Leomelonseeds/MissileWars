@@ -14,6 +14,8 @@ public class MissileWarsPlayer {
     private UUID playerId;
     /** The current deck the player has selected. */
     private Deck deck;
+    /** The number of kills the player has. */
+    private int kills;
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -58,6 +60,20 @@ public class MissileWarsPlayer {
      */
     public Player getMCPlayer() {
         return Bukkit.getPlayer(playerId);
+    }
+
+    /**
+     * Get the number of kills this {@link MissileWarsPlayer} has.
+     *
+     * @return the number of kills this {@link MissileWarsPlayer} has
+     */
+    public int getKills() {
+        return kills;
+    }
+
+    /** Increment the kill count for this {@link MissileWarsPlayer}. */
+    public void incrementKills() {
+        kills++;
     }
 
     /**
