@@ -53,6 +53,8 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
             msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
+            msg = msg.replaceAll("%umw_arena_status%", "" + (arena.isRunning() ? ChatColor.GREEN + "" +
+                    "running" : ChatColor.GOLD + "In Lobby"));
             // TODO: Implement placeholders for during game and end of game
         }
 

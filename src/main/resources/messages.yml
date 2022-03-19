@@ -127,4 +127,5 @@ inventories:
       name: "&c%umw_arena%"
       lore:
         - "&7Players: %umw_arena_players%/%umw_arena_cap%"
+        - "&7Status: %umw_arena_status%"
         - "&7Click to join, %player_name%!"
