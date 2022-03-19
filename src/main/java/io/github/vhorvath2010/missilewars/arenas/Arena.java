@@ -474,4 +474,37 @@ public class Arena implements ConfigurationSerializable {
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 100);
     }
 
+    /**
+     * Get the spawn of a Spigot Player in the arena.
+     *
+     * @param player the player
+     * @return player's spawn
+     */
+    public Location getPlayerSpawn(Player player) {
+        if (redTeam.containsPlayer(player.getUniqueId())) {
+            return redTeam.getSpawn();
+        } else if (blueTeam.containsPlayer(player.getUniqueId())) {
+            return blueTeam.getSpawn();
+        } else {
+            return getWorld().getSpawnLocation();
+        }
+    }
+
+    /**
+     * Give the user a new set of gear.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void regear(UUID uuid) {
+        MissileWarsPlayer player = getPlayerInArena(uuid);
+        if (player != null) {
+            if (redTeam.containsPlayer(uuid)) {
+                redTeam.giveItems(player);
+            } else if (blueTeam.containsPlayer(uuid)) {
+                blueTeam.giveItems(player);
+            }
+            player.giveDeckGear();
+        }
+    }
+
 }

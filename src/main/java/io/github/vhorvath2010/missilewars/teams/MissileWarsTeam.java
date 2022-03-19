@@ -64,6 +64,15 @@ public class MissileWarsTeam {
     }
 
     /**
+     * Get the team's spawn location.
+     *
+     * @return the team's spawn location
+     */
+    public Location getSpawn() {
+        return spawn;
+    }
+
+    /**
      * Check if a team contains a specific player based on their MC UUID.
      *
      * @param uuid the uuid of player to check for
@@ -76,6 +85,15 @@ public class MissileWarsTeam {
             }
         }
         return false;
+    }
+
+    public void giveItems(MissileWarsPlayer player) {
+        // TP to team spawn and give armor
+        Player mcPlayer = player.getMCPlayer();
+        mcPlayer.getInventory().clear();
+        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
     }
 
     /**

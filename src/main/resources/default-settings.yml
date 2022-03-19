@@ -41,3 +41,6 @@ barrier:
   center:
     x: 52
     z: 0
+
+# The y-level players will be teleported back to their spawn after falling to
+void-tp-level: 16
