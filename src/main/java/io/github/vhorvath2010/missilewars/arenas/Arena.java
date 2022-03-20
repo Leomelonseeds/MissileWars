@@ -307,6 +307,19 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
+     * Remove the given player from the spectators list.
+     *
+     * @param player the player
+     */
+    private void removeSpectator(MissileWarsPlayer player) {
+        if (spectators.remove(player)) {
+            String joinMsg = ConfigUtils.getConfigText("spectate-join-others", player.getMCPlayer(),
+                    this, player.getMCPlayer());
+            announceMessage(joinMsg);
+        }
+    }
+
+    /**
      * Enqueue a player with a given UUID to the red team.
      *
      * @param uuid the Player's UUID
@@ -319,12 +332,14 @@ public class Arena implements ConfigurationSerializable {
                         blueQueue.remove(player);
                         redQueue.add(player);
                         ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                        removeSpectator(player);
                     }
                 } else {
                     if (redTeam.getSize() - blueTeam.getSize() >= 1) {
                         player.getMCPlayer().sendMessage(ChatColor.RED + "The red team has no space!");
                     } else {
                         redTeam.addPlayer(player);
+                        removeSpectator(player);
                     }
                 }
                 break;
@@ -345,12 +360,14 @@ public class Arena implements ConfigurationSerializable {
                         redQueue.remove(player);
                         blueQueue.add(player);
                         ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                        removeSpectator(player);
                     }
                 } else {
                     if (blueTeam.getSize() - redTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ChatColor.RED + "The red team has no space!");
+                        player.getMCPlayer().sendMessage(ChatColor.RED + "The blue team has no space!");
                     } else {
                         blueTeam.addPlayer(player);
+                        removeSpectator(player);
                     }
                 }
                 break;
@@ -367,6 +384,8 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
                 spectators.add(player);
+                redQueue.remove(player);
+                blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
                 String joinMsg = ConfigUtils.getConfigText("spectate-join-others", mcPlayer, this, mcPlayer);
