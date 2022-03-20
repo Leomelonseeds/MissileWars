@@ -310,6 +310,7 @@ public class Arena implements ConfigurationSerializable {
         redTeam.removePlayer(toRemove);
         blueTeam.removePlayer(toRemove);
         Player mcPlayer = toRemove.getMCPlayer();
+        System.out.println("Removing " + mcPlayer);
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");

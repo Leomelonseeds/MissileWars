@@ -73,11 +73,15 @@ public class StructureItemEvents implements Listener {
         }
         String utility = hand.getItemMeta().getPersistentDataContainer().get(
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
+        assert utility != null;
+        // Allow event if using bow
+        if (utility.equalsIgnoreCase("sentinel_bow")) {
+            return;
+        }
         event.setCancelled(true);
 
         // Do proper action based on utility type
-        assert utility != null;
-        if (utility.equalsIgnoreCase("fireball")) {
+        if (utility.equalsIgnoreCase("fireball") && event.getAction().toString().contains("RIGHT_CLICK")) {
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(0);

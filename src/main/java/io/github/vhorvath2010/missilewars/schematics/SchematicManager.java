@@ -63,8 +63,15 @@ public class SchematicManager {
         if (!structureConfig.contains(structureName + ".file")) {
             return false;
         }
+        String fileName = structureConfig.getString(structureName + ".file");
+        if (fileName == null) {
+            return false;
+        }
+        if (redMissile) {
+            fileName = fileName.replaceAll(".nbt", "_red.nbt");
+        }
         File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
-                structureConfig.getString(structureName + ".file"));
+            fileName);
 
         // Load structure data
         StructureManager manager = Bukkit.getStructureManager();
@@ -79,28 +86,12 @@ public class SchematicManager {
         Location spawnLoc = loc.clone();
         Vector offset = getVector(structureConfig, structureName + ".offset");
         // Flip z if on red team
-        if (redMissile) {
-            offset.setZ(offset.getZ() * -1);
-        }
-        spawnLoc = spawnLoc.add(offset);
-
-        // Replace convert blue blocks to red blocks and apply rotation if needed
         StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
+            offset.setZ(offset.getZ() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
-            Palette blockPalette = structure.getPalettes().get(0);
-            for (BlockState data : blockPalette.getBlocks()) {
-                String type = data.getType().toString();
-                if (type.contains("BLUE_")) {
-                    Material newMat = Material.getMaterial(type.replace("BLUE_", "RED_"));
-                    if (newMat != null) {
-                        data.setType(newMat);
-                        data.update(true, true);
-                        System.out.println("updated " + data.getType());
-                    }
-                }
-            }
         }
+        spawnLoc = spawnLoc.add(offset);
 
         // Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
