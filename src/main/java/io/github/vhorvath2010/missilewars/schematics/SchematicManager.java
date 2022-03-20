@@ -89,6 +89,7 @@ public class SchematicManager {
         StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
             offset.setZ(offset.getZ() * -1);
+            offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
         }
         spawnLoc = spawnLoc.add(offset);
