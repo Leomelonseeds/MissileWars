@@ -49,12 +49,14 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_arena%", arena.getName());
             msg = msg.replaceAll("%umw_arena_players%", "" + arena.getNumPlayers());
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
-            msg = msg.replaceAll("%umw_team%", arena.getTeam(player.getUniqueId()));
-            msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
             msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
             msg = msg.replaceAll("%umw_arena_status%", "" + (arena.isRunning() ? ChatColor.GREEN + "" +
-                    "running" : ChatColor.GOLD + "In Lobby"));
+                    "Running" : ChatColor.GOLD + "In Lobby"));
+            if (player != null) {
+                msg = msg.replaceAll("%umw_team%", arena.getTeam(player.getUniqueId()));
+                msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
+            }
             // TODO: Implement placeholders for during game and end of game
         }
 

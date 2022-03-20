@@ -168,6 +168,20 @@ public class MissileWarsTeam {
         if (chaosMode) {
             timeBetween /= settings.getInt("chaos-mode.multiplier");
         }
+
+        int secsBetween = (int) Math.floor(timeBetween);
+
+        // Setup level countdown till distribution
+        for (int secInCd = secsBetween; secInCd > 0; secInCd--) {
+            int finalSecInCd = secInCd;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    arena.setXpLevel(finalSecInCd);
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), (secsBetween - secInCd) * 20);
+        }
+
         poolItemRunnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -178,7 +192,7 @@ public class MissileWarsTeam {
                 // Enqueue next distribution
                 scheduleDeckItems();
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), (int) Math.floor(timeBetween * 20L));
+        }.runTaskLater(MissileWarsPlugin.getPlugin(),  secsBetween * 20L);
     }
 
     /** Stop the distribution of in-game Deck items. */

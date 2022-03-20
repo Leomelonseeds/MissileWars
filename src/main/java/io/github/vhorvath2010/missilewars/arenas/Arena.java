@@ -275,7 +275,7 @@ public class Arena implements ConfigurationSerializable {
         // Check for game start
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("minimum-players");
-        if (getNumPlayers() > minPlayers) {
+        if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
         return true;
@@ -326,7 +326,7 @@ public class Arena implements ConfigurationSerializable {
      */
     private void removeSpectator(MissileWarsPlayer player) {
         if (spectators.remove(player)) {
-            String joinMsg = ConfigUtils.getConfigText("spectate-join-others", player.getMCPlayer(),
+            String joinMsg = ConfigUtils.getConfigText("messages.spectate-join-others", player.getMCPlayer(),
                     this, player.getMCPlayer());
             announceMessage(joinMsg);
         }
@@ -349,8 +349,8 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (redTeam.getSize() - blueTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("queue-join-error", null,
-                                this, null));
+                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error",
+                                null, this, null));
                     } else {
                         redTeam.addPlayer(player);
                         removeSpectator(player);
@@ -378,7 +378,7 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (blueTeam.getSize() - redTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("queue-join-error", null,
+                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error", null,
                                 this, null));
                     } else {
                         blueTeam.addPlayer(player);
@@ -403,7 +403,7 @@ public class Arena implements ConfigurationSerializable {
                 blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
-                String joinMsg = ConfigUtils.getConfigText("spectate-join-others", mcPlayer, this, mcPlayer);
+                String joinMsg = ConfigUtils.getConfigText("messages.spectate-join-others", mcPlayer, this, mcPlayer);
                 announceMessage(joinMsg);
                 break;
             }
@@ -417,7 +417,7 @@ public class Arena implements ConfigurationSerializable {
         // Schedule the start of the game if not already running
         if (startTime == null) {
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
-            String startMsg = ConfigUtils.getConfigText("lobby-countdown-start", null, this, null);
+            String startMsg = ConfigUtils.getConfigText("messages.lobby-countdown-start", null, this, null);
             announceMessage(startMsg);
             tasks.add(new BukkitRunnable() {
                 @Override
@@ -427,13 +427,17 @@ public class Arena implements ConfigurationSerializable {
             }.runTaskLater(MissileWarsPlugin.getPlugin(), secCountdown * 20));
             // Schedule 3-second countdown
             Arena arena = this;
-            for (int secInCd = 3; secInCd > 0; secInCd--) {
+            for (int secInCd = secCountdown; secInCd > 0; secInCd--) {
+                int finalSecInCd = secInCd;
                 tasks.add(new BukkitRunnable() {
                     @Override
                     public void run() {
-                        String startMsg = ConfigUtils.getConfigText("lobby-countdown-near", null,
-                                arena, null);
-                        announceMessage(startMsg);
+                        if (finalSecInCd < 5) {
+                            String startMsg = ConfigUtils.getConfigText("messages.lobby-countdown-near", null,
+                                    arena, null);
+                            announceMessage(startMsg);
+                        }
+                        setXpLevel(finalSecInCd);
                     }
                 }.runTaskLater(MissileWarsPlugin.getPlugin(), (secCountdown - secInCd) * 20));
             }
@@ -610,6 +614,24 @@ public class Arena implements ConfigurationSerializable {
         }
         for (MissileWarsPlayer player : spectators) {
             player.getMCPlayer().sendMessage(msg);
+        }
+    }
+
+    /**
+     * Sets the XP level for everyone in the arena.
+     *
+     * @param level the level to set XP to
+     */
+    public void setXpLevel(int level) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayer() != null) {
+                player.getMCPlayer().setLevel(level);
+            }
+        }
+        for (MissileWarsPlayer spectator : spectators) {
+            if (spectator.getMCPlayer() != null) {
+                spectator.getMCPlayer().setLevel(level);
+            }
         }
     }
 
