@@ -24,20 +24,15 @@ public class ArenaGameruleEvents implements Listener {
         }
     }
     
-    /** Handle void death. */
+    /** Handle void death. Works outside arenas too. */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
     	//Check if entity is player
     	if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        // Check if player is in an Arena
+    	
         Player player = (Player) event.getEntity();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
-            return;
-        }
 
         // Cause instant death so player can respawn faster
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
