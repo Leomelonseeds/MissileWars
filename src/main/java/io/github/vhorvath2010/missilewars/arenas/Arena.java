@@ -314,14 +314,22 @@ public class Arena implements ConfigurationSerializable {
     public void enqueueRed(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (!redQueue.contains(player)) {
-                    blueQueue.remove(player);
-                    redQueue.add(player);
-                    ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                if (!running) {
+                    if (!redQueue.contains(player)) {
+                        blueQueue.remove(player);
+                        redQueue.add(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                    }
+                } else {
+                    if (redTeam.getSize() - blueTeam.getSize() >= 1) {
+                        player.getMCPlayer().sendMessage(ChatColor.RED + "The red team has no space!");
+                    } else {
+                        redTeam.addPlayer(player);
+                    }
                 }
+                break;
             }
         }
-        // TODO: Join team if balanced and joining while game is running
     }
 
     /**
@@ -332,14 +340,22 @@ public class Arena implements ConfigurationSerializable {
     public void enqueueBlue(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (!blueQueue.contains(player)) {
-                    redQueue.remove(player);
-                    blueQueue.add(player);
-                    ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                if (!running) {
+                    if (!blueQueue.contains(player)) {
+                        redQueue.remove(player);
+                        blueQueue.add(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                    }
+                } else {
+                    if (blueTeam.getSize() - redTeam.getSize() >= 1) {
+                        player.getMCPlayer().sendMessage(ChatColor.RED + "The red team has no space!");
+                    } else {
+                        blueTeam.addPlayer(player);
+                    }
                 }
+                break;
             }
         }
-        // TODO: Join team if balanced and joining while game is running
     }
 
     /**
