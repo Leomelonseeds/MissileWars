@@ -269,6 +269,12 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
         player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().addItem(new ItemStack(Material.BOW));
+        // Check for game start
+        int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml").getInt("minimum-players");
+        if (getNumPlayers() > minPlayers) {
+            scheduleStart();
+        }
         return true;
     }
 
@@ -336,7 +342,8 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (redTeam.getSize() - blueTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ChatColor.RED + "The red team has no space!");
+                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("queue-join-error", null,
+                                this, null));
                     } else {
                         redTeam.addPlayer(player);
                         removeSpectator(player);
@@ -364,7 +371,8 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (blueTeam.getSize() - redTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ChatColor.RED + "The blue team has no space!");
+                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("queue-join-error", null,
+                                this, null));
                     } else {
                         blueTeam.addPlayer(player);
                         removeSpectator(player);
@@ -391,6 +399,36 @@ public class Arena implements ConfigurationSerializable {
                 String joinMsg = ConfigUtils.getConfigText("spectate-join-others", mcPlayer, this, mcPlayer);
                 announceMessage(joinMsg);
                 break;
+            }
+        }
+    }
+
+    /** Schedule the start of the game based on the config time. */
+    public void scheduleStart() {
+        int secCountdown = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                        "default-settings.yml").getInt("start-countdown");
+        // Schedule the start of the game if not already running
+        if (startTime == null) {
+            startTime = LocalDateTime.now().plusSeconds(secCountdown);
+            String startMsg = ConfigUtils.getConfigText("lobby-countdown-start", null, this, null);
+            announceMessage(startMsg);
+            tasks.add(new BukkitRunnable() {
+                @Override
+                public void run() {
+                    start();
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), secCountdown * 20));
+            // Schedule 3-second countdown
+            Arena arena = this;
+            for (int secInCd = 3; secInCd > 0; secInCd--) {
+                tasks.add(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        String startMsg = ConfigUtils.getConfigText("lobby-countdown-near", null,
+                                arena, null);
+                        announceMessage(startMsg);
+                    }
+                }.runTaskLater(MissileWarsPlugin.getPlugin(), (secCountdown - secInCd) * 20));
             }
         }
     }
@@ -527,6 +565,7 @@ public class Arena implements ConfigurationSerializable {
             public void run() {
                 removePlayers();
                 resetWorld();
+                startTime = null;
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 100);
     }

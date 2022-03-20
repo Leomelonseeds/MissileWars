@@ -44,3 +44,6 @@ barrier:
 
 # The y-level players will be teleported back to their spawn after falling to
 void-tp-level: 16
+
+# Countdown time for start after minimum players is left
+start-countdown: 30
