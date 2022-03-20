@@ -266,9 +266,9 @@ public class Arena implements ConfigurationSerializable {
         player.setHealth(20);
         player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
-        player.teleport(Bukkit.getWorld("mwarena_" + name).getSpawnLocation());
+        player.teleport(getPlayerSpawn(player));
         player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().addItem(new ItemStack(Material.BOW));
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
         // Check for game start
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("minimum-players");
@@ -306,8 +306,8 @@ public class Arena implements ConfigurationSerializable {
         redQueue.remove(toRemove);
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
-            mcPlayer.getInventory().clear();
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + mcPlayer.getName());
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
     }
@@ -577,29 +577,18 @@ public class Arena implements ConfigurationSerializable {
      * @return player's spawn
      */
     public Location getPlayerSpawn(Player player) {
-        if (redTeam.containsPlayer(player.getUniqueId())) {
-            return redTeam.getSpawn();
-        } else if (blueTeam.containsPlayer(player.getUniqueId())) {
-            return blueTeam.getSpawn();
-        } else {
-            return getWorld().getSpawnLocation();
-        }
-    }
-
-    /**
-     * Give the user a new set of gear.
-     *
-     * @param uuid the UUID of the player
-     */
-    public void regear(UUID uuid) {
-        MissileWarsPlayer player = getPlayerInArena(uuid);
-        if (player != null) {
-            if (redTeam.containsPlayer(uuid)) {
-                redTeam.giveItems(player);
-            } else if (blueTeam.containsPlayer(uuid)) {
-                blueTeam.giveItems(player);
-            }
-            player.giveDeckGear();
+		if (redTeam != null && redTeam.containsPlayer(player.getUniqueId())) {
+			return redTeam.getSpawn();
+		} else if (blueTeam != null && blueTeam.containsPlayer(player.getUniqueId())) {
+			return blueTeam.getSpawn();
+		}
+         else {
+        	FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                    .toString(), "maps.yml");
+            Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
+            Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            spawnLoc.setYaw(90);
+            return spawnLoc;
         }
     }
 

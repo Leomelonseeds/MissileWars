@@ -18,40 +18,11 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
 
-    /** Events to handle creature spawns. */
-    @EventHandler
-    public void onSpawn(CreatureSpawnEvent event) {
-        // Cancel natural spawns in arena worlds
-        if (event.getLocation().getWorld() != null && event.getLocation().getWorld().getName().contains("mwarena_")) {
-            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
     /** Event to ignore hunger. */
     @EventHandler
     public void onHunger(FoodLevelChangeEvent event) {
         if (event.getEntity().getWorld().getName().contains("mwarena_")) {
             event.setCancelled(true);
-        }
-    }
-
-    /** Event to avoid deaths by void. */
-    @EventHandler
-    public void onVoidCross(PlayerMoveEvent event) {
-        // Check if player is in Arena
-        Player player = event.getPlayer();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
-            return;
-        }
-
-        // Check for void TP
-        if (player.getLocation().getY() <= ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "default-settings.yml").getInt("void-tp-level")) {
-            player.teleport(playerArena.getPlayerSpawn(player));
         }
     }
 
@@ -67,7 +38,7 @@ public class ArenaGameruleEvents implements Listener {
         }
 
         // Find killer and increment kills
-        if (player.getKiller() == null) {
+        if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
             killer.incrementKills();
         }
@@ -86,7 +57,6 @@ public class ArenaGameruleEvents implements Listener {
 
         // Setup proper respawn location
         event.setRespawnLocation(playerArena.getPlayerSpawn(player));
-        playerArena.regear(player.getUniqueId());
     }
 
 }

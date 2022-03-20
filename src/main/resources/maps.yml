@@ -5,6 +5,10 @@ lobby:
     x: 85
     y: 63
     z: 0
+  spawn:
+    x: 85.5
+    y: 63.5
+    z: 0.5
   npc-pos:
     red:
       x: 96.5
