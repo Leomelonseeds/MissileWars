@@ -76,12 +76,13 @@ public class StructureItemEvents implements Listener {
         event.setCancelled(true);
 
         // Do proper action based on utility type
-        hand.setAmount(hand.getAmount() - 1);
         assert utility != null;
         if (utility.equalsIgnoreCase("fireball")) {
-            Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.FIREBALL);
+            Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
+                    .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(0);
             fireball.setDirection(player.getEyeLocation().getDirection());
+            hand.setAmount(hand.getAmount() - 1);
         }
     }
 

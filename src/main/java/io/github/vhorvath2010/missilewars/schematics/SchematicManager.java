@@ -87,12 +87,15 @@ public class SchematicManager {
         // Replace convert blue blocks to red blocks and apply rotation if needed
         StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
+            System.out.println("Spawning Red Missile");
             rotation = StructureRotation.CLOCKWISE_180;
             Palette blockPalette = structure.getPalettes().get(0);
             for (BlockState data : blockPalette.getBlocks()) {
                 String type = data.getType().toString();
+                System.out.println(type);
                 if (type.contains("BLUE_")) {
                     Material newMat = Material.getMaterial(type.replace("BLUE_", "RED_"));
+                    System.out.println(newMat.toString());
                     if (newMat != null) {
                         data.setType(newMat);
                     }

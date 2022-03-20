@@ -307,6 +307,8 @@ public class Arena implements ConfigurationSerializable {
         spectators.remove(toRemove);
         blueQueue.remove(toRemove);
         redQueue.remove(toRemove);
+        redTeam.removePlayer(toRemove);
+        blueTeam.removePlayer(toRemove);
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());

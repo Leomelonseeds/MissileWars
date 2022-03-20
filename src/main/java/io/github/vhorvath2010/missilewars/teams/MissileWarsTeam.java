@@ -186,4 +186,18 @@ public class MissileWarsTeam {
         poolItemRunnable.cancel();
     }
 
+    /**
+     * Remove a given player from the team.
+     *
+     * @param player the player to remove
+     */
+    public void removePlayer(MissileWarsPlayer player) {
+        if (members.contains(player)) {
+            player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", player.getMCPlayer(), arena,
+                    player.getMCPlayer()));
+            members.remove(player);
+            broadcastConfigMsg("messages.leave-team-others", player);
+        }
+    }
+
 }

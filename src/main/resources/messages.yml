@@ -9,6 +9,8 @@ messages:
   joined-arena-others: "%umw_focus% &7joined the arena."
   leave-arena: "You left %umw_arena%"
   leave-arena-others: "%umw_focus% &7left the arena."
+  leave-team: "You left the %umw_team% team."
+  leave-team-others: "%umw_focus% &7left your team."
   spectate-join-others: "%umw_focus% &7is now spectating."
   spectate-leave-others: "%umw_focus% &7is no longer spectating."
   queue-waiting: "You are now queued for %umw_team%&7 in position %umw_position%"
