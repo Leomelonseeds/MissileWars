@@ -80,7 +80,8 @@ public class StructureItemEvents implements Listener {
         if (utility.equalsIgnoreCase("fireball")) {
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
-            fireball.setYield(0);
+            fireball.setYield(1);
+            fireball.setIsIncendiary(false);
             fireball.setDirection(player.getEyeLocation().getDirection());
             hand.setAmount(hand.getAmount() - 1);
         }
