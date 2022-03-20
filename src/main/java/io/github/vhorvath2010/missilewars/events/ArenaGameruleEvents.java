@@ -1,33 +1,20 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
-import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
-import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
-
-    /** Events to handle creature spawns. */
-    @EventHandler
-    public void onSpawn(CreatureSpawnEvent event) {
-        // Cancel natural spawns in arena worlds
-        if (event.getLocation().getWorld() != null && event.getLocation().getWorld().getName().contains("mwarena_")) {
-            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-                event.setCancelled(true);
-            }
-        }
-    }
 
     /** Event to ignore hunger. */
     @EventHandler
@@ -36,22 +23,20 @@ public class ArenaGameruleEvents implements Listener {
             event.setCancelled(true);
         }
     }
-
-    /** Event to avoid deaths by void. */
+    
+    /** Handle void death. Works outside arenas too. */
     @EventHandler
-    public void onVoidCross(PlayerMoveEvent event) {
-        // Check if player is in Arena
-        Player player = event.getPlayer();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
+    public void onDamage(EntityDamageEvent event) {
+    	//Check if entity is player
+    	if (!(event.getEntity() instanceof Player)) {
             return;
         }
+    	
+        Player player = (Player) event.getEntity();
 
-        // Check for void TP
-        if (player.getLocation().getY() <= ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "default-settings.yml").getInt("void-tp-level")) {
-            player.teleport(playerArena.getPlayerSpawn(player));
+        // Cause instant death so player can respawn faster
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            player.setHealth(0);
         }
     }
 
@@ -67,7 +52,7 @@ public class ArenaGameruleEvents implements Listener {
         }
 
         // Find killer and increment kills
-        if (player.getKiller() == null) {
+        if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
             killer.incrementKills();
         }
@@ -86,7 +71,6 @@ public class ArenaGameruleEvents implements Listener {
 
         // Setup proper respawn location
         event.setRespawnLocation(playerArena.getPlayerSpawn(player));
-        playerArena.regear(player.getUniqueId());
     }
 
 }

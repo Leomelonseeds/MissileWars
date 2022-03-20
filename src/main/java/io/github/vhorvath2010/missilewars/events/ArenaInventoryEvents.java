@@ -113,14 +113,6 @@ public class ArenaInventoryEvents implements Listener {
         if (mwPlayer.getDeck().getGear().contains(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
-
-        // Delete drop after 10 seconds if still on ground
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                event.getItemDrop().remove();
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 10*20);
     }
 
     /** Manage item pickups. */

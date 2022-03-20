@@ -108,7 +108,7 @@ rifter: {}
 shieldbuster:
   file: 'shieldbuster.nbt'
   item: WITCH_SPAWN_EGG
-  name: "&2☢ Shieldbuster &c&l☣"
+  name: "&2☢ Shieldbuster &2&l☣"
   lore:
   - ""
   - "&7This classic missile is able to"

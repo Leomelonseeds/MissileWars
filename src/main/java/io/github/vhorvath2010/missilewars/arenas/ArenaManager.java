@@ -69,7 +69,9 @@ public class ArenaManager {
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
-            new WorldCreator("mwarena_" + arena.getName()).createWorld().setAutoSave(false);
+            WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
+            arenaCreator.generator(new VoidChunkGenerator());
+            arenaCreator.createWorld();
         }
     }
 
@@ -156,7 +158,7 @@ public class ArenaManager {
         // Adds flags
         Set<String> enterCommands = new HashSet<>();
         enterCommands.add("/kit " + team + "waitinglobby %username%");
-        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_ENTRY, enterCommands);
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_ENTRY, enterCommands);
         Set<PotionEffect> effects = new HashSet<>();
         effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999999, 5));
         effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 99999999, 5));
@@ -168,7 +170,7 @@ public class ArenaManager {
         leaveCommands.add("/minecraft:item replace entity %username% armor.chest with air");
         leaveCommands.add("/minecraft:item replace entity %username% armor.feet with air");
         leaveCommands.add("/clear %username%");
-        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_EXIT, leaveCommands);
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_EXIT, leaveCommands);
         try {
             lobbyRegion.setParent(parent);
         } catch (ProtectedRegion.CircularInheritanceException e) {
@@ -191,6 +193,9 @@ public class ArenaManager {
             return false;
         }
 
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+
         // Create Arena world
         creator.sendMessage(ChatColor.GREEN + "Generating arena world...");
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
@@ -198,6 +203,18 @@ public class ArenaManager {
         World arenaWorld = arenaCreator.createWorld();
         assert arenaWorld != null;
         arenaWorld.setAutoSave(false);
+        arenaWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        arenaWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        arenaWorld.setGameRule(GameRule.DO_TILE_DROPS, false);
+        arenaWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+        arenaWorld.setGameRule(GameRule.KEEP_INVENTORY, true);
+        arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+        arenaWorld.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
+        Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
+        Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+        spawnLoc.setYaw(90);
+        arenaWorld.setSpawnLocation(spawnLoc);
+        arenaWorld.setTime(6000);
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
         // Create Arena lobby
@@ -208,10 +225,6 @@ public class ArenaManager {
         } else {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
         }
-
-        // Spawn lobby NPCs
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
 
         // Spawn red NPC
         Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red");
