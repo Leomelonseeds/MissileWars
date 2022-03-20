@@ -41,7 +41,7 @@ public class DeckManager {
         ItemStack shield = createSchematicItem("shield_2");
         ItemStack fireball = createUtilityItem("fireball");
         List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{arrows, guardian, buster, tomahawk, juggernaut,
-                lightning, shield}));
+                lightning, shield, fireball}));
 
         defaultDeck = new Deck("Default", gear, pool);
     }

@@ -158,7 +158,7 @@ public class ArenaManager {
         // Adds flags
         Set<String> enterCommands = new HashSet<>();
         enterCommands.add("/kit " + team + "waitinglobby %username%");
-        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_ENTRY, enterCommands);
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_ENTRY, enterCommands);
         Set<PotionEffect> effects = new HashSet<>();
         effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999999, 5));
         effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 99999999, 5));
@@ -170,7 +170,7 @@ public class ArenaManager {
         leaveCommands.add("/minecraft:item replace entity %username% armor.chest with air");
         leaveCommands.add("/minecraft:item replace entity %username% armor.feet with air");
         leaveCommands.add("/clear %username%");
-        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.COMMAND_ON_EXIT, leaveCommands);
+        lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_EXIT, leaveCommands);
         try {
             lobbyRegion.setParent(parent);
         } catch (ProtectedRegion.CircularInheritanceException e) {

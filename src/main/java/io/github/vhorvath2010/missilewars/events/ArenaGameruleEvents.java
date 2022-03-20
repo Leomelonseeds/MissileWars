@@ -1,19 +1,17 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
-import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
-import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
@@ -23,6 +21,27 @@ public class ArenaGameruleEvents implements Listener {
     public void onHunger(FoodLevelChangeEvent event) {
         if (event.getEntity().getWorld().getName().contains("mwarena_")) {
             event.setCancelled(true);
+        }
+    }
+    
+    /** Handle void death. */
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+    	//Check if entity is player
+    	if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        // Check if player is in an Arena
+        Player player = (Player) event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena == null) {
+            return;
+        }
+
+        // Cause instant death so player can respawn faster
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            player.setHealth(0);
         }
     }
 

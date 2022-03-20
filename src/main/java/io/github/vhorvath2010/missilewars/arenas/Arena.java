@@ -269,6 +269,9 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(getPlayerSpawn(player));
         player.setGameMode(GameMode.ADVENTURE);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.legs with air");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.chest with air");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.feet with air");
         // Check for game start
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("minimum-players");
@@ -307,7 +310,9 @@ public class Arena implements ConfigurationSerializable {
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + mcPlayer.getName());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.chest with air");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.feet with air");
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
     }
