@@ -146,7 +146,7 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the map successfully generated, otherwise false
      */
     public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld());
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), true);
     }
 
     /**
@@ -475,6 +475,7 @@ public class Arena implements ConfigurationSerializable {
         // Generate map.
         if (!generateMap("default-map")) {
         	announceMessage("messages.map-failed");
+        	return false;
         } else {
         	announceMessage("messages.starting");
         }
