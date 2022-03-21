@@ -1,22 +1,35 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
+
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.*;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
@@ -308,8 +321,10 @@ public class Arena implements ConfigurationSerializable {
         spectators.remove(toRemove);
         blueQueue.remove(toRemove);
         redQueue.remove(toRemove);
-        redTeam.removePlayer(toRemove);
-        blueTeam.removePlayer(toRemove);
+        if (redTeam != null) {
+            redTeam.removePlayer(toRemove);
+            blueTeam.removePlayer(toRemove);
+        }
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
@@ -327,8 +342,7 @@ public class Arena implements ConfigurationSerializable {
      */
     private void removeSpectator(MissileWarsPlayer player) {
         if (spectators.remove(player)) {
-            String joinMsg = ConfigUtils.getConfigText("messages.spectate-join-others", player.getMCPlayer(),
-                    this, player.getMCPlayer());
+            String joinMsg = "messages.spectate-join-others";
             announceMessage(joinMsg);
         }
     }
@@ -406,7 +420,7 @@ public class Arena implements ConfigurationSerializable {
                 blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
-                String joinMsg = ConfigUtils.getConfigText("messages.spectate-join-others", mcPlayer, this, mcPlayer);
+                String joinMsg = "messages.spectate-join-others";
                 announceMessage(joinMsg);
                 break;
             }
@@ -415,34 +429,33 @@ public class Arena implements ConfigurationSerializable {
 
     /** Schedule the start of the game based on the config time. */
     public void scheduleStart() {
-        int secCountdown = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                        "default-settings.yml").getInt("start-countdown");
+    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        int secCountdown = plugin.getConfig().getInt("lobby-wait-time");
         // Schedule the start of the game if not already running
         if (startTime == null) {
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
-            String startMsg = ConfigUtils.getConfigText("messages.lobby-countdown-start", null, this, null);
+            String startMsg = "messages.lobby-countdown-start";
             announceMessage(startMsg);
             tasks.add(new BukkitRunnable() {
                 @Override
                 public void run() {
                     start();
                 }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), secCountdown * 20));
-            // Schedule 3-second countdown
-            Arena arena = this;
+            }.runTaskLater(plugin, secCountdown * 20));
+            // Schedule 30-second countdown
+            int cdNear = plugin.getConfig().getInt("lobby-countdown-near");
             for (int secInCd = secCountdown; secInCd > 0; secInCd--) {
                 int finalSecInCd = secInCd;
                 tasks.add(new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (finalSecInCd < 5) {
-                            String startMsg = ConfigUtils.getConfigText("messages.lobby-countdown-near", null,
-                                    arena, null);
+                        if (finalSecInCd <= cdNear) {
+                            String startMsg = "messages.lobby-countdown-near";
                             announceMessage(startMsg);
                         }
                         setXpLevel(finalSecInCd);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), (secCountdown - secInCd) * 20));
+                }.runTaskLater(plugin, (secCountdown - secInCd) * 20));
             }
         }
     }
@@ -456,12 +469,15 @@ public class Arena implements ConfigurationSerializable {
         if (running) {
             return false;
         }
-        // Generate map
+        
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        generateMap("default-map");
-
-        // Save clean world to disk
-        getWorld().save();
+        
+        // Generate map.
+        if (!generateMap("default-map")) {
+        	announceMessage("messages.map-failed");
+        } else {
+        	announceMessage("messages.starting");
+        }
 
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
@@ -478,39 +494,46 @@ public class Arena implements ConfigurationSerializable {
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
-        do {
-            if (!redQueue.isEmpty()) {
-                MissileWarsPlayer toAdd = redQueue.remove();
-                redTeam.addPlayer(toAdd);
-                toAssign.remove(toAdd);
-            }
-            if (!blueQueue.isEmpty()) {
-                MissileWarsPlayer toAdd = blueQueue.remove();
-                blueTeam.addPlayer(toAdd);
-                toAssign.remove(toAdd);
-            }
-        } while (!blueQueue.isEmpty() && !redQueue.isEmpty());
+        
+        // Teleport teams slightly later to wait for map generation
+        tasks.add(new BukkitRunnable() {
+        	@Override
+        	public void run() {
+		        do {
+		            if (!redQueue.isEmpty()) {
+		                MissileWarsPlayer toAdd = redQueue.remove();
+		                redTeam.addPlayer(toAdd);
+		                toAssign.remove(toAdd);
+		            }
+		            if (!blueQueue.isEmpty()) {
+		                MissileWarsPlayer toAdd = blueQueue.remove();
+		                blueTeam.addPlayer(toAdd);
+		                toAssign.remove(toAdd);
+		            }
+		        } while (!blueQueue.isEmpty() && !redQueue.isEmpty());
+		
+		        // Assign remaining players
+		        for (MissileWarsPlayer player : toAssign) {
+		            // Ignore if player is a spectator
+		            if (spectators.contains(player)) {
+		                continue;
+		            }
+		            if (blueTeam.getSize() <= redTeam.getSize()) {
+		                blueTeam.addPlayer(player);
+		            } else {
+		                redTeam.addPlayer(player);
+		            }
+		        }
 
-        // Assign remaining players
-        for (MissileWarsPlayer player : toAssign) {
-            // Ignore if player is a spectator
-            if (spectators.contains(player)) {
-                continue;
-            }
-            if (blueTeam.getSize() <= redTeam.getSize()) {
-                blueTeam.addPlayer(player);
-            } else {
-                redTeam.addPlayer(player);
-            }
-        }
-
-        // Start deck distribution for each team and send messages
-        redTeam.scheduleDeckItems();
-        redTeam.broadcastConfigMsg("messages.classic-start", null);
-        redTeam.distributeGear();
-        blueTeam.scheduleDeckItems();
-        blueTeam.distributeGear();
-        blueTeam.broadcastConfigMsg("messages.classic-start", null);
+		        // Start deck distribution for each team and send messages
+		        redTeam.scheduleDeckItems();
+		        redTeam.broadcastConfigMsg("messages.classic-start", null);
+		        redTeam.distributeGear();
+		        blueTeam.scheduleDeckItems();
+		        blueTeam.distributeGear();
+		        blueTeam.broadcastConfigMsg("messages.classic-start", null);
+        	}
+        }.runTaskLater(plugin, 20));
 
         // Setup game timers
         // Game start
@@ -574,6 +597,8 @@ public class Arena implements ConfigurationSerializable {
         // Stop game and send messages
         redTeam.broadcastConfigMsg("messages.classic-end", null);
         blueTeam.broadcastConfigMsg("messages.classic-end", null);
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Remove all players after a short time
         new BukkitRunnable() {
@@ -583,7 +608,7 @@ public class Arena implements ConfigurationSerializable {
                 resetWorld();
                 startTime = null;
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 100);
+        }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time"));
     }
 
     /**
@@ -613,12 +638,14 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param msg the message
      */
-    public void announceMessage(String msg) {
+    public void announceMessage(String path) {
         for (MissileWarsPlayer player : players) {
-            player.getMCPlayer().sendMessage(msg);
+        	Player mcPlayer = player.getMCPlayer();
+            ConfigUtils.sendConfigMessage(path, mcPlayer, this, null);
         }
         for (MissileWarsPlayer player : spectators) {
-            player.getMCPlayer().sendMessage(msg);
+        	Player mcPlayer = player.getMCPlayer();
+            ConfigUtils.sendConfigMessage(path, mcPlayer, this, null);
         }
     }
 

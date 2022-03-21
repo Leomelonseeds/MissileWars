@@ -8,7 +8,7 @@ cancel-schematic:
     
 # When min player requirements met for each arena, 
 # how long do players wait for to start game (s)
-lobby-wait-time: 60
+lobby-wait-time: 30
 
 # When lobby is full, how long do players wait for (s)
 lobby-wait-time-full: 10
@@ -17,9 +17,53 @@ lobby-wait-time-full: 10
 # and players kicked to main lobby.
 victory-wait-time: 15
 
-# When player falls past this level, it is counted as a death
-# and players respawn instantly
-void-y-level: -20
-
 # At what point should the countdown send messages and play sounds
 lobby-countdown-near: 5
+
+### The below section is copied from default-settings.yml.   ###
+### default-settings.yml will be removed in the future - all ###
+### future config lookups should use this section instead    ###
+
+# The player capacity. 10 means 5 players per team.
+# Additional players can still join the arena, but they can only spectate.  
+arena-cap: 10
+  
+# Length of game before a tie is declared, in minutes  
+game-length: 30
+
+# Frequency of giving items, based on how many players are on a team.
+item-frequency:
+  # ex. for 1 player on a team, give items every 10 seconds
+  1: 15
+  2: 20
+  # 3 and above
+  3: 25
+
+# Maximum number of items available to players by default
+inventory-limit: 6
+
+# Give items faster as game time nears end   
+chaos-mode:
+  # Activates when this many minutes are left in the game
+  time-left: 10
+  # Multiply item-frequency by this amount
+  multiplier: 2
+  
+# Min number of players to start countdown for a game  
+minimum-players: 2
+
+# square worldborder with width radius*2
+worldborder:
+  center:
+    x: 0
+    z: 0
+  radius: 250
+
+# Square barrier between the lobby and the map in each world
+# Note: center is the absolute location in the world
+# Note: the barrier runs in the Y and Z plane
+barrier:
+  length: 256
+  center:
+    x: 52
+    z: 0

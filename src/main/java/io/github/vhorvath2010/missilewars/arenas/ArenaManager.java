@@ -275,10 +275,6 @@ public class ArenaManager {
         bartender.spawn(barLoc);
         profession.setProfession(Villager.Profession.NITWIT);
 
-        // Setup world spawn to lobby center
-        Vector spawnVector = SchematicManager.getVector(schematicConfig, "lobby.pos");
-        arenaWorld.setSpawnLocation(spawnVector.getBlockX(), spawnVector.getBlockY(), spawnVector.getBlockZ());
-
         // Spawn barrier wall
         FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml");
@@ -291,17 +287,8 @@ public class ArenaManager {
             }
         }
 
-        // Spawn arena with default map
+        // Register arena
         Arena arena = new Arena(name, settings.getInt("arena-cap"));
-        creator.sendMessage(ChatColor.GREEN + "Generating default map...");
-        if (arena.generateMap("default-map")) {
-            creator.sendMessage(ChatColor.GREEN + "Default map generated!");
-        } else {
-            creator.sendMessage(ChatColor.RED + "Error generating default map! Are schematic files present?");
-            return false;
-        }
-
-        // Register Arena
         loadedArenas.add(arena);
 
         // Setup regions
@@ -319,6 +306,9 @@ public class ArenaManager {
         wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld)).addRegion(lobbyRegion);
         createWaitingLobby("red", arena, lobbyRegion);
         createWaitingLobby("blue", arena, lobbyRegion);
+
+        creator.sendMessage(ChatColor.GREEN + "Saving world...");
+        arenaWorld.save();
 
         return true;
     }
