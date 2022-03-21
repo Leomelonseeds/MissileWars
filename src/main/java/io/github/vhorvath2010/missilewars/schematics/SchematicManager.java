@@ -16,6 +16,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
@@ -132,8 +133,13 @@ public class SchematicManager {
 
         // Paste WE clipboard
         Vector spawnPos = getVector(schematicConfig, schematicName + ".pos");
-        clipboard.paste(BukkitAdapter.adapt(world),
-                Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                clipboard.paste(BukkitAdapter.adapt(world),
+                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+            }
+        }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
         return true;
     }
 
