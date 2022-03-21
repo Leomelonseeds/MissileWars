@@ -52,6 +52,7 @@ public class ArenaGameruleEvents implements Listener {
         }
 
         // Find killer and increment kills
+        ArenaLeaveEvents.beingRespawned.add(player);
         if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
             killer.incrementKills();
