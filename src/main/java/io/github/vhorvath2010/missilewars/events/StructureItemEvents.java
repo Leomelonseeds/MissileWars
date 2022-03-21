@@ -33,14 +33,13 @@ public class StructureItemEvents implements Listener {
                 PersistentDataType.STRING)) {
             return;
         }
-        String structureName = hand.getItemMeta().getPersistentDataContainer().get(
-                new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), PersistentDataType.STRING);
-        event.setCancelled(true);
 
-        // Stop if not left-click on block
+        // Stop if not right-click on block
         if (!event.getAction().toString().contains("RIGHT") || clicked == null) {
             return;
         }
+        
+        event.setCancelled(true);
 
         // Find player's team (Default to blue)
         boolean redTeam = false;
@@ -50,6 +49,9 @@ public class StructureItemEvents implements Listener {
             redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED +
                     "red" + ChatColor.RESET);
         }
+        
+        String structureName = hand.getItemMeta().getPersistentDataContainer().get(
+                new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), PersistentDataType.STRING);
 
         // Place structure
         SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), redTeam);
@@ -71,17 +73,20 @@ public class StructureItemEvents implements Listener {
                 PersistentDataType.STRING)) {
             return;
         }
+        
         String utility = hand.getItemMeta().getPersistentDataContainer().get(
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
         assert utility != null;
+        
         // Allow event if using bow
         if (utility.equalsIgnoreCase("sentinel_bow")) {
             return;
         }
-        event.setCancelled(true);
+       
 
         // Do proper action based on utility type
         if (utility.equalsIgnoreCase("fireball") && event.getAction().toString().contains("RIGHT_CLICK")) {
+        	event.setCancelled(true);
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(1);

@@ -270,7 +270,6 @@ public class Arena implements ConfigurationSerializable {
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
-        player.getInventory().addItem(new ItemStack(Material.BOW));
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.legs with air");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.chest with air");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.feet with air");
