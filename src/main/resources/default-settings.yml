@@ -8,10 +8,10 @@ game-length: 30
 # Frequency of giving items, based on how many players are on a team.
 item-frequency:
   # ex. for 1 player on a team, give items every 10 seconds
-  1: 10
-  2: 15
+  1: 15
+  2: 20
   # 3 and above
-  3: 20
+  3: 25
 
 # Maximum number of items available to players by default
 inventory-limit: 6
