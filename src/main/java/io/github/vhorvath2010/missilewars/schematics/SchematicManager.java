@@ -95,7 +95,12 @@ public class SchematicManager {
         }
         spawnLoc = spawnLoc.add(offset);
 
-        // Place structure
+        // Do not place if hitbox would intersect with barrier
+        if (structure.getSize().getX() + spawnLoc.getX() >= plugin.getConfig().getInt("barrier.center.x")) {
+        	return false;
+        }
+        
+        //Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         return true;
     }

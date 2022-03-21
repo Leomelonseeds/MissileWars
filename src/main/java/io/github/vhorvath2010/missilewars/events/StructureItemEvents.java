@@ -1,10 +1,10 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
-import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
+import java.util.List;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -14,12 +14,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to handle events for structure items. */
 public class StructureItemEvents implements Listener {
@@ -64,15 +71,15 @@ public class StructureItemEvents implements Listener {
     @EventHandler
     public void useStructureItem(PlayerInteractEvent event) {
         // Check if player is trying to place a structure item
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Player player = event.getPlayer();
+    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+;        Player player = event.getPlayer();
         ItemStack hand = player.getInventory().getItemInMainHand();
         Block clicked = event.getClickedBlock();
         String structureName = getStructureFromItem(hand);
         if (structureName == null) {
             return;
         }
-
+      
         // Switch to throwing logic if using shield
         if (structureName.contains("shield_")) {
             return;
@@ -83,20 +90,30 @@ public class StructureItemEvents implements Listener {
             return;
         }
         event.setCancelled(true);
+        
+        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+        
+        for (String s : cancel) {
+        	if (clicked.getType() == Material.getMaterial(s)) {
+            	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+        		return;
+        	}
+        }
 
         // Place structure
-        SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player));
-        hand.setAmount(hand.getAmount() - 1);
+        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player))) {
+            hand.setAmount(hand.getAmount() - 1);
+        } else {
+        	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+        }
     }
 
     /** Handle utilities utilization. */
     @EventHandler
     public void useUtility(PlayerInteractEvent event) {
         // Check if player is trying to place a utility item
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
         ItemStack hand = player.getInventory().getItemInMainHand();
-        Block clicked = event.getClickedBlock();
         if (hand.getItemMeta() == null) {
             return;
         }
@@ -111,6 +128,11 @@ public class StructureItemEvents implements Listener {
         if (utility.equalsIgnoreCase("sentinel_bow")) {
             return;
         }
+        // Stop if not left-click
+        if (!event.getAction().toString().contains("RIGHT")) {
+            return;
+        }
+      
         event.setCancelled(true);
 
         // Do proper action based on utility type
@@ -160,22 +182,4 @@ public class StructureItemEvents implements Listener {
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
     }
-
-    /** Handle shield generation on hit */
-    @EventHandler
-    public void shieldHit(ProjectileHitEvent event) {
-        // Ensure we are tracking a shield thrown by a player
-        if (event.getEntity().getType() != EntityType.SNOWBALL) {
-            return;
-        }
-        Snowball thrown = (Snowball) event.getEntity();
-        if (!(thrown.getShooter() instanceof Player) || thrown.getCustomName() == null) {
-            return;
-        }
-        Player thrower = (Player) thrown.getShooter();
-
-        // Attempt to spawn shield
-        SchematicManager.spawnNBTStructure(thrown.getCustomName(), thrown.getLocation(), isRedTeam(thrower));
-    }
-
 }

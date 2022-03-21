@@ -41,6 +41,3 @@ barrier:
   center:
     x: 52
     z: 0
-
-# Countdown time for start after minimum players is left
-start-countdown: 30

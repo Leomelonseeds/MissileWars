@@ -5,7 +5,7 @@ messages:
   prefix: "&7"
   join-arena: "Joining %umw_arena%..."
   arena-full: "&cThat arena is full!"
-  joined-arena: "Welcome! Use &a/queue &7to join a team, and &a/spawn &7to return to main lobby."
+  joined-arena: "Welcome! &aRight-click an NPC &7to join a team, and use &a/spawn &7to return to main lobby."
   joined-arena-others: "%umw_focus% &7joined the arena."
   leave-arena: "You left %umw_arena%"
   leave-arena-others: "%umw_focus% &7left the arena."
@@ -13,18 +13,21 @@ messages:
   leave-team-others: "%umw_focus% &7left your team."
   spectate-join-others: "%umw_focus% &7is now spectating."
   spectate-leave-others: "%umw_focus% &7is no longer spectating."
-  queue-waiting: "You are now queued for %umw_team%&7 in position %umw_position%"
+  queue-waiting: "You are now queued for %umw_team%&7 in position &c%umw_position%"
   queue-join: "You joined the game as %umw_team%&7"
   queue-join-others: "%umw_focus% has joined %umw_team%&7!"
   queue-join-error: "You cannot join %umw_team%&7 as the teams would be unbalanced."
-  lobby-countdown-start: "Minimum player requirements met. The game will start in %umw_time% seconds."
-  lobby-countdown-full: "The lobby is full! The game will start in %umw_time% seconds."
-  lobby-countdown-near: "Starting in %umw_time%..."
-  game-end-reminder: "The game will end in %umw_time_remaining% minutes!"
-  chaos-mode: "&a&l[!] &7There are %umw_chaos_time% minutes until the game ends. Items will now be given 2x faster."
-  drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds!"
+  lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
+  lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."
+  lobby-countdown-near: "Starting in &c%umw_time%..."
+  map-failed: "&cMap failed to generate! Please contact an admin."
+  starting: "&7Starting now! Please wait for the map to generate..."
+  cannot-place-structure: "&cYou cannot use that here!"
+  game-end-reminder: "The game will end in &c%umw_time_remaining% &7minutes!"
+  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster."
+  drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
-  game-end-near: "Game ending in %umw_time_remaining% minutes!"
+  game-end-near: "Game ending in &c%umw_time_remaining% &7minutes!"
   team-empty: "All players on %umw_team% have left."
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
@@ -32,17 +35,21 @@ messages:
   nerf-team: "You will recieve items slower since a teammate joined."
   # All lines sent simultaneously, with prefix included
   classic-start:
-    - "Welcome to &dMissile &5Wars &7- &aClassic"
+    - "&b========================================"
+    - "&fWelcome to &dMissile &5Wars &7- &aClassic"
     - "&bBlow up your opponents' nether portals to win!"
     - "&aRight-click &7your items to use them."
-    - "&aType /leave &7to go back to the lobby."
+    - "&7Type &a/leave &7to go back to the lobby."
+    - "&b========================================"
   classic-end:
     # mvps - players who blew up portals
+    - "&b========================================"
     - "&5MVPs: %umw_mvps%"
     # If tied for top killer/deaths, list both
     - "&cMost Kills: %umw_focus%"
     - "&eMost Deaths: %umw_focus%"
     - "&aThanks for playing!"
+    - "&b========================================"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
