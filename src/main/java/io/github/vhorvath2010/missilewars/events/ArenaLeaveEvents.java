@@ -42,10 +42,7 @@ public class ArenaLeaveEvents implements Listener {
         Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null || beingRespawned.remove(player)) {
-            if (playerArena != null) {
-                player.teleport(playerArena.getPlayerSpawn(player));
-            }
+        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
             return;
         }
         playerArena.removePlayer(player.getUniqueId());
