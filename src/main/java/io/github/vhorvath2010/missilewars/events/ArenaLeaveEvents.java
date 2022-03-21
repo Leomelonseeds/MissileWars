@@ -9,8 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /** Class for managing arena leaving. */
 public class ArenaLeaveEvents implements Listener {
+
+    public static Set<Player> beingRespawned = new HashSet<>();
 
     /** Remove player from Arena if they DC. */
     @EventHandler
@@ -37,11 +42,7 @@ public class ArenaLeaveEvents implements Listener {
         Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
-<<<<<<< Updated upstream
-        if (playerArena == null) {
-=======
         if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
->>>>>>> Stashed changes
             return;
         }
         playerArena.removePlayer(player.getUniqueId());

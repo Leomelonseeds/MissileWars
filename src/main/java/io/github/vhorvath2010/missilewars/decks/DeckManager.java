@@ -29,6 +29,9 @@ public class DeckManager {
         bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
         bow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 4);
+        ItemMeta bowMeta = bow.getItemMeta();
+        bowMeta.setUnbreakable(true);
+        bow.setItemMeta(bowMeta);
         gear.add(bow);
 
         // Setup pool items

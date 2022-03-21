@@ -5,6 +5,7 @@ import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -149,6 +150,7 @@ public class MissileWarsTeam {
         ItemStack item = new ItemStack(type);
         LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
         meta.setColor(DyeColor.valueOf(ChatColor.stripColor(name).toUpperCase()).getColor());
+        meta.setUnbreakable(true);
         item.setItemMeta(meta);
         return item;
     }

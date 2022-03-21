@@ -16,6 +16,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
@@ -63,8 +64,15 @@ public class SchematicManager {
         if (!structureConfig.contains(structureName + ".file")) {
             return false;
         }
+        String fileName = structureConfig.getString(structureName + ".file");
+        if (fileName == null) {
+            return false;
+        }
+        if (redMissile) {
+            fileName = fileName.replaceAll(".nbt", "_red.nbt");
+        }
         File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
-                structureConfig.getString(structureName + ".file"));
+            fileName);
 
         // Load structure data
         StructureManager manager = Bukkit.getStructureManager();
@@ -79,28 +87,13 @@ public class SchematicManager {
         Location spawnLoc = loc.clone();
         Vector offset = getVector(structureConfig, structureName + ".offset");
         // Flip z if on red team
-        if (redMissile) {
-            offset.setZ(offset.getZ() * -1);
-        }
-        spawnLoc = spawnLoc.add(offset);
-
-        // Replace convert blue blocks to red blocks and apply rotation if needed
         StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
+            offset.setZ(offset.getZ() * -1);
+            offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
-            Palette blockPalette = structure.getPalettes().get(0);
-            for (BlockState data : blockPalette.getBlocks()) {
-                String type = data.getType().toString();
-                if (type.contains("BLUE_")) {
-                    Material newMat = Material.getMaterial(type.replace("BLUE_", "RED_"));
-                    if (newMat != null) {
-                        data.setType(newMat);
-                        data.update(true, true);
-                        System.out.println("updated " + data.getType());
-                    }
-                }
-            }
         }
+        spawnLoc = spawnLoc.add(offset);
 
         // Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
@@ -140,8 +133,13 @@ public class SchematicManager {
 
         // Paste WE clipboard
         Vector spawnPos = getVector(schematicConfig, schematicName + ".pos");
-        clipboard.paste(BukkitAdapter.adapt(world),
-                Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                clipboard.paste(BukkitAdapter.adapt(world),
+                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+            }
+        }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
         return true;
     }
 
