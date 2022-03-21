@@ -1,24 +1,21 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.gamemode.GameMode;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.*;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
-import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
-import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.trait.CommandTrait;
-import net.citizensnpcs.trait.LookClose;
-import net.citizensnpcs.trait.SheepTrait;
-import net.citizensnpcs.trait.VillagerProfession;
-import org.bukkit.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -31,11 +28,29 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
+import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
+import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.LookClose;
+import net.citizensnpcs.trait.SheepTrait;
+import net.citizensnpcs.trait.VillagerProfession;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -187,13 +202,16 @@ public class ArenaManager {
      * @return true if the Arena was created, otherwise false
      */
     public boolean createArena(String name, CommandSender creator) {
+    	
+    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+    	
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
             creator.sendMessage(ChatColor.RED + "A world already exists for that arena!");
             return false;
         }
 
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
 
         // Create Arena world
@@ -216,13 +234,14 @@ public class ArenaManager {
 
         // Create Arena lobby
         creator.sendMessage(ChatColor.GREEN + "Generating lobby...");
-        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld)) {
+        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, false)) {
             creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
             return false;
         } else {
             creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
         }
 
+        
         // Spawn red NPC
         Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red");
         Location redLoc = new Location(arenaWorld, redVec.getX(), redVec.getY(), redVec.getZ());
@@ -236,6 +255,7 @@ public class ArenaManager {
         SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
         redSheepTrait.setColor(DyeColor.RED);
         redLoc.getWorld().loadChunk(redLoc.getChunk());
+        redNPC.data().set(NPC.SILENT_METADATA, true);
         redNPC.spawn(redLoc);
 
         // Spawn blue NPC
@@ -251,6 +271,7 @@ public class ArenaManager {
         SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
         blueSheepTrait.setColor(DyeColor.BLUE);
         blueLoc.getWorld().loadChunk(blueLoc.getChunk());
+        blueNPC.data().set(NPC.SILENT_METADATA, true);
         blueNPC.spawn(blueLoc);
 
 
@@ -272,6 +293,7 @@ public class ArenaManager {
         // Setup Villager Profession
         VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
         barLoc.getWorld().loadChunk(barLoc.getChunk());
+        bartender.data().set(NPC.SILENT_METADATA, true);
         bartender.spawn(barLoc);
         profession.setProfession(Villager.Profession.NITWIT);
 
@@ -303,13 +325,20 @@ public class ArenaManager {
         lobbyRegion.setFlag(Flags.GAME_MODE, GameMode.REGISTRY.get("adventure"));
         lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
+        lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
         wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld)).addRegion(lobbyRegion);
         createWaitingLobby("red", arena, lobbyRegion);
         createWaitingLobby("blue", arena, lobbyRegion);
 
         creator.sendMessage(ChatColor.GREEN + "Saving world...");
-        arenaWorld.save();
-
+        // Wait a bit to ensure world is fully loaded before saving
+        new BukkitRunnable() {
+        	@Override
+        	public void run() {
+        		arenaWorld.save();
+        	}
+        }.runTaskLater(plugin, 100);
+        
         return true;
     }
 

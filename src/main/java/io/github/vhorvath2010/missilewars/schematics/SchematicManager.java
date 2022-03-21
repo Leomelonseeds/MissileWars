@@ -111,9 +111,10 @@ public class SchematicManager {
      *
      * @param schematicName the name of the schematic in the maps.yml file
      * @param world the world to spawn the schematic in
+     * @param whether to run async
      * @return true if the schematic was generated successfully, otherwise false
      */
-    public static boolean spawnFAWESchematic(String schematicName, World world) {
+    public static boolean spawnFAWESchematic(String schematicName, World world, Boolean async) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
@@ -138,13 +139,19 @@ public class SchematicManager {
 
         // Paste WE clipboard
         Vector spawnPos = getVector(schematicConfig, schematicName + ".pos");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                clipboard.paste(BukkitAdapter.adapt(world),
-                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
-            }
-        }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
+        
+        if (async) {
+	        new BukkitRunnable() {
+	            @Override
+	            public void run() {
+	                clipboard.paste(BukkitAdapter.adapt(world),
+	                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+	            }
+	        }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
+        } else {
+        	clipboard.paste(BukkitAdapter.adapt(world),
+                    Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+        }
         return true;
     }
 
