@@ -74,7 +74,7 @@ public class StructureItemEvents implements Listener {
         }
 
         // Switch to throwing logic if using shield
-        if (structureName.contains("shield")) {
+        if (structureName.contains("shield_")) {
             return;
         }
 
