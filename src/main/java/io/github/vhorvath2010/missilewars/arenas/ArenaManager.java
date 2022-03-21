@@ -325,7 +325,7 @@ public class ArenaManager {
         lobbyRegion.setFlag(Flags.GAME_MODE, GameMode.REGISTRY.get("adventure"));
         lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
-        lobbyRegion.setFlag(Flags.DENY_MESSAGE, "-e");
+        lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
         wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld)).addRegion(lobbyRegion);
         createWaitingLobby("red", arena, lobbyRegion);
         createWaitingLobby("blue", arena, lobbyRegion);
