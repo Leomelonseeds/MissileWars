@@ -92,9 +92,14 @@ public class MissileWarsTeam {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         mcPlayer.getInventory().clear();
-        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
+        new BukkitRunnable() {
+        	@Override
+        	public void run() {
+		        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+		        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+		        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
+        	}
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 5);
     }
 
     /**
@@ -113,13 +118,10 @@ public class MissileWarsTeam {
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        mcPlayer.getInventory().clear();
-        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
+        giveItems(player);
     }
 
     /**
