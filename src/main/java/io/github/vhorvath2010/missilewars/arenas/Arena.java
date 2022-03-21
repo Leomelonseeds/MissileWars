@@ -269,6 +269,7 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(getPlayerSpawn(player));
         player.setGameMode(GameMode.ADVENTURE);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
+        player.getInventory().addItem(new ItemStack(Material.BOW));
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.legs with air");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.chest with air");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.feet with air");
@@ -310,7 +311,6 @@ public class Arena implements ConfigurationSerializable {
         redTeam.removePlayer(toRemove);
         blueTeam.removePlayer(toRemove);
         Player mcPlayer = toRemove.getMCPlayer();
-        System.out.println("Removing " + mcPlayer);
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");
@@ -354,6 +354,7 @@ public class Arena implements ConfigurationSerializable {
                                 null, this, null));
                     } else {
                         redTeam.addPlayer(player);
+                        player.giveDeckGear();
                         removeSpectator(player);
                     }
                 }
@@ -383,6 +384,7 @@ public class Arena implements ConfigurationSerializable {
                                 this, null));
                     } else {
                         blueTeam.addPlayer(player);
+                        player.giveDeckGear();
                         removeSpectator(player);
                     }
                 }
@@ -469,6 +471,8 @@ public class Arena implements ConfigurationSerializable {
         Vector redSpawnVec = SchematicManager.getVector(mapConfig, "default-map.red-spawn");
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
+        blueSpawn.setWorld(getWorld());
+        redSpawn.setWorld(getWorld());
 
         // Assign players to teams based on queue (which removes their items)
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
