@@ -3,25 +3,24 @@ package io.github.vhorvath2010.missilewars.events;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-<<<<<<< Updated upstream
-=======
 import org.bukkit.Location;
 import org.bukkit.Material;
->>>>>>> Stashed changes
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-<<<<<<< Updated upstream
-=======
 import org.bukkit.event.entity.ProjectileLaunchEvent;
->>>>>>> Stashed changes
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -32,6 +31,43 @@ import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 /** Class to handle events for structure items. */
 public class StructureItemEvents implements Listener {
 
+    /**
+     * Get a structure from a structure item.
+     *
+     * @param item the structure item
+     * @return the name of the structure, or null if the item has none
+     */
+    private String getStructureFromItem(ItemStack item) {
+        if (item.getItemMeta() == null) {
+            return null;
+        }
+        if (!item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"),
+                PersistentDataType.STRING)) {
+            return null;
+        }
+        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
+                "item-structure"), PersistentDataType.STRING);
+    }
+
+    /**
+     * Check if a given player is on the red team.
+     *
+     * @param player the player
+     * @return true if they are on the red team, false otherwise (including if they are not on any team at all)
+     */
+    private boolean isRedTeam(Player player) {
+        // Find player's team (Default to blue)
+        boolean redTeam = false;
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena != null) {
+            redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED +
+                    "red" + ChatColor.RESET);
+        }
+        return redTeam;
+    }
+
+    /** Handle missile and other structure item spawning. */
     @EventHandler
     public void useStructureItem(PlayerInteractEvent event) {
         // Check if player is trying to place a structure item
@@ -39,25 +75,20 @@ public class StructureItemEvents implements Listener {
 ;        Player player = event.getPlayer();
         ItemStack hand = player.getInventory().getItemInMainHand();
         Block clicked = event.getClickedBlock();
-        if (hand.getItemMeta() == null) {
+        String structureName = getStructureFromItem(hand);
+        if (structureName == null) {
             return;
         }
-<<<<<<< Updated upstream
-        if (!hand.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"),
-                PersistentDataType.STRING)) {
-=======
-
+      
         // Switch to throwing logic if using shield
-        if (structureName.contains("shield") && !structureName.contains("buster")) {
->>>>>>> Stashed changes
+        if (structureName.contains("shield_")) {
             return;
         }
 
-        // Stop if not right-click on block
+        // Stop if not left-click on block
         if (!event.getAction().toString().contains("RIGHT") || clicked == null) {
             return;
         }
-        
         event.setCancelled(true);
         
         List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
@@ -69,34 +100,17 @@ public class StructureItemEvents implements Listener {
         	}
         }
 
-        // Find player's team (Default to blue)
-        boolean redTeam = false;
-        ArenaManager manager = plugin.getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
-        if (arena != null) {
-            redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED +
-                    "red" + ChatColor.RESET);
-        }
-        
-        String structureName = hand.getItemMeta().getPersistentDataContainer().get(
-                new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), PersistentDataType.STRING);
-
         // Place structure
-<<<<<<< Updated upstream
-        SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), redTeam);
-        hand.setAmount(hand.getAmount() - 1);
-=======
         if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player))) {
             hand.setAmount(hand.getAmount() - 1);
         } else {
         	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
         }
->>>>>>> Stashed changes
     }
 
     /** Handle utilities utilization. */
     @EventHandler
-    public void useFireball(PlayerInteractEvent event) {
+    public void useUtility(PlayerInteractEvent event) {
         // Check if player is trying to place a utility item
         Player player = event.getPlayer();
         ItemStack hand = player.getInventory().getItemInMainHand();
@@ -107,28 +121,22 @@ public class StructureItemEvents implements Listener {
                 PersistentDataType.STRING)) {
             return;
         }
-        
         String utility = hand.getItemMeta().getPersistentDataContainer().get(
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
         assert utility != null;
-        
         // Allow event if using bow
         if (utility.equalsIgnoreCase("sentinel_bow")) {
             return;
         }
-<<<<<<< Updated upstream
-       
-=======
         // Stop if not left-click
         if (!event.getAction().toString().contains("RIGHT")) {
             return;
         }
+      
         event.setCancelled(true);
->>>>>>> Stashed changes
 
         // Do proper action based on utility type
         if (utility.equalsIgnoreCase("fireball") && event.getAction().toString().contains("RIGHT_CLICK")) {
-        	event.setCancelled(true);
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(1);
@@ -138,8 +146,6 @@ public class StructureItemEvents implements Listener {
         }
     }
 
-<<<<<<< Updated upstream
-=======
     /** Handle shield snowball creation */
     @EventHandler
     public void useShield(ProjectileLaunchEvent event) {
@@ -176,5 +182,4 @@ public class StructureItemEvents implements Listener {
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
     }
->>>>>>> Stashed changes
 }

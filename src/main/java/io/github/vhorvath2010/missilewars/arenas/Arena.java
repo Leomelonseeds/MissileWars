@@ -490,9 +490,11 @@ public class Arena implements ConfigurationSerializable {
         blueSpawn.setWorld(getWorld());
         redSpawn.setWorld(getWorld());
 
-        // Assign players to teams based on queue (which removes their items)
+        // Setup scoreboard and teams
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
+
+        // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
         
         // Teleport teams slightly later to wait for map generation
@@ -566,10 +568,10 @@ public class Arena implements ConfigurationSerializable {
 
     /** Remove Players from the map. */
     public void removePlayers() {
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : new HashSet<>(players)) {
             removePlayer(player.getMCPlayerId());
         }
-        for (MissileWarsPlayer player : spectators) {
+        for (MissileWarsPlayer player : new HashSet<>(spectators)) {
             removePlayer(player.getMCPlayerId());
         }
     }

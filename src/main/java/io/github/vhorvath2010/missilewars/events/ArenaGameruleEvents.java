@@ -1,8 +1,11 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -60,4 +63,39 @@ public class ArenaGameruleEvents implements Listener {
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
+
+    /** Handle friendly fire. */
+    @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
+        // Ensure we are handling a player in an arena
+        if (event.getEntityType() != EntityType.PLAYER) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+
+        // Check if player is damaged by a player
+        Player damager = null;
+        if (event.getDamager().getType() == EntityType.PLAYER) {
+            damager = (Player) event.getDamager();
+        } else if (event.getDamager() instanceof Projectile) {
+            Projectile projectile = (Projectile) event.getDamager();
+            if (projectile.getShooter() instanceof Player) {
+                damager = (Player) projectile.getShooter();
+            }
+        }
+        if (damager == null) {
+            return;
+        }
+
+        // Stop event if damager and damaged are on same team
+        if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId()))) {
+            event.setCancelled(true);
+        }
+    }
+
 }
