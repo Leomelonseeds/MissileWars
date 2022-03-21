@@ -37,7 +37,11 @@ public class ArenaLeaveEvents implements Listener {
         Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
+<<<<<<< Updated upstream
         if (playerArena == null) {
+=======
+        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
+>>>>>>> Stashed changes
             return;
         }
         playerArena.removePlayer(player.getUniqueId());

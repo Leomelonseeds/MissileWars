@@ -211,10 +211,6 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         arenaWorld.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
         arenaWorld.setGameRule(GameRule.NATURAL_REGENERATION, false);
-        Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
-        Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
-        spawnLoc.setYaw(90);
-        arenaWorld.setSpawnLocation(spawnLoc);
         arenaWorld.setTime(6000);
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 
