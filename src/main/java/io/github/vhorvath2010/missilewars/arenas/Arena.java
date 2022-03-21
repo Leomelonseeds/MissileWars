@@ -9,10 +9,8 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.time.Duration;
@@ -46,8 +44,6 @@ public class Arena implements ConfigurationSerializable {
     private List<BukkitTask> tasks;
     /** Whether the arena is in chaos mode. */
     private boolean inChaos;
-    /** The scoreboard associated with the Arena's current game. */
-    private Scoreboard scoreboard;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -478,11 +474,8 @@ public class Arena implements ConfigurationSerializable {
         redSpawn.setWorld(getWorld());
 
         // Setup scoreboard and teams
-        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn,
-                ChatColor.BLUE, scoreboard);
-        redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn,
-                ChatColor.RED, scoreboard);
+        blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
+        redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
 
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
