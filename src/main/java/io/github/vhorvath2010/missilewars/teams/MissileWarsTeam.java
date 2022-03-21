@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +33,8 @@ public class MissileWarsTeam {
     private BukkitTask poolItemRunnable;
     /** Whether the team's decks should be distributing items in chaos-mode. */
     private boolean chaosMode;
+    /** The Minecraft {@link org.bukkit.scoreboard.Team} associated with this team. */
+    private Team mcTeam;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -39,11 +43,14 @@ public class MissileWarsTeam {
      * @param spawn the spawn for the team
      * @param arena the arena the team is linked to
      */
-    public MissileWarsTeam(String name, Arena arena, Location spawn) {
+    public MissileWarsTeam(String name, Arena arena, Location spawn, ChatColor teamColor, Scoreboard gameBoard) {
         this.name = name;
         this.members = new HashSet<>();
         this.spawn = spawn;
         this.arena = arena;
+        this.mcTeam = gameBoard.registerNewTeam(name);
+        this.mcTeam.setColor(teamColor);
+        this.mcTeam.setAllowFriendlyFire(false);
     }
 
     /**
@@ -115,6 +122,9 @@ public class MissileWarsTeam {
 
         // Assign default deck
         player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
+
+        // Add to team
+        mcTeam.addEntry(player.getMCPlayer().getName());
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
@@ -214,6 +224,7 @@ public class MissileWarsTeam {
             player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", player.getMCPlayer(), arena,
                     player.getMCPlayer()));
             members.remove(player);
+            mcTeam.removeEntry(player.getMCPlayer().getName());
             broadcastConfigMsg("messages.leave-team-others", player);
         }
     }

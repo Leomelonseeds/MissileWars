@@ -155,12 +155,14 @@ public class StructureItemEvents implements Listener {
                     // Spawn shield at current location and remove snowball
                     Location spawnLoc = thrown.getLocation();
                     SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower));
+                    thrown.remove();
                 }
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
     }
 
     /** Handle shield generation on hit */
+    @EventHandler
     public void shieldHit(ProjectileHitEvent event) {
         // Ensure we are tracking a shield thrown by a player
         if (event.getEntity().getType() != EntityType.SNOWBALL) {
