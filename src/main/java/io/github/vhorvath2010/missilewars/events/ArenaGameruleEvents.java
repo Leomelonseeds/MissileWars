@@ -1,22 +1,22 @@
 package io.github.vhorvath2010.missilewars.events;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
+
+import java.util.ArrayList;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
@@ -116,6 +116,20 @@ public class ArenaGameruleEvents implements Listener {
 
         // Register portal breaking at the location
         possibleArena.registerPortalBreak(event.getBlock().getLocation());
+    }
+
+    /** Handle fireball explosions. */
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event) {
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getEntity().getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        // Remove all portals from block list
+        event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
     }
 
 }
