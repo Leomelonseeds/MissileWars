@@ -127,6 +127,11 @@ public class ArenaGameruleEvents implements Listener {
         if (possibleArena == null) {
             return;
         }
+        
+        // Ensure its actually a fireball
+        if (event.getEntityType() != EntityType.FIREBALL) {
+        	return;
+        }
 
         // Remove all portals from block list
         event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);

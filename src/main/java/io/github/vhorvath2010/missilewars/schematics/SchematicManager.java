@@ -54,11 +54,14 @@ public class SchematicManager {
      * @param redMissile if the NBT structure is a red missile
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, boolean isMissile) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "items.yml");
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "maps.yml");
+
 
         // Attempt to get structure file
         if (!structureConfig.contains(structureName + ".file")) {
@@ -98,6 +101,15 @@ public class SchematicManager {
         // Do not place if hitbox would intersect with barrier
         if (structure.getSize().getX() + spawnLoc.getX() >= plugin.getConfig().getInt("barrier.center.x")) {
         	return false;
+        }
+        
+        // Do not place missiles if hitbox would come close to portal
+        if (isMissile) {
+        	if (redMissile && spawnLoc.getZ() - structure.getSize().getZ() < mapsConfig.getInt("default-map.portal.blue-z") + 1) {
+        		return false;
+        	} else if (!redMissile && spawnLoc.getZ() + structure.getSize().getZ() > mapsConfig.getInt("default-map.portal.red-z") - 1) {
+        		return false;
+        	}
         }
         
         //Place structure
