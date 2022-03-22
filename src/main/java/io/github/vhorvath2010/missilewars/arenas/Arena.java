@@ -20,7 +20,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -319,6 +318,17 @@ public class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
+
+        // Cancel tasks if starting and below min players
+        int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "default-settings.yml").getInt("minimum-players");
+        if (!running && startTime != null && players.size() < minPlayers) {
+            for (BukkitTask task : tasks) {
+                task.cancel();
+            }
+            startTime = null;
+        }
+
         spectators.remove(toRemove);
         blueQueue.remove(toRemove);
         redQueue.remove(toRemove);
