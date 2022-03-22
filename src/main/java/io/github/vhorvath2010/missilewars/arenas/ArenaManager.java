@@ -86,7 +86,7 @@ public class ArenaManager {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
             WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
             arenaCreator.generator(new VoidChunkGenerator());
-            arenaCreator.createWorld();
+            arenaCreator.createWorld().setAutoSave(false);
         }
     }
 
@@ -255,8 +255,8 @@ public class ArenaManager {
         SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
         redSheepTrait.setColor(DyeColor.RED);
         redLoc.getWorld().loadChunk(redLoc.getChunk());
-        redNPC.data().set(NPC.SILENT_METADATA, true);
         redNPC.spawn(redLoc);
+        redNPC.data().set(NPC.SILENT_METADATA, true);
 
         // Spawn blue NPC
         Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue");
@@ -271,9 +271,8 @@ public class ArenaManager {
         SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
         blueSheepTrait.setColor(DyeColor.BLUE);
         blueLoc.getWorld().loadChunk(blueLoc.getChunk());
-        blueNPC.data().set(NPC.SILENT_METADATA, true);
         blueNPC.spawn(blueLoc);
-
+        blueNPC.data().set(NPC.SILENT_METADATA, true);
 
         // Spawn bar NPC
         Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
@@ -293,9 +292,9 @@ public class ArenaManager {
         // Setup Villager Profession
         VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
         barLoc.getWorld().loadChunk(barLoc.getChunk());
-        bartender.data().set(NPC.SILENT_METADATA, true);
         bartender.spawn(barLoc);
         profession.setProfession(Villager.Profession.NITWIT);
+        bartender.data().set(NPC.SILENT_METADATA, true);
 
         // Spawn barrier wall
         FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
