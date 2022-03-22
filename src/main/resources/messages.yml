@@ -28,7 +28,8 @@ messages:
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
   game-end-near: "Game ending in &c%umw_time_remaining% &7minutes!"
-  team-empty: "All players on %umw_team% have left."
+  red-team-empty: "All players on the red team have left."
+  blue-team-empty: "All players on the blue team have left."
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
   buff-team: "You will recieve items faster because a teammate left."
