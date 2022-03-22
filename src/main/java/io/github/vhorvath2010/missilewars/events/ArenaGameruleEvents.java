@@ -1,10 +1,12 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -96,6 +98,24 @@ public class ArenaGameruleEvents implements Listener {
         if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId()))) {
             event.setCancelled(true);
         }
+    }
+
+    /** Handle portal breaking in Arenas. */
+    @EventHandler
+    public void onPortalBreak(BlockPhysicsEvent event) {
+        // See if portal was broken
+        if (event.getChangedType() != Material.NETHER_PORTAL) {
+            return;
+        }
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        // Register portal breaking at the location
+        possibleArena.registerPortalBreak(event.getBlock().getLocation());
     }
 
 }

@@ -589,6 +589,11 @@ public class Arena implements ConfigurationSerializable {
      * @param winningTeam the winning team
      */
     public void endGame(MissileWarsTeam winningTeam) {
+        // Ignore if game isn't running
+        if (!running) {
+            return;
+        }
+
         // Cancel all tasks
         for (BukkitTask task : tasks) {
             task.cancel();
@@ -639,7 +644,7 @@ public class Arena implements ConfigurationSerializable {
     /**
      * Send a message to all players in the arena.
      *
-     * @param msg the message
+     * @param path the path to the configurable message
      */
     public void announceMessage(String path) {
         for (MissileWarsPlayer player : players) {
@@ -667,6 +672,31 @@ public class Arena implements ConfigurationSerializable {
             if (spectator.getMCPlayer() != null) {
                 spectator.getMCPlayer().setLevel(level);
             }
+        }
+    }
+
+
+    /**
+     * Register the breaking of a portal at a location in this Arena.
+     *
+     * @param location the location
+     */
+    public void registerPortalBreak(Location location) {
+        // Check if portal broke at blue or red z
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        int z = location.getBlockZ();
+        if (z == mapsConfig.getInt("default-map.portal.blue-z")) {
+            blueTeam.registerPortalBreak(location);
+        } else if (z == mapsConfig.getInt("default-map.portal.red-z")) {
+            redTeam.registerPortalBreak(location);
+        }
+
+        // Check if either team's last portal has been broken
+        if (!redTeam.hasLivingPortal()) {
+            endGame(blueTeam);
+        } else if (!blueTeam.hasLivingPortal()) {
+            endGame(redTeam);
         }
     }
 

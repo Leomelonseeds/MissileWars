@@ -30,6 +30,8 @@ public class MissileWarsTeam {
     private BukkitTask poolItemRunnable;
     /** Whether the team's decks should be distributing items in chaos-mode. */
     private boolean chaosMode;
+    /** Whether the first and second portals are destroyed. Default to false. */
+    private boolean firstPortalDestroyed, secondPortalDestroyed;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -215,6 +217,44 @@ public class MissileWarsTeam {
             members.remove(player);
             broadcastConfigMsg("messages.leave-team-others", player);
         }
+    }
+
+    /**
+     * Register a portal break at a given location.
+     *
+     * @param loc the location
+     */
+    public void registerPortalBreak(Location loc) {
+        // Check if portal break was within location of first portal
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int x1 = mapsConfig.getInt("default-map.portal.x1");
+        int y1 = mapsConfig.getInt("default-map.portal.y1");
+        int x2 = mapsConfig.getInt("default-map.portal.x2");
+        int y2 = mapsConfig.getInt("default-map.portal.y2");
+        if (x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
+            firstPortalDestroyed = true;
+        }
+
+        // Check if second portal was broken
+        int x3 = mapsConfig.getInt("default-map.portal.x3");
+        int y3 = mapsConfig.getInt("default-map.portal.y3");
+        int x4 = mapsConfig.getInt("default-map.portal.x4");
+        int y4 = mapsConfig.getInt("default-map.portal.y4");
+        if (x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
+            secondPortalDestroyed = true;
+        }
+    }
+
+    /**
+     * Obtain whether the team has a living portal.
+     *
+     * @return true if either the first or second portal for this team exists
+     */
+    public boolean hasLivingPortal() {
+        return !firstPortalDestroyed || !secondPortalDestroyed;
     }
 
 }
