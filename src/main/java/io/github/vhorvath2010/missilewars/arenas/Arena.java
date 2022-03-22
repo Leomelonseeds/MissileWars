@@ -640,7 +640,7 @@ public class Arena implements ConfigurationSerializable {
                 resetWorld();
                 startTime = null;
             }
-        }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time"));
+        }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time") * 20L);
     }
 
     /**
