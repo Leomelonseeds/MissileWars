@@ -316,6 +316,7 @@ public class Arena implements ConfigurationSerializable {
      * @param uuid the UUID of the player
      */
     public void removePlayer(UUID uuid) {
+        // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
         spectators.remove(toRemove);
@@ -325,6 +326,8 @@ public class Arena implements ConfigurationSerializable {
             redTeam.removePlayer(toRemove);
             blueTeam.removePlayer(toRemove);
         }
+
+        // Run proper clearing commands on the player
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
@@ -332,6 +335,15 @@ public class Arena implements ConfigurationSerializable {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.chest with air");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.feet with air");
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
+        }
+
+        // Check for empty team win condition
+        if (redTeam.getSize() <= 0) {
+            announceMessage("messages.team-empty");
+            endGame(blueTeam);
+        } else if (blueTeam.getSize() <= 0) {
+            announceMessage("messages.team-empty");
+            endGame(redTeam);
         }
     }
 
