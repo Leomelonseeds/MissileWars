@@ -338,10 +338,10 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Check for empty team win condition
-        if (redTeam.getSize() <= 0) {
+        if (redTeam != null && redTeam.getSize() <= 0) {
             announceMessage("messages.red-team-empty");
             endGame(blueTeam);
-        } else if (blueTeam.getSize() <= 0) {
+        } else if (blueTeam != null && blueTeam.getSize() <= 0) {
             announceMessage("messages.blue-team-empty");
             endGame(redTeam);
         }
