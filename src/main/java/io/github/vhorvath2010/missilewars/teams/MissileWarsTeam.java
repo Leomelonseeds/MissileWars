@@ -160,6 +160,7 @@ public class MissileWarsTeam {
     public void distributeGear() {
         for (MissileWarsPlayer player : members) {
             player.giveDeckGear();
+            player.givePoolItem();
         }
     }
 
