@@ -80,6 +80,12 @@ titles:
       - "[insert joke here]"
       - "How!?"
       - "(╯°□°)╯︵ ┻━┻"
+  tie:
+    title: "&7&lStalemate"
+    subtitle:
+      - "Really?"
+      - "So close!"
+      - "Maybe next time..."
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
     subtitle: "&71 portal remains"

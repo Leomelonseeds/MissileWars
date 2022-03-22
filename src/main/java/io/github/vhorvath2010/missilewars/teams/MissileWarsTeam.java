@@ -11,9 +11,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /** Represents a team of Missile Wars Players. */
 public class MissileWarsTeam {
@@ -223,8 +221,9 @@ public class MissileWarsTeam {
      * Register a portal break at a given location.
      *
      * @param loc the location
+     * @return true if a portal's broken status was changed
      */
-    public void registerPortalBreak(Location loc) {
+    public boolean registerPortalBreak(Location loc) {
         // Check if portal break was within location of first portal
         FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "maps.yml");
@@ -234,8 +233,9 @@ public class MissileWarsTeam {
         int y1 = mapsConfig.getInt("default-map.portal.y1");
         int x2 = mapsConfig.getInt("default-map.portal.x2");
         int y2 = mapsConfig.getInt("default-map.portal.y2");
-        if (x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
+        if (!firstPortalDestroyed && x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
             firstPortalDestroyed = true;
+            return true;
         }
 
         // Check if second portal was broken
@@ -243,9 +243,11 @@ public class MissileWarsTeam {
         int y3 = mapsConfig.getInt("default-map.portal.y3");
         int x4 = mapsConfig.getInt("default-map.portal.x4");
         int y4 = mapsConfig.getInt("default-map.portal.y4");
-        if (x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
+        if (!secondPortalDestroyed && x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
             secondPortalDestroyed = true;
+            return true;
         }
+        return false;
     }
 
     /**
@@ -255,6 +257,30 @@ public class MissileWarsTeam {
      */
     public boolean hasLivingPortal() {
         return !firstPortalDestroyed || !secondPortalDestroyed;
+    }
+
+    /**
+     * Send the team a title at a given path.
+     *
+     * @param path the path
+     */
+    public void sendTitle(String path) {
+        // Find titles and subtitles from config
+        String title = ConfigUtils.getConfigText("titles." + path + ".title", null, null, null);
+        List<String> subtitles = ConfigUtils.getConfigTextList("titles." + path + ".subtitle", null,
+                null, null);
+        String subtitle;
+        if (!subtitles.isEmpty()) {
+            subtitle = subtitles.get(new Random().nextInt(subtitles.size()));
+        } else {
+            subtitle = ConfigUtils.getConfigText("titles." + path + ".subtitle", null, null,
+                    null);
+        }
+
+        // Send titles to players
+        for (MissileWarsPlayer member : members) {
+            member.getMCPlayer().sendTitle(title, subtitle, 10, 70, 20);
+        }
     }
 
 }

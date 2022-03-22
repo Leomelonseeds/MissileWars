@@ -532,9 +532,11 @@ public class Arena implements ConfigurationSerializable {
 		        redTeam.scheduleDeckItems();
 		        redTeam.broadcastConfigMsg("messages.classic-start", null);
 		        redTeam.distributeGear();
+                redTeam.sendTitle("game-start");
 		        blueTeam.scheduleDeckItems();
 		        blueTeam.distributeGear();
 		        blueTeam.broadcastConfigMsg("messages.classic-start", null);
+                blueTeam.sendTitle("game-start");
         	}
         }.runTaskLater(plugin, 20));
 
@@ -605,7 +607,17 @@ public class Arena implements ConfigurationSerializable {
         // Stop game and send messages
         redTeam.broadcastConfigMsg("messages.classic-end", null);
         blueTeam.broadcastConfigMsg("messages.classic-end", null);
-        
+        if (winningTeam == null) {
+            redTeam.sendTitle("tie");
+            blueTeam.sendTitle("tie");
+        } else if (winningTeam == blueTeam) {
+            blueTeam.sendTitle("victory");
+            redTeam.sendTitle("defeat");
+        } else {
+            redTeam.sendTitle("victory");
+            blueTeam.sendTitle("defeat");
+        }
+
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Remove all players after a short time
@@ -687,9 +699,16 @@ public class Arena implements ConfigurationSerializable {
                 .toString(), "maps.yml");
         int z = location.getBlockZ();
         if (z == mapsConfig.getInt("default-map.portal.blue-z")) {
-            blueTeam.registerPortalBreak(location);
+            // Register breaking of blue team's portal and send titles
+            if (blueTeam.registerPortalBreak(location) && blueTeam.hasLivingPortal()) {
+                blueTeam.sendTitle("own-portal-destroyed");
+                redTeam.sendTitle("enemy-portal-destroyed");
+            }
         } else if (z == mapsConfig.getInt("default-map.portal.red-z")) {
-            redTeam.registerPortalBreak(location);
+            if (redTeam.registerPortalBreak(location) && redTeam.hasLivingPortal()) {
+                redTeam.sendTitle("own-portal-destroyed");
+                blueTeam.sendTitle("enemy-portal-destroyed");
+            }
         }
 
         // Check if either team's last portal has been broken
