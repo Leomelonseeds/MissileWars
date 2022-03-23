@@ -69,6 +69,11 @@ titles:
       - "Bomb expert!"
       - "easy"
       - "┬─┬ ノ( ゜-゜ノ)"
+      - "now touch grass"
+      - "but at what cost"
+      - "👌"
+      - "✌️"
+      - "flex it to your friends"
   defeat:
     title: "&c&lDefeat"
     subtitle:
@@ -81,12 +86,21 @@ titles:
       - "[insert joke here]"
       - "How!?"
       - "(╯°□°)╯︵ ┻━┻"
+      - "we'll get'em next time"
+      - "if only M310N was here"
+      - "try again"
+      - "not even close"
   tie:
-    title: "&7&lStalemate"
+    title: "&e&lTie"
     subtitle:
-      - "Really?"
-      - "So close!"
-      - "Maybe next time..."
+      - "¯\_(ツ)_/¯"
+      - "do something"
+      - "looks like time ran out"
+      - "epic &f&mfail"
+      - "close enough"
+      - "time for a rematch"
+      - "stalemate"
+      - "the real winner is me"
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
     subtitle: "&71 portal remains"

@@ -101,7 +101,7 @@ public class StructureItemEvents implements Listener {
         }
 
         // Place structure
-        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player))) {
+        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), true)) {
             hand.setAmount(hand.getAmount() - 1);
         } else {
         	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -176,7 +176,7 @@ public class StructureItemEvents implements Listener {
                 if (!thrown.isDead()) {
                     // Spawn shield at current location and remove snowball
                     Location spawnLoc = thrown.getLocation();
-                    SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower));
+                    SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), false);
                     thrown.remove();
                 }
             }
