@@ -75,7 +75,7 @@ public class SchematicManager {
             fileName = fileName.replaceAll(".nbt", "_red.nbt");
         }
         File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
-            fileName);
+                fileName);
 
         // Load structure data
         StructureManager manager = Bukkit.getStructureManager();
@@ -100,18 +100,18 @@ public class SchematicManager {
 
         // Do not place if hitbox would intersect with barrier
         if (structure.getSize().getX() + spawnLoc.getX() >= plugin.getConfig().getInt("barrier.center.x")) {
-        	return false;
+            return false;
         }
-        
+
         // Do not place missiles if hitbox would come close to portal
         if (isMissile) {
-        	if (redMissile && spawnLoc.getZ() - structure.getSize().getZ() < mapsConfig.getInt("default-map.portal.blue-z") + 1) {
-        		return false;
-        	} else if (!redMissile && spawnLoc.getZ() + structure.getSize().getZ() > mapsConfig.getInt("default-map.portal.red-z") - 1) {
-        		return false;
-        	}
+            if (redMissile && spawnLoc.getZ() - structure.getSize().getZ() < mapsConfig.getInt("default-map.portal.blue-z") + 1) {
+                return false;
+            } else if (!redMissile && spawnLoc.getZ() + structure.getSize().getZ() > mapsConfig.getInt("default-map.portal.red-z") - 1) {
+                return false;
+            }
         }
-        
+
         //Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         return true;
@@ -123,14 +123,14 @@ public class SchematicManager {
      *
      * @param schematicName the name of the schematic in the maps.yml file
      * @param world the world to spawn the schematic in
-     * @param whether to run async
+     * @param async to run async
      * @return true if the schematic was generated successfully, otherwise false
      */
     public static boolean spawnFAWESchematic(String schematicName, World world, Boolean async) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                        .toString(), "maps.yml");
+                .toString(), "maps.yml");
 
         // Acquire WE clipboard
         if (!schematicConfig.contains(schematicName + ".file")) {
@@ -151,17 +151,17 @@ public class SchematicManager {
 
         // Paste WE clipboard
         Vector spawnPos = getVector(schematicConfig, schematicName + ".pos");
-        
+
         if (async) {
-	        new BukkitRunnable() {
-	            @Override
-	            public void run() {
-	                clipboard.paste(BukkitAdapter.adapt(world),
-	                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
-	            }
-	        }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    clipboard.paste(BukkitAdapter.adapt(world),
+                            Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+                }
+            }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
         } else {
-        	clipboard.paste(BukkitAdapter.adapt(world),
+            clipboard.paste(BukkitAdapter.adapt(world),
                     Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
         }
         return true;

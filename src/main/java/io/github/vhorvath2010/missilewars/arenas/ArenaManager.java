@@ -84,9 +84,7 @@ public class ArenaManager {
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
-            WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
-            arenaCreator.generator(new VoidChunkGenerator());
-            arenaCreator.createWorld().setAutoSave(false);
+            arena.loadWorldFromDisk();
         }
     }
 
@@ -330,14 +328,15 @@ public class ArenaManager {
         createWaitingLobby("blue", arena, lobbyRegion);
 
         creator.sendMessage(ChatColor.GREEN + "Saving world...");
-        // Wait a bit to ensure world is fully loaded before saving
+
+        // Wait to ensure schematic is spawned
         new BukkitRunnable() {
-        	@Override
-        	public void run() {
-        		arenaWorld.save();
-        	}
-        }.runTaskLater(plugin, 100);
-        
+            @Override
+            public void run() {
+                arenaWorld.save();
+            }
+        }.runTaskLater(plugin, 200);
+
         return true;
     }
 

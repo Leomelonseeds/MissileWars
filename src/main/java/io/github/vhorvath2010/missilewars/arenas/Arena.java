@@ -11,6 +11,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
+import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -602,10 +603,16 @@ public class Arena implements ConfigurationSerializable {
         }
     }
 
+    /** Load this Arena's world from the disk. */
+    public void loadWorldFromDisk() {
+        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
+    }
+
     /** Reset the arena world. */
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
-        new WorldCreator("mwarena_" + name).createWorld().setAutoSave(false);
+        loadWorldFromDisk();
     }
 
     /**
@@ -644,7 +651,7 @@ public class Arena implements ConfigurationSerializable {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Remove all players after a short time or immediately if
-        if (plugin.isEnabled()) {
+        if (plugin.isEnabled() && players.size() > 0) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
