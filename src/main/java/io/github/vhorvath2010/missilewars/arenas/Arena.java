@@ -642,15 +642,21 @@ public class Arena implements ConfigurationSerializable {
 
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
-        // Remove all players after a short time
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                removePlayers();
-                resetWorld();
-                startTime = null;
-            }
-        }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time") * 20L);
+        // Remove all players after a short time or immediately if
+        if (plugin.isEnabled()) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    removePlayers();
+                    resetWorld();
+                    startTime = null;
+                }
+            }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time") * 20L);
+        } else {
+            removePlayers();
+            resetWorld();
+            startTime = null;
+        }
     }
 
     /**
