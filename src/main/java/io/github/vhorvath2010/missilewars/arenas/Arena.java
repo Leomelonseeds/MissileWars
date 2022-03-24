@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
+import net.citizensnpcs.Citizens;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.exception.NPCLoadException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -310,10 +313,6 @@ public class Arena implements ConfigurationSerializable {
                 "default-settings.yml").getInt("minimum-players");
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
-        }
-        // Very temporary fix for NPCs disappearing
-        if (getNumPlayers() == 1) {
-        	Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "citizens load");
         }
         return true;
     }
@@ -631,6 +630,12 @@ public class Arena implements ConfigurationSerializable {
     public void loadWorldFromDisk() {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
+        // Load Citizens NPCs
+        try {
+            ((Citizens) CitizensAPI.getPlugin()).reload();
+        } catch (NPCLoadException e) {
+            e.printStackTrace();
+        }
     }
 
     /** Reset the arena world. */
