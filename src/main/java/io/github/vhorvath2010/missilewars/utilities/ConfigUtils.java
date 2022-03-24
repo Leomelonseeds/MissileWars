@@ -54,8 +54,13 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
             msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
-            msg = msg.replaceAll("%umw_arena_status%", "" + (arena.isRunning() ? ChatColor.GREEN + "" +
-                    "Running" : ChatColor.GOLD + "In Lobby"));
+            String status = ChatColor.GOLD + "In Lobby";
+            if (arena.isRunning()) {
+                status = ChatColor.GREEN + "In Game";
+            } else if (arena.isResetting()) {
+                status = ChatColor.RED + "Resetting";
+            }
+            msg = msg.replaceAll("%umw_arena_status%", status);
             if (player != null) {
                 msg = msg.replaceAll("%umw_team%", arena.getTeam(player.getUniqueId()));
                 msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));

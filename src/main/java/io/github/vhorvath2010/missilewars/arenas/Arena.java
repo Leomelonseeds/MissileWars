@@ -59,6 +59,8 @@ public class Arena implements ConfigurationSerializable {
     private List<BukkitTask> tasks;
     /** Whether the arena is in chaos mode. */
     private boolean inChaos;
+    /** Whether the arena is currently resetting the world. */
+    private boolean resetting;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -128,6 +130,15 @@ public class Arena implements ConfigurationSerializable {
      */
     public boolean isRunning() {
         return running;
+    }
+
+    /**
+     * Check if the arena is resetting.
+     *
+     * @return whether the arena world is resetting
+     */
+    public boolean isResetting() {
+        return resetting;
     }
 
     /**
@@ -274,9 +285,16 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the player joined the Arena, otherwise false
      */
     public boolean joinPlayer(Player player) {
+        // Check for Arena capacity
         if (getNumPlayers() >= capacity) {
             return false;
         }
+
+        // Ensure world isn't resetting
+        if (resetting) {
+            return false;
+        }
+
         player.setHealth(20);
         player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
@@ -619,6 +637,7 @@ public class Arena implements ConfigurationSerializable {
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
+        resetting = false;
     }
 
     /**
@@ -657,7 +676,8 @@ public class Arena implements ConfigurationSerializable {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
 
-        // Remove all players after a short time or immediately if
+        // Remove all players after a short time or immediately if none exist
+        resetting = true;
         if (plugin.isEnabled() && players.size() > 0) {
             new BukkitRunnable() {
                 @Override
