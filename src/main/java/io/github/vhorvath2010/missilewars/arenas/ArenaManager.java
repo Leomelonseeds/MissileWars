@@ -328,12 +328,13 @@ public class ArenaManager {
         createWaitingLobby("blue", arena, lobbyRegion);
 
         creator.sendMessage(ChatColor.GREEN + "Saving world...");
-
+        
         // Wait to ensure schematic is spawned
         new BukkitRunnable() {
             @Override
             public void run() {
                 arenaWorld.save();
+                creator.sendMessage(ChatColor.GREEN + "World saved!");           
             }
         }.runTaskLater(plugin, 200);
 

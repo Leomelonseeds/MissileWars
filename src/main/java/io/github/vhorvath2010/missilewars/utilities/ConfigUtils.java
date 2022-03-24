@@ -1,18 +1,21 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import me.clip.placeholderapi.PlaceholderAPI;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
@@ -136,6 +139,53 @@ public class ConfigUtils {
             String msg = messagesConfig.getString(path);
             player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
         }
+        
+        // Check for associated sound
+        String soundPath = path.replace("messages.", "");
+        sendConfigSound(soundPath, player);
     }
-
+    
+    /**
+     * Send a sound to the player.
+     *
+     * @param path the key of the sound in the sounds.yml file
+     * @param player the player to send sound to
+     */
+    public static void sendConfigSound(String path, Player player) {
+        FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "sounds.yml");
+        
+        if (!soundConfig.contains(path)) {
+        	return;
+        }
+        
+        Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
+        float volume = (float) soundConfig.getDouble(path + ".volume");
+        float pitch = (float) soundConfig.getDouble(path + ".pitch");
+        
+        player.playSound(player.getLocation(), sound, volume, pitch);
+    }
+    
+    /**
+     * Send a sound to the player, with location! Mainly
+     * useful for utility items.
+     *
+     * @param path the key of the sound in the sounds.yml file
+     * @param player the player to send sound to
+     * @param location the location to send the sound to
+     */
+    public static void sendConfigSound(String path, Player player, Location location) {
+        FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
+                "sounds.yml");
+        
+        if (!soundConfig.contains(path)) {
+        	return;
+        }
+        
+        Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
+        float volume = (float) soundConfig.getDouble(path + ".volume");
+        float pitch = (float) soundConfig.getDouble(path + ".pitch");
+        
+        player.playSound(location, sound, volume, pitch);
+    }
 }

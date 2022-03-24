@@ -143,6 +143,9 @@ public class StructureItemEvents implements Listener {
             fireball.setIsIncendiary(false);
             fireball.setDirection(player.getEyeLocation().getDirection());
             hand.setAmount(hand.getAmount() - 1);
+            for (Player players : player.getWorld().getPlayers()) {
+            	 ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
+            }
         }
     }
 
@@ -177,6 +180,9 @@ public class StructureItemEvents implements Listener {
                     // Spawn shield at current location and remove snowball
                     Location spawnLoc = thrown.getLocation();
                     SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), false);
+                    for (Player players : thrower.getWorld().getPlayers()) {
+                    	ConfigUtils.sendConfigSound("spawn-shield", players, spawnLoc);
+                    }
                     thrown.remove();
                 }
             }

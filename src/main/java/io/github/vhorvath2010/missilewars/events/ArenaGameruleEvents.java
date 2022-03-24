@@ -1,22 +1,25 @@
 package io.github.vhorvath2010.missilewars.events;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
-
-import java.util.ArrayList;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
@@ -57,10 +60,10 @@ public class ArenaGameruleEvents implements Listener {
         }
 
         // Find killer and increment kills
-        ArenaLeaveEvents.beingRespawned.add(player);
         if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
             killer.incrementKills();
+            ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
@@ -107,6 +110,20 @@ public class ArenaGameruleEvents implements Listener {
         if (event.getChangedType() != Material.NETHER_PORTAL) {
             return;
         }
+
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin()
+        		.getDataFolder().toString(), "maps.yml");
+        int locz = event.getSourceBlock().getLocation().getBlockZ();
+        int red = schematicConfig.getInt("default-map.portal.red-z");
+        int blue = schematicConfig.getInt("default-map.portal.blue-z");
+        
+        // Stop blocks placed beside the portal from triggering event
+        if (locz == red + 1 || locz == red - 1 ||
+        	locz == blue + 1 || locz == blue - 1) {
+        	return;
+        }
+        	
+        
         // Ensure it was in an arena world
         String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
@@ -116,6 +133,20 @@ public class ArenaGameruleEvents implements Listener {
 
         // Register portal breaking at the location
         possibleArena.registerPortalBreak(event.getBlock().getLocation());
+    }
+    
+    /** Make sure players can't create portals */
+    @EventHandler
+    public void onPortalCreate(PortalCreateEvent event) {
+        
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
     /** Handle fireball explosions. */

@@ -37,7 +37,7 @@ messages:
   # All lines sent simultaneously, with prefix included
   classic-start:
     - "&b========================================"
-    - "&fWelcome to &dMissile &5Wars &7- &aClassic"
+    - "&d&lMissile &5&lWars &7- &a&lClassic"
     - "&bBlow up your opponents' nether portals to win!"
     - "&aRight-click &7your items to use them."
     - "&7Type &a/leave &7to go back to the lobby."
@@ -54,9 +54,10 @@ messages:
     
 titles:
   # Should be sent to players who join in the middle of a game as well
-  game-start:
+  classic-start:
     title: "&a&lClassic"
-    subtitle: "Blow up opponent portals!"
+    subtitle: "Blow up both opponent portals!"
+    length: 80
   victory:
     title: "&a&lVictory"
     # pick random one to show to all players in game
@@ -71,9 +72,9 @@ titles:
       - "┬─┬ ノ( ゜-゜ノ)"
       - "now touch grass"
       - "but at what cost"
-      - "👌"
-      - "✌️"
+      - "✌"
       - "flex it to your friends"
+    length: 120
   defeat:
     title: "&c&lDefeat"
     subtitle:
@@ -90,6 +91,7 @@ titles:
       - "if only M310N was here"
       - "try again"
       - "not even close"
+    length: 120
   tie:
     title: "&e&lTie"
     subtitle:
@@ -101,12 +103,15 @@ titles:
       - "time for a rematch"
       - "stalemate"
       - "the real winner is me"
+    length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
     subtitle: "&71 portal remains"
+    length: 60
   own-portal-destroyed:
     title: "&4Portal Destroyed"
     subtitle: "&71 portal remaining"
+    length: 60
     
   
 scoreboard:

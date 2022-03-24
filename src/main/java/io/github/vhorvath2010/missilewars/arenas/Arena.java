@@ -293,6 +293,10 @@ public class Arena implements ConfigurationSerializable {
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
+        // Very temporary fix for NPCs disappearing
+        if (getNumPlayers() == 1) {
+        	Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "citizens load");
+        }
         return true;
     }
 
@@ -556,11 +560,13 @@ public class Arena implements ConfigurationSerializable {
 		        redTeam.scheduleDeckItems();
 		        redTeam.broadcastConfigMsg("messages.classic-start", null);
 		        redTeam.distributeGear();
-                redTeam.sendTitle("game-start");
+                redTeam.sendTitle("classic-start");
+                redTeam.sendSound("game-start");
 		        blueTeam.scheduleDeckItems();
 		        blueTeam.distributeGear();
 		        blueTeam.broadcastConfigMsg("messages.classic-start", null);
-                blueTeam.sendTitle("game-start");
+                blueTeam.sendTitle("classic-start");
+                blueTeam.sendSound("game-start");
         	}
         }.runTaskLater(plugin, 20));
 
@@ -649,6 +655,7 @@ public class Arena implements ConfigurationSerializable {
         }
 
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
 
         // Remove all players after a short time or immediately if
         if (plugin.isEnabled() && players.size() > 0) {
@@ -656,10 +663,15 @@ public class Arena implements ConfigurationSerializable {
                 @Override
                 public void run() {
                     removePlayers();
-                    resetWorld();
                     startTime = null;
                 }
-            }.runTaskLater(plugin, plugin.getConfig().getInt("victory-wait-time") * 20L);
+            }.runTaskLater(plugin, waitTime);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    resetWorld();
+                }
+            }.runTaskLater(plugin, waitTime + 40L);
         } else {
             removePlayers();
             resetWorld();
