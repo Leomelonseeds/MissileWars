@@ -254,7 +254,7 @@ public class ArenaManager {
         redSheepTrait.setColor(DyeColor.RED);
         redLoc.getWorld().loadChunk(redLoc.getChunk());
         redNPC.spawn(redLoc);
-        redNPC.data().set(NPC.SILENT_METADATA, true);
+        redNPC.data().setPersistent(NPC.SILENT_METADATA, true);
 
         // Spawn blue NPC
         Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue");
@@ -270,7 +270,7 @@ public class ArenaManager {
         blueSheepTrait.setColor(DyeColor.BLUE);
         blueLoc.getWorld().loadChunk(blueLoc.getChunk());
         blueNPC.spawn(blueLoc);
-        blueNPC.data().set(NPC.SILENT_METADATA, true);
+        blueNPC.data().setPersistent(NPC.SILENT_METADATA, true);
 
         // Spawn bar NPC
         Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
@@ -292,7 +292,7 @@ public class ArenaManager {
         barLoc.getWorld().loadChunk(barLoc.getChunk());
         bartender.spawn(barLoc);
         profession.setProfession(Villager.Profession.NITWIT);
-        bartender.data().set(NPC.SILENT_METADATA, true);
+        bartender.data().setPersistent(NPC.SILENT_METADATA, true);
 
         // Spawn barrier wall
         FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
