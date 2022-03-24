@@ -6,6 +6,10 @@ defeat:
   sound: ENTITY_WITHER_DEATH
   volume: 0.5
   pitch: 0.0
+tie:
+  sound: ENTITY_LIGHTNING_BOLT_THUNDER
+  volume: 0.5
+  pitch: 0.7
 enemy-portal-destroyed:
   sound: ENTITY_ZOMBIE_VILLAGER_CURE
   volume: 1.0
@@ -14,39 +18,43 @@ own-portal-destroyed:
   sound: ENTITY_LIGHTNING_BOLT_THUNDER
   volume: 1.0
   pitch: 1.0
-countdown_near:
+lobby-countdown-start:
   sound: BLOCK_NOTE_BLOCK_PLING
   volume: 1.0
   pitch: 1.0
-game_start:
+lobby-countdown-near:
+  sound: BLOCK_NOTE_BLOCK_PLING
+  volume: 1.0
+  pitch: 1.0
+game-start:
   sound: ENTITY_PLAYER_LEVELUP
   volume: 1.0
   pitch: 0.5
-game_end_reminder:
+game-end-reminder:
   sound: ENTITY_CHICKEN_EGG
   volume: 1.0
   pitch: 1.0
-join_arena:
+join-arena:
   sound: ENTITY_ENDERMAN_TELEPORT
   volume: 0.5
   pitch: 1.0
-spawn_shield:
+spawn-shield:
   sound: BLOCK_GLASS_BREAK
   volume: 2.0
   pitch: 0.5
-player_kill:
+player-kill:
   sound: ENTITY_EXPERIENCE_ORB_PICKUP
   volume: 1.0
   pitch: 1.0
-dropped_item_warning:
+dropped-item-warning:
   sound: BLOCK_NOTE_BLOCK_BASS
   volume: 1.0
   pitch: 0.0
-spawn_fireball:
+spawn-fireball:
   sound: ENTITY_GHAST_SHOOT
   volume: 1.0
   pitch: 1.0
-chaos_start:
+chaos-mode:
   sound: ENTITY_GHAST_SCREAM
   volume: 1.0
   pitch: 0.5

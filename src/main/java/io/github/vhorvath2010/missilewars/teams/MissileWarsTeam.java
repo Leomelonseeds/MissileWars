@@ -277,11 +277,26 @@ public class MissileWarsTeam {
             subtitle = ConfigUtils.getConfigText("titles." + path + ".subtitle", null, null,
                     null);
         }
+        
+        int length = Integer.parseInt(ConfigUtils.getConfigText("titles." + path + ".length", null, null, null));
 
         // Send titles to players
         for (MissileWarsPlayer member : members) {
-            member.getMCPlayer().sendTitle(title, subtitle, 10, 70, 20);
+        	Player player = member.getMCPlayer();
+            player.sendTitle(title, subtitle, 10, length, 20);
+            ConfigUtils.sendConfigSound(path, player);
         }
     }
-
+    
+    /**
+     * Send the team a sound at a given path.
+     *
+     * @param path the path
+     */
+    public void sendSound(String path) {
+    	for (MissileWarsPlayer member : members) {
+    		Player player = member.getMCPlayer();
+    		ConfigUtils.sendConfigSound(path, player);;
+    	}
+    }
 }

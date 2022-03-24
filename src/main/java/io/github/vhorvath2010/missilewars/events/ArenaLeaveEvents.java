@@ -15,8 +15,6 @@ import java.util.Set;
 /** Class for managing arena leaving. */
 public class ArenaLeaveEvents implements Listener {
 
-    public static Set<Player> beingRespawned = new HashSet<>();
-
     /** Remove player from Arena if they DC. */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
