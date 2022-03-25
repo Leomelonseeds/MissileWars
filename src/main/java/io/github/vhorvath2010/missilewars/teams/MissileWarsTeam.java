@@ -214,6 +214,7 @@ public class MissileWarsTeam {
         	Player mcPlayer = player.getMCPlayer();
             player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", mcPlayer, arena, mcPlayer));
             members.remove(player);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + mcPlayer.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.chest with air");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.feet with air");
