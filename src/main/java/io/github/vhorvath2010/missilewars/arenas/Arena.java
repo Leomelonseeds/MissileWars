@@ -364,9 +364,6 @@ public class Arena implements ConfigurationSerializable {
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.chest with air");
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.feet with air");
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
 
@@ -542,23 +539,29 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
+        double maxSize = Math.ceil((players.size() - spectators.size()) / 2);
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {
         	@Override
         	public void run() {
-		        do {
+        		// Assign queued players
+        		while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
 		            if (!redQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = redQueue.remove();
-		                redTeam.addPlayer(toAdd);
-		                toAssign.remove(toAdd);
+		                if (redTeam.getSize() < maxSize) {
+		                	redTeam.addPlayer(toAdd);
+			                toAssign.remove(toAdd);
+		                }     
 		            }
 		            if (!blueQueue.isEmpty()) {
-		                MissileWarsPlayer toAdd = blueQueue.remove();
-		                blueTeam.addPlayer(toAdd);
-		                toAssign.remove(toAdd);
+		                MissileWarsPlayer toAdd = blueQueue.remove();           
+		                if (blueTeam.getSize() < maxSize) {
+		                	blueTeam.addPlayer(toAdd);
+		                	toAssign.remove(toAdd);
+		                } 
 		            }
-		        } while (!blueQueue.isEmpty() && !redQueue.isEmpty());
+		        } 
 		
 		        // Assign remaining players
 		        for (MissileWarsPlayer player : toAssign) {
