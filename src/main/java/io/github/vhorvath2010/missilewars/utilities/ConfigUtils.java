@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -192,5 +193,22 @@ public class ConfigUtils {
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
         
         player.playSound(location, sound, volume, pitch);
+    }
+    
+    /**
+     * Gets world spawn location w/ yaw and pitch
+     * 
+     * @return Location
+     */
+    public static Location getSpawnLocation() {
+    	FileConfiguration config = MissileWarsPlugin.getPlugin().getConfig();
+    	
+    	double x = config.getDouble("spawn.x");
+    	double y = config.getDouble("spawn.y");
+    	double z = config.getDouble("spawn.z");
+    	float yaw = (float) config.getDouble("spawn.yaw");
+    	float pitch = (float) config.getDouble("spawn.pitch");
+    	
+    	return new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
     }
 }

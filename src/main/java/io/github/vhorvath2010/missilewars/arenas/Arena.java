@@ -34,6 +34,7 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
@@ -304,10 +305,7 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(getPlayerSpawn(player));
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.legs with air");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.chest with air");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.feet with air");
+        InventoryUtils.clearInventory(player);
         // Check for game start
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("minimum-players");
@@ -363,7 +361,7 @@ public class Arena implements ConfigurationSerializable {
         // Run proper clearing commands on the player
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
+        	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
 

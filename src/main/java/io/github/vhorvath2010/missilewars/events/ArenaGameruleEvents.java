@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -13,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -56,6 +58,7 @@ public class ArenaGameruleEvents implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
+        	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation());
             return;
         }
 
