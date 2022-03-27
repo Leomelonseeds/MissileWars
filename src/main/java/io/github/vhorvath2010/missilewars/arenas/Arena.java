@@ -362,6 +362,8 @@ public class Arena implements ConfigurationSerializable {
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
         	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
+        	mcPlayer.setGameMode(GameMode.ADVENTURE);
+        	InventoryUtils.loadInventory(mcPlayer);
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
 

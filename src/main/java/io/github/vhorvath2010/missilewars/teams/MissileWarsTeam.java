@@ -92,7 +92,7 @@ public class MissileWarsTeam {
     public void giveItems(MissileWarsPlayer player) {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        mcPlayer.getInventory().clear();
+        InventoryUtils.clearInventory(mcPlayer);
         new BukkitRunnable() {
         	@Override
         	public void run() {
