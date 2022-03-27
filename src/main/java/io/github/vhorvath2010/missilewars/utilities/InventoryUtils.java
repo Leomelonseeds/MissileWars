@@ -78,8 +78,9 @@ public class InventoryUtils {
             BukkitObjectInputStream data = new BukkitObjectInputStream(stream);
             int invSize = data.readInt();
             for (int i = 0; i < invSize; i++) {
+                ItemStack invItem = (ItemStack) data.readObject();
                 if (i != 39) {
-                    inventory.setItem(i, (ItemStack) data.readObject());
+                    inventory.setItem(i, invItem);
                 }
             }
         } catch (final IOException | ClassNotFoundException e) {

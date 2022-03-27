@@ -24,13 +24,14 @@ public class ArenaLeaveEvents implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
+        	InventoryUtils.saveInventory(player);
             return;
         }
         playerArena.removePlayer(player.getUniqueId());
     }
     
     /** Handle inventory loading on join */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
     	Player player = event.getPlayer();
     	if (!player.getWorld().getName().equals("world")) {
