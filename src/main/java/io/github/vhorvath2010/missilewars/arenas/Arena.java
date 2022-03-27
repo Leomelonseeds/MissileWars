@@ -680,6 +680,10 @@ public class Arena implements ConfigurationSerializable {
             redTeam.sendTitle("victory");
             blueTeam.sendTitle("defeat");
         }
+        
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+        }
 
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
