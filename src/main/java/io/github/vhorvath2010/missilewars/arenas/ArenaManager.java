@@ -15,6 +15,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -225,8 +226,11 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         arenaWorld.setGameRule(GameRule.KEEP_INVENTORY, true);
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
-        arenaWorld.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
         arenaWorld.setGameRule(GameRule.NATURAL_REGENERATION, false);
+        WorldBorder border = arenaWorld.getWorldBorder();
+        border.setCenter(plugin.getConfig().getInt("worldborder.center.x"), 
+                plugin.getConfig().getInt("worldborder.center.z"));
+        border.setSize(plugin.getConfig().getInt("worldborder.radius") * 2);
         arenaWorld.setTime(6000);
         creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
 

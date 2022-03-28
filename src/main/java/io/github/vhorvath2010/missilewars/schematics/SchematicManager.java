@@ -54,7 +54,7 @@ public class SchematicManager {
      * @param redMissile if the NBT structure is a red missile
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, boolean isMissile) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
@@ -96,20 +96,46 @@ public class SchematicManager {
             offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
         }
-        spawnLoc = spawnLoc.add(offset);
-
+        spawnLoc = spawnLoc.add(offset);        
+        
+        // Time to perform no place checks
+        int spawnx = spawnLoc.getBlockX();
+        int spawny = spawnLoc.getBlockY();
+        int spawnz = spawnLoc.getBlockZ();
+        
+        int sizex = structure.getSize().getBlockX();
+        int sizey = structure.getSize().getBlockY();
+        int sizez = structure.getSize().getBlockZ();
+        
+        int barrierx = plugin.getConfig().getInt("barrier.center.x");
+        
+        int portalx1 = mapsConfig.getInt("default-map.portal.x1") - 1;
+        int portalx2 = mapsConfig.getInt("default-map.portal.x4") + 1;
+        int portaly1 = mapsConfig.getInt("default-map.portal.y1") - 1;
+        int portaly2 = mapsConfig.getInt("default-map.portal.y4") + 1;
+        
+        int portalredz = mapsConfig.getInt("default-map.portal.red-z");
+        int portalbluez = mapsConfig.getInt("default-map.portal.blue-z");
+        
+        
         // Do not place if hitbox would intersect with barrier
-        if (structure.getSize().getX() + spawnLoc.getX() >= plugin.getConfig().getInt("barrier.center.x")) {
+        if (!redMissile && spawnx + sizex > barrierx) {
+            return false;
+        } else if (redMissile && spawnx >= barrierx) {
             return false;
         }
-
-        // Do not place missiles if hitbox would come close to portal
-        if (isMissile) {
-            if (redMissile && spawnLoc.getZ() - structure.getSize().getZ() < mapsConfig.getInt("default-map.portal.blue-z") + 1) {
-                return false;
-            } else if (!redMissile && spawnLoc.getZ() + structure.getSize().getZ() > mapsConfig.getInt("default-map.portal.red-z") - 1) {
-                return false;
-            }
+        
+        // Do not place if hitbox would intersect with a portal
+        if (!redMissile && 
+                spawnz <= portalredz && spawnz + sizez > portalredz && 
+                spawnx <= portalx2 && spawnx + sizex > portalx1 &&
+                spawny <= portaly2 && spawny + sizey > portaly1) {
+            return false;
+        } else if (redMissile && 
+                spawnz >= portalbluez && spawnz - sizez < portalbluez &&
+                spawnx >= portalx1 && spawnx - sizex < portalx2 &&
+                spawny <= portaly2 && spawny + sizey > portaly1) {
+            return false;
         }
 
         //Place structure

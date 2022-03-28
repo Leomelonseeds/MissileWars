@@ -34,6 +34,7 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
@@ -297,6 +298,10 @@ public class Arena implements ConfigurationSerializable {
         if (resetting) {
             return false;
         }
+        
+        for (MissileWarsPlayer mwPlayer : players) {
+            ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
+        }
 
         player.setHealth(20);
         player.setFoodLevel(20);
@@ -304,10 +309,7 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(getPlayerSpawn(player));
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "clear " + player.getName());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.legs with air");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.chest with air");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + player.getName() + " armor.feet with air");
+        InventoryUtils.clearInventory(player);
         // Check for game start
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "default-settings.yml").getInt("minimum-players");
@@ -341,6 +343,10 @@ public class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
+        
+        for (MissileWarsPlayer mwPlayer : players) {
+            ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+        }
 
         // Cancel tasks if starting and below min players
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
@@ -363,10 +369,9 @@ public class Arena implements ConfigurationSerializable {
         // Run proper clearing commands on the player
         Player mcPlayer = toRemove.getMCPlayer();
         if (mcPlayer != null) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + mcPlayer.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.legs with air");
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.chest with air");
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:item replace entity " + mcPlayer.getName() + " armor.feet with air");
+        	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
+        	mcPlayer.setGameMode(GameMode.ADVENTURE);
+        	InventoryUtils.loadInventory(mcPlayer);
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
         }
 
@@ -542,23 +547,29 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
+        double maxSize = Math.ceil((double) (players.size() - spectators.size()) / 2);
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {
         	@Override
         	public void run() {
-		        do {
+        		// Assign queued players
+        		while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
 		            if (!redQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = redQueue.remove();
-		                redTeam.addPlayer(toAdd);
-		                toAssign.remove(toAdd);
+		                if (redTeam.getSize() < maxSize) {
+		                	redTeam.addPlayer(toAdd);
+			                toAssign.remove(toAdd);
+		                }     
 		            }
 		            if (!blueQueue.isEmpty()) {
-		                MissileWarsPlayer toAdd = blueQueue.remove();
-		                blueTeam.addPlayer(toAdd);
-		                toAssign.remove(toAdd);
+		                MissileWarsPlayer toAdd = blueQueue.remove();           
+		                if (blueTeam.getSize() < maxSize) {
+		                	blueTeam.addPlayer(toAdd);
+		                	toAssign.remove(toAdd);
+		                } 
 		            }
-		        } while (!blueQueue.isEmpty() && !redQueue.isEmpty());
+		        } 
 		
 		        // Assign remaining players
 		        for (MissileWarsPlayer player : toAssign) {
@@ -676,6 +687,10 @@ public class Arena implements ConfigurationSerializable {
         } else {
             redTeam.sendTitle("victory");
             blueTeam.sendTitle("defeat");
+        }
+        
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
         }
 
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();

@@ -3,6 +3,8 @@ package io.github.vhorvath2010.missilewars.teams;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
+
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -90,7 +92,7 @@ public class MissileWarsTeam {
     public void giveItems(MissileWarsPlayer player) {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        mcPlayer.getInventory().clear();
+        InventoryUtils.clearInventory(mcPlayer);
         new BukkitRunnable() {
         	@Override
         	public void run() {
@@ -211,9 +213,10 @@ public class MissileWarsTeam {
      */
     public void removePlayer(MissileWarsPlayer player) {
         if (members.contains(player)) {
-            player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", player.getMCPlayer(), arena,
-                    player.getMCPlayer()));
+        	Player mcPlayer = player.getMCPlayer();
+            player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", mcPlayer, arena, mcPlayer));
             members.remove(player);
+            InventoryUtils.clearInventory(mcPlayer);
             broadcastConfigMsg("messages.leave-team-others", player);
         }
     }
