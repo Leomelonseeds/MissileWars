@@ -5,6 +5,8 @@ import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,6 +57,9 @@ public class ArenaInventoryEvents implements Listener {
         if (selectedArena.joinPlayer(player)) {
             player.closeInventory();
             ConfigUtils.sendConfigMessage("messages.joined-arena", player, selectedArena, null);
+            for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
+                ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, selectedArena, player);
+            }
         } else {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }

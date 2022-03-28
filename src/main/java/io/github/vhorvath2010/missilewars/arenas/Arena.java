@@ -298,6 +298,10 @@ public class Arena implements ConfigurationSerializable {
         if (resetting) {
             return false;
         }
+        
+        for (MissileWarsPlayer mwPlayer : players) {
+            ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
+        }
 
         player.setHealth(20);
         player.setFoodLevel(20);
@@ -339,6 +343,10 @@ public class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
+        
+        for (MissileWarsPlayer mwPlayer : players) {
+            ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+        }
 
         // Cancel tasks if starting and below min players
         int minPlayers = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
@@ -539,7 +547,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
-        double maxSize = Math.ceil((players.size() - spectators.size()) / 2);
+        double maxSize = Math.ceil((double) (players.size() - spectators.size()) / 2);
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {

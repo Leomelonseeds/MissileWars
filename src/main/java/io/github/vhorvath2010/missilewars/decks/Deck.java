@@ -1,12 +1,14 @@
 package io.github.vhorvath2010.missilewars.decks;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import java.util.List;
+import java.util.Random;
+
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-import java.util.Random;
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** A class representing a generic Deck. */
 public class Deck {
@@ -86,9 +88,18 @@ public class Deck {
         if (pool.isEmpty()) {
             return;
         }
-        // Give random item if under limit
+        ItemStack poolItem = pool.get(rand.nextInt(pool.size()));
         if (hasInventorySpace(player)) {
-            player.getInventory().addItem(pool.get(rand.nextInt(pool.size())));
+            player.getInventory().addItem(poolItem);
+        } else {
+            String message = ConfigUtils.getConfigText("messages.inventory-limit", player, null, null);
+            String name;
+            if (poolItem.getItemMeta().hasDisplayName()) {
+                name = poolItem.getItemMeta().getDisplayName();
+            } else {
+                name = poolItem.getAmount() + "x " + StringUtils.capitalize(poolItem.getType().toString().toLowerCase());
+            }
+            player.sendMessage(message.replaceAll("%umw_item%", name));
         }
     }
 

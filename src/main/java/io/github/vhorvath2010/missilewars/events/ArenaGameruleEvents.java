@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -41,12 +43,10 @@ public class ArenaGameruleEvents implements Listener {
     	if (!(event.getEntity() instanceof Player)) {
             return;
         }
-    	
-        Player player = (Player) event.getEntity();
 
         // Cause instant death so player can respawn faster
-        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            player.setHealth(0);
+        if (event.getCause() == DamageCause.VOID) {
+            event.setDamage(40.0);
         }
     }
 
@@ -67,6 +67,10 @@ public class ArenaGameruleEvents implements Listener {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
             killer.incrementKills();
             ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
+        }
+        
+        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            event.setDeathMessage("");
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);

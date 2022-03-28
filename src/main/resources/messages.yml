@@ -7,6 +7,7 @@ messages:
   arena-full: "&cThat arena is full!"
   joined-arena: "Welcome! &aRight-click an NPC &7to join a team, and use &a/spawn &7to return to main lobby."
   joined-arena-others: "%umw_focus% &7joined the arena."
+  joined-arena-lobby: "%umw_focus% &7joined arena &a%umw_arena%"
   leave-arena: "You left %umw_arena%"
   leave-arena-others: "%umw_focus% &7left the arena."
   leave-team: "You left the %umw_team% team."
