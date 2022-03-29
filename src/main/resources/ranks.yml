@@ -1,0 +1,66 @@
+# xp needed to get to the next level
+formula: 100*%umw_rank_number%*%umw_rank_number%+250
+
+# xp from various sources
+experience:
+  spawn_missile: 1
+  # does not include shooting bow/crossbow
+  use_utility: 1
+  kill: 3
+  portal_destroy: 8
+  win: 5
+
+# Each rank unlocks a new COLOR/STYLE and SYMBOL
+# Both of these can be used in a cosmetics menu to
+# customize the look of your rank. You can select
+# from all colors and symbols currently unlocked.
+# Selecting them simply changes the:
+# %umw_rank_color%, %umw_rank_symbol%
+# placeholders to be used in chat plugin.
+# %umw_rank_name% should also be available
+ranks:
+  # default rank
+  0:
+    name: "&7Private"
+    color: "&7"
+    symbol: "(◆)"
+  1:
+    name: "&8Gunner"
+    color: "&8"
+    symbol: "(✦)"
+  2:
+    name: "&aBombardier"
+    color: "&a"
+    symbol: "(♠)"
+  3:
+    name: "&2Corporal"
+    color: "&2"
+    symbol: "(❉)"
+  4:
+    name: "&bSergeant"
+    color: "&b"
+    symbol: "(❂)"
+  5:
+    name: "&3Lieutenant"
+    color: "&3"
+    symbol: "(❁)"
+  6:
+    name: "&dColonel"
+    color: "&d"
+    symbol: "(✌)"
+  7:
+    name: "&5General"
+    color: "&5"
+    symbol: "(❃)"
+  8:
+    name: "&6&lDuke"
+    color: "&6"
+    symbol: "(⚜)"
+  9:
+    name: "&4&lEmperor"
+    color: "&4"
+    symbol: "(☬)"
+  10:
+    name: "&0&k&l[ &c&lO&d&lv&6&le&e&lr&a&ll&b&lo&9&lr&5&ld &0&k&l]"
+    color: "&0"
+    symbol: "&c(&e⌐&a▨&b_&d▨&5)"
