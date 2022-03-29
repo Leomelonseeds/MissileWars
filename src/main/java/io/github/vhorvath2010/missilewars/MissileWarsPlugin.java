@@ -9,6 +9,7 @@ import io.github.vhorvath2010.missilewars.events.ArenaGameruleEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
 import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
+import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -56,6 +57,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
         // Load arenas
         arenaManager = new ArenaManager();
         arenaManager.loadArenas();
+
+        // Load placeholders
+        new MissileWarsPlaceholder().register();
     }
 
     /**

@@ -807,4 +807,20 @@ public class Arena implements ConfigurationSerializable {
         }
     }
 
+    /**
+     * Get the team color of a given player.
+     *
+     * @param id the player's UUID
+     * @return the team color of the given player
+     */
+    public ChatColor getTeamColor(UUID id) {
+        if (blueTeam.containsPlayer(id)) {
+            return ChatColor.BLUE;
+        } else if (redTeam.containsPlayer(id)) {
+            return ChatColor.RED;
+        } else {
+            return null;
+        }
+    }
+
 }
