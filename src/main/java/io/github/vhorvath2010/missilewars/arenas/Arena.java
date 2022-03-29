@@ -675,9 +675,25 @@ public class Arena implements ConfigurationSerializable {
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
 
+        // Find players with most deaths and kills
+        MissileWarsPlayer mostKills = null;
+        MissileWarsPlayer mostDeaths = null;
+        for (MissileWarsPlayer player : players) {
+            if (mostKills == null || mostKills.getKills() < player.getKills()) {
+                mostKills = player;
+            }
+            if (mostDeaths == null || mostDeaths.getDeaths() < player.getDeaths()) {
+                mostDeaths = player;
+            }
+        }
+
         // Stop game and send messages
-        redTeam.broadcastConfigMsg("messages.classic-end", null);
-        blueTeam.broadcastConfigMsg("messages.classic-end", null);
+        redTeam.broadcastConfigMsg("messages.classic-end-mvp", null);
+        redTeam.broadcastConfigMsg("messages.classic-end-kills", mostKills);
+        redTeam.broadcastConfigMsg("messages.classic-end-deaths", mostDeaths);
+        blueTeam.broadcastConfigMsg("messages.classic-end-mvp", null);
+        blueTeam.broadcastConfigMsg("messages.classic-end-kills", mostKills);
+        blueTeam.broadcastConfigMsg("messages.classic-end-deaths", mostDeaths);
         if (winningTeam == null) {
             redTeam.sendTitle("tie");
             blueTeam.sendTitle("tie");
@@ -688,7 +704,7 @@ public class Arena implements ConfigurationSerializable {
             redTeam.sendTitle("victory");
             blueTeam.sendTitle("defeat");
         }
-        
+
         for (MissileWarsPlayer player : players) {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
         }

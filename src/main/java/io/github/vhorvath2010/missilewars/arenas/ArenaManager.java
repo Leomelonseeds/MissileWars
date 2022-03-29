@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -373,6 +374,20 @@ public class ArenaManager {
         }
         ArenaInventoryEvents.selectingArena.add(player);
         player.openInventory(selector);
+    }
+
+    /**
+     * Get the {@link MissileWarsPlayer} representing the player with the given UUID
+     *
+     * @param id the player's UUID
+     * @return the {@link MissileWarsPlayer} representing the player with the given UUID if it exists
+     */
+    public MissileWarsPlayer getPlayer(UUID id) {
+        Arena arena = getArena(id);
+        if (arena != null) {
+            return arena.getPlayerInArena(id);
+        }
+        return null;
     }
 
 }

@@ -43,12 +43,14 @@ messages:
     - "&aRight-click &7your items to use them."
     - "&7Type &a/leave &7to go back to the lobby."
     - "&b========================================"
-  classic-end:
+  classic-end-mvp:
     # mvps - players who blew up portals
     - "&b========================================"
     - "&5MVPs: %umw_mvps%"
     # If tied for top killer/deaths, list both
+  classic-end-kills:
     - "&cMost Kills: %umw_focus%"
+  classic-end-deaths:
     - "&eMost Deaths: %umw_focus%"
     - "&aThanks for playing!"
     - "&b========================================"

@@ -68,9 +68,13 @@ public class ArenaGameruleEvents implements Listener {
             killer.incrementKills();
             ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
         }
-        
+
+        // Count death if player is on a team
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
             event.setDeathMessage("");
+        } else {
+            MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
+            missileWarsPlayer.incrementDeaths();
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);

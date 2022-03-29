@@ -16,6 +16,8 @@ public class MissileWarsPlayer {
     private Deck deck;
     /** The number of kills the player has. */
     private int kills;
+    /** The number of deaths the player has. */
+    private int deaths;
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -74,6 +76,20 @@ public class MissileWarsPlayer {
     /** Increment the kill count for this {@link MissileWarsPlayer}. */
     public void incrementKills() {
         kills++;
+    }
+
+    /**
+     * Get the number of deaths this {@link MissileWarsPlayer} has.
+     *
+     * @return the number of deaths this {@link MissileWarsPlayer} has
+     */
+    public int getDeaths() {
+        return deaths;
+    }
+
+    /** Increment the kill count for this {@link MissileWarsPlayer}. */
+    public void incrementDeaths() {
+        deaths++;
     }
 
     /**
