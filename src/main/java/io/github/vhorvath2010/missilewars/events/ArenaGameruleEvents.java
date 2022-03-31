@@ -113,38 +113,6 @@ public class ArenaGameruleEvents implements Listener {
             event.setCancelled(true);
         }
     }
-
-    /** Handle portal breaking in Arenas. */
-    @EventHandler
-    public void onPortalBreak(BlockPhysicsEvent event) {
-        // See if portal was broken
-        if (event.getChangedType() != Material.NETHER_PORTAL) {
-            return;
-        }
-
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin()
-        		.getDataFolder().toString(), "maps.yml");
-        int locz = event.getSourceBlock().getLocation().getBlockZ();
-        int red = schematicConfig.getInt("default-map.portal.red-z");
-        int blue = schematicConfig.getInt("default-map.portal.blue-z");
-        
-        // Stop blocks placed beside the portal from triggering event
-        if (locz == red + 1 || locz == red - 1 ||
-        	locz == blue + 1 || locz == blue - 1) {
-        	return;
-        }
-        	
-        
-        // Ensure it was in an arena world
-        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
-        if (possibleArena == null) {
-            return;
-        }
-
-        // Register portal breaking at the location
-        possibleArena.registerPortalBreak(event.getBlock().getLocation());
-    }
     
     /** Make sure players can't create portals */
     @EventHandler
@@ -160,7 +128,7 @@ public class ArenaGameruleEvents implements Listener {
         event.setCancelled(true);
     }
 
-    /** Handle fireball explosions. */
+    /** Handle fireball and TNT explosions. */
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         // Ensure it was in an arena world
@@ -171,12 +139,19 @@ public class ArenaGameruleEvents implements Listener {
         }
         
         // Ensure its actually a fireball
-        if (event.getEntityType() != EntityType.FIREBALL) {
-        	return;
+        if (event.getEntityType() == EntityType.FIREBALL) {
+            // Remove all portals from block list
+            event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
         }
-
-        // Remove all portals from block list
-        event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
+        // Check for TNT explosions of portals
+        else if (event.getEntityType() == EntityType.PRIMED_TNT) {
+            event.blockList().forEach(block -> {
+                // Register portal brake if block was broken
+                if (block.getType() == Material.NETHER_PORTAL) {
+                    possibleArena.registerPortalBreak(block.getLocation());
+                }
+            });
+        }
     }
 
 }
