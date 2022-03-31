@@ -377,12 +377,22 @@ public class Arena implements ConfigurationSerializable {
 
         // Check for empty team win condition
         if (redTeam != null && redTeam.getSize() <= 0) {
-            announceMessage("messages.red-team-empty");
+            announceMessage("messages.red-team-empty", null);
             endGame(blueTeam);
         } else if (blueTeam != null && blueTeam.getSize() <= 0) {
-            announceMessage("messages.blue-team-empty");
+            announceMessage("messages.blue-team-empty", null);
             endGame(redTeam);
         }
+    }
+
+    /**
+     * Check if a player is spectating.
+     *
+     * @param player the player
+     * @return true if player is spectating otherwise false
+     */
+    public boolean isSpectating(MissileWarsPlayer player) {
+        return spectators.contains(player);
     }
 
     /**
@@ -390,10 +400,11 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param player the player
      */
-    private void removeSpectator(MissileWarsPlayer player) {
+    public void removeSpectator(MissileWarsPlayer player) {
         if (spectators.remove(player)) {
-            String joinMsg = "messages.spectate-join-others";
-            announceMessage(joinMsg);
+            announceMessage("messages.spectate-leave-others", player);
+            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
+            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
         }
     }
 
@@ -469,13 +480,19 @@ public class Arena implements ConfigurationSerializable {
     public void addSpectator(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                spectators.add(player);
-                redQueue.remove(player);
-                blueQueue.remove(player);
-                Player mcPlayer = player.getMCPlayer();
-                mcPlayer.setGameMode(GameMode.SPECTATOR);
-                String joinMsg = "messages.spectate-join-others";
-                announceMessage(joinMsg);
+                if (running) {
+                    announceMessage("messages.spectate-join-others", player);
+                    spectators.add(player);
+                    redTeam.removePlayer(player);
+                    redQueue.remove(player);
+                    blueTeam.removePlayer(player);
+                    blueQueue.remove(player);
+                    Player mcPlayer = player.getMCPlayer();
+                    mcPlayer.setGameMode(GameMode.SPECTATOR);
+                } else {
+                    player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.spectate-join-fail",
+                            player.getMCPlayer(), null, player.getMCPlayer()));
+                }
                 break;
             }
         }
@@ -489,7 +506,7 @@ public class Arena implements ConfigurationSerializable {
         if (startTime == null) {
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
             String startMsg = "messages.lobby-countdown-start";
-            announceMessage(startMsg);
+            announceMessage(startMsg, null);
             tasks.add(new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -505,7 +522,7 @@ public class Arena implements ConfigurationSerializable {
                     public void run() {
                         if (finalSecInCd <= cdNear) {
                             String startMsg = "messages.lobby-countdown-near";
-                            announceMessage(startMsg);
+                            announceMessage(startMsg, null);
                         }
                         setXpLevel(finalSecInCd);
                     }
@@ -528,10 +545,10 @@ public class Arena implements ConfigurationSerializable {
         
         // Generate map.
         if (!generateMap("default-map")) {
-        	announceMessage("messages.map-failed");
+        	announceMessage("messages.map-failed", null);
         	return false;
         } else {
-        	announceMessage("messages.starting");
+        	announceMessage("messages.starting", null);
         }
 
         // Acquire red and blue spawns
@@ -766,7 +783,7 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param path the path to the configurable message
      */
-    public void announceMessage(String path) {
+    public void announceMessage(String path, MissileWarsPlayer focus) {
         for (MissileWarsPlayer player : players) {
         	Player mcPlayer = player.getMCPlayer();
             ConfigUtils.sendConfigMessage(path, mcPlayer, this, null);

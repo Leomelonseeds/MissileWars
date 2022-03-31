@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.commands;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,9 +29,10 @@ public class SpectateCommand implements CommandExecutor {
             return true;
         }
 
-        // Check if player is currently on a team
-        if (!arena.getTeam(player.getUniqueId()).equalsIgnoreCase("no team")) {
-            sendErrorMsg(player, "You are already on a team!");
+        // Check if player is currently spectating
+        MissileWarsPlayer missileWarsPlayer = arena.getPlayerInArena(player.getUniqueId());
+        if (arena.isSpectating(missileWarsPlayer)) {
+            arena.removeSpectator(missileWarsPlayer);
             return true;
         }
 
