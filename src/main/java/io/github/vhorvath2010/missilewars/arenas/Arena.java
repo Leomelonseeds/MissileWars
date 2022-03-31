@@ -413,11 +413,13 @@ public class Arena implements ConfigurationSerializable {
                         removeSpectator(player);
                     }
                 } else {
-                    if (redTeam.getSize() - blueTeam.getSize() >= 1) {
+                    if (!player.getMCPlayer().isOp() && redTeam.getSize() - blueTeam.getSize() >= 1) {
                         player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error",
                                 null, this, null));
                     } else {
+                        blueTeam.removePlayer(player);
                         redTeam.addPlayer(player);
+                        redTeam.giveItems(player);
                         player.giveDeckGear();
                         removeSpectator(player);
                     }
@@ -443,11 +445,13 @@ public class Arena implements ConfigurationSerializable {
                         removeSpectator(player);
                     }
                 } else {
-                    if (blueTeam.getSize() - redTeam.getSize() >= 1) {
+                    if (!player.getMCPlayer().isOp() && blueTeam.getSize() - redTeam.getSize() >= 1) {
                         player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error", null,
                                 this, null));
                     } else {
+                        redTeam.removePlayer(player);
                         blueTeam.addPlayer(player);
+                        blueTeam.giveItems(player);
                         player.giveDeckGear();
                         removeSpectator(player);
                     }
