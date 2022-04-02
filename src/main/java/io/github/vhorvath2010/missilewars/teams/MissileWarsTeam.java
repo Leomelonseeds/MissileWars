@@ -109,10 +109,8 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
-        // Send messages
-        broadcastConfigMsg("messages.queue-join-others", player);
+        
         members.add(player);
-        ConfigUtils.sendConfigMessage("messages.queue-join", player.getMCPlayer(), arena, null);
 
         // Assign default deck
         player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
@@ -168,8 +166,7 @@ public class MissileWarsTeam {
 
     /** Schedule the distribution of in-game Deck items. */
     public void scheduleDeckItems() {
-        FileConfiguration settings = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "default-settings.yml");
+        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
         double timeBetween = settings.getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
         if (chaosMode) {
             timeBetween /= settings.getInt("chaos-mode.multiplier");
@@ -214,7 +211,6 @@ public class MissileWarsTeam {
     public void removePlayer(MissileWarsPlayer player) {
         if (members.contains(player)) {
         	Player mcPlayer = player.getMCPlayer();
-            player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.leave-team", mcPlayer, arena, mcPlayer));
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
             broadcastConfigMsg("messages.leave-team-others", player);

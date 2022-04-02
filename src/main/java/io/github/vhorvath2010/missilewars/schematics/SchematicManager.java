@@ -126,13 +126,15 @@ public class SchematicManager {
         }
         
         // Do not place if hitbox would intersect with a portal
-        if (!redMissile && 
-                spawnz <= portalredz && spawnz + sizez > portalredz && 
+        if (!redMissile &&
+                ((spawnz <= portalredz && spawnz + sizez > portalredz) ||
+                (spawnz <= portalbluez && spawnz + sizez > portalbluez)) && 
                 spawnx <= portalx2 && spawnx + sizex > portalx1 &&
                 spawny <= portaly2 && spawny + sizey > portaly1) {
             return false;
-        } else if (redMissile && 
-                spawnz >= portalbluez && spawnz - sizez < portalbluez &&
+        } else if (redMissile &&
+                ((spawnz >= portalbluez && spawnz - sizez < portalbluez) || 
+                (spawnz >= portalredz && spawnz - sizez < portalredz)) &&
                 spawnx >= portalx1 && spawnx - sizex < portalx2 &&
                 spawny <= portaly2 && spawny + sizey > portaly1) {
             return false;

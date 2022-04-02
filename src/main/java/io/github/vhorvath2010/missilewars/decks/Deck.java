@@ -62,8 +62,7 @@ public class Deck {
      * @return true if player has inventory space
      */
     public boolean hasInventorySpace(Player player) {
-        int limit = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "default-settings.yml").getInt("inventory-limit");
+        int limit = MissileWarsPlugin.getPlugin().getConfig().getInt("inventory-limit");
 
         // Count multiples of item in inventory
         for (ItemStack poolItem : pool) {

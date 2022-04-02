@@ -1,10 +1,7 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
-import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,12 +12,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryEvents implements Listener {
@@ -60,6 +60,8 @@ public class ArenaInventoryEvents implements Listener {
             for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
                 ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, selectedArena, player);
             }
+            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+            discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + selectedArena.getName()).queue();
         } else {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
