@@ -1,22 +1,17 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -24,6 +19,7 @@ import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleEvents implements Listener {
@@ -68,13 +64,17 @@ public class ArenaGameruleEvents implements Listener {
             killer.incrementKills();
             ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
         }
+        
+        Component deathMessage = event.deathMessage();
+        event.setDeathMessage("");
 
         // Count death if player is on a team
-        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
-            event.setDeathMessage("");
-        } else {
+        if (!playerArena.getTeam(player.getUniqueId()).equals("no team")) {
             MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
             missileWarsPlayer.incrementDeaths();
+            for (Player p : player.getWorld().getPlayers()) {
+                p.sendMessage(deathMessage);
+            }
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);

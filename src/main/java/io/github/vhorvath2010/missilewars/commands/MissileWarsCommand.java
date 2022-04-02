@@ -3,12 +3,17 @@ package io.github.vhorvath2010.missilewars.commands;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 
 public class MissileWarsCommand implements CommandExecutor {
 
@@ -66,6 +71,46 @@ public class MissileWarsCommand implements CommandExecutor {
             arenaManager.openArenaSelector(target);
 
             sendSuccessMsg(sender, "Game selector opened!");
+            return true;
+        }
+        
+        // Join the fullest available game
+        if (action.equalsIgnoreCase("Join") && sender instanceof Player) {
+
+            Player player = (Player) sender;
+            
+            // Require player to be in the lobby
+            if (!player.getWorld().getName().equals("world")) {
+                sendErrorMsg(sender, "You must be in the lobby to use this!");
+                return true;
+            }
+            
+            // Allow player to join the fullest arena, or specify an arena name
+            if (args.length == 1) {
+                for (Arena arena : arenaManager.getLoadedArenas()) {
+                    if (arena.getNumPlayers() <= arena.getCapacity()) {
+                        if (arena.joinPlayer(player)) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (args.length >= 2) {
+                for (Arena arena : arenaManager.getLoadedArenas()) {
+                    if (arena.getName().equalsIgnoreCase(args[1])) {
+                        if (arena.joinPlayer(player)) {
+                            return true;
+                        } else {
+                            ConfigUtils.sendConfigMessage("messages.arena-full", player, arena, null);
+                            return true;
+                        }
+                    }
+                }
+                
+                sendErrorMsg(sender, "Please specify a valid arena name!");
+                return true;      
+            }
+            
+            sendErrorMsg(sender, "All arenas are full! Please open the menu and choose one to spectate.");
             return true;
         }
 

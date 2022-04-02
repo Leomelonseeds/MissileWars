@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.arenas;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -360,7 +361,7 @@ public class ArenaManager {
                 ConfigUtils.getConfigText("inventories.game-selector.title", player, null, null));
 
         // Add Arena items
-        for (Arena arena : loadedArenas) {
+        for (Arena arena : getLoadedArenas()) {
             ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
             assert arenaItemMeta != null;
@@ -387,6 +388,17 @@ public class ArenaManager {
             return arena.getPlayerInArena(id);
         }
         return null;
+    }
+    
+    /**
+     * Gets a list of the loaded arenas, sorted by highest capacity
+     * 
+     * @return The list of loaded arenas
+     */
+    public List<Arena> getLoadedArenas() {
+        List<Arena> sortedArenas = loadedArenas;
+        sortedArenas.sort(Collections.reverseOrder(Arena.byPlayers));
+        return sortedArenas;
     }
 
 }

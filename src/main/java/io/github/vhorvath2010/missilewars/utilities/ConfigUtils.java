@@ -52,7 +52,8 @@ public class ConfigUtils {
         // Set umw arena placeholders
         if (arena != null) {
             msg = msg.replaceAll("%umw_arena%", arena.getName());
-            msg = msg.replaceAll("%umw_arena_players%", "" + arena.getNumPlayers());
+            msg = msg.replaceAll("%umw_arena_players%", "" + arena.getTotalPlayers());
+            msg = msg.replaceAll("%umw_arena_active%", "" + arena.getNumPlayers());
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
             msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
@@ -79,7 +80,7 @@ public class ConfigUtils {
         msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
         msg = msg.replaceAll("umw_finished", messageConfig.getString("placeholders.status.finished"));
         if (focus != null) {
-            msg = msg.replaceAll("%umw_focus%", focus.getDisplayName());
+            msg = msg.replaceAll("%umw_focus%", getFocusName(focus));
         }
 
         // Set PAPI placeholders and color

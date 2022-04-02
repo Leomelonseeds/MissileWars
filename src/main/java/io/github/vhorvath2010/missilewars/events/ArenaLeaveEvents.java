@@ -60,8 +60,6 @@ public class ArenaLeaveEvents implements Listener {
 	        
 	        if (player.getWorld().getName().equals("world")) {
 	        	InventoryUtils.loadInventory(player);
-	            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-	            discordChannel.sendMessage(":arrow_forward: " + player.getName() + " rejoined lobby from arena " + playerArena.getName()).queue();
 	        }
 	        
 	        return;

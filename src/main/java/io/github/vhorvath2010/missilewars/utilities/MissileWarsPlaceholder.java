@@ -27,10 +27,11 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
+        
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
 
         if(params.equalsIgnoreCase("team")) {
-            Arena playerArena = manager.getArena(player.getUniqueId());
             return playerArena == null ? "no team" : ChatColor.stripColor(playerArena.getTeam(player.getUniqueId()));
         }
 
