@@ -4,20 +4,19 @@
 messages:
   prefix: "&7"
   join-arena: "Joining %umw_arena%..."
-  arena-full: "&cThat arena is full!"
+  arena-full: "&cYou cannot join this arena!"
   joined-arena: "Welcome! &aRight-click an NPC &7to join a team, and use &a/spawn &7to return to main lobby."
   joined-arena-others: "%umw_focus% &7joined the arena."
   joined-arena-lobby: "%umw_focus% &7joined arena &a%umw_arena%"
   leave-arena: "You left %umw_arena%"
   leave-arena-others: "%umw_focus% &7left the arena."
-  leave-team: "You left the %umw_team% team."
   leave-team-others: "%umw_focus% &7left your team."
   spectate-join-others: "%umw_focus% &7is now spectating."
   spectate-join-fail: "&cYou cannot spectate at this time."
   spectate-leave-others: "%umw_focus% &7is no longer spectating."
   queue-waiting: "You are now queued for %umw_team%&7 in position &c%umw_position%"
-  queue-join: "You joined the game as %umw_team%&7"
-  queue-join-others: "%umw_focus% has joined %umw_team%&7!"
+  queue-join-red: "%umw_focus% &7has joined &cred&7!"
+  queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
   queue-join-error: "You cannot join %umw_team%&7 as the teams would be unbalanced."
   lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
   lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."
@@ -30,8 +29,8 @@ messages:
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
   game-end-near: "Game ending in &c%umw_time_remaining% &7minutes!"
-  red-team-empty: "All players on the red team have left."
-  blue-team-empty: "All players on the blue team have left."
+  red-team-empty: "&cRed team &7 is empty. &9Blue team &7will automatically win in 60 seconds."
+  blue-team-empty: "&9Blue team &7 is empty. &cRed team &7will automatically win in 60 seconds."
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
   buff-team: "You will recieve items faster because a teammate left."
@@ -42,17 +41,13 @@ messages:
     - "&d&lMissile &5&lWars &7- &a&lClassic"
     - "&bBlow up your opponents' nether portals to win!"
     - "&aRight-click &7your items to use them."
-    - "&7Type &a/leave &7to go back to the lobby."
+    - "&7Type &a/lobby &7to go back to the lobby."
     - "&b========================================"
-  classic-end-mvp:
-    # mvps - players who blew up portals
+  classic-end:
     - "&b========================================"
-    - "&5MVPs: %umw_mvps%"
-    # If tied for top killer/deaths, list both
-  classic-end-kills:
-    - "&cMost Kills: %umw_focus%"
-  classic-end-deaths:
-    - "&eMost Deaths: %umw_focus%"
+    - "&a&lWINNER &7- %umw_winning_team%"
+    - "&cMost Kills (%umw_most_kills_amount%): %umw_most_kills%"
+    - "&eMost Deaths (%umw_most_deaths_amount%): %umw_most_deaths%"
     - "&aThanks for playing!"
     - "&b========================================"
     

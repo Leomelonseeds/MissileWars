@@ -8,6 +8,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
@@ -58,6 +60,8 @@ public class ArenaLeaveEvents implements Listener {
 	        
 	        if (player.getWorld().getName().equals("world")) {
 	        	InventoryUtils.loadInventory(player);
+	            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+	            discordChannel.sendMessage(":arrow_forward: " + player.getName() + " rejoined lobby from arena " + playerArena.getName()).queue();
 	        }
 	        
 	        return;

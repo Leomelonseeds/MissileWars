@@ -26,7 +26,7 @@ lobby-countdown-near: 5
 
 # The player capacity. 10 means 5 players per team.
 # Additional players can still join the arena, but they can only spectate.  
-arena-cap: 10
+arena-cap: 20
   
 # Length of game before a tie is declared, in minutes  
 game-length: 30

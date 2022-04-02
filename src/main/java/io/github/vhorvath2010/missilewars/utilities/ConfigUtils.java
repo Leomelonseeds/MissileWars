@@ -8,6 +8,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -82,8 +83,10 @@ public class ConfigUtils {
         }
 
         // Set PAPI placeholders and color
-        String parsedMsg = PlaceholderAPI.setPlaceholders(player, msg);
-        return ChatColor.translateAlternateColorCodes('&', parsedMsg);
+        if (player != null) {
+            msg = PlaceholderAPI.setPlaceholders(player, msg);
+        }
+        return ChatColor.translateAlternateColorCodes('&', msg);
     }
 
     /**
@@ -210,5 +213,22 @@ public class ConfigUtils {
     	float pitch = (float) config.getDouble("spawn.pitch");
     	
     	return new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
+    }
+    
+    /**
+     * Gets focus name of player
+     * 
+     * @param player
+     * @return player name stripped of color and applied of team
+     */
+    public static String getFocusName(OfflinePlayer player) {
+        Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        if (playerArena != null) {
+            ChatColor teamColor = playerArena.getTeamColor(player.getUniqueId());
+            if (teamColor != null) {
+                return teamColor + ChatColor.stripColor(player.getPlayer().getDisplayName());
+            }
+        }
+        return player.getPlayer().getDisplayName();
     }
 }

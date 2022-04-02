@@ -1,5 +1,11 @@
 package io.github.vhorvath2010.missilewars;
 
+import java.io.File;
+
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
@@ -10,12 +16,6 @@ import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
 import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 /** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
@@ -37,7 +37,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Save data files
         saveDefaultConfig();
-        saveIfNotPresent("default-settings.yml");
         saveIfNotPresent("messages.yml");
         saveIfNotPresent("sounds.yml");
         saveIfNotPresent("items.yml");
