@@ -93,6 +93,10 @@ public class ArenaGameruleEvents implements Listener {
         if (arena == null) {
             return;
         }
+        
+        if (!arena.isRunning()) {
+            return;
+        }
 
         // Check if player is damaged by a player
         Player damager = null;
@@ -109,7 +113,8 @@ public class ArenaGameruleEvents implements Listener {
         }
 
         // Stop event if damager and damaged are on same team
-        if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId()))) {
+        if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId())) &&
+           !arena.getTeam(player.getUniqueId()).equalsIgnoreCase("no team")) {
             event.setCancelled(true);
         }
     }
