@@ -1,7 +1,7 @@
 # yay item lol epic gamer
 # file, item, name, lore, offset (i think that's it?)
 # file and offset not exist for items without schematic
-# Unicode symbols: item ☢ ⚔ ★ ; kit ⚡ ⚜ &l☣ ⚒
+# Unicode symbols: item ☢ ⚔ ★ ; kit ⚡ ✟ &l☣ ⚒
 
 # Vanguard missiles
 
@@ -11,7 +11,8 @@ lightning:
   name: "&e☢ Lightning ⚡"
   lore:
   - ""
-  - "&7The classic, speedy missile."
+  - "&7The classic, reliable speedy missile."
+  - "&7Well, mostly reliable. Trade-offs were made."
   - ""
   - "&aSpeed: &f3.3m/s"
   - "&cTNT: &f10"
@@ -19,16 +20,126 @@ lightning:
     x: -1
     y: -4
     z: 4
-hurricane: {}
+hurricane: 
+  file: 'hurricane.nbt'
+  item: OCELOT_SPAWN_EGG
+  name: "&e☢ &lHurricane &e⚡"
+  lore:
+  - ""
+  - "&7A newer iteration of the Lightning, with"
+  - "&78 more TNT. That's 56% more TNT per TNT."
+  - ""
+  - "&aSpeed: &f3.3m/s"
+  - "&cTNT: &f10"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
-cruiser: {}
-thunderbolt: {}
+cruiser:
+  file: 'cruiser.nbt'
+  item: BLAZE_SPAWN_EGG
+  name: "&6☢ Cruiser ⚡"
+  lore:
+  - ""
+  - "&7This is not a cruise missile as the"
+  - "&7name may suggest. In fact, it is"
+  - "&7technically just a rocket, though a"
+  - "&7fast one at that."
+  - ""
+  - "&aSpeed: &f3.3m/s"
+  - "&cTNT: &f15"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+thunderbolt:
+  file: 'cruiser.nbt'
+  item: BLAZE_SPAWN_EGG
+  name: "&6☢ &lThunderbolt &6⚡"
+  lore:
+  - ""
+  - "&7Blink, and you'll miss it. And instantly die."
+  - "&7Detonates on impact. Hopefully before"
+  - "&7anyone shoots its glaring weak spot."
+  - ""
+  - "&aSpeed: &f3.3m/s"
+  - "&cTNT: &f13 + 4 TNT Minecarts"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
-hilt: {}
-dagger: {}
 
-supersonic: {}
-hypersonic: {}
+hilt:
+  file: 'hilt.nbt'
+  item: RABBIT_SPAWN_EGG
+  name: "&8☢ Hilt ⚡"
+  lore:
+  - ""
+  - "&7You may be wondering where the rest"
+  - "&7of this bladed weapon went. So are we."
+  - "&7Nonetheless, this compact missile"
+  - "&7packs incredible speed."
+  - ""
+  - "&aSpeed: &f4.4m/s"
+  - "&cTNT: &f10"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+dagger:
+  file: 'dagger.nbt'
+  item: RABBIT_SPAWN_EGG
+  name: "&8☢ &lDagger &8⚡"
+  lore:
+  - ""
+  - "&7There, we found the rest of the weapon."
+  - "&7This missile carries the 5 TNT that the"
+  - "&7Hilt was missing. Just try to avoid"
+  - "&7shields."
+  - ""
+  - "&aSpeed: &f4.4m/s"
+  - "&cTNT: &f15"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+
+supersonic:
+  file: 'supersonic.nbt'
+  item: PUFFERFISH_SPAWN_EGG
+  name: "&b☢ Supersonic ⚡"
+  lore:
+  - ""
+  - "&74.4 meters per second is not, in technical"
+  - "&7terms, supersonic. However, this thing is"
+  - "&7still fast. Blazing fast. Don't even try to ride"
+  - "&7it. Really, dont. We can't afford another"
+  - "&7lawsuit."
+  - ""
+  - "&aSpeed: &f4.4m/s"
+  - "&cTNT: &f4"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+hypersonic:
+  file: 'hypersonic.nbt'
+  item: PUFFERFISH_SPAWN_EGG
+  name: "&b☢ &lHypersonic &b⚡"
+  lore:
+  - ""
+  - "&7This missile is the older, preferred, and"
+  - "&7spoiled brother of the socially anxious"
+  - "&7Supersonic."
+  - ""
+  - "&aSpeed: &f4.4m/s"
+  - "&cTNT: &f6"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 tomahawk:
   file: 'tomahawk.nbt'
@@ -36,7 +147,8 @@ tomahawk:
   name: "&a☢ Tomahawk ⚡"
   lore:
   - ""
-  - "&7The first missile to ever be designed."
+  - "&7The first missile ever built. What's that?"
+  - "&7Sidewinder? No, we don't talk about that."
   - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f12"
@@ -44,7 +156,21 @@ tomahawk:
     x: -1
     y: -4
     z: 4
-tomatwo: {}
+tomatwo:
+  file: 'tomatwo.nbt'
+  item: ZOMBIE_SPAWN_EGG
+  name: "&a☢ &lTomatwo &a⚡"
+  lore:
+  - ""
+  - "&7The second missile ever—nevermind, wrong"
+  - "&7one. Has more TNT than the Tomahawk, though."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f16"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 
 # Sentinel missiles
@@ -52,10 +178,11 @@ tomatwo: {}
 guardian:
   file: 'guardian.nbt'
   item: GUARDIAN_SPAWN_EGG
-  name: "&3☢ Guardian ⚜"
+  name: "&3☢ Guardian ✟"
   lore:
   - ""
-  - "&7A simple, defensive missile."
+  - "&7A notoriously resilient missile, capable of"
+  - "&7blocking fireballs, arrows, and traumatic memories."
   - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f5"
@@ -63,15 +190,76 @@ guardian:
     x: -1
     y: -4
     z: 4
-elder_guardian: {}
+elder_guardian:
+  file: 'elderguard.nbt'
+  item: GUARDIAN_SPAWN_EGG
+  name: "&3☢ &lElder Guardian &3✟"
+  lore:
+  - ""
+  - "&7Packed with more explosives than the Guardian,"
+  - "&7this missile can nonetheless defend against a"
+  - "&7wide range of physical and emotional attacks."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f9"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
-gemini: {}
-gemini_warrior: {}
+gemini:
+  file: 'gemini.nbt'
+  item: COD_SPAWN_EGG
+  name: "&e☢ Gemini ✟"
+  lore:
+  - ""
+  - "&7Why launch one missile when you can launch"
+  - "&7two at once? Don't expect to deal much damage,"
+  - "&7though."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f4"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+gemini_warrior:
+  file: 'gemini_warrior.nbt'
+  item: COD_SPAWN_EGG
+  name: "&e☢ &lGemini Warrior &e✟"
+  lore:
+  - ""
+  - "&7Why launch two weak missiles at once, when"
+  - "&7you can launch two stronger ones? With, uh,"
+  - "&7very legal aftermarket modifications."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f16"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 cronullifier: {}
 aeonullifier: {}
 
-sword: {}
+sword: 
+  file: 'sword.nbt'
+  item: SKELETON_SPAWN_EGG
+  name: "&7☢ Sword ✟"
+  lore:
+  - ""
+  - "&7This thing might not have much TNT, but"
+  - "&7the labs told me they managed to stack"
+  - "&7almost all the explosives in a single line."
+  - "&7Arrows won't be a problem for this one."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f8"
+  offset:
+    x: 0
+    y: -4
+    z: 4
 blade: {}
 
 piranha: {}
@@ -92,7 +280,8 @@ juggernaut:
   name: "&c☢ Juggernaut &c&l☣"
   lore:
   - ""
-  - "&7This classic missile packs a punch."
+  - "&7High-yield piston-propelled face removal."
+  - "&7Insurance will not cover caused damage."
   - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f23"
@@ -100,7 +289,22 @@ juggernaut:
     x: -1
     y: -4
     z: 4
-juggerbuster: {}
+juggerbuster:
+  file: 'juggerbuster.nbt'
+  item: CHICKEN_SPAWN_EGG
+  name: "&c☢ &lJuggerbuster &c&l☣"
+  lore:
+  - ""
+  - "&7This Juggernaut-derived behemoth will"
+  - "&7destroy anything in its path, including shields."
+  - "&7Usage for transportation not recommended."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f32"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 breaker: {}
 rifter: {}
@@ -111,8 +315,9 @@ shieldbuster:
   name: "&2☢ Shieldbuster &2&l☣"
   lore:
   - ""
-  - "&7This classic missile is able to"
-  - "&7bust through a thin layer of blocks."
+  - "&7This missile exists to spite whatever god"
+  - "&7created shields, by simply passing through"
+  - "&7most such barriers."
   - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f17"
@@ -120,7 +325,22 @@ shieldbuster:
     x: -1
     y: -4
     z: 4
-shark: {}
+shark:
+  file: 'shark.nbt'
+  item: WITCH_SPAWN_EGG
+  name: "&2☢ &lShark &2&l☣"
+  lore:
+  - ""
+  - "&7The Shark is nearly unstoppable, assuming it"
+  - "&7encounters no more than eleven shields, and no"
+  - "&7one tries to stop it."
+  - ''
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f10"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 
 # Architect missiles
@@ -143,9 +363,26 @@ lifter: {}
 
 # Utility items
 
-splash: {}
+splash:
+  item: SPLASH_WATER_BOTTLE
+  name: "&9★ Splash ⚡"
+  lore:
+  - ""
+  - "&7Make it rain (but not snow) with the Splash!"
+  - "&7This handy utility allows its user to fall"
+  - "&7from great heights, climb walls, put out"
+  - "&7fires, and flood the Nile river every August."
 
-nova_rocket: {}
+nova_rocket:
+  file: ''
+  item:
+  name: ""
+  lore:
+  - ""
+  - "&7Despite being banned from purchasing from"
+  - "&7military suppliers, we were able to source these"
+  - "&7handy crossbow-launched explosive fireworks"
+  - "&7from a trailer park in Florida."
 
 shield_1: {}
 shield_2:
@@ -155,7 +392,8 @@ shield_2:
   lore:
   - ""
   - "&7Creates a barrier that is able"
-  - "&7to block most missiles."
+  - "&7to block most missiles. Emphasis on"
+  - "&7most. No warranty available."
   - ""
   - "&9Size: &f2"
   offset:
@@ -165,7 +403,23 @@ shield_2:
 shield_3: {}
 
 platform_1: {}
-platform_2: {}
+platform_2:
+  file: 'platform_2.nbt'
+  item: SNOWBALL
+  name: "&7★ Platform ⚒"
+  lore:
+  - ""
+  - "&7Take a shield, flip it ninety degrees, and"
+  - "&7you get a platform. It's great for standing on."
+  - "&7You can invite your friends onto your"
+  - "&7platform and have a platform party. With"
+  - "&7blackjack and hookers."
+  - ""
+  - "&9Size: &f2"
+  offset:
+    x: -3
+    y: 0
+    z: -3
 platform_3: {}
 
 torpedo_1: {}
@@ -184,7 +438,9 @@ fireball:
   name: "&4★ Fireball &4&l☣"
   lore:
   - ""
-  - "&7*Ghast noises*"
+  - "&7No ghasts were harmed in the"
+  - "&7making of this utility. Technically."
+  - "&7They died instantly and painlessly."
   - ""
   - "&4Power: &f1"
 
@@ -193,14 +449,36 @@ leaves: {}
 
 # Gear items (just used for names and lores i guess)
 
-vanguard_sword: {}
+vanguard_sword:
+  item: GOLDEN_SWORD
+  name: "&6⚔ Sword ⚡"
+  lore:
+  - ""
+  - "&7Many weapons double as tools. Axes chop wood,"
+  - "&7hammers shape metal, and daggers dice onions."
+  - "&7Not swords. Swords are meant to &okill."
 sentinel_bow:
   item: BOW
-  name: "&b⚔ Bow ⚜"
+  name: "&b⚔ Bow ✟"
   lore:
   - ""
   - "&7Could this be the legendary Gunblade?"
-berserker_crossbow: {}
-architect_shears: {}
-
-
+  - "&7No. It's a bayonet. But our marketing team"
+  - "&7did a great job selling them as gunblades."
+berserker_crossbow:
+  item: CROSSBOW
+  name: "&0⚔ Crossbow &l☣"
+  lore:
+  - ""
+  - "&7Before guns were invented, the coolest people"
+  - "&7strapped bows sideways onto stick-and-trigger"
+  - "&7assemblies. Then they unified the Qin dynasty."
+architect_shears:
+  item: SHEARS
+  name: "&2⚔ Shears ⚒"
+  lore:
+  - ""
+  - "&7Not to be confused with the Wrench,"
+  - "&7this non-australium tool can safely harvest"
+  - "&7a wide variety of blocks. Not asbestos, though."
+  - "&7Never touch asbestos, even with shears."
