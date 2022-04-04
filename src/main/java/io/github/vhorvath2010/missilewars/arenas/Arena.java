@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -67,6 +68,8 @@ public class Arena implements ConfigurationSerializable {
     private boolean inChaos;
     /** Whether the arena is currently resetting the world. */
     private boolean resetting;
+    /** Comparator to sort by active players */
+    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -270,7 +273,19 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of player currently in the game
      */
     public int getNumPlayers() {
-        return players.size() - spectators.size();
+        if (blueTeam == null || blueTeam.getSize() == 0) {
+            return players.size() - spectators.size();
+        }
+        return redTeam.getSize() + blueTeam.getSize();
+    }
+    
+    /**
+     * Get total number of players in the arena
+     *
+     * @return the number of player currently in the game
+     */
+    public int getTotalPlayers() {
+        return players.size();
     }
 
     /**
@@ -289,10 +304,8 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the player joined the Arena, otherwise false
      */
     public boolean joinPlayer(Player player) {
-        // Check for Arena capacity
-        if (getNumPlayers() >= capacity) {
-            return false;
-        }
+        
+        ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         // Ensure world isn't resetting
         if (resetting) {
@@ -303,6 +316,10 @@ public class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
         }
 
+        ConfigUtils.sendConfigMessage("messages.joined-arena", player, this, null);
+        TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+        discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
+
         player.setHealth(20);
         player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
@@ -310,6 +327,11 @@ public class Arena implements ConfigurationSerializable {
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
         InventoryUtils.clearInventory(player);
+
+        for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
+            ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
+        }
+        
         // Check for game start
         int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
         if (getNumPlayers() >= minPlayers) {
@@ -378,8 +400,10 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Check for empty team win condition
-        if (running) {
-            if (redTeam != null && redTeam.getSize() <= 0) {
+        if (running && redTeam != null && blueTeam != null) {
+            if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
+                endGame(null);
+            } else if (redTeam.getSize() <= 0) {
                 announceMessage("messages.red-team-empty", null);
                 new BukkitRunnable() {
                     @Override
@@ -389,8 +413,7 @@ public class Arena implements ConfigurationSerializable {
                         }
                     }
                 }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
-                endGame(blueTeam);
-            } else if (blueTeam != null && blueTeam.getSize() <= 0) {
+            } else if (blueTeam.getSize() <= 0) {
                 announceMessage("messages.blue-team-empty", null);
                 new BukkitRunnable() {
                     @Override
@@ -444,8 +467,9 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (!player.getMCPlayer().isOp() && redTeam.getSize() - blueTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error",
-                                null, this, null));
+                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
+                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && redTeam.getSize() >= getCapacity() / 2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
                     } else {
                         blueTeam.removePlayer(player);
                         redTeam.addPlayer(player);
@@ -477,8 +501,9 @@ public class Arena implements ConfigurationSerializable {
                     }
                 } else {
                     if (!player.getMCPlayer().isOp() && blueTeam.getSize() - redTeam.getSize() >= 1) {
-                        player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.queue-join-error", null,
-                                this, null));
+                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
+                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && blueTeam.getSize() >= getCapacity() / 2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
                     } else {
                         redTeam.removePlayer(player);
                         blueTeam.addPlayer(player);

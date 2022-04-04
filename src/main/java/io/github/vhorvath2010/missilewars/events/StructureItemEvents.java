@@ -80,8 +80,8 @@ public class StructureItemEvents implements Listener {
             return;
         }
       
-        // Switch to throwing logic if using shield
-        if (structureName.contains("shield_")) {
+        // Switch to throwing logic if using a throwable
+        if (structureName.contains("shield_") || structureName.contains("platform_") || structureName.contains("torpedo_")) {
             return;
         }
 
@@ -149,9 +149,9 @@ public class StructureItemEvents implements Listener {
         }
     }
 
-    /** Handle shield snowball creation */
+    /** Handle snowball items structure creation */
     @EventHandler
-    public void useShield(ProjectileLaunchEvent event) {
+    public void useSnowball(ProjectileLaunchEvent event) {
         // Ensure we are tracking a snowball thrown by a player
         if (event.getEntity().getType() != EntityType.SNOWBALL) {
             return;
@@ -181,7 +181,7 @@ public class StructureItemEvents implements Listener {
                     Location spawnLoc = thrown.getLocation();
                     if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower))) {
                         for (Player players : thrower.getWorld().getPlayers()) {
-                        	ConfigUtils.sendConfigSound("spawn-shield", players, spawnLoc);
+                            ConfigUtils.sendConfigSound("spawn-shield", players, spawnLoc);
                         }
                     } else {
                         ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
