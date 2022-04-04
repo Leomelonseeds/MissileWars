@@ -113,37 +113,36 @@ titles:
     subtitle: "&71 portal remaining"
     length: 60
     
-  
-scoreboard:
-  title: "&d&lMissile &5&lWars"
-  lines-main-lobby:
-    - "&7&m－－－－－－－－－－－－"
-    - "&bWelcome %displayname%&f!"
-    - ""
-    - "&aRight-click &fthe compass"
-    - "&fto join a game!"
-    - "&7&m－－－－－－－－－－－－"
-    - "&5play.ultimamc.net"
-  lines-waiting:
-    - "&7&m－－－－－－－－－－－－"
-    - "&fGamemode: &a%umw_gamemode%"
-    - "&fMap: &a%umw_map%"
-    - ""
-    - "&fStarting in: %umw_time%"
-    - "&7&m－－－－－－－－－－－－"
-    - "&5play.ultimamc.net"
-  lines-classic:
-    - "&7&m－－－－－－－－－－－－"
-    - "&fGamemode: &aClassic"
-    - ""
-    - "&cRed Shield: %umw_shield_health_red%"
-    - "&9Blue Shield: %umw_shield_health_blue%"
-    - ""
-    - "&fTime left: %umw_time_remaining%"
-    - "&7&m－－－－－－－－－－－－"
-    - "&5play.ultimamc.net"
-  #For future use
-  lines-ctf: []
+# This section is no longer needed
+# and will be removed in the future
+#scoreboard:
+#  title: "&d&lMissile &5&lWars"
+#  lines-main-lobby:
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&bWelcome %displayname%&f!"
+#    - ""
+#    - "&aRight-click &fthe compass"
+#    - "&fto join a game!"
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&5play.ultimamc.net"
+#  lines-waiting:
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&fGamemode: &a%umw_gamemode%"
+#    - "&fMap: &a%umw_map%"
+#    - ""
+#    - "&fStarting in: %umw_time%"
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&5play.ultimamc.net"
+#  lines-classic:
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&fGamemode: &aClassic"
+#    - ""
+#    - "&cRed Shield: %umw_shield_health_red%"
+#    - "&9Blue Shield: %umw_shield_health_blue%"
+#    - ""
+#    - "&fTime left: %umw_time_remaining%"
+#    - "&7&m－－－－－－－－－－－－"
+#    - "&5play.ultimamc.net"
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  
@@ -164,3 +163,9 @@ inventories:
         - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
         - "&7Status: %umw_arena_status%"
         - "&7Click to join, %player_name%!"
+  map-voting:
+    title: "Map Vote"
+    vote-item:
+      name: "&f%umw_map%"
+      lore:
+        - "&7Votes: &c%umw_map_votes%"

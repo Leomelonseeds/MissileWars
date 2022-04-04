@@ -50,8 +50,9 @@ lobby:
       y: 65
       z: -13
 
-# Settings for the Default map
+# Settings for the Default map. Persists unless overridden
 default-map:
+  name: "&fStandoff"
   file: "DefaultMap.schem"
   pos:
     x: 0
@@ -98,4 +99,14 @@ default-map:
     y3: 52
     x4: 21
     y4: 72
+middle-ground:
+  name: "&fMiddle Ground"
+  file: "MiddleGround.schem"
+double-layer:
+  name: "&fDouble Layer"
+  file: "DoubleLayer.schem"
+  blue-shield:
+    z2: -42
+  red-shield:
+    z2: 42
     
