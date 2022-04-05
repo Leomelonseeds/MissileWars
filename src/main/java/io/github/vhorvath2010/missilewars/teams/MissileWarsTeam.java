@@ -120,6 +120,7 @@ public class MissileWarsTeam {
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
+        mcPlayer.setFireTicks(0);
         giveItems(player);
     }
 
