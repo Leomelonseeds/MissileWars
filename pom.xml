@@ -152,10 +152,10 @@
             <systemPath>${basedir}\WorldGuardExtraFlags.jar</systemPath>
         </dependency>
         <dependency>
-    		<groupId>com.discordsrv</groupId>
-    		<artifactId>discordsrv</artifactId>
-    		<version>1.25.1</version>
-   	 		<scope>provided</scope>
-		</dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.25.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

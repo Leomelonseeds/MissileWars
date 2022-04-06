@@ -58,13 +58,24 @@ public class StructureItemEvents implements Listener {
     private boolean isRedTeam(Player player) {
         // Find player's team (Default to blue)
         boolean redTeam = false;
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = getPlayerArena(player);
         if (arena != null) {
             redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED +
                     "red" + ChatColor.RESET);
         }
         return redTeam;
+    }
+
+    /**
+     * Get the Arena the current player is in.
+     *
+     * @param player the player
+     * @return the Arena the player is in
+     */
+    private Arena getPlayerArena(Player player) {
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        return arena;
     }
 
     /** Handle missile and other structure item spawning. */
@@ -101,7 +112,12 @@ public class StructureItemEvents implements Listener {
         }
 
         // Place structure
-        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player))) {
+        Arena playerArena = getPlayerArena(player);
+        String mapName = "default-map";
+        if (playerArena != null && playerArena.getMapName() != null) {
+            mapName = playerArena.getMapName();
+        }
+        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
             hand.setAmount(hand.getAmount() - 1);
         } else {
         	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -179,7 +195,12 @@ public class StructureItemEvents implements Listener {
                 if (!thrown.isDead()) {
                     // Spawn shield at current location and remove snowball
                     Location spawnLoc = thrown.getLocation();
-                    if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower))) {
+                    Arena playerArena = getPlayerArena(thrower);
+                    String mapName = "default-map";
+                    if (playerArena != null && playerArena.getMapName() != null) {
+                        mapName = playerArena.getMapName();
+                    }
+                    if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
                         for (Player players : thrower.getWorld().getPlayers()) {
                             ConfigUtils.sendConfigSound("spawn-shield", players, spawnLoc);
                         }

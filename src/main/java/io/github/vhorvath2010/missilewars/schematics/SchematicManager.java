@@ -52,16 +52,14 @@ public class SchematicManager {
      * @param structureName the name of the structure
      * @param loc the location to spawn the structure (pre-offset)
      * @param redMissile if the NBT structure is a red missile
+     * @param mapName The name of the Arena map the NBT structure is being spawned in
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "items.yml");
-        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "maps.yml");
-
 
         // Attempt to get structure file
         if (!structureConfig.contains(structureName + ".file")) {
@@ -109,13 +107,13 @@ public class SchematicManager {
         
         int barrierx = plugin.getConfig().getInt("barrier.center.x");
         
-        int portalx1 = mapsConfig.getInt("default-map.portal.x1") - 1;
-        int portalx2 = mapsConfig.getInt("default-map.portal.x4") + 1;
-        int portaly1 = mapsConfig.getInt("default-map.portal.y1") - 1;
-        int portaly2 = mapsConfig.getInt("default-map.portal.y4") + 1;
+        int portalx1 = (int) (ConfigUtils.getMapData("classic", mapName, "portal.x1") - 1);
+        int portalx2 = (int) ConfigUtils.getMapData("classic", mapName, "portal.x4") + 1;
+        int portaly1 = (int) ConfigUtils.getMapData("classic", mapName, "portal.y1") - 1;
+        int portaly2 = (int) ConfigUtils.getMapData("classic", mapName, "portal.y4") + 1;
         
-        int portalredz = mapsConfig.getInt("default-map.portal.red-z");
-        int portalbluez = mapsConfig.getInt("default-map.portal.blue-z");
+        int portalredz = (int) ConfigUtils.getMapData("classic", mapName, "portal.red-z");
+        int portalbluez = (int) ConfigUtils.getMapData("classic", mapName, "portal.blue-z");
         
         
         // Do not place if hitbox would intersect with barrier

@@ -51,62 +51,62 @@ lobby:
       z: -13
 
 # Settings for the Default map. Persists unless overridden
-default-map:
-  name: "&fStandoff"
-  file: "DefaultMap.schem"
-  pos:
-    x: 0
-    y: 77
-    z: -65
-  blue-spawn:
-    x: 0.5
-    y: 77
-    z: -64.5
-  red-spawn:
-    x: 0.5
-    y: 77
-    z: 65.5
-  # Two corners of blue and red shield, to calculate shield health
-  # where shield health = non-air blocks/total volume * 100%
-  blue-shield:
-    x1: -26
-    y1: 47
-    z1: -65
-    x2: 26
-    y2: 76
-    z2: -51
-  red-shield:
-    x1: -26
-    y1: 47
-    z1: 65
-    x2: 26
-    y2: 76
-    z2: 51
-  # the measurements here ONLY include portal blocks, no obsidian
-  # only z coords differ between the two sides. x and y are exactly the same
-  # x1 and x3 should both be the WEST side (towards -x) of the portals
-  # y1 and y3 should both be the LOWER side of the portals
-  portal:
-    blue-z: -72
-    red-z: 72
-    # portal 1
-    x1: -21
-    y1: 52
-    x2: -1
-    y2: 72
-    # portal 2
-    x3: 1
-    y3: 52
-    x4: 21
-    y4: 72
-middle-ground:
-  name: "&fMiddle Ground"
-  file: "MiddleGround.schem"
-double-layer:
-  name: "&fDouble Layer"
-  file: "DoubleLayer.schem"
-  blue-shield:
-    z2: -42
-  red-shield:
-    z2: 42
-    
+classic:
+  default-map:
+    name: "&fStandoff"
+    file: "DefaultMap.schem"
+    pos:
+      x: 0
+      y: 77
+      z: -65
+    blue-spawn:
+      x: 0.5
+      y: 77
+      z: -64.5
+    red-spawn:
+      x: 0.5
+      y: 77
+      z: 65.5
+    # Two corners of blue and red shield, to calculate shield health
+    # where shield health = non-air blocks/total volume * 100%
+    blue-shield:
+      x1: -26
+      y1: 47
+      z1: -65
+      x2: 26
+      y2: 76
+      z2: -51
+    red-shield:
+      x1: -26
+      y1: 47
+      z1: 65
+      x2: 26
+      y2: 76
+      z2: 51
+    # the measurements here ONLY include portal blocks, no obsidian
+    # only z coords differ between the two sides. x and y are exactly the same
+    # x1 and x3 should both be the WEST side (towards -x) of the portals
+    # y1 and y3 should both be the LOWER side of the portals
+    portal:
+      blue-z: -72
+      red-z: 72
+      # portal 1
+      x1: -21
+      y1: 52
+      x2: -1
+      y2: 72
+      # portal 2
+      x3: 1
+      y3: 52
+      x4: 21
+      y4: 72
+  middle-ground:
+    name: "&fMiddle Ground"
+    file: "MiddleGround.schem"
+  double-layer:
+    name: "&fDouble Layer"
+    file: "DoubleLayer.schem"
+    blue-shield:
+      z2: -42
+    red-shield:
+      z2: 42

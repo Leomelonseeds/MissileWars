@@ -44,6 +44,8 @@ public class Arena implements ConfigurationSerializable {
 
     /** The arena name. */
     private String name;
+    /** The map for the arena. */
+    private String mapName;
     /** The max number of players for this arena. */
     private int capacity;
     /** The list of all players currently in the arena. */
@@ -130,6 +132,15 @@ public class Arena implements ConfigurationSerializable {
      */
     public World getWorld() {
         return Bukkit.getWorld("mwarena_" + name);
+    }
+
+    /**
+     * Get the current map for this Arena.
+     *
+     * @return the selected map name for this Arena
+     */
+    public String getMapName() {
+        return mapName;
     }
 
     /**
@@ -586,9 +597,12 @@ public class Arena implements ConfigurationSerializable {
         }
         
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        
+
+        // TODO: select map
+        mapName = "default-map";
+
         // Generate map.
-        if (!generateMap("default-map")) {
+        if (!generateMap(mapName)) {
         	announceMessage("messages.map-failed", null);
         	return false;
         } else {
@@ -598,9 +612,9 @@ public class Arena implements ConfigurationSerializable {
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
-        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "default-map.blue-spawn");
+        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, mapName + ".blue-spawn");
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "default-map.red-spawn");
+        Vector redSpawnVec = SchematicManager.getVector(mapConfig, mapName + ".red-spawn");
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
         blueSpawn.setWorld(getWorld());
@@ -924,17 +938,20 @@ public class Arena implements ConfigurationSerializable {
      * @param location the location
      */
     public void registerPortalBreak(Location location) {
+        // Ignore if game not running
+        if (!running) {
+            return;
+        }
+
         // Check if portal broke at blue or red z
-        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
         int z = location.getBlockZ();
-        if (z == mapsConfig.getInt("default-map.portal.blue-z")) {
+        if (z == Math.round(ConfigUtils.getMapData("classic", mapName, "portal.blue-z"))) {
             // Register breaking of blue team's portal and send titles
             if (blueTeam.registerPortalBreak(location) && blueTeam.hasLivingPortal()) {
                 blueTeam.sendTitle("own-portal-destroyed");
                 redTeam.sendTitle("enemy-portal-destroyed");
             }
-        } else if (z == mapsConfig.getInt("default-map.portal.red-z")) {
+        } else if (z == Math.round(ConfigUtils.getMapData("classic", mapName, "portal.red-z"))) {
             if (redTeam.registerPortalBreak(location) && redTeam.hasLivingPortal()) {
                 redTeam.sendTitle("own-portal-destroyed");
                 blueTeam.sendTitle("enemy-portal-destroyed");
