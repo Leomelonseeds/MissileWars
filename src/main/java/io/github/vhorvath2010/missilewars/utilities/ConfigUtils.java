@@ -240,7 +240,7 @@ public class ConfigUtils {
      * @param path the path to the data
      * @return the data at the path for the given math, or default data if it does not exist
      */
-    public static double getMapData(String mapType, String mapName, String path) {
+    public static double getMapNumber(String mapType, String mapName, String path) {
         FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "maps.yml");
         if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
@@ -249,4 +249,5 @@ public class ConfigUtils {
             return mapsConfig.getDouble(mapType + ".default-map." + path);
         }
     }
+
 }

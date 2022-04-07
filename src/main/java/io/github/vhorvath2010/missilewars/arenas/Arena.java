@@ -46,6 +46,8 @@ public class Arena implements ConfigurationSerializable {
     private String name;
     /** The map for the arena. */
     private String mapName;
+    /** The gamemode type for the map for the arena. */
+    private String mapType;
     /** The max number of players for this arena. */
     private int capacity;
     /** The list of all players currently in the arena. */
@@ -177,7 +179,7 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the map successfully generated, otherwise false
      */
     public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), true);
+        return SchematicManager.spawnFAWESchematic(mapType + "." + mapName, getWorld(), true);
     }
 
     /**
@@ -600,6 +602,7 @@ public class Arena implements ConfigurationSerializable {
 
         // TODO: select map
         mapName = "default-map";
+        mapType = "classic";
 
         // Generate map.
         if (!generateMap(mapName)) {
@@ -612,9 +615,9 @@ public class Arena implements ConfigurationSerializable {
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
-        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, mapName + ".blue-spawn");
+        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, mapType + "." + mapName + ".blue-spawn");
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-        Vector redSpawnVec = SchematicManager.getVector(mapConfig, mapName + ".red-spawn");
+        Vector redSpawnVec = SchematicManager.getVector(mapConfig, mapType + "." + mapName + ".red-spawn");
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
         blueSpawn.setWorld(getWorld());
@@ -945,13 +948,13 @@ public class Arena implements ConfigurationSerializable {
 
         // Check if portal broke at blue or red z
         int z = location.getBlockZ();
-        if (z == Math.round(ConfigUtils.getMapData("classic", mapName, "portal.blue-z"))) {
+        if (z == Math.round(ConfigUtils.getMapNumber("classic", mapName, "portal.blue-z"))) {
             // Register breaking of blue team's portal and send titles
             if (blueTeam.registerPortalBreak(location) && blueTeam.hasLivingPortal()) {
                 blueTeam.sendTitle("own-portal-destroyed");
                 redTeam.sendTitle("enemy-portal-destroyed");
             }
-        } else if (z == Math.round(ConfigUtils.getMapData("classic", mapName, "portal.red-z"))) {
+        } else if (z == Math.round(ConfigUtils.getMapNumber("classic", mapName, "portal.red-z"))) {
             if (redTeam.registerPortalBreak(location) && redTeam.hasLivingPortal()) {
                 redTeam.sendTitle("own-portal-destroyed");
                 blueTeam.sendTitle("enemy-portal-destroyed");

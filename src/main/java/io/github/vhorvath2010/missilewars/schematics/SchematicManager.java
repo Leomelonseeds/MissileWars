@@ -10,14 +10,11 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.Vector;
@@ -107,13 +104,13 @@ public class SchematicManager {
         
         int barrierx = plugin.getConfig().getInt("barrier.center.x");
         
-        int portalx1 = (int) (ConfigUtils.getMapData("classic", mapName, "portal.x1") - 1);
-        int portalx2 = (int) ConfigUtils.getMapData("classic", mapName, "portal.x4") + 1;
-        int portaly1 = (int) ConfigUtils.getMapData("classic", mapName, "portal.y1") - 1;
-        int portaly2 = (int) ConfigUtils.getMapData("classic", mapName, "portal.y4") + 1;
+        int portalx1 = (int) (ConfigUtils.getMapNumber("classic", mapName, "portal.x1") - 1);
+        int portalx2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4") + 1;
+        int portaly1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1") - 1;
+        int portaly2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4") + 1;
         
-        int portalredz = (int) ConfigUtils.getMapData("classic", mapName, "portal.red-z");
-        int portalbluez = (int) ConfigUtils.getMapData("classic", mapName, "portal.blue-z");
+        int portalredz = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.red-z");
+        int portalbluez = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.blue-z");
         
         
         // Do not place if hitbox would intersect with barrier
