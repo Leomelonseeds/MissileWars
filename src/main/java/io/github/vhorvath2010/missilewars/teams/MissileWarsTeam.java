@@ -32,6 +32,8 @@ public class MissileWarsTeam {
     private boolean chaosMode;
     /** Whether the first and second portals are destroyed. Default to false. */
     private boolean firstPortalDestroyed, secondPortalDestroyed;
+    /** The number of shield blocks broken. */
+    private int shieldBlocksBroken;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -72,6 +74,15 @@ public class MissileWarsTeam {
      */
     public Location getSpawn() {
         return spawn;
+    }
+
+    /**
+     * Get the number of shield blocks broken.
+     *
+     * @return the number of shield blocks broken
+     */
+    public int getShieldBlocksBroken() {
+        return shieldBlocksBroken;
     }
 
     /**
@@ -300,4 +311,54 @@ public class MissileWarsTeam {
     		ConfigUtils.sendConfigSound(path, player);;
     	}
     }
+
+    /**
+     * Attempt to register the placing or breaking of a shield block for this team.
+     *
+     * @param location the location of the edited block
+     * @param place whether the block was placed
+     * @return true if the updated block was a shield block for this team
+     */
+    public boolean registerShieldBlockUpdate(Location location, boolean place) {
+        // Check if block was in shield location
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        String teamName = ChatColor.stripColor(name).toLowerCase();
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
+        if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
+            shieldBlocksBroken += place ? -1 : 1;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the volume of the shield for this team in the current given map.
+     *
+     * @return the shield volume for this team in the current map
+     */
+    public int getShieldVolume() {
+        // Ignore if arena not running
+        if (arena == null || !arena.isRunning()) {
+            return 1;
+        }
+
+        // Calculate volume
+        String teamName = ChatColor.stripColor(name).toLowerCase();
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
+        return (x2 - x1) * (y2 - y1) * (z2 - z1);
+    }
+
 }

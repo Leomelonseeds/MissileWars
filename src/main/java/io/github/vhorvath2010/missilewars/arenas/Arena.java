@@ -1,5 +1,7 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -143,6 +145,15 @@ public class Arena implements ConfigurationSerializable {
      */
     public String getMapName() {
         return mapName;
+    }
+
+    /**
+     * Get the current map type for this arena.
+     *
+     * @return the current map type for this arena
+     */
+    public String getMapType() {
+        return mapType;
     }
 
     /**
@@ -934,7 +945,6 @@ public class Arena implements ConfigurationSerializable {
         }
     }
 
-
     /**
      * Register the breaking of a portal at a location in this Arena.
      *
@@ -983,6 +993,58 @@ public class Arena implements ConfigurationSerializable {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Register the editing of a block in the Arena.
+     *
+     * @param location the location of the edited block
+     */
+    public void registerShieldBlockEdit(Location location, boolean place) {
+        // Ignore if game not running
+        if (!running) {
+            return;
+        }
+
+        // Only attempt blue update if red unchanged
+        redTeam.registerShieldBlockUpdate(location, place);
+        blueTeam.registerShieldBlockUpdate(location, place);
+    }
+
+    /**
+     * Get the red team's current shield health.
+     *
+     * @return the red team's current shield health
+     */
+    public double getRedShieldHealth() {
+        // Full health if game not running
+        if (!running) {
+            return 100.00;
+        }
+
+        // Acquire shield data
+        int totalBlocks = redTeam.getShieldVolume();
+        int broken = redTeam.getShieldBlocksBroken();
+
+        return 100 * ((totalBlocks - broken) / (double) totalBlocks);
+    }
+
+    /**
+     * Get the blue team's current shield health as a percentage.
+     *
+     * @return the blue team's current shield health
+     */
+    public double getBlueShieldHealth() {
+        // Full health if game not running
+        if (!running) {
+            return 100.00;
+        }
+
+        // Acquire shield data
+        int totalBlocks = blueTeam.getShieldVolume();
+        int broken = blueTeam.getShieldBlocksBroken();
+
+        return 100 * ((totalBlocks - broken) / (double) totalBlocks);
     }
 
 }

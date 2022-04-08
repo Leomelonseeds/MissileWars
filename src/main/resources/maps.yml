@@ -79,10 +79,10 @@ classic:
     red-shield:
       x1: -26
       y1: 47
-      z1: 65
+      z1: 51
       x2: 26
       y2: 76
-      z2: 51
+      z2: 65
     # the measurements here ONLY include portal blocks, no obsidian
     # only z coords differ between the two sides. x and y are exactly the same
     # x1 and x3 should both be the WEST side (towards -x) of the portals

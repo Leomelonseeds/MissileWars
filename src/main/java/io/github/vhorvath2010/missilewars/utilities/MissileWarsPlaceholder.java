@@ -7,6 +7,8 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
+import java.text.DecimalFormat;
+
 public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
 
@@ -37,6 +39,17 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("focus")) {
             return ConfigUtils.getFocusName(player);
+        }
+
+        // Decimal formatter for percentages
+        DecimalFormat df = new DecimalFormat("##.##");
+
+        if (params.equalsIgnoreCase("shield_health_red")) {
+            return df.format(playerArena.getRedShieldHealth())+ "%";
+        }
+
+        if (params.equalsIgnoreCase("shield_health_blue")) {
+            return df.format(playerArena.getBlueShieldHealth()) + "%";
         }
 
         return null; // Placeholder is unknown by the Expansion

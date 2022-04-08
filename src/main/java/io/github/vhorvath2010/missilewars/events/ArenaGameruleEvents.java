@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -142,7 +144,13 @@ public class ArenaGameruleEvents implements Listener {
         if (possibleArena == null) {
             return;
         }
-        
+
+        // Check for shield breaks
+        event.blockList().forEach(block -> {
+            // Register shield breaking
+            possibleArena.registerShieldBlockEdit(block.getLocation(), false);
+        });
+
         // Ensure its actually a fireball
         if (event.getEntityType() == EntityType.FIREBALL) {
             // Remove all portals from block list
@@ -157,6 +165,34 @@ public class ArenaGameruleEvents implements Listener {
                 }
             });
         }
+    }
+
+    /** Handle shield block breaks breaks. */
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        // Register block break
+        possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), false);
+    }
+
+    /** Handle shield block breaks places. */
+    @EventHandler
+    public void onPlace(BlockPlaceEvent event) {
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        // Register block break
+        possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), true);
     }
 
 }
