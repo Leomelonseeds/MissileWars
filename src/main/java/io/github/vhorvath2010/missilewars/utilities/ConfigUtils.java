@@ -3,7 +3,9 @@ package io.github.vhorvath2010.missilewars.utilities;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +24,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
 
+    // Map of open cached config files
+    private static Map<String, FileConfiguration> configCache = new HashMap<>();
+
     /**
      * Method to get a config file from its yml name.
      *
@@ -30,6 +35,11 @@ public class ConfigUtils {
      * @return the config
      */
     public static FileConfiguration getConfigFile(String dir, String configName) {
+        // Check for config file in cache
+        if (configCache.containsKey(configName)) {
+            return configCache.get(configName);
+        }
+
         File file = new File(dir, configName);
         FileConfiguration config = new YamlConfiguration();
         try {
@@ -37,6 +47,7 @@ public class ConfigUtils {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
+        configCache.put(configName, config);
         return config;
     }
 
