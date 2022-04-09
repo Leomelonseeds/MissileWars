@@ -242,20 +242,20 @@ public class MissileWarsTeam {
         String mapName = arena.getMapName();
         int x = loc.getBlockX();
         int y = loc.getBlockY();
-        int x1 = mapsConfig.getInt(mapName + ".portal.x1");
-        int y1 = mapsConfig.getInt(mapName + ".portal.y1");
-        int x2 = mapsConfig.getInt(mapName + ".portal.x2");
-        int y2 = mapsConfig.getInt(mapName + ".portal.y2");
+        int x1 = mapsConfig.getInt("classic." + mapName + ".portal.x1");
+        int y1 = mapsConfig.getInt("classic." + mapName + ".portal.y1");
+        int x2 = mapsConfig.getInt("classic." + mapName + ".portal.x2");
+        int y2 = mapsConfig.getInt("classic." + mapName + ".portal.y2");
         if (!firstPortalDestroyed && x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
             firstPortalDestroyed = true;
             return true;
         }
 
         // Check if second portal was broken
-        int x3 = mapsConfig.getInt(mapName + ".portal.x3");
-        int y3 = mapsConfig.getInt(mapName + ".portal.y3");
-        int x4 = mapsConfig.getInt(mapName + ".portal.x4");
-        int y4 = mapsConfig.getInt(mapName + ".portal.y4");
+        int x3 = mapsConfig.getInt("classic." + mapName + ".portal.x3");
+        int y3 = mapsConfig.getInt("classic." + mapName + ".portal.y3");
+        int x4 = mapsConfig.getInt("classic." + mapName + ".portal.x4");
+        int y4 = mapsConfig.getInt("classic." + mapName + ".portal.y4");
         if (!secondPortalDestroyed && x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
             secondPortalDestroyed = true;
             return true;
