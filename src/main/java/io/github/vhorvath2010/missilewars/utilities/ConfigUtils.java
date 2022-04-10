@@ -261,4 +261,23 @@ public class ConfigUtils {
         }
     }
 
+    /**
+     * Acquire specific text data for a given map.
+     * @param mapType the gamemode for the map
+     * @param mapName the name of the map
+     * @param path the path to the data
+     * @return the data at the path for the given math, or default data if it does not exist
+     */
+    public static String getMapText(String mapType, String mapName, String path) {
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
+            return ChatColor.translateAlternateColorCodes('&',
+                    mapsConfig.getString(mapType + "." + mapName + "." + path));
+        } else {
+            return ChatColor.translateAlternateColorCodes('&',
+                    mapsConfig.getString(mapType + ".default-map." + path));
+        }
+    }
+
 }

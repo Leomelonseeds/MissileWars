@@ -1,7 +1,5 @@
 package io.github.vhorvath2010.missilewars.arenas;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,18 +10,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -43,6 +47,9 @@ import net.citizensnpcs.api.exception.NPCLoadException;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
+
+    /** Comparator to sort by active players */
+    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
 
     /** The arena name. */
     private String name;
@@ -70,12 +77,12 @@ public class Arena implements ConfigurationSerializable {
     private boolean running;
     /** List of currently running tasks. */
     private List<BukkitTask> tasks;
-    /** Whether the arena is in chaos mode. */
-    private boolean inChaos;
     /** Whether the arena is currently resetting the world. */
     private boolean resetting;
-    /** Comparator to sort by active players */
-    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
+    /** The current number of votes for each map. */
+    private Map<String, Integer> mapVotes;
+    /** Connect players and their votes. */
+    private Map<UUID, String> playerVotes;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -91,6 +98,7 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
+        setupMapVotes();
     }
 
     /**
@@ -118,6 +126,22 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
+        setupMapVotes();
+    }
+
+    /**
+     * Setup map voting for the next game.
+     */
+    public void setupMapVotes() {
+        mapType = "classic";
+
+        // Add maps in map type to voting pool
+        mapVotes = new HashMap<>();
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        for (String mapName : mapConfig.getConfigurationSection(mapType).getKeys(false)) {
+            mapVotes.put(mapName, 0);
+        }
     }
 
     /**
@@ -361,6 +385,10 @@ public class Arena implements ConfigurationSerializable {
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
+
+        // Open map voting inventory
+        openMapVote(player);
+
         return true;
     }
 
@@ -611,9 +639,26 @@ public class Arena implements ConfigurationSerializable {
         
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
-        // TODO: select map
+        // Select Map
         mapName = "default-map";
-        mapType = "classic";
+        List<String> mapsWithTopVotes = new LinkedList<>();
+        for (String map : mapVotes.keySet()) {
+            if (mapsWithTopVotes.isEmpty()) {
+                mapsWithTopVotes.add(map);
+            } else {
+                String previousTop = mapsWithTopVotes.get(0);
+                if (mapVotes.get(previousTop) == mapVotes.get(map)) {
+                    mapsWithTopVotes.add(map);
+                } else if (mapVotes.get(previousTop) < mapVotes.get(map)) {
+                    mapsWithTopVotes.clear();
+                    mapsWithTopVotes.add(map);
+                }
+            }
+        }
+        if (!mapsWithTopVotes.isEmpty()) {
+            // Set map to random map with top votes
+            mapName = mapsWithTopVotes.get(new Random().nextInt(mapsWithTopVotes.size()));
+        }
 
         // Generate map.
         if (!generateMap(mapName)) {
@@ -708,7 +753,6 @@ public class Arena implements ConfigurationSerializable {
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
-                inChaos = true;
                 blueTeam.setChaosMode(true);
                 redTeam.setChaosMode(true);
                 redTeam.broadcastConfigMsg("messages.chaos-mode", null);
@@ -747,6 +791,7 @@ public class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
         resetting = false;
+        setupMapVotes();
     }
 
     /**
@@ -1048,6 +1093,41 @@ public class Arena implements ConfigurationSerializable {
         int broken = blueTeam.getShieldBlocksBroken();
 
         return 100 * ((totalBlocks - broken) / (double) totalBlocks);
+    }
+
+    /**
+     * Open the map voting GUI for a player.
+     *
+     * @param player the player
+     */
+    public void openMapVote(Player player) {
+        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable("Vote for a Map"));
+        for (String mapName : mapVotes.keySet()) {
+            ItemStack mapItem = new ItemStack(Material.PAPER);
+            ItemMeta mapItemMeta = mapItem.getItemMeta();
+            mapItemMeta.setDisplayName(ConfigUtils.getMapText(mapType, mapName, "name"));
+            List<String> lore = new LinkedList<>();
+            lore.add(ChatColor.GRAY + "Left click to vote for this map");
+            mapItemMeta.setLore(lore);
+            mapItem.setItemMeta(mapItemMeta);
+            mapInv.addItem(mapItem);
+        }
+        player.openInventory(mapInv);
+    }
+
+    /**
+     * Register a player's map vote, removing any of their previous votes.
+     *
+     * @param id the player's UUID
+     * @param map the map the player is voting for
+     */
+    public void registerVote(UUID id, String map) {
+        if (playerVotes.containsKey(id)) {
+            String previousVote = playerVotes.remove(id);
+            mapVotes.put(previousVote, mapVotes.get(previousVote) - 1);
+        }
+        mapVotes.put(map, mapVotes.get(map) + 1);
+        playerVotes.put(id, map);
     }
 
 }
