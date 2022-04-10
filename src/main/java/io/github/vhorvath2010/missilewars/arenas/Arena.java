@@ -1007,8 +1007,11 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Only attempt blue update if red unchanged
-        redTeam.registerShieldBlockUpdate(location, place);
-        blueTeam.registerShieldBlockUpdate(location, place);
+        if (location.getBlockZ() > 0) {
+            redTeam.registerShieldBlockUpdate(location, place);   
+        } else {
+            blueTeam.registerShieldBlockUpdate(location, place);
+        }
     }
 
     /**
