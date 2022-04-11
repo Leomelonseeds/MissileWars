@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars;
 import java.io.File;
 
 import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
+import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,6 +52,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);
         Bukkit.getPluginManager().registerEvents(new StructureItemEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new MapVotingEvents(), this);
 
         // Load decks
         deckManager = new DeckManager();

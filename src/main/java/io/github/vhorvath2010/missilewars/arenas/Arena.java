@@ -50,6 +50,8 @@ public class Arena implements ConfigurationSerializable {
 
     /** Comparator to sort by active players */
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
+    /** Name of map voting inventory */
+    public static String mapVoteInventoryTitle = "Vote for a Map";
 
     /** The arena name. */
     private String name;
@@ -142,6 +144,8 @@ public class Arena implements ConfigurationSerializable {
         for (String mapName : mapConfig.getConfigurationSection(mapType).getKeys(false)) {
             mapVotes.put(mapName, 0);
         }
+
+        playerVotes = new HashMap<>();
     }
 
     /**
@@ -1101,7 +1105,7 @@ public class Arena implements ConfigurationSerializable {
      * @param player the player
      */
     public void openMapVote(Player player) {
-        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable("Vote for a Map"));
+        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable(mapVoteInventoryTitle));
         for (String mapName : mapVotes.keySet()) {
             ItemStack mapItem = new ItemStack(Material.PAPER);
             ItemMeta mapItemMeta = mapItem.getItemMeta();
@@ -1119,15 +1123,32 @@ public class Arena implements ConfigurationSerializable {
      * Register a player's map vote, removing any of their previous votes.
      *
      * @param id the player's UUID
-     * @param map the map the player is voting for
+     * @param mapName the name map the player is voting for
+     * @return the name of the map the player voted for, otherwise null
      */
-    public void registerVote(UUID id, String map) {
+    public String registerVote(UUID id, String mapName) {
+        // Remove previous vote
         if (playerVotes.containsKey(id)) {
             String previousVote = playerVotes.remove(id);
             mapVotes.put(previousVote, mapVotes.get(previousVote) - 1);
         }
-        mapVotes.put(map, mapVotes.get(map) + 1);
-        playerVotes.put(id, map);
+
+        // Find map from map name
+        String mapId = null;
+        for (String possibleMap : mapVotes.keySet()) {
+            if (ConfigUtils.getMapText(mapType, possibleMap, "name").equalsIgnoreCase(mapName)) {
+                mapId = possibleMap;
+            }
+        }
+
+        // Stop if invalid map
+        if (mapId == null) {
+            return null;
+        }
+
+        mapVotes.put(mapId, mapVotes.get(mapId) + 1);
+        playerVotes.put(id, mapId);
+        return mapName;
     }
 
 }
