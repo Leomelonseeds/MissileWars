@@ -25,11 +25,10 @@ messages:
   map-failed: "&cMap failed to generate! Please contact an admin."
   starting: "&7Starting now! Please wait for the map to generate..."
   cannot-place-structure: "&cYou cannot use that here!"
-  game-end-reminder: "The game will end in &c%umw_time_remaining% &7minutes!"
   chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster."
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
-  game-end-near: "Game ending in &c%umw_time_remaining% &7minutes!"
+  game-end-reminder: "&c&l[!] &7The game will end in &c%umw_time_remaining%&7!"
   red-team-empty: "&cRed team &7is empty. &9Blue team &7will automatically win in 60 seconds."
   blue-team-empty: "&9Blue team &7is empty. &cRed team &7will automatically win in 60 seconds."
   # When a player on your team leaves and changes the arena item-frequency
@@ -40,9 +39,11 @@ messages:
   classic-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &a&lClassic"
-    - "&bBlow up your opponents' nether portals to win!"
-    - "&aRight-click &7your items to use them."
-    - "&7Type &a/lobby &7to go back to the lobby."
+    - "&f- You will recieve &cmissile&f/&9utility &fitems."
+    - "&f- &aRight click &fyour &cmissile spawn eggs &fon"
+    - "   &3blocks &fto spawn them."
+    - "&f- &4Blow up &fyour opponents' &5nether portals &fto win."
+    - "&f- &6Ride &fyour missiles to victory!"
     - "&b========================================"
   classic-end:
     - "&b========================================"

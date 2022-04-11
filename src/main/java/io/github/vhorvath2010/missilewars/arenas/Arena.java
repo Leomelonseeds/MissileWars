@@ -203,12 +203,12 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the number of minutes remaining when chaos time activates.
+     * Get the number of seconds remaining when chaos time activates.
      *
-     * @return the number of minutes remaining when chaos time activates
+     * @return the number of seconds remaining when chaos time activates
      */
     public static int getChaosTime() {
-        return MissileWarsPlugin.getPlugin().getConfig().getInt("chaos-mode.time-left");
+        return MissileWarsPlugin.getPlugin().getConfig().getInt("chaos-mode.time-left") * 60;
     }
 
     /**
@@ -218,8 +218,61 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the map successfully generated, otherwise false
      */
     public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapType + "." + mapName, getWorld(), true);
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), true, mapType);
     }
+    
+    /**
+     * Get people in red queue
+     * 
+     * @return
+     */
+    public int getRedQueue() {
+        return redQueue.size();
+    }
+    
+    /**
+     * Get people in blue queue
+     * 
+     * @return
+     */
+    public int getBlueQueue() {
+        return blueQueue.size();
+    }
+    
+    /**
+     * Get people in red team
+     * 
+     * @return
+     */
+    public int getRedTeam() {
+        return redTeam.getSize();
+    }
+    
+    /**
+     * Get people in blue team
+     * 
+     * @return
+     */
+    public int getBlueTeam() {
+        return blueTeam.getSize();
+    }
+    
+    // Get portal statuses
+    public boolean getRedFirstPortalStatus() {
+        return redTeam.getFirstPortalStatus();
+    }
+    
+    public boolean getRedSecondPortalStatus() {
+        return redTeam.getSecondPortalStatus();
+    }
+    
+    public boolean getBlueFirstPortalStatus() {
+        return blueTeam.getFirstPortalStatus();
+    }
+    
+    public boolean getBlueSecondPortalStatus() {
+        return blueTeam.getSecondPortalStatus();
+    } 
 
     /**
      * Get a {@link MissileWarsPlayer} in this arena from a given UUID.
@@ -306,17 +359,28 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the number of minutes remaining in the game.
+     * Get the number of seconds remaining in the game.
      *
-     * @return the number of minutes remaining in the game
+     * @return the number of seconds remaining in the game
      */
-    public long getMinutesRemaining() {
+    public long getSecondsRemaining() {
         if (startTime == null) {
             return 0;
         }
-        int totalMins = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length");
-        long minsTaken = Duration.between(startTime, LocalDateTime.now()).toMinutes();
-        return totalMins - minsTaken;
+        int totalSecs = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length") * 60;
+        long secsTaken = Duration.between(startTime, LocalDateTime.now()).toSeconds();
+        return totalSecs - secsTaken;
+    }
+    
+    /**
+     * Gets the time remaining
+     * 
+     * @return a formatted time with mm:ss
+     */
+    public String getTimeRemaining() {
+        // Adjust for correct timings
+        int seconds = (int) getSecondsRemaining() - 1;
+        return String.format("%02d:%02d", (seconds / 60) % 60, seconds % 60);
     }
 
     /**
@@ -391,7 +455,7 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Open map voting inventory
-        openMapVote(player);
+        // openMapVote(player);
 
         return true;
     }
@@ -420,6 +484,12 @@ public class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
+        
+        if (playerVotes != null && playerVotes.containsKey(uuid)) {
+            String toChange = playerVotes.get(uuid);
+            mapVotes.put(toChange, mapVotes.get(toChange) - 1);
+            playerVotes.remove(uuid);
+        }
         
         for (MissileWarsPlayer mwPlayer : players) {
             ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
@@ -675,9 +745,9 @@ public class Arena implements ConfigurationSerializable {
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
-        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, mapType + "." + mapName + ".blue-spawn");
+        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", mapType, mapName);
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-        Vector redSpawnVec = SchematicManager.getVector(mapConfig, mapType + "." + mapName + ".red-spawn");
+        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", mapType, mapName);
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
         blueSpawn.setWorld(getWorld());
@@ -743,14 +813,14 @@ public class Arena implements ConfigurationSerializable {
         // Setup game timers
         // Game start
         startTime = LocalDateTime.now();
-        long gameLength = getMinutesRemaining();
+        long gameLength = getSecondsRemaining();
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
                 // End game in a tie
                 endGame(null);
             }
-        }.runTaskLater(plugin, gameLength * 20 * 60));
+        }.runTaskLater(plugin, gameLength * 20));
 
         // Chaos time start
         int chaosStart = getChaosTime();
@@ -762,7 +832,19 @@ public class Arena implements ConfigurationSerializable {
                 redTeam.broadcastConfigMsg("messages.chaos-mode", null);
                 blueTeam.broadcastConfigMsg("messages.chaos-mode", null);
             }
-        }.runTaskLater(plugin, (gameLength - chaosStart) * 20 * 60));
+        }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
+        
+        // Game is 1800 seconds long.
+        int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
+        
+        for (int i : reminderTimes) {
+            tasks.add(new BukkitRunnable() {
+                @Override
+                public void run() {
+                    announceMessage("messages.game-end-reminder", null);
+                }
+            }.runTaskLater(plugin, i * 20));
+        }
 
         running = true;
         return true;
@@ -953,7 +1035,7 @@ public class Arena implements ConfigurationSerializable {
          else {
         	FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                     .toString(), "maps.yml");
-            Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
+            Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn", null, null);
             Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
             spawnLoc.setYaw(90);
             return spawnLoc;
@@ -1051,7 +1133,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public void registerShieldBlockEdit(Location location, boolean place) {
         // Ignore if game not running
-        if (!running) {
+        if (!(running || resetting)) {
             return;
         }
 
@@ -1070,7 +1152,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public double getRedShieldHealth() {
         // Full health if game not running
-        if (!running) {
+        if (!(running || resetting)) {
             return 100.00;
         }
 
@@ -1088,7 +1170,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public double getBlueShieldHealth() {
         // Full health if game not running
-        if (!running) {
+        if (!(running || resetting)) {
             return 100.00;
         }
 

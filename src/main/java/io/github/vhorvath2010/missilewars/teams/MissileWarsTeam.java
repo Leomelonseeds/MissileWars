@@ -84,6 +84,24 @@ public class MissileWarsTeam {
     public int getShieldBlocksBroken() {
         return shieldBlocksBroken;
     }
+    
+    /**
+     * Get whether the first portal has been destroyed
+     * 
+     * @return true if portal destroyed
+     */
+    public boolean getFirstPortalStatus() {
+        return firstPortalDestroyed;
+    }
+    
+    /**
+     * Get whether the second portal has been destroyed
+     * 
+     * @return true if portal destroyed
+     */
+    public boolean getSecondPortalStatus() {
+        return secondPortalDestroyed;
+    }
 
     /**
      * Check if a team contains a specific player based on their MC UUID.
@@ -237,25 +255,23 @@ public class MissileWarsTeam {
      */
     public boolean registerPortalBreak(Location loc) {
         // Check if portal break was within location of first portal
-        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
         String mapName = arena.getMapName();
         int x = loc.getBlockX();
         int y = loc.getBlockY();
-        int x1 = mapsConfig.getInt("classic." + mapName + ".portal.x1");
-        int y1 = mapsConfig.getInt("classic." + mapName + ".portal.y1");
-        int x2 = mapsConfig.getInt("classic." + mapName + ".portal.x2");
-        int y2 = mapsConfig.getInt("classic." + mapName + ".portal.y2");
+        int x1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x1");
+        int y1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1");
+        int x2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x2");
+        int y2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y2");
         if (!firstPortalDestroyed && x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
             firstPortalDestroyed = true;
             return true;
         }
 
         // Check if second portal was broken
-        int x3 = mapsConfig.getInt("classic." + mapName + ".portal.x3");
-        int y3 = mapsConfig.getInt("classic." + mapName + ".portal.y3");
-        int x4 = mapsConfig.getInt("classic." + mapName + ".portal.x4");
-        int y4 = mapsConfig.getInt("classic." + mapName + ".portal.y4");
+        int x3 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x3");
+        int y3 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y3");
+        int x4 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4");
+        int y4 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4");
         if (!secondPortalDestroyed && x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
             secondPortalDestroyed = true;
             return true;
@@ -346,7 +362,7 @@ public class MissileWarsTeam {
      */
     public int getShieldVolume() {
         // Ignore if arena not running
-        if (arena == null || !arena.isRunning()) {
+        if (arena == null || !(arena.isRunning() || arena.isResetting())) {
             return 1;
         }
 

@@ -58,3 +58,7 @@ chaos-mode:
   sound: ENTITY_GHAST_SCREAM
   volume: 1.0
   pitch: 0.5
+game-end-reminder:
+  sound: BLOCK_NOTE_BLOCK_HAT
+  volume: 1.0
+  pitch: 1.0

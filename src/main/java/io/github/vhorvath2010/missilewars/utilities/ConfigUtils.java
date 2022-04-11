@@ -67,7 +67,7 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_arena_active%", "" + arena.getNumPlayers());
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
-            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
+            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getTimeRemaining());
             String status = ChatColor.GOLD + "In Lobby";
             if (arena.isRunning()) {
                 status = ChatColor.GREEN + "In Game";
@@ -83,7 +83,7 @@ public class ConfigUtils {
         }
 
         // Set umw arena-less placeholders
-        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime());
+        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime() / 60);
         FileConfiguration messageConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "messages.yml");
         msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
