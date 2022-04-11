@@ -2,6 +2,7 @@ package io.github.vhorvath2010.missilewars;
 
 import java.io.File;
 
+import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,6 +46,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         // Load commands and events
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
         getCommand("Spectate").setExecutor(new SpectateCommand());
+        getCommand("VoteMap").setExecutor(new VoteMapCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);

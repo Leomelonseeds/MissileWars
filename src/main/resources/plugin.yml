@@ -12,6 +12,8 @@ commands:
       - umw
   Spectate:
     description: Spectate the MissileWarsGame
+  VoteMap:
+    description: Open the map voting GUI
 depend:
   - WorldEdit
   - WorldGuard
