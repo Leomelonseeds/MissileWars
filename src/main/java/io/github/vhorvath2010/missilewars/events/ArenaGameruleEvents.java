@@ -56,7 +56,7 @@ public class ArenaGameruleEvents implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
-        	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation());
+        	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation(), true);
             return;
         }
 

@@ -3,7 +3,7 @@ package io.github.vhorvath2010.missilewars.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,10 +12,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
@@ -103,13 +103,14 @@ public class ArenaInventoryEvents implements Listener {
             return;
         }
 
-        // Stop drops entirely if game not running
-        if (!arena.isRunning()) {
+        // Stop drops entirely if player not on team
+        if ((arena.getTeam(player.getUniqueId()).equals("no team"))) {
             event.setCancelled(true);
+            return;
         }
 
         // Stop drops of gear items
-        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId()); 
         if (mwPlayer.getDeck().getGear().contains(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
@@ -143,6 +144,20 @@ public class ArenaInventoryEvents implements Listener {
         Arena arena = manager.getArena(event.getPlayer().getUniqueId());
         if (arena != null) {
             event.setCancelled(true);
+        }
+    }
+    
+    /** Remove glass bottles after drinking potions */
+    @EventHandler
+    public void onDrink(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        if (event.getItem().getType() == Material.POTION) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    player.getInventory().setItemInMainHand(null);
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
         }
     }
 

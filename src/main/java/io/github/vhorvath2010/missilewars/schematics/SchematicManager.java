@@ -34,11 +34,16 @@ public class SchematicManager {
      * @param path the path to the x, y, z vector data
      * @return the x, y, z as a vector
      */
-    public static Vector getVector(FileConfiguration config, String path) {
+    public static Vector getVector(FileConfiguration config, String path, String mapType, String mapName) {
         Vector vector = new Vector();
         if (config.contains(path)) {
             vector = new Vector(config.getDouble(path + ".x"), config.getDouble(path + ".y"),
                     config.getDouble(path + ".z"));
+        } else {
+            // If config does not contain path, then it's definitely a map
+            vector = new Vector(ConfigUtils.getMapNumber(mapType, mapName, path + ".x"),
+                                ConfigUtils.getMapNumber(mapType, mapName, path + ".y"),
+                                ConfigUtils.getMapNumber(mapType, mapName, path + ".z"));
         }
         return vector;
     }
@@ -83,7 +88,7 @@ public class SchematicManager {
 
         // Apply offset
         Location spawnLoc = loc.clone();
-        Vector offset = getVector(structureConfig, structureName + ".offset");
+        Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
@@ -149,19 +154,20 @@ public class SchematicManager {
      * @param async to run async
      * @return true if the schematic was generated successfully, otherwise false
      */
-    public static boolean spawnFAWESchematic(String schematicName, World world, Boolean async) {
+    public static boolean spawnFAWESchematic(String schematicName, World world, Boolean async, String mapType) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "maps.yml");
 
         // Acquire WE clipboard
-        if (!schematicConfig.contains(schematicName + ".file")) {
+        String possibleMapType = mapType == null ? "" : mapType + ".";
+        if (!schematicConfig.contains(possibleMapType + schematicName + ".file")) {
             System.out.println("No schem file found!");
             return false;
         }
         File schematicFile = new File(plugin.getDataFolder() + File.separator + "maps",
-                schematicConfig.getString(schematicName + ".file"));
+                schematicConfig.getString(possibleMapType + schematicName + ".file"));
         Clipboard clipboard;
         ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
         try {
@@ -173,7 +179,13 @@ public class SchematicManager {
         }
 
         // Paste WE clipboard
-        Vector spawnPos = getVector(schematicConfig, schematicName + ".pos");
+        Vector spawnPos;
+
+        if (mapType == null) {
+            spawnPos = getVector(schematicConfig, schematicName + ".pos", null, null);
+        } else {
+            spawnPos = getVector(schematicConfig, "pos", mapType, schematicName);
+        }
 
         if (async) {
             new BukkitRunnable() {

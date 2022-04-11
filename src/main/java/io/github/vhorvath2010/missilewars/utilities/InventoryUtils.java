@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -23,13 +24,16 @@ public class InventoryUtils {
     
     /**
      * Clears everything except for helmet of player
+     * and alcoholic beverages
      * 
      * @param player
      */
     public static void clearInventory(Player player) {
         Inventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getSize(); i++) {
-            if (i != 39) {
+            ItemStack current = inventory.getItem(i);
+            boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
+            if (!(i == 39 || isPotion)) {
                 inventory.clear(i);
             }
         }
@@ -37,6 +41,7 @@ public class InventoryUtils {
     
     /**
      * Saves a player's inventory to file.
+     * Doesn't save potions to prevent duping.
      * 
      * @param player
      */
@@ -49,7 +54,13 @@ public class InventoryUtils {
         
             data.writeInt(inventory.getSize());
             for (int i = 0; i < inventory.getSize(); i++) {
-                data.writeObject(inventory.getItem(i));
+                ItemStack current = inventory.getItem(i);
+                boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
+                if (!isPotion) {
+                    data.writeObject(inventory.getItem(i));
+                } else {
+                    data.writeObject(null);
+                }
             }
             String inventoryData = Base64.getEncoder().encodeToString(str.toByteArray());
             FileConfiguration inventoryConfig = getInventoryConfig();
@@ -63,6 +74,8 @@ public class InventoryUtils {
     
     /**
      * Loads player inventory from file (no helmet)
+     * Ignores potions if an item already exists
+     * in that slot
      * 
      * @param player
      */
@@ -79,7 +92,10 @@ public class InventoryUtils {
             int invSize = data.readInt();
             for (int i = 0; i < invSize; i++) {
                 ItemStack invItem = (ItemStack) data.readObject();
-                if (i != 39) {
+                Boolean empty = invItem == null;
+                ItemStack current = inventory.getItem(i);
+                boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
+                if (!(i == 39 || (isPotion && empty))) {
                     inventory.setItem(i, invItem);
                 }
             }

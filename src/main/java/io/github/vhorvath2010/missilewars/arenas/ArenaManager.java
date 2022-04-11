@@ -165,8 +165,8 @@ public class ArenaManager {
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "maps.yml");
         WorldGuard wg = WorldGuard.getInstance();
-        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min");
-        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max");
+        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min", null, null);
+        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max", null, null);
         ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(arena.getName() + "-" + team + "-lobby",
                 BlockVector3.at(minLobby.getX(), minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(),
                 maxLobby.getY(), maxLobby.getZ()));
@@ -238,7 +238,7 @@ public class ArenaManager {
 
         // Create Arena lobby
         creator.sendMessage(ChatColor.GREEN + "Generating lobby...");
-        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, false)) {
+        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, false, null)) {
             creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
             return false;
         } else {
@@ -247,7 +247,7 @@ public class ArenaManager {
 
         
         // Spawn red NPC
-        Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red");
+        Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red", null, null);
         Location redLoc = new Location(arenaWorld, redVec.getX(), redVec.getY(), redVec.getZ());
         redLoc.setYaw(90);
         NPC redNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
@@ -263,7 +263,7 @@ public class ArenaManager {
         redNPC.data().setPersistent(NPC.SILENT_METADATA, true);
 
         // Spawn blue NPC
-        Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue");
+        Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue", null, null);
         Location blueLoc = new Location(arenaWorld, blueVec.getX(), blueVec.getY(), blueVec.getZ());
         blueLoc.setYaw(90);
         NPC blueNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
@@ -279,7 +279,7 @@ public class ArenaManager {
         blueNPC.data().setPersistent(NPC.SILENT_METADATA, true);
 
         // Spawn bar NPC
-        Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
+        Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar", null, null);
         Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ());
         barLoc.setYaw(-90);
         NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER,
@@ -317,8 +317,8 @@ public class ArenaManager {
 
         // Setup regions
         WorldGuard wg = WorldGuard.getInstance();
-        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min");
-        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max");
+        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min", null, null);
+        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max", null, null);
         ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
                 minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(), maxLobby.getY(), maxLobby.getZ()));
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);

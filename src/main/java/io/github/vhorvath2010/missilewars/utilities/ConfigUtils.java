@@ -67,7 +67,7 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_arena_active%", "" + arena.getNumPlayers());
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
-            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getMinutesRemaining());
+            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getTimeRemaining());
             String status = ChatColor.GOLD + "In Lobby";
             if (arena.isRunning()) {
                 status = ChatColor.GREEN + "In Game";
@@ -83,7 +83,7 @@ public class ConfigUtils {
         }
 
         // Set umw arena-less placeholders
-        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime());
+        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime() / 60);
         FileConfiguration messageConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "messages.yml");
         msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
@@ -258,6 +258,25 @@ public class ConfigUtils {
             return mapsConfig.getDouble(mapType + "." + mapName + "." + path);
         } else {
             return mapsConfig.getDouble(mapType + ".default-map." + path);
+        }
+    }
+
+    /**
+     * Acquire specific text data for a given map.
+     * @param mapType the gamemode for the map
+     * @param mapName the name of the map
+     * @param path the path to the data
+     * @return the data at the path for the given math, or default data if it does not exist
+     */
+    public static String getMapText(String mapType, String mapName, String path) {
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "maps.yml");
+        if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
+            return ChatColor.translateAlternateColorCodes('&',
+                    mapsConfig.getString(mapType + "." + mapName + "." + path));
+        } else {
+            return ChatColor.translateAlternateColorCodes('&',
+                    mapsConfig.getString(mapType + ".default-map." + path));
         }
     }
 
