@@ -122,14 +122,9 @@ public class MissileWarsTeam {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         InventoryUtils.clearInventory(mcPlayer);
-        new BukkitRunnable() {
-        	@Override
-        	public void run() {
-		        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-		        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-		        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
-        	}
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 5);
+        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+		mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+		mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
     }
 
     /**
@@ -146,14 +141,7 @@ public class MissileWarsTeam {
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        // Force dismount players
-        mcPlayer.teleport(mcPlayer.getLocation());
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                mcPlayer.teleport(spawn);
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
+        mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);

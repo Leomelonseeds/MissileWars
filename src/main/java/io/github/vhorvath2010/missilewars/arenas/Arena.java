@@ -754,7 +754,7 @@ public class Arena implements ConfigurationSerializable {
         redSpawn.setYaw(180);
         blueSpawn.setWorld(getWorld());
         redSpawn.setWorld(getWorld());
-
+        
         // Setup scoreboard and teams
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
@@ -762,6 +762,17 @@ public class Arena implements ConfigurationSerializable {
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
         double maxSize = getCapacity() / 2;
+        
+        // Teleport all players to center to remove lobby minigame items/dismount
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (MissileWarsPlayer player : players) {
+                    player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+                }
+            }
+        }.runTaskLater(plugin, 15));
+
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {
