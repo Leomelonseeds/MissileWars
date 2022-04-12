@@ -26,7 +26,7 @@ public class VoteMapCommand implements CommandExecutor {
             sendErrorMsg(player, "You are not in an arena!");
             return true;
         }
-        if (playerArena.isRunning()) {
+        if (playerArena.isRunning() || playerArena.isResetting()) {
             sendErrorMsg(player, "The game has already started!");
             return true;
         }

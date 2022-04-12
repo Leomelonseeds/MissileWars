@@ -1,14 +1,16 @@
 package io.github.vhorvath2010.missilewars.events;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 public class MapVotingEvents implements Listener {
 
@@ -26,7 +28,7 @@ public class MapVotingEvents implements Listener {
         }
 
         // Ensure map vote inventory is open
-        if (!event.getView().getTitle().equalsIgnoreCase(Arena.mapVoteInventoryTitle)) {
+        if (!event.getView().getTitle().equals(ConfigUtils.getConfigText("inventories.map-voting.title", player, null, null))) {
             return;
         }
 
@@ -38,6 +40,7 @@ public class MapVotingEvents implements Listener {
         }
         String mapVotedFor = arena.registerVote(player.getUniqueId(), clicked.getItemMeta().getDisplayName());
         player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
+        arena.openMapVote(player);
     }
 
 }

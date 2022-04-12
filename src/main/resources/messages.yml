@@ -39,11 +39,11 @@ messages:
   classic-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &a&lClassic"
-    - "&f- You will recieve &cmissile&f/&9utility &fitems."
-    - "&f- &aRight click &fyour &cmissile spawn eggs &fon"
-    - "   &3blocks &fto spawn them."
+    - "&f- Recieve &cmissile&f/&9utility &fevery few seconds."
+    - "&f- &aRight click &fyour spawn eggs on &3blocks"
+    - "   &fto create missiles."
     - "&f- &4Blow up &fyour opponents' &5nether portals &fto win."
-    - "&f- &6Ride &fyour missiles to victory!"
+    - "&f- &fRide your missiles to victory!"
     - "&b========================================"
   classic-end:
     - "&b========================================"
@@ -165,8 +165,9 @@ inventories:
         - "&7Status: %umw_arena_status%"
         - "&7Click to join, %player_name%!"
   map-voting:
-    title: "Map Vote"
+    title: "Vote for a map"
     vote-item:
       name: "&f%umw_map%"
       lore:
         - "&7Votes: &c%umw_map_votes%"
+        - "&cLeft-click &7to vote!"

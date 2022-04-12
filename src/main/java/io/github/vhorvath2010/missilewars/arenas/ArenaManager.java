@@ -324,7 +324,6 @@ public class ArenaManager {
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);
         lobbyRegion.setFlag(Flags.PVP, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.TNT, StateFlag.State.DENY);
-        lobbyRegion.setFlag(Flags.GAME_MODE, GameMode.REGISTRY.get("adventure"));
         lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
@@ -397,7 +396,7 @@ public class ArenaManager {
      */
     public List<Arena> getLoadedArenas() {
         List<Arena> sortedArenas = loadedArenas;
-        sortedArenas.sort(Collections.reverseOrder(Arena.byPlayers));
+        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity));
         return sortedArenas;
     }
 
