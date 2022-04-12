@@ -48,11 +48,8 @@ import net.citizensnpcs.api.exception.NPCLoadException;
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
 
-    /** Comparator to sort by active players */
-    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
-    /** Name of map voting inventory */
-    public static String mapVoteInventoryTitle = "Vote for a Map";
-
+    /** Comparator to sort by capacity */
+    public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
     /** The arena name. */
     private String name;
     /** The map for the arena. */
@@ -379,7 +376,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public String getTimeRemaining() {
         // Adjust for correct timings
-        int seconds = (int) getSecondsRemaining() - 1;
+        int seconds = Math.max((int) getSecondsRemaining() - 1, 0);
         return String.format("%02d:%02d", (seconds / 60) % 60, seconds % 60);
     }
 
@@ -487,7 +484,7 @@ public class Arena implements ConfigurationSerializable {
         
         if (playerVotes != null && playerVotes.containsKey(uuid)) {
             String toChange = playerVotes.get(uuid);
-            mapVotes.put(toChange, mapVotes.get(toChange) - 1);
+            mapVotes.put(toChange, mapVotes.get(toChange) - (Bukkit.getPlayer(uuid).hasPermission("umw.extravote") ? 2 : 1));
             playerVotes.remove(uuid);
         }
         
@@ -523,6 +520,10 @@ public class Arena implements ConfigurationSerializable {
             // Notify discord
             TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
             discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + this.getName()).queue();
+        }
+        
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return;
         }
 
         // Check for empty team win condition
@@ -659,6 +660,7 @@ public class Arena implements ConfigurationSerializable {
                     blueQueue.remove(player);
                     Player mcPlayer = player.getMCPlayer();
                     mcPlayer.setGameMode(GameMode.SPECTATOR);
+                    mcPlayer.sendActionBar("Type /spectate to stop spectating");
                 } else {
                     player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.spectate-join-fail",
                             player.getMCPlayer(), null, null));
@@ -759,7 +761,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
-        double maxSize = Math.ceil((double) (players.size() - spectators.size()) / 2);
+        double maxSize = getCapacity() / 2;
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {
@@ -790,9 +792,17 @@ public class Arena implements ConfigurationSerializable {
 		                continue;
 		            }
 		            if (blueTeam.getSize() <= redTeam.getSize()) {
-		                blueTeam.addPlayer(player);
+		                if (blueTeam.getSize() >= maxSize) {
+		                    ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+		                } else {
+		                    blueTeam.addPlayer(player);
+		                }
 		            } else {
-		                redTeam.addPlayer(player);
+                        if (redTeam.getSize() >= maxSize) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+                        } else {
+                            redTeam.addPlayer(player);
+                        }
 		            }
 		        }
 
@@ -817,8 +827,15 @@ public class Arena implements ConfigurationSerializable {
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
-                // End game in a tie
-                endGame(null);
+                if (!(getBlueFirstPortalStatus() || getBlueSecondPortalStatus()) &&
+                     (getRedFirstPortalStatus() || getRedSecondPortalStatus())) {
+                    endGame(blueTeam);
+                } else if ((getBlueFirstPortalStatus() || getBlueSecondPortalStatus()) &&
+                          !(getRedFirstPortalStatus() || getRedSecondPortalStatus())) {
+                    endGame(redTeam);
+                } else {
+                    endGame(null);
+                }
             }
         }.runTaskLater(plugin, gameLength * 20));
 
@@ -853,9 +870,6 @@ public class Arena implements ConfigurationSerializable {
     /** Remove Players from the map. */
     public void removePlayers() {
         for (MissileWarsPlayer player : new HashSet<>(players)) {
-            removePlayer(player.getMCPlayerId());
-        }
-        for (MissileWarsPlayer player : new HashSet<>(spectators)) {
             removePlayer(player.getMCPlayerId());
         }
     }
@@ -1052,10 +1066,6 @@ public class Arena implements ConfigurationSerializable {
         	Player mcPlayer = player.getMCPlayer();
             ConfigUtils.sendConfigMessage(path, mcPlayer, this, focus != null ? focus.getMCPlayer() : null);
         }
-        for (MissileWarsPlayer player : spectators) {
-        	Player mcPlayer = player.getMCPlayer();
-            ConfigUtils.sendConfigMessage(path, mcPlayer, this, focus != null ? focus.getMCPlayer() : null);
-        }
     }
 
     /**
@@ -1067,11 +1077,6 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayer() != null) {
                 player.getMCPlayer().setLevel(level);
-            }
-        }
-        for (MissileWarsPlayer spectator : spectators) {
-            if (spectator.getMCPlayer() != null) {
-                spectator.getMCPlayer().setLevel(level);
             }
         }
     }
@@ -1187,13 +1192,17 @@ public class Arena implements ConfigurationSerializable {
      * @param player the player
      */
     public void openMapVote(Player player) {
-        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable(mapVoteInventoryTitle));
+        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable(ConfigUtils.getConfigText
+                ("inventories.map-voting.title", player, null, null)));
         for (String mapName : mapVotes.keySet()) {
             ItemStack mapItem = new ItemStack(Material.PAPER);
             ItemMeta mapItemMeta = mapItem.getItemMeta();
             mapItemMeta.setDisplayName(ConfigUtils.getMapText(mapType, mapName, "name"));
             List<String> lore = new LinkedList<>();
-            lore.add(ChatColor.GRAY + "Left click to vote for this map");
+            for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {
+                String sn = s.replaceAll("%umw_map_votes%", "" + mapVotes.get(mapName));
+                lore.add(sn);
+            }
             mapItemMeta.setLore(lore);
             mapItem.setItemMeta(mapItemMeta);
             mapInv.addItem(mapItem);
@@ -1209,10 +1218,13 @@ public class Arena implements ConfigurationSerializable {
      * @return the name of the map the player voted for, otherwise null
      */
     public String registerVote(UUID id, String mapName) {
+        
+        int votes = Bukkit.getPlayer(id).hasPermission("umw.extravote") ? 2 : 1;
+        
         // Remove previous vote
         if (playerVotes.containsKey(id)) {
             String previousVote = playerVotes.remove(id);
-            mapVotes.put(previousVote, mapVotes.get(previousVote) - 1);
+            mapVotes.put(previousVote, mapVotes.get(previousVote) - votes);
         }
 
         // Find map from map name
@@ -1228,7 +1240,7 @@ public class Arena implements ConfigurationSerializable {
             return null;
         }
 
-        mapVotes.put(mapId, mapVotes.get(mapId) + 1);
+        mapVotes.put(mapId, mapVotes.get(mapId) + votes);
         playerVotes.put(id, mapId);
         return mapName;
     }

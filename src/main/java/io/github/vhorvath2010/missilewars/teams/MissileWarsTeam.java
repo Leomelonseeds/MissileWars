@@ -146,7 +146,14 @@ public class MissileWarsTeam {
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        mcPlayer.teleport(spawn);
+        // Force dismount players
+        mcPlayer.teleport(mcPlayer.getLocation());
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                mcPlayer.teleport(spawn);
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
@@ -210,7 +217,9 @@ public class MissileWarsTeam {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    arena.setXpLevel(finalSecInCd);
+                    for (MissileWarsPlayer player : members) {
+                        player.getMCPlayer().setLevel(finalSecInCd);
+                    }
                 }
             }.runTaskLater(MissileWarsPlugin.getPlugin(), (secsBetween - secInCd) * 20);
         }
