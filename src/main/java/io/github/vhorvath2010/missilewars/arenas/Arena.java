@@ -417,13 +417,13 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the player joined the Arena, otherwise false
      */
     public boolean joinPlayer(Player player) {
-        
-        ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         // Ensure world isn't resetting
         if (resetting) {
             return false;
         }
+        
+        ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
         
         for (MissileWarsPlayer mwPlayer : players) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
@@ -772,7 +772,6 @@ public class Arena implements ConfigurationSerializable {
                 }
             }
         }.runTaskLater(plugin, 15));
-
         
         // Teleport teams slightly later to wait for map generation
         tasks.add(new BukkitRunnable() {
