@@ -818,13 +818,11 @@ public class Arena implements ConfigurationSerializable {
 
 		        // Start deck distribution for each team and send messages
 		        redTeam.scheduleDeckItems();
-		        redTeam.broadcastConfigMsg("messages.classic-start", null);
 		        redTeam.distributeGear();
                 redTeam.sendTitle("classic-start");
                 redTeam.sendSound("game-start");
 		        blueTeam.scheduleDeckItems();
 		        blueTeam.distributeGear();
-		        blueTeam.broadcastConfigMsg("messages.classic-start", null);
                 blueTeam.sendTitle("classic-start");
                 blueTeam.sendSound("game-start");
         	}

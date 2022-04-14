@@ -123,8 +123,8 @@ public class MissileWarsTeam {
         Player mcPlayer = player.getMCPlayer();
         InventoryUtils.clearInventory(mcPlayer);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-		mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-		mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
+        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
     }
 
     /**
@@ -145,6 +145,7 @@ public class MissileWarsTeam {
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
+        ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
         giveItems(player);
     }
 
