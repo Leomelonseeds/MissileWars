@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -127,6 +129,25 @@ public class ArenaGameruleEvents implements Listener {
         
         // Ensure it was in an arena world
         String possibleArenaName = event.getWorld().getName().replace("mwarena_", "");
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        if (possibleArena == null) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+    
+    /** Make sure players can't teleport with ender pearls */
+    @EventHandler
+    public void onPearl(PlayerTeleportEvent event) {
+        
+        // Ensure it's an ender pearl
+        if (event.getCause() != TeleportCause.ENDER_PEARL) {
+            return;
+        }
+        
+        // Ensure it was in an arena world
+        String possibleArenaName = event.getPlayer().getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
         if (possibleArena == null) {
             return;

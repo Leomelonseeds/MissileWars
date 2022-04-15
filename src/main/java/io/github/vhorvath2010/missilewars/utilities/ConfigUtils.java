@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -184,7 +185,7 @@ public class ConfigUtils {
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
         
-        player.playSound(player.getLocation(), sound, volume, pitch);
+        player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
     }
     
     /**
@@ -207,7 +208,7 @@ public class ConfigUtils {
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
         
-        player.playSound(location, sound, volume, pitch);
+        player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
     
     /**

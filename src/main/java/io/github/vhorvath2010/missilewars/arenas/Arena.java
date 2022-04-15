@@ -473,7 +473,7 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Remove a player with a given UUID from the game.
+     * Remove a player with a given UUID from the arena.
      *
      * @param uuid the UUID of the player
      */
@@ -525,8 +525,55 @@ public class Arena implements ConfigurationSerializable {
         if (!MissileWarsPlugin.getPlugin().isEnabled()) {
             return;
         }
+        
+        checkEmpty();
 
-        // Check for empty team win condition
+    }
+    
+    /**
+     * Warp player back to the waiting lobby
+     * 
+     * @param uuid the UUID of player
+     */
+    public boolean leaveGame(UUID uuid) {
+        
+        MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
+        Player player = Bukkit.getPlayer(uuid);
+        
+        if (!isRunning()) {
+            return false;
+        }
+        
+        if (redTeam == null || blueTeam == null) {
+            return false;
+        }
+        
+        if (redTeam.containsPlayer(uuid)) {
+            redTeam.removePlayer(toRemove);
+            for (MissileWarsPlayer mwPlayer : players) {
+                ConfigUtils.sendConfigMessage("messages.leave-team-red", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+            }
+        } else if (blueTeam.containsPlayer(uuid)) {
+            blueTeam.removePlayer(toRemove);
+            for (MissileWarsPlayer mwPlayer : players) {
+                ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+            }
+        } else {
+            return false;
+        }
+        
+        checkEmpty();
+        
+        player.teleport(getPlayerSpawn(player));
+        
+        return true; 
+    }
+    
+    /**
+     * Checks if the game is empty, and ends game if so
+     */
+    public void checkEmpty() {
+
         if (running && redTeam != null && blueTeam != null) {
             if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
                 endGame(null);
@@ -551,7 +598,7 @@ public class Arena implements ConfigurationSerializable {
                     }
                 }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
             }
-        }
+        }  
     }
 
     /**

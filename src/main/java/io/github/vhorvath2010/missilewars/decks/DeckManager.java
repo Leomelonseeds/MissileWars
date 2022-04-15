@@ -1,7 +1,8 @@
 package io.github.vhorvath2010.missilewars.decks;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,10 +10,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
@@ -37,16 +41,25 @@ public class DeckManager {
         // Setup pool items
         ItemStack arrows = new ItemStack(Material.ARROW, 3);
         ItemStack guardian = createSchematicItem("guardian");
+        ItemStack elderguardian = createSchematicItem("elder_guardian");
+        ItemStack dagger = createSchematicItem("dagger");
+        ItemStack shark = createSchematicItem("shark");
         ItemStack buster = createSchematicItem("shieldbuster");
+        ItemStack pisces = createSchematicItem("pisces");
         ItemStack tomahawk = createSchematicItem("tomahawk");
+        ItemStack gemini_w = createSchematicItem("gemini_warrior");
+        ItemStack cruiser = createSchematicItem("cruiser");
         ItemStack juggernaut = createSchematicItem("juggernaut");
         ItemStack lightning = createSchematicItem("lightning");
         ItemStack sword = createSchematicItem("sword");
         ItemStack shield = createSchematicItem("shield_2");
         ItemStack platform = createSchematicItem("platform_2");
+        ItemStack torpedo = createSchematicItem("torpedo_2");
+        ItemStack obsidianshield = createSchematicItem("obsidian_shield");
         ItemStack fireball = createUtilityItem("fireball");
-        List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{arrows, guardian, buster, tomahawk, juggernaut,
-                lightning, shield, fireball, sword, platform}));
+        ItemStack splash = createUtilityItem("splash");
+        List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{arrows, elderguardian, shark, cruiser, juggernaut,
+                tomahawk, dagger, gemini_w, pisces, obsidianshield, torpedo, splash, shield, platform}));
 
         defaultDeck = new Deck("Default", gear, pool);
     }
@@ -110,6 +123,11 @@ public class DeckManager {
         itemMeta.setLore(lore);
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
                 PersistentDataType.STRING, type);
+        if (type.equals("splash")) {
+            PotionMeta pmeta = (PotionMeta) itemMeta;
+            PotionData pdata = new PotionData(PotionType.WATER);
+            pmeta.setBasePotionData(pdata);
+        }
         item.setItemMeta(itemMeta);
         return item;
     }

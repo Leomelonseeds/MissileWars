@@ -62,3 +62,19 @@ game-end-reminder:
   sound: BLOCK_NOTE_BLOCK_HAT
   volume: 1.0
   pitch: 1.0
+spawn-torpedo:
+  sound: ENTITY_IRON_GOLEM_REPAIR
+  volume: 1.0
+  pitch: 0.5
+spawn-obsidian-shield:
+  sound: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
+  volume: 1.0
+  pitch: 1.0
+break-obsidian-shield:
+  sound: BLOCK_RESPAWN_ANCHOR_DEPLETE
+  volume: 1.0
+  pitch: 1.0
+spawn-torpedo:
+  sound: BLOCK_ANVIL_PLACE
+  volume: 1.0
+  pitch: 0.5

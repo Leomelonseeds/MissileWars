@@ -30,7 +30,7 @@ hurricane:
   - "&78 more TNT. That's 56% more TNT per TNT."
   - ""
   - "&aSpeed: &f3.3m/s"
-  - "&cTNT: &f10"
+  - "&cTNT: &f18"
   offset:
     x: -1
     y: -4
@@ -50,11 +50,11 @@ cruiser:
   - "&aSpeed: &f3.3m/s"
   - "&cTNT: &f15"
   offset:
-    x: -1
+    x: 0
     y: -4
     z: 4
 thunderbolt:
-  file: 'cruiser.nbt'
+  file: 'thunderbolt.nbt'
   item: BLAZE_SPAWN_EGG
   name: "&6☢ &lThunderbolt &6⚡"
   lore:
@@ -66,14 +66,14 @@ thunderbolt:
   - "&aSpeed: &f3.3m/s"
   - "&cTNT: &f13 + 4 TNT Minecarts"
   offset:
-    x: -1
+    x: 0
     y: -4
     z: 4
 
 
 hilt:
   file: 'hilt.nbt'
-  item: RABBIT_SPAWN_EGG
+  item: DOLPHIN_SPAWN_EGG
   name: "&8☢ Hilt ⚡"
   lore:
   - ""
@@ -90,7 +90,7 @@ hilt:
     z: 4
 dagger:
   file: 'dagger.nbt'
-  item: RABBIT_SPAWN_EGG
+  item: DOLPHIN_SPAWN_EGG
   name: "&8☢ &lDagger &8⚡"
   lore:
   - ""
@@ -108,7 +108,7 @@ dagger:
 
 supersonic:
   file: 'supersonic.nbt'
-  item: PUFFERFISH_SPAWN_EGG
+  item: HORSE_SPAWN_EGG
   name: "&b☢ Supersonic ⚡"
   lore:
   - ""
@@ -126,7 +126,7 @@ supersonic:
     z: 4
 hypersonic:
   file: 'hypersonic.nbt'
-  item: PUFFERFISH_SPAWN_EGG
+  item: HORSE_SPAWN_EGG
   name: "&b☢ &lHypersonic &b⚡"
   lore:
   - ""
@@ -192,7 +192,7 @@ guardian:
     z: 4
 elder_guardian:
   file: 'elderguard.nbt'
-  item: GUARDIAN_SPAWN_EGG
+  item: ELDER_GUARDIAN_SPAWN_EGG
   name: "&3☢ &lElder Guardian &3✟"
   lore:
   - ""
@@ -209,7 +209,7 @@ elder_guardian:
 
 gemini:
   file: 'gemini.nbt'
-  item: COD_SPAWN_EGG
+  item: SLIME_SPAWN_EGG
   name: "&e☢ Gemini ✟"
   lore:
   - ""
@@ -225,7 +225,7 @@ gemini:
     z: 4
 gemini_warrior:
   file: 'gemini_warrior.nbt'
-  item: COD_SPAWN_EGG
+  item: SLIME_SPAWN_EGG
   name: "&e☢ &lGemini Warrior &e✟"
   lore:
   - ""
@@ -354,7 +354,21 @@ catapult: {}
 citadel: {}
 fortress: {}
 
-pisces: {}
+pisces:
+  file: 'pisces.nbt'
+  item: RAVAGER_SPAWN_EGG
+  name: "&a☢ Pisces ⚒"
+  lore:
+  - ""
+  - "&7This wide missile could almost compete with"
+  - "&7your mother."
+  - ''
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f12"
+  offset:
+    x: -3
+    y: -4
+    z: 4
 aries: {}
 
 ant: {}
@@ -364,7 +378,7 @@ lifter: {}
 # Utility items
 
 splash:
-  item: SPLASH_WATER_BOTTLE
+  item: SPLASH_POTION
   name: "&9★ Splash ⚡"
   lore:
   - ""
@@ -422,11 +436,63 @@ platform_2:
     z: -3
 platform_3: {}
 
-torpedo_1: {}
-torpedo_2: {}
+torpedo_1:
+  file: 'torpedo_1.nbt'
+  item: EGG
+  name: "&0★ Torpedo ✟"
+  lore:
+  - ""
+  - "&7Although this torpedo can't actually move,"
+  - "&7it still packs a punch. In the form of a"
+  - "&7deadly explosion triggered by the slightest"
+  - "&7movement from a player or missile."
+  - ""
+  - "&9Size: &f1"
+  offset:
+    x: -2
+    y: -4
+    z: -2
+torpedo_2:
+  file: 'torpedo_2.nbt'
+  item: EGG
+  name: "&0★ Torpedo ✟"
+  lore:
+  - ""
+  - "&7Normal shields have nothing on this gigantic,"
+  - "&7extremely sensitive explosive."
+  - ""
+  - "&9Size: &f2"
+  offset:
+    x: -2
+    y: -7
+    z: -2
 
-obsidian_shield_1: {}
-obsidian_shield_2: {}
+obsidian_shield:
+  file: 'obsidian_shield.nbt'
+  item: ENDER_PEARL
+  name: "&5★ Obsidian Shield ✟"
+  lore:
+  - ""
+  - "&7Due to a budget increase, we can now afford"
+  - "&7better construction materials. This one"
+  - "&7vanishes after a while though."
+  offset:
+    x: -2
+    y: -2
+    z: 0
+  
+obsidian_shield_deplete:
+  file: 'obsidian_shield_deplete.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
+obsidian_shield_clear:
+  file: 'obsidian_shield_clear.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
 
 canopy: {}
 

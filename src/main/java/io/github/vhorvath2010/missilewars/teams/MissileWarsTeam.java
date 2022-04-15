@@ -241,7 +241,6 @@ public class MissileWarsTeam {
         	Player mcPlayer = player.getMCPlayer();
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
-            broadcastConfigMsg("messages.leave-team-others", player);
         }
     }
 

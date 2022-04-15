@@ -74,6 +74,24 @@ public class MissileWarsCommand implements CommandExecutor {
             return true;
         }
         
+        // Quit to waiting lobby of a game
+        if (action.equalsIgnoreCase("Leave") && sender instanceof Player) {
+            
+            Player player = (Player) sender;
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            if (arena == null) {
+                sendErrorMsg(sender, "You must be in a game to do this!");
+                return true;
+            }
+            
+            if (!(arena.leaveGame(player.getUniqueId()))) {
+                sendErrorMsg(sender, "You cannot do this now!");
+                return true;
+            }
+            
+            return true; 
+        }
+        
         // Join the fullest available game
         if (action.equalsIgnoreCase("Join") && sender instanceof Player) {
 
