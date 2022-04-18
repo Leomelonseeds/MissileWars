@@ -58,6 +58,12 @@ public class SchematicManager {
      * @return true if the NBT structure was found and spawned, otherwise false
      */
     public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
+        
+        // Don't kill the lobby
+        if (loc.getWorld().getName().equals("world")){
+            return false;
+        }
+        
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),

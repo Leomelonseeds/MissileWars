@@ -228,7 +228,9 @@ public class MissileWarsTeam {
 
     /** Stop the distribution of in-game Deck items. */
     public void stopDeckItems() {
-        poolItemRunnable.cancel();
+        if (poolItemRunnable != null) {
+            poolItemRunnable.cancel();
+        }
     }
 
     /**

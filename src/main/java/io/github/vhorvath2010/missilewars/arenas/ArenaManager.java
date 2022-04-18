@@ -48,7 +48,9 @@ import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
@@ -87,7 +89,7 @@ public class ArenaManager {
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
-            arena.loadWorldFromDisk();
+            arena.loadWorldFromDisk(false);
         }
     }
 

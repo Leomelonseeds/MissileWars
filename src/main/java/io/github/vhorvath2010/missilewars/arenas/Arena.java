@@ -930,21 +930,23 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /** Load this Arena's world from the disk. */
-    public void loadWorldFromDisk() {
+    public void loadWorldFromDisk(Boolean loadCitizens) {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
         // Load Citizens NPCs
-        try {
-            ((Citizens) CitizensAPI.getPlugin()).reload();
-        } catch (NPCLoadException e) {
-            e.printStackTrace();
+        if (loadCitizens) {
+            try {
+                ((Citizens) CitizensAPI.getPlugin()).reload();
+            } catch (NPCLoadException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /** Reset the arena world. */
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
-        loadWorldFromDisk();
+        loadWorldFromDisk(true);
         resetting = false;
         setupMapVotes();
     }
