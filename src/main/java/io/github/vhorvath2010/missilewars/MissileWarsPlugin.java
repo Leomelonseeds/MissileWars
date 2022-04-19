@@ -2,8 +2,6 @@ package io.github.vhorvath2010.missilewars;
 
 import java.io.File;
 
-import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
-import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -13,11 +11,14 @@ import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
 import io.github.vhorvath2010.missilewars.commands.SpectateCommand;
+import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
 import io.github.vhorvath2010.missilewars.decks.DeckManager;
 import io.github.vhorvath2010.missilewars.events.ArenaGameruleEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
+import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
 import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
+import io.github.vhorvath2010.missilewars.events.WorldCreationEvents;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import net.milkbowl.vault.economy.Economy;
 
@@ -58,6 +59,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);
         Bukkit.getPluginManager().registerEvents(new StructureItemEvents(), this);
         Bukkit.getPluginManager().registerEvents(new MapVotingEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new WorldCreationEvents(), this);
 
         // Load decks
         deckManager = new DeckManager();

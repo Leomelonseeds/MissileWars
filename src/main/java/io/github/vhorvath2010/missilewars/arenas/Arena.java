@@ -949,17 +949,19 @@ public class Arena implements ConfigurationSerializable {
         List<MissileWarsPlayer> mostKills = new ArrayList<MissileWarsPlayer>();
         List<MissileWarsPlayer> mostDeaths = new ArrayList<MissileWarsPlayer>();
         for (MissileWarsPlayer player : players) {
-            if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
-                mostKills.clear();
-                mostKills.add(player);
-            } else if (mostKills.get(0).getKills() == player.getKills()) {
-                mostKills.add(player);
-            }
-            if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
-                mostDeaths.clear();
-                mostDeaths.add(player);
-            } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
-                mostDeaths.add(player);
+            if (!getTeam(player.getMCPlayerId()).equals("no team")) {
+                if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
+                    mostKills.clear();
+                    mostKills.add(player);
+                } else if (mostKills.get(0).getKills() == player.getKills()) {
+                    mostKills.add(player);
+                }
+                if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
+                    mostDeaths.clear();
+                    mostDeaths.add(player);
+                } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
+                    mostDeaths.add(player);
+                }
             }
         }
         
@@ -1056,8 +1058,6 @@ public class Arena implements ConfigurationSerializable {
             int amountEarned = 0;
             int playerAmount = 0;
             int teamAmount = 0;
-            long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
-            double percentPlayed = (double) playTime / gameTime;
             UUID uuid = player.getMCPlayerId();
             if (!getTeam(uuid).equals("no team")) {
                 playerAmount = spawn_missile * player.getMissles() + 
@@ -1074,8 +1074,10 @@ public class Arena implements ConfigurationSerializable {
                         teamAmount += win;
                     }
                 }
+                long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
+                double percentPlayed = (double) playTime / gameTime;
+                amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
             }
-            amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
             econ.depositPlayer(player.getMCPlayer(), amountEarned);
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);

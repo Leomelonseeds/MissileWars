@@ -8,8 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -23,6 +25,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -36,7 +39,6 @@ import org.bukkit.util.Vector;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -47,10 +49,9 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
@@ -98,7 +99,7 @@ public class ArenaManager {
         // Unload each Arena
         for (Arena arena : loadedArenas) {
             arena.removePlayers();
-            arena.resetWorld();
+            Bukkit.unloadWorld(arena.getWorld(), false);
         }
 
         // Save Arenas to file
@@ -126,6 +127,54 @@ public class ArenaManager {
         }
         return null;
     }
+    
+    /**
+     * Completely remove an Arena by name.
+     *
+     * @param name the name of the Arena
+     * @return true if the arena was successfully deleted
+     */
+    public Boolean removeArena(Arena arena) {
+        World arenaWorld = arena.getWorld();
+        Logger logger = Bukkit.getLogger();
+        if (!arenaWorld.getPlayers().isEmpty()) {
+            logger.log(Level.WARNING, "An arena with players in it cannot be deleted");
+            return false;
+        }
+        // Load chunks so citizens can be removed properly
+        arenaWorld.setChunkForceLoaded(4, 0, true);
+        arenaWorld.setChunkForceLoaded(5, 0, true);
+        arenaWorld.setChunkForceLoaded(6, 0, true);
+        arenaWorld.setChunkForceLoaded(4, -1, true);
+        arenaWorld.setChunkForceLoaded(5, -1, true);
+        arenaWorld.setChunkForceLoaded(6, -1, true);
+        for (Entity entity : arenaWorld.getEntities()) {
+            if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
+                logger.log(Level.INFO, "Citizen with UUID " + entity.getUniqueId() + " deleted.");
+                CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
+            }
+        }
+        CitizensAPI.getNPCRegistry().saveToStore();
+        Bukkit.unloadWorld(arenaWorld, false);
+        File worldFolder = new File("mwarena_" + arena.getName());
+        try {
+            FileUtils.deleteDirectory(worldFolder);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "The world file couldn't be removed! Please remove manually.");
+        }
+        loadedArenas.remove(arena);
+        // Remove arena from file
+        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+        FileConfiguration arenaConfig = new YamlConfiguration();
+        arenaConfig.set("arenas", loadedArenas);
+        try {
+            arenaConfig.save(arenaFile);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Arena file couldn't be saved!");
+        }
+        return true;
+    }
+
 
     /**
      * Get an Arena by index.
@@ -204,13 +253,14 @@ public class ArenaManager {
      * @param creator the creator of the world
      * @return true if the Arena was created, otherwise false
      */
-    public boolean createArena(String name, CommandSender creator) {
+    public boolean createArena(String name) {
     	
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+    	Logger logger = Bukkit.getLogger();
     	
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
-            creator.sendMessage(ChatColor.RED + "A world already exists for that arena!");
+            logger.log(Level.WARNING, "An arena with the name " + name + " already exists!");
             return false;
         }
 
@@ -218,7 +268,7 @@ public class ArenaManager {
                 .toString(), "maps.yml");
 
         // Create Arena world
-        creator.sendMessage(ChatColor.GREEN + "Generating arena world...");
+        logger.log(Level.INFO, "Generating arena world for " + name);
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator());
         World arenaWorld = arenaCreator.createWorld();
@@ -236,15 +286,15 @@ public class ArenaManager {
                 plugin.getConfig().getInt("worldborder.center.z"));
         border.setSize(plugin.getConfig().getInt("worldborder.radius") * 2);
         arenaWorld.setTime(6000);
-        creator.sendMessage(ChatColor.GREEN + "Arena world generated!");
+        logger.log(Level.INFO, "Arena world generated!");
 
         // Create Arena lobby
-        creator.sendMessage(ChatColor.GREEN + "Generating lobby...");
-        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, false, null)) {
-            creator.sendMessage(ChatColor.RED + "Error generating lobby! Are schematic files present?");
+        logger.log(Level.INFO, "Generating lobby...");
+        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, true, null)) {
+            logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
             return false;
         } else {
-            creator.sendMessage(ChatColor.GREEN + "Lobby generated!");
+            logger.log(Level.INFO, "Lobby generated!");
         }
 
         
@@ -263,6 +313,7 @@ public class ArenaManager {
         redLoc.getWorld().loadChunk(redLoc.getChunk());
         redNPC.spawn(redLoc);
         redNPC.data().setPersistent(NPC.SILENT_METADATA, true);
+        logger.log(Level.INFO, "Red NPC with UUID " + redNPC.getUniqueId() + " spawned.");
 
         // Spawn blue NPC
         Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue", null, null);
@@ -279,6 +330,7 @@ public class ArenaManager {
         blueLoc.getWorld().loadChunk(blueLoc.getChunk());
         blueNPC.spawn(blueLoc);
         blueNPC.data().setPersistent(NPC.SILENT_METADATA, true);
+        logger.log(Level.INFO, "Blue NPC with UUID " + blueNPC.getUniqueId() + " spawned.");
 
         // Spawn bar NPC
         Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar", null, null);
@@ -301,6 +353,7 @@ public class ArenaManager {
         bartender.spawn(barLoc);
         profession.setProfession(Villager.Profession.NITWIT);
         bartender.data().setPersistent(NPC.SILENT_METADATA, true);
+        logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
 
         // Spawn barrier wall
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
@@ -333,14 +386,15 @@ public class ArenaManager {
         createWaitingLobby("red", arena, lobbyRegion);
         createWaitingLobby("blue", arena, lobbyRegion);
 
-        creator.sendMessage(ChatColor.GREEN + "Saving world...");
+        logger.log(Level.INFO, "Arena " + name + " generated. World will save in 10 seconds.");
         
         // Wait to ensure schematic is spawned
         new BukkitRunnable() {
             @Override
             public void run() {
                 arenaWorld.save();
-                creator.sendMessage(ChatColor.GREEN + "World saved!");           
+                logger.log(Level.INFO, "Saving new arena " + name);
+                logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
             }
         }.runTaskLater(plugin, 200);
 

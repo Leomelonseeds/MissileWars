@@ -21,7 +21,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <CreateArena/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
+            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
             return true;
         }
 
@@ -29,8 +29,38 @@ public class MissileWarsCommand implements CommandExecutor {
         String action = args[0];
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ArenaManager arenaManager = plugin.getArenaManager();
-        if (action.equalsIgnoreCase("CreateArena")) {
+        if (action.equalsIgnoreCase("DeleteArena")) {
             // Ensure player is allowed to create an arena
+            if (!sender.hasPermission("umw.delete-arena")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            // Validate given arena name
+            if (args.length < 2) {
+                sendErrorMsg(sender, "Usage: /umw DeleteArena <arena-name>");
+                return true;
+            }
+            String arenaName = args[1];
+            Arena toRemove = arenaManager.getArena(arenaName);
+            
+            if (toRemove == null) {
+                sendErrorMsg(sender, "That arena does not exist!");
+                return true;
+            }
+
+            // Delete the arena
+            if (arenaManager.removeArena(toRemove)) {
+                sendSuccessMsg(sender, "The arena has been deleted!");
+                return true;
+            } else {
+                sendErrorMsg(sender, "Something went wrong deleting the arena. Notify an admin.");
+                return true;
+            }
+        }
+        
+        if (action.equalsIgnoreCase("CreateArena")) {
+            // Ensure player is allowed to delete an arena
             if (!sender.hasPermission("umw.create-arena")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
@@ -48,8 +78,11 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Create new arena
-            if (arenaManager.createArena(arenaName, sender)) {
+            if (arenaManager.createArena(arenaName)) {
                 sendSuccessMsg(sender, "New arena created!");
+                return true;
+            } else {
+                sendErrorMsg(sender, "Something went wrong creating the arena. Notify an admin.");
                 return true;
             }
         }
