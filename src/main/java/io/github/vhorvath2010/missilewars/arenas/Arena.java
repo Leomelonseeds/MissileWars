@@ -83,8 +83,6 @@ public class Arena implements ConfigurationSerializable {
     private Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     private Map<UUID, String> playerVotes;
-    /** Connect players and exp earned */
-    private Map<UUID, Integer> currency;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -101,7 +99,6 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         setupMapVotes();
-        currency = new HashMap<>();
     }
 
     /**
@@ -256,18 +253,6 @@ public class Arena implements ConfigurationSerializable {
      */
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
-    }
-    
-    public void addCurrency(UUID uuid, int amount) {
-        if (currency.containsKey(uuid)) {
-            currency.put(uuid, currency.get(uuid) + amount);
-        } else if (!getTeam(uuid).equals("no team")) {
-            currency.put(uuid, amount);
-        }
-    }
-    
-    public int getCurrency(UUID uuid) {
-        return currency.get(uuid);
     }
 
     /**
@@ -940,7 +925,6 @@ public class Arena implements ConfigurationSerializable {
         loadWorldFromDisk(true);
         resetting = false;
         setupMapVotes();
-        currency = new HashMap<>();
     }
 
     /**
