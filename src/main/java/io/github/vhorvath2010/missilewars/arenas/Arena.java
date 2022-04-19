@@ -536,8 +536,6 @@ public class Arena implements ConfigurationSerializable {
             return false;
         }
         
-        getPlayerInArena(uuid).resetPlayer();
-        
         checkEmpty();
         
         player.teleport(getPlayerSpawn(player));
@@ -1036,6 +1034,7 @@ public class Arena implements ConfigurationSerializable {
         int kill = ranksConfig.getInt("experience.kill");
         int portal_broken = ranksConfig.getInt("experience.portal_broken");
         int shield_health = ranksConfig.getInt("experience.shield_health");
+        int win = ranksConfig.getInt("experience.win");
         
         int red_portal_amount = (blueTeam.getFirstPortalStatus() ? portal_broken : 0) + 
                 (blueTeam.getSecondPortalStatus() ? portal_broken : 0);
@@ -1055,20 +1054,29 @@ public class Arena implements ConfigurationSerializable {
             
             // Calculate currency gain per-game
             int amountEarned = 0;
+            int playerAmount = 0;
+            int teamAmount = 0;
             long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
             double percentPlayed = (double) playTime / gameTime;
             UUID uuid = player.getMCPlayerId();
             if (!getTeam(uuid).equals("no team")) {
-                int baseAmount = spawn_missile * player.getMissles() + 
-                                 use_utility * player.getUtility() +
-                                 kill * player.getKills();
+                playerAmount = spawn_missile * player.getMissles() + 
+                               use_utility * player.getUtility() +
+                               kill * player.getKills();
                 if (blueTeam.containsPlayer(uuid)) {
-                    amountEarned = baseAmount + (int) (percentPlayed * (blue_portal_amount + blue_shield_health_amount));
+                    teamAmount = blue_portal_amount + blue_shield_health_amount;
+                    if (winningTeam == blueTeam) {
+                        teamAmount += win;
+                    }
                 } else {
-                    amountEarned = baseAmount + (int) (percentPlayed * (red_portal_amount + red_shield_health_amount));
+                    teamAmount = red_portal_amount + red_shield_health_amount;
+                    if (winningTeam == redTeam) {
+                        teamAmount += win;
+                    }
                 }
             }
-            econ.depositPlayer(player.getMCPlayer(), (int) amountEarned);
+            amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
+            econ.depositPlayer(player.getMCPlayer(), amountEarned);
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
                 s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));

@@ -12,6 +12,7 @@ experience:
   portal_broken: 20
   # every 10% of shield health opponent lost gives this much
   shield_health: 5
+  win: 25
 
 # Each rank unlocks a new COLOR/STYLE and SYMBOL
 # Both of these can be used in a cosmetics menu to
