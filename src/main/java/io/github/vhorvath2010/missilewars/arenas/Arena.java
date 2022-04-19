@@ -14,7 +14,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -44,6 +43,8 @@ import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
+import net.kyori.adventure.text.Component;
+import net.milkbowl.vault.economy.Economy;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public class Arena implements ConfigurationSerializable {
@@ -82,6 +83,8 @@ public class Arena implements ConfigurationSerializable {
     private Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     private Map<UUID, String> playerVotes;
+    /** Connect players and exp earned */
+    private Map<UUID, Integer> currency;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -98,6 +101,7 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         setupMapVotes();
+        currency = new HashMap<>();
     }
 
     /**
@@ -237,39 +241,34 @@ public class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Get people in red team
+     * Get the red team
      * 
      * @return
      */
-    public int getRedTeam() {
-        return redTeam.getSize();
+    public MissileWarsTeam getRedTeam() {
+        return redTeam;
     }
     
     /**
-     * Get people in blue team
+     * Get the blue team
      * 
      * @return
      */
-    public int getBlueTeam() {
-        return blueTeam.getSize();
+    public MissileWarsTeam getBlueTeam() {
+        return blueTeam;
     }
     
-    // Get portal statuses
-    public boolean getRedFirstPortalStatus() {
-        return redTeam.getFirstPortalStatus();
+    public void addCurrency(UUID uuid, int amount) {
+        if (currency.containsKey(uuid)) {
+            currency.put(uuid, currency.get(uuid) + amount);
+        } else if (!getTeam(uuid).equals("no team")) {
+            currency.put(uuid, amount);
+        }
     }
     
-    public boolean getRedSecondPortalStatus() {
-        return redTeam.getSecondPortalStatus();
+    public int getCurrency(UUID uuid) {
+        return currency.get(uuid);
     }
-    
-    public boolean getBlueFirstPortalStatus() {
-        return blueTeam.getFirstPortalStatus();
-    }
-    
-    public boolean getBlueSecondPortalStatus() {
-        return blueTeam.getSecondPortalStatus();
-    } 
 
     /**
      * Get a {@link MissileWarsPlayer} in this arena from a given UUID.
@@ -293,16 +292,6 @@ public class Arena implements ConfigurationSerializable {
      * @return the team that the player with uuid is on
      */
     public String getTeam(UUID uuid) {
-        for (MissileWarsPlayer player : redQueue) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                return ChatColor.RED + "red" + ChatColor.RESET;
-            }
-        }
-        for (MissileWarsPlayer player : blueQueue) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                return ChatColor.BLUE + "blue" + ChatColor.RESET;
-            }
-        }
         if (redTeam == null || blueTeam == null) {
             return "no team";
         }
@@ -562,6 +551,8 @@ public class Arena implements ConfigurationSerializable {
             return false;
         }
         
+        getPlayerInArena(uuid).resetPlayer();
+        
         checkEmpty();
         
         player.teleport(getPlayerSpawn(player));
@@ -636,7 +627,7 @@ public class Arena implements ConfigurationSerializable {
                     if (!redQueue.contains(player)) {
                         blueQueue.remove(player);
                         redQueue.add(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                        ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
                         removeSpectator(player);
                     }
                 } else {
@@ -670,7 +661,7 @@ public class Arena implements ConfigurationSerializable {
                     if (!blueQueue.contains(player)) {
                         redQueue.remove(player);
                         blueQueue.add(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-waiting", player.getMCPlayer(), this, null);
+                        ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
                         removeSpectator(player);
                     }
                 } else {
@@ -882,11 +873,11 @@ public class Arena implements ConfigurationSerializable {
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
-                if (!(getBlueFirstPortalStatus() || getBlueSecondPortalStatus()) &&
-                     (getRedFirstPortalStatus() || getRedSecondPortalStatus())) {
+                if (!(blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
+                     (redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
                     endGame(blueTeam);
-                } else if ((getBlueFirstPortalStatus() || getBlueSecondPortalStatus()) &&
-                          !(getRedFirstPortalStatus() || getRedSecondPortalStatus())) {
+                } else if ((blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
+                          !(redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
                     endGame(redTeam);
                 } else {
                     endGame(null);
@@ -949,6 +940,7 @@ public class Arena implements ConfigurationSerializable {
         loadWorldFromDisk(true);
         resetting = false;
         setupMapVotes();
+        currency = new HashMap<>();
     }
 
     /**
@@ -967,6 +959,7 @@ public class Arena implements ConfigurationSerializable {
             task.cancel();
         }
         running = false;
+        resetting = true;
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
 
@@ -1052,15 +1045,51 @@ public class Arena implements ConfigurationSerializable {
         discordChannel.sendMessage(discordMessage).queue();
         
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages.classic-end", null, null, null);
+        FileConfiguration ranksConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "ranks.yml");
+        int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
+        int use_utility = ranksConfig.getInt("experience.use_utility");
+        int kill = ranksConfig.getInt("experience.kill");
+        int portal_broken = ranksConfig.getInt("experience.portal_broken");
+        int shield_health = ranksConfig.getInt("experience.shield_health");
+        
+        int red_portal_amount = (blueTeam.getFirstPortalStatus() ? portal_broken : 0) + 
+                (blueTeam.getSecondPortalStatus() ? portal_broken : 0);
+        int blue_portal_amount = (redTeam.getFirstPortalStatus() ? portal_broken : 0) + 
+                (redTeam.getSecondPortalStatus() ? portal_broken : 0);
+        
+        int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
+        int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
+        
+        Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
+        LocalDateTime endTime = LocalDateTime.now();
+        long gameTime = Duration.between(startTime, endTime).toSeconds();
 
         for (MissileWarsPlayer player : players) {
+            int amountEarned = 0;
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+            UUID uuid = player.getMCPlayerId();
+            if (!getTeam(uuid).equals("no team")) {
+                int baseAmount = spawn_missile * player.getMissles() + 
+                                 use_utility * player.getUtility() +
+                                 kill * player.getKills();
+                if (blueTeam.containsPlayer(uuid)) {
+                    amountEarned = baseAmount + blue_portal_amount + blue_shield_health_amount;
+                } else {
+                    amountEarned = baseAmount + red_portal_amount + red_shield_health_amount;
+                }
+            }
+            long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
+            double percentPlayed = (double) playTime / gameTime;
+            amountEarned = (int) (amountEarned * percentPlayed);
+            econ.depositPlayer(player.getMCPlayer(), (int) amountEarned);
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
                 s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));
                 s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(mostDeaths.get(0).getDeaths()));
                 s = s.replaceAll("%umw_most_kills%", most_kills);
                 s = s.replaceAll("%umw_most_deaths%", most_deaths);
+                s = s.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
             }
         }
@@ -1069,7 +1098,6 @@ public class Arena implements ConfigurationSerializable {
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
 
         // Remove all players after a short time or immediately if none exist
-        resetting = true;
         if (plugin.isEnabled() && players.size() > 0) {
             new BukkitRunnable() {
                 @Override
@@ -1205,42 +1233,6 @@ public class Arena implements ConfigurationSerializable {
         } else {
             blueTeam.registerShieldBlockUpdate(location, place);
         }
-    }
-
-    /**
-     * Get the red team's current shield health.
-     *
-     * @return the red team's current shield health
-     */
-    public double getRedShieldHealth() {
-        // Full health if game not running
-        if (!(running || resetting)) {
-            return 100.00;
-        }
-
-        // Acquire shield data
-        int totalBlocks = redTeam.getShieldVolume();
-        int broken = redTeam.getShieldBlocksBroken();
-
-        return 100 * ((totalBlocks - broken) / (double) totalBlocks);
-    }
-
-    /**
-     * Get the blue team's current shield health as a percentage.
-     *
-     * @return the blue team's current shield health
-     */
-    public double getBlueShieldHealth() {
-        // Full health if game not running
-        if (!(running || resetting)) {
-            return 100.00;
-        }
-
-        // Acquire shield data
-        int totalBlocks = blueTeam.getShieldVolume();
-        int broken = blueTeam.getShieldBlocksBroken();
-
-        return 100 * ((totalBlocks - broken) / (double) totalBlocks);
     }
 
     /**

@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /** Represents a team of Missile Wars Players. */
@@ -147,6 +148,7 @@ public class MissileWarsTeam {
         mcPlayer.setFireTicks(0);
         ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
         giveItems(player);
+        player.setJoinTime(LocalDateTime.now());
     }
 
     /**
@@ -374,6 +376,16 @@ public class MissileWarsTeam {
         int z1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z1");
         int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
         return (x2 - x1) * (y2 - y1) * (z2 - z1);
+    }
+    
+    /**
+     * Gets the shield health of this team based on shield volume and broken blocks
+     * 
+     * @return the shield health as a percentage
+     */
+    public double getShieldHealth() {
+        int totalBlocks = getShieldVolume();
+        return 100 * ((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
     }
 
 }

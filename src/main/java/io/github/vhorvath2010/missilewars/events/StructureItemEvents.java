@@ -86,7 +86,13 @@ public class StructureItemEvents implements Listener {
     public void useStructureItem(PlayerInteractEvent event) {
         // Check if player is trying to place a structure item
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-;        Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        
+        Arena playerArena = getPlayerArena(player);
+        if (playerArena == null) {
+            return;
+        }
+        
         ItemStack hand = player.getInventory().getItemInMainHand();
         Block clicked = event.getClickedBlock();
         String structureName = getStructureFromItem(hand);
@@ -116,13 +122,13 @@ public class StructureItemEvents implements Listener {
         }
 
         // Place structure
-        Arena playerArena = getPlayerArena(player);
         String mapName = "default-map";
-        if (playerArena != null && playerArena.getMapName() != null) {
+        if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
         }
         if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
             hand.setAmount(hand.getAmount() - 1);
+            playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
         } else {
         	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
         }
@@ -133,6 +139,12 @@ public class StructureItemEvents implements Listener {
     public void useUtility(PlayerInteractEvent event) {
         // Check if player is trying to place a utility item
         Player player = event.getPlayer();
+        
+        Arena playerArena = getPlayerArena(player);
+        if (playerArena == null) {
+            return;
+        }
+        
         ItemStack hand = player.getInventory().getItemInMainHand();
         // Handle splash potion through other methods
         if (hand.getType() == Material.SPLASH_POTION) {
@@ -158,6 +170,7 @@ public class StructureItemEvents implements Listener {
         }
         
         event.setCancelled(true);
+        playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
 
         // Do proper action based on utility type
         if (utility.equalsIgnoreCase("fireball") && event.getAction().toString().contains("RIGHT_CLICK")) {
@@ -187,6 +200,10 @@ public class StructureItemEvents implements Listener {
             return;
         }
         Player thrower = (Player) thrown.getShooter();
+        Arena playerArena = getPlayerArena(thrower);
+        if (playerArena == null) {
+            return;
+        }
 
         // Check if player is holding a structure item
         ItemStack hand = thrower.getInventory().getItemInMainHand();
@@ -205,12 +222,12 @@ public class StructureItemEvents implements Listener {
                 if (!thrown.isDead()) {
                     // Spawn shield at current location and remove snowball
                     Location spawnLoc = thrown.getLocation();
-                    Arena playerArena = getPlayerArena(thrower);
                     String mapName = "default-map";
-                    if (playerArena != null && playerArena.getMapName() != null) {
+                    if (playerArena.getMapName() != null) {
                         mapName = playerArena.getMapName();
                     }
                     if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
+                        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
                         String sound = "none";
                         if (structureName.contains("shield_") || structureName.contains("platform")) {
                             sound = "spawn-shield";
@@ -245,7 +262,11 @@ public class StructureItemEvents implements Listener {
             return;
         }
         Player thrower = (Player) thrown.getShooter();
-
+        Arena playerArena = getPlayerArena(thrower);
+        if (playerArena == null) {
+            return;
+        }
+        
         // Check if player is holding a utility item
         ItemStack hand = thrower.getInventory().getItemInMainHand();
         
@@ -264,6 +285,7 @@ public class StructureItemEvents implements Listener {
         
         // Check the duration here
         thrown.setCustomName("splash:" + "1");
+        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
     }
     
     @EventHandler

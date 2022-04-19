@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 public class MissileWarsPlaceholder extends PlaceholderExpansion {
@@ -78,6 +79,8 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
         // In-Game placeholders
         DecimalFormat df = new DecimalFormat("##.##");
+        MissileWarsTeam redTeam = playerArena.getRedTeam();
+        MissileWarsTeam blueTeam = playerArena.getBlueTeam();
         
         if (params.equalsIgnoreCase("map")) {
             return ConfigUtils.getMapText(playerArena.getMapType(), playerArena.getMapName(), "name");
@@ -88,7 +91,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         if (params.equalsIgnoreCase("red_shield_health")) {
-            double health = Math.max(0, playerArena.getRedShieldHealth());
+            double health = Math.max(0, redTeam.getShieldHealth());
             ChatColor chatcolor;
             if (health >= 90) {
                 chatcolor = ChatColor.DARK_GREEN;
@@ -107,7 +110,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equalsIgnoreCase("blue_shield_health")) {
-            double health = Math.max(0, playerArena.getBlueShieldHealth());
+            double health = Math.max(0, blueTeam.getShieldHealth());
             ChatColor chatcolor;
             if (health >= 90) {
                 chatcolor = ChatColor.DARK_GREEN;
@@ -126,16 +129,16 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         if (params.equalsIgnoreCase("red_team")) {
-            return Integer.toString(playerArena.getRedTeam());
+            return Integer.toString(redTeam.getSize());
         }
         
         if (params.equalsIgnoreCase("blue_team")) {
-            return Integer.toString(playerArena.getBlueTeam());
+            return Integer.toString(blueTeam.getSize());
         }
         
         if (params.equalsIgnoreCase("red_portals")) {
-            String firstPortal = playerArena.getRedFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            String secondPortal = playerArena.getRedSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
+            String firstPortal = redTeam.getFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
+            String secondPortal = redTeam.getSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
             if (playerArena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED + "red" + ChatColor.RESET)) {
                 return firstPortal + secondPortal;
             }
@@ -143,8 +146,8 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         if (params.equalsIgnoreCase("blue_portals")) {
-            String firstPortal = playerArena.getBlueFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            String secondPortal = playerArena.getBlueSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
+            String firstPortal = blueTeam.getFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
+            String secondPortal = blueTeam.getSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
             if (playerArena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.BLUE + "blue" + ChatColor.RESET)) {
                 return secondPortal + firstPortal;
             }

@@ -171,14 +171,16 @@ public class ArenaGameruleEvents implements Listener {
             // Register shield breaking
             possibleArena.registerShieldBlockEdit(block.getLocation(), false);
         });
+        
+        EntityType entity = event.getEntityType();
 
         // Ensure its actually a fireball
-        if (event.getEntityType() == EntityType.FIREBALL) {
+        if (entity == EntityType.FIREBALL) {
             // Remove all portals from block list
             event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
         }
         // Check for TNT explosions of portals
-        else if (event.getEntityType() == EntityType.PRIMED_TNT) {
+        else if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT) {
             event.blockList().forEach(block -> {
                 // Register portal brake if block was broken
                 if (block.getType() == Material.NETHER_PORTAL) {

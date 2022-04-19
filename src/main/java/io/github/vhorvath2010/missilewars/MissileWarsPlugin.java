@@ -6,6 +6,7 @@ import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
 import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -18,6 +19,7 @@ import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
 import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
 import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
+import net.milkbowl.vault.economy.Economy;
 
 /** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
@@ -28,6 +30,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private ArenaManager arenaManager;
     /** The loaded DeckManager for this plugin. */
     private DeckManager deckManager;
+    /** The loaded economy for this plugin */
+    private static Economy econ;
 
     @Override
     public void onEnable() {
@@ -43,6 +47,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         saveIfNotPresent("sounds.yml");
         saveIfNotPresent("items.yml");
         saveIfNotPresent("maps.yml");
+        saveIfNotPresent("ranks.yml");
 
         // Load commands and events
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
@@ -63,6 +68,18 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Load placeholders
         new MissileWarsPlaceholder().register();
+        
+        // Load economy
+        setupEconomy();
+    }
+    
+    
+    /**
+     * Setup the economy manager
+     */
+    private void setupEconomy() {
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        econ = rsp.getProvider();
     }
 
     /**
@@ -108,5 +125,14 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public ArenaManager getArenaManager() {
         return arenaManager;
+    }
+    
+    /**
+     * Gets the plugin's current Economy
+     * 
+     * @return the plugin's current Economy
+     */
+    public Economy getEconomy() {
+        return econ;
     }
 }

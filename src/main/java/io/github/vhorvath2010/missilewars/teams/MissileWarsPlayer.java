@@ -1,11 +1,13 @@
 package io.github.vhorvath2010.missilewars.teams;
 
-import io.github.vhorvath2010.missilewars.decks.Deck;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Objects;
-import java.util.UUID;
+import io.github.vhorvath2010.missilewars.decks.Deck;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
@@ -18,6 +20,13 @@ public class MissileWarsPlayer {
     private int kills;
     /** The number of deaths the player has. */
     private int deaths;
+    /** The number of utility the player used */
+    private int utility;
+    /** The number of missiles the player spawned */
+    private int missiles;
+    /** The time that the player joined the game */
+    private LocalDateTime joinTime;
+    
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -90,6 +99,56 @@ public class MissileWarsPlayer {
     /** Increment the kill count for this {@link MissileWarsPlayer}. */
     public void incrementDeaths() {
         deaths++;
+    }
+    
+    /** Increment the utility count for this {@link MissileWarsPlayer}. */
+    public void incrementUtility() {
+        utility++;
+    }
+    
+    /**
+     * Get the number of utility spawns this {@link MissileWarsPlayer} has.
+     *
+     * @return the number of utility spawns this {@link MissileWarsPlayer} has
+     */
+    public int getUtility() {
+        return utility;
+    }
+    
+    /** Increment the missile count for this {@link MissileWarsPlayer}. */
+    public void incrementMissiles() {
+        missiles++;
+    }
+    
+    /**
+     * Get the number of missile spawns this {@link MissileWarsPlayer} has.
+     *
+     * @return the number of missile spawns this {@link MissileWarsPlayer} has
+     */
+    public int getMissles() {
+        return missiles;
+    }
+    
+    /** Reset the stats of this {@link MissileWarsPlayer} back to 0 */
+    public void resetPlayer() {
+        missiles = 0;
+        utility = 0;
+        kills = 0;
+        deaths = 0;
+    }
+    
+    /** Set the join time of this {@link MissileWarsPlayer} */
+    public void setJoinTime(LocalDateTime time) {
+        joinTime = time;
+    }
+    
+    /**
+     * Get the join time of this {@link MissileWarsPlayer}.
+     *
+     * @return the join time of this {@link MissileWarsPlayer}
+     */
+    public LocalDateTime getJoinTime() {
+        return joinTime;
     }
 
     /**

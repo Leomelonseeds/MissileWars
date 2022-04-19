@@ -15,7 +15,8 @@ messages:
   spectate-join-others: "%umw_focus% &7is now spectating."
   spectate-join-fail: "&cYou cannot spectate at this time."
   spectate-leave-others: "%umw_focus% &7is no longer spectating."
-  queue-waiting: "You are now queued for %umw_team%&7 in position &c%umw_position%"
+  queue-waiting-red: "You are now queued for &cred&7 in position &c%umw_position%"
+  queue-waiting-blue: "You are now queued for &9blue&7 in position &c%umw_position%"
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
   queue-join-error: "You cannot join %umw_team%&7 as the teams would be unbalanced."
@@ -51,7 +52,8 @@ messages:
     - "&a&lWINNER &7- %umw_winning_team%"
     - "&cMost Kills (%umw_most_kills_amount%): %umw_most_kills%"
     - "&eMost Deaths (%umw_most_deaths_amount%): %umw_most_deaths%"
-    - "&aThanks for playing!"
+    - "&aYou earned %umw_amount_earned% mokens this game."
+    - "&fThanks for playing!"
     - "&b========================================"
     
 titles:

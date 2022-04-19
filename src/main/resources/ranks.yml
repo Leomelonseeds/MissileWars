@@ -5,10 +5,13 @@ formula: 100*%umw_rank_number%*%umw_rank_number%+250
 experience:
   spawn_missile: 1
   # does not include shooting bow/crossbow
+  # only count successful utilizations (eg structure was spawned)
   use_utility: 1
-  kill: 3
-  portal_destroy: 8
-  win: 5
+  kill: 5
+  # every enemy portal broken gives this much
+  portal_broken: 20
+  # every 10% of shield health opponent lost gives this much
+  shield_health: 5
 
 # Each rank unlocks a new COLOR/STYLE and SYMBOL
 # Both of these can be used in a cosmetics menu to
