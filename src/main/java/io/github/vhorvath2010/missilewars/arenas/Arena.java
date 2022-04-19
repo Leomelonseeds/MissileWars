@@ -1050,22 +1050,24 @@ public class Arena implements ConfigurationSerializable {
         long gameTime = Duration.between(startTime, endTime).toSeconds();
 
         for (MissileWarsPlayer player : players) {
-            int amountEarned = 0;
+            
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+            
+            // Calculate currency gain per-game
+            int amountEarned = 0;
+            long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
+            double percentPlayed = (double) playTime / gameTime;
             UUID uuid = player.getMCPlayerId();
             if (!getTeam(uuid).equals("no team")) {
                 int baseAmount = spawn_missile * player.getMissles() + 
                                  use_utility * player.getUtility() +
                                  kill * player.getKills();
                 if (blueTeam.containsPlayer(uuid)) {
-                    amountEarned = baseAmount + blue_portal_amount + blue_shield_health_amount;
+                    amountEarned = baseAmount + (int) (percentPlayed * (blue_portal_amount + blue_shield_health_amount));
                 } else {
-                    amountEarned = baseAmount + red_portal_amount + red_shield_health_amount;
+                    amountEarned = baseAmount + (int) (percentPlayed * (red_portal_amount + red_shield_health_amount));
                 }
             }
-            long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
-            double percentPlayed = (double) playTime / gameTime;
-            amountEarned = (int) (amountEarned * percentPlayed);
             econ.depositPlayer(player.getMCPlayer(), (int) amountEarned);
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
