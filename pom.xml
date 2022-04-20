@@ -100,6 +100,12 @@
     </repositories>
 
     <dependencies>
+        <!-- Hikari -->
+    	<dependency>
+   			<groupId>com.zaxxer</groupId>
+		    <artifactId>HikariCP</artifactId>
+		    <version>5.0.1</version>
+		</dependency>
         <dependency>
     		<groupId>io.papermc.paper</groupId>
     		<artifactId>paper-api</artifactId>

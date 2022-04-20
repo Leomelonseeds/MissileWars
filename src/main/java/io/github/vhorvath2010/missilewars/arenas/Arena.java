@@ -496,10 +496,6 @@ public class Arena implements ConfigurationSerializable {
             discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + this.getName()).queue();
         }
         
-        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
-            return;
-        }
-        
         checkEmpty();
 
     }
@@ -547,7 +543,11 @@ public class Arena implements ConfigurationSerializable {
      * Checks if the game is empty, and ends game if so
      */
     public void checkEmpty() {
-
+        
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return;
+        }
+        
         if (running && redTeam != null && blueTeam != null) {
             if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
                 endGame(null);
