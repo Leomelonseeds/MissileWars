@@ -1058,31 +1058,42 @@ public class Arena implements ConfigurationSerializable {
             
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             
+            int won = 0;
+            
             // Calculate currency gain per-game
             int amountEarned = 0;
             int playerAmount = 0;
             int teamAmount = 0;
             UUID uuid = player.getMCPlayerId();
             if (!getTeam(uuid).equals("no team")) {
-                playerAmount = spawn_missile * player.getMissles() + 
+                playerAmount = spawn_missile * player.getMissiles() + 
                                use_utility * player.getUtility() +
                                kill * player.getKills();
                 if (blueTeam.containsPlayer(uuid)) {
                     teamAmount = blue_portal_amount + blue_shield_health_amount;
                     if (winningTeam == blueTeam) {
                         teamAmount += win;
+                        won = 1;
                     }
                 } else {
                     teamAmount = red_portal_amount + red_shield_health_amount;
                     if (winningTeam == redTeam) {
                         teamAmount += win;
+                        won = 1;
                     }
                 }
                 long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
                 double percentPlayed = (double) playTime / gameTime;
                 amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
+                
+                // Update player stats
+                MissileWarsPlugin.getPlugin().getSQL().updateClassicStats(uuid, won, 1, 
+                        player.getKills(), player.getMissiles(), player.getUtility());
+                MissileWarsPlugin.getPlugin().getSQL().updateExp(uuid, amountEarned);
             }
             econ.depositPlayer(player.getMCPlayer(), amountEarned);
+            
+            // Send win message
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
                 s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));

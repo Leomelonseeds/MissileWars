@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
+import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -97,11 +98,16 @@ public class ArenaManager {
         }
     }
 
-    /** Reset and save arenas from data file. */
+    /** Clean up and save arenas on server shutdown */
     public void saveArenas() {
+        // Remove all players
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.teleport(ConfigUtils.getSpawnLocation());
+            player.setGameMode(GameMode.ADVENTURE);
+        }
+        
         // Unload each Arena
         for (Arena arena : loadedArenas) {
-            arena.removePlayers();
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
 

@@ -125,7 +125,7 @@ public class MissileWarsPlayer {
      *
      * @return the number of missile spawns this {@link MissileWarsPlayer} has
      */
-    public int getMissles() {
+    public int getMissiles() {
         return missiles;
     }
     

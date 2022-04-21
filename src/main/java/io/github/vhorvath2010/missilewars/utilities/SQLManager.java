@@ -58,25 +58,87 @@ public class SQLManager {
         scheduler.runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
+                // Player table
                 try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                         """
                         CREATE TABLE IF NOT EXISTS umw_players(
                                 uuid CHAR(36) NOT NULL,
                                 inventory MEDIUMTEXT,
-                                wins INT DEFAULT 0 NOT NULL,
-                                games INT DEFAULT 0 NOT NULL,
-                                kills INT DEFAULT 0 NOT NULL,
-                                missiles INT DEFAULT 0 NOT NULL,
-                                utility INT DEFAULT 0 NOT NULL,
+                                exp INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid)
                         );
                         """
                 )) {
                     stmt.execute();
-                    logger.log(Level.INFO, "[MissileWars] Default tables have been setup!");
+                    logger.log(Level.INFO, "[MissileWars] Setup the umw_players table!");
                 } catch (SQLException e) {
-                    logger.log(Level.SEVERE, "Failed to setup the MySQL table!");
+                    logger.log(Level.SEVERE, "Failed to setup the umw_players table!");
                 }
+                
+                // Classic stats table
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        """
+                        CREATE TABLE IF NOT EXISTS umw_stats_classic(
+                                uuid CHAR(36) NOT NULL,
+                                wins INT DEFAULT 0 NOT NULL,
+                                games INT DEFAULT 0 NOT NULL,
+                                kills INT DEFAULT 0 NOT NULL,
+                                missiles INT DEFAULT 0 NOT NULL,
+                                utility INT DEFAULT 0 NOT NULL,
+                                PRIMARY KEY (uuid),
+                                FOREIGN KEY (uuid) REFERENCES umw_players(uuid) 
+                        );
+                        """
+                )) {
+                    stmt.execute();
+                    logger.log(Level.INFO, "[MissileWars] Setup the umw_stats_classic table!");
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to setup the umw_stats_classic table!");
+                }
+                
+                // CTF stats table
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        """
+                        CREATE TABLE IF NOT EXISTS umw_stats_ctf(
+                                uuid CHAR(36) NOT NULL,
+                                captures INT DEFAULT 0 NOT NULL,
+                                wins INT DEFAULT 0 NOT NULL,
+                                games INT DEFAULT 0 NOT NULL,
+                                kills INT DEFAULT 0 NOT NULL,
+                                missiles INT DEFAULT 0 NOT NULL,
+                                utility INT DEFAULT 0 NOT NULL,
+                                PRIMARY KEY (uuid),
+                                FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
+                        );
+                        """
+                )) {
+                    stmt.execute();
+                    logger.log(Level.INFO, "[MissileWars] Setup the umw_stats_ctf table!");
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to setup the umw_stats_ctf table!");
+                }
+                
+                // Domination stats table
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        """
+                        CREATE TABLE IF NOT EXISTS umw_stats_domination(
+                                uuid CHAR(36) NOT NULL,
+                                ptcaptures INT DEFAULT 0 NOT NULL,
+                                wins INT DEFAULT 0 NOT NULL,
+                                games INT DEFAULT 0 NOT NULL,
+                                kills INT DEFAULT 0 NOT NULL,
+                                missiles INT DEFAULT 0 NOT NULL,
+                                utility INT DEFAULT 0 NOT NULL,
+                                PRIMARY KEY (uuid),
+                                FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
+                        );
+                        """
+                )) {
+                    stmt.execute();
+                    logger.log(Level.INFO, "[MissileWars] Setup the umw_stats_domination table!");
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to setup the umw_stats_domination table!");
+                } 
             }
         });
     }
@@ -155,6 +217,69 @@ public class SQLManager {
                     });
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Failed to get inventory for " + Bukkit.getPlayer(uuid).getName());
+                }
+            }
+        });
+    }
+    
+    /**
+     * Updates experience value of player
+     * 
+     * @param uuid
+     * @param amount
+     */
+    public void updateExp(UUID uuid, int amount) {
+        scheduler.runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        "UPDATE umw_players SET exp = exp + ? WHERE uuid = ?;"
+                )) {
+                    stmt.setInt(1, amount);
+                    stmt.setString(2, uuid.toString());
+                    stmt.execute();
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to update experience for " + Bukkit.getPlayer(uuid).getName());
+                }
+            }
+        });
+    }
+    
+    /**
+     * Update classic gamemode stats for a player
+     * 
+     * @param uuid
+     * @param wins
+     * @param games
+     * @param kills
+     * @param missiles
+     * @param utility
+     */
+    public void updateClassicStats(UUID uuid, int wins, int games, int kills, int missiles, int utility) {
+        scheduler.runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        """
+                        INSERT INTO umw_stats_classic(uuid, wins, games, kills, missiles, utility)
+                        VALUES(?, ?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE
+                        wins = wins + VALUES(wins),
+                        games = games + VALUES(games), 
+                        kills = kills + VALUES(kills), 
+                        missiles = missiles + VALUES(missiles), 
+                        utility = utility + VALUES(utility)                    
+                        """
+                )) {
+                    stmt.setString(1, uuid.toString());
+                    stmt.setInt(2, wins);
+                    stmt.setInt(3, games);
+                    stmt.setInt(4, kills);
+                    stmt.setInt(5, missiles);
+                    stmt.setInt(6, utility);
+                    stmt.execute();
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to update stats for " + Bukkit.getPlayer(uuid).getName());
                 }
             }
         });
