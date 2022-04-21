@@ -19,7 +19,7 @@ messages:
   queue-waiting-blue: "You are now queued for &9blue&7 in position &c%umw_position%"
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
-  queue-join-error: "You cannot join %umw_team%&7 as the teams would be unbalanced."
+  queue-join-error: "You cannot join this team as the teams would be unbalanced."
   queue-join-full: "&cSorry, this team is full!"
   lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
   lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."

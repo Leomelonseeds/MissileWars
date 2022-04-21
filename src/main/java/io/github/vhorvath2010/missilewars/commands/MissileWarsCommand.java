@@ -6,8 +6,11 @@ import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameRule;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +25,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
+            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart/GameRule>");
             return true;
         }
 
@@ -69,7 +72,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
             // Validate given arena name
             if (args.length < 2) {
-                sendErrorMsg(sender, "Usage: /umw CreateArena <arena-name>");
+                sendErrorMsg(sender, "Usage: /umw CreateArena <arena-name> [capacity]");
                 return true;
             }
             String arenaName = args[1];
@@ -77,9 +80,20 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "An arena with that name already exists!");
                 return true;
             }
-
+            
+            int arenaCapacity = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
+            
+            if (args.length > 2) {
+                try {
+                    arenaCapacity = Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    sendErrorMsg(sender, "Capacity must be a number!");
+                    return true;
+                }
+            }
+            
             // Create new arena
-            if (arenaManager.createArena(arenaName)) {
+            if (arenaManager.createArena(arenaName, arenaCapacity)) {
                 sendSuccessMsg(sender, "New arena created!");
                 return true;
             } else {
@@ -88,6 +102,16 @@ public class MissileWarsCommand implements CommandExecutor {
             }
         }
         
+        // Update all arenas. Might take a while
+        if (action.equalsIgnoreCase("PerformArenaUpgrade")) {
+            if (sender instanceof Player) {
+                return false;
+            }
+            MissileWarsPlugin.getPlugin().getArenaManager().performArenaUpgrade();
+            return true;
+        }
+        
+        // Clear inventories the umw way
         if (action.equalsIgnoreCase("clear")) {
             
             if (args.length == 1) {
@@ -273,6 +297,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             return true;
         }
+        
         return true;
     }
 

@@ -13,6 +13,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -396,6 +397,16 @@ public class Arena implements ConfigurationSerializable {
         if (resetting) {
             return false;
         }
+
+        player.teleport(getPlayerSpawn(player));
+        
+        // Make sure another plugin hasn't cancelled the event
+        if (player.getWorld().getName().equals("world")) {
+            return false;
+        }
+        
+        InventoryUtils.saveInventory(player);
+        InventoryUtils.clearInventory(player);
         
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
         
@@ -406,16 +417,10 @@ public class Arena implements ConfigurationSerializable {
         ConfigUtils.sendConfigMessage("messages.joined-arena", player, this, null);
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
-        
-        if (player.getWorld().getName().equals("world")) {
-            InventoryUtils.saveInventory(player);
-            InventoryUtils.clearInventory(player);
-        }
 
         player.setHealth(20);
         player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
-        player.teleport(getPlayerSpawn(player));
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
 
@@ -429,8 +434,14 @@ public class Arena implements ConfigurationSerializable {
             scheduleStart();
         }
 
-        // Open map voting inventory
-        // openMapVote(player);
+        // Reloads citizens if they for some reason aren't present
+        if (getWorld().getEntityCount() < 4) {
+            try {
+                ((Citizens) CitizensAPI.getPlugin()).reload();
+            } catch (NPCLoadException e) {
+                Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
+            }
+        }
 
         return true;
     }
@@ -908,23 +919,15 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /** Load this Arena's world from the disk. */
-    public void loadWorldFromDisk(Boolean loadCitizens) {
+    public void loadWorldFromDisk() {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
-        // Load Citizens NPCs
-        if (loadCitizens) {
-            try {
-                ((Citizens) CitizensAPI.getPlugin()).reload();
-            } catch (NPCLoadException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /** Reset the arena world. */
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
-        loadWorldFromDisk(true);
+        loadWorldFromDisk();
         resetting = false;
         setupMapVotes();
     }
@@ -940,6 +943,8 @@ public class Arena implements ConfigurationSerializable {
             return;
         }
 
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+
         // Cancel all tasks
         for (BukkitTask task : tasks) {
             task.cancel();
@@ -948,39 +953,6 @@ public class Arena implements ConfigurationSerializable {
         resetting = true;
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
-
-        // Find players with most deaths and kills
-        List<MissileWarsPlayer> mostKills = new ArrayList<MissileWarsPlayer>();
-        List<MissileWarsPlayer> mostDeaths = new ArrayList<MissileWarsPlayer>();
-        for (MissileWarsPlayer player : players) {
-            if (!getTeam(player.getMCPlayerId()).equals("no team")) {
-                if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
-                    mostKills.clear();
-                    mostKills.add(player);
-                } else if (mostKills.get(0).getKills() == player.getKills()) {
-                    mostKills.add(player);
-                }
-                if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
-                    mostDeaths.clear();
-                    mostDeaths.add(player);
-                } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
-                    mostDeaths.add(player);
-                }
-            }
-        }
-        
-        // Produce most kills/deaths list
-        List<String> mostKillsList = new ArrayList<String>();
-        for (MissileWarsPlayer player : mostKills) {
-            mostKillsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_kills = String.join(", ", mostKillsList);
-        
-        List<String> mostDeathsList = new ArrayList<String>();
-        for (MissileWarsPlayer player : mostDeaths) {
-            mostDeathsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_deaths = String.join(", ", mostDeathsList);
         
         // Produce winner/discord messages
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
@@ -1032,6 +1004,7 @@ public class Arena implements ConfigurationSerializable {
         
         discordChannel.sendMessage(discordMessage).queue();
         
+        // Setup player variables
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages.classic-end", null, null, null);
         FileConfiguration ranksConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "ranks.yml");
@@ -1049,11 +1022,45 @@ public class Arena implements ConfigurationSerializable {
         
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
+
+        // Find players with most deaths and kills
+        List<MissileWarsPlayer> mostKills = new ArrayList<MissileWarsPlayer>();
+        List<MissileWarsPlayer> mostDeaths = new ArrayList<MissileWarsPlayer>();
+        for (MissileWarsPlayer player : players) {
+            if (!getTeam(player.getMCPlayerId()).equals("no team")) {
+                if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
+                    mostKills.clear();
+                    mostKills.add(player);
+                } else if (mostKills.get(0).getKills() == player.getKills()) {
+                    mostKills.add(player);
+                }
+                if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
+                    mostDeaths.clear();
+                    mostDeaths.add(player);
+                } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
+                    mostDeaths.add(player);
+                }
+            }
+        }
+        
+        // Produce most kills/deaths list
+        List<String> mostKillsList = new ArrayList<String>();
+        for (MissileWarsPlayer player : mostKills) {
+            mostKillsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
+        }
+        String most_kills = String.join(", ", mostKillsList);
+        
+        List<String> mostDeathsList = new ArrayList<String>();
+        for (MissileWarsPlayer player : mostDeaths) {
+            mostDeathsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
+        }
+        String most_deaths = String.join(", ", mostDeathsList);
         
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
         long gameTime = Duration.between(startTime, endTime).toSeconds();
-
+        
+        // Update stats for each player
         for (MissileWarsPlayer player : players) {
             
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
@@ -1104,8 +1111,7 @@ public class Arena implements ConfigurationSerializable {
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
             }
         }
-
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
 
         // Remove all players after a short time or immediately if none exist

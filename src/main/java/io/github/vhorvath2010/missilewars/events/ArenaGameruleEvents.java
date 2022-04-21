@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -216,6 +218,14 @@ public class ArenaGameruleEvents implements Listener {
 
         // Register block break
         possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), true);
+    }
+    
+    /** Stop chickens spawning from eggs */
+    @EventHandler
+    public void onEgg(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() == SpawnReason.EGG) {
+            event.setCancelled(true);
+        }
     }
 
 }

@@ -52,7 +52,9 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
@@ -94,7 +96,7 @@ public class ArenaManager {
         assert loadedArenas != null;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
-            arena.loadWorldFromDisk(false);
+            arena.loadWorldFromDisk();
         }
     }
 
@@ -150,13 +152,13 @@ public class ArenaManager {
             logger.log(Level.WARNING, "An arena with players in it cannot be deleted");
             return false;
         }
-        // Load chunks so citizens can be removed properly
-        arenaWorld.setChunkForceLoaded(4, 0, true);
-        arenaWorld.setChunkForceLoaded(5, 0, true);
-        arenaWorld.setChunkForceLoaded(6, 0, true);
-        arenaWorld.setChunkForceLoaded(4, -1, true);
-        arenaWorld.setChunkForceLoaded(5, -1, true);
-        arenaWorld.setChunkForceLoaded(6, -1, true);
+        // Reload citizens to load chunks
+        try {
+            logger.log(Level.INFO, "Reloading citizens to properly remove them...");
+            ((Citizens) CitizensAPI.getPlugin()).reload();
+        } catch (NPCLoadException e) {
+            logger.log(Level.INFO, "Reloading citizens failed somehow :(");
+        }
         for (Entity entity : arenaWorld.getEntities()) {
             if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
                 logger.log(Level.INFO, "Citizen with UUID " + entity.getUniqueId() + " deleted.");
@@ -182,6 +184,25 @@ public class ArenaManager {
             logger.log(Level.WARNING, "Arena file couldn't be saved!");
         }
         return true;
+    }
+    
+    /**
+     * Deletes and re-creates all arenas to implement new settings
+     */
+    public void performArenaUpgrade() {
+        Logger logger = Bukkit.getLogger();
+        // If players are in arenas, don't do it
+        if (Bukkit.getOnlinePlayers().size() != Bukkit.getWorld("world").getPlayerCount()) {
+            logger.log(Level.WARNING, "Some players are in arenas!");
+            return;
+        }
+        logger.log(Level.INFO, "Performing arena upgrades. This might take a while!");
+        for (Arena arena : new ArrayList<Arena>(getLoadedArenas())) {
+            String name = arena.getName();
+            int capacity = arena.getCapacity();
+            removeArena(arena);
+            createArena(name, capacity);
+        }
     }
 
 
@@ -259,7 +280,7 @@ public class ArenaManager {
      * @param creator the creator of the world
      * @return true if the Arena was created, otherwise false
      */
-    public boolean createArena(String name) {
+    public boolean createArena(String name, int capacity) {
         
     	Logger logger = Bukkit.getLogger();
     	
@@ -286,6 +307,8 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.KEEP_INVENTORY, true);
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         arenaWorld.setGameRule(GameRule.NATURAL_REGENERATION, false);
+        arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
+        arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"), 
                 plugin.getConfig().getInt("worldborder.center.z"));
@@ -359,6 +382,8 @@ public class ArenaManager {
         profession.setProfession(Villager.Profession.NITWIT);
         bartender.data().setPersistent(NPC.SILENT_METADATA, true);
         logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
+        
+        CitizensAPI.getNPCRegistry().saveToStore();
 
         // Spawn barrier wall
         FileConfiguration settings = plugin.getConfig();
@@ -372,7 +397,7 @@ public class ArenaManager {
         }
 
         // Register arena
-        Arena arena = new Arena(name, settings.getInt("arena-cap"));
+        Arena arena = new Arena(name, capacity);
         loadedArenas.add(arena);
 
         // Setup regions

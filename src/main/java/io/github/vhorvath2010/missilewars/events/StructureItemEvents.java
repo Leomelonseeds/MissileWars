@@ -23,6 +23,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -189,13 +190,13 @@ public class StructureItemEvents implements Listener {
     /** Handle projectile items structure creation */
     @EventHandler
     public void useProjectile(ProjectileLaunchEvent event) {
-        // Ensure we are tracking a snowball thrown by a player
+        // Ensure we are tracking a utility thrown by a player
         if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
               event.getEntity().getType() == EntityType.EGG ||
               event.getEntity().getType() == EntityType.ENDER_PEARL)) {
             return;
         }
-        Projectile thrown = (Projectile) event.getEntity();
+        Projectile thrown = event.getEntity();
         if (!(thrown.getShooter() instanceof Player)) {
             return;
         }
@@ -220,33 +221,74 @@ public class StructureItemEvents implements Listener {
             @Override
             public void run() {
                 if (!thrown.isDead()) {
-                    // Spawn shield at current location and remove snowball
-                    Location spawnLoc = thrown.getLocation();
-                    String mapName = "default-map";
-                    if (playerArena.getMapName() != null) {
-                        mapName = playerArena.getMapName();
-                    }
-                    if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
-                        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
-                        String sound = "none";
-                        if (structureName.contains("shield_") || structureName.contains("platform")) {
-                            sound = "spawn-shield";
-                        } else if (structureName.contains("torpedo")) {
-                            sound = "spawn-torpedo";
-                        } else if (structureName.contains("obsidian_")) {
-                            sound = "spawn-obsidian-shield";
-                            clearObsidianShield(thrower, spawnLoc, isRedTeam(thrower), mapName);
-                        }
-                        for (Player players : thrower.getWorld().getPlayers()) {
-                            ConfigUtils.sendConfigSound(sound, players, spawnLoc);
-                        }
-                    } else {
-                        ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
-                    }
-                    thrown.remove();
+                    spawnUtility(structureName, thrown.getLocation(), thrower, thrown, playerArena);
                 }
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
+    }
+    
+    /** Utility should go through players */
+    @EventHandler
+    public void handleUtilityCollisions(ProjectileHitEvent event) {
+        // Ensure we are tracking a utility thrown by a player
+        if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
+              event.getEntity().getType() == EntityType.EGG ||
+              event.getEntity().getType() == EntityType.ENDER_PEARL)) {
+            return;
+        }
+        
+        Projectile thrown = event.getEntity();
+        
+        // Make sure a player threw this projectile
+        if (!(thrown.getShooter() instanceof Player)) {
+            return;
+        }
+        
+        // If it has a custom name, it definitely is a missile wars item
+        if (thrown.getCustomName() == null) {
+            return;
+        }
+        
+        // Make sure it's in an arena
+        Player thrower = (Player) thrown.getShooter();
+        Arena playerArena = getPlayerArena(thrower);
+        if (playerArena == null) {
+            return;
+        }
+        
+        // Make them go through entities
+        if (event.getHitEntity() != null) {
+            event.setCancelled(true);
+            return;
+        }
+    }
+    
+    /** Handle spawning of utility structures */
+    public void spawnUtility(String structureName, Location spawnLoc, Player thrower, Projectile thrown, Arena playerArena) {
+        String mapName = "default-map";
+        if (playerArena.getMapName() != null) {
+            mapName = playerArena.getMapName();
+        }
+        if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
+            playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
+            String sound = "none";
+            if (structureName.contains("shield_") || structureName.contains("platform")) {
+                sound = "spawn-shield";
+            } else if (structureName.contains("torpedo")) {
+                sound = "spawn-torpedo";
+            } else if (structureName.contains("obsidian_")) {
+                sound = "spawn-obsidian-shield";
+                clearObsidianShield(thrower, spawnLoc, isRedTeam(thrower), mapName, playerArena);
+            }
+            for (Player players : thrower.getWorld().getPlayers()) {
+                ConfigUtils.sendConfigSound(sound, players, spawnLoc);
+            }
+        } else {
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
+        }
+        if (!thrown.isDead()) {
+            thrown.remove();
+        }
     }
     
     /** Handle projectile item utility creation */
@@ -288,6 +330,7 @@ public class StructureItemEvents implements Listener {
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
     }
     
+    /** Handle spawning of splash waters */
     @EventHandler
     public void handleSplash(ProjectileHitEvent event) {
         
@@ -338,7 +381,8 @@ public class StructureItemEvents implements Listener {
         
     }
     
-    public void clearObsidianShield(Player thrower, Location location, Boolean red, String mapName) {
+    /** Clears obsidian shield after a certain amount of time */
+    public void clearObsidianShield(Player thrower, Location location, Boolean red, String mapName, Arena playerArena) {
         
         // Insert code for detecting obsidian shield duration here
         int duration = 10 * 2;
@@ -347,15 +391,17 @@ public class StructureItemEvents implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (finalDuration == duration) {
-                        SchematicManager.spawnNBTStructure("obsidian_shield_clear", location, red, mapName);
-                        for (Player player : thrower.getWorld().getPlayers()) {
-                            ConfigUtils.sendConfigSound("break-obsidian-shield", player, location); 
+                    if (playerArena.isRunning()) {
+                        if (finalDuration == duration) {
+                            SchematicManager.spawnNBTStructure("obsidian_shield_clear", location, red, mapName);
+                            for (Player player : thrower.getWorld().getPlayers()) {
+                                ConfigUtils.sendConfigSound("break-obsidian-shield", player, location); 
+                            }
+                        } else if (finalDuration % 2 == 0) {
+                            SchematicManager.spawnNBTStructure("obsidian_shield_deplete", location, red, mapName);
+                        } else {
+                            SchematicManager.spawnNBTStructure("obsidian_shield", location, red, mapName);
                         }
-                    } else if (finalDuration % 2 == 0) {
-                        SchematicManager.spawnNBTStructure("obsidian_shield_deplete", location, red, mapName);
-                    } else {
-                        SchematicManager.spawnNBTStructure("obsidian_shield", location, red, mapName);
                     }
                 }          
             }.runTaskLater(MissileWarsPlugin.getPlugin(), i * 10L);
