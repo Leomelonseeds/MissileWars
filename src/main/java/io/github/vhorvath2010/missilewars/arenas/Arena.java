@@ -406,6 +406,11 @@ public class Arena implements ConfigurationSerializable {
         ConfigUtils.sendConfigMessage("messages.joined-arena", player, this, null);
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
+        
+        if (player.getWorld().getName().equals("world")) {
+            InventoryUtils.saveInventory(player);
+            InventoryUtils.clearInventory(player);
+        }
 
         player.setHealth(20);
         player.setFoodLevel(20);
@@ -413,7 +418,6 @@ public class Arena implements ConfigurationSerializable {
         player.teleport(getPlayerSpawn(player));
         player.setBedSpawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
-        InventoryUtils.clearInventory(player);
 
         for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);

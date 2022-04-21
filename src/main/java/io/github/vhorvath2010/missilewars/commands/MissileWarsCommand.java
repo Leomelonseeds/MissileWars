@@ -4,6 +4,7 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -83,6 +84,30 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             } else {
                 sendErrorMsg(sender, "Something went wrong creating the arena. Notify an admin.");
+                return true;
+            }
+        }
+        
+        if (action.equalsIgnoreCase("clear")) {
+            
+            if (args.length == 1) {
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    InventoryUtils.clearInventory(player);
+                    sendSuccessMsg(sender, "Inventory cleared!");
+                    return true;
+                } else {
+                    sendSuccessMsg(sender, "Must specify a target.");
+                    return true;
+                }
+            } else if (args.length == 2) {
+                Player target = getCommandTarget(args, sender);
+                if (target == null) {
+                    sendErrorMsg(sender, "No target found!");
+                    return true;
+                }
+                
+                InventoryUtils.clearInventory(target);
                 return true;
             }
         }

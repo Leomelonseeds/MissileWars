@@ -61,17 +61,20 @@ import net.citizensnpcs.trait.VillagerProfession;
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
 
+    private MissileWarsPlugin plugin;
+    
     /** A list of all loaded arenas. */
     private List<Arena> loadedArenas;
 
     /** Default constructor */
-    public ArenaManager() {
+    public ArenaManager(MissileWarsPlugin plugin) {
+        this.plugin = plugin;
         loadedArenas = new ArrayList<>();
     }
 
     /** Load arenas from data file */
     public void loadArenas() {
-        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
 
         // Acquire arenas from data file
         if (arenaFile.exists()) {
@@ -103,7 +106,7 @@ public class ArenaManager {
         }
 
         // Save Arenas to file
-        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
         FileConfiguration arenaConfig = new YamlConfiguration();
         arenaConfig.set("arenas", loadedArenas);
         try {
@@ -164,7 +167,7 @@ public class ArenaManager {
         }
         loadedArenas.remove(arena);
         // Remove arena from file
-        File arenaFile = new File(MissileWarsPlugin.getPlugin().getDataFolder(), "arenas.yml");
+        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
         FileConfiguration arenaConfig = new YamlConfiguration();
         arenaConfig.set("arenas", loadedArenas);
         try {
@@ -213,7 +216,7 @@ public class ArenaManager {
      */
     private void createWaitingLobby(String team, Arena arena, ProtectedRegion parent) {
         // Setup region
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
                 .toString(), "maps.yml");
         WorldGuard wg = WorldGuard.getInstance();
         Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min", null, null);
@@ -233,10 +236,7 @@ public class ArenaManager {
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.PVP, StateFlag.State.ALLOW);
         Set<String> leaveCommands = new HashSet<>();
-        leaveCommands.add("/minecraft:item replace entity %username% armor.legs with air");
-        leaveCommands.add("/minecraft:item replace entity %username% armor.chest with air");
-        leaveCommands.add("/minecraft:item replace entity %username% armor.feet with air");
-        leaveCommands.add("/clear %username%");
+        leaveCommands.add("/umw clear %username%");
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_EXIT, leaveCommands);
         try {
             lobbyRegion.setParent(parent);
@@ -254,8 +254,7 @@ public class ArenaManager {
      * @return true if the Arena was created, otherwise false
      */
     public boolean createArena(String name) {
-    	
-    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        
     	Logger logger = Bukkit.getLogger();
     	
         // Ensure arena world doesn't exist
@@ -356,7 +355,7 @@ public class ArenaManager {
         logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
 
         // Spawn barrier wall
-        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
+        FileConfiguration settings = plugin.getConfig();
         int length = settings.getInt("barrier.length");
         int x = settings.getInt("barrier.center.x");
         int zCenter = settings.getInt("barrier.center.z");

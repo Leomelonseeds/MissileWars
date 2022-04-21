@@ -15,7 +15,7 @@ import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
-/** Class for managing arena leaving. */
+/** Class for managing arena leaving and joining. */
 public class ArenaLeaveEvents implements Listener {
 
     /** Remove player from Arena if they DC. */
@@ -39,7 +39,10 @@ public class ArenaLeaveEvents implements Listener {
     	if (!player.getWorld().getName().equals("world")) {
     		return;
     	}
-    	InventoryUtils.loadInventory(player);
+    	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId());
+    	if (player.hasPlayedBefore()) {
+    	    InventoryUtils.loadInventory(player);
+    	} 
     }
 
     /** Remove player from Arena if they leave the world.
@@ -55,23 +58,8 @@ public class ArenaLeaveEvents implements Listener {
 	        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
 	            return;
 	        }   
-	        
 	        playerArena.removePlayer(player.getUniqueId());
-	        
-	        if (player.getWorld().getName().equals("world")) {
-	        	InventoryUtils.loadInventory(player);
-	        }
-	        
-	        return;
         }
-
+    }   
         
-        if (event.getFrom().getName().equals("world") && 
-    		player.getWorld().getName().contains("mwarena")) {
-        	InventoryUtils.saveInventory(player);
-        	InventoryUtils.clearInventory(player);
-        	return;
-        }
-    }
-
 }
