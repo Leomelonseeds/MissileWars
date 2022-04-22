@@ -52,9 +52,9 @@ messages:
     - "&a&lWINNER &7- %umw_winning_team%"
     - "&cMost Kills (%umw_most_kills_amount%): %umw_most_kills%"
     - "&eMost Deaths (%umw_most_deaths_amount%): %umw_most_deaths%"
-    - "&aYou earned %umw_amount_earned% mokens this game."
     - "&fThanks for playing!"
     - "&b========================================"
+  earn-currency: "&7You earned &c%umw_amount_earned% &amokens &7and &6experience &7this game."
     
 titles:
   # Should be sent to players who join in the middle of a game as well

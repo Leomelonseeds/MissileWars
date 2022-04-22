@@ -25,7 +25,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart/GameRule>");
+            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/Leave/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
             return true;
         }
 

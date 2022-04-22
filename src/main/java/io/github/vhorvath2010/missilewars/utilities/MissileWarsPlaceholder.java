@@ -33,8 +33,14 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, String params) {
         
+        // Stop trying to fetch placeholders if the plugin is disabled
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return null;
+        }
+        
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
+        DecimalFormat df = new DecimalFormat("##.##");
 
         // General purpose placeholders
         if (params.equalsIgnoreCase("focus")) {
@@ -44,6 +50,61 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("team")) {
             return playerArena == null ? "no team" : ChatColor.stripColor(playerArena.getTeam(player.getUniqueId()));
         } 
+        
+        // Rank placeholders
+        if (params.contains("rank")) {
+            
+            int exp = MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId());
+            int level = RankUtils.getRankLevel(exp);
+            int max = 10;
+            
+            if (params.equalsIgnoreCase("rank_exp_total")) {
+                return Integer.toString(exp);
+            }
+            
+            if (params.equalsIgnoreCase("rank_name")) {
+                return RankUtils.getRankName(exp);
+            }
+            
+            if (params.equalsIgnoreCase("rank_symbol")) {
+                return RankUtils.getRankSymbol(exp);
+            }
+            
+            if (params.equalsIgnoreCase("rank_exp")) {
+                if (level >= max) {
+                    return "0";
+                }
+                return Integer.toString(RankUtils.getCurrentExp(exp));
+            }
+            
+            if (params.equalsIgnoreCase("rank_exp_next")) {
+                if (level >= max) {
+                    return "N/A";
+                }
+                return Integer.toString(RankUtils.getNextExp(exp));
+            }
+            
+            if (params.equalsIgnoreCase("rank_progress_percentage")) {
+                if (level >= max) {
+                    return "0%";
+                }
+                return df.format(RankUtils.getExpProgress(exp) * 100) + "%";
+            }
+            
+            if (params.equalsIgnoreCase("rank_progress_bar")) {
+                int size = 20;
+                if (level >= max) {
+                    String result = "";
+                    for (int i = 0; i < size; i++) {
+                        result = result + "|";
+                    }
+                    return ChatColor.GRAY + result;
+                }
+                return RankUtils.getProgressBar(exp, 20);
+            }
+            
+            return null;
+        }
         
         if (playerArena == null) {
             return null;
@@ -78,7 +139,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         // In-Game placeholders
-        DecimalFormat df = new DecimalFormat("##.##");
         MissileWarsTeam redTeam = playerArena.getRedTeam();
         MissileWarsTeam blueTeam = playerArena.getBlueTeam();
         

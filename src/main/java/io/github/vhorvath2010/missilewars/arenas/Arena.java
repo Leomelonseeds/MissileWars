@@ -1006,6 +1006,7 @@ public class Arena implements ConfigurationSerializable {
         
         // Setup player variables
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages.classic-end", null, null, null);
+        String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
         FileConfiguration ranksConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "ranks.yml");
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
@@ -1065,6 +1066,16 @@ public class Arena implements ConfigurationSerializable {
             
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             
+            // Send win message
+            for (String s : winningMessages) {
+                s = s.replaceAll("%umw_winning_team%", winner);
+                s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));
+                s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(mostDeaths.get(0).getDeaths()));
+                s = s.replaceAll("%umw_most_kills%", most_kills);
+                s = s.replaceAll("%umw_most_deaths%", most_deaths);
+                player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
+            }
+            
             int won = 0;
             
             // Calculate currency gain per-game
@@ -1097,19 +1108,11 @@ public class Arena implements ConfigurationSerializable {
                 MissileWarsPlugin.getPlugin().getSQL().updateClassicStats(uuid, won, 1, 
                         player.getKills(), player.getMissiles(), player.getUtility());
                 MissileWarsPlugin.getPlugin().getSQL().updateExp(uuid, amountEarned);
+                
+                String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
+                player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
             }
             econ.depositPlayer(player.getMCPlayer(), amountEarned);
-            
-            // Send win message
-            for (String s : winningMessages) {
-                s = s.replaceAll("%umw_winning_team%", winner);
-                s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));
-                s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(mostDeaths.get(0).getDeaths()));
-                s = s.replaceAll("%umw_most_kills%", most_kills);
-                s = s.replaceAll("%umw_most_deaths%", most_deaths);
-                s = s.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-                player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
-            }
         }
         
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;

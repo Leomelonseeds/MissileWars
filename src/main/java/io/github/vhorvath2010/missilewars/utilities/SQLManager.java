@@ -285,6 +285,30 @@ public class SQLManager {
         });
     }
     
+
+    
+    /**
+     * Gets player exp value from the database
+     * 
+     * @param uuid
+     */
+    public int getExp(UUID uuid) {
+        int exp = 0;
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                "SELECT exp FROM umw_players WHERE uuid = ?;"
+        )) {
+            stmt.setString(1, uuid.toString());
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                exp = resultSet.getInt("exp");
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get exp for " + Bukkit.getPlayer(uuid).getName());
+            return 0;
+        }
+        return exp;
+    }
+    
     /**
      * Closes everything in case it isn't closed.
      */
