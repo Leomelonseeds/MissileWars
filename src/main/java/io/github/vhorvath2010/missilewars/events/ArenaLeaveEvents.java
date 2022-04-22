@@ -14,6 +14,7 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
+import io.github.vhorvath2010.missilewars.utilities.RankUtils;
 
 /** Class for managing arena leaving and joining. */
 public class ArenaLeaveEvents implements Listener {
@@ -43,6 +44,7 @@ public class ArenaLeaveEvents implements Listener {
     	if (player.hasPlayedBefore()) {
     	    InventoryUtils.loadInventory(player);
     	} 
+    	RankUtils.setPlayerExpBar(player);
     }
 
     /** Remove player from Arena if they leave the world.
@@ -60,6 +62,5 @@ public class ArenaLeaveEvents implements Listener {
 	        }   
 	        playerArena.removePlayer(player.getUniqueId());
         }
-    }   
-        
+    }     
 }

@@ -41,6 +41,7 @@ import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
+import io.github.vhorvath2010.missilewars.utilities.RankUtils;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -505,6 +506,7 @@ public class Arena implements ConfigurationSerializable {
         	mcPlayer.setGameMode(GameMode.ADVENTURE);
         	InventoryUtils.loadInventory(mcPlayer);
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
+            RankUtils.setPlayerExpBar(mcPlayer);
             
             // Notify discord
             TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
@@ -1106,7 +1108,7 @@ public class Arena implements ConfigurationSerializable {
                 
                 // Update player stats
                 MissileWarsPlugin.getPlugin().getSQL().updateClassicStats(uuid, won, 1, 
-                        player.getKills(), player.getMissiles(), player.getUtility());
+                        player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
                 MissileWarsPlugin.getPlugin().getSQL().updateExp(uuid, amountEarned);
                 
                 String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));

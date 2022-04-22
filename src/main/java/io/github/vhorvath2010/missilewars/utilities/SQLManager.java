@@ -85,6 +85,7 @@ public class SQLManager {
                                 kills INT DEFAULT 0 NOT NULL,
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
+                                deaths INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid) 
                         );
@@ -107,6 +108,7 @@ public class SQLManager {
                                 kills INT DEFAULT 0 NOT NULL,
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
+                                deaths INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
                         );
@@ -129,6 +131,7 @@ public class SQLManager {
                                 kills INT DEFAULT 0 NOT NULL,
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
+                                deaths INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
                         );
@@ -255,20 +258,21 @@ public class SQLManager {
      * @param missiles
      * @param utility
      */
-    public void updateClassicStats(UUID uuid, int wins, int games, int kills, int missiles, int utility) {
+    public void updateClassicStats(UUID uuid, int wins, int games, int kills, int missiles, int utility, int deaths) {
         scheduler.runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
                 try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                         """
                         INSERT INTO umw_stats_classic(uuid, wins, games, kills, missiles, utility)
-                        VALUES(?, ?, ?, ?, ?, ?)
+                        VALUES(?, ?, ?, ?, ?, ?, ?)
                         ON DUPLICATE KEY UPDATE
                         wins = wins + VALUES(wins),
                         games = games + VALUES(games), 
                         kills = kills + VALUES(kills), 
                         missiles = missiles + VALUES(missiles), 
-                        utility = utility + VALUES(utility)                    
+                        utility = utility + VALUES(utility), 
+                        deaths = deaths + VALUES(deaths)                   
                         """
                 )) {
                     stmt.setString(1, uuid.toString());
@@ -277,6 +281,7 @@ public class SQLManager {
                     stmt.setInt(4, kills);
                     stmt.setInt(5, missiles);
                     stmt.setInt(6, utility);
+                    stmt.setInt(7, deaths);
                     stmt.execute();
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Failed to update stats for " + Bukkit.getPlayer(uuid).getName());
@@ -288,11 +293,11 @@ public class SQLManager {
 
     
     /**
-     * Gets player exp value from the database
+     * Gets player exp value from the database in sync
      * 
      * @param uuid
      */
-    public int getExp(UUID uuid) {
+    public int getExpSync(UUID uuid) {
         int exp = 0;
         try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                 "SELECT exp FROM umw_players WHERE uuid = ?;"
@@ -304,9 +309,42 @@ public class SQLManager {
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to get exp for " + Bukkit.getPlayer(uuid).getName());
-            return 0;
         }
         return exp;
+    }
+    
+    /**
+     * Gets player exp value from database
+     * 
+     * @param uuid
+     * @param callback
+     */
+    public void getExp(UUID uuid, DBCallback callback) {
+        scheduler.runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        "SELECT exp FROM umw_players WHERE uuid = ?;"
+                )) {
+                    stmt.setString(1, uuid.toString());
+                    ResultSet resultSet = stmt.executeQuery();
+                    int exp = 0;
+                    if (resultSet.next()) {
+                        exp = resultSet.getInt("exp");
+                    }
+                    int finalExp = exp;
+                    scheduler.runTask(plugin, new Runnable() {  
+                        @Override
+                        public void run() {
+                            callback.onQueryDone(finalExp);
+                        }
+                        
+                    });
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to get exp for " + Bukkit.getPlayer(uuid).getName());
+                }
+            }
+        });
     }
     
     /**

@@ -1,6 +1,7 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import net.md_5.bungee.api.ChatColor;
@@ -8,11 +9,16 @@ import net.md_5.bungee.api.ChatColor;
 public class RankUtils {
     
     /**
-     * Convert rank level to total exp
+     * Function for converting rank level to exp required for next level
+     * Changing this function changes the whole rank system
      * 
-     * @return rank level -> exp
+     * @param x
+     * @return exp required to get to level x+1
      */
     private static int f(int x) {
+        if (x < 0) {
+            return 0;
+        }
         return 500 * x * x + 250;
     }
     
@@ -23,21 +29,40 @@ public class RankUtils {
      * @return the rank level
      */
     public static int getRankLevel(int exp) {
-        if (exp < 250) {
-            return 0;
+        
+        int total = 0;
+        for (int i = 0; i <= 10; i++) {
+            total = total + f(i);
+            if (total > exp) {
+                return i;
+            }
         }
-        return Math.min(10, (int) Math.floor(Math.sqrt((exp - 250)/500)));
+        return 0;
+    }
+    
+    /**
+     * Get total exp required to reach given level
+     * 
+     * @param rank
+     * @return int
+     */
+    public static int getTotalToLevel(int rank) {
+        int total = 0;
+        for (int i = rank - 1; i >= 0; i--) {
+            total = total + f(i);
+        }
+        return total;
     }
     
     /**
      * Gets the exp required to reach the next level
      * 
      * @param rank
-     * @return the exp required for the NEXT level
+     * @return the exp required for the next level
      */
     public static int getNextExp(int exp) {
         int current = getRankLevel(exp);
-        return f(current + 1) - f(current);
+        return f(current);
     }
     
     /**
@@ -48,7 +73,7 @@ public class RankUtils {
      */
     public static int getCurrentExp(int exp) {
         int current = getRankLevel(exp);
-        return exp - f(current);
+        return exp - getTotalToLevel(current);
     }
     
     /**
@@ -106,5 +131,24 @@ public class RankUtils {
         String rankColor = rankConfig.getString("ranks." + rank + ".color");
         String rankSymbol = rankConfig.getString("ranks." + rank + ".symbol");
         return ChatColor.translateAlternateColorCodes('&', rankColor + rankSymbol);
+    }
+    
+    /**
+     * Sets player current experience level
+     * 
+     * @param player
+     * @param exp
+     */
+    public static void setPlayerExpBar(Player player) {
+        MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId(), new DBCallback() {
+            @Override
+            public void onQueryDone(Object result) {
+                int exp = (int) result;
+                int rank = getRankLevel(exp);
+                double progress = getExpProgress(exp);
+                player.setLevel(rank);
+                player.setExp((float) progress);
+            }
+        });
     }
 }

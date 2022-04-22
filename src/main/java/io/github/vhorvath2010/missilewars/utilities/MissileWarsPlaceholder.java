@@ -54,7 +54,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         // Rank placeholders
         if (params.contains("rank")) {
             
-            int exp = MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId());
+            int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
             int level = RankUtils.getRankLevel(exp);
             int max = 10;
             
@@ -91,8 +91,9 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return df.format(RankUtils.getExpProgress(exp) * 100) + "%";
             }
             
-            if (params.equalsIgnoreCase("rank_progress_bar")) {
-                int size = 20;
+            if (params.contains("rank_progress_bar")) {
+                String[] args = params.split("_");
+                int size = Integer.parseInt(args[3]);
                 if (level >= max) {
                     String result = "";
                     for (int i = 0; i < size; i++) {
@@ -100,7 +101,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                     }
                     return ChatColor.GRAY + result;
                 }
-                return RankUtils.getProgressBar(exp, 20);
+                return RankUtils.getProgressBar(exp, size);
             }
             
             return null;
