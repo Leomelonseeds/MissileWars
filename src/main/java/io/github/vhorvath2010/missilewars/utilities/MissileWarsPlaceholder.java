@@ -1,6 +1,9 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -112,7 +115,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
         
-        // Stats placeholders
+        // Stats placeholders. Includes top 10 placeholders, which includes top 10 exp values.
         if (params.contains("stats")) {
             
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
@@ -125,12 +128,17 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return Integer.toString(sql.getStatSync(player.getUniqueId(), gamemode, stat));
             }
             
-            
-            // stats_[gamemode/overall]_[stat]_top_#_player
-            // Gets the player name of a top stat
-            
-            // stats_[gamemode/overall]_[stat]_top_#_stat
-            // Gets the statistic number of a top stat
+            // Args length must be 4 now, since we are looking for a top stat
+            // stats_[gamemode/overall]_[stat]_top_#
+            // a formatted entry for a leaderboard spot
+            // # can be 1-10, nothing more or error
+            if (args[3].equals("top")) {
+                List<ArrayList<Object>> list = sql.getTopTenStat(stat, gamemode);
+                int index = Integer.parseInt(args[4]) - 1;
+                String playerName = RankUtils.getLeaderboardPlayer((OfflinePlayer) list.get(index).get(0));
+                String playerStat = Integer.toString((int) list.get(index).get(1));
+                return ChatColor.translateAlternateColorCodes('&', playerName + " &7- &f" + playerStat);
+            }
             
             // stats_[gamemode/overall]_[stat]_rank
             // Gets the player position in for that stat

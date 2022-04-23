@@ -4,13 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -372,6 +375,138 @@ public class SQLManager {
         });
     }
     
+    /*
+    public int getStatRank(UUID uuid, String stat, String gamemode) {
+        
+    }
+    
+    public int getOverallStatRank(UUID uuid, String stat) {
+        
+    }
+    
+    public int getPlayerStatRank();
+    
+    public int getGamemodeStatRank();*/
+    
+    /**
+     * The main method of getting the top 10 list for a certain statistic.
+     * Here, the statistic can also be exp or winstreak.
+     * 
+     * @param stat
+     * @param gamemode
+     * @return An arraylist of player and integer for top ten
+     */
+    public List<ArrayList<Object>> getTopTenStat(String stat, String gamemode) {
+        
+        // Case for overall stat
+        if (gamemode.equalsIgnoreCase("overall")) {
+            
+            if (stat.equalsIgnoreCase("exp") || stat.equalsIgnoreCase("winstreak")) {
+                return getTopTenPlayerStat(stat);
+            }
+            
+            return getTopTenOverallStat(stat);
+        }
+        
+        // Otherwise,
+        return getTopTenGamemodeStat(stat, gamemode);
+    }
+    
+    private List<ArrayList<Object>> getTopTenGamemodeStat(String stat, String gamemode){
+        
+        List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+        String query = "SELECT uuid, $1 FROM umw_stats_$2 ORDER BY $1 DESC LIMIT 10";
+        query = query.replace("$1", stat);
+        query = query.replace("$2", gamemode);
+        
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                query
+        )) {
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                ArrayList<Object> temp = new ArrayList<Object>();
+                
+                String uuid = resultSet.getString("uuid");
+                int statistic = resultSet.getInt(stat);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                
+                temp.add(player);
+                temp.add(statistic);
+                result.add(temp);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get top 10 " + gamemode + " " + stat + ".");
+        }
+        
+        return result;
+    }
+    
+    private List<ArrayList<Object>> getTopTenPlayerStat(String stat) {
+        
+        List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+        String query = "SELECT uuid, $1 FROM umw_players ORDER BY $1 DESC LIMIT 10";
+        query = query.replace("$1", stat);
+        
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                query
+        )) {
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                ArrayList<Object> temp = new ArrayList<Object>();
+                
+                String uuid = resultSet.getString("uuid");
+                int statistic = resultSet.getInt(stat);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                
+                temp.add(player);
+                temp.add(statistic);
+                result.add(temp);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get top 10 player " + stat + " stat.");
+        }
+        return result;
+    }
+    
+    private List<ArrayList<Object>> getTopTenOverallStat(String stat) {
+        
+        List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+        String query = """
+                       SELECT players.uuid,
+                       (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) + 
+                       (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) + 
+                       (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END) AS $1
+                       FROM umw_players players
+                       LEFT JOIN umw_stats_classic a
+                       ON players.uuid = a.uuid
+                       LEFT JOIN umw_stats_ctf b
+                       ON a.uuid = b.uuid
+                       LEFT JOIN umw_stats_domination c
+                       ON b.uuid = c.uuid
+                       ORDER BY $1 DESC LIMIT 10;
+                       """.replace("$1", stat);
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                query
+        )) {
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                ArrayList<Object> temp = new ArrayList<Object>();
+                
+                String uuid = resultSet.getString("uuid");
+                int statistic = resultSet.getInt(stat);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                
+                temp.add(player);
+                temp.add(statistic);
+                result.add(temp);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get top 10 overall " + stat + " stat.");
+        }
+        return result;
+        
+    }
+    
     /**
      * The main method to find a statistic for a player
      * Find a statistic for a gamemode in sync
@@ -546,6 +681,31 @@ public class SQLManager {
                 }
             }
         });
+    }
+    
+    /**
+     * Gets a player nickname from the Chatcontrol database.
+     * this feels illegal to be honest
+     * 
+     * @param uuid
+     * @return 
+     */
+    public String getPlayerNick(UUID uuid) {
+        String nick = Bukkit.getOfflinePlayer(uuid).getName();
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                "SELECT Nick FROM ChatControl WHERE uuid = ?;"
+        )) {
+            stmt.setString(1, uuid.toString());
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                if (resultSet.getString("Nick") != null) {
+                    nick = resultSet.getString("Nick");
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get nickname of player " + nick + " from CHC database.");
+        }
+        return nick;
     }
     
     /**

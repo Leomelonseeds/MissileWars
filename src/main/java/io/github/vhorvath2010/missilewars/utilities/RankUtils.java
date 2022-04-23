@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -150,5 +151,25 @@ public class RankUtils {
                 player.setExp((float) progress);
             }
         });
+    }
+    
+    /**
+     * Gets the name to display for a player on the leaderboard
+     * 
+     * @param player
+     * @return the leaderboard player name
+     */
+    public static String getLeaderboardPlayer(OfflinePlayer player) {
+        String prefix = MissileWarsPlugin.getPlugin().getChat().getPlayerPrefix(null, player);
+        
+        // Don't show guest prefix on leaderboard
+        if (prefix.contains("Guest")) {
+            prefix = "&7";
+        }
+        
+        String nick = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
+        int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+        
+        return prefix + nick + " " + getRankSymbol(exp);
     }
 }
