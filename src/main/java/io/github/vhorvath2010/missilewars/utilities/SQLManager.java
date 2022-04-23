@@ -415,7 +415,7 @@ public class SQLManager {
     private List<ArrayList<Object>> getTopTenGamemodeStat(String stat, String gamemode){
         
         List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
-        String query = "SELECT uuid, $1 FROM umw_stats_$2 ORDER BY $1 DESC LIMIT 10";
+        String query = "SELECT uuid, $1 FROM umw_stats_$2 ORDER BY $1 DESC, uuid DESC LIMIT 10";
         query = query.replace("$1", stat);
         query = query.replace("$2", gamemode);
         
@@ -444,7 +444,7 @@ public class SQLManager {
     private List<ArrayList<Object>> getTopTenPlayerStat(String stat) {
         
         List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
-        String query = "SELECT uuid, $1 FROM umw_players ORDER BY $1 DESC LIMIT 10";
+        String query = "SELECT uuid, $1 FROM umw_players ORDER BY $1 DESC, uuid DESC LIMIT 10";
         query = query.replace("$1", stat);
         
         try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
@@ -483,7 +483,7 @@ public class SQLManager {
                        ON a.uuid = b.uuid
                        LEFT JOIN umw_stats_domination c
                        ON b.uuid = c.uuid
-                       ORDER BY $1 DESC LIMIT 10;
+                       ORDER BY $1 DESC, uuid DESC LIMIT 10;
                        """.replace("$1", stat);
         try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                 query
