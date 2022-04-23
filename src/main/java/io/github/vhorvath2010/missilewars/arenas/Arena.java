@@ -42,6 +42,7 @@ import io.github.vhorvath2010.missilewars.teams.MissileWarsTeam;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 import io.github.vhorvath2010.missilewars.utilities.RankUtils;
+import io.github.vhorvath2010.missilewars.utilities.SQLManager;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -504,6 +505,7 @@ public class Arena implements ConfigurationSerializable {
         if (mcPlayer != null) {
         	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
         	mcPlayer.setGameMode(GameMode.ADVENTURE);
+        	mcPlayer.setHealth(20);
         	InventoryUtils.loadInventory(mcPlayer);
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
             RankUtils.setPlayerExpBar(mcPlayer);
@@ -1107,9 +1109,11 @@ public class Arena implements ConfigurationSerializable {
                 amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
                 
                 // Update player stats
-                MissileWarsPlugin.getPlugin().getSQL().updateClassicStats(uuid, won, 1, 
-                        player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
-                MissileWarsPlugin.getPlugin().getSQL().updateExp(uuid, amountEarned);
+                SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
+                
+                sql.updateClassicStats(uuid, won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
+                sql.updateWinstreak(uuid, mapType, won);
+                sql.updateExp(uuid, amountEarned);
                 
                 String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));

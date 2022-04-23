@@ -107,6 +107,37 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
         
+        // Stats placeholders
+        if (params.contains("stats")) {
+            
+            SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
+            String[] args = params.split("_");
+            String gamemode = args[1];
+            String stat = args[2];
+            int result = 0;
+            
+            // stats_[gamemode/overall]_[stat]
+            if (args.length == 3) {
+                if (gamemode.equalsIgnoreCase("overall")) {
+                    result = sql.getOverallStatSync(player.getUniqueId(), stat);
+                } else {
+                    result = sql.getGamemodeStatSync(player.getUniqueId(), gamemode, stat);
+                }
+                return Integer.toString(result);
+            }
+            
+            // stats_[gamemode/overall]_[stat]_top_#_player
+            // Gets the player name of a top stat
+            
+            // stats_[gamemode/overall]_[stat]_top_#_stat
+            // Gets the statistic number of a top stat
+            
+            // stats_[gamemode/overall]_[stat]_rank
+            // Gets the player position in for that stat
+            
+            return null;
+        }
+        
         if (playerArena == null) {
             return null;
         }

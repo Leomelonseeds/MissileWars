@@ -65,6 +65,7 @@ public class SQLManager {
                                 uuid CHAR(36) NOT NULL,
                                 inventory MEDIUMTEXT,
                                 exp INT DEFAULT 0 NOT NULL,
+                                winstreak INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid)
                         );
                         """
@@ -86,6 +87,7 @@ public class SQLManager {
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
                                 deaths INT DEFAULT 0 NOT NULL,
+                                winstreak INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid) 
                         );
@@ -109,6 +111,7 @@ public class SQLManager {
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
                                 deaths INT DEFAULT 0 NOT NULL,
+                                winstreak INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
                         );
@@ -132,6 +135,7 @@ public class SQLManager {
                                 missiles INT DEFAULT 0 NOT NULL,
                                 utility INT DEFAULT 0 NOT NULL,
                                 deaths INT DEFAULT 0 NOT NULL,
+                                winstreak INT DEFAULT 0 NOT NULL,
                                 PRIMARY KEY (uuid),
                                 FOREIGN KEY (uuid) REFERENCES umw_players(uuid)
                         );
@@ -264,7 +268,7 @@ public class SQLManager {
             public void run() {
                 try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                         """
-                        INSERT INTO umw_stats_classic(uuid, wins, games, kills, missiles, utility)
+                        INSERT INTO umw_stats_classic(uuid, wins, games, kills, missiles, utility, deaths)
                         VALUES(?, ?, ?, ?, ?, ?, ?)
                         ON DUPLICATE KEY UPDATE
                         wins = wins + VALUES(wins),
@@ -272,7 +276,7 @@ public class SQLManager {
                         kills = kills + VALUES(kills), 
                         missiles = missiles + VALUES(missiles), 
                         utility = utility + VALUES(utility), 
-                        deaths = deaths + VALUES(deaths)                   
+                        deaths = deaths + VALUES(deaths);          
                         """
                 )) {
                     stmt.setString(1, uuid.toString());
@@ -290,6 +294,143 @@ public class SQLManager {
         });
     }
     
+    /**
+     * Updates a player's winstreak, or resets back to 0 on lose
+     * 
+     * @param uuid
+     * @param gamemode
+     * @param won
+     */
+    public void updateWinstreak(UUID uuid, String gamemode, int won) {
+        scheduler.runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if (won == 1) {
+                    
+                    String query = 
+                            """
+                            INSERT INTO umw_stats_$1(uuid, winstreak)
+                            VALUES(?, ?)
+                            ON DUPLICATE KEY UPDATE
+                            winstreak = winstreak + VALUES(winstreak);              
+                            """.replace("$1", gamemode);
+                    
+                    // Update gamemode tables
+                    try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                            query
+                    )) {
+                        stmt.setString(1, uuid.toString());
+                        stmt.setInt(2, won);
+                        stmt.execute();
+                    } catch (SQLException e) {
+                        logger.log(Level.SEVERE, "Failed to update winstreak for " + Bukkit.getPlayer(uuid).getName());
+                    }
+                    
+                    // Update overall table
+                    try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                            "UPDATE umw_players SET winstreak = winstreak + ? WHERE uuid = ?;"
+                    )) {
+                        stmt.setInt(1, won);
+                        stmt.setString(2, uuid.toString());
+                        stmt.execute();
+                    } catch (SQLException e) {
+                        logger.log(Level.SEVERE, "Failed to update winstreak for " + Bukkit.getPlayer(uuid).getName());
+                    }
+                } else {
+                    
+                    String query = 
+                            """
+                            INSERT INTO umw_stats_$1(uuid, winstreak)
+                            VALUES(?, 0)
+                            ON DUPLICATE KEY UPDATE
+                            winstreak = 0;
+                            """.replace("$1", gamemode);
+                    
+                    // Update gamemode tables
+                    try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                            query
+                    )) {
+                        stmt.setString(1, uuid.toString());
+                        stmt.execute();
+                    } catch (SQLException e) {
+                        logger.log(Level.SEVERE, "Failed to update winstreak for " + Bukkit.getPlayer(uuid).getName());
+                    }
+                    
+                    // Update overall table
+                    try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                            "UPDATE umw_players SET winstreak = 0 WHERE uuid = ?;"
+                    )) {
+                        stmt.setString(1, uuid.toString());
+                        stmt.execute();
+                    } catch (SQLException e) {
+                        logger.log(Level.SEVERE, "Failed to update winstreak for " + Bukkit.getPlayer(uuid).getName());
+                    }
+                }
+            }
+        });
+    }
+    
+    /**
+     * Find a statistic for a gamemode in sync
+     * stat can be any of wins, games, kills, missiles, utility, deaths
+     * Or gamemode specific like captures
+     * 
+     * @param uuid
+     * @param gamemode
+     * @param stat
+     * @return a gamemode statistic
+     */
+    public int getGamemodeStatSync(UUID uuid, String gamemode, String stat) {
+        String query = "SELECT $1 FROM umw_stats_$2 WHERE uuid = ?;";
+        int result = 0;
+        query = query.replace("$1", stat.toLowerCase());
+        query = query.replace("$2", gamemode.toLowerCase());
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                query
+        )) {
+            stmt.setString(1, uuid.toString());
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                result = resultSet.getInt(stat);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get " + gamemode + " stat " + stat + " for " +
+                    Bukkit.getPlayer(uuid).getName());
+        }
+        return result;
+    }
+    
+    /**
+     * Get an overall stat, which is stats from all gamemodes added together
+     * The stat needs to be present in all gamemodes, or else errors will be thrown
+     * In the case of stat being winstreak, then the overall winstreak will be returned.
+     * 
+     * @param uuid
+     * @param stat
+     * @return an overall stat
+     */
+    public int getOverallStatSync(UUID uuid, String stat) {
+        if (stat.equalsIgnoreCase("winstreak")) {
+            int winstreak = 0;
+            try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                    "SELECT winstreak FROM umw_players WHERE uuid = ?;"
+            )) {
+                stmt.setString(1, uuid.toString());
+                ResultSet resultSet = stmt.executeQuery();
+                if (resultSet.next()) {
+                    winstreak = resultSet.getInt("winstreak");
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Failed to get overall winstreak for " + 
+                        Bukkit.getPlayer(uuid).getName());
+            }
+            return winstreak;
+        }
+        int a = getGamemodeStatSync(uuid, "classic", stat);
+        int b = getGamemodeStatSync(uuid, "ctf", stat);
+        int c = getGamemodeStatSync(uuid, "domination", stat);
+        return a + b + c;
+    }
 
     
     /**
