@@ -29,6 +29,11 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
     public String getVersion() {
         return "1.0.0";
     }
+    
+    @Override
+    public boolean persist() {
+        return true;
+    }
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
@@ -114,17 +119,12 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             String[] args = params.split("_");
             String gamemode = args[1];
             String stat = args[2];
-            int result = 0;
             
             // stats_[gamemode/overall]_[stat]
             if (args.length == 3) {
-                if (gamemode.equalsIgnoreCase("overall")) {
-                    result = sql.getOverallStatSync(player.getUniqueId(), stat);
-                } else {
-                    result = sql.getGamemodeStatSync(player.getUniqueId(), gamemode, stat);
-                }
-                return Integer.toString(result);
+                return Integer.toString(sql.getStatSync(player.getUniqueId(), gamemode, stat));
             }
+            
             
             // stats_[gamemode/overall]_[stat]_top_#_player
             // Gets the player name of a top stat

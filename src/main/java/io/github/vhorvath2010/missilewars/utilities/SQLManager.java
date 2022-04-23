@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -371,16 +373,106 @@ public class SQLManager {
     }
     
     /**
+     * The main method to find a statistic for a player
      * Find a statistic for a gamemode in sync
      * stat can be any of wins, games, kills, missiles, utility, deaths
      * Or gamemode specific like captures
+     * If gamemode is "overall", then the overall stat will be gotten
      * 
      * @param uuid
      * @param gamemode
      * @param stat
      * @return a gamemode statistic
      */
-    public int getGamemodeStatSync(UUID uuid, String gamemode, String stat) {
+    public int getStatSync(UUID uuid, String gamemode, String stat) {
+        
+        // Check for overall
+        if (gamemode.equalsIgnoreCase("overall")) {
+            
+            // Special case for winstreak
+            if (stat.equalsIgnoreCase("winstreak")) {
+                return getOverallWinstreak(uuid);
+            }
+            
+            return getOverallStat(uuid, stat);
+        }
+        
+        // Otherwise just return a gamemode stat
+        return getGamemodeStat(uuid, gamemode, stat);
+    }
+    
+    /**
+     * Get an overall stat, which is stats from all gamemodes added together
+     * The stat needs to be present in all gamemodes, or else errors will be thrown
+     * In the case of stat being winstreak, then the overall winstreak will be returned.
+     * 
+     * @param uuid
+     * @param stat
+     * @return an overall stat
+     */
+    private int getOverallStat(UUID uuid, String stat) {
+        String query = """
+                       SELECT
+                       (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) + 
+                       (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) + 
+                       (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END) AS $1
+                       FROM umw_players players
+                       LEFT JOIN umw_stats_classic a
+                       ON players.uuid = a.uuid
+                       LEFT JOIN umw_stats_ctf b
+                       ON a.uuid = b.uuid
+                       LEFT JOIN umw_stats_domination c
+                       ON b.uuid = c.uuid
+                       WHERE players.uuid = ?;
+                       """.replace("$1", stat);
+        int result = 0;
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                query
+        )) {
+            stmt.setString(1, uuid.toString());
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                result = resultSet.getInt(stat);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get overall stat " + stat + " for " +
+                    Bukkit.getPlayer(uuid).getName());
+        }
+        return result;
+    }
+    
+    /**
+     * Gets the overall winstreak of a player
+     * 
+     * @param uuid
+     * @return a players overall winstreak
+     */
+    private int getOverallWinstreak(UUID uuid) {
+        int winstreak = 0;
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                "SELECT winstreak FROM umw_players WHERE uuid = ?;"
+        )) {
+            stmt.setString(1, uuid.toString());
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                winstreak = resultSet.getInt("winstreak");
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to get overall winstreak for " + 
+                    Bukkit.getPlayer(uuid).getName());
+        }
+        return winstreak;
+    }
+    
+    /**
+     * Gets the statistic from a specific gamemode for a specific player
+     * 
+     * @param uuid
+     * @param gamemode
+     * @param stat
+     * @return the statistic as an int
+     */
+    private int getGamemodeStat(UUID uuid, String gamemode, String stat) {
         String query = "SELECT $1 FROM umw_stats_$2 WHERE uuid = ?;";
         int result = 0;
         query = query.replace("$1", stat.toLowerCase());
@@ -398,38 +490,6 @@ public class SQLManager {
                     Bukkit.getPlayer(uuid).getName());
         }
         return result;
-    }
-    
-    /**
-     * Get an overall stat, which is stats from all gamemodes added together
-     * The stat needs to be present in all gamemodes, or else errors will be thrown
-     * In the case of stat being winstreak, then the overall winstreak will be returned.
-     * 
-     * @param uuid
-     * @param stat
-     * @return an overall stat
-     */
-    public int getOverallStatSync(UUID uuid, String stat) {
-        if (stat.equalsIgnoreCase("winstreak")) {
-            int winstreak = 0;
-            try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
-                    "SELECT winstreak FROM umw_players WHERE uuid = ?;"
-            )) {
-                stmt.setString(1, uuid.toString());
-                ResultSet resultSet = stmt.executeQuery();
-                if (resultSet.next()) {
-                    winstreak = resultSet.getInt("winstreak");
-                }
-            } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Failed to get overall winstreak for " + 
-                        Bukkit.getPlayer(uuid).getName());
-            }
-            return winstreak;
-        }
-        int a = getGamemodeStatSync(uuid, "classic", stat);
-        int b = getGamemodeStatSync(uuid, "ctf", stat);
-        int c = getGamemodeStatSync(uuid, "domination", stat);
-        return a + b + c;
     }
 
     

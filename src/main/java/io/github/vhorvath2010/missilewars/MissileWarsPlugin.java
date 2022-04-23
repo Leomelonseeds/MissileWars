@@ -22,6 +22,7 @@ import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
 import io.github.vhorvath2010.missilewars.events.WorldCreationEvents;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import io.github.vhorvath2010.missilewars.utilities.SQLManager;
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 
 /** Base class for the Missile Wars plugin */
@@ -35,6 +36,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private DeckManager deckManager;
     /** The loaded economy for this plugin */
     private static Economy econ;
+    /** The loaded chat API for this plugin */
+    private static Chat chat;
     /** The loaded sql manager for this plugin */
     private SQLManager sqlManager;
 
@@ -87,7 +90,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         
         // Load economy
         log("Hooking into Vault...");
-        setupEconomy();
+        setupVault();
         log("Economy setup complete.");
         
         // Load MySQL
@@ -101,9 +104,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
     /**
      * Setup the economy manager
      */
-    private void setupEconomy() {
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        econ = rsp.getProvider();
+    private void setupVault() {
+        RegisteredServiceProvider<Economy> rspE = getServer().getServicesManager().getRegistration(Economy.class);
+        econ = rspE.getProvider();
+        RegisteredServiceProvider<Chat> rspC = getServer().getServicesManager().getRegistration(Chat.class);
+        chat = rspC.getProvider();
     }
     
     /**
@@ -181,6 +186,15 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public Economy getEconomy() {
         return econ;
+    }
+    
+    /**
+     * Gets the vault chat API
+     * 
+     * @return the vault chat API
+     */
+    public Chat getChat() {
+        return chat;
     }
     
     /**
