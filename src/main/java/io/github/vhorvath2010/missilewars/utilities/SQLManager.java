@@ -307,6 +307,12 @@ public class SQLManager {
      * @param won
      */
     public void updateWinstreak(UUID uuid, String gamemode, int won) {
+        
+        // If game is tie, don't do anything
+        if (won == -1) {
+            return;
+        }
+        
         scheduler.runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {

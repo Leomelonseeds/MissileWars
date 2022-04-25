@@ -1080,7 +1080,8 @@ public class Arena implements ConfigurationSerializable {
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
             }
             
-            int won = 0;
+            // -1 = TIE, 0 = LOST, 1 = WIN
+            int won = winningTeam == null ? -1 : 0;
             
             // Calculate currency gain per-game
             int amountEarned = 0;
@@ -1104,6 +1105,7 @@ public class Arena implements ConfigurationSerializable {
                         won = 1;
                     }
                 }
+                
                 long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
                 double percentPlayed = (double) playTime / gameTime;
                 amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
