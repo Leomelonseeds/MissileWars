@@ -436,15 +436,6 @@ public class Arena implements ConfigurationSerializable {
             scheduleStart();
         }
 
-        // Reloads citizens if they for some reason aren't present
-        if (getWorld().getEntityCount() < 4) {
-            try {
-                ((Citizens) CitizensAPI.getPlugin()).reload();
-            } catch (NPCLoadException e) {
-                Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
-            }
-        }
-
         return true;
     }
 
@@ -626,6 +617,13 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
                 if (!running) {
+                    if (startTime != null) {
+                        int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                        if (time <= 5 && time >= -5) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                            return;
+                        }
+                    }
                     if (!redQueue.contains(player)) {
                         blueQueue.remove(player);
                         redQueue.add(player);
@@ -660,6 +658,13 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
                 if (!running) {
+                    if (startTime != null) {
+                        int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                        if (time <= 5 && time >= -5) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                            return;
+                        }
+                    }
                     if (!blueQueue.contains(player)) {
                         redQueue.remove(player);
                         blueQueue.add(player);
@@ -714,8 +719,19 @@ public class Arena implements ConfigurationSerializable {
     public void scheduleStart() {
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         int secCountdown = plugin.getConfig().getInt("lobby-wait-time");
+        
         // Schedule the start of the game if not already running
         if (startTime == null) {
+
+            // Reloads citizens if they for some reason aren't present
+            if (getWorld().getEntityCount() < 5) {
+                try {
+                    ((Citizens) CitizensAPI.getPlugin()).reload();
+                } catch (NPCLoadException e) {
+                    Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
+                }
+            }
+            
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
             String startMsg = "messages.lobby-countdown-start";
             announceMessage(startMsg, null);
@@ -725,6 +741,7 @@ public class Arena implements ConfigurationSerializable {
                     start();
                 }
             }.runTaskLater(plugin, secCountdown * 20));
+            
             // Schedule 30-second countdown
             int cdNear = plugin.getConfig().getInt("lobby-countdown-near");
             for (int secInCd = secCountdown; secInCd > 0; secInCd--) {
@@ -1061,6 +1078,9 @@ public class Arena implements ConfigurationSerializable {
         }
         String most_deaths = String.join(", ", mostDeathsList);
         
+        int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
+        int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getKills();
+        
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
         long gameTime = Duration.between(startTime, endTime).toSeconds();
@@ -1073,8 +1093,8 @@ public class Arena implements ConfigurationSerializable {
             // Send win message
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
-                s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(mostKills.get(0).getKills()));
-                s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(mostDeaths.get(0).getDeaths()));
+                s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
+                s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
                 s = s.replaceAll("%umw_most_kills%", most_kills);
                 s = s.replaceAll("%umw_most_deaths%", most_deaths);
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));

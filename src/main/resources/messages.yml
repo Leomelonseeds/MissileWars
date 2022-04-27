@@ -19,8 +19,9 @@ messages:
   queue-waiting-blue: "You are now queued for &9blue&7 in position &c%umw_position%"
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
-  queue-join-error: "You cannot join this team as the teams would be unbalanced."
+  queue-join-error: "&cYou cannot join this team as the teams would be unbalanced."
   queue-join-full: "&cSorry, this team is full!"
+  queue-join-time: "&cYou cannot queue at this time!"
   lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
   lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."
   lobby-countdown-near: "Starting in &c%umw_time%..."
@@ -55,6 +56,10 @@ messages:
     - "&fThanks for playing!"
     - "&b========================================"
   earn-currency: "&7You earned &c%umw_amount_earned% &amokens &7and &6experience &7this game."
+  canopy-cancel: "&cYour canopy teleportation was cancelled!"
+  canopy-fail: "&cYou can only use a canopy while standing!"
+  canopy-activate: "&7Teleporting in 1 second..."
+  canopy-blocked: "&cSomething is blocking your teleportation path!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well

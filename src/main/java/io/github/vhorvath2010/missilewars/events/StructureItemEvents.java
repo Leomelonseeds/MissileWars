@@ -1,6 +1,11 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -12,7 +17,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
@@ -21,10 +25,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -134,6 +141,8 @@ public class StructureItemEvents implements Listener {
         	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
         }
     }
+    
+    Set<UUID> canopy_cooldown = new HashSet<UUID>();
 
     /** Handle utilities utilization. */
     @EventHandler
@@ -162,30 +171,154 @@ public class StructureItemEvents implements Listener {
                 new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
         assert utility != null;
         // Allow event if using bow
-        if (utility.equalsIgnoreCase("sentinel_bow")) {
+        if (utility.contains("bow")) {
             return;
         }
         // Stop if not left-click
-        if (!event.getAction().toString().contains("RIGHT")) {
+        if (!event.getAction().toString().contains("RIGHT_CLICK")) {
+            return;
+        }
+        
+        if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
+            List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
+            
+            for (String s : cancel) {
+                if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
+                    event.setCancelled(true);
+                    ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+                    return;
+                }
+            }
+        }
+        
+        // Allow if using spawn creeper
+        if (utility.contains("creeper")) {
             return;
         }
         
         event.setCancelled(true);
-        playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
 
         // Do proper action based on utility type
-        if (utility.equalsIgnoreCase("fireball") && event.getAction().toString().contains("RIGHT_CLICK")) {
+        if (utility.equalsIgnoreCase("fireball")) {
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
-            fireball.setYield(1);
+            fireball.setYield(2);
             fireball.setIsIncendiary(false);
             fireball.setDirection(player.getEyeLocation().getDirection());
             hand.setAmount(hand.getAmount() - 1);
             for (Player players : player.getWorld().getPlayers()) {
             	 ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
             }
+            playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+        } else if (utility.equalsIgnoreCase("canopy")) {
+            if (canopy_cooldown.contains(player.getUniqueId())) {
+                return;
+            }
+            if (!player.isOnGround()) {
+                ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
+                return;
+            }
+            ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
+            canopy_cooldown.add(player.getUniqueId());
+            spawnCanopy(player, playerArena);
         }
     }
+    
+    private void spawnCanopy(Player player, Arena playerArena) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                
+                // Make sure the canopy spawn hasn't already been cancelled
+                if (!canopy_cooldown.contains(player.getUniqueId())) {
+                    return;
+                }
+                
+                canopy_cooldown.remove(player.getUniqueId());
+                
+                // Ignore offline players. Obviously
+                if (!player.isOnline()) {
+                    return;
+                }
+
+                ItemStack hand = player.getInventory().getItemInMainHand();
+                
+                // Ignore if player is not holding a canopy
+                if (hand.getType() != Material.ENDER_EYE) {
+                    ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
+                    return;
+                }
+                
+                String mapName = "default-map";
+                if (playerArena.getMapName() != null) {
+                    mapName = playerArena.getMapName();
+                }
+                
+                // Insert fetching of canopy distance + time (s) here
+                int canopy_distance = 12;
+                
+                // Ignore if player would be going through wall
+                if (player.getTargetBlock(null, canopy_distance + 3).getType() != Material.AIR) {
+                    ConfigUtils.sendConfigMessage("messages.canopy-blocked", player, null, null);
+                    return;
+                }
+                
+                // Finally spawn canopy
+                Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
+                Location spawnLoc = player.getEyeLocation().clone().add(distance);
+                if (SchematicManager.spawnNBTStructure("canopy", spawnLoc, isRedTeam(player), mapName)) {
+                    player.teleport(spawnLoc);
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
+                    hand.setAmount(hand.getAmount() - 1);
+                    for (Player players : player.getWorld().getPlayers()) {
+                        ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
+                    }
+                    playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+                    despawnCanopy(spawnLoc, 5);   
+                } else {
+                    ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+                }
+
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
+    }
+    
+    Map<Location, Integer> canopy_extensions = new HashMap<Location, Integer>();
+    
+    private void despawnCanopy(Location loc, int duration) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Location wood = loc.clone().add(0, -1, 0).getBlock().getLocation();
+                if (wood.getBlock().getType() == Material.OAK_WOOD) {
+                    if (canopy_extensions.containsKey(wood)) {
+                        despawnCanopy(loc, canopy_extensions.get(wood));
+                        canopy_extensions.remove(wood);
+                        return;
+                    }
+                    wood.getBlock().setType(Material.AIR);
+                }
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), duration * 20L);
+    }
+    
+    /** Cancel canopy activation if player jumps falls or something */
+    @EventHandler   
+    public void canopyCancel(PlayerMoveEvent e) {
+        
+        Player player = e.getPlayer();
+        
+        if (!canopy_cooldown.contains(player.getUniqueId())) {
+            return;
+        }
+        
+        if (!player.isOnGround()) {
+            canopy_cooldown.remove(player.getUniqueId());
+            ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
+        }
+    }
+    
+    //private void despawnCanopy()
 
     /** Handle projectile items structure creation */
     @EventHandler
@@ -221,6 +354,9 @@ public class StructureItemEvents implements Listener {
             @Override
             public void run() {
                 if (!thrown.isDead()) {
+                    if (!thrower.isOnline()) {
+                        return;
+                    }
                     spawnUtility(structureName, thrown.getLocation(), thrower, thrown, playerArena);
                 }
             }
@@ -278,7 +414,9 @@ public class StructureItemEvents implements Listener {
                 sound = "spawn-torpedo";
             } else if (structureName.contains("obsidian_")) {
                 sound = "spawn-obsidian-shield";
-                clearObsidianShield(thrower, spawnLoc, isRedTeam(thrower), mapName, playerArena);
+                // Detect obsidian shield duration in seconds here!
+                int duration = 10;
+                clearObsidianShield(duration, spawnLoc, isRedTeam(thrower), mapName, playerArena);
             }
             for (Player players : thrower.getWorld().getPlayers()) {
                 ConfigUtils.sendConfigSound(sound, players, spawnLoc);
@@ -352,8 +490,32 @@ public class StructureItemEvents implements Listener {
             event.getHitEntity().setFireTicks(0);
         }
         
+        Block hitBlock = event.getHitBlock();
+        
         // Spawn some water
-        if (event.getHitBlock() == null) {
+        if (hitBlock == null) {
+            return;
+        }
+        
+        // Handle hitting oak_wood to fully repair canopies
+        if (hitBlock.getType() == Material.OAK_WOOD) {
+            if (event.getEntity().getShooter() instanceof Player) {
+                Player thrower = (Player) event.getEntity().getShooter();
+                int extraduration = 10;
+                Location key = hitBlock.getLocation();
+                if (canopy_extensions.containsKey(key)) {
+                    canopy_extensions.put(key, canopy_extensions.get(key) + extraduration);
+                } else {
+                    canopy_extensions.put(key, extraduration);
+                }
+                Location newSpawn = hitBlock.getLocation().add(0, 1, 0);
+                // map name doesn't matter here because the canopy has already been spawned,
+                // we therefore know that the structure was placed successfully and do not need
+                // to perform validity checks based on the map
+                SchematicManager.spawnNBTStructure("canopy", newSpawn, isRedTeam(thrower), "default-map");
+                thrower.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7This canopy will now last &a" + 
+                            extraduration + " &7seconds longer."));
+            }
             return;
         }
         
@@ -382,10 +544,9 @@ public class StructureItemEvents implements Listener {
     }
     
     /** Clears obsidian shield after a certain amount of time */
-    public void clearObsidianShield(Player thrower, Location location, Boolean red, String mapName, Arena playerArena) {
-        
-        // Insert code for detecting obsidian shield duration here
-        int duration = 10 * 2;
+    private void clearObsidianShield(int t, Location location, Boolean red, String mapName, Arena playerArena) {
+
+        int duration = t * 2;
         for (int i = duration; i > duration - 10; i--) {
             int finalDuration = i;
             new BukkitRunnable() {
@@ -394,7 +555,7 @@ public class StructureItemEvents implements Listener {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
                             SchematicManager.spawnNBTStructure("obsidian_shield_clear", location, red, mapName);
-                            for (Player player : thrower.getWorld().getPlayers()) {
+                            for (Player player : location.getWorld().getPlayers()) {
                                 ConfigUtils.sendConfigSound("break-obsidian-shield", player, location); 
                             }
                         } else if (finalDuration % 2 == 0) {

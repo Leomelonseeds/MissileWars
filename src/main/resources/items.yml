@@ -48,7 +48,7 @@ cruiser:
   - "&7fast one at that."
   - ""
   - "&aSpeed: &f3.3m/s"
-  - "&cTNT: &f15"
+  - "&cTNT: &f11"
   offset:
     x: 0
     y: -4
@@ -64,7 +64,7 @@ thunderbolt:
   - "&7anyone shoots its glaring weak spot."
   - ""
   - "&aSpeed: &f3.3m/s"
-  - "&cTNT: &f13 + 4 TNT Minecarts"
+  - "&cTNT: &f9 + 4 TNT Minecarts"
   offset:
     x: 0
     y: -4
@@ -240,13 +240,43 @@ gemini_warrior:
     y: -4
     z: 4
 
-cronullifier: {}
-aeonullifier: {}
+cronullifier:
+  file: 'cronullifier.nbt'
+  item: HUSK_SPAWN_EGG
+  name: "&e☢ Cronullifier ⚡"
+  lore:
+  - ""
+  - "&7Take all the speed benefits of a missile like the"
+  - "&7Gemini, nullify them using some clever angineering,"
+  - "&7and you get this. If the Tomahawk is Mug, this is"
+  - "&7A&W."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f12"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+aeonullifier:
+  file: 'aeonullifier.nbt'
+  item: HUSK_SPAWN_EGG
+  name: "&e☢ &lAeonullifier &e⚡"
+  lore:
+  - ""
+  - "&7A Tomatwo wannabe with an appetite for"
+  - "&7incredible violence."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f18"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 sword: 
   file: 'sword.nbt'
   item: SKELETON_SPAWN_EGG
-  name: "&7☢ Sword ✟"
+  name: "&f☢ Sword ✟"
   lore:
   - ""
   - "&7This thing might not have much TNT, but"
@@ -260,19 +290,106 @@ sword:
     x: 0
     y: -4
     z: 4
-blade: {}
+blade:
+  file: 'blade.nbt'
+  item: SKELETON_SPAWN_EGG
+  name: "&f☢ &lBlade &f✟"
+  lore:
+  - ""
+  - "&7Tired of the Sword's drawbacks? So are we."
+  - "&7The Blade solves most of them by simply"
+  - "&7having more TNT."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f15"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
-piranha: {}
-anglerfish: {}
+piranha:
+  file: 'piranha.nbt'
+  item: COD_SPAWN_EGG
+  name: "&7☢ Piranha ✟"
+  lore:
+  - ""
+  - "&7Relatively simple, mostly reliable, and looks"
+  - "&7somewhat good. The Piranha has it all."
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f10"
+  offset:
+    x: -2
+    y: -4
+    z: 4
+anglerfish:
+  file: 'anglerfish.nbt'
+  item: COD_SPAWN_EGG
+  name: "&7☢ &lAnglerfish &7✟"
+  lore:
+  - ""
+  - "&7The Piranha wishes it was this. Or maybe"
+  - "&7it doesn't. We don't know anyone who"
+  - "&7wants to look like an anglerfish."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f23"
+  offset:
+    x: -2
+    y: -4
+    z: 4
 
 
 # Berserker missiles
 
-supporter: {}
-auxiliary: {}
+supporter:
+  file: 'supporter.nbt'
+  item: STRIDER_SPAWN_EGG
+  name: "&c☢ Supporter &c&l☣"
+  lore:
+  - ""
+  - "&7This missile wants to buy your Patreon."
+  - "&7It also launches TNT behind it upon"
+  - "&7detonation."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f17"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+auxiliary:
+  file: 'auxiliary.nbt'
+  item: STRIDER_SPAWN_EGG
+  name: "&c☢ &lAuxiliary ☣"
+  lore:
+  - ""
+  - "&7Why blow up things in front of you when"
+  - "&7you can blow up things behind you?"
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f25"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 warhead: {}
-bullet: {}
+bullet:
+  file: 'bullet.nbt'
+  item: TROPICAL_FISH_SPAWN_EGG
+  name: "&6☢ &lBullet ☣"
+  lore:
+  - ""
+  - "&7This absolutely insane missile should"
+  - "&7probably be used carefully. Probably"
+  - "&7not though."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f33"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 juggernaut:
   file: 'juggernaut.nbt'
@@ -289,14 +406,14 @@ juggernaut:
     x: -1
     y: -4
     z: 4
-juggerbuster:
-  file: 'juggerbuster.nbt'
+meganaut:
+  file: 'meganaut.nbt'
   item: CHICKEN_SPAWN_EGG
-  name: "&c☢ &lJuggerbuster &c&l☣"
+  name: "&c☢ &lMeganaut &c&l☣"
   lore:
   - ""
   - "&7This Juggernaut-derived behemoth will"
-  - "&7destroy anything in its path, including shields."
+  - "&7destroy anything in its path, including itself."
   - "&7Usage for transportation not recommended."
   - ""
   - "&aSpeed: &f1.7m/s"
@@ -348,7 +465,21 @@ shark:
 shipper: {}
 slasher: {}
 
-slingshot: {}
+slingshot:
+  file: 'slingshot.nbt'
+  item: SHULKER_SPAWN_EGG
+  name: "&d☢ Slingshot ⚒"
+  lore:
+  - ""
+  - "&7Break the slimeblock in the back to"
+  - "&7launch a tnt. And to self-destruct."
+  - ''
+  - "&aSpeed: &f2.2m/s"
+  - "&cTNT: &f9"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 catapult: {}
 
 citadel: {}
@@ -371,7 +502,21 @@ pisces:
     z: 4
 aries: {}
 
-ant: {}
+ant:
+  file: 'ant.nbt'
+  item: ENDERMITE_SPAWN_EGG
+  name: "&0☢ Ant ⚒"
+  lore:
+  - ""
+  - "&7As the name implies, this missile is very small."
+  - "&7But fortunately, size doesn't matter in missile wars."
+  - ''
+  - "&aSpeed: &f2.2m/s"
+  - "&cTNT: &f2"
+  offset:
+    x: 0
+    y: -4
+    z: 4
 lifter: {}
 
 
@@ -494,9 +639,32 @@ obsidian_shield_clear:
     y: -2
     z: 0
 
-canopy: {}
+canopy:
+  file: 'canopy.nbt'
+  item: ENDER_EYE
+  name: "&2★ Canopy ⚡"
+  lore:
+  - ""
+  - "&7Harness the power of the trees, and create"
+  - "&7an instant leaf-based platform upon which you"
+  - "&7instantly teleport. Great for quick transportation, not"
+  - "&7great for explaining how you got this to the"
+  - "&7local druids."
+  - ""
+  - "&7Warning: prone to decay."
+  - ""
+  offset:
+    x: -3
+    y: -2
+    z: -3
 
-spawn_creeper: {}
+spawn_creeper:
+  item: CREEPER_SPAWN_EGG
+  name: "&a★ Spawn Creeper &a&l☣"
+  lore:
+  - ""
+  - "&7A creeper walks into a bar. I wasn't paid"
+  - "&7enough to finish the joke"
 spawn_creeper_charged: {}
 
 fireball:
@@ -511,6 +679,9 @@ fireball:
   - "&4Power: &f1"
 
 leaves: {}
+
+lingering_potion_of_weakness_1: {}
+lingering_potion_of_weakness_2: {}
 
 
 # Gear items (just used for names and lores i guess)
@@ -533,7 +704,7 @@ sentinel_bow:
   - "&7did a great job selling them as gunblades."
 berserker_crossbow:
   item: CROSSBOW
-  name: "&0⚔ Crossbow &l☣"
+  name: "&3⚔ Crossbow &l☣"
   lore:
   - ""
   - "&7Before guns were invented, the coolest people"

@@ -92,8 +92,17 @@ public class SchematicManager {
             return false;
         }
 
+        int bluespawnz = (int) Math.floor(ConfigUtils.getMapNumber("classic", mapName, "blue-spawn.z"));
+        int redspawnz = (int) Math.floor(ConfigUtils.getMapNumber("classic", mapName, "red-spawn.z"));
+
         // Apply offset
         Location spawnLoc = loc.clone();
+        
+        // Cancel if attempt to grief team spawnpoint
+        if (spawnLoc.getBlockZ() == bluespawnz || spawnLoc.getBlockZ() == redspawnz) {
+            return false;
+        }
+        
         Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
@@ -115,7 +124,7 @@ public class SchematicManager {
         
         int barrierx = plugin.getConfig().getInt("barrier.center.x");
         
-        int portalx1 = (int) (ConfigUtils.getMapNumber("classic", mapName, "portal.x1") - 1);
+        int portalx1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x1") - 1;
         int portalx2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4") + 1;
         int portaly1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1") - 1;
         int portaly2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4") + 1;

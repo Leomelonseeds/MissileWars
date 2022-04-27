@@ -28,11 +28,20 @@ public class DeckManager {
     public DeckManager() {
         // Setup gear items
         List<ItemStack> gear = new ArrayList<>();
-        ItemStack bow = createUtilityItem("sentinel_bow");
+        /*ItemStack bow = createUtilityItem("sentinel_bow");
         bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
         bow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 4);
+        ItemMeta bowMeta = bow.getItemMeta();
+        bowMeta.setUnbreakable(true);
+        bow.setItemMeta(bowMeta);
+        gear.add(bow);*/
+        
+        ItemStack bow = createUtilityItem("berserker_crossbow");
+        bow.addUnsafeEnchantment(Enchantment.QUICK_CHARGE, 2);
+        bow.addUnsafeEnchantment(Enchantment.MULTISHOT, 1);
+        bow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 7);
         ItemMeta bowMeta = bow.getItemMeta();
         bowMeta.setUnbreakable(true);
         bow.setItemMeta(bowMeta);
@@ -42,24 +51,36 @@ public class DeckManager {
         ItemStack arrows = new ItemStack(Material.ARROW, 3);
         ItemStack guardian = createSchematicItem("guardian");
         ItemStack elderguardian = createSchematicItem("elder_guardian");
+        ItemStack thunderbolt = createSchematicItem("thunderbolt");
+        ItemStack slingshot = createSchematicItem("slingshot");
+        ItemStack tomatwo = createSchematicItem("tomatwo");
+        ItemStack ant = createSchematicItem("ant");
+        ItemStack piranha = createSchematicItem("piranha");
+        ItemStack meganaut = createSchematicItem("meganaut");
+        ItemStack auxiliary = createSchematicItem("auxiliary");
+        ItemStack bullet = createSchematicItem("bullet");
         ItemStack dagger = createSchematicItem("dagger");
         ItemStack shark = createSchematicItem("shark");
         ItemStack buster = createSchematicItem("shieldbuster");
         ItemStack pisces = createSchematicItem("pisces");
         ItemStack tomahawk = createSchematicItem("tomahawk");
         ItemStack gemini_w = createSchematicItem("gemini_warrior");
+        ItemStack gemini = createSchematicItem("gemini");
         ItemStack cruiser = createSchematicItem("cruiser");
         ItemStack juggernaut = createSchematicItem("juggernaut");
         ItemStack lightning = createSchematicItem("lightning");
         ItemStack sword = createSchematicItem("sword");
+        ItemStack blade = createSchematicItem("blade");
         ItemStack shield = createSchematicItem("shield_2");
         ItemStack platform = createSchematicItem("platform_2");
-        ItemStack torpedo = createSchematicItem("torpedo_2");
+        ItemStack torpedo = createSchematicItem("torpedo_1");
         ItemStack obsidianshield = createSchematicItem("obsidian_shield");
         ItemStack fireball = createUtilityItem("fireball");
         ItemStack splash = createUtilityItem("splash");
-        List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{arrows, elderguardian, shark, cruiser, juggernaut,
-                tomahawk, dagger, gemini_w, pisces, obsidianshield, torpedo, splash, shield, platform}));
+        ItemStack canopy = createUtilityItem("canopy");
+        ItemStack creeper = createUtilityItem("spawn_creeper");
+        List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{arrows, ant, piranha, thunderbolt, meganaut,
+                tomatwo, bullet, gemini, slingshot, blade, torpedo, fireball, splash, canopy, creeper}));
 
         defaultDeck = new Deck("Default", gear, pool);
     }
