@@ -106,7 +106,13 @@ public class SchematicManager {
         Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
-        if (redMissile) {
+        // Temp hotfix for structure rail rotation bug
+        if (redMissile && structureName.contains("thunderbolt")) {
+            offset.setZ(-15);
+            offset.setX(0);
+        } 
+        // Normal red missile offset adjustment 
+        else if (redMissile) {
             offset.setZ(offset.getZ() * -1);
             offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
