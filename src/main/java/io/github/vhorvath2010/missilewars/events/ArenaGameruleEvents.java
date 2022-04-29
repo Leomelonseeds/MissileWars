@@ -182,7 +182,8 @@ public class ArenaGameruleEvents implements Listener {
             event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
         }
         // Check for TNT explosions of portals
-        else if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT) {
+        else if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
+                 entity == EntityType.CREEPER) {
             event.blockList().forEach(block -> {
                 // Register portal brake if block was broken
                 if (block.getType() == Material.NETHER_PORTAL) {
