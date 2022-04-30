@@ -80,32 +80,27 @@ public class InventoryUtils {
     public static void loadInventory(Player player) {
         Inventory inventory = player.getInventory();
         UUID uuid = player.getUniqueId();
-        MissileWarsPlugin.getPlugin().getSQL().getInventory(uuid, new DBCallback() {
-
-            @Override
-            public void onQueryDone(Object result) {
-                try {
-                    String encodedString = (String) result;
-                    if (encodedString == null) {
-                        return;
-                    }
-                    ByteArrayInputStream stream = new ByteArrayInputStream(Base64.getDecoder().decode(encodedString)); 
-                    BukkitObjectInputStream data = new BukkitObjectInputStream(stream);
-                    int invSize = data.readInt();
-                    for (int i = 0; i < invSize; i++) {
-                        ItemStack invItem = (ItemStack) data.readObject();
-                        Boolean empty = invItem == null;
-                        ItemStack current = inventory.getItem(i);
-                        boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
-                        if (!(i == 39 || (isPotion && empty))) {
-                            inventory.setItem(i, invItem);
-                        }
-                    }
-                } catch (final Exception e) {
-                    Bukkit.getLogger().log(Level.WARNING, "Failed to read inventory string of " + player.getName());
+        MissileWarsPlugin.getPlugin().getSQL().getInventory(uuid, result -> {
+            try {
+                String encodedString = (String) result;
+                if (encodedString == null) {
+                    return;
                 }
+                ByteArrayInputStream stream = new ByteArrayInputStream(Base64.getDecoder().decode(encodedString)); 
+                BukkitObjectInputStream data = new BukkitObjectInputStream(stream);
+                int invSize = data.readInt();
+                for (int i = 0; i < invSize; i++) {
+                    ItemStack invItem = (ItemStack) data.readObject();
+                    Boolean empty = invItem == null;
+                    ItemStack current = inventory.getItem(i);
+                    boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
+                    if (!(i == 39 || (isPotion && empty))) {
+                        inventory.setItem(i, invItem);
+                    }
+                }
+            } catch (final Exception e) {
+                Bukkit.getLogger().log(Level.WARNING, "Failed to read inventory string of " + player.getName());
             }
-            
         });   
     }
 }
