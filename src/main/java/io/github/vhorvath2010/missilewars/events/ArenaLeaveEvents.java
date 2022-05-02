@@ -7,9 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
@@ -30,7 +29,14 @@ public class ArenaLeaveEvents implements Listener {
         	InventoryUtils.saveInventory(player);
             return;
         }
-        playerArena.removePlayer(player.getUniqueId());
+        
+        // Remove player 1 tick later, so the arena doesn't think they're still online
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+            playerArena.removePlayer(player.getUniqueId());
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
     }
     
     /** Handle inventory loading on join */

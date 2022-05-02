@@ -10,6 +10,7 @@ messages:
   joined-arena-lobby: "%umw_focus% &7joined arena &a%umw_arena%"
   leave-arena: "You left %umw_arena%"
   leave-arena-others: "%umw_focus% &7left the arena."
+  leave-arena-lobby: "%umw_focus% &7rejoined the lobby."
   leave-team-red: "%umw_focus% &7has left &cred&7."
   leave-team-blue: "%umw_focus% &7has left &9blue&7."
   spectate-join-others: "%umw_focus% &7is now spectating."

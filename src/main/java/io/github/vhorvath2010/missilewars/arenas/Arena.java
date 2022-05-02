@@ -504,6 +504,10 @@ public class Arena implements ConfigurationSerializable {
             // Notify discord
             TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
             discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + this.getName()).queue();
+            
+            for (Player player : Bukkit.getWorld("world").getPlayers()) {
+                ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
+            }
         }
         
         checkEmpty();
