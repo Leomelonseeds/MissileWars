@@ -73,7 +73,7 @@ thunderbolt:
 
 hilt:
   file: 'hilt.nbt'
-  item: DOLPHIN_SPAWN_EGG
+  item: RAVAGER_SPAWN_EGG
   name: "&8☢ Hilt ⚡"
   lore:
   - ""
@@ -90,7 +90,7 @@ hilt:
     z: 4
 dagger:
   file: 'dagger.nbt'
-  item: DOLPHIN_SPAWN_EGG
+  item: RAVAGER_SPAWN_EGG
   name: "&8☢ &lDagger &8⚡"
   lore:
   - ""
@@ -108,7 +108,7 @@ dagger:
 
 supersonic:
   file: 'supersonic.nbt'
-  item: HORSE_SPAWN_EGG
+  item: TURTLE_SPAWN_EGG
   name: "&b☢ Supersonic ⚡"
   lore:
   - ""
@@ -126,7 +126,7 @@ supersonic:
     z: 4
 hypersonic:
   file: 'hypersonic.nbt'
-  item: HORSE_SPAWN_EGG
+  item: TURTLE_SPAWN_EGG
   name: "&b☢ &lHypersonic &b⚡"
   lore:
   - ""
@@ -193,7 +193,7 @@ guardian:
 elder_guardian:
   file: 'elderguard.nbt'
   item: ELDER_GUARDIAN_SPAWN_EGG
-  name: "&3☢ &lElder Guardian &3✟"
+  name: "&f☢ &lElder Guardian &f✟"
   lore:
   - ""
   - "&7Packed with more explosives than the Guardian,"
@@ -210,7 +210,7 @@ elder_guardian:
 gemini:
   file: 'gemini.nbt'
   item: SLIME_SPAWN_EGG
-  name: "&e☢ Gemini ✟"
+  name: "&a☢ Gemini ✟"
   lore:
   - ""
   - "&7Why launch one missile when you can launch"
@@ -226,7 +226,7 @@ gemini:
 gemini_warrior:
   file: 'gemini_warrior.nbt'
   item: SLIME_SPAWN_EGG
-  name: "&e☢ &lGemini Warrior &e✟"
+  name: "&a☢ &lGemini Warrior &a✟"
   lore:
   - ""
   - "&7Why launch two weak missiles at once, when"
@@ -242,8 +242,8 @@ gemini_warrior:
 
 cronullifier:
   file: 'cronullifier.nbt'
-  item: HUSK_SPAWN_EGG
-  name: "&e☢ Cronullifier ⚡"
+  item: MAGMA_CUBE_SPAWN_EGG
+  name: "&e☢ Cronullifier ✟"
   lore:
   - ""
   - "&7Take all the speed benefits of a missile like the"
@@ -259,8 +259,8 @@ cronullifier:
     z: 4
 aeonullifier:
   file: 'aeonullifier.nbt'
-  item: HUSK_SPAWN_EGG
-  name: "&e☢ &lAeonullifier &e⚡"
+  item: MAGMA_CUBE_SPAWN_EGG
+  name: "&e☢ &lAeonullifier &e✟"
   lore:
   - ""
   - "&7A Tomatwo wannabe with an appetite for"
@@ -343,8 +343,8 @@ anglerfish:
 
 supporter:
   file: 'supporter.nbt'
-  item: STRIDER_SPAWN_EGG
-  name: "&c☢ Supporter &c&l☣"
+  item: BEE_SPAWN_EGG
+  name: "&e☢ Supporter &e&l☣"
   lore:
   - ""
   - "&7This missile wants to buy your Patreon."
@@ -359,8 +359,8 @@ supporter:
     z: 4
 auxiliary:
   file: 'auxiliary.nbt'
-  item: STRIDER_SPAWN_EGG
-  name: "&c☢ &lAuxiliary ☣"
+  item: BEE_SPAWN_EGG
+  name: "&e☢ &lAuxiliary ☣"
   lore:
   - ""
   - "&7Why blow up things in front of you when"
@@ -373,7 +373,22 @@ auxiliary:
     y: -4
     z: 4
 
-warhead: {}
+warhead: 
+  file: 'warhead.nbt'
+  item: TROPICAL_FISH_SPAWN_EGG
+  name: "&6☢ Warhead &6&l☣"
+  lore:
+  - ""
+  - "&7The activation TNT on this missile entered"
+  - "&7its goth phase and hides itself from the"
+  - "&7piercing gaze of missile wars players."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f27"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 bullet:
   file: 'bullet.nbt'
   item: TROPICAL_FISH_SPAWN_EGG
@@ -423,8 +438,38 @@ meganaut:
     y: -4
     z: 4
 
-breaker: {}
-rifter: {}
+breaker:
+  file: 'breaker.nbt'
+  item: DOLPHIN_SPAWN_EGG
+  name: "&1☢ Breaker &1&l☣"
+  lore:
+  - ""
+  - "&7Like its name suggests, this missile breaks"
+  - "&7stuff pretty well, including the hearts"
+  - "&7of missile wars players."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f18"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+rifter:
+  file: 'rifter.nbt'
+  item: DOLPHIN_SPAWN_EGG
+  name: "&1☢ &lRifter &1&l☣"
+  lore:
+  - ""
+  - "&7With almost double the amount of TNT compared"
+  - "&7to the breaker, this missile is equally as"
+  - "&7easy and dangerous to ride on."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f34"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 shieldbuster:
   file: 'shieldbuster.nbt'
@@ -451,7 +496,7 @@ shark:
   - "&7The Shark is nearly unstoppable, assuming it"
   - "&7encounters no more than eleven shields, and no"
   - "&7one tries to stop it."
-  - ''
+  - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f10"
   offset:
@@ -462,8 +507,38 @@ shark:
 
 # Architect missiles
 
-shipper: {}
-slasher: {}
+shipper:
+  file: 'shipper.nbt'
+  item: HORSE_SPAWN_EGG
+  name: "&e☢ Shipper ⚒"
+  lore:
+  - ""
+  - "&7This missile sure carries its crew well."
+  - "&7Unless, of course, it explodes, in which"
+  - "&7case it doesn't."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f5"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+slasher:
+  file: 'slasher.nbt'
+  item: HORSE_SPAWN_EGG
+  name: "&e☢ &lSlasher &e⚒"
+  lore:
+  - ""
+  - "&7The TNT on this missile is tucked behind"
+  - "&7a solid layer of glass. Much like its"
+  - "&7emotions."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f6"
+  offset:
+    x: -1
+    y: -5
+    z: 4
 
 slingshot:
   file: 'slingshot.nbt'
@@ -473,34 +548,93 @@ slingshot:
   - ""
   - "&7Break the slimeblock in the back to"
   - "&7launch a tnt. And to self-destruct."
-  - ''
+  - ""
   - "&aSpeed: &f2.2m/s"
   - "&cTNT: &f9"
   offset:
     x: -1
     y: -4
     z: 4
-catapult: {}
+catapult:
+  file: 'catapult.nbt'
+  item: SHULKER_SPAWN_EGG
+  name: "&d☢ &lCatapult &d⚒"
+  lore:
+  - ""
+  - "&7Why launch one TNT when you can launch"
+  - "&7two? Enough said (I ran out of ideas)"
+  - ""
+  - "&aSpeed: &f2.2m/s"
+  - "&cTNT: &f14"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
-citadel: {}
-fortress: {}
+citadel:
+  file: 'citadel.nbt'
+  item: SILVERFISH_SPAWN_EGG
+  name: "&7☢ Citadel ⚒"
+  lore:
+  - ""
+  - "&7Hide in this missile's hatch and experience"
+  - "&7the joys of becoming a turtle."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f9"
+  offset:
+    x: -1
+    y: -4
+    z: 4
+fortress:
+  file: 'fortress.nbt'
+  item: SILVERFISH_SPAWN_EGG
+  name: "&7☢ &lFortress &7⚒"
+  lore:
+  - ""
+  - "&7A literal flying fortress, but really in a more"
+  - "&7metaphorical sense because these missiles don't"
+  - "&7really 'fly' nor do they resemble fortresses."
+  - "&7Plus, it doesn't defend against itself blowing"
+  - "&7up very well."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f16"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 pisces:
   file: 'pisces.nbt'
-  item: RAVAGER_SPAWN_EGG
+  item: PARROT_SPAWN_EGG
   name: "&a☢ Pisces ⚒"
   lore:
   - ""
   - "&7This wide missile could almost compete with"
   - "&7your mother."
-  - ''
+  - ""
   - "&aSpeed: &f1.7m/s"
   - "&cTNT: &f12"
   offset:
     x: -3
     y: -4
     z: 4
-aries: {}
+aries:
+  file: 'aries.nbt'
+  item: PARROT_SPAWN_EGG
+  name: "&a☢ &lAries &a⚒"
+  lore:
+  - ""
+  - "&7This missile has three whole engines."
+  - "&7Doesn't really do anything, just a cool fact."
+  - ""
+  - "&aSpeed: &f1.7m/s"
+  - "&cTNT: &f24"
+  offset:
+    x: -3
+    y: -4
+    z: 4
 
 ant:
   file: 'ant.nbt'
@@ -510,14 +644,29 @@ ant:
   - ""
   - "&7As the name implies, this missile is very small."
   - "&7But fortunately, size doesn't matter in missile wars."
-  - ''
+  - ""
   - "&aSpeed: &f2.2m/s"
   - "&cTNT: &f2"
   offset:
     x: 0
     y: -4
     z: 4
-lifter: {}
+lifter:
+  file: 'lifter.nbt'
+  item: ENDERMITE_SPAWN_EGG
+  name: "&0☢ &lLifter &0⚒"
+  lore:
+  - ""
+  - "&7This missile lifts its TNT (and occupants)"
+  - "&7three blocks up into the air before blowing"
+  - "&7them all up. Bit like my high school grades."
+  - ""
+  - "&aSpeed: &f2.0m/s"
+  - "&cTNT: &f8"
+  offset:
+    x: -1
+    y: -4
+    z: 4
 
 
 # Utility items
@@ -533,9 +682,7 @@ splash:
   - "&7fires, and flood the Nile river every August."
 
 nova_rocket:
-  file: ''
-  item:
-  name: ""
+  name: "&1⚠ &lNova Rocket ☣"
   lore:
   - ""
   - "&7Despite being banned from purchasing from"
@@ -543,29 +690,50 @@ nova_rocket:
   - "&7handy crossbow-launched explosive fireworks"
   - "&7from a trailer park in Florida."
 
-shield_1: {}
-shield_2:
-  file: 'shield_2.nbt'
+shield_1:
+  file: 'shield_1.nbt'
   item: SNOWBALL
-  name: "&f★ Shield ⚒"
+  name: "&f★ Shield I ⚒"
   lore:
   - ""
   - "&7Creates a barrier that is able"
   - "&7to block most missiles. Emphasis on"
   - "&7most. No warranty available."
+  offset:
+    x: -2
+    y: -2
+    z: 0
+shield_2:
+  file: 'shield_2.nbt'
+  item: SNOWBALL
+  name: "&f★ Shield II ⚒"
+  lore:
   - ""
-  - "&9Size: &f2"
+  - "&7Creates a barrier that is able"
+  - "&7to block most missiles. Emphasis on"
+  - "&7most. No warranty available."
   offset:
     x: -3
     y: -3
     z: 0
-shield_3: {}
-
-platform_1: {}
-platform_2:
-  file: 'platform_2.nbt'
+shield_3:
+  file: 'shield_3.nbt'
   item: SNOWBALL
-  name: "&7★ Platform ⚒"
+  name: "&f★ Shield III ⚒"
+  lore:
+  - ""
+  - "&7Creates a barrier that is able"
+  - "&7to block most missiles. Emphasis on"
+  - "&7most. No warranty available."
+  offset:
+    x: -4
+    y: -4
+    z: 0
+
+platform_1:
+  file: 'platform_1.nbt'
+  item: SNOWBALL
+  name: "&7★ Platform I ⚒"
   lore:
   - ""
   - "&7Take a shield, flip it ninety degrees, and"
@@ -573,26 +741,51 @@ platform_2:
   - "&7You can invite your friends onto your"
   - "&7platform and have a platform party. With"
   - "&7blackjack and hookers."
+  offset:
+    x: -2
+    y: 0
+    z: -2
+platform_2:
+  file: 'platform_2.nbt'
+  item: SNOWBALL
+  name: "&7★ Platform II ⚒"
+  lore:
   - ""
-  - "&9Size: &f2"
+  - "&7Take a shield, flip it ninety degrees, and"
+  - "&7you get a platform. It's great for standing on."
+  - "&7You can invite your friends onto your"
+  - "&7platform and have a platform party. With"
+  - "&7blackjack and hookers."
   offset:
     x: -3
     y: 0
     z: -3
-platform_3: {}
+platform_3:
+  file: 'platform_3.nbt'
+  item: SNOWBALL
+  name: "&7★ Platform III ⚒"
+  lore:
+  - ""
+  - "&7Take a shield, flip it ninety degrees, and"
+  - "&7you get a platform. It's great for standing on."
+  - "&7You can invite your friends onto your"
+  - "&7platform and have a platform party. With"
+  - "&7blackjack and hookers."
+  offset:
+    x: -4
+    y: 0
+    z: -4
 
 torpedo_1:
   file: 'torpedo_1.nbt'
   item: EGG
-  name: "&0★ Torpedo ✟"
+  name: "&0★ Torpedo I ✟"
   lore:
   - ""
   - "&7Although this torpedo can't actually move,"
   - "&7it still packs a punch. In the form of a"
   - "&7deadly explosion triggered by the slightest"
   - "&7movement from a player or missile."
-  - ""
-  - "&9Size: &f1"
   offset:
     x: -2
     y: -4
@@ -600,7 +793,7 @@ torpedo_1:
 torpedo_2:
   file: 'torpedo_2.nbt'
   item: EGG
-  name: "&0★ Torpedo ✟"
+  name: "&0★ Torpedo II ✟"
   lore:
   - ""
   - "&7Normal shields have nothing on this gigantic,"
@@ -652,7 +845,6 @@ canopy:
   - "&7local druids."
   - ""
   - "&7Warning: prone to decay."
-  - ""
   offset:
     x: -3
     y: -2
@@ -665,7 +857,15 @@ spawn_creeper:
   - ""
   - "&7A creeper walks into a bar. I wasn't paid"
   - "&7enough to finish the joke"
-spawn_creeper_charged: {}
+spawn_creeper_charged:
+  item: CREEPER_SPAWN_EGG
+  name: "&a★ Spawn Creeper (Charged) &a&l☣"
+  lore:
+  - ""
+  - "&7I wonder what the chemistry behind a charged"
+  - "&7creeper is. Seems like the specimen we have"
+  - "&7here got struck by lightning. It has become"
+  - "&7a lot more aggressive since and we concl-"
 
 fireball:
   item: FIRE_CHARGE
@@ -675,20 +875,42 @@ fireball:
   - "&7No ghasts were harmed in the"
   - "&7making of this utility. Technically."
   - "&7They died instantly and painlessly."
+
+leaves:
+  item: JUNGLE_LEAVES
+  name: "&2★ Leaves ⚒"
+  lore:
   - ""
-  - "&4Power: &f1"
-
-leaves: {}
-
-lingering_potion_of_weakness_1: {}
-lingering_potion_of_weakness_2: {}
+  - "&7Since when could you walk on leaves?"
+  - "&7I thought they would just deca-"
+  
+# 3 different items needed here, since different potion lengths 
+# determined beforehand for each.
+lingering_potion_of_weakness_1:
+  item: LINGERING_POTION
+  name: "&5★ Lingering Harming Potion I ⚡"
+  lore:
+  - ""
+  - "&7How it feels to chew 5 gum"
+lingering_potion_of_weakness_2:
+  item: LINGERING_POTION
+  name: "&5★ Lingering Harming Potion II ⚡"
+  lore:
+  - ""
+  - "&7How it feels to chew 5 gum"
+lingering_potion_of_weakness_3:
+  item: LINGERING_POTION
+  name: "&5★ Lingering Harming Potion III ⚡"
+  lore:
+  - ""
+  - "&7How it feels to chew 5 gum"
 
 
 # Gear items (just used for names and lores i guess)
 
 vanguard_sword:
   item: GOLDEN_SWORD
-  name: "&6⚔ Sword ⚡"
+  name: "&6⚔ Cutlass ⚡"
   lore:
   - ""
   - "&7Many weapons double as tools. Axes chop wood,"
@@ -710,12 +932,12 @@ berserker_crossbow:
   - "&7Before guns were invented, the coolest people"
   - "&7strapped bows sideways onto stick-and-trigger"
   - "&7assemblies. Then they unified the Qin dynasty."
-architect_shears:
-  item: SHEARS
-  name: "&2⚔ Shears ⚒"
+architect_pickaxe:
+  item: IRON_PICKAXE
+  name: "&f⚔ Iron Claw ⚒"
   lore:
   - ""
   - "&7Not to be confused with the Wrench,"
   - "&7this non-australium tool can safely harvest"
   - "&7a wide variety of blocks. Not asbestos, though."
-  - "&7Never touch asbestos, even with shears."
+  - "&7Never touch asbestos, even with a pickaxe."
