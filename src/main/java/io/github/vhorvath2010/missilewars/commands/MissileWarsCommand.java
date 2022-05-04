@@ -305,7 +305,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             if (args.length != 2) {
-                sendErrorMsg(sender, "Incorrect amount of arguments. Please specify a deck to choose.");
+                sendErrorMsg(sender, "Usage: /mw deck Vanguard/Berserker/Sentinel/Architect");
                 return true;
             }
             

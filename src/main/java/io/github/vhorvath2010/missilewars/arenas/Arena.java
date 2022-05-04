@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -62,6 +63,8 @@ public class Arena implements ConfigurationSerializable {
     private String mapType;
     /** The max number of players for this arena. */
     private int capacity;
+    /** The ids of the NPCs */
+    private int[] npcs;
     /** The list of all players currently in the arena. */
     private Set<MissileWarsPlayer> players;
     /** The list of all spectators currently in the arena. */
@@ -86,6 +89,8 @@ public class Arena implements ConfigurationSerializable {
     private Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     private Map<UUID, String> playerVotes;
+    /** Leaves so we can remove them once in a while */
+    private Map<Location, Integer> leaves;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -256,6 +261,10 @@ public class Arena implements ConfigurationSerializable {
      */
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
+    }
+    
+    public void addLeaf(Location location, Player player) {
+        leaves.put(location, 30);
     }
 
     /**
@@ -943,7 +952,19 @@ public class Arena implements ConfigurationSerializable {
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
-                
+                Map<Location, Integer> temp = new HashMap<>(leaves);
+                for (Entry<Location, Integer> e : temp.entrySet()) {
+                    int i = e.getValue();
+                    Location loc = e.getKey();
+                    if (i <= 0) {
+                        if (loc.getBlock().getType().toString().contains("LEAVES")) {
+                            loc.getBlock().setType(Material.AIR);
+                        }
+                        leaves.remove(loc);
+                    } else {
+                        leaves.put(loc, i - 5);
+                    }
+                }
             }
         }.runTaskTimer(plugin, 100, 100));
 

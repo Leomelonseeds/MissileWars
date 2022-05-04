@@ -140,7 +140,7 @@ public class DeckManager {
         ItemStack creeper = createUtilityItem("spawn_creeper");
         ItemStack berserkerarrows = new ItemStack(Material.ARROW, 3);
         
-        List<ItemStack> berserkerpool = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, warhead, breaker, shark,
+        List<ItemStack> berserkerpool = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark,
                 fireball, creeper, berserkerarrows}));
         berserker = new Deck("Berserker", berserkergear, berserkerpool);
 

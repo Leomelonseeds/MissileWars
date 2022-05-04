@@ -223,6 +223,18 @@ public class StructureItemEvents implements Listener {
     @EventHandler
     public void architectLeaves(BlockPlaceEvent event) {
         
+        Player player = event.getPlayer();
+        
+        Arena playerArena = getPlayerArena(player);
+        if (playerArena == null) {
+            return;
+        }
+        
+        if (!event.getItemInHand().getType().toString().contains("LEAVES")) {
+            return;
+        }
+        
+        playerArena.addLeaf(event.getBlockPlaced().getLocation(), player);
     }
     
     private void spawnCanopy(Player player, Arena playerArena) {
