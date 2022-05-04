@@ -492,12 +492,12 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Run proper clearing commands on the player
-        Player mcPlayer = toRemove.getMCPlayer();
         Arena arena = this;
 
         new BukkitRunnable() {
             @Override
             public void run() {
+                Player mcPlayer = toRemove.getMCPlayer();
                 if (mcPlayer != null) {
                 	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
                 	mcPlayer.setGameMode(GameMode.ADVENTURE);

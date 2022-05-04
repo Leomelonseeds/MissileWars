@@ -29,14 +29,8 @@ public class ArenaLeaveEvents implements Listener {
         	InventoryUtils.saveInventory(player);
             return;
         }
-        
-        // Remove player 1 tick later, so the arena doesn't think they're still online
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-            playerArena.removePlayer(player.getUniqueId());
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
+
+        playerArena.removePlayer(player.getUniqueId());
     }
     
     /** Handle inventory loading on join */

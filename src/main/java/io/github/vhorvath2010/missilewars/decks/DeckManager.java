@@ -74,7 +74,7 @@ public class DeckManager {
         ItemStack elderguardian = createSchematicItem("elder_guardian");
         ItemStack gemini = createSchematicItem("gemini");
         ItemStack gemini_w = createSchematicItem("gemini_warrior");
-        ItemStack chron = createSchematicItem("chronullifier");
+        ItemStack chron = createSchematicItem("cronullifier");
         ItemStack aeon = createSchematicItem("aeonullifier");
         ItemStack sword = createSchematicItem("sword");
         ItemStack blade = createSchematicItem("blade");
