@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +20,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -143,6 +142,7 @@ public class StructureItemEvents implements Listener {
     }
     
     Set<UUID> canopy_cooldown = new HashSet<UUID>();
+    public static Map<Location, Integer> leaves = new HashMap<>();
 
     /** Handle utilities utilization. */
     @EventHandler
@@ -190,16 +190,10 @@ public class StructureItemEvents implements Listener {
                 }
             }
         }
-        
-        // Allow if using spawn creeper
-        if (utility.contains("creeper")) {
-            return;
-        }
-        
-        event.setCancelled(true);
 
         // Do proper action based on utility type
         if (utility.equalsIgnoreCase("fireball")) {
+            event.setCancelled(true);
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(2);
@@ -211,6 +205,7 @@ public class StructureItemEvents implements Listener {
             }
             playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         } else if (utility.equalsIgnoreCase("canopy")) {
+            event.setCancelled(true);
             if (canopy_cooldown.contains(player.getUniqueId())) {
                 return;
             }
@@ -221,7 +216,13 @@ public class StructureItemEvents implements Listener {
             ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
             canopy_cooldown.add(player.getUniqueId());
             spawnCanopy(player, playerArena);
-        }
+        } 
+    }
+    
+    // Check for architect leaves to despawn them after a while
+    @EventHandler
+    public void architectLeaves(BlockPlaceEvent event) {
+        
     }
     
     private void spawnCanopy(Player player, Arena playerArena) {

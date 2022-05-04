@@ -1,23 +1,18 @@
 package io.github.vhorvath2010.missilewars.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.json.JSONObject;
+
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
-
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameRule;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 
 public class MissileWarsCommand implements CommandExecutor {
 
@@ -295,6 +290,39 @@ public class MissileWarsCommand implements CommandExecutor {
             } else {
                 sendErrorMsg(sender, "Arena is already running!");
             }
+            return true;
+        }
+        
+        if (action.equalsIgnoreCase("Deck")) {
+            
+            Player player = (Player) sender;
+            
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            
+            if (!(arena == null || arena.getTeam(player.getUniqueId()).equals("no team"))) {
+                sendErrorMsg(sender, "You cannot change decks while playing.");
+                return true;
+            }
+            
+            if (args.length != 2) {
+                sendErrorMsg(sender, "Incorrect amount of arguments. Please specify a deck to choose.");
+                return true;
+            }
+            
+            String deck = args[1];
+            
+            if (plugin.getDeckManager().getDeck(deck) == null) {
+                sendErrorMsg(sender, "Please specify a valid deck!");
+                return true;
+            }
+            
+            // Update deck in cache
+            JSONObject currentDeck = plugin.getJSON().getPlayer(player.getUniqueId());
+            currentDeck.put("Deck", deck);
+            plugin.getJSON().setPlayer(player.getUniqueId(), currentDeck);
+            
+            sendSuccessMsg(sender, "Set your deck to " + deck + "!");
+            
             return true;
         }
         

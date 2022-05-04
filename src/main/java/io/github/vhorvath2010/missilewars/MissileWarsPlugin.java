@@ -20,6 +20,7 @@ import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
 import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
 import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
 import io.github.vhorvath2010.missilewars.events.WorldCreationEvents;
+import io.github.vhorvath2010.missilewars.utilities.JSONManager;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import io.github.vhorvath2010.missilewars.utilities.SQLManager;
 import net.milkbowl.vault.chat.Chat;
@@ -40,6 +41,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private static Chat chat;
     /** The loaded sql manager for this plugin */
     private SQLManager sqlManager;
+    /** The loaded json manager for this plugin */
+    private JSONManager jsonManager;
 
     @Override
     public void onEnable() {
@@ -76,6 +79,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Creating and loading deck items...");
         deckManager = new DeckManager();
         log("All deck items locked and loaded.");
+        
+        // Load player deck cache
+        log("Starting player deck cache...");
+        jsonManager = new JSONManager(this);
+        log("Player deck cache loaded!");
 
         // Load arenas
         log("Loading up arenas...");
@@ -146,6 +154,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
         arenaManager.saveArenas();
         log("Arenas saved!");
         
+        // Save all player decks
+        log("Saving player deck configurations...");
+        jsonManager.saveAll(false);
+        log("Player decks saved!");
+        
         // Close database connection
         log("Closing MySQL connection...");
         sqlManager.onDisable();
@@ -204,6 +217,15 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public SQLManager getSQL() {
         return sqlManager;
+    }
+    
+    /**
+     * Gets the plugin's current json manager
+     * 
+     * @return the plugin's json manager
+     */
+    public JSONManager getJSON() {
+        return jsonManager;
     }
     
     /**

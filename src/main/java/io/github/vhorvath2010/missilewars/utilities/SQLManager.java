@@ -71,6 +71,7 @@ public class SQLManager {
                                 inventory MEDIUMTEXT,
                                 exp INT DEFAULT 0 NOT NULL,
                                 winstreak INT DEFAULT 0 NOT NULL,
+                                deck MEDIUMTEXT,
                                 PRIMARY KEY (uuid)
                         );
                         """
@@ -160,7 +161,7 @@ public class SQLManager {
      * 
      * @param uuid
      */
-    public void createPlayer(UUID uuid) {
+    public void createPlayer(UUID uuid, DBCallback callback) {
         scheduler.runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
@@ -169,6 +170,12 @@ public class SQLManager {
                 )) {
                     stmt.setString(1, uuid.toString());
                     stmt.execute();
+                    scheduler.runTask(plugin, new Runnable() {  
+                        @Override
+                        public void run() {
+                            callback.onQueryDone(null);
+                        }
+                    });
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Failed to create a new entry for " + Bukkit.getPlayer(uuid).getName());
                 }
@@ -712,6 +719,68 @@ public class SQLManager {
             logger.log(Level.SEVERE, "Failed to get nickname of player " + nick + " from CHC database.");
         }
         return nick;
+    }
+    
+    /**
+     * Grab a player's json configuration
+     * 
+     * @param uuid
+     */
+    public void getPlayerDeck(UUID uuid, DBCallback callback) {
+        scheduler.runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                        "SELECT deck FROM umw_players WHERE uuid = ?;"
+                )) {
+                    stmt.setString(1, uuid.toString());
+                    ResultSet resultSet = stmt.executeQuery();
+                    String deck = null;
+                    if (resultSet.next()) {
+                        deck = resultSet.getString("deck");
+                    }
+                    final String result = deck;
+                    callback.onQueryDone(result);
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Failed to get deck for " + Bukkit.getPlayer(uuid).getName());
+                }
+            }
+        });
+    }
+    
+    /**
+     * Save a players deck
+     * 
+     * @param uuid
+     */
+    public void savePlayerDeck(UUID uuid, String deck, Boolean async) {
+        if (async) {
+            scheduler.runTaskAsynchronously(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                            "UPDATE umw_players SET deck = ? WHERE uuid = ?;"
+                    )) {
+                        stmt.setString(1, deck);
+                        stmt.setString(2, uuid.toString());
+                        stmt.execute();
+                    } catch (SQLException e) {
+                        logger.log(Level.SEVERE, "Failed to set deck for " + Bukkit.getPlayer(uuid).getName());
+                    }
+                }
+            });
+            return;
+        } 
+        
+        try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
+                "UPDATE umw_players SET deck = ? WHERE uuid = ?;"
+        )) {
+            stmt.setString(1, deck);
+            stmt.setString(2, uuid.toString());
+            stmt.execute();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to set deck for " + Bukkit.getPlayer(uuid).getName());
+        }
     }
     
     /**

@@ -938,6 +938,14 @@ public class Arena implements ConfigurationSerializable {
                 }
             }.runTaskLater(plugin, i * 20));
         }
+        
+        // Despawn leaves after a while
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                
+            }
+        }.runTaskTimer(plugin, 100, 100));
 
         running = true;
         return true;
