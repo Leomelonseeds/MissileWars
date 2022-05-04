@@ -886,19 +886,19 @@ leaves:
   
 # 3 different items needed here, since different potion lengths 
 # determined beforehand for each.
-lingering_potion_of_weakness_1:
+lingering_harming_1:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion I ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
-lingering_potion_of_weakness_2:
+lingering_harming_2:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion II ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
-lingering_potion_of_weakness_3:
+lingering_harming_3:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion III ⚡"
   lore:

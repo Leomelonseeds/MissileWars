@@ -493,22 +493,29 @@ public class Arena implements ConfigurationSerializable {
 
         // Run proper clearing commands on the player
         Player mcPlayer = toRemove.getMCPlayer();
-        if (mcPlayer != null) {
-        	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
-        	mcPlayer.setGameMode(GameMode.ADVENTURE);
-        	mcPlayer.setHealth(20);
-        	InventoryUtils.loadInventory(mcPlayer);
-            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, this, null);
-            RankUtils.setPlayerExpBar(mcPlayer);
-            
-            // Notify discord
-            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-            discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + this.getName()).queue();
-            
-            for (Player player : Bukkit.getWorld("world").getPlayers()) {
-                ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
+        Arena arena = this;
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (mcPlayer != null) {
+                	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
+                	mcPlayer.setGameMode(GameMode.ADVENTURE);
+                	mcPlayer.setHealth(20);
+                	InventoryUtils.loadInventory(mcPlayer);
+                    ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
+                    RankUtils.setPlayerExpBar(mcPlayer);
+                    
+                    // Notify discord
+                    TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+                    discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + arena.getName()).queue();
+                    
+                    for (Player player : Bukkit.getWorld("world").getPlayers()) {
+                        ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
+                    }
+                }
             }
-        }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
         
         checkEmpty();
 
@@ -1083,7 +1090,7 @@ public class Arena implements ConfigurationSerializable {
         String most_deaths = String.join(", ", mostDeathsList);
         
         int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
-        int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getKills();
+        int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getDeaths();
         
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
