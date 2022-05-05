@@ -152,18 +152,11 @@ public class ArenaManager {
             logger.log(Level.WARNING, "An arena with players in it cannot be deleted");
             return false;
         }
-        // Reload citizens to load chunks
-        try {
-            logger.log(Level.INFO, "Reloading citizens to properly remove them...");
-            ((Citizens) CitizensAPI.getPlugin()).reload();
-        } catch (NPCLoadException e) {
-            logger.log(Level.INFO, "Reloading citizens failed somehow :(");
-        }
-        for (Entity entity : arenaWorld.getEntities()) {
-            if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
-                logger.log(Level.INFO, "Citizen with UUID " + entity.getUniqueId() + " deleted.");
-                CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
-            }
+        // Remove citizens
+        for (int id : arena.getNPCs()) {
+            UUID uuid = CitizensAPI.getNPCRegistry().getById(id).getEntity().getUniqueId();
+            logger.log(Level.INFO, "Deleting citizen with UUID " + uuid);
+            CitizensAPI.getNPCRegistry().getById(id).destroy();
         }
         CitizensAPI.getNPCRegistry().saveToStore();
         Bukkit.unloadWorld(arenaWorld, false);
@@ -474,6 +467,11 @@ public class ArenaManager {
         // Register arena
         Arena arena = new Arena(name, capacity);
         loadedArenas.add(arena);
+        NPC[] npcs = {redNPC, blueNPC, bartender, vanguard, berserker, sentinel, architect};
+        for (NPC npc : npcs) {
+            arena.addNPC(npc.getId());
+        }
+    
 
         // Setup regions
         WorldGuard wg = WorldGuard.getInstance();

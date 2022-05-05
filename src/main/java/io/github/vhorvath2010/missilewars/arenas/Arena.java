@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,7 +65,7 @@ public class Arena implements ConfigurationSerializable {
     /** The max number of players for this arena. */
     private int capacity;
     /** The ids of the NPCs */
-    private int[] npcs;
+    private List<Integer> npcs;
     /** The list of all players currently in the arena. */
     private Set<MissileWarsPlayer> players;
     /** The list of all spectators currently in the arena. */
@@ -106,6 +107,8 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
+        leaves = new HashMap<>();
+        npcs = new ArrayList<>();
         setupMapVotes();
     }
 
@@ -118,6 +121,11 @@ public class Arena implements ConfigurationSerializable {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
         serializedArena.put("capacity", capacity);
+        List<String> npcStrings = new ArrayList<>();
+        for (int i : npcs) {
+            npcStrings.add(Integer.toString(i));
+        }
+        serializedArena.put("npc", String.join(",", npcStrings));
         return serializedArena;
     }
 
@@ -129,6 +137,11 @@ public class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
+        npcs = new ArrayList<>();
+        String npcIDs = (String) serializedArena.get("npc");
+        for (String s : npcIDs.split(",")) {
+            npcs.add(Integer.parseInt(s));
+        }
         players = new HashSet<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
@@ -152,6 +165,14 @@ public class Arena implements ConfigurationSerializable {
         }
 
         playerVotes = new HashMap<>();
+    }
+    
+    public void addNPC(int id) {
+        npcs.add(id);
+    }
+    
+    public List<Integer> getNPCs() {
+        return npcs;
     }
 
     /**
@@ -990,6 +1011,7 @@ public class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
         resetting = false;
+        leaves.clear();
         setupMapVotes();
     }
 
