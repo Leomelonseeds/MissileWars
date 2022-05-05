@@ -107,7 +107,6 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
-        leaves = new HashMap<>();
         npcs = new ArrayList<>();
         setupMapVotes();
     }
@@ -245,7 +244,7 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the map successfully generated, otherwise false
      */
     public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), true, mapType);
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), mapType, null);
     }
     
     /**
@@ -701,7 +700,7 @@ public class Arena implements ConfigurationSerializable {
                 if (!running) {
                     if (startTime != null) {
                         int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                        if (time <= 5 && time >= -5) {
+                        if (time <= 2 && time >= -2) {
                             ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                             return;
                         }
@@ -970,6 +969,7 @@ public class Arena implements ConfigurationSerializable {
         }
         
         // Despawn leaves after a while
+        leaves = new HashMap<>();
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {

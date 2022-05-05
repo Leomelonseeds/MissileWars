@@ -3,11 +3,10 @@ package io.github.vhorvath2010.missilewars.utilities;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.json.JSONObject;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -58,6 +57,11 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("team")) {
             return playerArena == null ? "no team" : ChatColor.stripColor(playerArena.getTeam(player.getUniqueId()));
         } 
+        
+        if (params.equalsIgnoreCase("deck")) {
+            JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+            return json.getString("Deck");
+        }
         
         // Rank placeholders
         if (params.contains("rank")) {
