@@ -764,7 +764,7 @@ public class Arena implements ConfigurationSerializable {
         if (startTime == null) {
 
             // Reloads citizens if they for some reason aren't present
-            if (getWorld().getEntityCount() < 5) {
+            if (getWorld().getEntityCount() < 9) {
                 try {
                     ((Citizens) CitizensAPI.getPlugin()).reload();
                 } catch (NPCLoadException e) {
