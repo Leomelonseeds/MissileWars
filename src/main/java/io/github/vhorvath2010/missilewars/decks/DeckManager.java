@@ -187,14 +187,15 @@ public class DeckManager {
      * @return the decks
      */
     public Deck getDeck(String name) {
-        if (name.equalsIgnoreCase("Vanguard")) {
-            return vanguard;
-        } else if (name.equalsIgnoreCase("Sentinel")) {
-            return sentinel;
-        } else if (name.equalsIgnoreCase("Berserker")) {
-            return berserker;
-        } else if (name.equalsIgnoreCase("Architect")) {
-            return architect;
+        switch (name) {
+            case "Vanguard":
+                return vanguard;
+            case "Sentinel":
+                return sentinel;
+            case "Berserker":
+                return berserker;
+            case "Architect":
+                return architect;
         }
         return null;
     }

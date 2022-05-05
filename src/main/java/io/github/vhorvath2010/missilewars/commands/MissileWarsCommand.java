@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.commands;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -309,7 +310,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
-            String deck = args[1];
+            String deck = StringUtils.capitalize(args[1].toLowerCase());
             
             if (plugin.getDeckManager().getDeck(deck) == null) {
                 sendErrorMsg(sender, "Please specify a valid deck!");
