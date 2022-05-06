@@ -48,6 +48,7 @@ import io.github.vhorvath2010.missilewars.utilities.SQLManager;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
+import net.citizensnpcs.api.npc.NPC;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 
@@ -585,6 +586,7 @@ public class Arena implements ConfigurationSerializable {
         checkEmpty();
         
         player.teleport(getPlayerSpawn(player));
+        player.setGameMode(GameMode.ADVENTURE);
         
         return true; 
     }
@@ -763,12 +765,13 @@ public class Arena implements ConfigurationSerializable {
         // Schedule the start of the game if not already running
         if (startTime == null) {
 
-            // Reloads citizens if they for some reason aren't present
+            // Respawns citizens if they are not present
             if (getWorld().getEntityCount() < 9) {
-                try {
-                    ((Citizens) CitizensAPI.getPlugin()).reload();
-                } catch (NPCLoadException e) {
-                    Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
+                for (int i : npcs) {
+                    NPC npc = CitizensAPI.getNPCRegistry().getById(i);
+                    Location loc = npc.getStoredLocation();
+                    npc.despawn();
+                    npc.spawn(loc);
                 }
             }
             
