@@ -1,20 +1,29 @@
 package io.github.vhorvath2010.missilewars.teams;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.json.JSONObject;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 
 /** Represents a team of Missile Wars Players. */
 public class MissileWarsTeam {
@@ -125,7 +134,6 @@ public class MissileWarsTeam {
         InventoryUtils.clearInventory(mcPlayer);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        mcPlayer.getInventory().setBoots(createColoredArmor(Material.LEATHER_BOOTS));
     }
 
     /**
@@ -136,9 +144,13 @@ public class MissileWarsTeam {
     public void addPlayer(MissileWarsPlayer player) {
         
         members.add(player);
+        
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getMCPlayerId());
+        
+        String deck = json.getString("Deck");
 
         // Assign default deck
-        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDefaultDeck());
+        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDeck(deck));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();

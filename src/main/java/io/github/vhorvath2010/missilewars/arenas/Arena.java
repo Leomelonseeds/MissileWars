@@ -3,12 +3,14 @@ package io.github.vhorvath2010.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -62,6 +64,8 @@ public class Arena implements ConfigurationSerializable {
     private String mapType;
     /** The max number of players for this arena. */
     private int capacity;
+    /** The ids of the NPCs */
+    private List<Integer> npcs;
     /** The list of all players currently in the arena. */
     private Set<MissileWarsPlayer> players;
     /** The list of all spectators currently in the arena. */
@@ -86,6 +90,8 @@ public class Arena implements ConfigurationSerializable {
     private Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     private Map<UUID, String> playerVotes;
+    /** Leaves so we can remove them once in a while */
+    private Map<Location, Integer> leaves;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -101,6 +107,7 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
+        npcs = new ArrayList<>();
         setupMapVotes();
     }
 
@@ -113,6 +120,11 @@ public class Arena implements ConfigurationSerializable {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
         serializedArena.put("capacity", capacity);
+        List<String> npcStrings = new ArrayList<>();
+        for (int i : npcs) {
+            npcStrings.add(Integer.toString(i));
+        }
+        serializedArena.put("npc", String.join(",", npcStrings));
         return serializedArena;
     }
 
@@ -124,6 +136,11 @@ public class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
+        npcs = new ArrayList<>();
+        String npcIDs = (String) serializedArena.get("npc");
+        for (String s : npcIDs.split(",")) {
+            npcs.add(Integer.parseInt(s));
+        }
         players = new HashSet<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
@@ -147,6 +164,14 @@ public class Arena implements ConfigurationSerializable {
         }
 
         playerVotes = new HashMap<>();
+    }
+    
+    public void addNPC(int id) {
+        npcs.add(id);
+    }
+    
+    public List<Integer> getNPCs() {
+        return npcs;
     }
 
     /**
@@ -219,7 +244,7 @@ public class Arena implements ConfigurationSerializable {
      * @return true if the map successfully generated, otherwise false
      */
     public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), true, mapType);
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), mapType, null);
     }
     
     /**
@@ -256,6 +281,10 @@ public class Arena implements ConfigurationSerializable {
      */
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
+    }
+    
+    public void addLeaf(Location location, Player player) {
+        leaves.put(location, 30);
     }
 
     /**
@@ -671,7 +700,7 @@ public class Arena implements ConfigurationSerializable {
                 if (!running) {
                     if (startTime != null) {
                         int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                        if (time <= 5 && time >= -5) {
+                        if (time <= 2 && time >= -2) {
                             ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                             return;
                         }
@@ -735,7 +764,7 @@ public class Arena implements ConfigurationSerializable {
         if (startTime == null) {
 
             // Reloads citizens if they for some reason aren't present
-            if (getWorld().getEntityCount() < 5) {
+            if (getWorld().getEntityCount() < 9) {
                 try {
                     ((Citizens) CitizensAPI.getPlugin()).reload();
                 } catch (NPCLoadException e) {
@@ -938,6 +967,27 @@ public class Arena implements ConfigurationSerializable {
                 }
             }.runTaskLater(plugin, i * 20));
         }
+        
+        // Despawn leaves after a while
+        leaves = new HashMap<>();
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                Map<Location, Integer> temp = new HashMap<>(leaves);
+                for (Entry<Location, Integer> e : temp.entrySet()) {
+                    int i = e.getValue();
+                    Location loc = e.getKey();
+                    if (i <= 0) {
+                        if (loc.getBlock().getType().toString().contains("LEAVES")) {
+                            loc.getBlock().setType(Material.AIR);
+                        }
+                        leaves.remove(loc);
+                    } else {
+                        leaves.put(loc, i - 5);
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 100, 100));
 
         running = true;
         return true;
@@ -961,6 +1011,7 @@ public class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
         resetting = false;
+        leaves.clear();
         setupMapVotes();
     }
 

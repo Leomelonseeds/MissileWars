@@ -31,6 +31,7 @@ public class ArenaLeaveEvents implements Listener {
         }
 
         playerArena.removePlayer(player.getUniqueId());
+        MissileWarsPlugin.getPlugin().getJSON().savePlayer(player.getUniqueId());
     }
     
     /** Handle inventory loading on join */
@@ -40,11 +41,14 @@ public class ArenaLeaveEvents implements Listener {
     	if (!player.getWorld().getName().equals("world")) {
     		return;
     	}
-    	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId());
-    	if (player.hasPlayedBefore()) {
-    	    InventoryUtils.loadInventory(player);
-    	} 
-    	RankUtils.setPlayerExpBar(player);
+    	
+    	// Load player data, making sure for new players that it happens after an entry for
+    	// them is created.
+    	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
+            MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
+            InventoryUtils.loadInventory(player);
+            RankUtils.setPlayerExpBar(player);
+    	});
     }
 
     /** Remove player from Arena if they leave the world.

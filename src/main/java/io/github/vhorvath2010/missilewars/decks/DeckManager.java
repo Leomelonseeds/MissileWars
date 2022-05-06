@@ -24,8 +24,10 @@ import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
 
-    /** The default deck for players. */
-    private final Deck defaultDeck;
+    private final Deck vanguard;
+    private final Deck sentinel;
+    private final Deck berserker;
+    private final Deck architect;
 
     /** Set up the DeckManager with loaded decks. */
     public DeckManager() {
@@ -41,6 +43,12 @@ public class DeckManager {
         swordMeta.setUnbreakable(true);
         vsword.setItemMeta(swordMeta);
         vanguardgear.add(vsword);
+        ItemStack vboots = new ItemStack(Material.GOLDEN_BOOTS);
+        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 2);
+        ItemMeta vbootsMeta = vboots.getItemMeta();
+        vbootsMeta.setUnbreakable(true);
+        vboots.setItemMeta(vbootsMeta);
+        vanguardgear.add(vboots);
 
         ItemStack lightning = createSchematicItem("lightning");
         ItemStack hurricane = createSchematicItem("hurricane");
@@ -55,7 +63,11 @@ public class DeckManager {
 
         ItemStack splash = createUtilityItem("splash");
         ItemStack canopy = createUtilityItem("canopy");
-        ItemStack lingering = createSchematicItem("lingering_harming_1");
+        ItemStack lingering = createUtilityItem("lingering_harming_1");
+        
+        List<ItemStack> vanguardpool = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo,
+                splash, canopy, lingering}));
+        vanguard = new Deck("Vanguard", vanguardgear, vanguardpool);
         
         
         // Sentinel 
@@ -69,6 +81,12 @@ public class DeckManager {
         bowMeta.setUnbreakable(true);
         bow.setItemMeta(bowMeta);
         sentinelgear.add(bow);
+        ItemStack sboots = new ItemStack(Material.IRON_BOOTS);
+        sboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 2);
+        ItemMeta sbootsMeta = sboots.getItemMeta();
+        sbootsMeta.setUnbreakable(true);
+        sboots.setItemMeta(sbootsMeta);
+        sentinelgear.add(sboots);
 
         ItemStack guardian = createSchematicItem("guardian");
         ItemStack elderguardian = createSchematicItem("elder_guardian");
@@ -84,6 +102,10 @@ public class DeckManager {
         ItemStack torpedo = createSchematicItem("torpedo_2");
         ItemStack obsidianshield = createSchematicItem("obsidian_shield");
         ItemStack sentinelarrows = new ItemStack(Material.ARROW, 3);
+        
+        List<ItemStack> sentinelpool = new ArrayList<>(List.of(new ItemStack[]{guardian, gemini_w, aeon, sword, piranha,
+                torpedo, obsidianshield, sentinelarrows}));
+        sentinel = new Deck("Sentinel", sentinelgear, sentinelpool);
 
         
         // Berserker
@@ -96,6 +118,12 @@ public class DeckManager {
         crossbowMeta.setUnbreakable(true);
         crossbow.setItemMeta(crossbowMeta);
         berserkergear.add(crossbow);
+        ItemStack bboots = new ItemStack(Material.DIAMOND_BOOTS);
+        bboots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 3);
+        ItemMeta bbootsMeta = bboots.getItemMeta();
+        bbootsMeta.setUnbreakable(true);
+        bboots.setItemMeta(bbootsMeta);
+        berserkergear.add(bboots);
 
         ItemStack supporter = createSchematicItem("supporter");
         ItemStack auxiliary = createSchematicItem("auxiliary");
@@ -111,6 +139,10 @@ public class DeckManager {
         ItemStack fireball = createUtilityItem("fireball");
         ItemStack creeper = createUtilityItem("spawn_creeper");
         ItemStack berserkerarrows = new ItemStack(Material.ARROW, 3);
+        
+        List<ItemStack> berserkerpool = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark,
+                fireball, creeper, berserkerarrows}));
+        berserker = new Deck("Berserker", berserkergear, berserkerpool);
 
         
         // Architect
@@ -122,6 +154,12 @@ public class DeckManager {
         pickaxeMeta.setUnbreakable(true);
         pickaxe.setItemMeta(pickaxeMeta);
         architectgear.add(pickaxe);
+        ItemStack aboots = new ItemStack(Material.CHAINMAIL_BOOTS);
+        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 1);
+        ItemMeta abootsMeta = aboots.getItemMeta();
+        abootsMeta.setUnbreakable(true);
+        aboots.setItemMeta(abootsMeta);
+        architectgear.add(aboots);
         
         ItemStack shipper = createSchematicItem("shipper");
         ItemStack slasher = createSchematicItem("slasher");
@@ -138,19 +176,28 @@ public class DeckManager {
         ItemStack platform = createSchematicItem("platform_2");
         ItemStack leaves = createUtilityItem("leaves");
         
-        List<ItemStack> pool = new ArrayList<>(List.of(new ItemStack[]{sentinelarrows, ant, piranha, thunderbolt, meganaut,
-                tomatwo, bullet, gemini, slingshot, blade, torpedo, fireball, splash, canopy, creeper}));
-
-        defaultDeck = new Deck("Default", berserkergear, pool);
+        List<ItemStack> architectpool = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter,
+                shield, platform, leaves}));
+        architect = new Deck("Architect", architectgear, architectpool);
     }
 
     /**
-     * Obtain and return the default deck.
+     * Obtain and return the various decks
      *
-     * @return the default deck
+     * @return the decks
      */
-    public Deck getDefaultDeck() {
-        return defaultDeck;
+    public Deck getDeck(String name) {
+        switch (name) {
+            case "Vanguard":
+                return vanguard;
+            case "Sentinel":
+                return sentinel;
+            case "Berserker":
+                return berserker;
+            case "Architect":
+                return architect;
+        }
+        return null;
     }
 
     /**
@@ -192,7 +239,7 @@ public class DeckManager {
                 .toString(), "items.yml");
 
         // Setup item
-        ItemStack item = new ItemStack(Material.getMaterial(itemsConfig.getString(type + ".item")));
+        ItemStack item = new ItemStack(Material.getMaterial(itemsConfig.getString(type + ".item")), type.equals("leaves") ? 4 : 1);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&',
                 itemsConfig.getString(type + ".name")));
@@ -207,10 +254,12 @@ public class DeckManager {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
+            itemMeta = pmeta;
         } else if (type.contains("lingering")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 10, 1), true);
             pmeta.setColor(Color.PURPLE);
+            itemMeta = pmeta;
         }
         item.setItemMeta(itemMeta);
         return item;

@@ -2,8 +2,10 @@ package io.github.vhorvath2010.missilewars.decks;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -51,7 +53,11 @@ public class Deck {
      */
     public void giveGear(Player player) {
         for (ItemStack gearItem : gear) {
-            player.getInventory().addItem(gearItem);
+            if (gearItem.getType().toString().contains("BOOTS")) {
+                player.getInventory().setBoots(gearItem);
+            } else {
+                player.getInventory().addItem(gearItem);
+            }
         }
     }
 
