@@ -1,9 +1,9 @@
 package io.github.vhorvath2010.missilewars.decks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +39,8 @@ public class Deck {
         this.gear = gear;
         this.missiles = missiles;
         this.utility = utility;
-        List<ItemStack> combined = ListUtils.union(missiles, utility);
+        List<ItemStack> combined = new ArrayList<>(missiles);
+        combined.addAll(utility);
         this.pool = combined;
     }
 
