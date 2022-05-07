@@ -2,10 +2,8 @@ package io.github.vhorvath2010.missilewars.decks;
 
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

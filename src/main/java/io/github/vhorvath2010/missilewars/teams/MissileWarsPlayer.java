@@ -26,7 +26,7 @@ public class MissileWarsPlayer {
     private int missiles;
     /** The time that the player joined the game */
     private LocalDateTime joinTime;
-    
+
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -100,12 +100,12 @@ public class MissileWarsPlayer {
     public void incrementDeaths() {
         deaths++;
     }
-    
+
     /** Increment the utility count for this {@link MissileWarsPlayer}. */
     public void incrementUtility() {
         utility++;
     }
-    
+
     /**
      * Get the number of utility spawns this {@link MissileWarsPlayer} has.
      *
@@ -114,12 +114,12 @@ public class MissileWarsPlayer {
     public int getUtility() {
         return utility;
     }
-    
+
     /** Increment the missile count for this {@link MissileWarsPlayer}. */
     public void incrementMissiles() {
         missiles++;
     }
-    
+
     /**
      * Get the number of missile spawns this {@link MissileWarsPlayer} has.
      *
@@ -128,7 +128,7 @@ public class MissileWarsPlayer {
     public int getMissiles() {
         return missiles;
     }
-    
+
     /** Reset the stats of this {@link MissileWarsPlayer} back to 0 */
     public void resetPlayer() {
         missiles = 0;
@@ -136,12 +136,12 @@ public class MissileWarsPlayer {
         kills = 0;
         deaths = 0;
     }
-    
+
     /** Set the join time of this {@link MissileWarsPlayer} */
     public void setJoinTime(LocalDateTime time) {
         joinTime = time;
     }
-    
+
     /**
      * Get the join time of this {@link MissileWarsPlayer}.
      *

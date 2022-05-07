@@ -1,10 +1,5 @@
 package io.github.vhorvath2010.missilewars.listener;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -44,7 +39,7 @@ public class ArenaGameruleListener implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     /** Handle void death. Works outside arenas too. */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
@@ -58,7 +53,7 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
     }
-    
+
     /** Handle player deaths. */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -77,7 +72,7 @@ public class ArenaGameruleListener implements Listener {
             killer.incrementKills();
             ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
         }
-        
+
         Component deathMessage = event.deathMessage();
         event.setDeathMessage("");
 
@@ -89,10 +84,10 @@ public class ArenaGameruleListener implements Listener {
                 p.sendMessage(deathMessage);
             }
         }
-        
+
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
-    
+
     /** Just in case a player somehow respawns in the lobby */
     @EventHandler
     public void onRespawn(PlayerPostRespawnEvent event) {
@@ -115,11 +110,7 @@ public class ArenaGameruleListener implements Listener {
         Player player = (Player) event.getEntity();
         ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
-        if (arena == null) {
-            return;
-        }
-        
-        if (!arena.isRunning()) {
+        if ((arena == null) || !arena.isRunning()) {
             return;
         }
 
@@ -143,11 +134,11 @@ public class ArenaGameruleListener implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     /** Make sure players can't create portals */
     @EventHandler
     public void onPortalCreate(PortalCreateEvent event) {
-        
+
         // Ensure it was in an arena world
         String possibleArenaName = event.getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
@@ -157,16 +148,16 @@ public class ArenaGameruleListener implements Listener {
 
         event.setCancelled(true);
     }
-    
+
     /** Make sure players can't teleport with ender pearls */
     @EventHandler
     public void onPearl(PlayerTeleportEvent event) {
-        
+
         // Ensure it's an ender pearl
         if (event.getCause() != TeleportCause.ENDER_PEARL) {
             return;
         }
-        
+
         // Ensure it was in an arena world
         String possibleArenaName = event.getPlayer().getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
@@ -192,7 +183,7 @@ public class ArenaGameruleListener implements Listener {
             // Register shield breaking
             possibleArena.registerShieldBlockEdit(block.getLocation(), false);
         });
-        
+
         EntityType entity = event.getEntityType();
 
         // Ensure its actually a fireball
@@ -239,7 +230,7 @@ public class ArenaGameruleListener implements Listener {
         // Register block break
         possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), true);
     }
-    
+
     /** Stop chickens spawning from eggs */
     @EventHandler
     public void onEgg(CreatureSpawnEvent event) {

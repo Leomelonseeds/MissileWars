@@ -161,12 +161,12 @@ public class ConfigUtils {
             String msg = messagesConfig.getString(path);
             player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
         }
-        
+
         // Check for associated sound
         String soundPath = path.replace("messages.", "");
         sendConfigSound(soundPath, player);
     }
-    
+
     /**
      * Send a sound to the player.
      *
@@ -176,18 +176,18 @@ public class ConfigUtils {
     public static void sendConfigSound(String path, Player player) {
         FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "sounds.yml");
-        
+
         if (!soundConfig.contains(path)) {
         	return;
         }
-        
+
         Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
-        
+
         player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
     }
-    
+
     /**
      * Send a sound to the player, with location! Mainly
      * useful for utility items.
@@ -199,38 +199,38 @@ public class ConfigUtils {
     public static void sendConfigSound(String path, Player player, Location location) {
         FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
                 "sounds.yml");
-        
+
         if (!soundConfig.contains(path)) {
         	return;
         }
-        
+
         Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
-        
+
         player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
-    
+
     /**
      * Gets world spawn location w/ yaw and pitch
-     * 
+     *
      * @return Location
      */
     public static Location getSpawnLocation() {
     	FileConfiguration config = MissileWarsPlugin.getPlugin().getConfig();
-    	
+
     	double x = config.getDouble("spawn.x");
     	double y = config.getDouble("spawn.y");
     	double z = config.getDouble("spawn.z");
     	float yaw = (float) config.getDouble("spawn.yaw");
     	float pitch = (float) config.getDouble("spawn.pitch");
-    	
+
     	return new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
     }
-    
+
     /**
      * Gets focus name of player
-     * 
+     *
      * @param player
      * @return player name stripped of color and applied of team
      */

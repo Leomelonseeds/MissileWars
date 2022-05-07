@@ -61,7 +61,7 @@ public class ArenaInventoryListener implements Listener {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
     }
-    
+
     /** Handle map voting */
     @EventHandler
     public void onMapVote(InventoryClickEvent event) {
@@ -72,12 +72,8 @@ public class ArenaInventoryListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
-        if (arena == null) {
-            return;
-        }
-
         // Ensure map vote inventory is open
-        if (!event.getView().getTitle().equals(ConfigUtils.getConfigText("inventories.map-voting.title", player, null, null))) {
+        if ((arena == null) || !event.getView().getTitle().equals(ConfigUtils.getConfigText("inventories.map-voting.title", player, null, null))) {
             return;
         }
 
@@ -142,7 +138,7 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Stop drops of gear items
-        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId()); 
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         if (mwPlayer.getDeck().getGear().contains(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
@@ -178,7 +174,7 @@ public class ArenaInventoryListener implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     /** Remove glass bottles after drinking potions */
     @EventHandler
     public void onDrink(PlayerItemConsumeEvent event) {

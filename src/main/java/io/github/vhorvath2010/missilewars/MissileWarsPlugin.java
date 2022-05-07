@@ -16,8 +16,8 @@ import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
 import io.github.vhorvath2010.missilewars.decks.DeckManager;
 import io.github.vhorvath2010.missilewars.listener.ArenaGameruleListener;
 import io.github.vhorvath2010.missilewars.listener.ArenaInventoryListener;
-import io.github.vhorvath2010.missilewars.listener.JoinLeaveListener;
 import io.github.vhorvath2010.missilewars.listener.CustomItemListener;
+import io.github.vhorvath2010.missilewars.listener.JoinLeaveListener;
 import io.github.vhorvath2010.missilewars.listener.WorldCreationListener;
 import io.github.vhorvath2010.missilewars.utilities.JSONManager;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
@@ -50,7 +50,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Register serializable data
         ConfigurationSerialization.registerClass(Arena.class);
-        
+
         // Save data files
         log("Loading and saving config files...");
         saveDefaultConfig();
@@ -77,7 +77,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Creating and loading deck items...");
         deckManager = new DeckManager();
         log("All deck items locked and loaded.");
-        
+
         // Load player deck cache
         log("Starting player deck cache...");
         jsonManager = new JSONManager(this);
@@ -93,17 +93,17 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Hooking into PlaceholderAPI...");
         new MissileWarsPlaceholder().register();
         log("All placeholders registered.");
-        
+
         // Load economy
         log("Hooking into Vault...");
         setupVault();
         log("Economy setup complete.");
-        
+
         // Load MySQL
         log("Setting up the MySQL database...");
         setupDatabase();
         log("MySQL setup complete.");
-        
+
         log("Missile Wars is ready to play :)");
     }
 
@@ -116,7 +116,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         RegisteredServiceProvider<Chat> rspC = getServer().getServicesManager().getRegistration(Chat.class);
         chat = rspC.getProvider();
     }
-    
+
     /**
      * Setup the server database
      */
@@ -128,7 +128,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
             this.getPluginLoader().disablePlugin(this);
         }
         log("MySQL connection test complete.");
-        
+
         log("Setting up default tables...");
         sqlManager.setupTables();
     }
@@ -151,12 +151,12 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Saving arenas to file...");
         arenaManager.saveArenas();
         log("Arenas saved!");
-        
+
         // Save all player decks
         log("Saving player deck configurations...");
         jsonManager.saveAll(false);
         log("Player decks saved!");
-        
+
         // Close database connection
         log("Closing MySQL connection...");
         sqlManager.onDisable();
@@ -189,46 +189,46 @@ public final class MissileWarsPlugin extends JavaPlugin {
     public ArenaManager getArenaManager() {
         return arenaManager;
     }
-    
+
     /**
      * Gets the plugin's current Economy
-     * 
+     *
      * @return the plugin's current Economy
      */
     public Economy getEconomy() {
         return econ;
     }
-    
+
     /**
      * Gets the vault chat API
-     * 
+     *
      * @return the vault chat API
      */
     public Chat getChat() {
         return chat;
     }
-    
+
     /**
      * Gets the plugin's current database manager
-     * 
+     *
      * @return the plugin's database manager
      */
     public SQLManager getSQL() {
         return sqlManager;
     }
-    
+
     /**
      * Gets the plugin's current json manager
-     * 
+     *
      * @return the plugin's json manager
      */
     public JSONManager getJSON() {
         return jsonManager;
     }
-    
+
     /**
      * Send a logging message to the console
-     * 
+     *
      * @param message
      */
     private void log(String message) {

@@ -33,7 +33,7 @@ public class JoinLeaveListener implements Listener {
         playerArena.removePlayer(player.getUniqueId());
         MissileWarsPlugin.getPlugin().getJSON().savePlayer(player.getUniqueId());
     }
-    
+
     /** Handle inventory loading on join */
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
@@ -41,7 +41,7 @@ public class JoinLeaveListener implements Listener {
     	if (!player.getWorld().getName().equals("world")) {
     		return;
     	}
-    	
+
     	// Load player data, making sure for new players that it happens after an entry for
     	// them is created.
     	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
@@ -54,15 +54,15 @@ public class JoinLeaveListener implements Listener {
     /** Remove player from Arena if they leave the world. */
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
-    	
+
     	Player player = event.getPlayer();
-    	
-        if (event.getFrom().getName().contains("mwarena")) {       
+
+        if (event.getFrom().getName().contains("mwarena")) {
 	        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
 	        Arena playerArena = manager.getArena(player.getUniqueId());
 	        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
 	            return;
-	        }   
+	        }
 	        // Check 1 tick later to make 100% sure
 	        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
 	            if (player.getWorld().getName().equals("world")) {
@@ -70,5 +70,5 @@ public class JoinLeaveListener implements Listener {
 	            }
 	        }, 1);
         }
-    }     
+    }
 }

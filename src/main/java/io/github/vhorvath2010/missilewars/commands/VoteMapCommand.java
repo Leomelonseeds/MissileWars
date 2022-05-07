@@ -1,13 +1,14 @@
 package io.github.vhorvath2010.missilewars.commands;
 
-import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.arenas.Arena;
-import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
+import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 
 public class VoteMapCommand implements CommandExecutor {
 

@@ -9,16 +9,16 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 
 public class DBConnectionManager {
-    
+
     private final MissileWarsPlugin plugin;
     private HikariDataSource dataSource;
-    
-    
+
+
     public DBConnectionManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         setupDatabase();
     }
-    
+
     private void setupDatabase() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:mysql://" + plugin.getConfig().getString("mysql.url"));
@@ -28,14 +28,14 @@ public class DBConnectionManager {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.setMaximumPoolSize(10);
-        
+
         dataSource = new HikariDataSource(config);
     }
-    
+
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
-    
+
     public void closePool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();

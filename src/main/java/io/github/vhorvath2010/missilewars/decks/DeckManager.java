@@ -31,9 +31,9 @@ public class DeckManager {
 
     /** Set up the DeckManager with loaded decks. */
     public DeckManager() {
-        
+
         // Setup gear items
-        
+
         // Vanguard
         List<ItemStack> vanguardgear = new ArrayList<>();
         ItemStack vsword = createUtilityItem("vanguard_sword");
@@ -64,13 +64,13 @@ public class DeckManager {
         ItemStack splash = createUtilityItem("splash");
         ItemStack canopy = createUtilityItem("canopy");
         ItemStack lingering = createUtilityItem("lingering_harming_1");
-        
+
         List<ItemStack> vanguardpool = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo,
                 splash, canopy, lingering}));
         vanguard = new Deck("Vanguard", vanguardgear, vanguardpool);
-        
-        
-        // Sentinel 
+
+
+        // Sentinel
         List<ItemStack> sentinelgear = new ArrayList<>();
         ItemStack bow = createUtilityItem("sentinel_bow");
         bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
@@ -102,12 +102,12 @@ public class DeckManager {
         ItemStack torpedo = createSchematicItem("torpedo_2");
         ItemStack obsidianshield = createSchematicItem("obsidian_shield");
         ItemStack sentinelarrows = new ItemStack(Material.ARROW, 3);
-        
+
         List<ItemStack> sentinelpool = new ArrayList<>(List.of(new ItemStack[]{guardian, gemini_w, aeon, sword, piranha,
                 torpedo, obsidianshield, sentinelarrows}));
         sentinel = new Deck("Sentinel", sentinelgear, sentinelpool);
 
-        
+
         // Berserker
         List<ItemStack> berserkergear = new ArrayList<>();
         ItemStack crossbow = createUtilityItem("berserker_crossbow");
@@ -139,12 +139,12 @@ public class DeckManager {
         ItemStack fireball = createUtilityItem("fireball");
         ItemStack creeper = createUtilityItem("spawn_creeper");
         ItemStack berserkerarrows = new ItemStack(Material.ARROW, 3);
-        
+
         List<ItemStack> berserkerpool = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark,
                 fireball, creeper, berserkerarrows}));
         berserker = new Deck("Berserker", berserkergear, berserkerpool);
 
-        
+
         // Architect
         List<ItemStack> architectgear = new ArrayList<>();
         ItemStack pickaxe = createUtilityItem("architect_pickaxe");
@@ -160,7 +160,7 @@ public class DeckManager {
         abootsMeta.setUnbreakable(true);
         aboots.setItemMeta(abootsMeta);
         architectgear.add(aboots);
-        
+
         ItemStack shipper = createSchematicItem("shipper");
         ItemStack slasher = createSchematicItem("slasher");
         ItemStack slingshot = createSchematicItem("slingshot");
@@ -171,11 +171,11 @@ public class DeckManager {
         ItemStack aries = createSchematicItem("aries");
         ItemStack ant = createSchematicItem("ant");
         ItemStack lifter = createSchematicItem("lifter");
-        
+
         ItemStack shield = createSchematicItem("shield_2");
         ItemStack platform = createSchematicItem("platform_2");
         ItemStack leaves = createUtilityItem("leaves");
-        
+
         List<ItemStack> architectpool = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter,
                 shield, platform, leaves}));
         architect = new Deck("Architect", architectgear, architectpool);

@@ -25,7 +25,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
 
     @Override
     public void generateSurface(WorldInfo worldInfo, Random random, int x, int z, ChunkData chunkData) { }
-    
+
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()

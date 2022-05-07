@@ -43,7 +43,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             String arenaName = args[1];
             Arena toRemove = arenaManager.getArena(arenaName);
-            
+
             if (toRemove == null) {
                 sendErrorMsg(sender, "That arena does not exist!");
                 return true;
@@ -58,7 +58,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
         }
-        
+
         if (action.equalsIgnoreCase("CreateArena")) {
             // Ensure player is allowed to delete an arena
             if (!sender.hasPermission("umw.create-arena")) {
@@ -76,9 +76,9 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "An arena with that name already exists!");
                 return true;
             }
-            
+
             int arenaCapacity = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-            
+
             if (args.length > 2) {
                 try {
                     arenaCapacity = Integer.parseInt(args[2]);
@@ -87,7 +87,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
             }
-            
+
             // Create new arena
             if (arenaManager.createArena(arenaName, arenaCapacity)) {
                 sendSuccessMsg(sender, "New arena created!");
@@ -97,7 +97,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
         }
-        
+
         // Update all arenas. Might take a while
         if (action.equalsIgnoreCase("PerformArenaUpgrade")) {
             if (sender instanceof Player) {
@@ -106,10 +106,10 @@ public class MissileWarsCommand implements CommandExecutor {
             MissileWarsPlugin.getPlugin().getArenaManager().performArenaUpgrade();
             return true;
         }
-        
+
         // Clear inventories the umw way
         if (action.equalsIgnoreCase("clear")) {
-            
+
             if (args.length == 1) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
@@ -126,7 +126,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     sendErrorMsg(sender, "No target found!");
                     return true;
                 }
-                
+
                 InventoryUtils.clearInventory(target);
                 return true;
             }
@@ -151,36 +151,36 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Game selector opened!");
             return true;
         }
-        
+
         // Quit to waiting lobby of a game
         if (action.equalsIgnoreCase("Leave") && sender instanceof Player) {
-            
+
             Player player = (Player) sender;
             Arena arena = arenaManager.getArena(player.getUniqueId());
             if (arena == null) {
                 sendErrorMsg(sender, "You must be in a game to do this!");
                 return true;
             }
-            
+
             if (!(arena.leaveGame(player.getUniqueId()))) {
                 sendErrorMsg(sender, "You cannot do this now!");
                 return true;
             }
-            
-            return true; 
+
+            return true;
         }
-        
+
         // Join the fullest available game
         if (action.equalsIgnoreCase("Join") && sender instanceof Player) {
 
             Player player = (Player) sender;
-            
+
             // Require player to be in the lobby
             if (!player.getWorld().getName().equals("world")) {
                 sendErrorMsg(sender, "You must be in the lobby to use this!");
                 return true;
             }
-            
+
             // Allow player to join the fullest arena, or specify an arena name
             if (args.length == 1) {
                 for (Arena arena : arenaManager.getLoadedArenas()) {
@@ -201,11 +201,11 @@ public class MissileWarsCommand implements CommandExecutor {
                         }
                     }
                 }
-                
+
                 sendErrorMsg(sender, "Please specify a valid arena name!");
-                return true;      
+                return true;
             }
-            
+
             sendErrorMsg(sender, "All arenas are full! Please open the menu and choose one to spectate.");
             return true;
         }
@@ -293,40 +293,40 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             return true;
         }
-        
+
         if (action.equalsIgnoreCase("Deck")) {
-            
+
             Player player = (Player) sender;
-            
+
             Arena arena = arenaManager.getArena(player.getUniqueId());
-            
+
             if (!(arena == null || arena.getTeam(player.getUniqueId()).equals("no team"))) {
                 sendErrorMsg(sender, "You cannot change decks while playing.");
                 return true;
             }
-            
+
             if (args.length != 2) {
                 sendErrorMsg(sender, "Usage: /mw deck Vanguard/Berserker/Sentinel/Architect");
                 return true;
             }
-            
+
             String deck = StringUtils.capitalize(args[1].toLowerCase());
-            
+
             if (plugin.getDeckManager().getDeck(deck) == null) {
                 sendErrorMsg(sender, "Please specify a valid deck!");
                 return true;
             }
-            
+
             // Update deck in cache
             JSONObject currentDeck = plugin.getJSON().getPlayer(player.getUniqueId());
             currentDeck.put("Deck", deck);
             plugin.getJSON().setPlayer(player.getUniqueId(), currentDeck);
-            
+
             sendSuccessMsg(sender, "Set your deck to " + deck + "!");
-            
+
             return true;
         }
-        
+
         return true;
     }
 

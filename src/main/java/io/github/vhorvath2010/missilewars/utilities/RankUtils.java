@@ -8,11 +8,11 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import net.md_5.bungee.api.ChatColor;
 
 public class RankUtils {
-    
+
     /**
      * Function for converting rank level to exp required for next level
      * Changing this function changes the whole rank system
-     * 
+     *
      * @param x
      * @return exp required to get to level x+1
      */
@@ -22,15 +22,15 @@ public class RankUtils {
         }
         return 500 * x * x + 250;
     }
-    
+
     /**
      * Gets rank level from an exp value
-     * 
+     *
      * @param exp
      * @return the rank level
      */
     public static int getRankLevel(int exp) {
-        
+
         int total = 0;
         for (int i = 0; i <= 10; i++) {
             total = total + f(i);
@@ -40,10 +40,10 @@ public class RankUtils {
         }
         return 0;
     }
-    
+
     /**
      * Get total exp required to reach given level
-     * 
+     *
      * @param rank
      * @return int
      */
@@ -54,10 +54,10 @@ public class RankUtils {
         }
         return total;
     }
-    
+
     /**
      * Gets the exp required to reach the next level
-     * 
+     *
      * @param rank
      * @return the exp required for the next level
      */
@@ -65,10 +65,10 @@ public class RankUtils {
         int current = getRankLevel(exp);
         return f(current);
     }
-    
+
     /**
      * Gets current exp in the level
-     * 
+     *
      * @param exp
      * @return current amount of exp
      */
@@ -76,20 +76,20 @@ public class RankUtils {
         int current = getRankLevel(exp);
         return exp - getTotalToLevel(current);
     }
-    
+
     /**
      * Gets progress for player
-     * 
+     *
      * @param exp
      * @return Progress in percentage
      */
     public static double getExpProgress(int exp) {
         return (double) getCurrentExp(exp) / getNextExp(exp);
     }
-    
+
     /**
      * Get a cool progress bar for player exp progress
-     * 
+     *
      * @param exp
      * @param size
      * @return A nice, formatted progress bar
@@ -100,14 +100,14 @@ public class RankUtils {
             progress = progress + "|";
         }
         int index = (int) (size * getExpProgress(exp));
-        progress = ChatColor.LIGHT_PURPLE + progress.substring(0, index) + 
+        progress = ChatColor.LIGHT_PURPLE + progress.substring(0, index) +
                 ChatColor.GRAY + progress.substring(index, size);
         return progress;
     }
-    
+
     /**
      * Get rank name for certain exp value
-     * 
+     *
      * @param exp
      * @return Rank name of rank
      */
@@ -118,10 +118,10 @@ public class RankUtils {
         String rankName = rankConfig.getString("ranks." + rank + ".name");
         return ChatColor.translateAlternateColorCodes('&', rankName);
     }
-    
+
     /**
      * Get rank symbol for certain exp value
-     * 
+     *
      * @param exp
      * @return Rank symbol of rank
      */
@@ -133,10 +133,10 @@ public class RankUtils {
         String rankSymbol = rankConfig.getString("ranks." + rank + ".symbol");
         return ChatColor.translateAlternateColorCodes('&', rankColor + rankSymbol);
     }
-    
+
     /**
      * Sets player current experience level
-     * 
+     *
      * @param player
      * @param exp
      */
@@ -147,27 +147,27 @@ public class RankUtils {
             double progress = getExpProgress(exp);
             player.setLevel(rank);
             player.setExp((float) progress);
-            
+
         });
     }
-    
+
     /**
      * Gets the name to display for a player on the leaderboard
-     * 
+     *
      * @param player
      * @return the leaderboard player name
      */
     public static String getLeaderboardPlayer(OfflinePlayer player) {
         String prefix = MissileWarsPlugin.getPlugin().getChat().getPlayerPrefix(null, player);
-        
+
         // Don't show guest prefix on leaderboard
         if (prefix.contains("Guest")) {
             prefix = "&7";
         }
-        
+
         String nick = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
         int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
-        
+
         return prefix + nick + " " + getRankSymbol(exp);
     }
 }

@@ -25,7 +25,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -51,9 +50,7 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
-import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.LookClose;
@@ -65,7 +62,7 @@ import net.citizensnpcs.trait.VillagerProfession;
 public class ArenaManager {
 
     private MissileWarsPlugin plugin;
-    
+
     /** A list of all loaded arenas. */
     private List<Arena> loadedArenas;
 
@@ -107,7 +104,7 @@ public class ArenaManager {
             player.teleport(ConfigUtils.getSpawnLocation());
             player.setGameMode(GameMode.ADVENTURE);
         }
-        
+
         // Unload each Arena
         for (Arena arena : loadedArenas) {
             Bukkit.unloadWorld(arena.getWorld(), false);
@@ -138,7 +135,7 @@ public class ArenaManager {
         }
         return null;
     }
-    
+
     /**
      * Completely remove an Arena by name.
      *
@@ -179,7 +176,7 @@ public class ArenaManager {
         }
         return true;
     }
-    
+
     /**
      * Deletes and re-creates all arenas to implement new settings
      */
@@ -191,7 +188,7 @@ public class ArenaManager {
             return;
         }
         logger.log(Level.INFO, "Performing arena upgrades. This might take a while!");
-        for (Arena arena : new ArrayList<Arena>(getLoadedArenas())) {
+        for (Arena arena : new ArrayList<>(getLoadedArenas())) {
             String name = arena.getName();
             int capacity = arena.getCapacity();
             removeArena(arena);
@@ -275,9 +272,9 @@ public class ArenaManager {
      * @return true if the Arena was created, otherwise false
      */
     public boolean createArena(String name, int capacity) {
-        
+
     	Logger logger = Bukkit.getLogger();
-    	
+
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
             logger.log(Level.WARNING, "An arena with the name " + name + " already exists!");
@@ -305,7 +302,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         WorldBorder border = arenaWorld.getWorldBorder();
-        border.setCenter(plugin.getConfig().getInt("worldborder.center.x"), 
+        border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
         border.setSize(plugin.getConfig().getInt("worldborder.radius") * 2);
         arenaWorld.setTime(6000);
@@ -314,9 +311,9 @@ public class ArenaManager {
         // Create Arena lobby
         logger.log(Level.INFO, "Generating lobby...");
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, result -> {
-            
+
             logger.log(Level.INFO, "Lobby generated!");
-            
+
             // Spawn red NPC
             Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red", null, null);
             Location redLoc = new Location(arenaWorld, redVec.getX(), redVec.getY(), redVec.getZ());
@@ -330,7 +327,7 @@ public class ArenaManager {
             SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
             redSheepTrait.setColor(DyeColor.RED);
             redNPC.data().setPersistent(NPC.SILENT_METADATA, true);
-            
+
             arenaWorld.loadChunk(redLoc.getChunk());
             redNPC.spawn(redLoc);
             logger.log(Level.INFO, "Red NPC with UUID " + redNPC.getUniqueId() + " spawned.");
@@ -348,7 +345,7 @@ public class ArenaManager {
             SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
             blueSheepTrait.setColor(DyeColor.BLUE);
             blueNPC.data().setPersistent(NPC.SILENT_METADATA, true);
-            
+
             arenaWorld.loadChunk(blueLoc.getChunk());
             blueNPC.spawn(blueLoc);
             logger.log(Level.INFO, "Blue NPC with UUID " + blueNPC.getUniqueId() + " spawned.");
@@ -372,11 +369,11 @@ public class ArenaManager {
             VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
             profession.setProfession(Villager.Profession.NITWIT);
             bartender.data().setPersistent(NPC.SILENT_METADATA, true);
-            
+
             arenaWorld.loadChunk(barLoc.getChunk());
             bartender.spawn(barLoc);
             logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
-            
+
             //Spawn 4 deck selection NPCs
             Vector vVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.vanguard", null, null);
             Location vLoc = new Location(arenaWorld, vVec.getX(), vVec.getY(), vVec.getZ());
@@ -384,17 +381,17 @@ public class ArenaManager {
             NPC vanguard = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
                     ChatColor.GOLD + "" + ChatColor.BOLD + "Vanguard");
             SkinTrait vSkin = vanguard.getOrAddTrait(SkinTrait.class);
-            vSkin.setSkinPersistent("vanguard", schematicConfig.getString("lobby.npc-pos.vanguard.signature"), 
+            vSkin.setSkinPersistent("vanguard", schematicConfig.getString("lobby.npc-pos.vanguard.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.vanguard.value"));
             CommandTrait vCommand = new CommandTrait();
             vCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open vanguard %player%",
                     CommandTrait.Hand.BOTH));
             vanguard.addTrait(vCommand);
-            
+
             arenaWorld.loadChunk(vLoc.getChunk());
             vanguard.spawn(vLoc);
             logger.log(Level.INFO, "Vanguard NPC with UUID " + vanguard.getUniqueId() + " spawned.");
-            
+
             //Spawn 4 deck selection NPCs
             Vector sVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.sentinel", null, null);
             Location sLoc = new Location(arenaWorld, sVec.getX(), sVec.getY(), sVec.getZ());
@@ -402,17 +399,17 @@ public class ArenaManager {
             NPC sentinel = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
                     ChatColor.AQUA + "" + ChatColor.BOLD + "Sentinel");
             SkinTrait sSkin = sentinel.getOrAddTrait(SkinTrait.class);
-            sSkin.setSkinPersistent("sentinel", schematicConfig.getString("lobby.npc-pos.sentinel.signature"), 
+            sSkin.setSkinPersistent("sentinel", schematicConfig.getString("lobby.npc-pos.sentinel.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.sentinel.value"));
             CommandTrait sCommand = new CommandTrait();
             sCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open sentinel %player%",
                     CommandTrait.Hand.BOTH));
             sentinel.addTrait(sCommand);
-            
+
             arenaWorld.loadChunk(sLoc.getChunk());
             sentinel.spawn(sLoc);
             logger.log(Level.INFO, "Sentinel NPC with UUID " + sentinel.getUniqueId() + " spawned.");
-            
+
             //Spawn 4 deck selection NPCs
             Vector bVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
             Location bLoc = new Location(arenaWorld, bVec.getX(), bVec.getY(), bVec.getZ());
@@ -420,17 +417,17 @@ public class ArenaManager {
             NPC berserker = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
                     ChatColor.RED + "" + ChatColor.BOLD + "Berserker");
             SkinTrait bSkin = berserker.getOrAddTrait(SkinTrait.class);
-            bSkin.setSkinPersistent("berserker", schematicConfig.getString("lobby.npc-pos.berserker.signature"), 
+            bSkin.setSkinPersistent("berserker", schematicConfig.getString("lobby.npc-pos.berserker.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.berserker.value"));
             CommandTrait bCommand = new CommandTrait();
             bCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open berserker %player%",
                     CommandTrait.Hand.BOTH));
             berserker.addTrait(bCommand);
-            
+
             arenaWorld.loadChunk(bLoc.getChunk());
             berserker.spawn(bLoc);
             logger.log(Level.INFO, "Berserker NPC with UUID " + berserker.getUniqueId() + " spawned.");
-            
+
             //Spawn 4 deck selection NPCs
             Vector aVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.architect", null, null);
             Location aLoc = new Location(arenaWorld, aVec.getX(), aVec.getY(), aVec.getZ());
@@ -438,17 +435,17 @@ public class ArenaManager {
             NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
                     ChatColor.WHITE + "" + ChatColor.BOLD + "Architect");
             SkinTrait aSkin = architect.getOrAddTrait(SkinTrait.class);
-            aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"), 
+            aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.architect.value"));
             CommandTrait aCommand = new CommandTrait();
             aCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open architect %player%",
                     CommandTrait.Hand.BOTH));
             architect.addTrait(aCommand);
-            
+
             arenaWorld.loadChunk(aLoc.getChunk());
             architect.spawn(aLoc);
             logger.log(Level.INFO, "Architect NPC with UUID " + architect.getUniqueId() + " spawned.");
-            
+
             CitizensAPI.getNPCRegistry().saveToStore();
 
             // Spawn barrier wall
@@ -469,7 +466,7 @@ public class ArenaManager {
             for (NPC npc : npcs) {
                 arena.addNPC(npc.getId());
             }
-        
+
 
             // Setup regions
             WorldGuard wg = WorldGuard.getInstance();
@@ -488,7 +485,7 @@ public class ArenaManager {
             createWaitingLobby("blue", arena, lobbyRegion);
 
             logger.log(Level.INFO, "Arena " + name + " generated. World will save in 10 seconds.");
-            
+
             // Wait to ensure schematic is spawned
             new BukkitRunnable() {
                 @Override
@@ -498,7 +495,7 @@ public class ArenaManager {
                     logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
                 }
             }.runTaskLater(plugin, 200);
-            
+
         })) {
             logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
             return false;
@@ -506,7 +503,7 @@ public class ArenaManager {
 
         return true;
     }
-    
+
     /**
      * Open the arena selector for a given player.
      *
@@ -550,10 +547,10 @@ public class ArenaManager {
         }
         return null;
     }
-    
+
     /**
      * Gets a list of the loaded arenas, sorted by highest capacity
-     * 
+     *
      * @return The list of loaded arenas
      */
     public List<Arena> getLoadedArenas() {

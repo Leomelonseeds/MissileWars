@@ -94,19 +94,19 @@ public class MissileWarsTeam {
     public int getShieldBlocksBroken() {
         return shieldBlocksBroken;
     }
-    
+
     /**
      * Get whether the first portal has been destroyed
-     * 
+     *
      * @return true if portal destroyed
      */
     public boolean getFirstPortalStatus() {
         return firstPortalDestroyed;
     }
-    
+
     /**
      * Get whether the second portal has been destroyed
-     * 
+     *
      * @return true if portal destroyed
      */
     public boolean getSecondPortalStatus() {
@@ -142,11 +142,11 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
-        
+
         members.add(player);
-        
+
         JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getMCPlayerId());
-        
+
         String deck = json.getString("Deck");
 
         // Assign default deck
@@ -319,7 +319,7 @@ public class MissileWarsTeam {
             subtitle = ConfigUtils.getConfigText("titles." + path + ".subtitle", null, null,
                     null);
         }
-        
+
         int length = Integer.parseInt(ConfigUtils.getConfigText("titles." + path + ".length", null, null, null));
 
         // Send titles to players
@@ -329,7 +329,7 @@ public class MissileWarsTeam {
             ConfigUtils.sendConfigSound(path, player);
         }
     }
-    
+
     /**
      * Send the team a sound at a given path.
      *
@@ -338,7 +338,7 @@ public class MissileWarsTeam {
     public void sendSound(String path) {
     	for (MissileWarsPlayer member : members) {
     		Player player = member.getMCPlayer();
-    		ConfigUtils.sendConfigSound(path, player);;
+    		ConfigUtils.sendConfigSound(path, player);
     	}
     }
 
@@ -390,10 +390,10 @@ public class MissileWarsTeam {
         int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
         return (x2 - x1) * (y2 - y1) * (z2 - z1);
     }
-    
+
     /**
      * Gets the shield health of this team based on shield volume and broken blocks
-     * 
+     *
      * @return the shield health as a percentage
      */
     public double getShieldHealth() {

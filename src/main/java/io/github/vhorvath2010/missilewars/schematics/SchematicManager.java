@@ -61,12 +61,12 @@ public class SchematicManager {
      * @return true if the NBT structure was found and spawned, otherwise false
      */
     public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
-        
+
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
             return false;
         }
-        
+
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
@@ -100,12 +100,12 @@ public class SchematicManager {
 
         // Apply offset
         Location spawnLoc = loc.clone();
-        
+
         // Cancel if attempt to grief team spawnpoint
         if (spawnLoc.getBlockZ() == bluespawnz || spawnLoc.getBlockZ() == redspawnz) {
             return false;
         }
-        
+
         Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
@@ -113,51 +113,51 @@ public class SchematicManager {
         if (redMissile && structureName.contains("thunderbolt")) {
             offset.setZ(-15);
             offset.setX(0);
-        } 
-        // Normal red missile offset adjustment 
+        }
+        // Normal red missile offset adjustment
         else if (redMissile) {
             offset.setZ(offset.getZ() * -1);
             offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
         }
-        spawnLoc = spawnLoc.add(offset);        
-        
+        spawnLoc = spawnLoc.add(offset);
+
         // Time to perform no place checks
         int spawnx = spawnLoc.getBlockX();
         int spawny = spawnLoc.getBlockY();
         int spawnz = spawnLoc.getBlockZ();
-        
+
         int sizex = structure.getSize().getBlockX();
         int sizey = structure.getSize().getBlockY();
         int sizez = structure.getSize().getBlockZ();
-        
+
         int barrierx = plugin.getConfig().getInt("barrier.center.x");
-        
+
         int portalx1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x1") - 1;
         int portalx2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4") + 1;
         int portaly1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1") - 1;
         int portaly2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4") + 1;
-        
+
         int portalredz = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.red-z");
         int portalbluez = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.blue-z");
-        
-        
+
+
         // Do not place if hitbox would intersect with barrier
         if (!redMissile && spawnx + sizex > barrierx) {
             return false;
         } else if (redMissile && spawnx >= barrierx) {
             return false;
         }
-        
+
         // Do not place if hitbox would intersect with a portal
         if (!redMissile &&
                 ((spawnz <= portalredz && spawnz + sizez > portalredz) ||
-                (spawnz <= portalbluez && spawnz + sizez > portalbluez)) && 
+                (spawnz <= portalbluez && spawnz + sizez > portalbluez)) &&
                 spawnx <= portalx2 && spawnx + sizex > portalx1 &&
                 spawny <= portaly2 && spawny + sizey > portaly1) {
             return false;
         } else if (redMissile &&
-                ((spawnz >= portalbluez && spawnz - sizez < portalbluez) || 
+                ((spawnz >= portalbluez && spawnz - sizez < portalbluez) ||
                 (spawnz >= portalredz && spawnz - sizez < portalredz)) &&
                 spawnx >= portalx1 && spawnx - sizex < portalx2 &&
                 spawny <= portaly2 && spawny + sizey > portaly1) {
@@ -210,7 +210,7 @@ public class SchematicManager {
         } else {
             spawnPos = getVector(schematicConfig, "pos", mapType, schematicName);
         }
-        
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -223,10 +223,10 @@ public class SchematicManager {
                             callback.onQueryDone(null);
                         }
                     }.runTask(MissileWarsPlugin.getPlugin());
-                } 
+                }
             }
         }.runTaskAsynchronously(MissileWarsPlugin.getPlugin());
-            
+
         return true;
     }
 
