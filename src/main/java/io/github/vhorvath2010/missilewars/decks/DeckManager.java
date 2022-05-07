@@ -65,9 +65,9 @@ public class DeckManager {
         ItemStack canopy = createUtilityItem("canopy");
         ItemStack lingering = createUtilityItem("lingering_harming_1");
 
-        List<ItemStack> vanguardpool = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo,
-                splash, canopy, lingering}));
-        vanguard = new Deck("Vanguard", vanguardgear, vanguardpool);
+        List<ItemStack> vMissiles = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo}));
+        List<ItemStack> vUtility = new ArrayList<>(List.of(new ItemStack[]{splash, canopy, lingering}));
+        vanguard = new Deck("Vanguard", vanguardgear, vMissiles, vUtility);
 
 
         // Sentinel
@@ -103,9 +103,9 @@ public class DeckManager {
         ItemStack obsidianshield = createSchematicItem("obsidian_shield");
         ItemStack sentinelarrows = new ItemStack(Material.ARROW, 3);
 
-        List<ItemStack> sentinelpool = new ArrayList<>(List.of(new ItemStack[]{guardian, gemini_w, aeon, sword, piranha,
-                torpedo, obsidianshield, sentinelarrows}));
-        sentinel = new Deck("Sentinel", sentinelgear, sentinelpool);
+        List<ItemStack> sMissiles = new ArrayList<>(List.of(new ItemStack[]{guardian, gemini_w, aeon, sword, piranha}));
+        List<ItemStack> sUtility = new ArrayList<>(List.of(new ItemStack[] {torpedo, obsidianshield, sentinelarrows}));
+        sentinel = new Deck("Sentinel", sentinelgear, sMissiles, sUtility);
 
 
         // Berserker
@@ -140,9 +140,9 @@ public class DeckManager {
         ItemStack creeper = createUtilityItem("spawn_creeper");
         ItemStack berserkerarrows = new ItemStack(Material.ARROW, 3);
 
-        List<ItemStack> berserkerpool = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark,
-                fireball, creeper, berserkerarrows}));
-        berserker = new Deck("Berserker", berserkergear, berserkerpool);
+        List<ItemStack> bMissiles = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark}));
+        List<ItemStack> bUtility = new ArrayList<>(List.of(new ItemStack[]{fireball, creeper, berserkerarrows}));
+        berserker = new Deck("Berserker", berserkergear, bMissiles, bUtility);
 
 
         // Architect
@@ -176,9 +176,9 @@ public class DeckManager {
         ItemStack platform = createSchematicItem("platform_2");
         ItemStack leaves = createUtilityItem("leaves");
 
-        List<ItemStack> architectpool = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter,
-                shield, platform, leaves}));
-        architect = new Deck("Architect", architectgear, architectpool);
+        List<ItemStack> aMissiles = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter}));
+        List<ItemStack> aUtility = new ArrayList<>(List.of(new ItemStack[]{shield, platform, leaves}));
+        architect = new Deck("Architect", architectgear, aMissiles, aUtility);
     }
 
     /**

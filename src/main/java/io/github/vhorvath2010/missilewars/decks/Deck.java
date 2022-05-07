@@ -3,6 +3,7 @@ package io.github.vhorvath2010.missilewars.decks;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +20,11 @@ public class Deck {
     private String name;
     /** Items given at the start of the game. */
     private List<ItemStack> gear;
-    /** Utility items and Missiles given by this deck during gameplay. */
+    /** Missiles given by this deck during gameplay. */
+    private List<ItemStack> missiles;
+    /** Utility items given by this deck during gameplay. */
+    private List<ItemStack> utility;
+    /** Combined for ease of use */
     private List<ItemStack> pool;
 
     /**
@@ -29,10 +34,13 @@ public class Deck {
      * @param gear the gear for the Deck
      * @param pool the utilities, missiles and items given throughout the game
      */
-    public Deck(String name, List<ItemStack> gear, List<ItemStack> pool) {
+    public Deck(String name, List<ItemStack> gear, List<ItemStack> missiles, List<ItemStack> utility) {
         this.name = name;
         this.gear = gear;
-        this.pool = pool;
+        this.missiles = missiles;
+        this.utility = utility;
+        List<ItemStack> combined = ListUtils.union(missiles, utility);
+        this.pool = combined;
     }
 
     /**
@@ -91,7 +99,9 @@ public class Deck {
         if (pool.isEmpty()) {
             return;
         }
-        ItemStack poolItem = pool.get(rand.nextInt(pool.size()));
+        double chance = 0.375;
+        List<ItemStack> toUse = rand.nextDouble() < chance ? utility : missiles;
+        ItemStack poolItem = toUse.get(rand.nextInt(toUse.size()));
         if (hasInventorySpace(player)) {
             player.getInventory().addItem(poolItem);
         } else {
