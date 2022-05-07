@@ -14,12 +14,11 @@ import io.github.vhorvath2010.missilewars.commands.MissileWarsCommand;
 import io.github.vhorvath2010.missilewars.commands.SpectateCommand;
 import io.github.vhorvath2010.missilewars.commands.VoteMapCommand;
 import io.github.vhorvath2010.missilewars.decks.DeckManager;
-import io.github.vhorvath2010.missilewars.events.ArenaGameruleEvents;
-import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
-import io.github.vhorvath2010.missilewars.events.ArenaLeaveEvents;
-import io.github.vhorvath2010.missilewars.events.MapVotingEvents;
-import io.github.vhorvath2010.missilewars.events.StructureItemEvents;
-import io.github.vhorvath2010.missilewars.events.WorldCreationEvents;
+import io.github.vhorvath2010.missilewars.listener.ArenaGameruleListener;
+import io.github.vhorvath2010.missilewars.listener.ArenaInventoryListener;
+import io.github.vhorvath2010.missilewars.listener.JoinLeaveListener;
+import io.github.vhorvath2010.missilewars.listener.CustomItemListener;
+import io.github.vhorvath2010.missilewars.listener.WorldCreationListener;
 import io.github.vhorvath2010.missilewars.utilities.JSONManager;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import io.github.vhorvath2010.missilewars.utilities.SQLManager;
@@ -67,12 +66,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
         getCommand("Spectate").setExecutor(new SpectateCommand());
         getCommand("VoteMap").setExecutor(new VoteMapCommand());
-        Bukkit.getPluginManager().registerEvents(new ArenaGameruleEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new ArenaInventoryEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new ArenaLeaveEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new StructureItemEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new MapVotingEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new WorldCreationEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new ArenaGameruleListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
+        Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
+        Bukkit.getPluginManager().registerEvents(new WorldCreationListener(), this);
         log("Commands and events loaded.");
 
         // Load decks

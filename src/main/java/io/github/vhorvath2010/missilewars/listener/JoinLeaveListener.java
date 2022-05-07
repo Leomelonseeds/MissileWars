@@ -1,4 +1,4 @@
-package io.github.vhorvath2010.missilewars.events;
+package io.github.vhorvath2010.missilewars.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 import io.github.vhorvath2010.missilewars.utilities.RankUtils;
 
 /** Class for managing arena leaving and joining. */
-public class ArenaLeaveEvents implements Listener {
+public class JoinLeaveListener implements Listener {
 
     /** Remove player from Arena if they DC. */
     @EventHandler

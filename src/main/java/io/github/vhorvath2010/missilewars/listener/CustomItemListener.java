@@ -1,4 +1,4 @@
-package io.github.vhorvath2010.missilewars.events;
+package io.github.vhorvath2010.missilewars.listener;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +39,7 @@ import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to handle events for structure items. */
-public class StructureItemEvents implements Listener {
+public class CustomItemListener implements Listener {
 
     /**
      * Get a structure from a structure item.

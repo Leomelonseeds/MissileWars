@@ -1,8 +1,9 @@
-package io.github.vhorvath2010.missilewars.events;
+package io.github.vhorvath2010.missilewars.listener;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -23,7 +25,7 @@ import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to manage arena joining and pregame events. */
-public class ArenaInventoryEvents implements Listener {
+public class ArenaInventoryListener implements Listener {
 
     /** List of players currently in arena selection. */
     public static List<Player> selectingArena = new ArrayList<>();
@@ -58,6 +60,36 @@ public class ArenaInventoryEvents implements Listener {
         } else {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
+    }
+    
+    /** Handle map voting */
+    @EventHandler
+    public void onMapVote(InventoryClickEvent event) {
+        // Check if player is in an Arena
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getWhoClicked();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+
+        // Ensure map vote inventory is open
+        if (!event.getView().getTitle().equals(ConfigUtils.getConfigText("inventories.map-voting.title", player, null, null))) {
+            return;
+        }
+
+        // Cancel click and try to register vote
+        event.setCancelled(true);
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
+            return;
+        }
+        String mapVotedFor = arena.registerVote(player.getUniqueId(), clicked.getItemMeta().getDisplayName());
+        player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
+        arena.openMapVote(player);
     }
 
     /** Replace from selectors when closed inventory. */

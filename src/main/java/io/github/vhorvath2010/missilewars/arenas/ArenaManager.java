@@ -46,7 +46,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
-import io.github.vhorvath2010.missilewars.events.ArenaInventoryEvents;
+import io.github.vhorvath2010.missilewars.listener.ArenaInventoryListener;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
 import io.github.vhorvath2010.missilewars.schematics.VoidChunkGenerator;
 import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
@@ -533,7 +533,7 @@ public class ArenaManager {
             arenaItem.setItemMeta(arenaItemMeta);
             selector.addItem(arenaItem);
         }
-        ArenaInventoryEvents.selectingArena.add(player);
+        ArenaInventoryListener.selectingArena.add(player);
         player.openInventory(selector);
     }
 

@@ -1,4 +1,4 @@
-package io.github.vhorvath2010.missilewars.events;
+package io.github.vhorvath2010.missilewars.listener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +35,7 @@ import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
-public class ArenaGameruleEvents implements Listener {
+public class ArenaGameruleListener implements Listener {
 
     /** Event to ignore hunger. */
     @EventHandler
