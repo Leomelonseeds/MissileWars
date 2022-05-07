@@ -767,11 +767,10 @@ public class Arena implements ConfigurationSerializable {
 
             // Respawns citizens if they are not present
             if (getWorld().getEntityCount() < 9) {
-                for (int i : npcs) {
-                    NPC npc = CitizensAPI.getNPCRegistry().getById(i);
-                    Location loc = npc.getStoredLocation();
-                    npc.despawn();
-                    npc.spawn(loc);
+                try {
+                    ((Citizens) CitizensAPI.getPlugin()).reload();
+                } catch (NPCLoadException e) {
+                    Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
                 }
             }
             

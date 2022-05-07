@@ -141,15 +141,13 @@ public class RankUtils {
      * @param exp
      */
     public static void setPlayerExpBar(Player player) {
-        MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId(), new DBCallback() {
-            @Override
-            public void onQueryDone(Object result) {
-                int exp = (int) result;
-                int rank = getRankLevel(exp);
-                double progress = getExpProgress(exp);
-                player.setLevel(rank);
-                player.setExp((float) progress);
-            }
+        MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId(), result -> {
+            int exp = (int) result;
+            int rank = getRankLevel(exp);
+            double progress = getExpProgress(exp);
+            player.setLevel(rank);
+            player.setExp((float) progress);
+            
         });
     }
     

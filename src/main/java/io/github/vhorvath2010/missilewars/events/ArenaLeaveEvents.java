@@ -1,5 +1,6 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -7,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -51,8 +51,7 @@ public class ArenaLeaveEvents implements Listener {
     	});
     }
 
-    /** Remove player from Arena if they leave the world.
-     * Also handles inventory saving and clearing */
+    /** Remove player from Arena if they leave the world. */
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
     	
@@ -64,7 +63,12 @@ public class ArenaLeaveEvents implements Listener {
 	        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
 	            return;
 	        }   
-	        playerArena.removePlayer(player.getUniqueId());
+	        // Check 1 tick later to make 100% sure
+	        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+	            if (player.getWorld().getName().equals("world")) {
+	                playerArena.removePlayer(player.getUniqueId());
+	            }
+	        }, 1);
         }
     }     
 }

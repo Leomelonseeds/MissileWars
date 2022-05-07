@@ -34,7 +34,7 @@ public class JSONManager {
             JSONObject json;
             // Updated json from file
             JSONObject newjson = new JSONObject(/*read file here*/);
-            newjson.put("Deck", "Berserker");
+            newjson.put("Deck", "Sentinel");
             if (jsonString == null) {
                 // For new players, use the default json
                 json = newjson;

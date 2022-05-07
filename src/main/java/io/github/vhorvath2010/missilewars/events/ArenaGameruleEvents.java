@@ -1,5 +1,10 @@
 package io.github.vhorvath2010.missilewars.events;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,6 +24,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
+
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
@@ -51,7 +58,7 @@ public class ArenaGameruleEvents implements Listener {
             event.setDamage(40.0);
         }
     }
-
+    
     /** Handle player deaths. */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -84,6 +91,18 @@ public class ArenaGameruleEvents implements Listener {
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
+    }
+    
+    /** Just in case a player somehow respawns in the lobby */
+    @EventHandler
+    public void onRespawn(PlayerPostRespawnEvent event) {
+        Player player = event.getPlayer();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena != null && event.getRespawnedLocation().getWorld().getName().equals("world")) {
+            ConfigUtils.sendConfigMessage("messages.spawn-obstructed", player, null, null);
+            player.teleport(playerArena.getPlayerSpawn(player));
+        }
     }
 
     /** Handle friendly fire. */

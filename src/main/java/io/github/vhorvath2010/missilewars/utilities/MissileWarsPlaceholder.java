@@ -3,7 +3,9 @@ package io.github.vhorvath2010.missilewars.utilities;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.json.JSONObject;
@@ -76,7 +78,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         // Rank placeholders
-        if (params.contains("rank")) {
+        if (params.contains("rank_")) {
             
             int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
             int level = RankUtils.getRankLevel(exp);
@@ -141,7 +143,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             
             // stats_[gamemode/overall]_[stat]
             if (args.length == 3) {
-                return Integer.toString(sql.getStatSync(player.getUniqueId(), gamemode, stat));
+                return Integer.toString(sql.getStatSync(player.getUniqueId(), stat, gamemode));
             }
             
             // Args length must be 4 now, since we are looking for a top stat
@@ -155,10 +157,13 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 String playerStat = Integer.toString((int) list.get(index).get(1));
                 return ChatColor.translateAlternateColorCodes('&', playerName + " &7- &f" + playerStat);
             }
-            
+
             // stats_[gamemode/overall]_[stat]_rank
             // Gets the player position in for that stat
-            
+            if (args[3].equals("rank")) {
+                return Integer.toString(sql.getStatRank(player.getUniqueId(), stat, gamemode));
+            }
+
             return null;
         }
         
