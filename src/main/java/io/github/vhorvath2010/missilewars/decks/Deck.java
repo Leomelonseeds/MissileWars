@@ -1,6 +1,8 @@
 package io.github.vhorvath2010.missilewars.decks;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Random;
 
@@ -26,6 +28,8 @@ public class Deck {
     private List<ItemStack> utility;
     /** Combined for ease of use */
     private List<ItemStack> pool;
+    /** Make game more skill dependent */
+    private Deque<ItemStack> lastTwo;
 
     /**
      * Generate a deck from a given set of gear, utils, and missiles.
@@ -42,6 +46,7 @@ public class Deck {
         List<ItemStack> combined = new ArrayList<>(missiles);
         combined.addAll(utility);
         this.pool = combined;
+        lastTwo = new ArrayDeque<>();
     }
 
     /**
@@ -102,7 +107,17 @@ public class Deck {
         }
         double chance = 0.375;
         List<ItemStack> toUse = rand.nextDouble() < chance ? utility : missiles;
-        ItemStack poolItem = toUse.get(rand.nextInt(toUse.size()));
+        ItemStack poolItem;
+        // Don't give players the same item twice
+        do {
+            poolItem = toUse.get(rand.nextInt(toUse.size()));
+        } while (lastTwo.contains(poolItem));
+        // Add item to the list
+        lastTwo.addFirst(poolItem);
+        if (lastTwo.size() > 2) {
+            lastTwo.removeLast();
+        }
+        // Add item to player
         if (hasInventorySpace(player)) {
             player.getInventory().addItem(poolItem);
         } else {

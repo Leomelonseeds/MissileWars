@@ -188,6 +188,7 @@ public class CustomItemListener implements Listener {
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
             fireball.setYield(2);
+            fireball.setIsIncendiary(true);
             fireball.setDirection(player.getEyeLocation().getDirection());
             fireball.setShooter(player);
             hand.setAmount(hand.getAmount() - 1);

@@ -7,7 +7,11 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Rail.Shape;
+import org.bukkit.block.data.type.RedstoneRail;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -109,13 +113,9 @@ public class SchematicManager {
         Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
-        // Temp hotfix for structure rail rotation bug
-        if (redMissile && structureName.contains("thunderbolt")) {
-            offset.setZ(-15);
-            offset.setX(0);
-        }
+        
         // Normal red missile offset adjustment
-        else if (redMissile) {
+        if (redMissile) {
             offset.setZ(offset.getZ() * -1);
             offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
@@ -166,6 +166,17 @@ public class SchematicManager {
 
         //Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
+        
+        // Temp hotfix for structure rail rotation bug
+        if (redMissile && structureName.contains("thunderbolt")) {
+            Location railLoc = spawnLoc.add(0, 1, -8);
+            Block block = railLoc.getBlock();
+            block.setType(Material.POWERED_RAIL);
+            RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
+            rail.setShape(Shape.NORTH_SOUTH);
+            block.setBlockData(rail);
+            block.getState().update(true);
+        }
         return true;
     }
 
