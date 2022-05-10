@@ -1,8 +1,9 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,9 +13,8 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
+import github.scarsz.discordsrv.dependencies.commons.io.IOUtils;
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 
 public class JSONManager {
@@ -33,10 +33,11 @@ public class JSONManager {
         // Find and parse the default json object
         String dir = MissileWarsPlugin.getPlugin().getDataFolder().toString();
         File json = new File(dir, "default.json");
-        JSONParser parser = new JSONParser();
         try {
-            defaultJson = (JSONObject) parser.parse(new FileReader(json));
-        } catch (IOException | ParseException e) {
+            InputStream is = new FileInputStream(json);
+            String jsonString = IOUtils.toString(is, "UTF-8");
+            defaultJson = new JSONObject(jsonString);
+        } catch (IOException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
     }
