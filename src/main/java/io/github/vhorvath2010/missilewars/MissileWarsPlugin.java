@@ -59,6 +59,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         saveIfNotPresent("items.yml");
         saveIfNotPresent("maps.yml");
         saveIfNotPresent("ranks.yml");
+        saveIfNotPresent("default.json");
         log("Loaded all config files.");
 
         // Load commands and events

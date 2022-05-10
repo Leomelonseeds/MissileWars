@@ -653,14 +653,17 @@ public class Arena implements ConfigurationSerializable {
     public void enqueueRed(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (!running) {
-                    if (startTime != null) {
-                        int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                        if (time <= 5 && time >= -5) {
-                            ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                            return;
-                        }
+                
+               // Make sure people can't break the game
+                if (startTime != null) {
+                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                    if (time <= 2 && time >= -2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                        return;
                     }
+                }
+                
+                if (!running) {
                     if (!redQueue.contains(player)) {
                         blueQueue.remove(player);
                         redQueue.add(player);
@@ -694,14 +697,17 @@ public class Arena implements ConfigurationSerializable {
     public void enqueueBlue(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (!running) {
-                    if (startTime != null) {
-                        int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                        if (time <= 2 && time >= -2) {
-                            ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                            return;
-                        }
+                
+                // Make sure people can't break the game
+                if (startTime != null) {
+                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                    if (time <= 2 && time >= -2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                        return;
                     }
+                }
+                
+                if (!running) {
                     if (!blueQueue.contains(player)) {
                         redQueue.remove(player);
                         blueQueue.add(player);

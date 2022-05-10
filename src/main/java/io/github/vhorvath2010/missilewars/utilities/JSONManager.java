@@ -1,12 +1,19 @@
 package io.github.vhorvath2010.missilewars.utilities;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 
@@ -15,11 +22,23 @@ public class JSONManager {
     private MissileWarsPlugin plugin;
 
     private Map<UUID, JSONObject> playerCache;
+    
+    private JSONObject defaultJson;
 
     public JSONManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         playerCache = new HashMap<>();
         periodicSave();
+        
+        // Find and parse the default json object
+        String dir = MissileWarsPlugin.getPlugin().getDataFolder().toString();
+        File json = new File(dir, "default.json");
+        JSONParser parser = new JSONParser();
+        try {
+            defaultJson = (JSONObject) parser.parse(new FileReader(json));
+        } catch (IOException | ParseException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
+        }
     }
 
     /**
@@ -44,6 +63,17 @@ public class JSONManager {
             }
             playerCache.put(uuid, json);
         });
+    }
+    
+    public void updatePreset(JSONObject json) {
+        
+    }
+    
+    /**
+     * @return the default json file
+     */
+    public JSONObject getDefault() {
+        return defaultJson;
     }
 
     /**
