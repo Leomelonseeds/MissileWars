@@ -1,3 +1,28 @@
-In Japan, heart surgeon. Number one. Steady hand. One day, yakuza boss need new heart. I do operation. But mistake! Yakuza boss die! Yakuza very mad! I hide fishing boat, come to America. No English, no food, no money. Darryl give me job. Now I have house, American car and new woman. Darryl save life.  My big secret. I kill yakuza boss on purpose. I good surgeon. The best!
+# Ultima Missile Wars
+A new, fresh installment of the classic gamemode made by Cubehamster and Sethbling, where slimeblock TNT flying machines are used to bust through enemy shields and blow up their nether portals. Join with your friends now at play.ultimamc.net
 
-Do not try to compile and use this plugin on your own server. It will not work.
+All the original, best features of Missile Wars are here, including the ability to choose your team and to join games while they're running. Of course, this plugin offers many features to expand and improve upon the original Missile Wars.
+
+## Items
+With over 35 new unique missiles (most credited to the Rocket Riders team!) and utility items, gameplay has been made more interesting, offering many new strategies and possibilities for team collaboration. Below are some new utility items:
+* **Torpedo** - A block-based sky mine that explodes on contact with missiles and players
+* **Canopy** - A nerfed version of the Rocket Riders canopy that requires a player to be on the ground to use, and only teleports after 1 second.
+* **Platform** - Rotate a shield 90 degrees, and you get a perfect space to party
+* **Leaves** - Temporary building blocks that decay after a while
+* **Lingering Harming Potion**
+* **Spawn Creeper**
+
+## Decks
+These new items have been split into 4 different Decks (kits), each with its own unique playstyle:
+* **Vanguard** - A speed-focused deck that contains the fastest missiles in the game, in addition to (nerfed) mobility items like the Canopy and Splash.
+* **Berserker** - With all the most explosive missiles, you don't want a Berserker getting to your side.
+* **Sentinel** - A defense specialist, with sturdy missiles and utility items like the torpedo and obsidian shield.
+* **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
+
+## Balancing
+An enemy player getting to your side almost always meant certain death in the original game. The balancing changes listed below make for more fun, intense gameplay.
+* You now need to blow up *both* enemy portals to win
+* An endstone shield has been added to the center back of each team's base to make it harder to blow up both portals at once
+* Berserker fireballs now have greater explosion power to counter Architect shieldstacking
+* Each deck has a different weapon item (Golden Sword, Crossbow, Bow, Pickaxe) to improve variety and make sure decks are balanced
+* Most Rocket Riders missiles were nerfed in terms of TNT
