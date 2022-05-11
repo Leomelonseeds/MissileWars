@@ -3,6 +3,8 @@ A new, fresh installment of the classic gamemode made by Cubehamster and Sethbli
 
 All the original, best features of Missile Wars are here, including the ability to choose your team and to join games while they're running. Of course, this plugin offers many features to expand and improve upon the original Missile Wars.
 
+*Do not try to compile and use this plugin on your own server. It will not work.*
+
 ## Items
 With over 35 new unique missiles (most credited to the Rocket Riders team!) and utility items, gameplay has been made more interesting, offering many new strategies and possibilities for team collaboration. Below are some new utility items:
 * **Torpedo** - A block-based sky mine that explodes on contact with missiles and players
@@ -13,11 +15,18 @@ With over 35 new unique missiles (most credited to the Rocket Riders team!) and 
 * **Spawn Creeper**
 
 ## Decks
-These new items have been split into 4 different Decks (kits), each with its own unique playstyle:
+These new items have been split into 4 different Decks (kits), each with 5 different missiles 3 unique utility items, and its own unique playstyle:
 * **Vanguard** - A speed-focused deck that contains the fastest missiles in the game, in addition to (nerfed) mobility items like the Canopy and Splash.
 * **Berserker** - With all the most explosive missiles, you don't want a Berserker getting to your side.
 * **Sentinel** - A defense specialist, with sturdy missiles and utility items like the torpedo and obsidian shield.
 * **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
+
+## New Maps
+4+ new maps, each changing the gameplay in fun and inventive ways, have been added. New maps are also being worked on - images will be uploaded here later.
+* **Double Layer** - The classic map, but with thicker bases. What could go wrong?
+* **Middle Ground** - An extra base, smack in the middle of the map.
+* **Minefield** - A menacing map with explosive chain reactions
+* **Cube Crowd** - The dumbest map name represents our coolest idea, a skygrid style field of blocks to chill on.
 
 ## Balancing
 An enemy player getting to your side almost always meant certain death in the original game. The balancing changes listed below make for more fun, intense gameplay.
@@ -26,3 +35,12 @@ An enemy player getting to your side almost always meant certain death in the or
 * Berserker fireballs now have greater explosion power to counter Architect shieldstacking
 * Each deck has a different weapon item (Golden Sword, Crossbow, Bow, Pickaxe) to improve variety and make sure decks are balanced
 * Most Rocket Riders missiles were nerfed in terms of TNT
+
+## Roadmap
+Why stop here? Missile Wars is in active development. Here are the features I have planned out:
+* Each deck will have different abilities and passives
+* Each deck will contain upgradable gear enchantments, utilities, missiles, abilities, and passives. Upgrades will cost skill points, of which there is a limited amount per build. You will be able to create up to 3 presets per deck for different builds, depending on your playstyle. If you've played Mineplex champions before, that's the inspiration.
+* New gamemode: Capture the Flag
+* New gamemode: Domination
+* Private games with custom settings (creatable by DIVINE rank players only)
+* Achievements, many new cosmetics, QOL improvements
