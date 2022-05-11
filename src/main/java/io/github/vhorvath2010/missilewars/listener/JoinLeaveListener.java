@@ -30,7 +30,7 @@ public class JoinLeaveListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
-        	InventoryUtils.saveInventory(player);
+        	InventoryUtils.saveInventory(player, true);
             return;
         }
 

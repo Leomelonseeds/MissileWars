@@ -5,6 +5,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,6 +20,7 @@ import io.github.vhorvath2010.missilewars.listener.ArenaInventoryListener;
 import io.github.vhorvath2010.missilewars.listener.CustomItemListener;
 import io.github.vhorvath2010.missilewars.listener.JoinLeaveListener;
 import io.github.vhorvath2010.missilewars.listener.WorldCreationListener;
+import io.github.vhorvath2010.missilewars.utilities.InventoryUtils;
 import io.github.vhorvath2010.missilewars.utilities.JSONManager;
 import io.github.vhorvath2010.missilewars.utilities.MissileWarsPlaceholder;
 import io.github.vhorvath2010.missilewars.utilities.SQLManager;
@@ -157,6 +159,13 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Saving player deck configurations...");
         jsonManager.saveAll(false);
         log("Player decks saved!");
+        
+        // Save all player inventories
+        log("Saving player inventories...");
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            InventoryUtils.saveInventory(player, false);
+        }
+        log("Player inventories saved!");
 
         // Close database connection
         log("Closing MySQL connection...");

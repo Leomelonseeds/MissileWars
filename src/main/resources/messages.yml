@@ -29,7 +29,7 @@ messages:
   map-failed: "&cMap failed to generate! Please contact an admin."
   starting: "&7Starting now! Please wait for the map to generate..."
   cannot-place-structure: "&cYou cannot use that here!"
-  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster."
+  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster, and the game will no longer wait for ties."
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
   game-end-reminder: "&c&l[!] &7The game will end in &c%umw_time_remaining%&7!"
@@ -85,6 +85,7 @@ titles:
       - "but at what cost"
       - "✌"
       - "flex it to your friends"
+      - "me when i"
     length: 120
   defeat:
     title: "&c&lDefeat"
@@ -102,6 +103,7 @@ titles:
       - "if only M310N was here"
       - "try again"
       - "not even close"
+      - "feelsbadman"
     length: 120
   tie:
     title: "&e&lTie"
@@ -114,6 +116,8 @@ titles:
       - "time for a rematch"
       - "stalemate"
       - "the real winner is me"
+      - "bruh"
+      - "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too"
     length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
@@ -123,37 +127,10 @@ titles:
     title: "&4Portal Destroyed"
     subtitle: "&71 portal remaining"
     length: 60
-    
-# This section is no longer needed
-# and will be removed in the future
-#scoreboard:
-#  title: "&d&lMissile &5&lWars"
-#  lines-main-lobby:
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&bWelcome %displayname%&f!"
-#    - ""
-#    - "&aRight-click &fthe compass"
-#    - "&fto join a game!"
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&5play.ultimamc.net"
-#  lines-waiting:
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&fGamemode: &a%umw_gamemode%"
-#    - "&fMap: &a%umw_map%"
-#    - ""
-#    - "&fStarting in: %umw_time%"
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&5play.ultimamc.net"
-#  lines-classic:
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&fGamemode: &aClassic"
-#    - ""
-#    - "&cRed Shield: %umw_shield_health_red%"
-#    - "&9Blue Shield: %umw_shield_health_blue%"
-#    - ""
-#    - "&fTime left: %umw_time_remaining%"
-#    - "&7&m－－－－－－－－－－－－"
-#    - "&5play.ultimamc.net"
+  waiting-for-tie:
+    title: "&f"
+    subtitle: "&7Waiting for tie..."
+    length: 60
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  

@@ -81,6 +81,8 @@ public class Arena implements ConfigurationSerializable {
     private LocalDateTime startTime;
     /** Whether a game is currently running */
     private boolean running;
+    /** Are we waiting for a tie or no */
+    private boolean waitingForTie;
     /** List of currently running tasks. */
     private List<BukkitTask> tasks;
     /** Whether the arena is currently resetting the world. */
@@ -436,7 +438,7 @@ public class Arena implements ConfigurationSerializable {
             return false;
         }
 
-        InventoryUtils.saveInventory(player);
+        InventoryUtils.saveInventory(player, true);
         InventoryUtils.clearInventory(player);
 
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
@@ -1037,6 +1039,7 @@ public class Arena implements ConfigurationSerializable {
         }
         running = false;
         resetting = true;
+        waitingForTie = false;
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
 
@@ -1304,12 +1307,50 @@ public class Arena implements ConfigurationSerializable {
                 blueTeam.sendTitle("enemy-portal-destroyed");
             }
         }
+        
+        if (waitingForTie) {
+            return;
+        }
 
         // Check if either team's last portal has been broken
+        int wait = MissileWarsPlugin.getPlugin().getConfig().getInt("tie-wait-time");
+        
         if (!redTeam.hasLivingPortal()) {
-            endGame(blueTeam);
+            if (getSecondsRemaining() <= getChaosTime()) {
+                endGame(blueTeam);
+            } else {
+                blueTeam.sendTitle("waiting-for-tie");
+                redTeam.sendTitle("waiting-for-tie");
+                waitingForTie = true;
+                tasks.add(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!blueTeam.hasLivingPortal()) {
+                            endGame(null);
+                        } else {
+                            endGame(blueTeam);
+                        }
+                    }
+                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
+            }
         } else if (!blueTeam.hasLivingPortal()) {
-            endGame(redTeam);
+            if (getSecondsRemaining() <= getChaosTime()) {
+                endGame(redTeam);
+            } else {
+                blueTeam.sendTitle("waiting-for-tie");
+                redTeam.sendTitle("waiting-for-tie");
+                waitingForTie = true;
+                tasks.add(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!redTeam.hasLivingPortal()) {
+                            endGame(null);
+                        } else {
+                            endGame(redTeam);
+                        }
+                    }
+                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
+            }
         }
     }
 

@@ -19,6 +19,9 @@ lobby-wait-time: 30
 # When lobby is full, how long do players wait for (s)
 lobby-wait-time-full: 10
 
+# How long to wait for a tie before declaring victory for a team
+tie-wait-time: 5
+
 # When victory, how long is the screen displayed before world resets
 # and players kicked to main lobby.
 victory-wait-time: 15

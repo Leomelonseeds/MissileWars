@@ -43,7 +43,7 @@ public class InventoryUtils {
      *
      * @param player
      */
-    public static void saveInventory(Player player) {
+    public static void saveInventory(Player player, Boolean async) {
         Inventory inventory = player.getInventory();
         UUID uuid = player.getUniqueId();
         try {
@@ -61,7 +61,7 @@ public class InventoryUtils {
                 }
             }
             String inventoryData = Base64.getEncoder().encodeToString(str.toByteArray());
-            MissileWarsPlugin.getPlugin().getSQL().setInventory(uuid, inventoryData);
+            MissileWarsPlugin.getPlugin().getSQL().setInventory(uuid, inventoryData, async);
         } catch (final IOException e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to save inventory to string of " + player.getName());
         }
