@@ -1308,6 +1308,12 @@ public class Arena implements ConfigurationSerializable {
             }
         }
         
+        // Waiting for a tie in this case
+        if (!redTeam.hasLivingPortal() && !blueTeam.hasLivingPortal()) {
+            endGame(null);
+            return;
+        }
+        
         if (waitingForTie) {
             return;
         }
@@ -1325,9 +1331,7 @@ public class Arena implements ConfigurationSerializable {
                 tasks.add(new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!blueTeam.hasLivingPortal()) {
-                            endGame(null);
-                        } else {
+                        if (blueTeam.hasLivingPortal()) {
                             endGame(blueTeam);
                         }
                     }
@@ -1343,9 +1347,7 @@ public class Arena implements ConfigurationSerializable {
                 tasks.add(new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!redTeam.hasLivingPortal()) {
-                            endGame(null);
-                        } else {
+                        if (redTeam.hasLivingPortal()) {
                             endGame(redTeam);
                         }
                     }
