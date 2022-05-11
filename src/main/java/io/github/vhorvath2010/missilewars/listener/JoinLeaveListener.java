@@ -21,8 +21,12 @@ public class JoinLeaveListener implements Listener {
     /** Remove player from Arena if they DC. */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        // Get Arena player is in and remove them
+
+        // Save player deck configuration
         Player player = event.getPlayer();
+        MissileWarsPlugin.getPlugin().getJSON().savePlayer(player.getUniqueId());
+        
+        // Get Arena player is in and remove them
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
@@ -31,7 +35,6 @@ public class JoinLeaveListener implements Listener {
         }
 
         playerArena.removePlayer(player.getUniqueId());
-        MissileWarsPlugin.getPlugin().getJSON().savePlayer(player.getUniqueId());
     }
 
     /** Handle inventory loading on join */

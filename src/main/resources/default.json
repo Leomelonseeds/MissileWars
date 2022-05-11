@@ -1,163 +1,153 @@
 {
     "Deck": "Sentinel",
-    "Preset": 0,
+    "Preset": "A",
 	"missilespec": false,
 	"utilityspec": false,
 	"hoarder": false,
-    "Decks": {
-  		"Vanguard": {
-			"fireprot": false,
-			"knockback": false,
-			"fireaspect": false,
-			"doublejump": false,
-			"hurl": false,
-			"bhop": false,
-			"adrenaline": false,
-			"Presets": {
-				"A": {
-					"skillpoints": 18,
-					"fireprot": 0,
-					"sharp": 2,
-					"knockback": 0,
-					"fireaspect": 0,
-					"canopy": 1,
-					"splash": 1,
-					"harming": 1,	
-					"lightning": 1,
-					"cruiser": 1,
-					"hilt": 1,
-					"supersonic": 1,
-					"tomahawk": 1,
-					"ability": {
-						"selected": "None",
-						"level": 0
-					},
-					"passive": {
-						"selected": "None",
-						"level": 0
-					},
-					"gpassive": {
-						"selected": "None",
-						"level": 0
-					}
-				}
+	"Vanguard": {
+		"fireprot": false,
+		"knockback": false,
+		"fireaspect": false,
+		"doublejump": false,
+		"hurl": false,
+		"bhop": false,
+		"adrenaline": false,
+		"defaultpreset": {
+			"skillpoints": 18,
+			"fireprot": 0,
+			"sharp": 2,
+			"knockback": 0,
+			"fireaspect": 0,
+			"canopy": 1,
+			"splash": 1,
+			"harming": 1,	
+			"lightning": 1,
+			"cruiser": 1,
+			"hilt": 1,
+			"supersonic": 1,
+			"tomahawk": 1,
+			"ability": {
+				"selected": "None",
+				"level": 0
+			},
+			"passive": {
+				"selected": "None",
+				"level": 0
+			},
+			"gpassive": {
+				"selected": "None",
+				"level": 0
 			}
-		},
-  		"Sentinel": {
-			"projprot": false,
-			"punch": false,
-			"flame": false,
-			"forksmash": false,
-			"fissionarrow": false,
-			"longshot": false,
-			"priest": false,
-			"Presets": {
-				"A": {
-					"skillpoints": 18,
-					"projprot": 0,
-					"punch": 0,
-					"power": 1,
-					"flame": 0,
-					"sharp": 1,
-					"oshield": 1,
-					"arrows": 2,
-					"torpedo": 1,
-					"guardian": 1,
-					"gemini": 1,
-					"cron": 1,
-					"sword": 1,
-					"piranha": 1,
-					"ability": {
-						"selected": "None",
-						"level": 0
-					},
-					"passive": {
-						"selected": "None",
-						"level": 0
-					},
-					"gpassive": {
-						"selected": "None",
-						"level": 0
-					}
-				}
+		}
+	},
+	"Sentinel": {
+		"projprot": false,
+		"punch": false,
+		"flame": false,
+		"forksmash": false,
+		"fissionarrow": false,
+		"longshot": false,
+		"priest": false,
+		"defaultpreset": {
+			"skillpoints": 18,
+			"projprot": 0,
+			"punch": 0,
+			"power": 1,
+			"flame": 0,
+			"sharp": 1,
+			"oshield": 1,
+			"arrows": 2,
+			"torpedo": 1,
+			"guardian": 1,
+			"gemini": 1,
+			"cron": 1,
+			"sword": 1,
+			"piranha": 1,
+			"ability": {
+				"selected": "None",
+				"level": 0
+			},
+			"passive": {
+				"selected": "None",
+				"level": 0
+			},
+			"gpassive": {
+				"selected": "None",
+				"level": 0
 			}
-		},
-  		"Berserker": {
-			"blastprot": false,
-			"multishot": false,
-			"quickcharge": false,
-			"launcher": false,
-			"slam": false,
-			"resolve": false,
-			"retaliation": false,
-			"booster": false,
-			"Presets": {
-				"A": {
-					"skillpoints": 18,
-					"blastprot": 0,
-					"multishot": 0,
-					"quickcharge": 0,
-					"sharp": 2,
-					"creeper": 1,
-					"arrows": 2,
-					"fireball": 2,
-					"supporter": 1,
-					"warhead": 1,
-					"juggernaut": 1,
-					"breaker": 1,
-					"shieldbuster": 1,
-					"ability": {
-						"selected": "None",
-						"level": 0
-					},
-					"passive": {
-						"selected": "None",
-						"level": 0
-					},
-					"gpassive": {
-						"selected": "None",
-						"level": 0
-					}
-				}
+		}
+	},
+	"Berserker": {
+		"blastprot": false,
+		"multishot": false,
+		"quickcharge": false,
+		"launcher": false,
+		"slam": false,
+		"resolve": false,
+		"retaliation": false,
+		"booster": false,
+		"defaultpreset": {
+			"skillpoints": 18,
+			"blastprot": 0,
+			"multishot": 0,
+			"quickcharge": 0,
+			"sharp": 2,
+			"creeper": 1,
+			"arrows": 2,
+			"fireball": 2,
+			"supporter": 1,
+			"warhead": 1,
+			"juggernaut": 1,
+			"breaker": 1,
+			"shieldbuster": 1,
+			"ability": {
+				"selected": "None",
+				"level": 0
+			},
+			"passive": {
+				"selected": "None",
+				"level": 0
+			},
+			"gpassive": {
+				"selected": "None",
+				"level": 0
 			}
-		},
-		"Architect": {
-			"haste": false,
-			"efficiency": false,
-			"featherfalling": false,
-			"utilitymaster": false,
-			"missilemaster": false,
-			"sidemonger": false,
-			"naturesblessing": false,
-			"lazybuilder": false,
-			"Presets": {
-				"A": {
-					"skillpoints": 18,
-					"featherfalling": 0,
-					"sharpness": 0,
-					"efficiency": 2,
-					"haste": 0,
-					"shield": 1,
-					"platform": 1,
-					"leaves": 1,
-					"shipper": 1,
-					"slingshot": 1,
-					"citadel": 1,
-					"pisces": 1,
-					"ant": 1,
-					"ability": {
-						"selected": "None",
-						"level": 0
-					},
-					"passive": {
-						"selected": "None",
-						"level": 0
-					},
-					"gpassive": {
-						"selected": "None",
-						"level": 0
-					}
-				}
+		}
+	},
+	"Architect": {
+		"haste": false,
+		"efficiency": false,
+		"featherfalling": false,
+		"utilitymaster": false,
+		"missilemaster": false,
+		"sidemonger": false,
+		"naturesblessing": false,
+		"lazybuilder": false,
+		"defaultpreset": {
+			"skillpoints": 18,
+			"featherfalling": 0,
+			"sharpness": 0,
+			"efficiency": 2,
+			"haste": 0,
+			"shield": 1,
+			"platform": 1,
+			"leaves": 1,
+			"shipper": 1,
+			"slingshot": 1,
+			"citadel": 1,
+			"pisces": 1,
+			"ant": 1,
+			"ability": {
+				"selected": "None",
+				"level": 0
+			},
+			"passive": {
+				"selected": "None",
+				"level": 0
+			},
+			"gpassive": {
+				"selected": "None",
+				"level": 0
 			}
 		}
 	}

@@ -433,7 +433,7 @@ public class ArenaManager {
             Location aLoc = new Location(arenaWorld, aVec.getX(), aVec.getY(), aVec.getZ());
             aLoc.setYaw(-90);
             NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
-                    ChatColor.WHITE + "" + ChatColor.BOLD + "Architect");
+                    ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Architect");
             SkinTrait aSkin = architect.getOrAddTrait(SkinTrait.class);
             aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.architect.value"));

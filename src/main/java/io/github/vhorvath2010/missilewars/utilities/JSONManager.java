@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import github.scarsz.discordsrv.dependencies.commons.io.IOUtils;
@@ -51,23 +52,58 @@ public class JSONManager {
     public void loadPlayer(UUID uuid) {
         plugin.getSQL().getPlayerDeck(uuid, result -> {
             String jsonString = (String) result;
-            JSONObject json;
-            // Updated json from file
-            JSONObject newjson = new JSONObject(/*read file here*/);
-            newjson.put("Deck", "Sentinel");
+            JSONObject newJson;
             if (jsonString == null) {
                 // For new players, use the default json
-                json = newjson;
+                newJson = defaultJson;
             } else {
-                // Otherwise, perform an update (WIP)
-                json = new JSONObject(jsonString);
+                try {
+                    newJson = new JSONObject(jsonString);
+                    // Recursively update json file
+                    updateJson(newJson, defaultJson);
+                    String[] decks = {"Vanguard", "Berserker", "Sentinel", "Architect"};
+                    String[] presets = {"A", "B", "C"};
+                    for (String deck : decks) {
+                        updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
+                        for (String preset : presets) {
+                            if (newJson.has(preset)) {
+                                updateJson(newJson.getJSONObject(deck).getJSONObject(preset),
+                                       defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                            } else {
+                                newJson.getJSONObject(deck).put(preset, 
+                                        defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
+                    newJson = defaultJson;
+                }
             }
-            playerCache.put(uuid, json);
+            playerCache.put(uuid, newJson);
         });
     }
     
-    public void updatePreset(JSONObject json) {
-        
+    /**
+     * Updates a specified preset
+     * 
+     * @param original the original preset
+     * @param updated an object within the defaultJson
+     * @param preset
+     */
+    private void updateJson(JSONObject original, JSONObject updated) {
+        // Add new keys if not exist
+        for (String key : JSONObject.getNames(updated)) {
+            if (!original.has(key)) {
+                original.put(key, updated.get(key));
+            }
+        }
+        // Remove keys not existing in default
+        for (String key : JSONObject.getNames(original)) {
+            if (!updated.has(key)) {
+                original.remove(key);
+            }
+        }
     }
     
     /**
@@ -84,6 +120,9 @@ public class JSONManager {
      * @param uuid
      */
     public void savePlayer(UUID uuid) {
+        if (playerCache.get(uuid) == null) {
+            return;
+        }
         plugin.getSQL().savePlayerDeck(uuid, playerCache.get(uuid).toString(), true);
         playerCache.remove(uuid);
     }
