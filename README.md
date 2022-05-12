@@ -1,4 +1,5 @@
 # Ultima Missile Wars
+![](https://cdn.discordapp.com/attachments/358673756836855810/958149582120968262/2022-03-28_16.36.03.png)
 A new, fresh installment of the classic gamemode made by Cubehamster and Sethbling, where slimeblock TNT flying machines are used to bust through enemy shields and blow up their nether portals. Join with your friends now at play.ultimamc.net
 
 All the original, best features of Missile Wars are here, including the ability to choose your team and to join games while they're running. Of course, this plugin offers many features to expand and improve upon the original Missile Wars.
@@ -22,11 +23,15 @@ These new items have been split into 4 different Decks (kits), each with 5 diffe
 * **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
 
 ## New Maps
-4+ new maps, each changing the gameplay in fun and inventive ways, have been added. New maps are also being worked on - images will be uploaded here later.
+4+ new maps, each changing the gameplay in fun and inventive ways, have been added. New maps are also being worked on.
 * **Double Layer** - The classic map, but with thicker bases. What could go wrong?
+![](https://i.imgur.com/ZXzhell.jpg)
 * **Middle Ground** - An extra base, smack in the middle of the map.
+![](https://i.imgur.com/KeWo1el.jpg)
 * **Minefield** - A menacing map with explosive chain reactions
+![](https://i.imgur.com/PnHOhla.jpg)
 * **Cube Crowd** - The dumbest map name represents our coolest idea, a skygrid style field of blocks to chill on.
+![](https://i.imgur.com/zKrGraC.jpg)
 
 ## Balancing
 An enemy player getting to your side almost always meant certain death in the original game. The balancing changes listed below make for more fun, intense gameplay.
