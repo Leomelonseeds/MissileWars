@@ -673,7 +673,7 @@ lifter:
 
 splash:
   item: SPLASH_POTION
-  name: "&9★ Splash ⚡"
+  name: "&9★ Splash %level% ⚡"
   lore:
   - ""
   - "&7Make it rain (but not snow) with the Splash!"
@@ -808,7 +808,7 @@ torpedo_2:
 obsidian_shield:
   file: 'obsidian_shield.nbt'
   item: ENDER_PEARL
-  name: "&5★ Obsidian Shield ✟"
+  name: "&5★ Obsidian Shield %level% ✟"
   lore:
   - ""
   - "&7Due to a budget increase, we can now afford"
@@ -835,7 +835,7 @@ obsidian_shield_clear:
 canopy:
   file: 'canopy.nbt'
   item: ENDER_EYE
-  name: "&2★ Canopy ⚡"
+  name: "&2★ Canopy %level% ⚡"
   lore:
   - ""
   - "&7Harness the power of the trees, and create"
@@ -869,16 +869,35 @@ spawn_creeper_charged:
 
 fireball:
   item: FIRE_CHARGE
-  name: "&4★ Fireball &4&l☣"
+  name: "&4★ Fireball %level% &4&l☣"
   lore:
   - ""
   - "&7No ghasts were harmed in the"
   - "&7making of this utility. Technically."
   - "&7They died instantly and painlessly."
 
-leaves:
+leaves_1:
   item: JUNGLE_LEAVES
-  name: "&2★ Leaves ⚒"
+  amount: 4
+  name: "&2★ Leaves I ⚒"
+  lore:
+  - ""
+  - "&7Since when could you walk on leaves?"
+  - "&7I thought they would just deca-"
+  
+leaves_2:
+  item: AZALEA_LEAVES
+  amount: 6
+  name: "&2★ Leaves II ⚒"
+  lore:
+  - ""
+  - "&7Since when could you walk on leaves?"
+  - "&7I thought they would just deca-"
+  
+leaves_3:
+  item: FLOWERING_AZALEA_LEAVES
+  amount: 8
+  name: "&2★ Leaves III ⚒"
   lore:
   - ""
   - "&7Since when could you walk on leaves?"
@@ -892,18 +911,26 @@ lingering_harming_1:
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
+  # 0 = lvl 1
+  amplifier: 1
+  # in seconds
+  duration: 5
 lingering_harming_2:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion II ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
+  amplifier: 1
+  duration: 10
 lingering_harming_3:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion III ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
+  amplifier: 2
+  duration: 15
 
 
 # Gear items (just used for names and lores i guess)
