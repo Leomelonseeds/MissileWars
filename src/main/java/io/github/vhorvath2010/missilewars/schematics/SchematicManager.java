@@ -70,6 +70,11 @@ public class SchematicManager {
         if (loc.getWorld().getName().equals("world")){
             return false;
         }
+        
+        // Don't be too high
+        if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
+            return false;
+        }
 
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();

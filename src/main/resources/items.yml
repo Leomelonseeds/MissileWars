@@ -851,14 +851,14 @@ canopy:
     z: -3
 
 spawn_creeper:
-  item: CREEPER_SPAWN_EGG
+  item: CREEPER_HEAD
   name: "&a★ Spawn Creeper &a&l☣"
   lore:
   - ""
   - "&7A creeper walks into a bar. I wasn't paid"
   - "&7enough to finish the joke"
 spawn_creeper_charged:
-  item: CREEPER_SPAWN_EGG
+  item: CREEPER_HEAD
   name: "&a★ Spawn Creeper (Charged) &a&l☣"
   lore:
   - ""

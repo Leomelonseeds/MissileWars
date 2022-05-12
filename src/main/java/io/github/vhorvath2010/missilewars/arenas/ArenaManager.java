@@ -453,7 +453,7 @@ public class ArenaManager {
             int length = settings.getInt("barrier.length");
             int x = settings.getInt("barrier.center.x");
             int zCenter = settings.getInt("barrier.center.z");
-            for (int y = 0; y <= 256; ++y) {
+            for (int y = 0; y <= 320; ++y) {
                 for (int z = zCenter - length / 2; z < zCenter + length / 2; z++) {
                     arenaWorld.getBlockAt(x, y, z).setType(Material.BARRIER);
                 }

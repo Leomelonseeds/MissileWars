@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -177,9 +178,21 @@ public class CustomItemListener implements Listener {
                 if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
                     event.setCancelled(true);
                     ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                    return;
+                    break;
                 }
             }
+
+            if (utility.contains("creeper")) {
+                Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
+                Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation(), EntityType.CREEPER);
+                if (utility.contains("charged")) {
+                    creeper.setPowered(true);
+                }
+                hand.setAmount(hand.getAmount() - 1);
+                event.setCancelled(true);
+            }
+            
+            return;
         }
 
         // Do proper action based on utility type

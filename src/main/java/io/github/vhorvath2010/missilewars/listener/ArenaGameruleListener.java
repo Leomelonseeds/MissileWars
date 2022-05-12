@@ -1,6 +1,7 @@
 package io.github.vhorvath2010.missilewars.listener;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -206,29 +207,44 @@ public class ArenaGameruleListener implements Listener {
     /** Handle shield block breaks breaks. */
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
         // Ensure it was in an arena world
-        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
+        String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
         if (possibleArena == null) {
             return;
         }
+        
+        // Fix dumb bug. No break obsidian
+        if (block.getType().toString().contains("OBSIDIAN")) {
+            event.setCancelled(true);
+            return;
+        }
 
         // Register block break
-        possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), false);
+        possibleArena.registerShieldBlockEdit(block.getLocation(), false);
     }
 
     /** Handle shield block breaks places. */
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
+        Block block = event.getBlock();
         // Ensure it was in an arena world
-        String possibleArenaName = event.getBlock().getWorld().getName().replace("mwarena_", "");
+        String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
         if (possibleArena == null) {
             return;
         }
+        
+        // Ain't no way bruh
+        if (block.getLocation().getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
+            event.setCancelled(true);
+            return;
+        }
 
         // Register block break
-        possibleArena.registerShieldBlockEdit(event.getBlock().getLocation(), true);
+        possibleArena.registerShieldBlockEdit(block.getLocation(), true);
     }
 
     /** Stop chickens spawning from eggs */

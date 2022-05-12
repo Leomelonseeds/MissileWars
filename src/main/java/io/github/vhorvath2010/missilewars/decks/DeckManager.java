@@ -179,7 +179,7 @@ public class DeckManager {
 
         ItemStack shield = createSchematicItem("shield_2");
         ItemStack platform = createSchematicItem("platform_2");
-        ItemStack leaves = createUtilityItem("leaves");
+        ItemStack leaves = createUtilityItem("leaves_1");
 
         List<ItemStack> aMissiles = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter}));
         List<ItemStack> aUtility = new ArrayList<>(List.of(new ItemStack[]{shield, platform, leaves}));
@@ -227,7 +227,6 @@ public class DeckManager {
         
         items.put("torpedo_1", createSchematicItem("torpedo_1"));
         items.put("torpedo_2", createSchematicItem("torpedo_2"));
-        items.put("torpedo_3", createSchematicItem("torpedo_3"));
         items.put("oshield", createSchematicItem("obsidian_shield"));
         items.put("arrows_1", new ItemStack(Material.ARROW, 2));
         items.put("arrows_2", new ItemStack(Material.ARROW, 3));

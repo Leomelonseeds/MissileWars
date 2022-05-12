@@ -11,6 +11,9 @@ cancel-schematic:
   - OBSIDIAN
   - CRYING_OBSIDIAN
   - NETHER_PORTAL
+ 
+# Things cannot be placed higher than this
+max-height: 256
     
 # When min player requirements met for each arena, 
 # how long do players wait for to start game (s)
