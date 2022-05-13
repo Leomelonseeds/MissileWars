@@ -50,12 +50,13 @@ public class DeckManager {
         vsword.setItemMeta(swordMeta);
         vanguardgear.add(vsword);
         ItemStack vboots = new ItemStack(Material.GOLDEN_BOOTS);
-        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 2);
+        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 2);
         ItemMeta vbootsMeta = vboots.getItemMeta();
         vbootsMeta.setUnbreakable(true);
         vboots.setItemMeta(vbootsMeta);
         vanguardgear.add(vboots);
 
+        ItemStack lightning = createSchematicItem("lightning");
         ItemStack hurricane = createSchematicItem("hurricane");
         ItemStack cruiser = createSchematicItem("cruiser");
         ItemStack thunderbolt = createSchematicItem("thunderbolt");
@@ -70,7 +71,7 @@ public class DeckManager {
         ItemStack canopy = createUtilityItem("canopy");
         ItemStack lingering = createUtilityItem("lingering_harming_2");
 
-        List<ItemStack> vMissiles = new ArrayList<>(List.of(new ItemStack[]{tomahawk, thunderbolt, supersonic, dagger, tomatwo}));
+        List<ItemStack> vMissiles = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo}));
         List<ItemStack> vUtility = new ArrayList<>(List.of(new ItemStack[]{splash, canopy, lingering}));
         vanguard = new Deck("Vanguard", vanguardgear, vMissiles, vUtility);
 
@@ -79,7 +80,6 @@ public class DeckManager {
         List<ItemStack> sentinelgear = new ArrayList<>();
         ItemStack bow = createUtilityItem("sentinel_bow");
         bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-        bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
         bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
         bow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 4);
         ItemMeta bowMeta = bow.getItemMeta();
@@ -87,7 +87,7 @@ public class DeckManager {
         bow.setItemMeta(bowMeta);
         sentinelgear.add(bow);
         ItemStack sboots = new ItemStack(Material.IRON_BOOTS);
-        sboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 2);
+        sboots.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 2);
         ItemMeta sbootsMeta = sboots.getItemMeta();
         sbootsMeta.setUnbreakable(true);
         sboots.setItemMeta(sbootsMeta);
@@ -160,7 +160,7 @@ public class DeckManager {
         pickaxe.setItemMeta(pickaxeMeta);
         architectgear.add(pickaxe);
         ItemStack aboots = new ItemStack(Material.CHAINMAIL_BOOTS);
-        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 1);
+        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 1);
         ItemMeta abootsMeta = aboots.getItemMeta();
         abootsMeta.setUnbreakable(true);
         aboots.setItemMeta(abootsMeta);
@@ -325,7 +325,7 @@ public class DeckManager {
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
             ItemStack boots = items.get("vboots");
-            addEnch(boots, Enchantment.PROTECTION_FIRE, json.getInt("fireprot") * 2);
+            addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling") * 2);
             gear.add(boots);
             
             return new Deck(deck, gear, missiles, utility);
@@ -384,7 +384,7 @@ public class DeckManager {
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
             gear.add(bow);
             ItemStack boots = items.get("sboots");
-            addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot") * 2);
+            addEnch(boots, Enchantment.PROTECTION_FIRE, json.getInt("fireprot") * 2);
             gear.add(boots);
             
             return new Deck(deck, gear, missiles, utility);
@@ -410,7 +410,7 @@ public class DeckManager {
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
             gear.add(pick);
             ItemStack boots = items.get("aboots");
-            addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling"));
+            addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot"));
             gear.add(boots);
             
             return new Deck(deck, gear, missiles, utility);

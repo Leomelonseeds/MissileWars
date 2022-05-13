@@ -127,10 +127,14 @@ titles:
     title: "&4Portal Destroyed"
     subtitle: "&71 portal remaining"
     length: 60
-  waiting-for-tie:
-    title: "&f"
+  enemy-portals-destroyed:
+    title: "&5Enemy Portal Destroyed"
     subtitle: "&7Waiting for tie..."
-    length: 60
+    length: 100
+  own-portals-destroyed:
+    title: "&4Portals Destroyed"
+    subtitle: "&7Waiting for tie..."
+    length: 100
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  

@@ -1325,8 +1325,8 @@ public class Arena implements ConfigurationSerializable {
             if (getSecondsRemaining() <= getChaosTime()) {
                 endGame(blueTeam);
             } else {
-                blueTeam.sendTitle("waiting-for-tie");
-                redTeam.sendTitle("waiting-for-tie");
+                blueTeam.sendTitle("enemy-portals-destroyed");
+                redTeam.sendTitle("own-portals-destroyed");
                 waitingForTie = true;
                 tasks.add(new BukkitRunnable() {
                     @Override
@@ -1341,8 +1341,8 @@ public class Arena implements ConfigurationSerializable {
             if (getSecondsRemaining() <= getChaosTime()) {
                 endGame(redTeam);
             } else {
-                blueTeam.sendTitle("waiting-for-tie");
-                redTeam.sendTitle("waiting-for-tie");
+                blueTeam.sendTitle("own-portals-destroyed");
+                redTeam.sendTitle("enemy-portals-destroyed");
                 waitingForTie = true;
                 tasks.add(new BukkitRunnable() {
                     @Override
