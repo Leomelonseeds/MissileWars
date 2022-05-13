@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
@@ -102,9 +103,10 @@ public class ArenaInventoryListener implements Listener {
     @EventHandler
     public void stopItemMoving(InventoryClickEvent event) {
         // Obtain player
-        if (!(event.getWhoClicked() instanceof Player)) {
+        if (!(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
         }
+        
         Player player = (Player) event.getWhoClicked();
 
         // Check if player is in an active arena
@@ -115,8 +117,9 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Stop armor removals and first slot changes
-        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR || event.getSlot() == 40) {
             event.setCancelled(true);
+            return;
         }
     }
 

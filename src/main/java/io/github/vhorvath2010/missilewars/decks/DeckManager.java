@@ -160,7 +160,7 @@ public class DeckManager {
         pickaxe.setItemMeta(pickaxeMeta);
         architectgear.add(pickaxe);
         ItemStack aboots = new ItemStack(Material.CHAINMAIL_BOOTS);
-        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 1);
+        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 2);
         ItemMeta abootsMeta = aboots.getItemMeta();
         abootsMeta.setUnbreakable(true);
         aboots.setItemMeta(abootsMeta);
@@ -325,7 +325,7 @@ public class DeckManager {
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
             ItemStack boots = items.get("vboots");
-            addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling") * 2);
+            addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling"));
             gear.add(boots);
             
             return new Deck(deck, gear, missiles, utility);
@@ -410,7 +410,7 @@ public class DeckManager {
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
             gear.add(pick);
             ItemStack boots = items.get("aboots");
-            addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot"));
+            addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot") * 2);
             gear.add(boots);
             
             return new Deck(deck, gear, missiles, utility);

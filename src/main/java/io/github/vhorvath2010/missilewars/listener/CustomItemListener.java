@@ -178,13 +178,13 @@ public class CustomItemListener implements Listener {
                 if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
                     event.setCancelled(true);
                     ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                    break;
+                    return;
                 }
             }
 
             if (utility.contains("creeper")) {
                 Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
-                Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation(), EntityType.CREEPER);
+                Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
                 if (utility.contains("charged")) {
                     creeper.setPowered(true);
                 }
@@ -281,7 +281,7 @@ public class CustomItemListener implements Listener {
                 Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
                 Location spawnLoc = player.getEyeLocation().clone().add(distance);
                 if (SchematicManager.spawnNBTStructure("canopy", spawnLoc, isRedTeam(player), mapName)) {
-                    player.teleport(spawnLoc);
+                    player.teleport(spawnLoc.toCenterLocation().add(0, -0.5, 0));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
                     hand.setAmount(hand.getAmount() - 1);
                     for (Player players : player.getWorld().getPlayers()) {
