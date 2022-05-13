@@ -864,6 +864,7 @@ public class Arena implements ConfigurationSerializable {
         // Assign players to teams based on queue (which removes their items)
         Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
         double maxSize = getCapacity() / 2;
+        double maxQueue = Math.ceil((double) players.size() / 2);
 
         // Teleport all players to center to remove lobby minigame items/dismount
         tasks.add(new BukkitRunnable() {
@@ -883,14 +884,14 @@ public class Arena implements ConfigurationSerializable {
         		while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
 		            if (!redQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = redQueue.remove();
-		                if (redTeam.getSize() < maxSize) {
+		                if (redTeam.getSize() < maxQueue) {
 		                	redTeam.addPlayer(toAdd);
 			                toAssign.remove(toAdd);
 		                }
 		            }
 		            if (!blueQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = blueQueue.remove();
-		                if (blueTeam.getSize() < maxSize) {
+		                if (blueTeam.getSize() < maxQueue) {
 		                	blueTeam.addPlayer(toAdd);
 		                	toAssign.remove(toAdd);
 		                }
