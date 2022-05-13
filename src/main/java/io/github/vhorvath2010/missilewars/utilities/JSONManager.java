@@ -52,34 +52,33 @@ public class JSONManager {
     public void loadPlayer(UUID uuid) {
         plugin.getSQL().getPlayerDeck(uuid, result -> {
             String jsonString = (String) result;
-            JSONObject newJson;
-            if (jsonString == null) {
-                // For new players, use the default json
-                newJson = defaultJson;
-            } else {
-                try {
-                    newJson = new JSONObject(jsonString);
-                    // Recursively update json file
-                    updateJson(newJson, defaultJson);
-                    String[] decks = {"Vanguard", "Berserker", "Sentinel", "Architect"};
-                    String[] presets = {"A", "B", "C"};
-                    for (String deck : decks) {
-                        updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
-                        for (String preset : presets) {
-                            if (newJson.has(preset)) {
-                                updateJson(newJson.getJSONObject(deck).getJSONObject(preset),
-                                       defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
-                            } else {
-                                newJson.getJSONObject(deck).put(preset, 
-                                        defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
-                            }
+            JSONObject newJson = new JSONObject();
+            if (jsonString != null) {
+                newJson = new JSONObject(jsonString);
+            }
+            
+            try {
+                // Recursively update json file
+                updateJson(newJson, defaultJson);
+                String[] decks = {"Vanguard", "Berserker", "Sentinel", "Architect"};
+                String[] presets = {"A", "B", "C"};
+                for (String deck : decks) {
+                    updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
+                    for (String preset : presets) {
+                        if (newJson.has(preset)) {
+                            updateJson(newJson.getJSONObject(deck).getJSONObject(preset),
+                                   defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                        } else {
+                            newJson.getJSONObject(deck).put(preset, 
+                                    defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
                         }
                     }
-                } catch (JSONException e) {
-                    Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
-                    newJson = defaultJson;
                 }
+            } catch (JSONException e) {
+                Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
+                newJson = defaultJson;
             }
+            
             playerCache.put(uuid, newJson);
         });
     }
