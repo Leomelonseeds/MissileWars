@@ -14,7 +14,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -117,7 +116,7 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Stop armor removals and first slot changes
-        if (event.getSlotType() == InventoryType.SlotType.ARMOR || event.getSlot() == 40) {
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
             event.setCancelled(true);
             return;
         }
@@ -168,16 +167,6 @@ public class ArenaInventoryListener implements Listener {
         }
     }
 
-    /** Stop swapping to offhand if in arena. */
-    @EventHandler
-    public void onSwap(PlayerSwapHandItemsEvent event) {
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(event.getPlayer().getUniqueId());
-        if (arena != null) {
-            event.setCancelled(true);
-        }
-    }
-
     /** Remove glass bottles after drinking potions */
     @EventHandler
     public void onDrink(PlayerItemConsumeEvent event) {
@@ -186,7 +175,11 @@ public class ArenaInventoryListener implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.getInventory().setItemInMainHand(null);
+                    if (player.getInventory().getItemInMainHand().getType() == Material.GLASS_BOTTLE) {
+                        player.getInventory().setItemInMainHand(null);
+                    } else if (player.getInventory().getItemInOffHand().getType() == Material.GLASS_BOTTLE) {
+                        player.getInventory().setItemInOffHand(null);
+                    }
                 }
             }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
         }

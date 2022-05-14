@@ -135,6 +135,7 @@ public class MissileWarsPlayer {
         utility = 0;
         kills = 0;
         deaths = 0;
+        deck = null;
     }
 
     /** Set the join time of this {@link MissileWarsPlayer} */

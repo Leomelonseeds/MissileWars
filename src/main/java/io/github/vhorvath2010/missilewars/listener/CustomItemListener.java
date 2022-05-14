@@ -37,6 +37,7 @@ import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
 import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.arenas.ArenaManager;
 import io.github.vhorvath2010.missilewars.schematics.SchematicManager;
+import io.github.vhorvath2010.missilewars.teams.MissileWarsPlayer;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** Class to handle events for structure items. */
@@ -55,6 +56,21 @@ public class CustomItemListener implements Listener {
         }
         return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
                 "item-structure"), PersistentDataType.STRING);
+    }
+    
+    /**
+     * Get a utility from a utility item.
+     *
+     * @param item the utility item
+     * @return the name of the utility, or null if the item has none
+     */
+    private String getUtilityFromItem(ItemStack item) {
+        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
+                PersistentDataType.STRING)) {
+            return null;
+        }
+        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
+                "item-utility"), PersistentDataType.STRING);
     }
 
     /**
@@ -85,6 +101,25 @@ public class CustomItemListener implements Listener {
         Arena arena = manager.getArena(player.getUniqueId());
         return arena;
     }
+    
+    /**
+     * Checks what item a player is using to account for offhand
+     * 
+     * @param player
+     * @return
+     */
+    private ItemStack getItemUsed(Player player) {
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        ItemStack offhand = player.getInventory().getItemInOffHand();
+        MissileWarsPlayer mwPlayer = getPlayerArena(player).getPlayerInArena(player.getUniqueId());
+        if (mwPlayer.getDeck() == null) {
+            return new ItemStack(Material.AIR);
+        }
+        if (mwPlayer.getDeck().getGear().contains(hand) || hand.getType() == Material.AIR) {
+            return offhand;
+        }
+        return hand;
+    }
 
     /** Handle missile and other structure item spawning. */
     @EventHandler
@@ -98,7 +133,7 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        ItemStack hand = player.getInventory().getItemInMainHand();
+        ItemStack hand = getItemUsed(player);
         Block clicked = event.getClickedBlock();
         String structureName = getStructureFromItem(hand);
         if (structureName == null) {
@@ -153,19 +188,22 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        ItemStack hand = player.getInventory().getItemInMainHand();
+        ItemStack hand = getItemUsed(player);
         // Handle splash potion through other methods
-        if ((hand.getType() == Material.SPLASH_POTION) || (hand.getItemMeta() == null) || !hand.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
-                PersistentDataType.STRING)) {
+        if (hand.getType() == Material.SPLASH_POTION) {
             return;
         }
-        String utility = hand.getItemMeta().getPersistentDataContainer().get(
-                new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"), PersistentDataType.STRING);
-        assert utility != null;
-        // Allow event if using bow
-        if (utility.contains("bow")) {
+        
+        String utility = getUtilityFromItem(hand);
+        if (utility == null) {
             return;
         }
+        
+        // Make sure we allow gear items to be used
+        if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
+            return;
+        }
+
         // Stop if not left-click
         if (!event.getAction().toString().contains("RIGHT_CLICK")) {
             return;
@@ -190,6 +228,7 @@ public class CustomItemListener implements Listener {
                 }
                 hand.setAmount(hand.getAmount() - 1);
                 event.setCancelled(true);
+                return;
             }
         }
 
@@ -253,7 +292,7 @@ public class CustomItemListener implements Listener {
                     return;
                 }
 
-                ItemStack hand = player.getInventory().getItemInMainHand();
+                ItemStack hand = getItemUsed(player);
 
                 // Ignore if player is not holding a canopy
                 if (hand.getType() != Material.ENDER_EYE) {
@@ -352,7 +391,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Check if player is holding a structure item
-        ItemStack hand = thrower.getInventory().getItemInMainHand();
+        ItemStack hand = getItemUsed(thrower);
         String structureName = getStructureFromItem(hand);
         if (structureName == null) {
             return;
@@ -456,11 +495,10 @@ public class CustomItemListener implements Listener {
         }
 
         // Check if player is holding a utility item
-        ItemStack hand = thrower.getInventory().getItemInMainHand();
+        ItemStack hand = getItemUsed(thrower);
 
         // Make sure it's splash potion of water
-        if ((hand.getItemMeta() == null) || !hand.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
-                PersistentDataType.STRING) || !thrown.getEffects().isEmpty()) {
+        if (getUtilityFromItem(hand) == null || !thrown.getEffects().isEmpty()) {
             return;
         }
 
