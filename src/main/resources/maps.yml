@@ -124,6 +124,8 @@ classic:
       y3: 52
       x4: 21
       y4: 72
+    too-high: 85
+    too-far: -45
   middle-ground:
     name: "&fMiddle Ground"
     file: "MiddleGround.schem"

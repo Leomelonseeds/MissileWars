@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import io.github.vhorvath2010.missilewars.MissileWarsPlugin;
+import io.github.vhorvath2010.missilewars.arenas.Arena;
 import io.github.vhorvath2010.missilewars.utilities.ConfigUtils;
 
 /** A class representing a generic Deck. */
@@ -117,19 +119,42 @@ public class Deck {
         if (lastTwo.size() > 2) {
             lastTwo.removeLast();
         }
-        // Add item to player
-        if (hasInventorySpace(player)) {
-            player.getInventory().addItem(poolItem);
-        } else {
-            String message = ConfigUtils.getConfigText("messages.inventory-limit", player, null, null);
-            String name;
-            if (poolItem.getItemMeta().hasDisplayName()) {
-                name = poolItem.getItemMeta().getDisplayName();
-            } else {
-                name = poolItem.getAmount() + "x " + StringUtils.capitalize(poolItem.getType().toString().toLowerCase());
-            }
-            player.sendMessage(message.replaceAll("%umw_item%", name));
+        
+        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        double toohigh = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-high");
+        double toofar = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-far");
+        Location loc = player.getLocation();
+        
+        // Don't give item if they are out of bounds
+        if (loc.getBlockY() > toohigh || loc.getBlockX() < toofar) {
+            refuseItem(player, poolItem, "messages.out-of-bounds");
+            return;
         }
+        
+        // Don't give item if their inventory space is full
+        if (!hasInventorySpace(player)) {
+            refuseItem(player, poolItem, "messages.inventory-limit");
+            return;
+        }
+        
+        player.getInventory().addItem(poolItem);
     }
-
+    
+    /**
+     * Refuse to give player an item, sending a message.
+     * 
+     * @param player
+     * @param poolItem
+     * @param messagePath
+     */
+    private void refuseItem(Player player, ItemStack poolItem, String messagePath) {
+        String message = ConfigUtils.getConfigText(messagePath, player, null, null);
+        String name;
+        if (poolItem.getItemMeta().hasDisplayName()) {
+            name = poolItem.getItemMeta().getDisplayName();
+        } else {
+            name = poolItem.getAmount() + "x " + StringUtils.capitalize(poolItem.getType().toString().toLowerCase());
+        }
+        player.sendMessage(message.replaceAll("%umw_item%", name));
+    }
 }
