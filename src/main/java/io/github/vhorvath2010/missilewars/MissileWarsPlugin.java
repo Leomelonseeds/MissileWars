@@ -162,8 +162,10 @@ public final class MissileWarsPlugin extends JavaPlugin {
         
         // Save all player inventories
         log("Saving player inventories...");
-        for (Player player : Bukkit.getWorld("world").getPlayers()) {
-            InventoryUtils.saveInventory(player, false);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (getArenaManager().getArena(player.getUniqueId()) == null) {
+                InventoryUtils.saveInventory(player, false);
+            }
         }
         log("Player inventories saved!");
 
