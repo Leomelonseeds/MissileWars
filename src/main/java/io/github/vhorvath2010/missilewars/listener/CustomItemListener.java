@@ -191,8 +191,6 @@ public class CustomItemListener implements Listener {
                 hand.setAmount(hand.getAmount() - 1);
                 event.setCancelled(true);
             }
-            
-            return;
         }
 
         // Do proper action based on utility type

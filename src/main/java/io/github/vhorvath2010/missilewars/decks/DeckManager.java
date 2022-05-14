@@ -50,7 +50,7 @@ public class DeckManager {
         vsword.setItemMeta(swordMeta);
         vanguardgear.add(vsword);
         ItemStack vboots = new ItemStack(Material.GOLDEN_BOOTS);
-        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 2);
+        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 1);
         ItemMeta vbootsMeta = vboots.getItemMeta();
         vbootsMeta.setUnbreakable(true);
         vboots.setItemMeta(vbootsMeta);
