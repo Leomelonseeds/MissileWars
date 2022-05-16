@@ -1,0 +1,44 @@
+locked: RED_STAINED_GLASS_PANE
+unlocked: ORANGE_STAINED_GLASS_PANE
+selected: GREEN_STAINED_GLASS_PANE
+
+missiles:
+  item: TNT
+  name: "&c&lMissiles"
+utility:
+  item: REDSTONE_REPEATER
+  name: "&9&lUtility"
+ability:
+  item: YELLOW_DYE
+  name: "&e&lAbility"
+passive:
+  item: LIGHT_BLUE_DYE
+  name: "&b&lPassive"
+gpassive:
+  item: LIGHT_GRAY_DYE
+  name: "&7&lGlobal Passive"
+  
+text:
+  cost: "&aCost: &f%cost%"
+  locked: "&cLeft-click &7to purchase"
+  upgradable: "&cLeft-click &7to upgrade"
+  downgradable: "&cRight-click &7to downgrade"
+
+preset:
+  item: NETHER_STAR
+  name: "&f&lPreset %preset%"
+  lore:
+  - ""
+  - "&7Ability: %ability%"
+  - "&7Passive: %passive%"
+  - "&7Global Passive: %gpassive%"
+  - ""
+  - "&cLeft-click &7to select this preset"
+  - "&cRight-click &7to edit this preset"
+  
+missiles:
+  item: TNT
+  name: "&c&lMissiles"
+utility:
+  
+vanguard:
