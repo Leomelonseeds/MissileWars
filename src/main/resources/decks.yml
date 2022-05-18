@@ -8,6 +8,9 @@ missiles:
 utility:
   item: REDSTONE_REPEATER
   name: "&9&lUtility"
+gear:
+  item: ENCHANTED_BOOK
+  name: "&6&lGear Enchantments"
 ability:
   item: YELLOW_DYE
   name: "&e&lAbility"
@@ -23,6 +26,8 @@ text:
   locked: "&cLeft-click &7to purchase"
   upgradable: "&cLeft-click &7to upgrade"
   downgradable: "&cRight-click &7to downgrade"
+  level: "&a%1%"
+  nextlevel: " &f(-> &e%2%&f)&7"
 
 preset:
   item: NETHER_STAR
@@ -36,6 +41,18 @@ preset:
   - "&cLeft-click &7to select this preset"
   - "&cRight-click &7to edit this preset"
   
-vanguard:
-  utility1:
+global:
+  missilespec:
+    slot: 38
+    name: "&cMissile Specialist %level%"
+    lore:
+    - ""
+    - "&7Your chance of recieving a missile increases"
+    - "&7and your chance of recieving a utility decreases"
+    - "&7by %percentage%&a%&7. At level 3, you will always"
+    - "&7recieve a missile when the game starts."
     
+vanguard:
+  gear:
+    item: GOLDEN_SWORD
+    name: "&6&lGear Enchantments"
