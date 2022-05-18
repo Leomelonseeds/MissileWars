@@ -36,9 +36,6 @@ preset:
   - "&cLeft-click &7to select this preset"
   - "&cRight-click &7to edit this preset"
   
-missiles:
-  item: TNT
-  name: "&c&lMissiles"
-utility:
-  
 vanguard:
+  utility1:
+    
