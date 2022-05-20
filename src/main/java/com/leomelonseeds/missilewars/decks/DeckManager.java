@@ -29,9 +29,12 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
+    
+    private MissileWarsPlugin plugin;
 
     /** Set up the DeckManager with loaded decks. */
-    public DeckManager() {
+    public DeckManager(MissileWarsPlugin plugin) {
+        this.plugin = plugin;
     }
     
     
@@ -44,10 +47,9 @@ public class DeckManager {
      */
     public Deck getPlayerDeck(UUID uuid) {
         
-        JSONObject basejson = MissileWarsPlugin.getPlugin().getJSON().getPlayer(uuid);
+        JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
-        String preset = basejson.getString("Preset");
-        JSONObject json = basejson.getJSONObject(deck).getJSONObject(preset);
+        JSONObject json = plugin.getJSON().getPlayerPreset(uuid);;
         
         // There are 12 utility items in the game
         // Some items have their level determined on creation, while
@@ -55,10 +57,7 @@ public class DeckManager {
         // Items with level determined on creation:
         // Shield, Platform, Leaves, Arrows (both sentinel + berserk), Torpedo, Lingering Harming
         // Items with level determined on use:
-        // Fireball, Splash, Obsidian Shield, Canopy
-        // Spawn creeper is both: Different names on creation, different actions on place
-        // For level determined on creation, fetch item from map based on level
-        // For level determined on usage, fetch item from map and replace item %level%
+        // Fireball, Splash, Obsidian Shield, Canopy, Spawn Creeper
         
         ArrayList<ItemStack> missiles = new ArrayList<>();
         ArrayList<ItemStack> utility = new ArrayList<>();
@@ -107,7 +106,7 @@ public class DeckManager {
         case "Sentinel":
         {
             ItemStack bow = new ItemStack(Material.BOW);
-            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharp") == 0 ? 0 : json.getInt("sharp") * 2 + 1);
+            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharp") * 2);
             addEnch(bow, Enchantment.ARROW_DAMAGE, json.getInt("power"));
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
@@ -230,16 +229,16 @@ public class DeckManager {
         if (ConfigUtils.getItemValue(name, level, "file") == null) {
             id = "item-utility";
         }
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
+        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
                 PersistentDataType.STRING, name + "_" + level);
         
-        // Setup item meta for special case items
+        // Setup item meta for potions
         if (name.equals("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
             itemMeta = pmeta;
-        } else if (name.contains("lingering")) {
+        } else if (name.equals("lingering_harming")) {
             int amplifier = (Integer) ConfigUtils.getItemValue(name, level, "amplifier");
             int duration = (Integer) ConfigUtils.getItemValue(name, level, "duration");
             PotionMeta pmeta = (PotionMeta) itemMeta;
@@ -272,8 +271,7 @@ public class DeckManager {
             matches.add(matcher.group());
         }
         // Replace all placeholder matches with specific value
-        FileConfiguration deckConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "decks.yml");
+        FileConfiguration deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
         for (String m : matches) {
             for (int i = 0; i < lines.size(); i++) {
                 String get = m.replaceAll("%", "");
@@ -295,8 +293,7 @@ public class DeckManager {
      * @return
      */
     private int getMaxLevel(String name) {
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "items.yml");
+        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
         Set<String> keys = itemsConfig.getKeys(false);
         ArrayList<Integer> levels = new ArrayList<>();
         for (String key : keys) {
@@ -314,5 +311,25 @@ public class DeckManager {
             }
         }
         return result;
+    }
+    
+    /**
+     * Helper function to set item metas
+     * 
+     * @param meta
+     * @param id
+     * @param key
+     * @return
+     */
+    private void setItemData(ItemMeta meta, String id, Object key) {
+        try {
+            double data = (Double) key;
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
+                    PersistentDataType.DOUBLE, data);
+        } catch (ClassCastException e) {
+            String data = (String) key;
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
+                    PersistentDataType.STRING, data);
+        }
     }
 }

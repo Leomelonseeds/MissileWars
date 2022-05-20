@@ -292,6 +292,8 @@ public class ConfigUtils {
     public static Object getItemValue(String item, int level, String get) {
         FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
                 .toString(), "items.yml");
+        String[] args = item.split("_");
+        item = args[0];
         if (itemsConfig.contains(item + "." + get)) {
             return itemsConfig.get(item + "." + get);
         } else if (itemsConfig.contains(item + "." + level + "." + get)) {

@@ -78,9 +78,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Commands and events loaded.");
 
         // Load decks
-        log("Creating and loading deck items...");
-        deckManager = new DeckManager();
-        log("All deck items locked and loaded.");
+        log("Loading deck manager...");
+        deckManager = new DeckManager(this);
+        log("Deck manager loaded.");
 
         // Load player deck cache
         log("Starting player deck cache...");

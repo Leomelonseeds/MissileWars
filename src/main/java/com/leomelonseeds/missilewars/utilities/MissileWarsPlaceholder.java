@@ -62,6 +62,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");
+            String preset = json.getString("Preset");
             ChatColor chatcolor = ChatColor.WHITE;
             switch (deck) {
                 case "Vanguard":
@@ -73,7 +74,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 case "Berserker":
                     chatcolor = ChatColor.RED;
             }
-            return chatcolor + json.getString("Deck");
+            return chatcolor + json.getString("Deck") + ChatColor.GRAY + " [" + preset + "]";
         }
 
         // Rank placeholders

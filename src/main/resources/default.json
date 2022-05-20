@@ -14,21 +14,21 @@
 		"adrenaline": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"featherfalling": 0,
+			"featherfalling": 1,
 			"sharpness": 2,
-			"knockback": 0,
+			"knockback": 1,
 			"fireaspect": 0,
 			"utility": {
-				"canopy": 1,
+				"canopy": 2,
 				"splash": 1,
-				"harming": 1
+				"lingering_harming": 2
 			},
 			"missiles": {
 				"lightning": 1,
-				"cruiser": 1,
-				"hilt": 1,
+				"cruiser": 2,
+				"hilt": 2,
 				"supersonic": 1,
-				"tomahawk": 1
+				"tomahawk": 2
 			},
 			"ability": {
 				"selected": "None",
@@ -54,20 +54,20 @@
 		"priest": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"fireprot": 0,
-			"punch": 0,
-			"power": 1,
+			"fireprot": 1,
+			"punch": 1,
+			"power": 0,
 			"flame": 1,
-			"sharpness": 0,
+			"sharpness": 2,
 			"utility": {
-				"oshield": 1,
+				"obsidian_shield": 1,
 				"arrows": 2,
 				"torpedo": 1
 			},
 			"missiles": {
 				"guardian": 1,
-				"gemini": 1,
-				"cron": 1,
+				"gemini": 2,
+				"cron": 2,
 				"sword": 1,
 				"piranha": 1
 			},
@@ -96,9 +96,9 @@
 		"booster": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"blastprot": 0,
-			"multishot": 0,
-			"quickcharge": 0,
+			"blastprot": 1,
+			"multishot": 1,
+			"quickcharge": 2,
 			"sharpness": 2,
 			"utility": {
 				"creeper": 1,
@@ -107,10 +107,10 @@
 			},
 			"missiles": {
 				"supporter": 1,
-				"warhead": 1,
+				"warhead": 2,
 				"juggernaut": 1,
 				"breaker": 1,
-				"shieldbuster": 1
+				"shieldbuster": 2
 			},
 			"ability": {
 				"selected": "None",
@@ -137,21 +137,21 @@
 		"lazybuilder": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"projprot": 0,
-			"sharpness": 0,
-			"efficiency": 2,
+			"projprot": 1,
+			"sharpness": 1,
+			"efficiency": 1,
 			"haste": 0,
 			"utility": {
-				"shield": 1,
-				"platform": 1,
+				"shield": 2,
+				"platform": 2,
 				"leaves": 1
 			},
 			"missiles": {
-				"shipper": 1,
+				"shipper": 2,
 				"slingshot": 1,
-				"citadel": 1,
-				"pisces": 1,
-				"ant": 1
+				"citadel": 2,
+				"pisces": 2,
+				"ant": 2
 			},
 			"ability": {
 				"selected": "None",

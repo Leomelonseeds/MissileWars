@@ -138,6 +138,18 @@ public class JSONManager {
     public JSONObject getPlayer(UUID uuid) {
         return playerCache.get(uuid);
     }
+    
+    /**
+     * Gets the json representation of the currently selected preset
+     *
+     * @param uuid
+     */
+    public JSONObject getPlayerPreset(UUID uuid) {
+        JSONObject basejson = getPlayer(uuid);
+        String deck = basejson.getString("Deck");
+        String preset = basejson.getString("Preset");
+        return basejson.getJSONObject(deck).getJSONObject(preset);
+    }
 
     /**
      * Saves the player deck back to the cache after

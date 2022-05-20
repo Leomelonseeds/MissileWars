@@ -42,6 +42,18 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
+    
+    /**
+     * Simply get level from name
+     * 
+     * @param name
+     * @return
+     */
+    private double getItemStat(String name, String stat) {
+        String[] args = name.split("_");
+        int level = Integer.parseInt(args[1]);
+        return (double) ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat);
+    }
 
     /**
      * Get a structure from a structure item.
@@ -223,7 +235,7 @@ public class CustomItemListener implements Listener {
             if (utility.contains("creeper")) {
                 Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
                 Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
-                if (utility.contains("charged")) {
+                if (utility.contains("2")) {
                     creeper.setPowered(true);
                 }
                 hand.setAmount(hand.getAmount() - 1);
@@ -233,11 +245,12 @@ public class CustomItemListener implements Listener {
         }
 
         // Do proper action based on utility type
-        if (utility.equalsIgnoreCase("fireball")) {
+        if (utility.contains("fireball")) {
             event.setCancelled(true);
             Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                     .getEyeLocation().getDirection()), EntityType.FIREBALL);
-            fireball.setYield(2);
+            float yield = (float) getItemStat(utility, "power");
+            fireball.setYield(yield);
             fireball.setIsIncendiary(true);
             fireball.setDirection(player.getEyeLocation().getDirection());
             fireball.setShooter(player);
@@ -246,7 +259,7 @@ public class CustomItemListener implements Listener {
             	 ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
             }
             playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
-        } else if (utility.equalsIgnoreCase("canopy")) {
+        } else if (utility.contains("canopy")) {
             event.setCancelled(true);
             if (canopy_cooldown.contains(player.getUniqueId())) {
                 return;
@@ -257,7 +270,7 @@ public class CustomItemListener implements Listener {
             }
             ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
             canopy_cooldown.add(player.getUniqueId());
-            spawnCanopy(player, playerArena);
+            spawnCanopy(player, playerArena, utility);
         }
     }
 
@@ -275,7 +288,7 @@ public class CustomItemListener implements Listener {
         playerArena.addLeaf(event.getBlockPlaced().getLocation(), player);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena) {
+    private void spawnCanopy(Player player, Arena playerArena, String utility) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -305,8 +318,7 @@ public class CustomItemListener implements Listener {
                     mapName = playerArena.getMapName();
                 }
 
-                // Insert fetching of canopy distance + time (s) here
-                int canopy_distance = 12;
+                int canopy_distance = (int) getItemStat(utility, "distance");
 
                 // Ignore if player would be going through wall
                 if (player.getTargetBlock(null, canopy_distance + 3).getType() != Material.AIR) {
@@ -462,7 +474,7 @@ public class CustomItemListener implements Listener {
             } else if (structureName.contains("obsidian_")) {
                 sound = "spawn-obsidian-shield";
                 // Detect obsidian shield duration in seconds here!
-                int duration = 10;
+                int duration = (int) getItemStat(structureName, "duration");
                 clearObsidianShield(duration, spawnLoc, isRedTeam(thrower), mapName, playerArena);
             }
             for (Player players : thrower.getWorld().getPlayers()) {
@@ -496,14 +508,17 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a utility item
         ItemStack hand = getItemUsed(thrower);
+        String utility = getUtilityFromItem(hand);
 
         // Make sure it's splash potion of water
-        if (getUtilityFromItem(hand) == null || !thrown.getEffects().isEmpty()) {
+        if (utility == null || !thrown.getEffects().isEmpty()) {
             return;
         }
 
         // Check the duration here
-        thrown.setCustomName("splash:" + "1");
+        double duration = getItemStat(utility, "duration");
+        double extend = getItemStat(utility, "extend");
+        thrown.setCustomName("splash:" + duration + ":" + extend);
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
     }
 
@@ -528,11 +543,14 @@ public class CustomItemListener implements Listener {
             return;
         }
 
+        // Get data from item
+        String[] args = event.getEntity().getCustomName().split(":");
+
         // Handle hitting oak_wood to fully repair canopies
         if (hitBlock.getType() == Material.OAK_WOOD) {
             if (event.getEntity().getShooter() instanceof Player) {
                 Player thrower = (Player) event.getEntity().getShooter();
-                int extraduration = 10;
+                int extraduration = Integer.parseInt(args[2]);
                 Location key = hitBlock.getLocation();
                 if (canopy_extensions.containsKey(key)) {
                     canopy_extensions.put(key, canopy_extensions.get(key) + extraduration);
@@ -559,10 +577,8 @@ public class CustomItemListener implements Listener {
 
         location.getBlock().setType(Material.WATER);
 
-        // Remove the water after a while
-        String[] args = event.getEntity().getCustomName().split(":");
+        // Remove water after while
         double duration = Double.parseDouble(args[1]);
-
         new BukkitRunnable() {
             @Override
             public void run() {
