@@ -51,8 +51,7 @@ public class CustomItemListener implements Listener {
      */
     private double getItemStat(String name, String stat) {
         String[] args = name.split("_");
-        int level = Integer.parseInt(args[1]);
-        return (double) ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat);
+        return Double.valueOf(ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat) + "");
     }
 
     /**
@@ -159,9 +158,30 @@ public class CustomItemListener implements Listener {
         }
 
         // Stop if not left-click on block
-        if (!event.getAction().toString().contains("RIGHT") || clicked == null) {
+        if (!event.getAction().toString().contains("RIGHT")) {
             return;
         }
+        
+        // We can handle canopies now!
+        if (structureName.contains("canopy")) {
+            event.setCancelled(true);
+            if (canopy_cooldown.contains(player.getUniqueId())) {
+                return;
+            }
+            if (!player.isOnGround()) {
+                ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
+                return;
+            }
+            ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
+            canopy_cooldown.add(player.getUniqueId());
+            spawnCanopy(player, playerArena, structureName);
+            return;
+        }
+        
+        if (clicked == null) {
+            return;
+        }
+        
         event.setCancelled(true);
 
         List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
@@ -212,8 +232,10 @@ public class CustomItemListener implements Listener {
         }
         
         // Make sure we allow gear items to be used
-        if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
-            return;
+        for (String name : MissileWarsPlugin.getPlugin().getDeckManager().getGear()) {
+            if (utility.contains(name)) {
+                return;
+            }
         }
 
         // Stop if not left-click
@@ -259,18 +281,6 @@ public class CustomItemListener implements Listener {
             	 ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
             }
             playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
-        } else if (utility.contains("canopy")) {
-            event.setCancelled(true);
-            if (canopy_cooldown.contains(player.getUniqueId())) {
-                return;
-            }
-            if (!player.isOnGround()) {
-                ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
-                return;
-            }
-            ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
-            canopy_cooldown.add(player.getUniqueId());
-            spawnCanopy(player, playerArena, utility);
         }
     }
 
@@ -329,7 +339,7 @@ public class CustomItemListener implements Listener {
                 // Finally spawn canopy
                 Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
                 Location spawnLoc = player.getEyeLocation().clone().add(distance);
-                if (SchematicManager.spawnNBTStructure("canopy", spawnLoc, isRedTeam(player), mapName)) {
+                if (SchematicManager.spawnNBTStructure("canopy_1", spawnLoc, isRedTeam(player), mapName)) {
                     player.teleport(spawnLoc.toCenterLocation().add(0, -0.5, 0));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
                     hand.setAmount(hand.getAmount() - 1);

@@ -10,7 +10,7 @@
 missilestats:
 - ""
 - "&aSpeed: %speed%m/s"
-- "&cTNT: %tnt%m/s"
+- "&cTNT: %tnt%"
 
 lightning:
   1:
@@ -846,7 +846,7 @@ canopy:
   3: 
     distance: 16
 
-spawn_creeper:
+creeper:
   1:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper &a&l☣"
@@ -921,6 +921,14 @@ lingering_harming:
   3:
     amplifier: 2
     duration: 15
+arrows:
+  item: ARROW
+  1:
+    amount: 2
+  2:
+    amount: 3
+  3:
+    amount: 4
 
 
 # Gear items (just used for names and lores i guess)

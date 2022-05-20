@@ -31,10 +31,24 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DeckManager {
     
     private MissileWarsPlugin plugin;
+    
+    private final List<String> presets;
+    private final List<String> decks;
+    private final List<String> gear;
+    
+    FileConfiguration itemsConfig;
+    FileConfiguration deckConfig;
 
     /** Set up the DeckManager with loaded decks. */
     public DeckManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
+        
+        presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
+        decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
+        gear = new ArrayList<>(List.of(new String[]{"vanguard_sword", "berserker_crossbow", "sentinel_bow", "architect_pickaxe"}));
+        
+        itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+        deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
     }
     
     
@@ -65,13 +79,13 @@ public class DeckManager {
         
         // Create missiles
         for (String key : JSONObject.getNames(json.getJSONObject("missiles"))) {
-            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key));
+            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
             missiles.add(m);
         }
         
         // Create utility
         for (String key : JSONObject.getNames(json.getJSONObject("utility"))) {
-            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key));
+            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
             utility.add(u);
         }
         
@@ -79,8 +93,8 @@ public class DeckManager {
         switch (deck) {
         case "Vanguard": 
         {
-            ItemStack sword = new ItemStack(Material.GOLDEN_SWORD);
-            addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharp") * 2 - 1);
+            ItemStack sword = createItem("vanguard_sword", 0, false);
+            addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2 - 1);
             addEnch(sword, Enchantment.KNOCKBACK, json.getInt("knockback"));
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
@@ -92,8 +106,8 @@ public class DeckManager {
         }
         case "Berserker":
         {
-            ItemStack crossbow = new ItemStack(Material.CROSSBOW);
-            addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharp") == 0 ? 0 : json.getInt("sharp") * 2 + 3);
+            ItemStack crossbow = createItem("berserker_crossbow", 0, false);
+            addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") == 0 ? 0 : json.getInt("sharpness") * 2 + 3);
             addEnch(crossbow, Enchantment.MULTISHOT, json.getInt("multishot"));
             addEnch(crossbow, Enchantment.QUICK_CHARGE, json.getInt("quickcharge"));
             gear.add(crossbow);
@@ -105,8 +119,8 @@ public class DeckManager {
         }
         case "Sentinel":
         {
-            ItemStack bow = new ItemStack(Material.BOW);
-            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharp") * 2);
+            ItemStack bow = createItem("sentinel_bow", 0, false);
+            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
             addEnch(bow, Enchantment.ARROW_DAMAGE, json.getInt("power"));
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
@@ -119,8 +133,8 @@ public class DeckManager {
         }
         case "Architect":
         {
-            ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
-            addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharp"));
+            ItemStack pick = createItem("architect_pickaxe", 0, false);
+            addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharpness"));
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
             gear.add(pick);
             ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
@@ -139,21 +153,28 @@ public class DeckManager {
      *
      * @return the decks
      */
-    public Boolean getDeck(String name) {
-        switch (name) {
-        case "Vanguard":
-            return true;
-        case "Sentinel":
-            return true;
-        case "Berserker":
-            return true;
-        case "Architect":
-            return true;
-        }
-        return false;
+    public List<String> getDecks() {
+        return decks;
     }
     
-    
+    /**
+     * Get list of presets
+     * 
+     * @return
+     */
+    public List<String> getPresets() {
+        return presets;
+    }
+     
+    /**
+     * Get list of gear
+     * 
+     * @return
+     */
+    public List<String> getGear() {
+        return gear;
+    }
+     
     /**
      * Add enchantment to level, making sure to not add if level is 0
      * 
@@ -165,7 +186,7 @@ public class DeckManager {
         if (lvl <= 0) {
             return;
         }
-        item.addEnchantment(ench, lvl);
+        item.addUnsafeEnchantment(ench, lvl);
     }
     
     /**
@@ -176,6 +197,8 @@ public class DeckManager {
      */
     public String roman(int i) {
         switch (i) {
+        case 0:
+            return "";
         case 1:
             return "I";
         case 2:
@@ -207,21 +230,23 @@ public class DeckManager {
      * @param level
      * @return an ItemStack
      */
-    private ItemStack createItem(String name, int level) {
+    public ItemStack createItem(String name, int level, Boolean missile) {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
-        if (name.contains("leaves")) {
+        if (ConfigUtils.getItemValue(name, level, "amount") != null) {
             item.setAmount((Integer) ConfigUtils.getItemValue(name, level, "amount"));
         }
+        // Don't bother with arrows
+        if (name.equals("arrows")) {
+            return item;
+        }
+        // Find item name and lore
         ItemMeta itemMeta = item.getItemMeta();
         String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
         displayName = displayName.replace("%level%", roman(level));
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
         List<String> lore = (ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore");
-        setPlaceholders(lore, name, level, false);
-        for (String loreString : lore) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', loreString));
-        }
+        setPlaceholders(lore, name, level, false, missile);
         itemMeta.setLore(lore);
         
         // Determine structure/utility
@@ -239,12 +264,20 @@ public class DeckManager {
             pmeta.setBasePotionData(pdata);
             itemMeta = pmeta;
         } else if (name.equals("lingering_harming")) {
-            int amplifier = (Integer) ConfigUtils.getItemValue(name, level, "amplifier");
-            int duration = (Integer) ConfigUtils.getItemValue(name, level, "duration");
+            int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
+            int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
             pmeta.setColor(Color.PURPLE);
             itemMeta = pmeta;
+        } 
+        // Make gear items unbreakable
+        else {
+            for (String s : gear) {
+                if (name.contains(s)) {
+                    itemMeta.setUnbreakable(true);
+                }
+            } 
         }
         item.setItemMeta(itemMeta);
         return item;
@@ -258,7 +291,12 @@ public class DeckManager {
      * @param showNext
      * @return
      */
-    public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext) {
+    public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext, Boolean missile) {
+        // Add missile stats for missiles
+        if (missile) {
+            List<String> stats = itemsConfig.getStringList("missilestats");
+            lines.addAll(stats);
+        }
         // Compile lore into single line
         String line = "";
         for (String s : lines) {
@@ -271,9 +309,9 @@ public class DeckManager {
             matches.add(matcher.group());
         }
         // Replace all placeholder matches with specific value
-        FileConfiguration deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
-        for (String m : matches) {
-            for (int i = 0; i < lines.size(); i++) {
+        for (int i = 0; i < lines.size(); i++) {
+            String l = lines.get(i);
+            for (String m : matches) {
                 String get = m.replaceAll("%", "");
                 String got1 = ConfigUtils.getItemValue(name, level, get) + "";
                 String value = deckConfig.getString("text.level").replace("%1%", got1);
@@ -281,8 +319,9 @@ public class DeckManager {
                     String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
                     value = value + deckConfig.getString("text.nextlevel").replace("%2%", got2);
                 }
-                lines.set(i, lines.get(i).replaceAll(m, value));
+                l = l.replaceAll(m, value);
             }
+            lines.set(i, ChatColor.translateAlternateColorCodes('&', l));
         }
     }
     
@@ -292,8 +331,7 @@ public class DeckManager {
      * @param name
      * @return
      */
-    private int getMaxLevel(String name) {
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+    public int getMaxLevel(String name) {
         Set<String> keys = itemsConfig.getKeys(false);
         ArrayList<Integer> levels = new ArrayList<>();
         for (String key : keys) {
@@ -311,25 +349,5 @@ public class DeckManager {
             }
         }
         return result;
-    }
-    
-    /**
-     * Helper function to set item metas
-     * 
-     * @param meta
-     * @param id
-     * @param key
-     * @return
-     */
-    private void setItemData(ItemMeta meta, String id, Object key) {
-        try {
-            double data = (Double) key;
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
-                    PersistentDataType.DOUBLE, data);
-        } catch (ClassCastException e) {
-            String data = (String) key;
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
-                    PersistentDataType.STRING, data);
-        }
     }
 }

@@ -82,10 +82,10 @@ public class SchematicManager {
         int level = Integer.parseInt(args[1]);
 
         // Attempt to get structure file
-        if (ConfigUtils.getItemValue(structureName, level, "file") == null) {
+        if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
             return false;
         }
-        String fileName = (String) ConfigUtils.getItemValue(structureName, level, "file");
+        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
         if (fileName == null) {
             return false;
         }
@@ -115,7 +115,12 @@ public class SchematicManager {
             return false;
         }
 
-        Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
+        Vector offset;
+        if (structureConfig.contains(args[0] + ".offset")) {
+            offset = getVector(structureConfig, args[0] + ".offset", null, null);
+        } else {
+            offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
+        }
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
         

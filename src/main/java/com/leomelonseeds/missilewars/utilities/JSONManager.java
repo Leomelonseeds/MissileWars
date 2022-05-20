@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -28,9 +26,6 @@ public class JSONManager {
     private Map<UUID, JSONObject> playerCache;
     
     private JSONObject defaultJson;
-    
-    private List<String> presets;
-    private List<String> decks;
 
     public JSONManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
@@ -47,10 +42,6 @@ public class JSONManager {
         } catch (IOException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
-        
-        // Load in default presets
-        presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
-        decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
     }
 
     /**
@@ -70,10 +61,10 @@ public class JSONManager {
             try {
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
-                for (String deck : decks) {
+                for (String deck : plugin.getDeckManager().getDecks()) {
                     updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
                     JSONObject defaultpreset = defaultJson.getJSONObject(deck).getJSONObject("defaultpreset");
-                    for (String preset : presets) {
+                    for (String preset : plugin.getDeckManager().getPresets()) {
                         if (newJson.getJSONObject(deck).has(preset)) {
                             JSONObject currentpreset = newJson.getJSONObject(deck).getJSONObject(preset);
                             updateJson(currentpreset, defaultpreset);
@@ -109,7 +100,8 @@ public class JSONManager {
         }
         // Remove keys not existing in default
         for (String key : JSONObject.getNames(original)) {
-            if ((!updated.has(key) || key.equals("defaultpreset")) && !presets.contains(key)) {
+            if ((!updated.has(key) || key.equals("defaultpreset")) && 
+                 !plugin.getDeckManager().getPresets().contains(key)) {
                 original.remove(key);
             }
         }

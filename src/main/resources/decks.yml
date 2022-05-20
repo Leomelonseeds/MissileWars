@@ -28,6 +28,7 @@ text:
   downgradable: "&cRight-click &7to downgrade"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
+  actuallevel: " &8%current%/%max%"
 
 preset:
   item: NETHER_STAR
