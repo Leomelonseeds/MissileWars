@@ -312,7 +312,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
             String deck = StringUtils.capitalize(args[1].toLowerCase());
 
-            if (plugin.getDeckManager().getDeck(deck) == null) {
+            if (!plugin.getDeckManager().getDeck(deck)) {
                 sendErrorMsg(sender, "Please specify a valid deck!");
                 return true;
             }

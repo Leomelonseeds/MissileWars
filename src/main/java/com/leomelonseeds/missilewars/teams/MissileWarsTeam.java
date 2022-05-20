@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -145,12 +144,7 @@ public class MissileWarsTeam {
 
         members.add(player);
 
-        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getMCPlayerId());
-
-        String deck = json.getString("Deck");
-
-        // Assign default deck
-        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getDeck(deck));
+        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(player.getMCPlayerId()));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
