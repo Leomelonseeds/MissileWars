@@ -2,9 +2,13 @@ package com.leomelonseeds.missilewars.decks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -450,12 +454,12 @@ public class DeckManager {
     }
     
     /**
-     * Translate integer to roman, only for first 5 numbers lol
+     * Translate integer to roman, only for first 10 numbers lol
      * 
      * @param i
      * @return
      */
-    private String roman(int i) {
+    public String roman(int i) {
         switch (i) {
         case 1:
             return "I";
@@ -467,6 +471,16 @@ public class DeckManager {
             return "IV";
         case 5:
             return "V";
+        case 6:
+            return "VI";
+        case 7:
+            return "VII";
+        case 8:
+            return "VIII";
+        case 9:
+            return "IX";
+        case 10:
+            return "X";
         }
         return null;
     }
@@ -489,6 +503,111 @@ public class DeckManager {
         }
         return null;
     }
+    
+    /**
+     * Create an ItemStack from JSON
+     *
+     * @param name
+     * @param level
+     * @return an ItemStack
+     */
+    private ItemStack createItem(String name, int level) {
+        // Load item data from config
+        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "items.yml");
+
+        // Setup item
+        ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
+        if (name.contains("leaves")) {
+            item.setAmount((Integer) ConfigUtils.getItemValue(name, level, "amount"));
+        }
+        ItemMeta itemMeta = item.getItemMeta();
+        String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
+        displayName = displayName.replace("%level%", roman(level));
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        List<String> lore = (ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore");
+        setPlaceholders(lore, name, level, false);
+        for (String loreString : lore) {
+            lore.add(ChatColor.translateAlternateColorCodes('&', loreString));
+        }
+        itemMeta.setLore(lore);
+        
+        // Determine structure/utility
+        String id = "item-structure";
+        if (ConfigUtils.getItemValue(name, level, "file") == null) {
+            id = "item-utility";
+        }
+        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
+                PersistentDataType.STRING, name + "_" + level);
+        item.setItemMeta(itemMeta);
+        return item;
+    }
+    
+    /**
+     * Set placeholders in an itemstack lore
+     * 
+     * @param line
+     * @param level
+     * @param showNext
+     * @return
+     */
+    public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext) {
+        // Compile lore into single line
+        String line = "";
+        for (String s : lines) {
+            line = line + " " + s;
+        }
+        // Match all instances of placeholders 
+        Matcher matcher = Pattern.compile("%[^%]+%").matcher(line);
+        Set<String> matches = new HashSet<>();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        // Replace all placeholder matches with specific value
+        FileConfiguration deckConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "decks.yml");
+        for (String m : matches) {
+            for (int i = 0; i < lines.size(); i++) {
+                String get = m.replaceAll("%", "");
+                String got1 = (String) ConfigUtils.getItemValue(name, level, get);
+                String value = deckConfig.getString("text.level").replace("%1%", got1);
+                if (showNext && level < getMaxLevel(name)) {
+                    String got2 = (String) ConfigUtils.getItemValue(name, level + 1, get);
+                    value = value + deckConfig.getString("text.nextlevel").replace("%2%", got2);
+                }
+                lines.set(i, lines.get(i).replaceAll(m, value));
+            }
+        }
+    }
+    
+    /**
+     * Gets the max level of an item
+     * 
+     * @param name
+     * @return
+     */
+    private int getMaxLevel(String name) {
+        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "items.yml");
+        Set<String> keys = itemsConfig.getKeys(false);
+        ArrayList<Integer> levels = new ArrayList<>();
+        for (String key : keys) {
+            try {
+                int i = Integer.parseInt(key);
+                levels.add(i);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+        }
+        int result = 0;
+        for (int i : levels) {
+            if (i > result) {
+                result = i;
+            }
+        }
+        return result;
+    }
+    
 
     /**
      * Create an ItemStack that spawns the given schematic on use.

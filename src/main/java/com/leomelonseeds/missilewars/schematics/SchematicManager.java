@@ -77,14 +77,15 @@ public class SchematicManager {
 
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "items.yml");
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+        String [] args = structureName.split("_");
+        int level = Integer.parseInt(args[1]);
 
         // Attempt to get structure file
-        if (!structureConfig.contains(structureName + ".file")) {
+        if (ConfigUtils.getItemValue(structureName, level, "file") == null) {
             return false;
         }
-        String fileName = structureConfig.getString(structureName + ".file");
+        String fileName = (String) ConfigUtils.getItemValue(structureName, level, "file");
         if (fileName == null) {
             return false;
         }

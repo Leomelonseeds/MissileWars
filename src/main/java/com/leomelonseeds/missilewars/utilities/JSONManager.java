@@ -65,13 +65,15 @@ public class JSONManager {
                 String[] presets = {"A", "B", "C"};
                 for (String deck : decks) {
                     updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
+                    JSONObject defaultpreset = defaultJson.getJSONObject(deck).getJSONObject("defaultpreset");
                     for (String preset : presets) {
                         if (newJson.has(preset)) {
-                            updateJson(newJson.getJSONObject(deck).getJSONObject(preset),
-                                   defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                            JSONObject currentpreset = newJson.getJSONObject(deck).getJSONObject(preset);
+                            updateJson(currentpreset, defaultpreset);
+                            updateJson(currentpreset.getJSONObject("missiles"), defaultpreset.getJSONObject("missiles"));
+                            updateJson(currentpreset.getJSONObject("utility"), defaultpreset.getJSONObject("utility"));
                         } else {
-                            newJson.getJSONObject(deck).put(preset, 
-                                    defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                            newJson.getJSONObject(deck).put(preset, defaultpreset);
                         }
                     }
                 }
@@ -94,13 +96,13 @@ public class JSONManager {
     private void updateJson(JSONObject original, JSONObject updated) {
         // Add new keys if not exist
         for (String key : JSONObject.getNames(updated)) {
-            if (!original.has(key)) {
+            if (!(original.has(key) || key.equals("defaultpreset"))) {
                 original.put(key, updated.get(key));
             }
         }
         // Remove keys not existing in default
         for (String key : JSONObject.getNames(original)) {
-            if (!updated.has(key)) {
+            if (!updated.has(key) || key.equals("defaultpreset")) {
                 original.remove(key);
             }
         }

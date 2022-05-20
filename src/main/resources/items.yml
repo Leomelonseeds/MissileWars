@@ -7,6 +7,11 @@
 
 # Vanguard missiles
 
+missilestats:
+- ""
+- "&aSpeed: %speed%m/s"
+- "&cTNT: %tnt%m/s"
+
 lightning:
   1:
     file: 'lightning.nbt'
@@ -16,13 +21,12 @@ lightning:
     - ""
     - "&7The classic, reliable speedy missile."
     - "&7Well, mostly reliable. Trade-offs were made."
-    - ""
-    - "&aSpeed: &f3.3m/s"
-    - "&cTNT: &f10"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 3.3
+    tnt: 10
   2:
     file: 'hurricane.nbt'
     item: OCELOT_SPAWN_EGG
@@ -31,13 +35,12 @@ lightning:
     - ""
     - "&7A newer iteration of the Lightning, with"
     - "&78 more TNT. That's 56% more TNT per TNT."
-    - ""
-    - "&aSpeed: &f3.3m/s"
-    - "&cTNT: &f18"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 3.3
+    tnt: 18
       
 
 cruiser:
@@ -51,13 +54,12 @@ cruiser:
     - "&7name may suggest. In fact, it is"
     - "&7technically just a rocket, though a"
     - "&7fast one at that."
-    - ""
-    - "&aSpeed: &f3.3m/s"
-    - "&cTNT: &f11"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 3.3
+    tnt: 11
   2:
     file: 'thunderbolt.nbt'
     item: BLAZE_SPAWN_EGG
@@ -66,15 +68,13 @@ cruiser:
     - ""
     - "&7Blink, and you'll miss it. And instantly die."
     - "&7Detonates on impact. Hopefully before"
-    - "&7anyone shoots its glaring weak spot."
-    - ""
-    - "&aSpeed: &f3.3m/s"
-    - "&cTNT: &f9 + 4 TNT Minecarts"
+    - "&7anyone shoots its 4 TNT Minecarts"
     offset:
       x: -1
       y: -4
       z: 4
-
+    speed: 3.3
+    tnt: 13
 
 hilt:
   1:
@@ -87,13 +87,12 @@ hilt:
     - "&7of this bladed weapon went. So are we."
     - "&7Nonetheless, this compact missile"
     - "&7packs incredible speed."
-    - ""
-    - "&aSpeed: &f4.4m/s"
-    - "&cTNT: &f10"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 3.3
+    tnt: 10
   2:
     file: 'dagger.nbt'
     item: RAVAGER_SPAWN_EGG
@@ -104,13 +103,12 @@ hilt:
     - "&7This missile carries the 5 TNT that the"
     - "&7Hilt was missing. Just try to avoid"
     - "&7shields."
-    - ""
-    - "&aSpeed: &f4.4m/s"
-    - "&cTNT: &f15"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 3.3
+    tnt: 15
 
 supersonic:
   1:
@@ -124,13 +122,12 @@ supersonic:
     - "&7still fast. Blazing fast. Don't even try to ride"
     - "&7it. Really, dont. We can't afford another"
     - "&7lawsuit."
-    - ""
-    - "&aSpeed: &f4.4m/s"
-    - "&cTNT: &f4"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 4.4
+    tnt: 4
   2:
     file: 'hypersonic.nbt'
     item: TURTLE_SPAWN_EGG
@@ -140,13 +137,12 @@ supersonic:
     - "&7This missile is the older, preferred, and"
     - "&7spoiled brother of the socially anxious"
     - "&7Supersonic."
-    - ""
-    - "&aSpeed: &f4.4m/s"
-    - "&cTNT: &f6"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 4.4
+    tnt: 6
 
 tomahawk:
   1:
@@ -157,13 +153,12 @@ tomahawk:
     - ""
     - "&7The first missile ever built. What's that?"
     - "&7Sidewinder? No, we don't talk about that."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f12"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 12
   2:
     file: 'tomatwo.nbt'
     item: ZOMBIE_SPAWN_EGG
@@ -172,13 +167,12 @@ tomahawk:
     - ""
     - "&7The second missile ever—nevermind, wrong"
     - "&7one. Has more TNT than the Tomahawk, though."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f16"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 16
 
 
 # Sentinel missiles
@@ -192,13 +186,12 @@ guardian:
     - ""
     - "&7A notoriously resilient missile, capable of"
     - "&7blocking fireballs, arrows, and traumatic memories."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f5"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 5
   2:
     file: 'elderguard.nbt'
     item: ELDER_GUARDIAN_SPAWN_EGG
@@ -208,13 +201,12 @@ guardian:
     - "&7Packed with more explosives than the Guardian,"
     - "&7this missile can nonetheless defend against a"
     - "&7wide range of physical and emotional attacks."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f9"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 9
 
 gemini:
   1:
@@ -226,13 +218,12 @@ gemini:
     - "&7Why launch one missile when you can launch"
     - "&7two at once? Don't expect to deal much damage,"
     - "&7though."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f4"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 4
   2:
     file: 'gemini_warrior.nbt'
     item: SLIME_SPAWN_EGG
@@ -242,13 +233,12 @@ gemini:
     - "&7Why launch two weak missiles at once, when"
     - "&7you can launch two stronger ones? With, uh,"
     - "&7very legal aftermarket modifications."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f12"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 12
 
 cronullifier:
   1:
@@ -261,13 +251,12 @@ cronullifier:
     - "&70.2m/s faster? Me neither, but Chronos22's"
     - "&7clever engineering did just that. Now to find"
     - "&7a way to get girls 0.2m/s faster..."
-    - ""
-    - "&aSpeed: &f2.2m/s"
-    - "&cTNT: &f14"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 2.2
+    tnt: 14
   2:
     file: 'doubleought.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
@@ -278,13 +267,12 @@ cronullifier:
     - "&7(less famous) Minecraft missile, now with zero"
     - "&7redstone blocks, is also known for its"
     - "&7incredible violence."
-    - ""
-    - "&aSpeed: &f2.2m/s"
-    - "&cTNT: &f25"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 2.2
+    tnt: 25
 
 sword: 
   1:
@@ -297,13 +285,12 @@ sword:
     - "&7the labs told me they managed to stack"
     - "&7almost all the explosives in a single line."
     - "&7Arrows won't be a problem for this one."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f8"
     offset:
       x: 0
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 8
   2:
     file: 'blade.nbt'
     item: SKELETON_SPAWN_EGG
@@ -313,13 +300,12 @@ sword:
     - "&7Tired of the Sword's drawbacks? So are we."
     - "&7The Blade solves most of them by simply"
     - "&7having more TNT."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f15"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 15
 
 piranha:
   1:
@@ -330,12 +316,12 @@ piranha:
     - ""
     - "&7Relatively simple, mostly reliable, and looks"
     - "&7somewhat good. The Piranha has it all."
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f10"
     offset:
       x: -2
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 10
   2:
     file: 'anglerfish.nbt'
     item: COD_SPAWN_EGG
@@ -345,13 +331,12 @@ piranha:
     - "&7The Piranha wishes it was this. Or maybe"
     - "&7it doesn't. We don't know anyone who"
     - "&7wants to look like an anglerfish."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f23"
     offset:
       x: -2
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 23
 
 
 # Berserker missiles
@@ -366,13 +351,12 @@ supporter:
     - "&7This missile wants to buy your Patreon."
     - "&7It also launches TNT behind it upon"
     - "&7detonation."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f17"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 1.7
+    tnt: 17
   2:
     file: 'auxiliary.nbt'
     item: BEE_SPAWN_EGG
@@ -381,13 +365,12 @@ supporter:
     - ""
     - "&7Why blow up things in front of you when"
     - "&7you can blow up things behind you?"
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f25"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 1.7
+    tnt: 25
 
 warhead: 
   1:
@@ -399,13 +382,12 @@ warhead:
     - "&7The activation TNT on this missile entered"
     - "&7its goth phase and hides itself from the"
     - "&7piercing gaze of missile wars players."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f27"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 27
   2:
     file: 'bullet.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
@@ -415,13 +397,12 @@ warhead:
     - "&7This absolutely insane missile should"
     - "&7probably be used carefully. Probably"
     - "&7not though."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f33"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 2.0
+    tnt: 33
 
 juggernaut:
   1:
@@ -432,13 +413,12 @@ juggernaut:
     - ""
     - "&7High-yield piston-propelled face removal."
     - "&7Insurance will not cover caused damage."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f23"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 23
   2:
     file: 'meganaut.nbt'
     item: CHICKEN_SPAWN_EGG
@@ -448,13 +428,12 @@ juggernaut:
     - "&7This Juggernaut-derived behemoth will"
     - "&7destroy anything in its path, including itself."
     - "&7Usage for transportation not recommended."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f32"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 32
 
 breaker:
   1:
@@ -466,13 +445,12 @@ breaker:
     - "&7Like its name suggests, this missile breaks"
     - "&7stuff pretty well, including the hearts"
     - "&7of missile wars players."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f18"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 18
   2:
     file: 'rifter.nbt'
     item: DOLPHIN_SPAWN_EGG
@@ -482,13 +460,12 @@ breaker:
     - "&7With almost double the amount of TNT compared"
     - "&7to the breaker, this missile is equally as"
     - "&7easy and dangerous to ride on."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f34"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 34
 
 shieldbuster:
   1:
@@ -500,13 +477,12 @@ shieldbuster:
     - "&7This missile exists to spite whatever god"
     - "&7created shields, by simply passing through"
     - "&7most such barriers."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f17"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 17
   2:
     file: 'shark.nbt'
     item: WITCH_SPAWN_EGG
@@ -516,13 +492,12 @@ shieldbuster:
     - "&7The Shark is nearly unstoppable, assuming it"
     - "&7encounters no more than eleven shields, and no"
     - "&7one tries to stop it."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f10"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 1.7
+    tnt: 10
 
 
 # Architect missiles
@@ -537,13 +512,12 @@ shipper:
     - "&7This missile sure carries its crew well."
     - "&7Unless, of course, it explodes, in which"
     - "&7case it doesn't."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f5"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 5
   2:
     file: 'slasher.nbt'
     item: HORSE_SPAWN_EGG
@@ -553,13 +527,12 @@ shipper:
     - "&7The TNT on this missile is tucked behind"
     - "&7a solid layer of glass. Much like its"
     - "&7emotions."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f6"
     offset:
       x: -1
       y: -5
       z: 4
+    speed: 2.0
+    tnt: 6
 
 slingshot:
   1:
@@ -570,13 +543,12 @@ slingshot:
     - ""
     - "&7Break the slimeblock in the back to"
     - "&7launch a tnt. And to self-destruct."
-    - ""
-    - "&aSpeed: &f2.2m/s"
-    - "&cTNT: &f9"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.2
+    tnt: 9
   2:
     file: 'catapult.nbt'
     item: SHULKER_SPAWN_EGG
@@ -585,13 +557,12 @@ slingshot:
     - ""
     - "&7Why launch one TNT when you can launch"
     - "&7two? Enough said (I ran out of ideas)"
-    - ""
-    - "&aSpeed: &f2.2m/s"
-    - "&cTNT: &f14"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.2
+    tnt: 14
 
 citadel:
   1:
@@ -602,13 +573,12 @@ citadel:
     - ""
     - "&7Hide in this missile's hatch and experience"
     - "&7the joys of becoming a turtle."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f9"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 9
   2:
     file: 'fortress.nbt'
     item: SILVERFISH_SPAWN_EGG
@@ -620,13 +590,12 @@ citadel:
     - "&7really 'fly' nor do they resemble fortresses."
     - "&7Plus, it doesn't defend against itself blowing"
     - "&7up very well."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f16"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 16
 
 pisces:
   1:
@@ -637,13 +606,12 @@ pisces:
     - ""
     - "&7This wide missile could almost compete with"
     - "&7your mother."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f12"
     offset:
       x: -3
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 12
   2:
     file: 'aries.nbt'
     item: PARROT_SPAWN_EGG
@@ -652,13 +620,12 @@ pisces:
     - ""
     - "&7This missile has three whole engines."
     - "&7Doesn't really do anything, just a cool fact."
-    - ""
-    - "&aSpeed: &f1.7m/s"
-    - "&cTNT: &f24"
     offset:
       x: -3
       y: -4
       z: 4
+    speed: 1.7
+    tnt: 24
 
 ant:
   1:
@@ -669,13 +636,12 @@ ant:
     - ""
     - "&7As the name implies, this missile is very small."
     - "&7But fortunately, size doesn't matter in missile wars."
-    - ""
-    - "&aSpeed: &f2.2m/s"
-    - "&cTNT: &f2"
     offset:
       x: 0
       y: -4
       z: 4
+    speed: 2.2
+    tnt: 2
   2:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
@@ -685,13 +651,12 @@ ant:
     - "&7This missile lifts its TNT (and occupants)"
     - "&7three blocks up into the air before blowing"
     - "&7them all up. Bit like my high school grades."
-    - ""
-    - "&aSpeed: &f2.0m/s"
-    - "&cTNT: &f8"
     offset:
       x: -1
       y: -4
       z: 4
+    speed: 2.0
+    tnt: 8
 
 
 # Utility items
@@ -704,7 +669,11 @@ splash:
   - "&7Make it rain (but not snow) with the Splash!"
   - "&7This handy utility allows its user to fall"
   - "&7from great heights, climb walls, put out"
-  - "&7fires, and flood the Nile river every August."
+  - "&7fires, increase canopy duration, and flood"
+  - "&7the Nile river every August."
+  - ""
+  - "&bDuration: %duration%s"
+  - "&bCanopy Extend: %extend%s"
   1:
     duration: 1
     extend: 10
@@ -725,122 +694,96 @@ nova_rocket:
   - "&7from a trailer park in Florida."
 
 shield:
+  item: SNOWBALL
+  name: "&f★ Shield %level% ⚒"
+  lore:
+  - ""
+  - "&7Creates a barrier that is able"
+  - "&7to block most missiles. Emphasis on"
+  - "&7most. No warranty available."
+  - ""
+  - "&bSize: %size%"
   1:
     file: 'shield_1.nbt'
-    item: SNOWBALL
-    name: "&f★ Shield I ⚒"
-    lore:
-    - ""
-    - "&7Creates a barrier that is able"
-    - "&7to block most missiles. Emphasis on"
-    - "&7most. No warranty available."
     offset:
       x: -2
       y: -2
       z: 0
+    size: "5x5"
   2:
     file: 'shield_2.nbt'
-    item: SNOWBALL
-    name: "&f★ Shield II ⚒"
-    lore:
-    - ""
-    - "&7Creates a barrier that is able"
-    - "&7to block most missiles. Emphasis on"
-    - "&7most. No warranty available."
     offset:
       x: -3
       y: -3
       z: 0
+    size: "7x7"
   3:
     file: 'shield_3.nbt'
-    item: SNOWBALL
-    name: "&f★ Shield III ⚒"
-    lore:
-    - ""
-    - "&7Creates a barrier that is able"
-    - "&7to block most missiles. Emphasis on"
-    - "&7most. No warranty available."
     offset:
       x: -4
       y: -4
       z: 0
+    size: "9x9"
 
 platform:
+  item: SNOWBALL
+  name: "&7★ Platform %level% ⚒"
+  lore:
+  - ""
+  - "&7Take a shield, flip it ninety degrees, and"
+  - "&7you get a platform. It's great for standing on."
+  - "&7You can invite your friends onto your"
+  - "&7platform and have a platform party. With"
+  - "&7blackjack and hookers."
+  - ""
+  - "&bSize: %size%"
   1:
     file: 'platform_1.nbt'
-    item: SNOWBALL
-    name: "&7★ Platform I ⚒"
-    lore:
-    - ""
-    - "&7Take a shield, flip it ninety degrees, and"
-    - "&7you get a platform. It's great for standing on."
-    - "&7You can invite your friends onto your"
-    - "&7platform and have a platform party. With"
-    - "&7blackjack and hookers."
     offset:
       x: -2
       y: 0
       z: -2
+    size: "5x5"
   2:
     file: 'platform_2.nbt'
-    item: SNOWBALL
-    name: "&7★ Platform II ⚒"
-    lore:
-    - ""
-    - "&7Take a shield, flip it ninety degrees, and"
-    - "&7you get a platform. It's great for standing on."
-    - "&7You can invite your friends onto your"
-    - "&7platform and have a platform party. With"
-    - "&7blackjack and hookers."
     offset:
       x: -3
       y: 0
       z: -3
+    size: "7x7"
   3:
     file: 'platform_3.nbt'
-    item: SNOWBALL
-    name: "&7★ Platform III ⚒"
-    lore:
-    - ""
-    - "&7Take a shield, flip it ninety degrees, and"
-    - "&7you get a platform. It's great for standing on."
-    - "&7You can invite your friends onto your"
-    - "&7platform and have a platform party. With"
-    - "&7blackjack and hookers."
     offset:
       x: -4
       y: 0
       z: -4
+    size: "9x9"
 
 torpedo:
+  item: EGG
+  name: "&0★ Torpedo %level% ✟"
+  lore:
+  - ""
+  - "&7Although this torpedo can't actually move,"
+  - "&7it still packs a punch. In the form of a"
+  - "&7deadly explosion triggered by the slightest"
+  - "&7movement from a player or missile."
+  - ""
+  - "&bSize: %size%"
   1:
     file: 'torpedo_1.nbt'
-    item: EGG
-    name: "&0★ Torpedo I ✟"
-    lore:
-    - ""
-    - "&7Although this torpedo can't actually move,"
-    - "&7it still packs a punch. In the form of a"
-    - "&7deadly explosion triggered by the slightest"
-    - "&7movement from a player or missile."
     offset:
       x: -2
       y: -4
       z: -2
+    size: "Small"
   2:
     file: 'torpedo_2.nbt'
-    item: EGG
-    name: "&0★ Torpedo II ✟"
-    lore:
-    - ""
-    - "&7Normal shields have nothing on this gigantic,"
-    - "&7extremely sensitive explosive."
-    - ""
-    - "&9Size: &f2"
     offset:
       x: -2
       y: -7
       z: -2
+    size: "Large"
 
 obsidian_shield:
   file: 'obsidian_shield.nbt'
@@ -851,6 +794,8 @@ obsidian_shield:
   - "&7Due to a budget increase, we can now afford"
   - "&7better construction materials. This one"
   - "&7vanishes after a while though."
+  - ""
+  - "&bDuration: %duration%"
   offset:
     x: -2
     y: -2
@@ -888,6 +833,8 @@ canopy:
   - "&7local druids."
   - ""
   - "&7Warning: prone to decay."
+  - ""
+  - "&bDistance: %distance%"
   offset:
     x: -3
     y: -2
@@ -925,6 +872,8 @@ fireball:
   - "&7No ghasts were harmed in the"
   - "&7making of this utility. Technically."
   - "&7They died instantly and painlessly."
+  - ""
+  - "&bPower: %power%"
   1:
     power: 1
     multiply: 2
@@ -935,45 +884,36 @@ fireball:
     power: 3
     multiply: 4
 
-leaves_:
+leaves:
+  name: "&2★ Leaves %level% ⚒"
   lore:
   - ""
   - "&7Since when could you walk on leaves?"
   - "&7I thought they would just deca-"
+  - ""
+  - "&bAmount: %amount%"
   1:
     item: JUNGLE_LEAVES
     amount: 4
-    name: "&2★ Leaves I ⚒"
-    lore:
   2:
     item: AZALEA_LEAVES
     amount: 6
-    name: "&2★ Leaves II ⚒"
-    lore:
-    - ""
-    - "&7Since when could you walk on leaves?"
-    - "&7I thought they would just deca-"
   3:
     item: FLOWERING_AZALEA_LEAVES
     amount: 8
-    name: "&2★ Leaves III ⚒"
-    lore:
-    - ""
-    - "&7Since when could you walk on leaves?"
-    - "&7I thought they would just deca-"
   
-# 3 different items needed here, since different potion lengths 
-# determined beforehand for each.
 lingering_harming:
   item: LINGERING_POTION
-  name: "&5★ Lingering Harming Potion I ⚡"
+  name: "&5★ Lingering Harming Potion %level% ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
+  - ""
+  - "&bAmplifier: %amplifier%"
+  - "&bDuration: %duration%"
   1:
     # 0 = lvl 1
     amplifier: 1
-    # in seconds
     duration: 5
   2:
     amplifier: 1

@@ -26,8 +26,8 @@ text:
   locked: "&cLeft-click &7to purchase"
   upgradable: "&cLeft-click &7to upgrade"
   downgradable: "&cRight-click &7to downgrade"
-  level: "&a%1%"
-  nextlevel: " &f(-> &e%2%&f)&7"
+  level: "&f%1%"
+  nextlevel: " &7(-> &e%2%&7)&f"
 
 preset:
   item: NETHER_STAR
@@ -51,8 +51,3 @@ global:
     - "&7and your chance of recieving a utility decreases"
     - "&7by %percentage%&a%&7. At level 3, you will always"
     - "&7recieve a missile when the game starts."
-    
-vanguard:
-  gear:
-    item: GOLDEN_SWORD
-    name: "&6&lGear Enchantments"
