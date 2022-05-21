@@ -1,10 +1,12 @@
 package com.leomelonseeds.missilewars.decks;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -27,254 +29,24 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
-
-    private final Deck vanguard;
-    private final Deck sentinel;
-    private final Deck berserker;
-    private final Deck architect;
     
-    private final Map<String, ItemStack> items;
+    private MissileWarsPlugin plugin;
+    
+    private final List<String> presets;
+    private final List<String> decks;
+    
+    FileConfiguration itemsConfig;
+    FileConfiguration deckConfig;
 
     /** Set up the DeckManager with loaded decks. */
-    public DeckManager() {
+    public DeckManager(MissileWarsPlugin plugin) {
+        this.plugin = plugin;
         
-        // Setup gear items
-
-        // Vanguard
-        List<ItemStack> vanguardgear = new ArrayList<>();
-        ItemStack vsword = createUtilityItem("vanguard_sword");
-        vsword.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 3);
-        vsword.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-        ItemMeta swordMeta = vsword.getItemMeta();
-        swordMeta.setUnbreakable(true);
-        vsword.setItemMeta(swordMeta);
-        vanguardgear.add(vsword);
-        ItemStack vboots = new ItemStack(Material.GOLDEN_BOOTS);
-        vboots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 1);
-        ItemMeta vbootsMeta = vboots.getItemMeta();
-        vbootsMeta.setUnbreakable(true);
-        vboots.setItemMeta(vbootsMeta);
-        vanguardgear.add(vboots);
-
-        ItemStack lightning = createSchematicItem("lightning");
-        ItemStack hurricane = createSchematicItem("hurricane");
-        ItemStack cruiser = createSchematicItem("cruiser");
-        ItemStack thunderbolt = createSchematicItem("thunderbolt");
-        ItemStack hilt = createSchematicItem("hilt");
-        ItemStack dagger = createSchematicItem("dagger");
-        ItemStack supersonic = createSchematicItem("supersonic");
-        ItemStack hypersonic = createSchematicItem("hypersonic");
-        ItemStack tomahawk = createSchematicItem("tomahawk");
-        ItemStack tomatwo = createSchematicItem("tomatwo");
-
-        ItemStack splash = createUtilityItem("splash");
-        ItemStack canopy = createUtilityItem("canopy");
-        ItemStack lingering = createUtilityItem("lingering_harming_2");
-
-        List<ItemStack> vMissiles = new ArrayList<>(List.of(new ItemStack[]{lightning, thunderbolt, supersonic, dagger, tomatwo}));
-        List<ItemStack> vUtility = new ArrayList<>(List.of(new ItemStack[]{splash, canopy, lingering}));
-        vanguard = new Deck("Vanguard", vanguardgear, vMissiles, vUtility);
-
-
-        // Sentinel
-        List<ItemStack> sentinelgear = new ArrayList<>();
-        ItemStack bow = createUtilityItem("sentinel_bow");
-        bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-        bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-        bow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 4);
-        ItemMeta bowMeta = bow.getItemMeta();
-        bowMeta.setUnbreakable(true);
-        bow.setItemMeta(bowMeta);
-        sentinelgear.add(bow);
-        ItemStack sboots = new ItemStack(Material.IRON_BOOTS);
-        sboots.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 2);
-        ItemMeta sbootsMeta = sboots.getItemMeta();
-        sbootsMeta.setUnbreakable(true);
-        sboots.setItemMeta(sbootsMeta);
-        sentinelgear.add(sboots);
-
-        ItemStack guardian = createSchematicItem("guardian");
-        ItemStack elderguardian = createSchematicItem("elder_guardian");
-        ItemStack gemini = createSchematicItem("gemini");
-        ItemStack gemini_w = createSchematicItem("gemini_warrior");
-        ItemStack chron = createSchematicItem("cronullifier");
-        ItemStack aeon = createSchematicItem("aeonullifier");
-        ItemStack sword = createSchematicItem("sword");
-        ItemStack blade = createSchematicItem("blade");
-        ItemStack piranha = createSchematicItem("piranha");
-        ItemStack anglerfish = createSchematicItem("anglerfish");
-
-        ItemStack torpedo = createSchematicItem("torpedo_2");
-        ItemStack obsidianshield = createSchematicItem("obsidian_shield");
-        ItemStack sentinelarrows = new ItemStack(Material.ARROW, 3);
-
-        List<ItemStack> sMissiles = new ArrayList<>(List.of(new ItemStack[]{guardian, gemini_w, aeon, sword, piranha}));
-        List<ItemStack> sUtility = new ArrayList<>(List.of(new ItemStack[] {torpedo, obsidianshield, sentinelarrows}));
-        sentinel = new Deck("Sentinel", sentinelgear, sMissiles, sUtility);
-
-
-        // Berserker
-        List<ItemStack> berserkergear = new ArrayList<>();
-        ItemStack crossbow = createUtilityItem("berserker_crossbow");
-        crossbow.addUnsafeEnchantment(Enchantment.QUICK_CHARGE, 2);
-        crossbow.addUnsafeEnchantment(Enchantment.MULTISHOT, 1);
-        crossbow.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 7);
-        ItemMeta crossbowMeta = crossbow.getItemMeta();
-        crossbowMeta.setUnbreakable(true);
-        crossbow.setItemMeta(crossbowMeta);
-        berserkergear.add(crossbow);
-        ItemStack bboots = new ItemStack(Material.DIAMOND_BOOTS);
-        bboots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 3);
-        ItemMeta bbootsMeta = bboots.getItemMeta();
-        bbootsMeta.setUnbreakable(true);
-        bboots.setItemMeta(bbootsMeta);
-        berserkergear.add(bboots);
-
-        ItemStack supporter = createSchematicItem("supporter");
-        ItemStack auxiliary = createSchematicItem("auxiliary");
-        ItemStack warhead = createSchematicItem("warhead");
-        ItemStack bullet = createSchematicItem("bullet");
-        ItemStack juggernaut = createSchematicItem("juggernaut");
-        ItemStack meganaut = createSchematicItem("meganaut");
-        ItemStack breaker = createSchematicItem("breaker");
-        ItemStack rifter = createSchematicItem("rifter");
-        ItemStack buster = createSchematicItem("shieldbuster");
-        ItemStack shark = createSchematicItem("shark");
-
-        ItemStack fireball = createUtilityItem("fireball");
-        ItemStack creeper = createUtilityItem("spawn_creeper");
-        ItemStack berserkerarrows = new ItemStack(Material.ARROW, 3);
-
-        List<ItemStack> bMissiles = new ArrayList<>(List.of(new ItemStack[]{supporter, bullet, juggernaut, breaker, shark}));
-        List<ItemStack> bUtility = new ArrayList<>(List.of(new ItemStack[]{fireball, creeper, berserkerarrows}));
-        berserker = new Deck("Berserker", berserkergear, bMissiles, bUtility);
-
-
-        // Architect
-        List<ItemStack> architectgear = new ArrayList<>();
-        ItemStack pickaxe = createUtilityItem("architect_pickaxe");
-        pickaxe.addUnsafeEnchantment(Enchantment.DIG_SPEED, 1);
-        pickaxe.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
-        ItemMeta pickaxeMeta = pickaxe.getItemMeta();
-        pickaxeMeta.setUnbreakable(true);
-        pickaxe.setItemMeta(pickaxeMeta);
-        architectgear.add(pickaxe);
-        ItemStack aboots = new ItemStack(Material.CHAINMAIL_BOOTS);
-        aboots.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 2);
-        ItemMeta abootsMeta = aboots.getItemMeta();
-        abootsMeta.setUnbreakable(true);
-        aboots.setItemMeta(abootsMeta);
-        architectgear.add(aboots);
-
-        ItemStack shipper = createSchematicItem("shipper");
-        ItemStack slasher = createSchematicItem("slasher");
-        ItemStack slingshot = createSchematicItem("slingshot");
-        ItemStack catapult = createSchematicItem("catapult");
-        ItemStack fortress = createSchematicItem("fortress");
-        ItemStack citadel = createSchematicItem("citadel");
-        ItemStack pisces = createSchematicItem("pisces");
-        ItemStack aries = createSchematicItem("aries");
-        ItemStack ant = createSchematicItem("ant");
-        ItemStack lifter = createSchematicItem("lifter");
-
-        ItemStack shield = createSchematicItem("shield_2");
-        ItemStack platform = createSchematicItem("platform_2");
-        ItemStack leaves = createUtilityItem("leaves_1");
-
-        List<ItemStack> aMissiles = new ArrayList<>(List.of(new ItemStack[]{slasher, slingshot, fortress, aries, lifter}));
-        List<ItemStack> aUtility = new ArrayList<>(List.of(new ItemStack[]{shield, platform, leaves}));
-        architect = new Deck("Architect", architectgear, aMissiles, aUtility);
+        presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
+        decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
         
-
-        
-        items = new HashMap<>();
-        
-        // Vanguard things
-        items.put("sword", createUtilityItem("vanguard_sword"));
-        items.put("vboots", new ItemStack(Material.GOLDEN_BOOTS));
-        
-        items.put("tomahawk_1", createSchematicItem("tomahawk"));
-        items.put("tomahawk_2", createSchematicItem("hurricane"));
-        items.put("cruiser_1", createSchematicItem("cruiser"));
-        items.put("cruiser_2", createSchematicItem("thunderbolt"));
-        items.put("hilt_1", createSchematicItem("hilt"));
-        items.put("hilt_2", createSchematicItem("dagger"));
-        items.put("supersonic_1", createSchematicItem("supersonic"));
-        items.put("supersonic_2", createSchematicItem("hypersonic"));
-        items.put("tomahawk_1", createSchematicItem("tomahawk"));
-        items.put("tomahawk_2", createSchematicItem("tomatwo"));
-
-        items.put("splash", createSchematicItem("splash"));
-        items.put("canopy", createSchematicItem("canopy"));
-        items.put("lingering_harming_1", createUtilityItem("lingering_harming_1"));
-        items.put("lingering_harming_2", createUtilityItem("lingering_harming_2"));
-        items.put("lingering_harming_3", createUtilityItem("lingering_harming_3"));
-        
-        // Sentinel things
-        items.put("bow", createUtilityItem("sentinel_bow"));
-        items.put("sboots", new ItemStack(Material.IRON_BOOTS));
-        
-        items.put("guardian_1", createSchematicItem("guardian"));
-        items.put("guardian_2", createSchematicItem("elder_guardian"));
-        items.put("gemini_1", createSchematicItem("gemini"));
-        items.put("gemini_2", createSchematicItem("gemini_warrior"));
-        items.put("cron_1", createSchematicItem("cronullifier"));
-        items.put("cron_2", createSchematicItem("aeonullifier"));
-        items.put("sword_1", createSchematicItem("sword"));
-        items.put("sword_2", createSchematicItem("blade"));
-        items.put("piranha_1", createSchematicItem("piranha"));
-        items.put("piranha_2", createSchematicItem("anglerfish"));
-        
-        items.put("torpedo_1", createSchematicItem("torpedo_1"));
-        items.put("torpedo_2", createSchematicItem("torpedo_2"));
-        items.put("oshield", createSchematicItem("obsidian_shield"));
-        items.put("arrows_1", new ItemStack(Material.ARROW, 2));
-        items.put("arrows_2", new ItemStack(Material.ARROW, 3));
-        items.put("arrows_3", new ItemStack(Material.ARROW, 4));
-        
-        // Berserker things
-        items.put("crossbow", createUtilityItem("berserker_crossbow"));
-        items.put("bboots", new ItemStack(Material.DIAMOND_BOOTS));
-        
-        items.put("supporter_1", createSchematicItem("supporter"));
-        items.put("supporter_2", createSchematicItem("auxiliary"));
-        items.put("warhead_1", createSchematicItem("warhead"));
-        items.put("warhead_2", createSchematicItem("bullet"));
-        items.put("juggernaut_1", createSchematicItem("juggernaut"));
-        items.put("juggernaut_2", createSchematicItem("meganaut"));
-        items.put("breaker_1", createSchematicItem("breaker"));
-        items.put("breaker_2", createSchematicItem("rifter"));
-        items.put("shieldbuster_1", createSchematicItem("shieldbuster"));
-        items.put("shieldbuster_2", createSchematicItem("shark"));
-
-        items.put("fireball", createUtilityItem("fireball"));
-        items.put("creeper", createUtilityItem("spawn_creeper"));
-        items.put("charged_creeper", createUtilityItem("spawn_creeper_charged"));
-        
-        // Architect things
-        items.put("pickaxe", createUtilityItem("architect_pickaxe"));
-        items.put("aboots", new ItemStack(Material.CHAINMAIL_BOOTS));
-        
-        items.put("shipper_1", createSchematicItem("shipper"));
-        items.put("shipper_2", createSchematicItem("slasher"));
-        items.put("slingshot_1", createSchematicItem("slingshot"));
-        items.put("slingshot_2", createSchematicItem("catapult"));
-        items.put("fortress_1", createSchematicItem("fortress"));
-        items.put("fortress_2", createSchematicItem("citadel"));
-        items.put("pisces_1", createSchematicItem("pisces"));
-        items.put("pisces_2", createSchematicItem("aries"));
-        items.put("ant_1", createSchematicItem("ant"));
-        items.put("ant_2", createSchematicItem("lifter"));
-        
-        items.put("shield_1", createSchematicItem("shield_1"));
-        items.put("shield_2", createSchematicItem("shield_2"));
-        items.put("shield_3", createSchematicItem("shield_3"));
-        items.put("platform_1", createSchematicItem("platform_1"));
-        items.put("platform_2", createSchematicItem("platform_2"));
-        items.put("platform_3", createSchematicItem("platform_3"));
-        items.put("leaves_1", createUtilityItem("leaves_1"));
-        items.put("leaves_2", createUtilityItem("leaves_2"));
-        items.put("leaves_3", createUtilityItem("leaves_3"));
+        itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+        deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
     }
     
     
@@ -287,10 +59,9 @@ public class DeckManager {
      */
     public Deck getPlayerDeck(UUID uuid) {
         
-        JSONObject basejson = MissileWarsPlugin.getPlugin().getJSON().getPlayer(uuid);
+        JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
-        String preset = basejson.getString("Preset");
-        JSONObject json = basejson.getJSONObject(deck).getJSONObject(preset);
+        JSONObject json = plugin.getJSON().getPlayerPreset(uuid);;
         
         // There are 12 utility items in the game
         // Some items have their level determined on creation, while
@@ -298,128 +69,108 @@ public class DeckManager {
         // Items with level determined on creation:
         // Shield, Platform, Leaves, Arrows (both sentinel + berserk), Torpedo, Lingering Harming
         // Items with level determined on use:
-        // Fireball, Splash, Obsidian Shield, Canopy
-        // Spawn creeper is both: Different names on creation, different actions on place
-        // For level determined on creation, fetch item from map based on level
-        // For level determined on usage, fetch item from map and replace item %level%
+        // Fireball, Splash, Obsidian Shield, Canopy, Spawn Creeper
+        
+        ArrayList<ItemStack> missiles = new ArrayList<>();
+        ArrayList<ItemStack> utility = new ArrayList<>();
+        ArrayList<ItemStack> gear = new ArrayList<>();
+        
+        // Create missiles
+        for (String key : JSONObject.getNames(json.getJSONObject("missiles"))) {
+            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
+            missiles.add(m);
+        }
+        
+        // Create utility
+        for (String key : JSONObject.getNames(json.getJSONObject("utility"))) {
+            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
+            utility.add(u);
+        }
+        
+        // Create gear items
         switch (deck) {
         case "Vanguard": 
         {
-            ArrayList<ItemStack> missiles = new ArrayList<>();
-            
-            missiles.add(items.get("lightning_" + json.getInt("lightning")));
-            missiles.add(items.get("cruiser_" + json.getInt("cruiser")));
-            missiles.add(items.get("hilt_" + json.getInt("hilt")));
-            missiles.add(items.get("supersonic_" + json.getInt("supersonic")));
-            missiles.add(items.get("tomahawk_" + json.getInt("tomahawk")));
-            
-            ArrayList<ItemStack> utility = new ArrayList<>();
-            utility.add(addLevel("canopy", json));
-            utility.add(addLevel("splash", json));
-            utility.add(items.get("lingering_harming_" + json.getInt("harming")));
-            
-            ArrayList<ItemStack> gear = new ArrayList<>();
-            ItemStack sword = items.get("sword");
-            addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharp") * 2 - 1);
+            ItemStack sword = createItem("vanguard_sword", 0, false);
+            addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2 - 1);
             addEnch(sword, Enchantment.KNOCKBACK, json.getInt("knockback"));
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
-            ItemStack boots = items.get("vboots");
+            ItemStack boots = new ItemStack(Material.GOLDEN_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling"));
             gear.add(boots);
             
-            return new Deck(deck, gear, missiles, utility);
+            break;
         }
         case "Berserker":
         {
-            ArrayList<ItemStack> missiles = new ArrayList<>();
-            
-            missiles.add(items.get("supporter_" + json.getInt("supporter")));
-            missiles.add(items.get("warhead_" + json.getInt("warhead")));
-            missiles.add(items.get("juggernaut_" + json.getInt("juggernaut")));
-            missiles.add(items.get("breaker_" + json.getInt("breaker")));
-            missiles.add(items.get("shieldbuster_" + json.getInt("shieldbuster")));
-            
-            ArrayList<ItemStack> utility = new ArrayList<>();
-            utility.add(addLevel("fireball", json));
-            if (json.getInt("creeper") == 1) {
-                utility.add(items.get("creeper"));
-            } else {
-                utility.add(items.get("charged_creeper"));
-            }
-            utility.add(items.get("arrows_" + json.getInt("arrows")));
-            
-            ArrayList<ItemStack> gear = new ArrayList<>();
-            ItemStack crossbow = items.get("crossbow");
-            addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharp") == 0 ? 0 : json.getInt("sharp") * 2 + 3);
+            ItemStack crossbow = createItem("berserker_crossbow", 0, false);
+            addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") == 0 ? 0 : json.getInt("sharpness") * 2 + 3);
             addEnch(crossbow, Enchantment.MULTISHOT, json.getInt("multishot"));
             addEnch(crossbow, Enchantment.QUICK_CHARGE, json.getInt("quickcharge"));
             gear.add(crossbow);
-            ItemStack boots = items.get("bboots");
+            ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_EXPLOSIONS, json.getInt("blastprot") * 3);
             gear.add(boots);
             
-            return new Deck(deck, gear, missiles, utility);
+            break;
         }
         case "Sentinel":
         {
-            ArrayList<ItemStack> missiles = new ArrayList<>();
-            
-            missiles.add(items.get("piranha_" + json.getInt("piranha")));
-            missiles.add(items.get("guardian_" + json.getInt("guardian")));
-            missiles.add(items.get("cron_" + json.getInt("cron")));
-            missiles.add(items.get("gemini_" + json.getInt("gemini")));
-            missiles.add(items.get("sword_" + json.getInt("sword")));
-            
-            ArrayList<ItemStack> utility = new ArrayList<>();
-            utility.add(addLevel("oshield", json));
-            utility.add(items.get("torpedo_" + json.getInt("torpedo")));
-            utility.add(items.get("arrows_" + json.getInt("arrows")));
-            
-            ArrayList<ItemStack> gear = new ArrayList<>();
-            ItemStack bow = items.get("bow");
-            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharp") == 0 ? 0 : json.getInt("sharp") * 2 + 1);
+            ItemStack bow = createItem("sentinel_bow", 0, false);
+            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
             addEnch(bow, Enchantment.ARROW_DAMAGE, json.getInt("power"));
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
             gear.add(bow);
-            ItemStack boots = items.get("sboots");
+            ItemStack boots = new ItemStack(Material.IRON_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_FIRE, json.getInt("fireprot") * 2);
             gear.add(boots);
             
-            return new Deck(deck, gear, missiles, utility);
+            break;
         }
         case "Architect":
         {
-            ArrayList<ItemStack> missiles = new ArrayList<>();
-            
-            missiles.add(items.get("ant_" + json.getInt("ant")));
-            missiles.add(items.get("shipper_" + json.getInt("shipper")));
-            missiles.add(items.get("slingshot_" + json.getInt("slingshot")));
-            missiles.add(items.get("citadel_" + json.getInt("citadel")));
-            missiles.add(items.get("pisces_" + json.getInt("pisces")));
-            
-            ArrayList<ItemStack> utility = new ArrayList<>();
-            utility.add(items.get("leaves_" + json.getInt("leaves")));
-            utility.add(items.get("shield_" + json.getInt("shield")));
-            utility.add(items.get("platform_" + json.getInt("platform")));
-            
-            ArrayList<ItemStack> gear = new ArrayList<>();
-            ItemStack pick = items.get("pickaxe");
-            addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharp"));
+            ItemStack pick = createItem("architect_pickaxe", 0, false);
+            addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharpness"));
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
             gear.add(pick);
-            ItemStack boots = items.get("aboots");
+            ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot") * 2);
             gear.add(boots);
             
-            return new Deck(deck, gear, missiles, utility);
+            break;
         }
         }
         
-        return null;
+        // Make gear items unbreakable
+        for (ItemStack item : gear) {
+            ItemMeta meta = item.getItemMeta();
+            meta.setUnbreakable(true);
+            item.setItemMeta(meta);
+        }
+        
+        return new Deck(deck, gear, missiles, utility);
     }
     
+    /**
+     * Check validity of deck
+     *
+     * @return the decks
+     */
+    public List<String> getDecks() {
+        return decks;
+    }
+    
+    /**
+     * Get list of presets
+     * 
+     * @return
+     */
+    public List<String> getPresets() {
+        return presets;
+    }
+     
     /**
      * Add enchantment to level, making sure to not add if level is 0
      * 
@@ -431,32 +182,19 @@ public class DeckManager {
         if (lvl <= 0) {
             return;
         }
-        item.addEnchantment(ench, lvl);
-    }   
-    
-    /**
-     * Change %level% parameter of an itemstack
-     * 
-     * @param item
-     * @return
-     */
-    private ItemStack addLevel(String itemname, JSONObject json) {
-        ItemStack item = items.get(itemname);
-        int itemlevel = json.getInt(itemname);
-        ItemMeta itemmeta = item.getItemMeta();
-        itemmeta.setDisplayName(itemmeta.getDisplayName().replace("%level%", roman(itemlevel)));
-        item.setItemMeta(itemmeta);
-        return item;
+        item.addUnsafeEnchantment(ench, lvl);
     }
     
     /**
-     * Translate integer to roman, only for first 5 numbers lol
+     * Translate integer to roman, only for first 10 numbers lol
      * 
      * @param i
      * @return
      */
-    private String roman(int i) {
+    public String roman(int i) {
         switch (i) {
+        case 0:
+            return "";
         case 1:
             return "I";
         case 2:
@@ -467,95 +205,140 @@ public class DeckManager {
             return "IV";
         case 5:
             return "V";
+        case 6:
+            return "VI";
+        case 7:
+            return "VII";
+        case 8:
+            return "VIII";
+        case 9:
+            return "IX";
+        case 10:
+            return "X";
         }
         return null;
     }
-
+    
     /**
-     * Obtain and return the various decks
+     * Create an ItemStack from JSON
      *
-     * @return the decks
+     * @param name
+     * @param level
+     * @return an ItemStack
      */
-    public Deck getDeck(String name) {
-        switch (name) {
-        case "Vanguard":
-            return vanguard;
-        case "Sentinel":
-            return sentinel;
-        case "Berserker":
-            return berserker;
-        case "Architect":
-            return architect;
-        }
-        return null;
-    }
-
-    /**
-     * Create an ItemStack that spawns the given schematic on use.
-     *
-     * @param schematicName the name of the schematic
-     * @return an ItemStack that spawns the schematic on use
-     */
-    private ItemStack createSchematicItem(String schematicName) {
-        // Load item data from config
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "items.yml");
-
+    public ItemStack createItem(String name, int level, Boolean missile) {
         // Setup item
-        ItemStack item = new ItemStack(Material.getMaterial(itemsConfig.getString(schematicName + ".item")));
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&',
-                itemsConfig.getString(schematicName + ".name")));
-        List<String> lore = new ArrayList<>();
-        for (String loreString : itemsConfig.getStringList(schematicName + ".lore")) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', loreString));
+        ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
+        if (ConfigUtils.getItemValue(name, level, "amount") != null) {
+            item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
         }
-        itemMeta.setLore(lore);
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"),
-                PersistentDataType.STRING, schematicName);
-        item.setItemMeta(itemMeta);
-        return item;
-    }
-
-    /**
-     * Create an ItemStack for a utility item with no schematic.
-     *
-     * @param type the type of utility
-     * @return an ItemStack that spawns the schematic on use
-     */
-    private ItemStack createUtilityItem(String type) {
-        // Load item data from config
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "items.yml");
-
-        // Setup item, with janky addition for special case of leaves
-        ItemStack item = new ItemStack(Material.getMaterial(itemsConfig.getString(type + ".item")), 
-                type.contains("leaves") ? itemsConfig.getInt(type + ".amount") : 1);
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&',
-                itemsConfig.getString(type + ".name")));
-        List<String> lore = new ArrayList<>();
-        for (String loreString : itemsConfig.getStringList(type + ".lore")) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', loreString));
+        // Don't bother with arrows
+        if (name.equals("arrows")) {
+            return item;
         }
+        // Find item name and lore
+        ItemMeta itemMeta = item.getItemMeta();
+        String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
+        displayName = displayName.replace("%level%", roman(level));
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
+        setPlaceholders(lore, name, level, false, missile);
         itemMeta.setLore(lore);
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
-                PersistentDataType.STRING, type);
-        if (type.equals("splash")) {
+        
+        // Determine structure/utility
+        String id = "item-structure";
+        if (ConfigUtils.getItemValue(name, level, "file") == null) {
+            id = "item-utility";
+        }
+        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
+                PersistentDataType.STRING, name + "_" + level);
+        
+        // Setup item meta for potions
+        if (name.equals("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
             itemMeta = pmeta;
-        } else if (type.contains("lingering")) {
-            int amplifier = itemsConfig.getInt(type + ".amplifier");
-            int duration = itemsConfig.getInt(type + ".duration");
+        } else if (name.equals("lingering_harming")) {
+            int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
+            int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
             pmeta.setColor(Color.PURPLE);
             itemMeta = pmeta;
-        }
+        } 
         item.setItemMeta(itemMeta);
         return item;
     }
-
+    
+    /**
+     * Set placeholders in an itemstack lore
+     * 
+     * @param line
+     * @param level
+     * @param showNext
+     * @return
+     */
+    public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext, Boolean missile) {
+        // Add missile stats for missiles
+        if (missile) {
+            List<String> stats = itemsConfig.getStringList("missilestats");
+            lines.addAll(stats);
+        }
+        // Compile lore into single line
+        String line = "";
+        for (String s : lines) {
+            line = line + " " + s;
+        }
+        // Match all instances of placeholders 
+        Matcher matcher = Pattern.compile("%[^%]+%").matcher(line);
+        Set<String> matches = new HashSet<>();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        // Replace all placeholder matches with specific value
+        for (int i = 0; i < lines.size(); i++) {
+            String l = lines.get(i);
+            for (String m : matches) {
+                if (!l.contains(m)) {
+                    continue;
+                }
+                String get = m.replaceAll("%", "");
+                String got1 = ConfigUtils.getItemValue(name, level, get) + "";
+                String value = deckConfig.getString("text.level").replace("%1%", got1);
+                if (showNext && level < getMaxLevel(name)) {
+                    String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
+                    value = value + deckConfig.getString("text.nextlevel").replace("%2%", got2);
+                }
+                l = l.replaceAll(m, value);
+            }
+            lines.set(i, ChatColor.translateAlternateColorCodes('&', l));
+        }
+    }
+    
+    /**
+     * Gets the max level of an item
+     * 
+     * @param name
+     * @return
+     */
+    public int getMaxLevel(String name) {
+        Set<String> keys = itemsConfig.getKeys(false);
+        ArrayList<Integer> levels = new ArrayList<>();
+        for (String key : keys) {
+            try {
+                int i = Integer.parseInt(key);
+                levels.add(i);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+        }
+        int result = 0;
+        for (int i : levels) {
+            if (i > result) {
+                result = i;
+            }
+        }
+        return result;
+    }
 }

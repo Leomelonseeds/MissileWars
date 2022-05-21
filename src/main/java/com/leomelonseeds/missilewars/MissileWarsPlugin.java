@@ -62,6 +62,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         saveIfNotPresent("items.yml");
         saveIfNotPresent("maps.yml");
         saveIfNotPresent("ranks.yml");
+        saveIfNotPresent("decks.yml");
         saveIfNotPresent("default.json");
         log("Loaded all config files.");
 
@@ -78,9 +79,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Commands and events loaded.");
 
         // Load decks
-        log("Creating and loading deck items...");
-        deckManager = new DeckManager();
-        log("All deck items locked and loaded.");
+        log("Loading deck manager...");
+        deckManager = new DeckManager(this);
+        log("Deck manager loaded.");
 
         // Load player deck cache
         log("Starting player deck cache...");

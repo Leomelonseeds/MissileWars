@@ -281,5 +281,24 @@ public class ConfigUtils {
                     mapsConfig.getString(mapType + ".default-map." + path));
         }
     }
+    
+    /**
+     * Acquire data for an item
+     * 
+     * @param item
+     * @param level
+     * @return
+     */
+    public static Object getItemValue(String item, int level, String get) {
+        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
+                .toString(), "items.yml");
+        if (itemsConfig.contains(item + "." + level + "." + get)) {
+            return itemsConfig.get(item + "." + level + "." + get);
+        } else if (itemsConfig.contains(item + "." + get)) {
+            return itemsConfig.get(item + "." + get);
+        } else {
+            return null;
+        }
+    }
 
 }

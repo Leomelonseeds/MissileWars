@@ -77,14 +77,15 @@ public class SchematicManager {
 
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration structureConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "items.yml");
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+        String [] args = structureName.split("_");
+        int level = Integer.parseInt(args[1]);
 
         // Attempt to get structure file
-        if (!structureConfig.contains(structureName + ".file")) {
+        if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
             return false;
         }
-        String fileName = structureConfig.getString(structureName + ".file");
+        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
         if (fileName == null) {
             return false;
         }
@@ -114,7 +115,12 @@ public class SchematicManager {
             return false;
         }
 
-        Vector offset = getVector(structureConfig, structureName + ".offset", null, null);
+        Vector offset;
+        if (structureConfig.contains(args[0] + ".offset")) {
+            offset = getVector(structureConfig, args[0] + ".offset", null, null);
+        } else {
+            offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
+        }
         // Flip z if on red team
         StructureRotation rotation = StructureRotation.NONE;
         

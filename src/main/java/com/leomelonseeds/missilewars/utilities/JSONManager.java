@@ -26,10 +26,12 @@ public class JSONManager {
     private Map<UUID, JSONObject> playerCache;
     
     private JSONObject defaultJson;
+    private Map<String, JSONObject> defaultPresets;
 
     public JSONManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         playerCache = new HashMap<>();
+        defaultPresets = new HashMap<>();
         periodicSave();
         
         // Find and parse the default json object
@@ -39,6 +41,11 @@ public class JSONManager {
             InputStream is = new FileInputStream(json);
             String jsonString = IOUtils.toString(is, "UTF-8");
             defaultJson = new JSONObject(jsonString);
+            // Initialize default presets
+            for (String deck : plugin.getDeckManager().getDecks()) {
+                defaultPresets.put(deck, defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                defaultJson.getJSONObject(deck).remove("defaultpreset");
+            }
         } catch (IOException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
@@ -61,21 +68,22 @@ public class JSONManager {
             try {
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
-                String[] decks = {"Vanguard", "Berserker", "Sentinel", "Architect"};
-                String[] presets = {"A", "B", "C"};
-                for (String deck : decks) {
+                for (String deck : plugin.getDeckManager().getDecks()) {
                     updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
-                    for (String preset : presets) {
-                        if (newJson.has(preset)) {
-                            updateJson(newJson.getJSONObject(deck).getJSONObject(preset),
-                                   defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                    JSONObject defaultpreset = defaultPresets.get(deck);
+                    for (String preset : plugin.getDeckManager().getPresets()) {
+                        if (newJson.getJSONObject(deck).has(preset)) {
+                            JSONObject currentpreset = newJson.getJSONObject(deck).getJSONObject(preset);
+                            updateJson(currentpreset, defaultpreset);
+                            updateJson(currentpreset.getJSONObject("missiles"), defaultpreset.getJSONObject("missiles"));
+                            updateJson(currentpreset.getJSONObject("utility"), defaultpreset.getJSONObject("utility"));
                         } else {
-                            newJson.getJSONObject(deck).put(preset, 
-                                    defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                            newJson.getJSONObject(deck).put(preset, defaultpreset);
                         }
                     }
                 }
             } catch (JSONException e) {
+                e.printStackTrace();
                 Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
                 newJson = defaultJson;
             }
@@ -100,7 +108,7 @@ public class JSONManager {
         }
         // Remove keys not existing in default
         for (String key : JSONObject.getNames(original)) {
-            if (!updated.has(key)) {
+            if (!(updated.has(key) || plugin.getDeckManager().getPresets().contains(key))) {
                 original.remove(key);
             }
         }
@@ -135,6 +143,18 @@ public class JSONManager {
      */
     public JSONObject getPlayer(UUID uuid) {
         return playerCache.get(uuid);
+    }
+    
+    /**
+     * Gets the json representation of the currently selected preset
+     *
+     * @param uuid
+     */
+    public JSONObject getPlayerPreset(UUID uuid) {
+        JSONObject basejson = getPlayer(uuid);
+        String deck = basejson.getString("Deck");
+        String preset = basejson.getString("Preset");
+        return basejson.getJSONObject(deck).getJSONObject(preset);
     }
 
     /**
