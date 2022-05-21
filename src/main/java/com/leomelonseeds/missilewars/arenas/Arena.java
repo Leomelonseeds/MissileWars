@@ -672,6 +672,9 @@ public class Arena implements ConfigurationSerializable {
                         redQueue.add(player);
                         ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
                         removeSpectator(player);
+                    } else {
+                        redQueue.remove(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-leave-red", player.getMCPlayer(), this, null);
                     }
                 } else {
                     if (!player.getMCPlayer().isOp() && redTeam.getSize() - blueTeam.getSize() >= 1) {
@@ -716,6 +719,9 @@ public class Arena implements ConfigurationSerializable {
                         blueQueue.add(player);
                         ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
                         removeSpectator(player);
+                    } else {
+                        blueQueue.remove(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-leave-blue", player.getMCPlayer(), this, null);
                     }
                 } else {
                     if (!player.getMCPlayer().isOp() && blueTeam.getSize() - redTeam.getSize() >= 1) {
