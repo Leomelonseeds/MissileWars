@@ -63,7 +63,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");
             String preset = json.getString("Preset");
-            ChatColor chatcolor = ChatColor.WHITE;
+            ChatColor chatcolor = ChatColor.DARK_GREEN;
             switch (deck) {
                 case "Vanguard":
                     chatcolor = ChatColor.GOLD;

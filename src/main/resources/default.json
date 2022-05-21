@@ -60,9 +60,9 @@
 			"flame": 1,
 			"sharpness": 2,
 			"utility": {
-				"obsidian_shield": 1,
+				"obsidianshield": 1,
 				"arrows": 2,
-				"torpedo": 1
+				"torpedo": 2
 			},
 			"missiles": {
 				"guardian": 1,

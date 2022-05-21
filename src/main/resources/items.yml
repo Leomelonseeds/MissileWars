@@ -684,7 +684,7 @@ splash:
     duration: 2
     extend: 20
 
-nova_rocket:
+novarocket:
   name: "&1⚠ &lNova Rocket ☣"
   lore:
   - ""
@@ -785,7 +785,7 @@ torpedo:
       z: -2
     size: "Large"
 
-obsidian_shield:
+obsidianshield:
   file: 'obsidian_shield.nbt'
   item: ENDER_PEARL
   name: "&5★ Obsidian Shield %level% ✟"
@@ -807,13 +807,13 @@ obsidian_shield:
   3:
     duration: 30
   
-obsidian_shield_deplete:
+obsidianshielddeplete:
   file: 'obsidian_shield_deplete.nbt'
   offset:
     x: -2
     y: -2
     z: 0
-obsidian_shield_clear:
+obsidianshieldclear:
   file: 'obsidian_shield_clear.nbt'
   offset:
     x: -2

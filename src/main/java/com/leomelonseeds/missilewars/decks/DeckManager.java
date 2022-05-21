@@ -34,7 +34,6 @@ public class DeckManager {
     
     private final List<String> presets;
     private final List<String> decks;
-    private final List<String> gear;
     
     FileConfiguration itemsConfig;
     FileConfiguration deckConfig;
@@ -45,7 +44,6 @@ public class DeckManager {
         
         presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
         decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
-        gear = new ArrayList<>(List.of(new String[]{"vanguard_sword", "berserker_crossbow", "sentinel_bow", "architect_pickaxe"}));
         
         itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
         deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
@@ -145,6 +143,13 @@ public class DeckManager {
         }
         }
         
+        // Make gear items unbreakable
+        for (ItemStack item : gear) {
+            ItemMeta meta = item.getItemMeta();
+            meta.setUnbreakable(true);
+            item.setItemMeta(meta);
+        }
+        
         return new Deck(deck, gear, missiles, utility);
     }
     
@@ -164,15 +169,6 @@ public class DeckManager {
      */
     public List<String> getPresets() {
         return presets;
-    }
-     
-    /**
-     * Get list of gear
-     * 
-     * @return
-     */
-    public List<String> getGear() {
-        return gear;
     }
      
     /**
@@ -234,7 +230,7 @@ public class DeckManager {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
         if (ConfigUtils.getItemValue(name, level, "amount") != null) {
-            item.setAmount((Integer) ConfigUtils.getItemValue(name, level, "amount"));
+            item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
         }
         // Don't bother with arrows
         if (name.equals("arrows")) {
@@ -245,7 +241,7 @@ public class DeckManager {
         String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
         displayName = displayName.replace("%level%", roman(level));
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
-        List<String> lore = (ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore");
+        List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
         setPlaceholders(lore, name, level, false, missile);
         itemMeta.setLore(lore);
         
@@ -271,14 +267,6 @@ public class DeckManager {
             pmeta.setColor(Color.PURPLE);
             itemMeta = pmeta;
         } 
-        // Make gear items unbreakable
-        else {
-            for (String s : gear) {
-                if (name.contains(s)) {
-                    itemMeta.setUnbreakable(true);
-                }
-            } 
-        }
         item.setItemMeta(itemMeta);
         return item;
     }
@@ -312,6 +300,9 @@ public class DeckManager {
         for (int i = 0; i < lines.size(); i++) {
             String l = lines.get(i);
             for (String m : matches) {
+                if (!l.contains(m)) {
+                    continue;
+                }
                 String get = m.replaceAll("%", "");
                 String got1 = ConfigUtils.getItemValue(name, level, get) + "";
                 String value = deckConfig.getString("text.level").replace("%1%", got1);

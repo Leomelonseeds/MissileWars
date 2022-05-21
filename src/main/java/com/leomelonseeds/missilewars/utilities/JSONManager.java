@@ -26,10 +26,12 @@ public class JSONManager {
     private Map<UUID, JSONObject> playerCache;
     
     private JSONObject defaultJson;
+    private Map<String, JSONObject> defaultPresets;
 
     public JSONManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         playerCache = new HashMap<>();
+        defaultPresets = new HashMap<>();
         periodicSave();
         
         // Find and parse the default json object
@@ -39,6 +41,11 @@ public class JSONManager {
             InputStream is = new FileInputStream(json);
             String jsonString = IOUtils.toString(is, "UTF-8");
             defaultJson = new JSONObject(jsonString);
+            // Initialize default presets
+            for (String deck : plugin.getDeckManager().getDecks()) {
+                defaultPresets.put(deck, defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+                defaultJson.getJSONObject(deck).remove("defaultpreset");
+            }
         } catch (IOException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
@@ -63,7 +70,7 @@ public class JSONManager {
                 updateJson(newJson, defaultJson);
                 for (String deck : plugin.getDeckManager().getDecks()) {
                     updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
-                    JSONObject defaultpreset = defaultJson.getJSONObject(deck).getJSONObject("defaultpreset");
+                    JSONObject defaultpreset = defaultPresets.get(deck);
                     for (String preset : plugin.getDeckManager().getPresets()) {
                         if (newJson.getJSONObject(deck).has(preset)) {
                             JSONObject currentpreset = newJson.getJSONObject(deck).getJSONObject(preset);
@@ -76,6 +83,7 @@ public class JSONManager {
                     }
                 }
             } catch (JSONException e) {
+                e.printStackTrace();
                 Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
                 newJson = defaultJson;
             }
@@ -94,14 +102,13 @@ public class JSONManager {
     private void updateJson(JSONObject original, JSONObject updated) {
         // Add new keys if not exist
         for (String key : JSONObject.getNames(updated)) {
-            if (!(original.has(key) || key.equals("defaultpreset"))) {
+            if (!original.has(key)) {
                 original.put(key, updated.get(key));
             }
         }
         // Remove keys not existing in default
         for (String key : JSONObject.getNames(original)) {
-            if ((!updated.has(key) || key.equals("defaultpreset")) && 
-                 !plugin.getDeckManager().getPresets().contains(key)) {
+            if (!(updated.has(key) || plugin.getDeckManager().getPresets().contains(key))) {
                 original.remove(key);
             }
         }

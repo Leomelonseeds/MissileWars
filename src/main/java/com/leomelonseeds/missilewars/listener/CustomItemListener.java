@@ -232,10 +232,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Make sure we allow gear items to be used
-        for (String name : MissileWarsPlugin.getPlugin().getDeckManager().getGear()) {
-            if (utility.contains(name)) {
-                return;
-            }
+        if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
+            return;
         }
 
         // Stop if not left-click
@@ -477,16 +475,16 @@ public class CustomItemListener implements Listener {
         if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
             playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
             String sound = "none";
-            if (structureName.contains("shield_") || structureName.contains("platform")) {
-                sound = "spawn-shield";
-            } else if (structureName.contains("torpedo")) {
-                sound = "spawn-torpedo";
-            } else if (structureName.contains("obsidian_")) {
+            if (structureName.contains("obsidianshield")) {
                 sound = "spawn-obsidian-shield";
                 // Detect obsidian shield duration in seconds here!
                 int duration = (int) getItemStat(structureName, "duration");
                 clearObsidianShield(duration, spawnLoc, isRedTeam(thrower), mapName, playerArena);
-            }
+            } else if (structureName.contains("shield_") || structureName.contains("platform")) {
+                sound = "spawn-shield";
+            } else if (structureName.contains("torpedo")) {
+                sound = "spawn-torpedo";
+            } 
             for (Player players : thrower.getWorld().getPlayers()) {
                 ConfigUtils.sendConfigSound(sound, players, spawnLoc);
             }
@@ -571,7 +569,7 @@ public class CustomItemListener implements Listener {
                 // map name doesn't matter here because the canopy has already been spawned,
                 // we therefore know that the structure was placed successfully and do not need
                 // to perform validity checks based on the map
-                SchematicManager.spawnNBTStructure("canopy", newSpawn, isRedTeam(thrower), "default-map");
+                SchematicManager.spawnNBTStructure("canopy_1", newSpawn, isRedTeam(thrower), "default-map");
                 thrower.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7This canopy will now last &a" +
                             extraduration + " &7seconds longer."));
             }
@@ -611,14 +609,14 @@ public class CustomItemListener implements Listener {
                 public void run() {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
-                            SchematicManager.spawnNBTStructure("obsidian_shield_clear", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshieldclear_1", location, red, mapName);
                             for (Player player : location.getWorld().getPlayers()) {
                                 ConfigUtils.sendConfigSound("break-obsidian-shield", player, location);
                             }
                         } else if (finalDuration % 2 == 0) {
-                            SchematicManager.spawnNBTStructure("obsidian_shield_deplete", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshielddeplete_1", location, red, mapName);
                         } else {
-                            SchematicManager.spawnNBTStructure("obsidian_shield", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshield_1", location, red, mapName);
                         }
                     }
                 }
