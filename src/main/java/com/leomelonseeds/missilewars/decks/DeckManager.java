@@ -27,6 +27,8 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+import net.kyori.adventure.text.Component;
+
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
     
@@ -239,11 +241,17 @@ public class DeckManager {
         // Find item name and lore
         ItemMeta itemMeta = item.getItemMeta();
         String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
-        displayName = displayName.replace("%level%", roman(level));
-        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        displayName = ChatColor.translateAlternateColorCodes('&', displayName.replace("%level%", roman(level)));
+        itemMeta.displayName(Component.text(displayName));
+        
+        @SuppressWarnings("unchecked")
         List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
         setPlaceholders(lore, name, level, false, missile);
-        itemMeta.setLore(lore);
+        List<Component> finalLore = new ArrayList<>();
+        for (String s : lore) {
+            finalLore.add(Component.text(s));
+        }
+        itemMeta.lore(finalLore);
         
         // Determine structure/utility
         String id = "item-structure";

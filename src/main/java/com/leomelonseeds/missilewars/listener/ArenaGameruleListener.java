@@ -75,7 +75,7 @@ public class ArenaGameruleListener implements Listener {
         }
 
         Component deathMessage = event.deathMessage();
-        event.setDeathMessage("");
+        event.deathMessage(Component.text(""));
 
         // Count death if player is on a team
         if (!playerArena.getTeam(player.getUniqueId()).equals("no team")) {

@@ -26,9 +26,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -167,6 +164,15 @@ public class Arena implements ConfigurationSerializable {
         }
 
         playerVotes = new HashMap<>();
+    }
+    
+    /**
+     * Self-explanatory?
+     * 
+     * @return
+     */
+    public Map<String, Integer> getMapVotes() {
+        return mapVotes;
     }
 
     public void addNPC(int id) {
@@ -757,7 +763,7 @@ public class Arena implements ConfigurationSerializable {
                     blueQueue.remove(player);
                     Player mcPlayer = player.getMCPlayer();
                     mcPlayer.setGameMode(GameMode.SPECTATOR);
-                    mcPlayer.sendActionBar("Type /spectate to stop spectating");
+                    mcPlayer.sendActionBar(Component.text("Type /spectate to stop spectating"));
                 } else {
                     player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.spectate-join-fail",
                             player.getMCPlayer(), null, null));
@@ -1397,30 +1403,6 @@ public class Arena implements ConfigurationSerializable {
         } else {
             blueTeam.registerShieldBlockUpdate(location, place);
         }
-    }
-
-    /**
-     * Open the map voting GUI for a player.
-     *
-     * @param player the player
-     */
-    public void openMapVote(Player player) {
-        Inventory mapInv = Bukkit.createInventory(null, 27, Component.translatable(ConfigUtils.getConfigText
-                ("inventories.map-voting.title", player, null, null)));
-        for (String mapName : mapVotes.keySet()) {
-            ItemStack mapItem = new ItemStack(Material.PAPER);
-            ItemMeta mapItemMeta = mapItem.getItemMeta();
-            mapItemMeta.setDisplayName(ConfigUtils.getMapText(mapType, mapName, "name"));
-            List<String> lore = new LinkedList<>();
-            for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {
-                String sn = s.replaceAll("%umw_map_votes%", "" + mapVotes.get(mapName));
-                lore.add(sn);
-            }
-            mapItemMeta.setLore(lore);
-            mapItem.setItemMeta(mapItemMeta);
-            mapInv.addItem(mapItem);
-        }
-        player.openInventory(mapInv);
     }
 
     /**

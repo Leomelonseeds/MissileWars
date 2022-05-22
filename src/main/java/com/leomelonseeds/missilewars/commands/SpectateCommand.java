@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,7 +10,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
-public class SpectateCommand implements CommandExecutor {
+public class SpectateCommand extends MissileWarsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -41,25 +40,4 @@ public class SpectateCommand implements CommandExecutor {
         arena.addSpectator(player.getUniqueId());
         return true;
     }
-
-    /**
-     * Send the given user an error message.
-     *
-     * @param target the user
-     * @param msg the error message
-     */
-    private void sendErrorMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.RED + "Error: " + ChatColor.GRAY + msg);
-    }
-
-    /**
-     * Send the given user a success message.
-     *
-     * @param target the user
-     * @param msg the error message
-     */
-    private void sendSuccessMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.GREEN + "Success! " + ChatColor.GRAY + msg);
-    }
-
 }

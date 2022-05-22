@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,8 +8,9 @@ import org.bukkit.entity.Player;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.invs.MapVoting;
 
-public class VoteMapCommand implements CommandExecutor {
+public class VoteMapCommand extends MissileWarsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -33,29 +33,8 @@ public class VoteMapCommand implements CommandExecutor {
         }
 
         // Open voting menu
-        playerArena.openMapVote(player);
+        new MapVoting(player);
 
         return true;
     }
-
-    /**
-     * Send the given user an error message.
-     *
-     * @param target the user
-     * @param msg the error message
-     */
-    private void sendErrorMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.RED + "Error: " + ChatColor.GRAY + msg);
-    }
-
-    /**
-     * Send the given user a success message.
-     *
-     * @param target the user
-     * @param msg the error message
-     */
-    private void sendSuccessMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.GREEN + "Success! " + ChatColor.GRAY + msg);
-    }
-
 }

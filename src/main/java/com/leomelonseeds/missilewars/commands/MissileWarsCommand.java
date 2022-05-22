@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -147,9 +148,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "No target found!");
                 return true;
             }
-            arenaManager.openArenaSelector(target);
-
-            sendSuccessMsg(sender, "Game selector opened!");
+            new ArenaSelector(target);
             return true;
         }
 
@@ -235,8 +234,6 @@ public class MissileWarsCommand implements CommandExecutor {
 
             // Enqueue for red team
             arena.enqueueRed(target.getUniqueId());
-
-            sendSuccessMsg(sender, "Enqueued player for red team!");
             return true;
         }
 
@@ -264,8 +261,6 @@ public class MissileWarsCommand implements CommandExecutor {
 
             // Enqueue for red team
             arena.enqueueBlue(target.getUniqueId());
-
-            sendSuccessMsg(sender, "Enqueued player for blue team!");
             return true;
         }
 
@@ -374,7 +369,7 @@ public class MissileWarsCommand implements CommandExecutor {
      * @param target the user
      * @param msg the error message
      */
-    private void sendErrorMsg(CommandSender target, String msg) {
+    protected void sendErrorMsg(CommandSender target, String msg) {
         target.sendMessage(ChatColor.RED + "Error: " + ChatColor.GRAY + msg);
     }
 
@@ -384,7 +379,7 @@ public class MissileWarsCommand implements CommandExecutor {
      * @param target the user
      * @param msg the error message
      */
-    private void sendSuccessMsg(CommandSender target, String msg) {
+    protected void sendSuccessMsg(CommandSender target, String msg) {
         target.sendMessage(ChatColor.GREEN + "Success! " + ChatColor.GRAY + msg);
     }
 

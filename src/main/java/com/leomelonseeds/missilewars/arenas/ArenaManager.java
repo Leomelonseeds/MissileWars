@@ -28,16 +28,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -73,6 +69,7 @@ public class ArenaManager {
     }
 
     /** Load arenas from data file */
+    @SuppressWarnings("unchecked")
     public void loadArenas() {
         File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
 
@@ -502,36 +499,6 @@ public class ArenaManager {
         }
 
         return true;
-    }
-
-    /**
-     * Open the arena selector for a given player.
-     *
-     * @param player the player
-     */
-    public void openArenaSelector(Player player) {
-        // Stop if player is already in an arena
-        if (getArena(player.getUniqueId()) != null) {
-            player.sendMessage(ChatColor.RED + "You are already in a game!");
-            return;
-        }
-        Inventory selector = Bukkit.createInventory(null, 27,
-                ConfigUtils.getConfigText("inventories.game-selector.title", player, null, null));
-
-        // Add Arena items
-        for (Arena arena : getLoadedArenas()) {
-            ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
-            ItemMeta arenaItemMeta = arenaItem.getItemMeta();
-            assert arenaItemMeta != null;
-            arenaItemMeta.setDisplayName(ConfigUtils.getConfigText("inventories.game-selector.game-item.name",
-                    player, arena,null));
-            arenaItemMeta.setLore(ConfigUtils.getConfigTextList("inventories.game-selector.game-item.lore",
-                    player, arena, null));
-            arenaItem.setItemMeta(arenaItemMeta);
-            selector.addItem(arenaItem);
-        }
-        ArenaInventoryListener.selectingArena.add(player);
-        player.openInventory(selector);
     }
 
     /**

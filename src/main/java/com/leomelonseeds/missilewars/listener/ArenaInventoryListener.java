@@ -1,20 +1,14 @@
 package com.leomelonseeds.missilewars.listener;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,81 +16,9 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
-
-    /** List of players currently in arena selection. */
-    public static List<Player> selectingArena = new ArrayList<>();
-
-    /** Handle arena selection. */
-    @EventHandler
-    public void selectArena(InventoryClickEvent event) {
-        // Check if player is selecting an Arena
-        if (!(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
-        Player player = (Player) event.getWhoClicked();
-        if (!selectingArena.contains(player)) {
-            return;
-        }
-
-        // Check for arena selection
-        event.setCancelled(true);
-        if (event.getClickedInventory() == null ||
-                !event.getClickedInventory().equals(event.getView().getTopInventory())) {
-            return;
-        }
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena selectedArena = manager.getArena(event.getSlot());
-        if (selectedArena == null) {
-            return;
-        }
-
-        // Attempt to send player to arena
-        if (selectedArena.joinPlayer(player)) {
-            player.closeInventory();
-        } else {
-            ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
-        }
-    }
-
-    /** Handle map voting */
-    @EventHandler
-    public void onMapVote(InventoryClickEvent event) {
-        // Check if player is in an Arena
-        if (!(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
-        Player player = (Player) event.getWhoClicked();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
-        // Ensure map vote inventory is open
-        if ((arena == null) || !event.getView().getTitle().equals(ConfigUtils.getConfigText("inventories.map-voting.title", player, null, null))) {
-            return;
-        }
-
-        // Cancel click and try to register vote
-        event.setCancelled(true);
-        ItemStack clicked = event.getCurrentItem();
-        if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
-            return;
-        }
-        String mapVotedFor = arena.registerVote(player.getUniqueId(), clicked.getItemMeta().getDisplayName());
-        player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
-        arena.openMapVote(player);
-    }
-
-    /** Replace from selectors when closed inventory. */
-    @EventHandler
-    public void onClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player)) {
-            return;
-        }
-        Player player = (Player) event.getPlayer();
-        selectingArena.remove(player);
-    }
 
     /** Stop players from changing their armor/bow items. */
     @EventHandler

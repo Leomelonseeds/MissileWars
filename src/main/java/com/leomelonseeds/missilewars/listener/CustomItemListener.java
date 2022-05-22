@@ -40,6 +40,9 @@ import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
     
@@ -418,7 +421,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Add meta for structure identification
-        thrown.setCustomName(structureName);
+        thrown.customName(Component.text(structureName));
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
@@ -448,7 +451,7 @@ public class CustomItemListener implements Listener {
 
         // Make sure a player threw this projectile
         // If it has a custom name, it definitely is a missile wars item
-        if (!(thrown.getShooter() instanceof Player) || (thrown.getCustomName() == null)) {
+        if (!(thrown.getShooter() instanceof Player) || (thrown.customName() == null)) {
             return;
         }
 
@@ -526,7 +529,7 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         double extend = getItemStat(utility, "extend");
-        thrown.setCustomName("splash:" + duration + ":" + extend);
+        thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
     }
 
@@ -535,7 +538,12 @@ public class CustomItemListener implements Listener {
     public void handleSplash(ProjectileHitEvent event) {
 
         // Make sure we're getting the right potion here
-        if ((event.getEntityType() != EntityType.SPLASH_POTION) || (event.getEntity().getCustomName() == null) || !event.getEntity().getCustomName().contains("splash:")) {
+        if ((event.getEntityType() != EntityType.SPLASH_POTION) || (event.getEntity().customName() == null)) {
+            return;
+        }
+        
+        String customName = PlainTextComponentSerializer.plainText().serialize(event.getEntity().customName());
+        if (!customName.contains("splash:")) {
             return;
         }
 
@@ -552,7 +560,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Get data from item
-        String[] args = event.getEntity().getCustomName().split(":");
+        String[] args = customName.split(":");
 
         // Handle hitting oak_wood to fully repair canopies
         if (hitBlock.getType() == Material.OAK_WOOD) {

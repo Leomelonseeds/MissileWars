@@ -237,13 +237,14 @@ public class ConfigUtils {
      */
     public static String getFocusName(OfflinePlayer player) {
         Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        String displayName = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
         if (playerArena != null) {
             ChatColor teamColor = playerArena.getTeamColor(player.getUniqueId());
             if (teamColor != null) {
-                return teamColor + ChatColor.stripColor(player.getPlayer().getDisplayName());
+                return teamColor + ChatColor.stripColor(displayName);
             }
         }
-        return player.getPlayer().getDisplayName();
+        return displayName;
     }
 
     /**

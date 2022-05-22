@@ -15,6 +15,8 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 /** A class representing a generic Deck. */
 public class Deck {
 
@@ -49,6 +51,10 @@ public class Deck {
         combined.addAll(utility);
         this.pool = combined;
         lastTwo = new ArrayDeque<>();
+    }
+    
+    public String getName() {
+        return name;
     }
 
     /**
@@ -151,7 +157,7 @@ public class Deck {
         String message = ConfigUtils.getConfigText(messagePath, player, null, null);
         String name;
         if (poolItem.getItemMeta().hasDisplayName()) {
-            name = poolItem.getItemMeta().getDisplayName();
+            name = PlainTextComponentSerializer.plainText().serialize(poolItem.getItemMeta().displayName());
         } else {
             name = poolItem.getAmount() + "x " + StringUtils.capitalize(poolItem.getType().toString().toLowerCase());
         }
