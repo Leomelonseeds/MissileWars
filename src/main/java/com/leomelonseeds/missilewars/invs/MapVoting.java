@@ -39,7 +39,7 @@ public class MapVoting implements Listener, MWInventory {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (inv != null) {
+                if (manager.getInventory(player) != null) {
                     updateInventory();
                 } else {
                     this.cancel();
