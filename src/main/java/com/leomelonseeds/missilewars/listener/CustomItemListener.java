@@ -25,6 +25,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -32,6 +33,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -133,6 +135,42 @@ public class CustomItemListener implements Listener {
             return offhand;
         }
         return hand;
+    }
+    
+    /** Give architect pickaxes the haste effect */
+    @EventHandler
+    public void giveHaste(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        
+        if (getPlayerArena(player) == null) {
+            return;
+        }
+        
+        // Makes sure player is using architect
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayerPreset(player.getUniqueId());
+        if (!json.has("haste")) {
+            return;
+        }
+        
+        // Clear haste if switching off from pickaxe
+        if (player.getInventory().getItem(event.getPreviousSlot()).getType() == Material.IRON_PICKAXE) {
+            if (player.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
+                player.removePotionEffect(PotionEffectType.FAST_DIGGING);
+            }
+            return;
+        }
+        
+        ItemStack item = player.getInventory().getItem(event.getNewSlot());
+        if (item.getType() != Material.IRON_PICKAXE) {
+            return;
+        }
+        
+        int level = json.getInt("haste");
+        if (level <= 0) {
+            return;
+        }
+        
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
 
     /** Handle missile and other structure item spawning. */

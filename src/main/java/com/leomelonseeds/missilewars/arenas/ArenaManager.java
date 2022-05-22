@@ -43,6 +43,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -465,8 +468,15 @@ public class ArenaManager {
             }
 
 
+            
             // Setup regions
             WorldGuard wg = WorldGuard.getInstance();
+            RegionManager manager = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld));
+            
+            GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("global");
+            globalRegion.setFlag(Flags.CHEST_ACCESS, State.DENY);
+            manager.addRegion(globalRegion);
+            
             Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min", null, null);
             Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max", null, null);
             ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
@@ -477,7 +487,7 @@ public class ArenaManager {
             lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
             lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
             lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
-            wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld)).addRegion(lobbyRegion);
+            manager.addRegion(lobbyRegion);
             createWaitingLobby("red", arena, lobbyRegion);
             createWaitingLobby("blue", arena, lobbyRegion);
 

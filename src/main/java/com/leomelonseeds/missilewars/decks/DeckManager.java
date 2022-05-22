@@ -136,6 +136,18 @@ public class DeckManager {
             ItemStack pick = createItem("architect_pickaxe", 0, false);
             addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharpness"));
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
+            // Add custom haste effect
+            if (json.getInt("haste") > 0) {
+                ItemMeta meta = pick.getItemMeta();
+                List<Component> loreLines = meta.lore();
+                List<Component> newLore = new ArrayList<>();
+                newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(json.getInt("Haste"))));
+                for (Component c : loreLines) {
+                    newLore.add(c);
+                }
+                meta.lore(newLore);
+                pick.setItemMeta(meta);
+            }
             gear.add(pick);
             ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot") * 2);
