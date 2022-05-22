@@ -18,6 +18,8 @@ messages:
   spectate-leave-others: "%umw_focus% &7is no longer spectating."
   queue-waiting-red: "You are now queued for &cred&7 in position &c%umw_position%"
   queue-waiting-blue: "You are now queued for &9blue&7 in position &c%umw_position%"
+  queue-leave-red: "You are no longer queued for &cred&7."
+  queue-leave-blue: "You are no longer queued for &9blue&7."
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
   queue-join-error: "&cYou cannot join this team as the teams would be unbalanced."
