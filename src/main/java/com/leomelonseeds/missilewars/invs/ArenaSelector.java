@@ -10,10 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -22,21 +20,24 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class ArenaSelector implements Listener, InventoryHolder {
+public class ArenaSelector implements Listener, MWInventory {
 
     private Inventory inv;
+    private Player player;
     
     public ArenaSelector(Player player) {
+        this.player = player;
+        
         String title = ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null);
-        inv = Bukkit.createInventory(this, 27, Component.text(title));
-        updateInventory(player);
-        player.openInventory(inv);
+        inv = Bukkit.createInventory(null, 27, Component.text(title));
+        manager.registerInventory(player, this);
     }
     
     public ArenaSelector() {}
     
     // Create a list of all arenas from ArenaManager list
-    public void updateInventory(Player player) {
+    @Override
+    public void updateInventory() {
         for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas()) {
             ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
@@ -53,17 +54,17 @@ public class ArenaSelector implements Listener, InventoryHolder {
         }
     }
     
+    @Override
     @EventHandler
-    public void selectArena(InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
         
         // Check for arena selection
-        if (!(event.getInventory().getHolder() instanceof ArenaSelector)) {
+        if (!(manager.getInventory(player) instanceof ArenaSelector)) {
             return;
         }
         
         event.setCancelled(true);
-        
-        Player player = (Player) event.getWhoClicked();
         
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena selectedArena = manager.getArena(event.getSlot());
@@ -80,8 +81,7 @@ public class ArenaSelector implements Listener, InventoryHolder {
     }
 
     @Override
-    public @NotNull Inventory getInventory() {
+    public Inventory getInventory() {
         return inv;
     }
-    
 }

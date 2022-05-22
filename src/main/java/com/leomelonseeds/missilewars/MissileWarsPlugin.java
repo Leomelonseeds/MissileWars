@@ -16,6 +16,7 @@ import com.leomelonseeds.missilewars.commands.SpectateCommand;
 import com.leomelonseeds.missilewars.commands.VoteMapCommand;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
+import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
@@ -47,6 +48,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private SQLManager sqlManager;
     /** The loaded json manager for this plugin */
     private JSONManager jsonManager;
+    /** The loaded json manager for this plugin */
+    private InventoryManager invManager;
 
     @Override
     public void onEnable() {
@@ -91,6 +94,11 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Starting player deck cache...");
         jsonManager = new JSONManager(this);
         log("Player deck cache loaded!");
+        
+        // Load player inventory cache
+        log("Starting player inventory cache...");
+        invManager = new InventoryManager();
+        log("Player inventory cache loaded!");
 
         // Load arenas
         log("Loading up arenas...");
@@ -242,6 +250,15 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public JSONManager getJSON() {
         return jsonManager;
+    }
+    
+    /**
+     * Gets the plugin's current inv manager
+     *
+     * @return the plugin's inv manager
+     */
+    public InventoryManager getInvs() {
+        return invManager;
     }
 
     /**

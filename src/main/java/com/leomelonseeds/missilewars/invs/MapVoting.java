@@ -11,10 +11,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -24,23 +23,39 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public class MapVoting implements Listener, InventoryHolder {
+public class MapVoting implements Listener, MWInventory {
     
     private Inventory inv;
+    private Player player;
     
     public MapVoting(Player player) {
+        this.player = player;
+        
         String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
-        inv = Bukkit.createInventory(this, 27, Component.text(title));
-        updateInventory(player);
-        player.openInventory(inv);
+        inv = Bukkit.createInventory(null, 27, Component.text(title));
+        manager.registerInventory(player, this);
+        
+        // Refresh inventory once in a while
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (inv != null) {
+                    updateInventory();
+                } else {
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 20, 20);
     }
     
     // Blank constructor to register events
     public MapVoting() {}
     
     // Register all maps and their votes to items
-    public void updateInventory(Player player) {
+    @Override
+    public void updateInventory() {
         Arena arena = getPlayerArena(player);
+        inv.clear();
         for (String mapName : arena.getMapVotes().keySet()) {
             ItemStack mapItem = new ItemStack(Material.PAPER);
             int votes = arena.getMapVotes().get(mapName);
@@ -59,16 +74,17 @@ public class MapVoting implements Listener, InventoryHolder {
         }
     }
     
+    @Override
     @EventHandler
-    public void onMapVote(InventoryClickEvent event) {
-        // Check if player is in an Arena
-        if (!(event.getInventory().getHolder() instanceof MapVoting)) {
+    public void onClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        
+        if (!(manager.getInventory(player) instanceof MapVoting)) {
             return;
         }
         
         event.setCancelled(true);
         
-        Player player = (Player) event.getWhoClicked();
         Arena arena = getPlayerArena(player);
         
         ItemStack clicked = event.getCurrentItem();
@@ -78,7 +94,7 @@ public class MapVoting implements Listener, InventoryHolder {
         String map = PlainTextComponentSerializer.plainText().serialize(clicked.getItemMeta().displayName());
         String mapVotedFor = arena.registerVote(player.getUniqueId(), map);
         player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
-        updateInventory(player);
+        manager.getInventory(player).updateInventory();
     }
     
     private Arena getPlayerArena(Player player) {
@@ -87,8 +103,7 @@ public class MapVoting implements Listener, InventoryHolder {
     }
 
     @Override
-    public @NotNull Inventory getInventory() {
+    public Inventory getInventory() {
         return inv;
     }
-
 }

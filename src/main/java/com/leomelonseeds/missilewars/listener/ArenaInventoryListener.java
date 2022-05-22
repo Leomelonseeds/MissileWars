@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -15,10 +16,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.invs.InventoryManager;
+import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
+    
+    /** Unregister custom mwinventories when they are closed. */
+    @EventHandler
+    public void unregisterCustomInventories(InventoryCloseEvent event) {
+        Player player = (Player) event.getPlayer();
+        InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
+        if (manager.getInventory(player) instanceof MWInventory) {
+            manager.removePlayer(player);
+        }
+    }
 
     /** Stop players from changing their armor/bow items. */
     @EventHandler

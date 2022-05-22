@@ -528,7 +528,7 @@ public class CustomItemListener implements Listener {
 
         // Check the duration here
         double duration = getItemStat(utility, "duration");
-        double extend = getItemStat(utility, "extend");
+        int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
     }
