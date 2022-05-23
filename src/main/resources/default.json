@@ -6,7 +6,6 @@
 	"hoarder": false,
 	"Vanguard": {
 		"featherfalling": false,
-		"knockback": false,
 		"fireaspect": false,
 		"doublejump": false,
 		"hurl": false,
@@ -16,7 +15,6 @@
 			"skillpoints": 18,
 			"featherfalling": 1,
 			"sharpness": 2,
-			"knockback": 1,
 			"fireaspect": 0,
 			"utility": {
 				"canopy": 2,
@@ -56,7 +54,6 @@
 			"skillpoints": 18,
 			"fireprot": 1,
 			"punch": 1,
-			"power": 0,
 			"flame": 1,
 			"sharpness": 2,
 			"utility": {

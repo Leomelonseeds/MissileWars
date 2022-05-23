@@ -95,7 +95,6 @@ public class DeckManager {
         {
             ItemStack sword = createItem("vanguard_sword", 0, false);
             addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2 - 1);
-            addEnch(sword, Enchantment.KNOCKBACK, json.getInt("knockback"));
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
             ItemStack boots = new ItemStack(Material.GOLDEN_BOOTS);
@@ -121,7 +120,6 @@ public class DeckManager {
         {
             ItemStack bow = createItem("sentinel_bow", 0, false);
             addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
-            addEnch(bow, Enchantment.ARROW_DAMAGE, json.getInt("power"));
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
             gear.add(bow);
