@@ -28,21 +28,20 @@ public class ConfigUtils {
 
     // Map of open cached config files
     private static Map<String, FileConfiguration> configCache = new HashMap<>();
-
+    
     /**
-     * Method to get a config file from its yml name.
-     *
-     * @param dir the directory of the config file
-     * @param configName the name of the config file
-     * @return the config
+     * Get config file from default folder
+     * 
+     * @param configName
+     * @return
      */
-    public static FileConfiguration getConfigFile(String dir, String configName) {
+    public static FileConfiguration getConfigFile(String configName) {
         // Check for config file in cache
         if (configCache.containsKey(configName)) {
             return configCache.get(configName);
         }
 
-        File file = new File(dir, configName);
+        File file = new File(MissileWarsPlugin.getPlugin().getDataFolder().toString(), configName);
         FileConfiguration config = new YamlConfiguration();
         try {
             config.load(file);
@@ -86,8 +85,7 @@ public class ConfigUtils {
 
         // Set umw arena-less placeholders
         msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime() / 60);
-        FileConfiguration messageConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "messages.yml");
+        FileConfiguration messageConfig = getConfigFile("messages.yml");
         msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
         msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));
         msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
@@ -113,8 +111,7 @@ public class ConfigUtils {
      * @return the parsed String
      */
     public static String getConfigText(String path, Player player, Arena arena, Player focus) {
-        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "messages.yml");
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
         return setPlaceholders(messagesConfig.getString(path), player, arena, focus);
     }
 
@@ -129,8 +126,7 @@ public class ConfigUtils {
      */
     public static List<String> getConfigTextList(String path, Player player, Arena arena, Player focus) {
         List<String> list = new ArrayList<>();
-        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "messages.yml");
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
         for (String msg : messagesConfig.getStringList(path)) {
             list.add(setPlaceholders(msg, player, arena, focus));
         }
@@ -146,8 +142,7 @@ public class ConfigUtils {
      * @param focus a separate player that is the focus of the message, but not receiving it
      */
     public static void sendConfigMessage(String path, Player player, Arena arena, Player focus) {
-        FileConfiguration messagesConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "messages.yml");
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
         String prefix = messagesConfig.getString("messages.prefix");
 
         // Check for multi line message
@@ -175,8 +170,7 @@ public class ConfigUtils {
      * @param player the player to send sound to
      */
     public static void sendConfigSound(String path, Player player) {
-        FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "sounds.yml");
+        FileConfiguration soundConfig = getConfigFile("sounds.yml");
 
         if (!soundConfig.contains(path)) {
         	return;
@@ -198,8 +192,7 @@ public class ConfigUtils {
      * @param location the location to send the sound to
      */
     public static void sendConfigSound(String path, Player player, Location location) {
-        FileConfiguration soundConfig = getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "sounds.yml");
+        FileConfiguration soundConfig = getConfigFile("sounds.yml");
 
         if (!soundConfig.contains(path)) {
         	return;
@@ -255,8 +248,7 @@ public class ConfigUtils {
      * @return the data at the path for the given math, or default data if it does not exist
      */
     public static double getMapNumber(String mapType, String mapName, String path) {
-        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile("maps.yml");
         if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
             return mapsConfig.getDouble(mapType + "." + mapName + "." + path);
         } else {
@@ -272,8 +264,7 @@ public class ConfigUtils {
      * @return the data at the path for the given math, or default data if it does not exist
      */
     public static String getMapText(String mapType, String mapName, String path) {
-        FileConfiguration mapsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration mapsConfig = ConfigUtils.getConfigFile("maps.yml");
         if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
             return ChatColor.translateAlternateColorCodes('&',
                     mapsConfig.getString(mapType + "." + mapName + "." + path));
@@ -291,8 +282,7 @@ public class ConfigUtils {
      * @return
      */
     public static Object getItemValue(String item, int level, String get) {
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "items.yml");
+        FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
         if (itemsConfig.contains(item + "." + level + "." + get)) {
             return itemsConfig.get(item + "." + level + "." + get);
         } else if (itemsConfig.contains(item + "." + get)) {

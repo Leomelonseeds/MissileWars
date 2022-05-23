@@ -234,8 +234,7 @@ public class ArenaManager {
      */
     private void createWaitingLobby(String team, Arena arena, ProtectedRegion parent) {
         // Setup region
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
         WorldGuard wg = WorldGuard.getInstance();
         Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min", null, null);
         Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max", null, null);
@@ -281,8 +280,7 @@ public class ArenaManager {
             return false;
         }
 
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
 
         // Create Arena world
         logger.log(Level.INFO, "Generating arena world for " + name);

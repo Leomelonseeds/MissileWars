@@ -154,8 +154,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Add maps in map type to voting pool
         mapVotes = new HashMap<>();
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
         for (String mapName : mapConfig.getConfigurationSection(mapType).getKeys(false)) {
             mapVotes.put(mapName, 0);
         }
@@ -853,8 +852,7 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Acquire red and blue spawns
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile(plugin.getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
         Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", mapType, mapName);
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
         Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", mapType, mapName);
@@ -1085,8 +1083,7 @@ public class Arena implements ConfigurationSerializable {
         // Setup player variables
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages.classic-end", null, null, null);
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
-        FileConfiguration ranksConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "ranks.yml");
+        FileConfiguration ranksConfig = ConfigUtils.getConfigFile("ranks.yml");
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
         int use_utility = ranksConfig.getInt("experience.use_utility");
         int kill = ranksConfig.getInt("experience.kill");
@@ -1237,8 +1234,7 @@ public class Arena implements ConfigurationSerializable {
 			return blueTeam.getSpawn();
 		}
          else {
-        	FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                    .toString(), "maps.yml");
+        	FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
             Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn", null, null);
             Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
             spawnLoc.setYaw(90);

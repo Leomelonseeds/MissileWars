@@ -77,7 +77,7 @@ public class SchematicManager {
 
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration structureConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
         String [] args = structureName.split("_");
         int level = Integer.parseInt(args[1]);
 
@@ -202,8 +202,7 @@ public class SchematicManager {
     public static boolean spawnFAWESchematic(String schematicName, World world, String mapType, DBCallback callback) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
 
         // Acquire WE clipboard
         String possibleMapType = mapType == null ? "" : mapType + ".";

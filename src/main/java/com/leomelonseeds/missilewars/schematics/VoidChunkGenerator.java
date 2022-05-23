@@ -9,7 +9,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.util.Vector;
 
-import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class VoidChunkGenerator extends ChunkGenerator {
@@ -28,8 +27,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
-        FileConfiguration schematicConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder()
-                .toString(), "maps.yml");
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
         Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn", null, null);
         Location spawnLoc = new Location(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
         return spawnLoc;

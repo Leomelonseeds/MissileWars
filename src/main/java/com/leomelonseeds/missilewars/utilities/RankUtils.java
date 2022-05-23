@@ -114,8 +114,7 @@ public class RankUtils {
      */
     public static String getRankName(int exp) {
         int rank = getRankLevel(exp);
-        FileConfiguration rankConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "ranks.yml");
+        FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
         String rankName = rankConfig.getString("ranks." + rank + ".name");
         return ChatColor.translateAlternateColorCodes('&', rankName);
     }
@@ -128,8 +127,7 @@ public class RankUtils {
      */
     public static String getRankSymbol(int exp) {
         int rank = getRankLevel(exp);
-        FileConfiguration rankConfig = ConfigUtils.getConfigFile(MissileWarsPlugin.getPlugin().getDataFolder().toString(),
-                "ranks.yml");
+        FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
         String rankColor = rankConfig.getString("ranks." + rank + ".color");
         String rankSymbol = rankConfig.getString("ranks." + rank + ".symbol");
         return ChatColor.translateAlternateColorCodes('&', rankColor + rankSymbol);

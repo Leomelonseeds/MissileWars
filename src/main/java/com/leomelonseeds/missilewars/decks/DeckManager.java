@@ -47,8 +47,8 @@ public class DeckManager {
         presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
         decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
         
-        itemsConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "items.yml");
-        deckConfig = ConfigUtils.getConfigFile(plugin.getDataFolder().toString(), "decks.yml");
+        itemsConfig = ConfigUtils.getConfigFile("items.yml");
+        deckConfig = ConfigUtils.getConfigFile("decks.yml");
     }
     
     
