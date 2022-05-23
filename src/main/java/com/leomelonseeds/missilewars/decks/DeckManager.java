@@ -122,6 +122,7 @@ public class DeckManager {
             addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
+            addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("power"));
             gear.add(bow);
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
             addEnch(boots, Enchantment.PROTECTION_FIRE, json.getInt("fireprot") * 2);

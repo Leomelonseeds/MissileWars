@@ -45,6 +45,7 @@
 	"Sentinel": {
 		"fireprot": false,
 		"punch": false,
+		"power": false,
 		"sharpness": false,
 		"forksmash": false,
 		"fissionarrow": false,
@@ -54,6 +55,7 @@
 			"skillpoints": 18,
 			"fireprot": 1,
 			"punch": 1,
+			"power": 0,
 			"flame": 1,
 			"sharpness": 2,
 			"utility": {
