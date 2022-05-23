@@ -384,17 +384,25 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
-            String preset = null;
             if (args.length == 3) {
-                preset = args[2];
+                String preset = args[2].toUpperCase();
                 if (!plugin.getDeckManager().getPresets().contains(preset)) {
                     sendErrorMsg(sender, "Please specify a valid preset!");
                     return true;
                 }
+                
+                // Update deck in cache
+                JSONObject currentDeck = plugin.getJSON().getPlayer(player.getUniqueId());
+                currentDeck.put("Deck", deck);
+                currentDeck.put("Preset", preset);
+                plugin.getJSON().setPlayer(player.getUniqueId(), currentDeck);
+
+                sendSuccessMsg(sender, "Set your deck to " + deck + " - Preset " + preset + "!");
+                return true;
             }
-
+            
+            // Open preset selector if player doesn't specify
             new PresetSelector(player, deck);
-
             return true;
         }
 

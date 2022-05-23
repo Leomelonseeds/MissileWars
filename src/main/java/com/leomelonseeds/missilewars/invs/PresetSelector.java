@@ -38,7 +38,7 @@ public class PresetSelector implements MWInventory, Listener {
         playerJson = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         
         String title = deckConfig.getString("title.preset").replace("%deck%", deck);
-        inv = Bukkit.createInventory(null, 27, ConfigUtils.toComponent(title));
+        inv = Bukkit.createInventory(null, 36, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this);
     }
     
@@ -55,10 +55,10 @@ public class PresetSelector implements MWInventory, Listener {
             ItemStack item = new ItemStack(Material.getMaterial(deckConfig.getString("preset.item")));
             ItemMeta meta = item.getItemMeta();
             
-            meta.displayName(ConfigUtils.toComponent(deckConfig.getString("preset.item.name").replace("%preset%", p)));
+            meta.displayName(ConfigUtils.toComponent(deckConfig.getString("preset.name").replace("%preset%", p)));
             
             List<String> lore = new ArrayList<>();
-            for (String l : deckConfig.getStringList("preset.item.lore")) {
+            for (String l : deckConfig.getStringList("preset.lore")) {
                 lore.add(l.replaceAll("%gpassive%", current.getJSONObject("gpassive").getString("selected")));
             }
             
@@ -66,9 +66,9 @@ public class PresetSelector implements MWInventory, Listener {
             if (deck.equals(playerJson.getString("Deck")) && p.equals(playerJson.getString("Preset"))) {
                 meta.addEnchant(Enchantment.DURABILITY, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                lore.add(deckConfig.getString("preset.item.loreselect"));
+                lore.add(deckConfig.getString("preset.loreselect"));
             } else {
-                lore.add(deckConfig.getString("preset.item.lorenotselect"));
+                lore.add(deckConfig.getString("preset.lorenotselect"));
             }
             
             meta.lore(ConfigUtils.toComponent(lore));
@@ -119,8 +119,7 @@ public class PresetSelector implements MWInventory, Listener {
 
     @Override
     public Inventory getInventory() {
-        // TODO Auto-generated method stub
-        return null;
+        return inv;
     }
 
 }
