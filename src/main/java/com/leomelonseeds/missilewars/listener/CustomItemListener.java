@@ -334,8 +334,17 @@ public class CustomItemListener implements Listener {
         if ((playerArena == null) || !event.getItemInHand().getType().toString().contains("LEAVES")) {
             return;
         }
-
-        playerArena.addLeaf(event.getBlockPlaced().getLocation(), player);
+        
+        Location loc = event.getBlockPlaced().getLocation();
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (loc.getBlock().getType().toString().contains("LEAVES")) {
+                    loc.getBlock().setType(Material.AIR);
+                }
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 30 * 20);
     }
 
     private void spawnCanopy(Player player, Arena playerArena, String utility) {

@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -21,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -90,8 +88,6 @@ public class Arena implements ConfigurationSerializable {
     private Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     private Map<UUID, String> playerVotes;
-    /** Leaves so we can remove them once in a while */
-    private Map<Location, Integer> leaves;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -291,10 +287,6 @@ public class Arena implements ConfigurationSerializable {
      */
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
-    }
-
-    public void addLeaf(Location location, Player player) {
-        leaves.put(location, 30);
     }
 
     /**
@@ -992,27 +984,6 @@ public class Arena implements ConfigurationSerializable {
             }.runTaskLater(plugin, i * 20));
         }
 
-        // Despawn leaves after a while
-        leaves = new HashMap<>();
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                Map<Location, Integer> temp = new HashMap<>(leaves);
-                for (Entry<Location, Integer> e : temp.entrySet()) {
-                    int i = e.getValue();
-                    Location loc = e.getKey();
-                    if (i <= 0) {
-                        if (loc.getBlock().getType().toString().contains("LEAVES")) {
-                            loc.getBlock().setType(Material.AIR);
-                        }
-                        leaves.remove(loc);
-                    } else {
-                        leaves.put(loc, i - 5);
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 100, 100));
-
         running = true;
         return true;
     }
@@ -1035,7 +1006,6 @@ public class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
         resetting = false;
-        leaves.clear();
         setupMapVotes();
     }
 
