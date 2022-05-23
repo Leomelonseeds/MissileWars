@@ -482,7 +482,8 @@ public class CustomItemListener implements Listener {
         // Ensure we are tracking a utility thrown by a player
         if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
               event.getEntity().getType() == EntityType.EGG ||
-              event.getEntity().getType() == EntityType.ENDER_PEARL)) {
+              event.getEntity().getType() == EntityType.ENDER_PEARL ||
+              event.getEntity().getType() == EntityType.SPLASH_POTION)) {
             return;
         }
 
@@ -584,11 +585,6 @@ public class CustomItemListener implements Listener {
         String customName = PlainTextComponentSerializer.plainText().serialize(event.getEntity().customName());
         if (!customName.contains("splash:")) {
             return;
-        }
-
-        // Extinguish entities
-        if (event.getHitEntity() != null) {
-            event.getHitEntity().setFireTicks(0);
         }
 
         Block hitBlock = event.getHitBlock();
