@@ -14,6 +14,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
+import com.leomelonseeds.missilewars.invs.PresetSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -358,6 +359,43 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "Bad arguments!");
                 return true;
             }
+        }
+        
+        if (action.equalsIgnoreCase("TestDeck")) {
+
+            Player player = (Player) sender;
+
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+
+            if (!(arena == null || arena.getTeam(player.getUniqueId()).equals("no team"))) {
+                sendErrorMsg(sender, "You cannot change decks while playing.");
+                return true;
+            }
+
+            if (args.length < 2) {
+                sendErrorMsg(sender, "Usage: /mw deck Vanguard/Berserker/Sentinel/Architect [Preset]");
+                return true;
+            }
+
+            String deck = StringUtils.capitalize(args[1].toLowerCase());
+
+            if (!plugin.getDeckManager().getDecks().contains(deck)) {
+                sendErrorMsg(sender, "Please specify a valid deck!");
+                return true;
+            }
+            
+            String preset = null;
+            if (args.length == 3) {
+                preset = args[2];
+                if (!plugin.getDeckManager().getPresets().contains(preset)) {
+                    sendErrorMsg(sender, "Please specify a valid preset!");
+                    return true;
+                }
+            }
+
+            new PresetSelector(player, deck);
+
+            return true;
         }
 
         return true;

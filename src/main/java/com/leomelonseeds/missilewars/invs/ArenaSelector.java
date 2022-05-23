@@ -64,6 +64,10 @@ public class ArenaSelector implements Listener, MWInventory {
             return;
         }
         
+        if (!event.getClickedInventory().equals(event.getView().getTopInventory())){
+            return; 
+        }
+        
         event.setCancelled(true);
         
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();

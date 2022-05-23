@@ -83,6 +83,10 @@ public class MapVoting implements Listener, MWInventory {
             return;
         }
         
+        if (!event.getClickedInventory().equals(event.getView().getTopInventory())){
+            return; 
+        }
+        
         event.setCancelled(true);
         
         Arena arena = getPlayerArena(player);

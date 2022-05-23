@@ -22,6 +22,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
@@ -290,6 +291,30 @@ public class ConfigUtils {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Get a line, translate it to a component.
+     * 
+     * @param line
+     * @return
+     */
+    public static Component toComponent(String line) {
+        return Component.text(ChatColor.translateAlternateColorCodes('&', line));
+    }
+    
+    /**
+     * Get lines to translate to components
+     * 
+     * @param line
+     * @return
+     */
+    public static List<Component> toComponent(List<String> lines) {
+        List<Component> result = new ArrayList<>();
+        for (String s : lines) {
+            result.add(toComponent(s));
+        }
+        return result;
     }
 
 }
