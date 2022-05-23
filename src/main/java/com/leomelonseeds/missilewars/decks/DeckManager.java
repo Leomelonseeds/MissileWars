@@ -141,7 +141,7 @@ public class DeckManager {
                 ItemMeta meta = pick.getItemMeta();
                 List<Component> loreLines = meta.lore();
                 List<Component> newLore = new ArrayList<>();
-                newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(json.getInt("Haste"))));
+                newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(json.getInt("haste"))));
                 for (Component c : loreLines) {
                     newLore.add(c);
                 }

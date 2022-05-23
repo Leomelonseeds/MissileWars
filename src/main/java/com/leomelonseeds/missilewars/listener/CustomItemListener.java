@@ -153,7 +153,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Clear haste if switching off from pickaxe
-        if (player.getInventory().getItem(event.getPreviousSlot()).getType() == Material.IRON_PICKAXE) {
+        ItemStack prev = player.getInventory().getItem(event.getPreviousSlot());
+        if (prev != null && prev.getType() == Material.IRON_PICKAXE) {
             if (player.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
                 player.removePotionEffect(PotionEffectType.FAST_DIGGING);
             }
@@ -161,7 +162,7 @@ public class CustomItemListener implements Listener {
         }
         
         ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        if (item.getType() != Material.IRON_PICKAXE) {
+        if (item == null || item.getType() != Material.IRON_PICKAXE) {
             return;
         }
         

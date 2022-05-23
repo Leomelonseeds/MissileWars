@@ -178,7 +178,7 @@ public class SchematicManager {
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Temp hotfix for structure rail rotation bug
-        if (redMissile && structureName.contains("thunderbolt")) {
+        if (redMissile && structureName.contains("cruiser_2")) {
             Location railLoc = spawnLoc.add(0, 1, -8);
             Block block = railLoc.getBlock();
             block.setType(Material.POWERED_RAIL);

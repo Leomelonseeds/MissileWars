@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -875,7 +876,11 @@ public class Arena implements ConfigurationSerializable {
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
 
         // Assign players to teams based on queue (which removes their items)
-        Set<MissileWarsPlayer> toAssign = new HashSet<>(players);
+        List<MissileWarsPlayer> toAssign = new ArrayList<>();
+        for (MissileWarsPlayer player : players) {
+            toAssign.add(player);
+        }
+        Collections.shuffle(toAssign);
         double maxSize = getCapacity() / 2;
         double maxQueue = Math.ceil((double) players.size() / 2);
 

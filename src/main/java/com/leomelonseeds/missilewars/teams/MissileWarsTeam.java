@@ -17,6 +17,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -256,6 +257,7 @@ public class MissileWarsTeam {
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
             player.resetPlayer();
+            mcPlayer.removePotionEffect(PotionEffectType.FAST_DIGGING);
         }
     }
 
