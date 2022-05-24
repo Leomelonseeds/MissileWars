@@ -6,9 +6,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,7 +17,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class ArenaSelector implements Listener, MWInventory {
+public class ArenaSelector implements MWInventory {
 
     private Inventory inv;
     private Player player;
@@ -32,8 +29,6 @@ public class ArenaSelector implements Listener, MWInventory {
         inv = Bukkit.createInventory(null, 27, Component.text(title));
         manager.registerInventory(player, this);
     }
-    
-    public ArenaSelector() {}
     
     // Create a list of all arenas from ArenaManager list
     @Override
@@ -53,25 +48,16 @@ public class ArenaSelector implements Listener, MWInventory {
             inv.addItem(arenaItem);
         }
     }
-    
+
     @Override
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        
-        // Check for arena selection
-        if (!(manager.getInventory(player) instanceof ArenaSelector)) {
-            return;
-        }
-        
-        if (!event.getClickedInventory().equals(event.getView().getTopInventory())){
-            return; 
-        }
-        
-        event.setCancelled(true);
-        
+    public Inventory getInventory() {
+        return inv;
+    }
+
+    @Override
+    public void registerClick(int slot) {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena selectedArena = manager.getArena(event.getSlot());
+        Arena selectedArena = manager.getArena(slot);
         if (selectedArena == null) {
             return;
         }
@@ -82,10 +68,5 @@ public class ArenaSelector implements Listener, MWInventory {
         } else {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
     }
 }

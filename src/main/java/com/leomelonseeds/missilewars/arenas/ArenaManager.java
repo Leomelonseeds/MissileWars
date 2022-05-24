@@ -471,8 +471,9 @@ public class ArenaManager {
             WorldGuard wg = WorldGuard.getInstance();
             RegionManager manager = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld));
             
-            GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("global");
+            GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("__global__");
             globalRegion.setFlag(Flags.CHEST_ACCESS, State.DENY);
+            globalRegion.setPriority(10);
             manager.addRegion(globalRegion);
             
             Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min", null, null);

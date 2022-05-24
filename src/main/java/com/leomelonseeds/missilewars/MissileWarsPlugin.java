@@ -15,10 +15,7 @@ import com.leomelonseeds.missilewars.commands.MissileWarsCommand;
 import com.leomelonseeds.missilewars.commands.SpectateCommand;
 import com.leomelonseeds.missilewars.commands.VoteMapCommand;
 import com.leomelonseeds.missilewars.decks.DeckManager;
-import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
-import com.leomelonseeds.missilewars.invs.MapVoting;
-import com.leomelonseeds.missilewars.invs.PresetSelector;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
@@ -68,7 +65,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         saveIfNotPresent("items.yml");
         saveIfNotPresent("maps.yml");
         saveIfNotPresent("ranks.yml");
-        saveIfNotPresent("decks.yml");
         saveIfNotPresent("default.json");
         log("Loaded all config files.");
 
@@ -82,9 +78,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
         Bukkit.getPluginManager().registerEvents(new WorldCreationListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArenaSelector(), this);
-        Bukkit.getPluginManager().registerEvents(new MapVoting(), this);
-        Bukkit.getPluginManager().registerEvents(new PresetSelector(), this);
         log("Commands and events loaded.");
 
         // Load decks

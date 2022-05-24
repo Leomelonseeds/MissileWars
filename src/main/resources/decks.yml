@@ -1,35 +1,37 @@
-locked: RED_STAINED_GLASS_PANE
-unlocked: ORANGE_STAINED_GLASS_PANE
-selected: GREEN_STAINED_GLASS_PANE
+intangibles:
+  locked: RED_STAINED_GLASS_PANE
+  unlocked: ORANGE_STAINED_GLASS_PANE
+  selected: GREEN_STAINED_GLASS_PANE
 
 title:
   preset: "%deck% - Preset Selection"
   deck: "%deck% - Editing Preset %preset%"
 
-missiles:
-  item: TNT
-  name: "&c&lMissiles"
-  slot: 0
-utility:
-  item: REDSTONE_REPEATER
-  name: "&9&lUtility"
-  slot: 9
-gear:
-  item: ENCHANTED_BOOK
-  name: "&6&lGear Enchantments"
-  slot: 18
-gpassive:
-  item: LIGHT_GRAY_DYE
-  name: "&7&lGlobal Passive"
-  slot: 27
-ability:
-  item: YELLOW_DYE
-  name: "&e&lAbility &d(Coming Soon)"
-  slot: 36
-passive:
-  item: LIGHT_BLUE_DYE
-  name: "&b&lPassive &d(Coming Soon)"
-  slot: 45
+indicators:
+  missiles:
+    item: TNT
+    name: "&c&lMissiles"
+    slot: 0
+  utility:
+    item: REDSTONE_REPEATER
+    name: "&9&lUtility"
+    slot: 9
+  gear:
+    item: ENCHANTED_BOOK
+    name: "&6&lGear Enchantments"
+    slot: 18
+  gpassive:
+    item: LIGHT_GRAY_DYE
+    name: "&7&lGlobal Passive"
+    slot: 27
+  ability:
+    item: YELLOW_DYE
+    name: "&e&lAbility &d(Coming Soon)"
+    slot: 36
+  passive:
+    item: LIGHT_BLUE_DYE
+    name: "&b&lPassive &d(Coming Soon)"
+    slot: 45
   
 text:
   locked: "&cLeft-click &7to purchase"

@@ -284,6 +284,7 @@ public class ConfigUtils {
      */
     public static Object getItemValue(String item, int level, String get) {
         FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
+        
         if (itemsConfig.contains(item + "." + level + "." + get)) {
             return itemsConfig.get(item + "." + level + "." + get);
         } else if (itemsConfig.contains(item + "." + get)) {

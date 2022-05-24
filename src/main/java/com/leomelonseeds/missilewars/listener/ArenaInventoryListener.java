@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,6 +23,26 @@ import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
+    
+    /** Handle clicking of custom GUIs */
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
+        
+        if (!(manager.getInventory(player) instanceof MWInventory)) {
+            return;
+        }
+        
+        Inventory inv = event.getClickedInventory();
+        if (inv == null || !inv.equals(event.getView().getTopInventory())){
+            return; 
+        }
+        
+        event.setCancelled(true);
+
+        manager.getInventory(player).registerClick(event.getSlot());
+    }
     
     /** Unregister custom mwinventories when they are closed. */
     @EventHandler

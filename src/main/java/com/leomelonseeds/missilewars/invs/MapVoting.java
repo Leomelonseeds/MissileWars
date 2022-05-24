@@ -7,9 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,7 +20,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public class MapVoting implements Listener, MWInventory {
+public class MapVoting implements MWInventory {
     
     private Inventory inv;
     private Player player;
@@ -48,9 +45,6 @@ public class MapVoting implements Listener, MWInventory {
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 20, 20);
     }
     
-    // Blank constructor to register events
-    public MapVoting() {}
-    
     // Register all maps and their votes to items
     @Override
     public void updateInventory() {
@@ -74,33 +68,6 @@ public class MapVoting implements Listener, MWInventory {
         }
     }
     
-    @Override
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        
-        if (!(manager.getInventory(player) instanceof MapVoting)) {
-            return;
-        }
-        
-        if (!event.getClickedInventory().equals(event.getView().getTopInventory())){
-            return; 
-        }
-        
-        event.setCancelled(true);
-        
-        Arena arena = getPlayerArena(player);
-        
-        ItemStack clicked = event.getCurrentItem();
-        if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
-            return;
-        }
-        String map = PlainTextComponentSerializer.plainText().serialize(clicked.getItemMeta().displayName());
-        String mapVotedFor = arena.registerVote(player.getUniqueId(), map);
-        player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
-        manager.getInventory(player).updateInventory();
-    }
-    
     private Arena getPlayerArena(Player player) {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         return manager.getArena(player.getUniqueId());
@@ -109,5 +76,19 @@ public class MapVoting implements Listener, MWInventory {
     @Override
     public Inventory getInventory() {
         return inv;
+    }
+
+    @Override
+    public void registerClick(int slot) {
+        Arena arena = getPlayerArena(player);
+        
+        ItemStack clicked = inv.getItem(slot);
+        if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
+            return;
+        }
+        String map = PlainTextComponentSerializer.plainText().serialize(clicked.getItemMeta().displayName());
+        String mapVotedFor = arena.registerVote(player.getUniqueId(), map);
+        player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
+        manager.getInventory(player).updateInventory();
     }
 }

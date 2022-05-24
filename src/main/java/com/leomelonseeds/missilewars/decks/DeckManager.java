@@ -38,7 +38,6 @@ public class DeckManager {
     private final List<String> decks;
     
     FileConfiguration itemsConfig;
-    FileConfiguration deckConfig;
 
     /** Set up the DeckManager with loaded decks. */
     public DeckManager(MissileWarsPlugin plugin) {
@@ -48,7 +47,6 @@ public class DeckManager {
         decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
         
         itemsConfig = ConfigUtils.getConfigFile("items.yml");
-        deckConfig = ConfigUtils.getConfigFile("decks.yml");
     }
     
     
@@ -79,13 +77,13 @@ public class DeckManager {
         
         // Create missiles
         for (String key : JSONObject.getNames(json.getJSONObject("missiles"))) {
-            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
+            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true, false);
             missiles.add(m);
         }
         
         // Create utility
         for (String key : JSONObject.getNames(json.getJSONObject("utility"))) {
-            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
+            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false, false);
             utility.add(u);
         }
         
@@ -93,7 +91,7 @@ public class DeckManager {
         switch (deck) {
         case "Vanguard": 
         {
-            ItemStack sword = createItem("vanguard_sword", 0, false);
+            ItemStack sword = createItem("vanguard_sword", 0, false, false);
             addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2 - 1);
             addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
             gear.add(sword);
@@ -105,7 +103,7 @@ public class DeckManager {
         }
         case "Berserker":
         {
-            ItemStack crossbow = createItem("berserker_crossbow", 0, false);
+            ItemStack crossbow = createItem("berserker_crossbow", 0, false, false);
             addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") == 0 ? 0 : json.getInt("sharpness") * 2 + 3);
             addEnch(crossbow, Enchantment.MULTISHOT, json.getInt("multishot"));
             addEnch(crossbow, Enchantment.QUICK_CHARGE, json.getInt("quickcharge"));
@@ -118,7 +116,7 @@ public class DeckManager {
         }
         case "Sentinel":
         {
-            ItemStack bow = createItem("sentinel_bow", 0, false);
+            ItemStack bow = createItem("sentinel_bow", 0, false, false);
             addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
             addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
             addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
@@ -132,7 +130,7 @@ public class DeckManager {
         }
         case "Architect":
         {
-            ItemStack pick = createItem("architect_pickaxe", 0, false);
+            ItemStack pick = createItem("architect_pickaxe", 0, false, false);
             addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharpness"));
             addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
             // Add custom haste effect
@@ -239,30 +237,39 @@ public class DeckManager {
      * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile) {
+    public ItemStack createItem(String name, int level, Boolean missile, Boolean isGUI) {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
-        if (ConfigUtils.getItemValue(name, level, "amount") != null) {
-            item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
+        if (!isGUI) {
+            if (ConfigUtils.getItemValue(name, level, "amount") != null) {
+                item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
+            }
+            // Don't bother with arrows
+            if (name.equals("arrows")) {
+                return item;
+            }
+        } else {
+            // Make item count reflect its level
+            item.setAmount(Math.max(level, 1));
         }
-        // Don't bother with arrows
-        if (name.equals("arrows")) {
-            return item;
-        }
+        
         // Find item name and lore
         ItemMeta itemMeta = item.getItemMeta();
-        String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
-        displayName = ChatColor.translateAlternateColorCodes('&', displayName.replace("%level%", roman(level)));
-        itemMeta.displayName(Component.text(displayName));
-        
-        @SuppressWarnings("unchecked")
-        List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
-        setPlaceholders(lore, name, level, false, missile);
-        List<Component> finalLore = new ArrayList<>();
-        for (String s : lore) {
-            finalLore.add(Component.text(s));
+        if (ConfigUtils.getItemValue(name, level, "name") != null) {
+            String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
+            itemMeta.displayName(ConfigUtils.toComponent(displayName.replace("%level%", roman(level))));
         }
-        itemMeta.lore(finalLore);
+        
+        if (ConfigUtils.getItemValue(name, level, "lore") != null) {
+            @SuppressWarnings("unchecked")
+            List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
+            setPlaceholders(lore, name, level, isGUI, missile);
+            List<Component> finalLore = new ArrayList<>();
+            for (String s : lore) {
+                finalLore.add(Component.text(s));
+            }
+            itemMeta.lore(finalLore);
+        }
         
         // Determine structure/utility
         String id = "item-structure";
@@ -301,7 +308,7 @@ public class DeckManager {
     public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext, Boolean missile) {
         // Add missile stats for missiles
         if (missile) {
-            List<String> stats = itemsConfig.getStringList("missilestats");
+            List<String> stats = itemsConfig.getStringList("text.missilestats");
             lines.addAll(stats);
         }
         // Compile lore into single line
@@ -324,10 +331,10 @@ public class DeckManager {
                 }
                 String get = m.replaceAll("%", "");
                 String got1 = ConfigUtils.getItemValue(name, level, get) + "";
-                String value = deckConfig.getString("text.level").replace("%1%", got1);
+                String value = itemsConfig.getString("text.level").replace("%1%", got1);
                 if (showNext && level < getMaxLevel(name)) {
                     String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
-                    value = value + deckConfig.getString("text.nextlevel").replace("%2%", got2);
+                    value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
                 }
                 l = l.replaceAll(m, value);
             }
