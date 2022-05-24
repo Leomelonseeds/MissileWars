@@ -45,7 +45,7 @@ public class DeckCustomizer implements MWInventory {
             ItemStack item = deckManager.createItem("indicators." + key, 0, false, true);
             if (key.equals("skillpoints")) {
                 ItemMeta meta = item.getItemMeta();
-                String name = ConfigUtils.toPlain(item.displayName());
+                String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
                 meta.displayName(ConfigUtils.toComponent(name.replace("%sp%", json.getInt("skillpoints") + "")));
                 item.setItemMeta(meta);
             }

@@ -962,6 +962,8 @@ architect_pickaxe:
   - "&7Never touch asbestos, even with a pickaxe."
 
 # Stuff relating to Deck GUI
+default-skillpoints: 20
+
 intangibles:
   locked: RED_STAINED_GLASS_PANE
   unlocked: ORANGE_STAINED_GLASS_PANE
@@ -1015,17 +1017,21 @@ indicators:
   skillpoints:
     item: EMERALD
     name: "&aRemaining Skillpoints: &f%sp%"
+    lore:
+    - ""
+    - "&7Click to downgrade all items"
+    - "&7and return all skillpoints. This"
+    - "&7also allows you to claim any extra"
+    - "&7skillpoints earned from MW ranks."
     slot: 17
   reset:
     item: BARRIER
     name: "&cReset Preset"
     lore:
     - ""
-    - "&7Click to reset this preset. All"
-    - "&7previously unlocked passives/abilities"
-    - "&7will remain unlocked. You can also use"
-    - "&7this to retrieve extra skillpoints earned"
-    - "&7from MW ranks."
+    - "&7Click to reset this preset to a default"
+    - "&7configuration. All previously unlocked"
+    - "&7passives/abilities will remain unlocked."
     slot: 26
   back:
     item: RED_STAINED_GLASS_PANE
