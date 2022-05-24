@@ -935,6 +935,13 @@ vanguard_sword:
   - "&7Many weapons double as tools. Axes chop wood,"
   - "&7hammers shape metal, and daggers dice onions."
   - "&7Not swords. Swords are meant to &okill."
+  sharpness:
+    1: 1
+    2: 3
+    3: 5
+  fire_aspect:
+    1: 1
+    2: 2
 sentinel_bow:
   item: BOW
   name: "&b⚔ Bow ✟"
@@ -943,6 +950,16 @@ sentinel_bow:
   - "&7Could this be the legendary Gunblade?"
   - "&7No. It's a bayonet. But our marketing team"
   - "&7did a great job selling them as gunblades."
+  power:
+    1: 1
+  punch:
+    1: 1
+  sharpness:
+    1: 2
+    2: 4
+    3: 6
+  flame:
+    1: 1
 berserker_crossbow:
   item: CROSSBOW
   name: "&3⚔ Crossbow &l☣"
@@ -951,6 +968,16 @@ berserker_crossbow:
   - "&7Before guns were invented, the coolest people"
   - "&7strapped bows sideways onto stick-and-trigger"
   - "&7assemblies. Then they unified the Qin dynasty."
+  multishot:
+    1: 1
+  quick_charge:
+    1: 1
+    2: 2
+    3: 3
+  sharpness:
+    1: 5
+    2: 7
+    3: 9
 architect_pickaxe:
   item: IRON_PICKAXE
   name: "&f⚔ Iron Claw ⚒"
@@ -960,6 +987,18 @@ architect_pickaxe:
   - "&7this non-australium tool can safely harvest"
   - "&7a wide variety of blocks. Not asbestos, though."
   - "&7Never touch asbestos, even with a pickaxe."
+  sharpness:
+    1: 1
+    2: 2
+    3: 3
+  efficiency:
+    1: 1
+    2: 2
+    3: 3
+  haste:
+    1: 1
+    2: 2
+   
 
 # Stuff relating to Deck GUI
 default-skillpoints: 20
@@ -1039,7 +1078,7 @@ indicators:
     slot: 53
   
 text:
-  locked: "&cLeft-click &7to purchase"
+  locked: "&cLeft-click &7to purchase &c(-%cost% Mokens)"
   upgradable: "&cLeft-click &7to upgrade &c(-%cost%sp)"
   downgradable: "&cRight-click &7to downgrade &a(+%cost%sp)"
   level: "&f%1%"
@@ -1063,11 +1102,42 @@ preset:
   
 global:
   missilespec:
-    slot: 38
-    name: "&cMissile Specialist %level%"
+    name: "&5Missile Specialist %level%"
     lore:
     - ""
     - "&7Your chance of recieving a missile increases"
     - "&7and your chance of recieving a utility decreases"
-    - "&7by %percentage%&a%&7. At level 3, you will always"
+    - "&7by %percentage%%&7. At level 3, you will always"
     - "&7recieve a missile when the game starts."
+    1:
+      percentage: 6
+    2:
+      percentage: 12.5
+    3: 
+      percentage: 19
+  utilityspec:
+    name: "&5Utility Specialist %level%"
+    lore:
+    - ""
+    - "&7Your chance of recieving a missile decreases"
+    - "&7and your chance of recieving a utility increases"
+    - "&7by %percentage%%&7. At level 3, you will always"
+    - "&7recieve a utility when the game starts."    
+    1:
+      percentage: 6
+    2:
+      percentage: 12.5
+    3: 
+      percentage: 19
+  hoarder:
+    name: "&5Hoarder %level%"
+    lore:
+    - ""
+    - "&7Your inventory limit is increased from"
+    - "&76 items to %limit%"
+    1:
+      limit: 7
+    2:
+      limit: 8
+    3
+      limit: 9
