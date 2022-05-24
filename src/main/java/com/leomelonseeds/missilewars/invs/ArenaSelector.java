@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -55,7 +56,7 @@ public class ArenaSelector implements MWInventory {
     }
 
     @Override
-    public void registerClick(int slot) {
+    public void registerClick(int slot, ClickType type) {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena selectedArena = manager.getArena(slot);
         if (selectedArena == null) {

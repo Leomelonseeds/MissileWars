@@ -271,9 +271,11 @@ public class DeckManager {
             itemMeta.lore(finalLore);
         }
         
-        // Determine structure/utility
+        // Inject NBT data
         String id = "item-structure";
-        if (ConfigUtils.getItemValue(name, level, "file") == null) {
+        if (isGUI) {
+            id = "item-gui";
+        } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             id = "item-utility";
         }
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),

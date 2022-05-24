@@ -977,7 +977,7 @@ indicators:
     name: "&c&lMissiles"
     slot: 0
   utility:
-    item: REDSTONE_REPEATER
+    item: REPEATER
     name: "&9&lUtility"
     slot: 9
   gear:
@@ -985,8 +985,8 @@ indicators:
     name: "&6&lGear Enchantments"
     slot: 18
   gpassive:
-    item: LIGHT_GRAY_DYE
-    name: "&7&lGlobal Passive"
+    item: PURPLE_DYE
+    name: "&5&lGlobal Passive"
     slot: 27
   ability:
     item: YELLOW_DYE
@@ -996,6 +996,41 @@ indicators:
     item: LIGHT_BLUE_DYE
     name: "&b&lPassive &d(Coming Soon)"
     slot: 45
+  info:
+    item: COMPASS
+    name: "&fMenu Information"
+    lore:
+    - ""
+    - "&7Use this menu to customize your deck."
+    - "&7After unlocking an ability/passive,"
+    - "&7purchase and upgrade it using"
+    - "&aSkillpoints&7. Check the item below"
+    - "&7for your remaining skillpoints."
+    - "&7You get one extra skillpoint per MW rank."
+    - ""
+    - "&cNote: If this is your first time opening"
+    - "&cthis menu, it is recommended that you"
+    - "&cclick 'Reset Preset' before continuing."
+    slot: 8
+  skillpoints:
+    item: EMERALD
+    name: "&aRemaining Skillpoints: &f%sp%"
+    slot: 17
+  reset:
+    item: BARRIER
+    name: "&cReset Preset"
+    lore:
+    - ""
+    - "&7Click to reset this preset. All"
+    - "&7previously unlocked passives/abilities"
+    - "&7will remain unlocked. You can also use"
+    - "&7this to retrieve extra skillpoints earned"
+    - "&7from MW ranks."
+    slot: 26
+  back:
+    item: RED_STAINED_GLASS_PANE
+    name: "&cBack"
+    slot: 53
   
 text:
   locked: "&cLeft-click &7to purchase"

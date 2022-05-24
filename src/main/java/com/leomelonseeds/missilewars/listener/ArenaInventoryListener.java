@@ -41,7 +41,7 @@ public class ArenaInventoryListener implements Listener {
         
         event.setCancelled(true);
 
-        manager.getInventory(player).registerClick(event.getSlot());
+        manager.getInventory(player).registerClick(event.getSlot(), event.getClick());
     }
     
     /** Unregister custom mwinventories when they are closed. */

@@ -9,6 +9,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -101,23 +102,34 @@ public class PresetSelector implements MWInventory {
     }
 
     @Override
-    public void registerClick(int slot) {
+    public void registerClick(int slot, ClickType type) {
         ItemStack item = inv.getItem(slot);
         
         if (item == null) {
             return;
         }
         
+        // Back button
         if (slot == 31) {
             String command = "bossshop open decks " + player.getName();
             Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
             return;
         }
         
+        // Clicking on a preset type
         if (item.getType() == Material.getMaterial(itemConfig.getString("preset.item"))) {
             String p = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING);
-            new DeckCustomizer(player, deck, p);
+            if (type == ClickType.RIGHT) {
+                // Open deck customizer
+                new DeckCustomizer(player, deck, p);
+            } else if (type == ClickType.LEFT) {
+                // Choose preset
+                playerJson.put("Deck", deck);
+                playerJson.put("Preset", p);
+                MissileWarsPlugin.getPlugin().getJSON().setPlayer(player.getUniqueId(), playerJson);
+                updateInventory();
+            }
         }
     }
 

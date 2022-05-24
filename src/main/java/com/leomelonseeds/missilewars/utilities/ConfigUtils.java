@@ -23,6 +23,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
@@ -318,4 +319,13 @@ public class ConfigUtils {
         return result;
     }
 
+    /**
+     * Component to plain text!
+     * 
+     * @param component
+     * @return
+     */
+    public static String toPlain(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
+    }
 }

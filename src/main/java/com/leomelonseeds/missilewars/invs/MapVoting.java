@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,7 +19,6 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class MapVoting implements MWInventory {
     
@@ -79,14 +79,14 @@ public class MapVoting implements MWInventory {
     }
 
     @Override
-    public void registerClick(int slot) {
+    public void registerClick(int slot, ClickType type) {
         Arena arena = getPlayerArena(player);
         
         ItemStack clicked = inv.getItem(slot);
         if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
             return;
         }
-        String map = PlainTextComponentSerializer.plainText().serialize(clicked.getItemMeta().displayName());
+        String map = ConfigUtils.toPlain(clicked.getItemMeta().displayName());
         String mapVotedFor = arena.registerVote(player.getUniqueId(), map);
         player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
         manager.getInventory(player).updateInventory();
