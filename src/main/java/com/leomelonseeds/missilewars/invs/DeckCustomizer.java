@@ -67,7 +67,11 @@ public class DeckCustomizer implements MWInventory {
     public void registerClick(int slot, ClickType type) {
         // Back button
         if (slot == 53) {
-            new PresetSelector(player, deck);
+            new ConfirmAction("Back", player, this, (confirm) -> {
+                if (confirm) {
+                    new PresetSelector(player, deck);
+                }
+            });
             return;
         }
     }
