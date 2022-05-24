@@ -61,17 +61,35 @@ public class DeckCustomizer implements MWInventory {
         for (int i : new int[]{35, 44}) {
             inv.setItem(i, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         }
+        
+        // Missile items
+        int index = itemConfig.getInt("indicators.missiles.slot") + 2;
+        for (String missile : JSONObject.getNames(json.getJSONObject("missiles"))) {
+            ItemStack item = deckManager.createItem(missile, json.getJSONObject("missiles").getInt(missile), true, true);
+            inv.setItem(index, item);
+            index++;
+        }
+        
+        // Utility items
+        index = itemConfig.getInt("indicators.utility.slot") + 2;
+        for (String utility : JSONObject.getNames(json.getJSONObject("utility"))) {
+            ItemStack item = deckManager.createItem(utility, json.getJSONObject("utility").getInt(utility), false, true);
+            inv.setItem(index, item);
+            index++;
+        }
     }
 
     @Override
     public void registerClick(int slot, ClickType type) {
+        /* AIN'T NO WAY THIS WORKED AHAHAHAHAH
+        new ConfirmAction("Back", player, this, (confirm) -> {
+            if (confirm) {
+                player.sendMessage("Just a test");
+            }
+        });*/
         // Back button
         if (slot == 53) {
-            new ConfirmAction("Back", player, this, (confirm) -> {
-                if (confirm) {
-                    player.sendMessage("Just a test");
-                }
-            });
+            new PresetSelector(player, deck);
             return;
         }
     }

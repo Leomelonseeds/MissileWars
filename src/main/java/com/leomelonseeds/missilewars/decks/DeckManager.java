@@ -200,7 +200,7 @@ public class DeckManager {
             item.setItemMeta(meta);
             return;
         }
-        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft("ench"));
+        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(ench));
         item.addUnsafeEnchantment(enchant, lvl);
     }
     

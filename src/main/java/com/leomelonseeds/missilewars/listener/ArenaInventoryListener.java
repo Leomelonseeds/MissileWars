@@ -1,7 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -121,15 +121,46 @@ public class ArenaInventoryListener implements Listener {
         
         Deck deck = mwPlayer.getDeck();
         
+        if (deck == null) {
+            return;
+        }
+       
+
+        // Cancel event if player cannot pick up item based on their given deck
+        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer())) {
+            event.setCancelled(true);
+            return;
+        }
+        
         // Stop decks without bows to pick up arrows
         if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
-            if (event.getItem().getType() == EntityType.ARROW) {
+            if (event.getItem().getItemStack().getType() == Material.ARROW) {
                 event.setCancelled(true);
             }
         }
-
-        // Cancel event if player cannot pick up item based on their given deck
-        if (mwPlayer.getDeck() != null && !mwPlayer.getDeck().hasInventorySpace(mwPlayer.getMCPlayer())) {
+    }
+    
+    /** Manage arrow pickups. */
+    @SuppressWarnings("deprecation")
+    @EventHandler
+    public void onArrowPickup(PlayerPickupArrowEvent event) {
+        // Check if player is in Arena
+        Player player = event.getPlayer();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        
+        Deck deck = mwPlayer.getDeck();
+        
+        if (deck == null) {
+            return;
+        }
+        
+        // Stop decks without bows to pick up arrows
+        if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
             event.setCancelled(true);
         }
     }
