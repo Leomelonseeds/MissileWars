@@ -69,7 +69,7 @@ public class DeckCustomizer implements MWInventory {
         if (slot == 53) {
             new ConfirmAction("Back", player, this, (confirm) -> {
                 if (confirm) {
-                    new PresetSelector(player, deck);
+                    player.sendMessage("Just a test");
                 }
             });
             return;

@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.listener;
 
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -116,6 +118,15 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        
+        Deck deck = mwPlayer.getDeck();
+        
+        // Stop decks without bows to pick up arrows
+        if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
+            if (event.getItem().getType() == EntityType.ARROW) {
+                event.setCancelled(true);
+            }
+        }
 
         // Cancel event if player cannot pick up item based on their given deck
         if (mwPlayer.getDeck() != null && !mwPlayer.getDeck().hasInventorySpace(mwPlayer.getMCPlayer())) {
