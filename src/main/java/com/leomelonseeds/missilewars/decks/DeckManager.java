@@ -91,63 +91,56 @@ public class DeckManager {
         switch (deck) {
         case "Vanguard": 
         {
-            ItemStack sword = createItem("vanguard_sword", 0, false, false);
-            addEnch(sword, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2 - 1);
-            addEnch(sword, Enchantment.FIRE_ASPECT, json.getInt("fireaspect"));
+            String name = "vanguard_sword";
+            ItemStack sword = createItem(name, 0, false, false);
+            addEnch(sword, "sharpness", name, json);
+            addEnch(sword, "fire_aspect", name, json);
             gear.add(sword);
             ItemStack boots = new ItemStack(Material.GOLDEN_BOOTS);
-            addEnch(boots, Enchantment.PROTECTION_FALL, json.getInt("featherfalling"));
+            addEnch(boots, "feather_falling", name, json);
             gear.add(boots);
             
             break;
         }
         case "Berserker":
         {
-            ItemStack crossbow = createItem("berserker_crossbow", 0, false, false);
-            addEnch(crossbow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") == 0 ? 0 : json.getInt("sharpness") * 2 + 3);
-            addEnch(crossbow, Enchantment.MULTISHOT, json.getInt("multishot"));
-            addEnch(crossbow, Enchantment.QUICK_CHARGE, json.getInt("quickcharge"));
+            String name = "berserker_crossbow";
+            ItemStack crossbow = createItem(name, 0, false, false);
+            addEnch(crossbow, "sharpness", name, json);
+            addEnch(crossbow, "multishot", name, json);
+            addEnch(crossbow, "quick_charge", name, json);
             gear.add(crossbow);
             ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
-            addEnch(boots, Enchantment.PROTECTION_EXPLOSIONS, json.getInt("blastprot") * 3);
+            addEnch(boots, "blast_protection", name, json);
             gear.add(boots);
             
             break;
         }
         case "Sentinel":
         {
-            ItemStack bow = createItem("sentinel_bow", 0, false, false);
-            addEnch(bow, Enchantment.DAMAGE_ALL, json.getInt("sharpness") * 2);
-            addEnch(bow, Enchantment.ARROW_FIRE, json.getInt("flame"));
-            addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("punch"));
-            addEnch(bow, Enchantment.ARROW_KNOCKBACK, json.getInt("power"));
+            String name = "sentinel_bow";
+            ItemStack bow = createItem(name, 0, false, false);
+            addEnch(bow, "sharpness", name, json);
+            addEnch(bow, "flame", name, json);
+            addEnch(bow, "punch", name, json);
+            addEnch(bow, "power", name, json);
             gear.add(bow);
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
-            addEnch(boots, Enchantment.PROTECTION_FIRE, json.getInt("fireprot") * 2);
+            addEnch(boots, "fire_protection", name, json);
             gear.add(boots);
             
             break;
         }
         case "Architect":
         {
-            ItemStack pick = createItem("architect_pickaxe", 0, false, false);
-            addEnch(pick, Enchantment.DAMAGE_ALL, json.getInt("sharpness"));
-            addEnch(pick, Enchantment.DIG_SPEED, json.getInt("efficiency"));
-            // Add custom haste effect
-            if (json.getInt("haste") > 0) {
-                ItemMeta meta = pick.getItemMeta();
-                List<Component> loreLines = meta.lore();
-                List<Component> newLore = new ArrayList<>();
-                newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(json.getInt("haste"))));
-                for (Component c : loreLines) {
-                    newLore.add(c);
-                }
-                meta.lore(newLore);
-                pick.setItemMeta(meta);
-            }
+            String name = "architect_pickaxe";
+            ItemStack pick = createItem(name, 0, false, false);
+            addEnch(pick, "sharpness", name, json);
+            addEnch(pick, "efficiency", name, json);
+            addEnch(pick, "haste", name, json);
             gear.add(pick);
             ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
-            addEnch(boots, Enchantment.PROTECTION_PROJECTILE, json.getInt("projprot") * 2);
+            addEnch(boots, "projectile_protection", name, json);
             gear.add(boots);
             
             break;
@@ -189,11 +182,26 @@ public class DeckManager {
      * @param ench
      * @param lvl
      */
-    private void addEnch(ItemStack item, Enchantment ench, int lvl) {
+    private void addEnch(ItemStack item, String ench, String itemname, JSONObject json) {
+        int lvl = itemsConfig.getInt(itemname + ".enchants." + ench + "." + json.getInt(ench));
         if (lvl <= 0) {
             return;
         }
-        item.addUnsafeEnchantment(ench, lvl);
+        // Add custom haste effect
+        if (ench.equals("haste")) {
+            ItemMeta meta = item.getItemMeta();
+            List<Component> loreLines = meta.lore();
+            List<Component> newLore = new ArrayList<>();
+            newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(lvl)));
+            for (Component c : loreLines) {
+                newLore.add(c);
+            }
+            meta.lore(newLore);
+            item.setItemMeta(meta);
+            return;
+        }
+        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft("ench"));
+        item.addUnsafeEnchantment(enchant, lvl);
     }
     
     /**

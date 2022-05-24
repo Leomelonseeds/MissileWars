@@ -5,17 +5,17 @@
 	"utilityspec": false,
 	"hoarder": false,
 	"Vanguard": {
-		"featherfalling": false,
-		"fireaspect": false,
+		"feather_falling": false,
+		"fire_aspect": false,
 		"doublejump": false,
 		"hurl": false,
 		"bhop": false,
 		"adrenaline": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"featherfalling": 1,
+			"feather_falling": 1,
 			"sharpness": 2,
-			"fireaspect": 0,
+			"fire_aspect": 0,
 			"utility": {
 				"canopy": 2,
 				"splash": 1,
@@ -43,7 +43,7 @@
 		}
 	},
 	"Sentinel": {
-		"fireprot": false,
+		"fire_protection": false,
 		"punch": false,
 		"power": false,
 		"sharpness": false,
@@ -53,7 +53,7 @@
 		"priest": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"fireprot": 1,
+			"fire_protection": 1,
 			"punch": 1,
 			"power": 0,
 			"flame": 1,
@@ -85,9 +85,9 @@
 		}
 	},
 	"Berserker": {
-		"blastprot": false,
+		"blast_protection": false,
 		"multishot": false,
-		"quickcharge": false,
+		"quick_charge": false,
 		"launcher": false,
 		"slam": false,
 		"resolve": false,
@@ -95,9 +95,9 @@
 		"booster": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"blastprot": 1,
+			"blast_protection": 1,
 			"multishot": 1,
-			"quickcharge": 2,
+			"quick_charge": 2,
 			"sharpness": 2,
 			"utility": {
 				"creeper": 1,
@@ -128,7 +128,7 @@
 	"Architect": {
 		"haste": false,
 		"efficiency": false,
-		"projprot": false,
+		"projectile_protection": false,
 		"utilitymaster": false,
 		"missilemaster": false,
 		"sidemonger": false,
@@ -136,7 +136,7 @@
 		"lazybuilder": false,
 		"defaultpreset": {
 			"skillpoints": 18,
-			"projprot": 1,
+			"projectile_protection": 1,
 			"sharpness": 1,
 			"efficiency": 1,
 			"haste": 0,
