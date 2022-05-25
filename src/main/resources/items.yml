@@ -35,6 +35,7 @@ lightning:
       z: 4
     speed: 3.3
     tnt: 18
+    cost: 
       
 
 cruiser:
@@ -1099,7 +1100,7 @@ text:
   downgradable: "&cRight-click &7to downgrade &a(+%cost%sp)"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
-  actuallevel: " &8%current%/%max%"
+  actuallevel: " &7- &8%current%/%max%"
   missilestats:
   - ""
   - "&aSpeed: %speed%m/s"
@@ -1125,6 +1126,7 @@ global:
     - "&7and your chance of recieving a utility decreases"
     - "&7by %percentage%%&7. At level 3, you will always"
     - "&7recieve a missile when the game starts."
+    cost: 2000
     1:
       percentage: 6
     2:
@@ -1138,7 +1140,8 @@ global:
     - "&7Your chance of recieving a missile decreases"
     - "&7and your chance of recieving a utility increases"
     - "&7by %percentage%%&7. At level 3, you will always"
-    - "&7recieve a utility when the game starts."    
+    - "&7recieve a utility when the game starts." 
+    cost: 1200   
     1:
       percentage: 6
     2:
@@ -1151,6 +1154,7 @@ global:
     - ""
     - "&7Your inventory limit is increased from"
     - "&76 items to %limit%"
+    cost: 1600
     1:
       limit: 7
     2:

@@ -353,7 +353,7 @@ public class MissileWarsCommand implements CommandExecutor {
             try {
                 Player player = Bukkit.getPlayer(args[1]);
                 int level = Integer.parseInt(args[3]);
-                ItemStack item = plugin.getDeckManager().createItem(args[2], level, false, false);
+                ItemStack item = plugin.getDeckManager().createItem(args[2], level, false);
                 player.getInventory().addItem(item);
             } catch (Exception e) {
                 sendErrorMsg(sender, "Bad arguments!");

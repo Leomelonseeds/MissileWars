@@ -77,13 +77,13 @@ public class DeckManager {
         
         // Create missiles
         for (String key : JSONObject.getNames(json.getJSONObject("missiles"))) {
-            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true, false);
+            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
             missiles.add(m);
         }
         
         // Create utility
         for (String key : JSONObject.getNames(json.getJSONObject("utility"))) {
-            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false, false);
+            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
             utility.add(u);
         }
         
@@ -92,7 +92,7 @@ public class DeckManager {
         case "Vanguard": 
         {
             String name = "vanguard_sword";
-            ItemStack sword = createItem(name, 0, false, false);
+            ItemStack sword = createItem(name, 0, false);
             addEnch(sword, "sharpness", name, json);
             addEnch(sword, "fire_aspect", name, json);
             gear.add(sword);
@@ -105,7 +105,7 @@ public class DeckManager {
         case "Berserker":
         {
             String name = "berserker_crossbow";
-            ItemStack crossbow = createItem(name, 0, false, false);
+            ItemStack crossbow = createItem(name, 0, false);
             addEnch(crossbow, "sharpness", name, json);
             addEnch(crossbow, "multishot", name, json);
             addEnch(crossbow, "quick_charge", name, json);
@@ -119,7 +119,7 @@ public class DeckManager {
         case "Sentinel":
         {
             String name = "sentinel_bow";
-            ItemStack bow = createItem(name, 0, false, false);
+            ItemStack bow = createItem(name, 0, false);
             addEnch(bow, "sharpness", name, json);
             addEnch(bow, "flame", name, json);
             addEnch(bow, "punch", name, json);
@@ -134,7 +134,7 @@ public class DeckManager {
         case "Architect":
         {
             String name = "architect_pickaxe";
-            ItemStack pick = createItem(name, 0, false, false);
+            ItemStack pick = createItem(name, 0, false);
             addEnch(pick, "sharpness", name, json);
             addEnch(pick, "efficiency", name, json);
             addEnch(pick, "haste", name, json);
@@ -239,16 +239,29 @@ public class DeckManager {
     }
     
     /**
-     * Create an ItemStack from JSON
+     * Same as createItem, but json is default null
+     * 
+     * @param name
+     * @param level
+     * @param missile
+     * @return
+     */
+    public ItemStack createItem(String name, int level, Boolean missile) {
+        return createItem(name, level, missile, null, null);
+    }
+    
+    /**
+     * General purpose item creation function. Creates items for
+     * decks, as well as for the deck GUIs.
      *
      * @param name
      * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile, Boolean isGUI) {
+    public ItemStack createItem(String name, int level, Boolean missile, JSONObject deck, JSONObject preset) {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
-        if (!isGUI) {
+        if (deck == null) {
             if (ConfigUtils.getItemValue(name, level, "amount") != null) {
                 item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
             }
@@ -265,23 +278,77 @@ public class DeckManager {
         ItemMeta itemMeta = item.getItemMeta();
         if (ConfigUtils.getItemValue(name, level, "name") != null) {
             String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
+            if (deck != null) {
+                displayName = displayName + itemsConfig.getString("text.actuallevel");
+                displayName = displayName.replace("%current%", level + "").replace("%max%", getMaxLevel(name) + "");
+            }
             itemMeta.displayName(ConfigUtils.toComponent(displayName.replace("%level%", roman(level))));
         }
         
         if (ConfigUtils.getItemValue(name, level, "lore") != null) {
+            // Set lore
             @SuppressWarnings("unchecked")
             List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
-            setPlaceholders(lore, name, level, isGUI, missile);
-            List<Component> finalLore = new ArrayList<>();
-            for (String s : lore) {
-                finalLore.add(Component.text(s));
+            
+            // Add missile stats for missiles
+            if (missile) {
+                List<String> stats = itemsConfig.getStringList("text.missilestats");
+                lore.addAll(stats);
             }
-            itemMeta.lore(finalLore);
+            
+            // Add extra lore for GUIs
+            if (deck != null) {
+                lore.add("&f");
+                String realname = name;
+                // If the name is a config path, find its real name
+                if (name.contains(".")) {
+                    String args[] = name.split("\\.");
+                    realname = args[args.length - 1];
+                }
+                // Add lore of unlocking possibility
+                if (deck.has(realname) && !deck.getBoolean(realname)) {
+                    lore.add(itemsConfig.getString("text.locked"));
+                }
+                // 
+            }
+            
+            // Compile lore into single line
+            String line = "";
+            for (String s : lore) {
+                line = line + " " + s;
+            }
+            
+            // Match all instances of placeholders 
+            Matcher matcher = Pattern.compile("%[^%]+%").matcher(line);
+            Set<String> matches = new HashSet<>();
+            while (matcher.find()) {
+                matches.add(matcher.group());
+            }
+            
+            // Replace all placeholder matches with specific value
+            for (int i = 0; i < lore.size(); i++) {
+                String l = lore.get(i);
+                for (String m : matches) {
+                    if (!l.contains(m)) {
+                        continue;
+                    }
+                    String get = m.replaceAll("%", "");
+                    String got1 = ConfigUtils.getItemValue(name, level, get) + "";
+                    String value = itemsConfig.getString("text.level").replace("%1%", got1);
+                    if (deck != null && level < getMaxLevel(name)) {
+                        String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
+                        value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
+                    }
+                    l = l.replaceAll(m, value);
+                }
+                lore.set(i, l);
+            }
+            itemMeta.lore(ConfigUtils.toComponent(lore));
         }
         
         // Inject NBT data
         String id = "item-structure";
-        if (isGUI) {
+        if (deck != null) {
             id = "item-gui";
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             id = "item-utility";
@@ -315,7 +382,7 @@ public class DeckManager {
      * @param showNext
      * @return
      */
-    public void setPlaceholders(List<String> lines, String name, int level, Boolean showNext, Boolean missile) {
+    public void setPlaceholders(List<String> lines, String name, int level, Boolean missile, JSONObject json) {
         // Add missile stats for missiles
         if (missile) {
             List<String> stats = itemsConfig.getStringList("text.missilestats");
@@ -342,7 +409,7 @@ public class DeckManager {
                 String get = m.replaceAll("%", "");
                 String got1 = ConfigUtils.getItemValue(name, level, get) + "";
                 String value = itemsConfig.getString("text.level").replace("%1%", got1);
-                if (showNext && level < getMaxLevel(name)) {
+                if (json != null && level < getMaxLevel(name)) {
                     String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
                     value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
                 }
@@ -359,7 +426,7 @@ public class DeckManager {
      * @return
      */
     public int getMaxLevel(String name) {
-        Set<String> keys = itemsConfig.getKeys(false);
+        Set<String> keys = itemsConfig.getConfigurationSection(name).getKeys(false);
         ArrayList<Integer> levels = new ArrayList<>();
         for (String key : keys) {
             try {
@@ -376,5 +443,42 @@ public class DeckManager {
             }
         }
         return result;
+    }
+    
+    /**
+     * Get min level of an item
+     * 
+     * @param name
+     * @param json
+     * @return
+     */
+    public int getMinLevel(String name, JSONObject json) {
+        if (json.getJSONObject("Missiles").has(name) ||
+            json.getJSONObject("Utility").has(name)) {
+            return 1;
+        }
+        return 0;
+    }
+    
+    /**
+     * Find deck from player json
+     * 
+     * @param json
+     * @return
+     */
+    public String findDeck(JSONObject json) {
+        if (json.has("punch")) {
+            return "Sentinel";
+        }
+        if (json.has("efficiency")) {
+            return "Architect";
+        }
+        if (json.has("fire_aspect")) {
+            return "Vanguard";
+        }
+        if (json.has("multishot")) {
+            return "Berserker";
+        }
+        return null;
     }
 }

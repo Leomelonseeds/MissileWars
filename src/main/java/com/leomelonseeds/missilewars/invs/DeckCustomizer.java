@@ -19,19 +19,23 @@ import net.kyori.adventure.text.Component;
 public class DeckCustomizer implements MWInventory {
     
     private Inventory inv;
-    private JSONObject json;
+    private JSONObject deckjson;
+    private JSONObject presetjson;
     private Player player;
     private String deck;
+    private String preset;
     private FileConfiguration itemConfig;
     private DeckManager deckManager;
     
     public DeckCustomizer(Player player, String deck, String preset) {
         JSONObject init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
-        json = init.getJSONObject(deck).getJSONObject(preset);
+        deckjson = init.getJSONObject(deck);
+        presetjson = deckjson.getJSONObject(preset);
         itemConfig = ConfigUtils.getConfigFile("items.yml");
         deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
         this.player = player;
         this.deck = deck;
+        this.preset = preset;
         
         String title = itemConfig.getString("title.deck").replace("%deck%", deck).replace("%preset%", preset);
         inv = Bukkit.createInventory(null, 54, ConfigUtils.toComponent(title));
@@ -42,11 +46,11 @@ public class DeckCustomizer implements MWInventory {
     public void updateInventory() {
         // Add indicators
         for (String key : itemConfig.getConfigurationSection("indicators").getKeys(false)) {
-            ItemStack item = deckManager.createItem("indicators." + key, 0, false, true);
+            ItemStack item = deckManager.createItem("indicators." + key, 0, false);
             if (key.equals("skillpoints")) {
                 ItemMeta meta = item.getItemMeta();
                 String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
-                meta.displayName(ConfigUtils.toComponent(name.replace("%sp%", json.getInt("skillpoints") + "")));
+                meta.displayName(ConfigUtils.toComponent(name.replace("%sp%", presetjson.getInt("skillpoints") + "")));
                 item.setItemMeta(meta);
             }
             inv.setItem(itemConfig.getInt("indicators." + key + ".slot"), item);
@@ -62,20 +66,16 @@ public class DeckCustomizer implements MWInventory {
             inv.setItem(i, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         }
         
-        // Missile items
-        int index = itemConfig.getInt("indicators.missiles.slot") + 2;
-        for (String missile : JSONObject.getNames(json.getJSONObject("missiles"))) {
-            ItemStack item = deckManager.createItem(missile, json.getJSONObject("missiles").getInt(missile), true, true);
-            inv.setItem(index, item);
-            index++;
-        }
-        
-        // Utility items
-        index = itemConfig.getInt("indicators.utility.slot") + 2;
-        for (String utility : JSONObject.getNames(json.getJSONObject("utility"))) {
-            ItemStack item = deckManager.createItem(utility, json.getJSONObject("utility").getInt(utility), false, true);
-            inv.setItem(index, item);
-            index++;
+        // Missile + Utility items
+        for (String s : new String[] {"Missiles", "Utility"}) {
+            String t = s.toLowerCase();
+            int index = itemConfig.getInt("indicators." + t + ".slot") + 2;
+            for (String u : JSONObject.getNames(presetjson.getJSONObject(s))) {
+                ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
+                        s.equals("Missiles"), deckjson, presetjson);
+                inv.setItem(index, item);
+                index++;
+            }
         }
     }
 

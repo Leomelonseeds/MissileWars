@@ -888,21 +888,26 @@ public class Arena implements ConfigurationSerializable {
         tasks.add(new BukkitRunnable() {
         	@Override
         	public void run() {
-        		// Assign queued players
+        		// Assign queued players. If a queue is larger than a team size put remaining
+        	    // players into the front of the queue to be assigned first into random teams
         		while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
 		            if (!redQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = redQueue.remove();
+                        toAssign.remove(toAdd);
 		                if (redTeam.getSize() < maxQueue) {
 		                	redTeam.addPlayer(toAdd);
-			                toAssign.remove(toAdd);
+		                } else {
+		                    toAssign.add(0, toAdd);
 		                }
 		            }
 		            if (!blueQueue.isEmpty()) {
 		                MissileWarsPlayer toAdd = blueQueue.remove();
+                        toAssign.remove(toAdd);
 		                if (blueTeam.getSize() < maxQueue) {
 		                	blueTeam.addPlayer(toAdd);
-		                	toAssign.remove(toAdd);
-		                }
+		                } else {
+                            toAssign.add(0, toAdd);
+                        }
 		            }
 		        }
 
