@@ -35,7 +35,7 @@ lightning:
       z: 4
     speed: 3.3
     tnt: 18
-    cost: 
+    spcost: 3
       
 
 cruiser:
@@ -70,6 +70,7 @@ cruiser:
       z: 4
     speed: 3.3
     tnt: 13
+    spcost: 4
 
 hilt:
   1:
@@ -104,6 +105,7 @@ hilt:
       z: 4
     speed: 3.3
     tnt: 15
+    spcost: 3
 
 supersonic:
   1:
@@ -138,6 +140,7 @@ supersonic:
       z: 4
     speed: 4.4
     tnt: 6
+    spcost: 2
 
 tomahawk:
   1:
@@ -168,6 +171,7 @@ tomahawk:
       z: 4
     speed: 2.0
     tnt: 16
+    spcost: 3
 
 
 # Sentinel missiles
@@ -202,6 +206,7 @@ guardian:
       z: 4
     speed: 1.7
     tnt: 9
+    spcost: 3
 
 gemini:
   1:
@@ -234,6 +239,7 @@ gemini:
       z: 4
     speed: 2.0
     tnt: 12
+    spcost: 3
 
 cronullifier:
   1:
@@ -268,6 +274,7 @@ cronullifier:
       z: 4
     speed: 2.2
     tnt: 25
+    spcost: 3
 
 sword: 
   1:
@@ -301,6 +308,7 @@ sword:
       z: 4
     speed: 1.7
     tnt: 15
+    spcost: 3
 
 piranha:
   1:
@@ -332,6 +340,7 @@ piranha:
       z: 4
     speed: 1.7
     tnt: 23
+    spcost: 4
 
 
 # Berserker missiles
@@ -366,6 +375,7 @@ supporter:
       z: 4
     speed: 1.7
     tnt: 25
+    spcost: 3
 
 warhead: 
   1:
@@ -398,6 +408,7 @@ warhead:
       z: 4
     speed: 2.0
     tnt: 33
+    spcost: 4
 
 juggernaut:
   1:
@@ -429,6 +440,7 @@ juggernaut:
       z: 4
     speed: 1.7
     tnt: 32
+    spcost: 3
 
 breaker:
   1:
@@ -461,6 +473,7 @@ breaker:
       z: 4
     speed: 2.0
     tnt: 34
+    spcost: 4
 
 shieldbuster:
   1:
@@ -493,6 +506,7 @@ shieldbuster:
       z: 4
     speed: 1.7
     tnt: 10
+    spcost: 2
 
 
 # Architect missiles
@@ -528,6 +542,7 @@ shipper:
       z: 4
     speed: 2.0
     tnt: 6
+    spcost: 2
 
 slingshot:
   1:
@@ -558,6 +573,7 @@ slingshot:
       z: 4
     speed: 2.2
     tnt: 14
+    spcost: 3
 
 citadel:
   1:
@@ -591,6 +607,7 @@ citadel:
       z: 4
     speed: 2.0
     tnt: 16
+    spcost: 3
 
 pisces:
   1:
@@ -621,6 +638,7 @@ pisces:
       z: 4
     speed: 1.7
     tnt: 24
+    spcost: 3
 
 ant:
   1:
@@ -652,6 +670,7 @@ ant:
       z: 4
     speed: 2.0
     tnt: 8
+    spcost: 3
 
 
 # Utility items
@@ -675,9 +694,11 @@ splash:
   2:
     duration: 1.5
     extend: 15
+    spcost: 1
   3:
     duration: 2
     extend: 20
+    spcost: 2
 
 novarocket:
   name: "&1⚠ &lNova Rocket ☣"
@@ -712,6 +733,7 @@ shield:
       y: -3
       z: 0
     size: "7x7"
+    spcost: 1
   3:
     file: 'shield_3.nbt'
     offset:
@@ -719,6 +741,7 @@ shield:
       y: -4
       z: 0
     size: "9x9"
+    spcost: 2
 
 platform:
   item: SNOWBALL
@@ -746,6 +769,7 @@ platform:
       y: 0
       z: -3
     size: "7x7"
+    spcost: 1
   3:
     file: 'platform_3.nbt'
     offset:
@@ -753,6 +777,7 @@ platform:
       y: 0
       z: -4
     size: "9x9"
+    spcost: 2
 
 torpedo:
   item: EGG
@@ -779,6 +804,7 @@ torpedo:
       y: -7
       z: -2
     size: "Large"
+    spcost: 3
 
 obsidianshield:
   file: 'obsidian_shield.nbt'
@@ -796,11 +822,13 @@ obsidianshield:
     y: -2
     z: 0
   1:
-    duration: 10
+    duration: 5
   2:
-    duration: 20
+    duration: 10
+    spcost: 1
   3:
-    duration: 30
+    duration: 20
+    spcost: 2
   
 obsidianshielddeplete:
   file: 'obsidian_shield_deplete.nbt'
@@ -838,8 +866,10 @@ canopy:
     distance: 8
   2: 
     distance: 12
+    spcost: 2
   3: 
     distance: 16
+    spcost: 2
 
 creeper:
   1:
@@ -858,6 +888,7 @@ creeper:
     - "&7creeper is. Seems like the specimen we have"
     - "&7here got struck by lightning. It has become"
     - "&7a lot more aggressive since and we concl-"
+    spcost: 3
 
 fireball:
   item: FIRE_CHARGE
@@ -875,9 +906,11 @@ fireball:
   2:
     power: 2
     multiply: 3
+    spcost: 1
   3:
     power: 3
     multiply: 4
+    spcost: 2
 
 leaves:
   name: "&2★ Leaves %level% ⚒"
@@ -893,9 +926,11 @@ leaves:
   2:
     item: AZALEA_LEAVES
     amount: 6
+    spcost: 2
   3:
     item: FLOWERING_AZALEA_LEAVES
     amount: 8
+    spcost: 2
   
 lingering_harming:
   item: LINGERING_POTION
@@ -913,17 +948,21 @@ lingering_harming:
   2:
     amplifier: 1
     duration: 10
+    spcost: 1
   3:
     amplifier: 2
     duration: 15
+    spcost: 2
 arrows:
   item: ARROW
   1:
     amount: 2
   2:
     amount: 3
+    spcost: 1
   3:
     amount: 4
+    spcost: 2
 
 
 # Gear items (just used for names and lores i guess)
@@ -938,15 +977,28 @@ vanguard_sword:
   - "&7Not swords. Swords are meant to &okill."
   enchants:
     sharpness:
-      1: 1
-      2: 3
-      3: 5
+      1: 
+        level: 1
+        spcost: 1
+      2: 
+        level: 3
+        spcost: 1
+      3:
+        level: 5
+        spcost: 2
     fire_aspect:
-      1: 1
-      2: 2
+      cost: 1200
+      1: 
+        level: 1
+        spcost: 2
     feather_falling:
-      1: 1
-      2: 2
+      cost: 800
+      1: 
+        level: 1
+        spcost: 1
+      2: 
+        level: 2
+        spcost: 2
 sentinel_bow:
   item: BOW
   name: "&b⚔ Bow ✟"
@@ -956,19 +1008,39 @@ sentinel_bow:
   - "&7No. It's a bayonet. But our marketing team"
   - "&7did a great job selling them as gunblades."
   enchants:
-    power:
-      1: 1
-    punch:
-      1: 1
-    sharpness:
-      1: 2
-      2: 4
-      3: 6
     flame:
-      1: 1
+      1:
+        level: 1
+        spcost: 1
+    power:
+      cost: 1500
+      1: 
+        level: 1
+        spcost: 2
+    punch:
+      cost: 1500
+      1: 
+        level: 1
+        spcost: 2
+    sharpness:
+      cost: 400
+      1: 
+        level: 2
+        spcost: 1
+      2:
+        level: 4
+        spcost: 1
+      3:
+        level: 6
+        spcost: 2
     fire_protection:
-      1: 2
-      2: 4
+      cost: 600
+      1:
+        level: 1
+        spcost: 1
+      2:
+        level: 2
+        spcost: 1
 berserker_crossbow:
   item: CROSSBOW
   name: "&3⚔ Crossbow &l☣"
@@ -978,19 +1050,40 @@ berserker_crossbow:
   - "&7strapped bows sideways onto stick-and-trigger"
   - "&7assemblies. Then they unified the Qin dynasty."
   enchants:
-    multishot:
-      1: 1
-    quick_charge:
-      1: 1
-      2: 2
-      3: 3
     sharpness:
-      1: 5
-      2: 7
-      3: 9
+      1:
+        level: 5
+        spcost: 1
+      2: 
+        level: 7
+        spcost: 1
+      3: 
+        level: 9
+        spcost: 2
+    multishot:
+      cost: 800
+      1: 
+        level: 1
+        spcost: 2
+    quick_charge:
+      cost: 1200
+      1: 
+        level: 1
+        spcost: 1
+      2: 
+        level: 2
+        spcost: 1
+      3: 
+        level: 3
+        spcost: 2
     blast_protection:
-      1: 3
-      2: 6
+      cost: 1600
+      1: 
+        level: 3
+        spcost: 1
+      2: 
+        level: 6
+        spcost: 2
 architect_pickaxe:
   item: IRON_PICKAXE
   name: "&f⚔ Iron Claw ⚒"
@@ -1002,19 +1095,42 @@ architect_pickaxe:
   - "&7Never touch asbestos, even with a pickaxe."
   enchants:
     sharpness:
-      1: 1
-      2: 2
-      3: 3
+      1: 
+        level: 1
+        spcost: 1
+      2: 
+        level: 2
+        spcost: 1
+      3: 
+        level: 3
+        spcost: 2
     efficiency:
-      1: 1
-      2: 2
-      3: 3
+      cost: 600
+      1: 
+        level: 1
+        cost: 1
+      2: 
+        level: 2
+        cost: 1
+      3: 
+        level: 3
+        cost: 2
     haste:
-      1: 1
-      2: 2
+      cost: 1400
+      1: 
+        level: 1
+        spcost: 1
+      2: 
+        level: 1
+        spcost: 2
     projectile_protection:
-      1: 2
-      2: 4
+      cost: 1200
+      1: 
+        level: 2
+        spcost: 1
+      2: 
+        level: 4
+        spcost: 2
    
 
 # Stuff relating to Deck GUI
@@ -1096,8 +1212,8 @@ indicators:
   
 text:
   locked: "&cLeft-click &7to purchase &c(-%cost% Mokens)"
-  upgradable: "&cLeft-click &7to upgrade &c(-%cost%sp)"
-  downgradable: "&cRight-click &7to downgrade &a(+%cost%sp)"
+  upgradable: "&cLeft-click &7to upgrade &c(-%spcost%sp)"
+  downgradable: "&cRight-click &7to downgrade &a(+%spcost%sp)"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
   actuallevel: " &7- &8%current%/%max%"
@@ -1129,10 +1245,13 @@ global:
     cost: 2000
     1:
       percentage: 6
+      spcost: 1
     2:
       percentage: 12.5
+      spcost: 2
     3: 
       percentage: 19
+      spcost: 2
   utilityspec:
     name: "&5Utility Specialist %level%"
     lore:
@@ -1144,10 +1263,13 @@ global:
     cost: 1200   
     1:
       percentage: 6
+      spcost: 1
     2:
       percentage: 12.5
+      spcost: 2
     3: 
       percentage: 19
+      spcost: 2
   hoarder:
     name: "&5Hoarder %level%"
     lore:
@@ -1157,7 +1279,10 @@ global:
     cost: 1600
     1:
       limit: 7
+      spcost: 1
     2:
       limit: 8
+      spcost: 1
     3:
       limit: 9
+      spcost: 2
