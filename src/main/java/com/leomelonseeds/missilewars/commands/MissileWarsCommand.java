@@ -331,7 +331,6 @@ public class MissileWarsCommand implements CommandExecutor {
             } else {
                 currentDeck.put("Preset", "A");
             }
-            plugin.getJSON().setPlayer(player.getUniqueId(), currentDeck);
 
             sendSuccessMsg(sender, "Set your deck to " + deck + "!");
 
@@ -395,7 +394,6 @@ public class MissileWarsCommand implements CommandExecutor {
                 JSONObject currentDeck = plugin.getJSON().getPlayer(player.getUniqueId());
                 currentDeck.put("Deck", deck);
                 currentDeck.put("Preset", preset);
-                plugin.getJSON().setPlayer(player.getUniqueId(), currentDeck);
 
                 sendSuccessMsg(sender, "Set your deck to " + deck + " - Preset " + preset + "!");
                 return true;

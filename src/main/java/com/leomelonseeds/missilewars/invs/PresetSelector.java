@@ -127,7 +127,6 @@ public class PresetSelector implements MWInventory {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
-                MissileWarsPlugin.getPlugin().getJSON().setPlayer(player.getUniqueId(), playerJson);
                 updateInventory();
             }
         }
