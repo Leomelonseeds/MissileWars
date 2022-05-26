@@ -23,7 +23,6 @@ public class DeckCustomizer implements MWInventory {
     private JSONObject presetjson;
     private Player player;
     private String deck;
-    private String preset;
     private FileConfiguration itemConfig;
     private DeckManager deckManager;
     
@@ -35,7 +34,6 @@ public class DeckCustomizer implements MWInventory {
         deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
         this.player = player;
         this.deck = deck;
-        this.preset = preset;
         
         String title = itemConfig.getString("title.deck").replace("%deck%", deck).replace("%preset%", preset);
         inv = Bukkit.createInventory(null, 54, ConfigUtils.toComponent(title));
@@ -67,12 +65,11 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Missile + Utility items
-        for (String s : new String[] {"Missiles", "Utility"}) {
-            String t = s.toLowerCase();
-            int index = itemConfig.getInt("indicators." + t + ".slot") + 2;
-            for (String u : JSONObject.getNames(presetjson.getJSONObject(s))) {
+        for (String s : new String[] {"missiles", "utility"}) {
+            int index = itemConfig.getInt("indicators." + s + ".slot") + 2;
+            for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
-                        s.equals("Missiles"), deckjson, presetjson);
+                        s.equals("missiles"), deckjson);
                 inv.setItem(index, item);
                 index++;
             }

@@ -70,8 +70,10 @@ public class ArenaGameruleListener implements Listener {
         // Find killer and increment kills
         if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
-            killer.incrementKills();
-            ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
+            if (!player.getKiller().equals(player)) {
+                killer.incrementKills();
+                ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
+            }
         }
 
         Component deathMessage = event.deathMessage();

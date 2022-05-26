@@ -76,13 +76,13 @@ public class DeckManager {
         ArrayList<ItemStack> gear = new ArrayList<>();
         
         // Create missiles
-        for (String key : JSONObject.getNames(json.getJSONObject("missiles"))) {
+        for (String key : json.getJSONObject("missiles").keySet()) {
             ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
             missiles.add(m);
         }
         
         // Create utility
-        for (String key : JSONObject.getNames(json.getJSONObject("utility"))) {
+        for (String key : json.getJSONObject("utility").keySet()) {
             ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
             utility.add(u);
         }
@@ -183,7 +183,7 @@ public class DeckManager {
      * @param lvl
      */
     private void addEnch(ItemStack item, String ench, String itemname, JSONObject json) {
-        int lvl = itemsConfig.getInt(itemname + ".enchants." + ench + "." + json.getInt(ench));
+        int lvl = itemsConfig.getInt(itemname + ".enchants." + ench + "." + json.getInt(ench) + ".level");
         if (lvl <= 0) {
             return;
         }
@@ -247,7 +247,7 @@ public class DeckManager {
      * @return
      */
     public ItemStack createItem(String name, int level, Boolean missile) {
-        return createItem(name, level, missile, null, null);
+        return createItem(name, level, missile, null);
     }
     
     /**
@@ -258,7 +258,7 @@ public class DeckManager {
      * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile, JSONObject deck, JSONObject preset) {
+    public ItemStack createItem(String name, int level, Boolean missile, JSONObject deck) {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
         if (deck == null) {
@@ -296,22 +296,6 @@ public class DeckManager {
                 lore.addAll(stats);
             }
             
-            // Add extra lore for GUIs
-            if (deck != null) {
-                lore.add("&f");
-                String realname = name;
-                // If the name is a config path, find its real name
-                if (name.contains(".")) {
-                    String args[] = name.split("\\.");
-                    realname = args[args.length - 1];
-                }
-                // Add lore of unlocking possibility
-                if (deck.has(realname) && !deck.getBoolean(realname)) {
-                    lore.add(itemsConfig.getString("text.locked"));
-                }
-                // 
-            }
-            
             // Compile lore into single line
             String line = "";
             for (String s : lore) {
@@ -337,11 +321,40 @@ public class DeckManager {
                     String value = itemsConfig.getString("text.level").replace("%1%", got1);
                     if (deck != null && level < getMaxLevel(name)) {
                         String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
-                        value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
+                        if (!got1.equals(got2)) {
+                            value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
+                        }
                     }
                     l = l.replaceAll(m, value);
                 }
                 lore.set(i, l);
+            }
+            
+            // Add extra lore for GUIs
+            if (deck != null) {
+                lore.add("&f");
+                String realname = name;
+                // If the name is a config path, find its real name
+                if (name.contains(".")) {
+                    String args[] = name.split("\\.");
+                    realname = args[args.length - 1];
+                }
+                // Add lore of unlocking possibility
+                if (deck.has(realname) && !deck.getBoolean(realname)) {
+                    int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
+                    lore.add(itemsConfig.getString("text.locked").replace("%cost%", cost + ""));
+                } else {
+                    // Possibility of upgrading
+                    if (level < getMaxLevel(name)) {
+                        int spCost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
+                        lore.add(itemsConfig.getString("text.upgradable").replace("%spcost%", spCost + ""));
+                    }
+                    // Possibility of downgrading
+                    if (getMinLevel(name, deck) < level) {
+                        int spCost = (int) ConfigUtils.getItemValue(name, level, "spcost");
+                        lore.add(itemsConfig.getString("text.downgradable").replace("%spcost%", spCost + ""));
+                    }
+                }
             }
             itemMeta.lore(ConfigUtils.toComponent(lore));
         }
@@ -375,51 +388,6 @@ public class DeckManager {
     }
     
     /**
-     * Set placeholders in an itemstack lore
-     * 
-     * @param line
-     * @param level
-     * @param showNext
-     * @return
-     */
-    public void setPlaceholders(List<String> lines, String name, int level, Boolean missile, JSONObject json) {
-        // Add missile stats for missiles
-        if (missile) {
-            List<String> stats = itemsConfig.getStringList("text.missilestats");
-            lines.addAll(stats);
-        }
-        // Compile lore into single line
-        String line = "";
-        for (String s : lines) {
-            line = line + " " + s;
-        }
-        // Match all instances of placeholders 
-        Matcher matcher = Pattern.compile("%[^%]+%").matcher(line);
-        Set<String> matches = new HashSet<>();
-        while (matcher.find()) {
-            matches.add(matcher.group());
-        }
-        // Replace all placeholder matches with specific value
-        for (int i = 0; i < lines.size(); i++) {
-            String l = lines.get(i);
-            for (String m : matches) {
-                if (!l.contains(m)) {
-                    continue;
-                }
-                String get = m.replaceAll("%", "");
-                String got1 = ConfigUtils.getItemValue(name, level, get) + "";
-                String value = itemsConfig.getString("text.level").replace("%1%", got1);
-                if (json != null && level < getMaxLevel(name)) {
-                    String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
-                    value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
-                }
-                l = l.replaceAll(m, value);
-            }
-            lines.set(i, ChatColor.translateAlternateColorCodes('&', l));
-        }
-    }
-    
-    /**
      * Gets the max level of an item
      * 
      * @param name
@@ -427,19 +395,15 @@ public class DeckManager {
      */
     public int getMaxLevel(String name) {
         Set<String> keys = itemsConfig.getConfigurationSection(name).getKeys(false);
-        ArrayList<Integer> levels = new ArrayList<>();
+        int result = 0;
         for (String key : keys) {
             try {
                 int i = Integer.parseInt(key);
-                levels.add(i);
+                if (i > result) {
+                    result = i;
+                }
             } catch (NumberFormatException e) {
                 continue;
-            }
-        }
-        int result = 0;
-        for (int i : levels) {
-            if (i > result) {
-                result = i;
             }
         }
         return result;
@@ -453,8 +417,9 @@ public class DeckManager {
      * @return
      */
     public int getMinLevel(String name, JSONObject json) {
-        if (json.getJSONObject("Missiles").has(name) ||
-            json.getJSONObject("Utility").has(name)) {
+        JSONObject pjson = json.getJSONObject("A");
+        if (pjson.getJSONObject("missiles").has(name) ||
+            pjson.getJSONObject("utility").has(name)) {
             return 1;
         }
         return 0;

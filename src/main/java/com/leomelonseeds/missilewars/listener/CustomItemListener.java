@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -180,6 +181,10 @@ public class CustomItemListener implements Listener {
         // Check if player is trying to place a structure item
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
+        
+        if (player.getGameMode() != GameMode.SURVIVAL) {
+            return;
+        }
 
         Arena playerArena = getPlayerArena(player);
         if (playerArena == null) {

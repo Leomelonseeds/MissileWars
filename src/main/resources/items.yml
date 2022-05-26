@@ -1108,13 +1108,13 @@ architect_pickaxe:
       cost: 600
       1: 
         level: 1
-        cost: 1
+        spcost: 1
       2: 
         level: 2
-        cost: 1
+        spcost: 1
       3: 
         level: 3
-        cost: 2
+        spcost: 2
     haste:
       cost: 1400
       1: 
