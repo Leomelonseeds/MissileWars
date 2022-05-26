@@ -366,8 +366,8 @@ public class DeckManager {
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             id = "utility";
         }
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
-                PersistentDataType.STRING, "item-" + name + "_" + level);
+        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
+                PersistentDataType.STRING, name + "_" + level);
         
         // Setup item meta for potions
         if (name.equals("splash")) {
