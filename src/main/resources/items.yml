@@ -965,16 +965,17 @@ arrows:
     spcost: 2
 
 
-# Gear items (just used for names and lores i guess)
+# Per-deck items/abilities
 
-vanguard_sword:
-  item: GOLDEN_SWORD
-  name: "&6⚔ Cutlass ⚡"
-  lore:
-  - ""
-  - "&7Many weapons double as tools. Axes chop wood,"
-  - "&7hammers shape metal, and daggers dice onions."
-  - "&7Not swords. Swords are meant to &okill."
+Vanguard:
+  weapon:
+    item: GOLDEN_SWORD
+    name: "&6⚔ Cutlass ⚡"
+    lore:
+    - ""
+    - "&7Many weapons double as tools. Axes chop wood,"
+    - "&7hammers shape metal, and daggers dice onions."
+    - "&7Not swords. Swords are meant to &okill."
   enchants:
     sharpness:
       1: 
@@ -999,14 +1000,15 @@ vanguard_sword:
       2: 
         level: 2
         spcost: 2
-sentinel_bow:
-  item: BOW
-  name: "&b⚔ Bow ✟"
-  lore:
-  - ""
-  - "&7Could this be the legendary Gunblade?"
-  - "&7No. It's a bayonet. But our marketing team"
-  - "&7did a great job selling them as gunblades."
+Sentinel:
+  weapon:
+    item: BOW
+    name: "&b⚔ Bow ✟"
+    lore:
+    - ""
+    - "&7Could this be the legendary Gunblade?"
+    - "&7No. It's a bayonet. But our marketing team"
+    - "&7did a great job selling them as gunblades."
   enchants:
     flame:
       1:
@@ -1041,14 +1043,15 @@ sentinel_bow:
       2:
         level: 2
         spcost: 1
-berserker_crossbow:
-  item: CROSSBOW
-  name: "&3⚔ Crossbow &l☣"
-  lore:
-  - ""
-  - "&7Before guns were invented, the coolest people"
-  - "&7strapped bows sideways onto stick-and-trigger"
-  - "&7assemblies. Then they unified the Qin dynasty."
+Berserker:
+  weapon:
+    item: CROSSBOW
+    name: "&3⚔ Crossbow &l☣"
+    lore:
+    - ""
+    - "&7Before guns were invented, the coolest people"
+    - "&7strapped bows sideways onto stick-and-trigger"
+    - "&7assemblies. Then they unified the Qin dynasty."
   enchants:
     sharpness:
       1:
@@ -1084,15 +1087,16 @@ berserker_crossbow:
       2: 
         level: 6
         spcost: 2
-architect_pickaxe:
-  item: IRON_PICKAXE
-  name: "&f⚔ Iron Claw ⚒"
-  lore:
-  - ""
-  - "&7Not to be confused with the Wrench,"
-  - "&7this non-australium tool can safely harvest"
-  - "&7a wide variety of blocks. Not asbestos, though."
-  - "&7Never touch asbestos, even with a pickaxe."
+Architect:
+  weapon:
+    item: IRON_PICKAXE
+    name: "&f⚔ Iron Claw ⚒"
+    lore:
+    - ""
+    - "&7Not to be confused with the Wrench,"
+    - "&7this non-australium tool can safely harvest"
+    - "&7a wide variety of blocks. Not asbestos, though."
+    - "&7Never touch asbestos, even with a pickaxe."
   enchants:
     sharpness:
       1: 

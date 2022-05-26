@@ -88,64 +88,55 @@ public class DeckManager {
         }
         
         // Create gear items
+        ItemStack weapon = createItem(deck + ".weapon", 0, false);
         switch (deck) {
         case "Vanguard": 
         {
-            String name = "vanguard_sword";
-            ItemStack sword = createItem(name, 0, false);
-            addEnch(sword, "sharpness", name, json);
-            addEnch(sword, "fire_aspect", name, json);
-            gear.add(sword);
+            addEnch(weapon, "sharpness", deck, json);
+            addEnch(weapon, "fire_aspect", deck, json);
             ItemStack boots = new ItemStack(Material.GOLDEN_BOOTS);
-            addEnch(boots, "feather_falling", name, json);
+            addEnch(boots, "feather_falling", deck, json);
             gear.add(boots);
             
             break;
         }
         case "Berserker":
         {
-            String name = "berserker_crossbow";
-            ItemStack crossbow = createItem(name, 0, false);
-            addEnch(crossbow, "sharpness", name, json);
-            addEnch(crossbow, "multishot", name, json);
-            addEnch(crossbow, "quick_charge", name, json);
-            gear.add(crossbow);
+            addEnch(weapon, "sharpness", deck, json);
+            addEnch(weapon, "multishot", deck, json);
+            addEnch(weapon, "quick_charge", deck, json);
             ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
-            addEnch(boots, "blast_protection", name, json);
+            addEnch(boots, "blast_protection", deck, json);
             gear.add(boots);
             
             break;
         }
         case "Sentinel":
         {
-            String name = "sentinel_bow";
-            ItemStack bow = createItem(name, 0, false);
-            addEnch(bow, "sharpness", name, json);
-            addEnch(bow, "flame", name, json);
-            addEnch(bow, "punch", name, json);
-            addEnch(bow, "power", name, json);
-            gear.add(bow);
+            addEnch(weapon, "sharpness", deck, json);
+            addEnch(weapon, "flame", deck, json);
+            addEnch(weapon, "punch", deck, json);
+            addEnch(weapon, "power", deck, json);
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
-            addEnch(boots, "fire_protection", name, json);
+            addEnch(boots, "fire_protection", deck, json);
             gear.add(boots);
             
             break;
         }
         case "Architect":
         {
-            String name = "architect_pickaxe";
-            ItemStack pick = createItem(name, 0, false);
-            addEnch(pick, "sharpness", name, json);
-            addEnch(pick, "efficiency", name, json);
-            addEnch(pick, "haste", name, json);
-            gear.add(pick);
+            addEnch(weapon, "sharpness", deck, json);
+            addEnch(weapon, "efficiency", deck, json);
+            addEnch(weapon, "haste", deck, json);
             ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
-            addEnch(boots, "projectile_protection", name, json);
+            addEnch(boots, "projectile_protection", deck, json);
             gear.add(boots);
             
             break;
         }
         }
+        
+        gear.add(weapon);
         
         // Make gear items unbreakable
         for (ItemStack item : gear) {
@@ -182,8 +173,8 @@ public class DeckManager {
      * @param ench
      * @param lvl
      */
-    private void addEnch(ItemStack item, String ench, String itemname, JSONObject json) {
-        int lvl = itemsConfig.getInt(itemname + ".enchants." + ench + "." + json.getInt(ench) + ".level");
+    private void addEnch(ItemStack item, String ench, String deck, JSONObject json) {
+        int lvl = itemsConfig.getInt(deck + ".enchants." + ench + "." + json.getInt(ench) + ".level");
         if (lvl <= 0) {
             return;
         }
