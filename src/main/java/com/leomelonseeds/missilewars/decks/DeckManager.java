@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -238,7 +239,7 @@ public class DeckManager {
      * @return
      */
     public ItemStack createItem(String name, int level, Boolean missile) {
-        return createItem(name, level, missile, null);
+        return createItem(name, level, missile, null, null, false);
     }
     
     /**
@@ -249,9 +250,24 @@ public class DeckManager {
      * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile, JSONObject deck) {
+    public ItemStack createItem(String name, int level, Boolean missile, JSONObject playerjson, String deck, Boolean intangible) {
+        String realname = name;
+        // If the name is a config path, find its real name
+        if (name.contains(".")) {
+            String args[] = name.split("\\.");
+            realname = args[args.length - 1];
+        }
+        
+        // Find material
+        String material;
+        if (intangible) {
+            material = itemsConfig.getString("intangibles.unlocked");
+        } else {
+            material = (String) ConfigUtils.getItemValue(name, level, "item");
+        }
+        
         // Setup item
-        ItemStack item = new ItemStack(Material.getMaterial((String) ConfigUtils.getItemValue(name, level, "item")));
+        ItemStack item = new ItemStack(Material.getMaterial(material));
         if (deck == null) {
             if (ConfigUtils.getItemValue(name, level, "amount") != null) {
                 item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
@@ -267,19 +283,27 @@ public class DeckManager {
         
         // Find item name and lore
         ItemMeta itemMeta = item.getItemMeta();
-        if (ConfigUtils.getItemValue(name, level, "name") != null) {
+        if (ConfigUtils.getItemValue(name, level, "name") != null || 
+                (name.contains("enchants") && !name.contains("indicator"))) {
             String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
             if (deck != null) {
+                if (name.contains("enchants")) {
+                    displayName = getEnchName(itemsConfig.getString("enchants.name").replace("%enchant%", realname));
+                }
                 displayName = displayName + itemsConfig.getString("text.actuallevel");
                 displayName = displayName.replace("%current%", level + "").replace("%max%", getMaxLevel(name) + "");
             }
             itemMeta.displayName(ConfigUtils.toComponent(displayName.replace("%level%", roman(level))));
-        }
+        } 
         
-        if (ConfigUtils.getItemValue(name, level, "lore") != null) {
+        Object templore = ConfigUtils.getItemValue(name, level, "lore");
+        if (name.contains("enchants") && !name.contains("indicators")) {
+            templore = ConfigUtils.getItemValue("enchants", level, "lore");
+        }
+        if (templore != null) {
             // Set lore
             @SuppressWarnings("unchecked")
-            List<String> lore = new ArrayList<>((ArrayList<String>) ConfigUtils.getItemValue(name, level, "lore"));
+            List<String> lore = new ArrayList<>((ArrayList<String>) templore);
             
             // Add missile stats for missiles
             if (missile) {
@@ -324,16 +348,15 @@ public class DeckManager {
             // Add extra lore for GUIs
             if (deck != null) {
                 lore.add("&f");
-                String realname = name;
-                // If the name is a config path, find its real name
-                if (name.contains(".")) {
-                    String args[] = name.split("\\.");
-                    realname = args[args.length - 1];
-                }
+                JSONObject deckjson = playerjson.getJSONObject(deck);
                 // Add lore of unlocking possibility
-                if (deck.has(realname) && !deck.getBoolean(realname)) {
+                if ((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
+                    (playerjson.has(realname) && !playerjson.getBoolean(realname))) {
                     int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
                     lore.add(itemsConfig.getString("text.locked").replace("%cost%", cost + ""));
+                    if (intangible) {
+                        item.setType(Material.getMaterial(itemsConfig.getString("intangibles.locked")));
+                    }
                 } else {
                     // Possibility of upgrading
                     if (level < getMaxLevel(name)) {
@@ -341,9 +364,12 @@ public class DeckManager {
                         lore.add(itemsConfig.getString("text.upgradable").replace("%spcost%", spCost + ""));
                     }
                     // Possibility of downgrading
-                    if (getMinLevel(name, deck) < level) {
+                    if (getMinLevel(name, deckjson) < level) {
                         int spCost = (int) ConfigUtils.getItemValue(name, level, "spcost");
                         lore.add(itemsConfig.getString("text.downgradable").replace("%spcost%", spCost + ""));
+                        if (intangible) {
+                            item.setType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
+                        }
                     }
                 }
             }
@@ -358,7 +384,7 @@ public class DeckManager {
             id = "utility";
         }
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
-                PersistentDataType.STRING, name + "_" + level);
+                PersistentDataType.STRING, realname + "_" + level);
         
         // Setup item meta for potions
         if (name.equals("splash")) {
@@ -407,8 +433,8 @@ public class DeckManager {
      * @param json
      * @return
      */
-    public int getMinLevel(String name, JSONObject json) {
-        JSONObject pjson = json.getJSONObject("A");
+    public int getMinLevel(String name, JSONObject deckjson) {
+        JSONObject pjson = deckjson.getJSONObject("A");
         if (pjson.getJSONObject("missiles").has(name) ||
             pjson.getJSONObject("utility").has(name)) {
             return 1;
@@ -417,24 +443,15 @@ public class DeckManager {
     }
     
     /**
-     * Find deck from player json
+     * Capitalizes enchantment names
      * 
-     * @param json
-     * @return
+     * @param ench
      */
-    public String findDeck(JSONObject json) {
-        if (json.has("punch")) {
-            return "Sentinel";
+    private String getEnchName(String ench) {
+        String[] temp = ench.split("_");
+        for (String t : temp) {
+            StringUtils.capitalize(t);
         }
-        if (json.has("efficiency")) {
-            return "Architect";
-        }
-        if (json.has("fire_aspect")) {
-            return "Vanguard";
-        }
-        if (json.has("multishot")) {
-            return "Berserker";
-        }
-        return null;
+        return String.join(" ", temp);
     }
 }

@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component;
 public class DeckCustomizer implements MWInventory {
     
     private Inventory inv;
+    private JSONObject init;
     private JSONObject deckjson;
     private JSONObject presetjson;
     private Player player;
@@ -27,7 +28,7 @@ public class DeckCustomizer implements MWInventory {
     private DeckManager deckManager;
     
     public DeckCustomizer(Player player, String deck, String preset) {
-        JSONObject init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+        init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         deckjson = init.getJSONObject(deck);
         presetjson = deckjson.getJSONObject(preset);
         itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -66,13 +67,32 @@ public class DeckCustomizer implements MWInventory {
         
         // Missile + Utility items
         for (String s : new String[] {"missiles", "utility"}) {
-            int index = itemConfig.getInt("indicators." + s + ".slot") + 2;
+            int index = getIndex(s);
             for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
-                        s.equals("missiles"), deckjson);
+                        s.equals("missiles"), init, deck, false);
                 inv.setItem(index, item);
                 index++;
             }
+        }
+        
+        // Enchantments
+        for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
+            int index = getIndex("enchants");
+            ItemStack item = deckManager.createItem(deck + ".enchants." + key, presetjson.getInt(key), 
+                        false, init, deck, true);
+            inv.setItem(index, item);
+            index++;
+        }
+        
+        // Global Passives
+        for (String key : itemConfig.getConfigurationSection("gpassive").getKeys(false)) {
+            int index = getIndex("gpassive");
+            int level = 0;
+            ItemStack item = deckManager.createItem("gpassive." + key, presetjson.getInt(key), 
+                        false, init, deck, true);
+            inv.setItem(index, item);
+            index++;
         }
     }
 
@@ -102,5 +122,15 @@ public class DeckCustomizer implements MWInventory {
         meta.displayName(Component.text(""));
         item.setItemMeta(meta);
         return item;
+    }
+    
+    /**
+     * Get index of item
+     * 
+     * @param key
+     * @return
+     */
+    private int getIndex(String key) {
+        return itemConfig.getInt("indicators." + key + ".slot") + 2;
     }
 }

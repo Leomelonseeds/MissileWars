@@ -955,6 +955,16 @@ lingering_harming:
     spcost: 2
 arrows:
   item: ARROW
+  name: "&fArrows"
+  lore:
+  - ""
+  - "&7Look, I could write a fancy description"
+  - "&7what an arrow is and what the history"
+  - "&7of arrows are, but I decided not to,"
+  - "&7and instead wasted your time reading"
+  - "&7this description."
+  - ""
+  - "&bAmount: %amount%"
   1:
     amount: 2
   2:
@@ -1158,9 +1168,9 @@ indicators:
     item: REPEATER
     name: "&9&lUtility"
     slot: 9
-  gear:
+  enchants:
     item: ENCHANTED_BOOK
-    name: "&6&lGear Enchantments"
+    name: "&3&lGear Enchantments"
     slot: 18
   gpassive:
     item: PURPLE_DYE
@@ -1171,8 +1181,8 @@ indicators:
     name: "&e&lAbility &d(Coming Soon)"
     slot: 36
   passive:
-    item: LIGHT_BLUE_DYE
-    name: "&b&lPassive &d(Coming Soon)"
+    item: ORANGE_DYE
+    name: "&6&lPassive &d(Coming Soon)"
     slot: 45
   info:
     item: COMPASS
@@ -1237,7 +1247,13 @@ preset:
   loreselect: "&aSelected"
   lorenotselect: "&cLeft-click &7to select this preset"
   
-global:
+enchants:
+  name: "&b%enchant%"
+  lore:
+  - ""
+  - "&bLevel: %level%"
+  
+gpassive:
   missilespec:
     name: "&5Missile Specialist %level%"
     lore:
