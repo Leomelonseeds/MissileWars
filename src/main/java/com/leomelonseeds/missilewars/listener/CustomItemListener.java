@@ -61,33 +61,19 @@ public class CustomItemListener implements Listener {
     }
 
     /**
-     * Get a structure from a structure item.
-     *
-     * @param item the structure item
-     * @return the name of the structure, or null if the item has none
+     * Get string data from custom item
+     * 
+     * @param item
+     * @param id
+     * @return
      */
-    private String getStructureFromItem(ItemStack item) {
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"),
+    private String getStringFromItem(ItemStack item, String id) {
+        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
                 PersistentDataType.STRING)) {
             return null;
         }
         return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
-                "item-structure"), PersistentDataType.STRING);
-    }
-    
-    /**
-     * Get a utility from a utility item.
-     *
-     * @param item the utility item
-     * @return the name of the utility, or null if the item has none
-     */
-    private String getUtilityFromItem(ItemStack item) {
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-utility"),
-                PersistentDataType.STRING)) {
-            return null;
-        }
-        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
-                "item-utility"), PersistentDataType.STRING);
+                id), PersistentDataType.STRING);
     }
 
     /**
@@ -193,7 +179,7 @@ public class CustomItemListener implements Listener {
 
         ItemStack hand = getItemUsed(player);
         Block clicked = event.getClickedBlock();
-        String structureName = getStructureFromItem(hand);
+        String structureName = getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
         }
@@ -273,7 +259,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        String utility = getUtilityFromItem(hand);
+        String utility = getStringFromItem(hand, "item-utility");
         if (utility == null) {
             return;
         }
@@ -468,7 +454,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a structure item
         ItemStack hand = getItemUsed(thrower);
-        String structureName = getStructureFromItem(hand);
+        String structureName = getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
         }
@@ -573,7 +559,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a utility item
         ItemStack hand = getItemUsed(thrower);
-        String utility = getUtilityFromItem(hand);
+        String utility = getStringFromItem(hand, "item-utility");
 
         // Make sure it's splash potion of water
         if (utility == null || !thrown.getEffects().isEmpty()) {

@@ -360,14 +360,14 @@ public class DeckManager {
         }
         
         // Inject NBT data
-        String id = "item-structure";
+        String id = "structure";
         if (deck != null) {
-            id = "item-gui";
+            id = "gui";
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
-            id = "item-utility";
+            id = "utility";
         }
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, id),
-                PersistentDataType.STRING, name + "_" + level);
+                PersistentDataType.STRING, "item-" + name + "_" + level);
         
         // Setup item meta for potions
         if (name.equals("splash")) {
