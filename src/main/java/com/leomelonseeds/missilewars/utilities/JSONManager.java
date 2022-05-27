@@ -129,13 +129,6 @@ public class JSONManager {
             }
         }
     }
-    
-    /**
-     * @return the default json file
-     */
-    public JSONObject getDefault() {
-        return defaultJson;
-    }
 
     /**
      * Call when a player leaves. Saves their deck
@@ -209,11 +202,12 @@ public class JSONManager {
     }
     
     /**
-     * Get default preset for a deck
+     * Returns a copy of the default preset for a deck
      * 
      * @param deck
      */
     public JSONObject getDefaultPreset(String deck) {
-        return defaultPresets.get(deck);
+        String json = defaultPresets.get(deck).toString();
+        return new JSONObject(json);
     }
 }

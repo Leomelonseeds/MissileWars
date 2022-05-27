@@ -1,7 +1,5 @@
 package com.leomelonseeds.missilewars.invs;
 
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -26,7 +24,6 @@ public class DeckCustomizer implements MWInventory {
     
     private Inventory inv;
     private JSONObject init;
-    private JSONObject deckjson;
     private JSONObject presetjson;
     private Player player;
     private String deck;
@@ -40,10 +37,8 @@ public class DeckCustomizer implements MWInventory {
     public DeckCustomizer(Player player, String deck, String preset) {
         deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
         jsonManager = MissileWarsPlugin.getPlugin().getJSON();
-        init = jsonManager.getPlayer(player.getUniqueId());
-        deckjson = init.getJSONObject(deck);
-        presetjson = deckjson.getJSONObject(preset);
         itemConfig = ConfigUtils.getConfigFile("items.yml");
+        init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         items = new String[] {"missiles", "utility"};
         abilities = new String[] {"gpassive", "passive", "ability"};
         this.player = player;
@@ -57,6 +52,7 @@ public class DeckCustomizer implements MWInventory {
 
     @Override
     public void updateInventory() {
+        presetjson = init.getJSONObject(deck).getJSONObject(preset);
         // Add indicators
         for (String key : itemConfig.getConfigurationSection("indicators").getKeys(false)) {
             ItemStack item = deckManager.createItem("indicators." + key, 0, false);
@@ -126,10 +122,7 @@ public class DeckCustomizer implements MWInventory {
         if (slot == 26) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
                 if (confirm) {
-                    deckjson.put(preset, jsonManager.getDefaultPreset(deck));
-                    Bukkit.getLogger().log(Level.INFO, deckjson.toString());
-                    Bukkit.getLogger().log(Level.INFO, preset);
-                    Bukkit.getLogger().log(Level.INFO, jsonManager.getDefaultPreset(deck).toString());
+                    init.getJSONObject(deck).put(preset, jsonManager.getDefaultPreset(deck));
                     updateInventory();
                 }
                 return;
@@ -181,8 +174,8 @@ public class DeckCustomizer implements MWInventory {
         String storedName = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
                 PersistentDataType.STRING);
         String[] args = storedName.split("_");
-        String name = args[1];
-        int level = Integer.parseInt(args[2]);
+        String name = args[0];
+        int level = Integer.parseInt(args[1]);
     }
 
     @Override
