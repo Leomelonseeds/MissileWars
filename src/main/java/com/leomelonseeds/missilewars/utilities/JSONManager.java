@@ -68,12 +68,28 @@ public class JSONManager {
             try {
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
+                // Unlock everything for royal rank
+                if (Bukkit.getPlayer(uuid).hasPermission("group.royal")) {
+                    for (String key : newJson.keySet()) {
+                        if (newJson.get(key) instanceof Boolean) {
+                            newJson.put(key, true);
+                        }
+                    }
+                }
                 for (String deck : plugin.getDeckManager().getDecks()) {
-                    updateJson(newJson.getJSONObject(deck), defaultJson.getJSONObject(deck));
+                    JSONObject deckjson = newJson.getJSONObject(deck);
+                    updateJson(deckjson, defaultJson.getJSONObject(deck));
+                    if (Bukkit.getPlayer(uuid).hasPermission("group.royal")) {
+                        for (String key : deckjson.keySet()) {
+                            if (deckjson.get(key) instanceof Boolean) {
+                                deckjson.put(key, true);
+                            }
+                        }
+                    }
                     JSONObject defaultpreset = defaultPresets.get(deck);
                     for (String preset : plugin.getDeckManager().getPresets()) {
-                        if (newJson.getJSONObject(deck).has(preset)) {
-                            JSONObject currentpreset = newJson.getJSONObject(deck).getJSONObject(preset);
+                        if (deckjson.has(preset)) {
+                            JSONObject currentpreset = deckjson.getJSONObject(preset);
                             updateJson(currentpreset, defaultpreset);
                             updateJson(currentpreset.getJSONObject("missiles"), defaultpreset.getJSONObject("missiles"));
                             updateJson(currentpreset.getJSONObject("utility"), defaultpreset.getJSONObject("utility"));
@@ -101,13 +117,13 @@ public class JSONManager {
      */
     private void updateJson(JSONObject original, JSONObject updated) {
         // Add new keys if not exist
-        for (String key : JSONObject.getNames(updated)) {
+        for (String key : updated.keySet()) {
             if (!original.has(key)) {
                 original.put(key, updated.get(key));
             }
         }
         // Remove keys not existing in default
-        for (String key : JSONObject.getNames(original)) {
+        for (String key : original.keySet()) {
             if (!(updated.has(key) || plugin.getDeckManager().getPresets().contains(key))) {
                 original.remove(key);
             }
@@ -191,5 +207,13 @@ public class JSONManager {
             plugin.getSQL().savePlayerDeck(entry.getKey(), entry.getValue().toString(), async);
         }
     }
-
+    
+    /**
+     * Get default preset for a deck
+     * 
+     * @param deck
+     */
+    public JSONObject getDefaultPreset(String deck) {
+        return defaultPresets.get(deck);
+    }
 }

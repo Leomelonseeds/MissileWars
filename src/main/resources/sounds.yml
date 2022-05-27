@@ -30,10 +30,6 @@ game-start:
   sound: ENTITY_PLAYER_LEVELUP
   volume: 1.0
   pitch: 0.5
-game-end-reminder:
-  sound: ENTITY_CHICKEN_EGG
-  volume: 1.0
-  pitch: 1.0
 join-arena:
   sound: ENTITY_ENDERMAN_TELEPORT
   volume: 0.5
@@ -62,10 +58,6 @@ game-end-reminder:
   sound: BLOCK_NOTE_BLOCK_HAT
   volume: 1.0
   pitch: 1.0
-spawn-torpedo:
-  sound: ENTITY_IRON_GOLEM_REPAIR
-  volume: 1.0
-  pitch: 0.5
 spawn-obsidian-shield:
   sound: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
   volume: 1.0
@@ -86,3 +78,15 @@ spawn-canopy:
   sound: BLOCK_GRASS_PLACE
   volume: 1.0
   pitch: 0.9
+change-preset:
+  sound: ITEM_ARMOR_EQUIP_IRON
+  volume: 1.0
+  pitch: 1.0
+purchase-item:
+  sound: BLOCK_NOTE_BLOCK_CHIME
+  volume: 1.0
+  pitch: 1.0
+use-skillpoint:
+  sound: UI_BUTTON_CLICK
+  volume: 1.0
+  pitch: 2.0

@@ -1148,7 +1148,7 @@ Architect:
    
 
 # Stuff relating to Deck GUI
-default-skillpoints: 20
+default-skillpoints: 12
 
 intangibles:
   locked: RED_STAINED_GLASS_PANE

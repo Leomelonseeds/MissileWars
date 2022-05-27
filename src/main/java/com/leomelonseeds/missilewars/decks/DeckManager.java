@@ -288,7 +288,7 @@ public class DeckManager {
             String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
             if (deck != null) {
                 if (name.contains("enchants")) {
-                    displayName = getEnchName(itemsConfig.getString("enchants.name").replace("%enchant%", realname));
+                    displayName = (itemsConfig.getString("enchants.name").replace("%enchant%", getEnchName(realname)));
                 }
                 displayName = displayName + itemsConfig.getString("text.actuallevel");
                 displayName = displayName.replace("%current%", level + "").replace("%max%", getMaxLevel(name) + "");

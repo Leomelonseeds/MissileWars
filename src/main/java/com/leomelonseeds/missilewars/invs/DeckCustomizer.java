@@ -1,18 +1,24 @@
 package com.leomelonseeds.missilewars.invs;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.JSONManager;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -24,17 +30,25 @@ public class DeckCustomizer implements MWInventory {
     private JSONObject presetjson;
     private Player player;
     private String deck;
+    private String preset;
     private FileConfiguration itemConfig;
     private DeckManager deckManager;
+    private JSONManager jsonManager;
+    private String[] items;
+    private String[] abilities;
     
     public DeckCustomizer(Player player, String deck, String preset) {
-        init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+        deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
+        jsonManager = MissileWarsPlugin.getPlugin().getJSON();
+        init = jsonManager.getPlayer(player.getUniqueId());
         deckjson = init.getJSONObject(deck);
         presetjson = deckjson.getJSONObject(preset);
         itemConfig = ConfigUtils.getConfigFile("items.yml");
-        deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
+        items = new String[] {"missiles", "utility"};
+        abilities = new String[] {"gpassive", "passive", "ability"};
         this.player = player;
         this.deck = deck;
+        this.preset = preset;
         
         String title = itemConfig.getString("title.deck").replace("%deck%", deck).replace("%preset%", preset);
         inv = Bukkit.createInventory(null, 54, ConfigUtils.toComponent(title));
@@ -66,7 +80,7 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Missile + Utility items
-        for (String s : new String[] {"missiles", "utility"}) {
+        for (String s : items) {
             int index = getIndex(s);
             for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
@@ -102,17 +116,73 @@ public class DeckCustomizer implements MWInventory {
 
     @Override
     public void registerClick(int slot, ClickType type) {
-        /* AIN'T NO WAY THIS WORKED AHAHAHAHAH
-        new ConfirmAction("Back", player, this, (confirm) -> {
-            if (confirm) {
-                player.sendMessage("Just a test");
-            }
-        });*/
         // Back button
         if (slot == 53) {
             new PresetSelector(player, deck);
             return;
         }
+        
+        // Reset to default config
+        if (slot == 26) {
+            new ConfirmAction("Reset Preset", player, this, (confirm) -> {
+                if (confirm) {
+                    deckjson.put(preset, jsonManager.getDefaultPreset(deck));
+                    Bukkit.getLogger().log(Level.INFO, deckjson.toString());
+                    Bukkit.getLogger().log(Level.INFO, preset);
+                    Bukkit.getLogger().log(Level.INFO, jsonManager.getDefaultPreset(deck).toString());
+                    updateInventory();
+                }
+                return;
+            });
+        }
+        
+        // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
+        if (slot == 17) {
+            new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
+                if (confirm) {
+                    for (String key : presetjson.keySet()) {
+                        if (presetjson.get(key) instanceof Integer) {
+                            presetjson.put(key, 0);
+                        }
+                        int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+                        int level = RankUtils.getRankLevel(exp);
+                        int sp = itemConfig.getInt("default-skillpoints") + level;
+                        presetjson.put("skillpoints", sp);
+                    }
+                    for (String s : items) {
+                        for (String key : presetjson.getJSONObject(s).keySet()) {
+                            presetjson.getJSONObject(s).put(key, 1);
+                        }
+                    }
+                    for (String s : abilities) {
+                        JSONObject j = presetjson.getJSONObject(s);
+                        j.put("selected", "None");
+                        j.put("level", 0);
+                    }
+                    updateInventory();
+                }
+                return;
+            });
+        }
+        
+        ItemStack item = inv.getItem(slot);
+        
+        // Ensure we got one
+        if (item == null || item.getItemMeta() == null) {
+            return;
+        }
+        
+        // Ensure it's clickable :))
+        if (!item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
+                PersistentDataType.STRING)) {
+            return;
+        }
+        
+        String storedName = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
+                PersistentDataType.STRING);
+        String[] args = storedName.split("_");
+        String name = args[1];
+        int level = Integer.parseInt(args[2]);
     }
 
     @Override

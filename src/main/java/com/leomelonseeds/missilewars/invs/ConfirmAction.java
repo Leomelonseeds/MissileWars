@@ -61,6 +61,7 @@ public class ConfirmAction implements MWInventory {
         manager.registerInventory(player, mwinv);
         
         if (material == Material.EMERALD_BLOCK) {
+            ConfigUtils.sendConfigSound("purchase-item", player);
             callback.onConfirm(true);
         } else if (material == Material.REDSTONE_BLOCK) {
             callback.onConfirm(false);
