@@ -1225,7 +1225,8 @@ indicators:
     slot: 53
   
 text:
-  locked: "&cLeft-click &7to purchase &c(-%cost% Mokens)"
+  locked1: "&4Locked &c(Requires %cost% Mokens)"
+  locked2: "&cLeft-click &7to purchase"
   upgradable: "&cLeft-click &7to upgrade &c(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &a(+%spcost%sp)"
   level: "&f%1%"
@@ -1251,7 +1252,7 @@ enchants:
   name: "&b%enchant%"
   lore:
   - ""
-  - "&bLevel: %level%"
+  - "&bEnchantment Level: %level%"
   
 gpassive:
   missilespec:

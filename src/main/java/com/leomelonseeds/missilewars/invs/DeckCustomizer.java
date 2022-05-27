@@ -77,26 +77,26 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Enchantments
+        int index_e = getIndex("enchants");
         for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
-            int index = getIndex("enchants");
             ItemStack item = deckManager.createItem(deck + ".enchants." + key, presetjson.getInt(key), 
                         false, init, deck, true);
-            inv.setItem(index, item);
-            index++;
+            inv.setItem(index_e, item);
+            index_e++;
         }
         
         // Global Passives
+        int index_g = getIndex("gpassive");
         JSONObject gpassivejson = presetjson.getJSONObject("gpassive");
         for (String key : itemConfig.getConfigurationSection("gpassive").getKeys(false)) {
-            int index = getIndex("gpassive");
             int level = 0;
             if (gpassivejson.getString("selected").equals(key)) {
                 level = gpassivejson.getInt("level");
             }
             ItemStack item = deckManager.createItem("gpassive." + key, level, 
                         false, init, deck, true);
-            inv.setItem(index, item);
-            index++;
+            inv.setItem(index_g, item);
+            index_g++;
         }
     }
 

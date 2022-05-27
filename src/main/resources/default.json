@@ -12,8 +12,8 @@
 		"bhop": false,
 		"adrenaline": false,
 		"defaultpreset": {
-			"skillpoints": 18,
-			"feather_falling": 1,
+			"skillpoints": 1,
+			"feather_falling": 0,
 			"sharpness": 2,
 			"fire_aspect": 0,
 			"utility": {
@@ -23,7 +23,7 @@
 			},
 			"missiles": {
 				"lightning": 1,
-				"cruiser": 2,
+				"cruiser": 1,
 				"hilt": 2,
 				"supersonic": 1,
 				"tomahawk": 2
@@ -52,21 +52,21 @@
 		"longshot": false,
 		"priest": false,
 		"defaultpreset": {
-			"skillpoints": 18,
-			"fire_protection": 1,
-			"punch": 1,
+			"skillpoints": 0,
+			"fire_protection": 0,
+			"punch": 0,
 			"power": 0,
 			"flame": 1,
-			"sharpness": 2,
+			"sharpness": 0,
 			"utility": {
-				"obsidianshield": 1,
+				"obsidianshield": 2,
 				"arrows": 2,
 				"torpedo": 2
 			},
 			"missiles": {
-				"guardian": 1,
+				"guardian": 2,
 				"gemini": 2,
-				"cronullifier": 2,
+				"cronullifier": 1,
 				"sword": 1,
 				"piranha": 1
 			},
@@ -94,10 +94,10 @@
 		"retaliation": false,
 		"booster": false,
 		"defaultpreset": {
-			"skillpoints": 18,
-			"blast_protection": 1,
-			"multishot": 1,
-			"quick_charge": 2,
+			"skillpoints": 1,
+			"blast_protection": 0,
+			"multishot": 0,
+			"quick_charge": 0,
 			"sharpness": 2,
 			"utility": {
 				"creeper": 1,
@@ -135,22 +135,22 @@
 		"naturesblessing": false,
 		"lazybuilder": false,
 		"defaultpreset": {
-			"skillpoints": 18,
-			"projectile_protection": 1,
+			"skillpoints": 1,
+			"projectile_protection": 0,
 			"sharpness": 1,
-			"efficiency": 1,
+			"efficiency": 0,
 			"haste": 0,
 			"utility": {
 				"shield": 2,
 				"platform": 2,
-				"leaves": 1
+				"leaves": 2
 			},
 			"missiles": {
 				"shipper": 2,
-				"slingshot": 1,
-				"citadel": 2,
-				"pisces": 2,
-				"ant": 2
+				"slingshot": 2,
+				"citadel": 1,
+				"pisces": 1,
+				"ant": 1
 			},
 			"ability": {
 				"selected": "None",

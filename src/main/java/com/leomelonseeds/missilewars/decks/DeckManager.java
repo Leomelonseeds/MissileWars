@@ -332,9 +332,9 @@ public class DeckManager {
                         continue;
                     }
                     String get = m.replaceAll("%", "");
-                    String got1 = ConfigUtils.getItemValue(name, level, get) + "";
+                    String got1 = ConfigUtils.getItemValue(name, Math.max(level, 1), get) + "";
                     String value = itemsConfig.getString("text.level").replace("%1%", got1);
-                    if (deck != null && level < getMaxLevel(name)) {
+                    if (deck != null && level < getMaxLevel(name) && level > 0) {
                         String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
                         if (!got1.equals(got2)) {
                             value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
@@ -353,7 +353,8 @@ public class DeckManager {
                 if ((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
                     (playerjson.has(realname) && !playerjson.getBoolean(realname))) {
                     int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
-                    lore.add(itemsConfig.getString("text.locked").replace("%cost%", cost + ""));
+                    lore.add(itemsConfig.getString("text.locked1").replace("%cost%", cost + ""));
+                    lore.add(itemsConfig.getString("text.locked2").replace("%cost%", cost + ""));
                     if (intangible) {
                         item.setType(Material.getMaterial(itemsConfig.getString("intangibles.locked")));
                     }
@@ -449,8 +450,8 @@ public class DeckManager {
      */
     private String getEnchName(String ench) {
         String[] temp = ench.split("_");
-        for (String t : temp) {
-            StringUtils.capitalize(t);
+        for (int i = 0; i < temp.length; i++) {
+            temp[i] = StringUtils.capitalize(temp[i]);
         }
         return String.join(" ", temp);
     }
