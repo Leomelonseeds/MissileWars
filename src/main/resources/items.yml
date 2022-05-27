@@ -243,7 +243,7 @@ gemini:
 
 cronullifier:
   1:
-    file: 'cronullifier.nbt'
+    file: 'chronullifier.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
     name: "&e☢ Chronullifier ✟"
     lore:
@@ -932,7 +932,7 @@ leaves:
     amount: 8
     spcost: 2
   
-lingering_harming:
+harming:
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion %level% ⚡"
   lore:
@@ -1196,9 +1196,9 @@ indicators:
     - "&7for your remaining skillpoints."
     - "&7You get one extra skillpoint per MW rank."
     - ""
-    - "&cNote: If this is your first time opening"
-    - "&cthis menu, it is recommended that you"
-    - "&cclick 'Reset Preset' before continuing."
+    - "&cNote: You may use either the 'Skillpoints'"
+    - "&cor 'Reset Preset' options below to claim"
+    - "&cadditional skillpoints from MW ranks."
     slot: 8
   skillpoints:
     item: EMERALD
@@ -1206,9 +1206,7 @@ indicators:
     lore:
     - ""
     - "&7Click to downgrade all items"
-    - "&7and return all skillpoints. This"
-    - "&7also allows you to claim any extra"
-    - "&7skillpoints earned from MW ranks."
+    - "&7and return all skillpoints"
     slot: 17
   reset:
     item: BARRIER

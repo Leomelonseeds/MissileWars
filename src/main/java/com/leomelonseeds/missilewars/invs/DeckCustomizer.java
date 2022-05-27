@@ -123,6 +123,10 @@ public class DeckCustomizer implements MWInventory {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
                 if (confirm) {
                     init.getJSONObject(deck).put(preset, jsonManager.getDefaultPreset(deck));
+                    int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+                    int level = RankUtils.getRankLevel(exp);
+                    int sp = presetjson.getInt("skillpoints") + level;
+                    presetjson.put("skillpoints", sp);
                     updateInventory();
                 }
                 return;
@@ -165,8 +169,10 @@ public class DeckCustomizer implements MWInventory {
             return;
         }
         
+        ItemMeta meta = item.getItemMeta();
+        
         // Ensure it's clickable :))
-        if (!item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
+        if (!meta.getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
                 PersistentDataType.STRING)) {
             return;
         }
@@ -175,7 +181,52 @@ public class DeckCustomizer implements MWInventory {
                 PersistentDataType.STRING);
         String[] args = storedName.split("_");
         String name = args[0];
+        String[] args2 = name.split("\\.");
+        String realname = args2[args2.length - 1];
         int level = Integer.parseInt(args[1]);
+        
+        // Unlock a locked item
+        if (item.getType() == Material.getMaterial(itemConfig.getString("intangibles.locked"))) {
+            double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
+            int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
+            if (bal >= cost) {
+                new ConfirmAction("Purchase '" + realname + "'", player, this, (confirm) -> {
+                    if (confirm) {
+                        if (init.has(realname)) {
+                            init.put(realname, true);
+                        } else if (init.getJSONObject(deck).has(realname)) {
+                            init.getJSONObject(deck).put(realname, true);
+                        }
+                        updateInventory();
+                    }
+                });
+            } else {
+                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+            }
+            return;
+        }
+        
+        int sp = presetjson.getInt("skillpoints");
+        
+        // Upgrade/downgade missiles/utility/enchants
+        for (String s : items) {
+            JSONObject cjson = presetjson.getJSONObject(s);
+            if (cjson.has(name)) {
+                processClick(sp, name, level, cjson, type, realname);
+                return;
+            }
+        }
+        
+        // Enchantments
+        if (presetjson.has(realname)) {
+            processClick(sp, name, level, presetjson, type, realname);
+            return;
+        }
+        
+        // Global Passive
+        if (itemConfig.getConfigurationSection("gpassive").getKeys(false).contains(realname)) {
+            processAbilityClick("gpassive", sp, name, realname, level, type);
+        }
     }
 
     @Override
@@ -199,5 +250,128 @@ public class DeckCustomizer implements MWInventory {
      */
     private int getIndex(String key) {
         return itemConfig.getInt("indicators." + key + ".slot") + 2;
+    }
+    
+    /**
+     * Process a click for a missile/utility/enchantment upgrade
+     * 
+     * @param sp
+     * @param name
+     * @param level
+     * @param json
+     * @param type
+     */
+    private void processClick(int sp, String name, int level, JSONObject json, ClickType type, String realname) {
+        
+        // Left click to upgrade...
+        if (type == ClickType.LEFT) {
+            if (level >= deckManager.getMaxLevel(name)) {
+                return;
+            }
+            
+            int spcost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
+            
+            if (sp < spcost) {
+                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+                return;
+            }
+            
+            json.put(realname, json.getInt(realname) + 1);
+            presetjson.put("skillpoints", sp - spcost);
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+            return;
+        }
+        
+        // Right click to downgrade.
+        if (type == ClickType.RIGHT) {
+            // Enchantments have min level 0
+            if (level <= (name.contains(".") ? 0 : 1)) {
+                return;
+            }
+            
+            int spgain = (int) ConfigUtils.getItemValue(name, level, "spcost");
+            
+            json.put(realname, json.getInt(realname) - 1);
+            presetjson.put("skillpoints", sp + spgain);
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+            return;
+        }
+    }
+    
+    /**
+     * Process click for global passive/passive/ability
+     * 
+     * @param type
+     * @param sp
+     * @param name
+     * @param level
+     * @param clickType
+     */
+    private void processAbilityClick(String type, int sp, String name, String realname, int level, ClickType clickType) {
+        JSONObject json = presetjson.getJSONObject(type);
+        
+        // Purchase this ability if player doesn't have one selected
+        if (json.getString("selected").equals("None") && clickType == ClickType.LEFT) {
+            int spcost = (int) ConfigUtils.getItemValue(name, 1, "spcost");
+            
+            if (sp < spcost) {
+                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+                return;
+            }
+            
+            json.put("selected", realname);
+            json.put("level", 1);
+            presetjson.put("skillpoints", sp - spcost);
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+            return;
+        }
+        
+        // Otherwise make sure the one we clicked on is selected one
+        if (!json.getString("selected").equals(realname)) {
+            ConfigUtils.sendConfigMessage("messages.cannot-purchase", player, null, null);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+        
+        if (clickType == ClickType.LEFT) {
+            
+            if (level >= deckManager.getMaxLevel(name)) {
+                return;
+            }
+            
+            int spcost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
+            
+            if (sp < spcost) {
+                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+                return;
+            }
+            
+            json.put("level", level + 1);
+            presetjson.put("skillpoints", sp - spcost);
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+            return;
+        }
+        
+        if (clickType == ClickType.RIGHT) {
+            if (level <= 0) {
+                return;
+            }
+            
+            int spgain = (int) ConfigUtils.getItemValue(name, level, "spcost");
+            
+            if (level - 1 == 0) {
+                json.put("selected", "None");
+            }
+            
+            json.put("level", level - 1);
+            presetjson.put("skillpoints", sp + spgain);
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+            return;
+        }
     }
 }

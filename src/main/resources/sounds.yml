@@ -90,3 +90,7 @@ use-skillpoint:
   sound: UI_BUTTON_CLICK
   volume: 1.0
   pitch: 2.0
+purchase-unsuccessful:
+  sound: BLOCK_NOTE_BLOCK_BASS
+  volume: 1.0
+  pitch: 1.0

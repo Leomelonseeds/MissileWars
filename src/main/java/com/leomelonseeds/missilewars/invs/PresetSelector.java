@@ -124,6 +124,9 @@ public class PresetSelector implements MWInventory {
                 // Open deck customizer
                 new DeckCustomizer(player, deck, p);
             } else if (type == ClickType.LEFT) {
+                if (playerJson.get("Preset").equals(p)) {
+                    return;
+                }
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);

@@ -23,7 +23,7 @@ messages:
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
   queue-join-error: "&cYou cannot join this team as the teams would be unbalanced."
-  queue-join-full: "&cSorry, this team is full!"
+  queue-join-full: "&cSorry, this team is full! Use /spectate to spectate the game."
   queue-join-time: "&cYou cannot queue at this time!"
   lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
   lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."
@@ -65,6 +65,8 @@ messages:
   canopy-fail: "&cYou can only use a canopy while standing!"
   canopy-activate: "&7Teleporting in 1 second..."
   canopy-blocked: "&cSomething is blocking your teleportation path!"
+  purchase-unsuccessful: "&cYou don't have enough for this purchase!"
+  cannot-purchase: "&cYou may only choose one passive/ability per category!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
