@@ -124,7 +124,7 @@ public class JSONManager {
             }
         }
         // Remove keys not existing in default
-        for (String key : original.keySet()) {
+        for (String key : JSONObject.getNames(original)) {
             if (!(updated.has(key) || plugin.getDeckManager().getPresets().contains(key))) {
                 original.remove(key);
             }
