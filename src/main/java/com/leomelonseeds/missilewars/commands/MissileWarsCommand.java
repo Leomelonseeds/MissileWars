@@ -228,6 +228,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 }
                 
                 arena.enqueueRed(player.getUniqueId());
+                return true;
             }
             
             // Ensure player is allowed
@@ -272,6 +273,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 }
                 
                 arena.enqueueBlue(player.getUniqueId());
+                return true;
             }
             
             // Ensure player is allowed
