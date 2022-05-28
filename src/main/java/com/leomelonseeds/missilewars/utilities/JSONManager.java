@@ -222,7 +222,7 @@ public class JSONManager {
     public int getAbility(UUID uuid, String ability) {
         JSONObject json = getPlayerPreset(uuid);
         for (String s : new String[] {"gpassive", "passive", "ability"}) {
-            if (json.getJSONObject(s).getString("selected").equals("ability")) {
+            if (json.getJSONObject(s).getString("selected").equals(ability)) {
                 return json.getJSONObject(s).getInt("level");
             }
         }
