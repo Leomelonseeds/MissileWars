@@ -109,15 +109,6 @@ public class Deck {
         // Give random item if under limit
         return limit > 0;
     }
-    
-    /**
-     * Give a pool item that's not the first item
-     * 
-     * @param player
-     */
-    public void givePoolItem(Player player) {
-        givePoolItem(player, false);
-    }
 
     /**
      * Give a random item from the pool to a given player if they have space.

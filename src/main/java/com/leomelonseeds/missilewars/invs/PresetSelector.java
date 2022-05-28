@@ -59,6 +59,8 @@ public class PresetSelector implements MWInventory {
                 String gpassive = current.getJSONObject("gpassive").getString("selected");
                 if (!gpassive.equals("None")) {
                     l = l.replaceAll("%gpassive%", itemConfig.getString("gpassive." + gpassive + ".name"));
+                } else {
+                    l = l.replaceAll("%gpassive%", "None");
                 }
                 lore.add(l);
             }

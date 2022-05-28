@@ -199,7 +199,7 @@ public class MissileWarsTeam {
     public void distributeGear() {
         for (MissileWarsPlayer player : members) {
             player.giveDeckGear();
-            player.givePoolItem();
+            player.givePoolItem(true);
         }
     }
 
@@ -231,7 +231,7 @@ public class MissileWarsTeam {
             public void run() {
                 // Distribute items
                 for (MissileWarsPlayer player : members) {
-                    player.givePoolItem();
+                    player.givePoolItem(false);
                 }
                 // Enqueue next distribution
                 scheduleDeckItems();

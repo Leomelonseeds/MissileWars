@@ -170,11 +170,11 @@ public class MissileWarsPlayer {
     public int hashCode() {
         return Objects.hash(playerId);
     }
-
+    
     /** Give the MC player an item from their Deck. */
-    public void givePoolItem() {
+    public void givePoolItem(Boolean first) {
         if (deck != null && getMCPlayer() != null) {
-            deck.givePoolItem(getMCPlayer());
+            deck.givePoolItem(getMCPlayer(), first);
         }
     }
 
