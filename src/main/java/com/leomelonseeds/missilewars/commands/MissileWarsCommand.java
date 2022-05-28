@@ -212,7 +212,25 @@ public class MissileWarsCommand implements CommandExecutor {
 
         // Queue for red team
         if (action.equalsIgnoreCase("EnqueueRed")) {
-            // Ensure player is allowed to open team menu
+            
+            if (args.length == 1) {
+                Player player = (Player) sender;
+                // Check if player is in arena
+                Arena arena = arenaManager.getArena(player.getUniqueId());
+                if (arena == null) {
+                    sendErrorMsg(sender, "You are not in an arena!");
+                    return true;
+                }
+                
+                if (!arena.getTeam(player.getUniqueId()).equals("no team") || !sender.hasPermission("umw.enqueue")) {
+                    sendErrorMsg(sender, "You are already on a team!");
+                    return true;
+                }
+                
+                arena.enqueueRed(player.getUniqueId());
+            }
+            
+            // Ensure player is allowed
             if (!sender.hasPermission("umw.enqueue")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
@@ -239,7 +257,24 @@ public class MissileWarsCommand implements CommandExecutor {
 
         // Queue for blue team
         if (action.equalsIgnoreCase("EnqueueBlue")) {
-            // Ensure player is allowed to open team menu
+            if (args.length == 1) {
+                Player player = (Player) sender;
+                // Check if player is in arena
+                Arena arena = arenaManager.getArena(player.getUniqueId());
+                if (arena == null) {
+                    sendErrorMsg(sender, "You are not in an arena!");
+                    return true;
+                }
+                
+                if (!arena.getTeam(player.getUniqueId()).equals("no team") || !sender.hasPermission("umw.enqueue")) {
+                    sendErrorMsg(sender, "You are already on a team!");
+                    return true;
+                }
+                
+                arena.enqueueBlue(player.getUniqueId());
+            }
+            
+            // Ensure player is allowed
             if (!sender.hasPermission("umw.enqueue")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
