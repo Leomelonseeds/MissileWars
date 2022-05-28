@@ -201,6 +201,8 @@ public class RankUtils {
                     p.sendMessage(othermessage);
                 }
             }
+            
+            MissileWarsPlugin.getPlugin().getJSON().rankUp(player.getUniqueId());
         }
 
         MissileWarsPlugin.getPlugin().getSQL().updateExp(player.getUniqueId(), exp);

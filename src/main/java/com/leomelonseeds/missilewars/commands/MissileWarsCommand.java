@@ -222,7 +222,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
                 
-                if (!arena.getTeam(player.getUniqueId()).equals("no team") || !sender.hasPermission("umw.enqueue")) {
+                if (!(arena.getTeam(player.getUniqueId()).equals("no team") || sender.hasPermission("umw.enqueue"))) {
                     sendErrorMsg(sender, "You are already on a team!");
                     return true;
                 }
@@ -267,7 +267,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
                 
-                if (!arena.getTeam(player.getUniqueId()).equals("no team") || !sender.hasPermission("umw.enqueue")) {
+                if (!(arena.getTeam(player.getUniqueId()).equals("no team") || sender.hasPermission("umw.enqueue"))) {
                     sendErrorMsg(sender, "You are already on a team!");
                     return true;
                 }

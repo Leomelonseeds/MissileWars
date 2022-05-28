@@ -128,9 +128,9 @@ public class Deck {
         double chance = 0.375;
         double add = 0;
         if (missilespec > 0) {
-            add = -1 * (double) ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage");
+            add = -1 * Double.valueOf(ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage") + "") / 100;
         } else if (utilityspec > 0) {
-            add = (double) ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage");
+            add = Double.valueOf(ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage") + "") / 100;
         }
         chance += add;
         List<ItemStack> toUse = rand.nextDouble() < chance ? utility : missiles;

@@ -243,16 +243,6 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Generate a map given the map name.
-     *
-     * @param mapName the name of the map
-     * @return true if the map successfully generated, otherwise false
-     */
-    public boolean generateMap(String mapName) {
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), mapType, null);
-    }
-
-    /**
      * Get people in red queue
      *
      * @return
@@ -843,14 +833,6 @@ public class Arena implements ConfigurationSerializable {
             mapName = mapsWithTopVotes.get(new Random().nextInt(mapsWithTopVotes.size()));
         }
 
-        // Generate map.
-        if (!generateMap(mapName)) {
-        	announceMessage("messages.map-failed", null);
-        	return false;
-        } else {
-        	announceMessage("messages.starting", null);
-        }
-
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
         Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", mapType, mapName);
@@ -864,86 +846,7 @@ public class Arena implements ConfigurationSerializable {
         // Setup scoreboard and teams
         blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
         redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
-
-        // Assign players to teams based on queue (which removes their items)
-        List<MissileWarsPlayer> toAssign = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
-            toAssign.add(player);
-        }
-        Collections.shuffle(toAssign);
-        double maxSize = getCapacity() / 2;
-        double maxQueue = Math.ceil((double) players.size() / 2);
-
-        // Teleport all players to center to remove lobby minigame items/dismount
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (MissileWarsPlayer player : players) {
-                    player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-                }
-            }
-        }.runTaskLater(plugin, 15));
-
-        // Teleport teams slightly later to wait for map generation
-        tasks.add(new BukkitRunnable() {
-        	@Override
-        	public void run() {
-        		// Assign queued players. If a queue is larger than a team size put remaining
-        	    // players into the front of the queue to be assigned first into random teams
-        		while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
-		            if (!redQueue.isEmpty()) {
-		                MissileWarsPlayer toAdd = redQueue.remove();
-                        toAssign.remove(toAdd);
-		                if (redTeam.getSize() < maxQueue) {
-		                	redTeam.addPlayer(toAdd);
-		                } else {
-		                    toAssign.add(0, toAdd);
-		                }
-		            }
-		            if (!blueQueue.isEmpty()) {
-		                MissileWarsPlayer toAdd = blueQueue.remove();
-                        toAssign.remove(toAdd);
-		                if (blueTeam.getSize() < maxQueue) {
-		                	blueTeam.addPlayer(toAdd);
-		                } else {
-                            toAssign.add(0, toAdd);
-                        }
-		            }
-		        }
-
-		        // Assign remaining players
-		        for (MissileWarsPlayer player : toAssign) {
-		            // Ignore if player is a spectator
-		            if (spectators.contains(player)) {
-		                continue;
-		            }
-		            if (blueTeam.getSize() <= redTeam.getSize()) {
-		                if (blueTeam.getSize() >= maxSize) {
-		                    ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
-		                } else {
-		                    blueTeam.addPlayer(player);
-		                }
-		            } else {
-                        if (redTeam.getSize() >= maxSize) {
-                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
-                        } else {
-                            redTeam.addPlayer(player);
-                        }
-		            }
-		        }
-
-		        // Start deck distribution for each team and send messages
-		        redTeam.scheduleDeckItems();
-		        redTeam.distributeGear();
-                redTeam.sendTitle("classic-start");
-                redTeam.sendSound("game-start");
-		        blueTeam.scheduleDeckItems();
-		        blueTeam.distributeGear();
-                blueTeam.sendTitle("classic-start");
-                blueTeam.sendSound("game-start");
-        	}
-        }.runTaskLater(plugin, 20));
-
+        
         // Setup game timers
         // Game start
         startTime = LocalDateTime.now();
@@ -986,6 +889,83 @@ public class Arena implements ConfigurationSerializable {
                 }
             }.runTaskLater(plugin, i * 20));
         }
+
+        // Generate map.
+        announceMessage("messages.starting", null);
+        SchematicManager.spawnFAWESchematic(mapName, getWorld(), mapType, (result) -> {
+            // Assign players to teams based on queue (which removes their items)
+            List<MissileWarsPlayer> toAssign = new ArrayList<>();
+            for (MissileWarsPlayer player : players) {
+                toAssign.add(player);
+            }
+            Collections.shuffle(toAssign);
+            double maxSize = getCapacity() / 2;
+            double maxQueue = Math.ceil((double) players.size() / 2);
+            
+            // Teleport all players to center to remove lobby minigame items/dismount
+            for (MissileWarsPlayer player : players) {
+                player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            }
+            
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    // Assign queued players. If a queue is larger than a team size put remaining
+                    // players into the front of the queue to be assigned first into random teams
+                    while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
+                        if (!redQueue.isEmpty()) {
+                            MissileWarsPlayer toAdd = redQueue.remove();
+                            toAssign.remove(toAdd);
+                            if (redTeam.getSize() < maxQueue) {
+                                redTeam.addPlayer(toAdd);
+                            } else {
+                                toAssign.add(0, toAdd);
+                            }
+                        }
+                        if (!blueQueue.isEmpty()) {
+                            MissileWarsPlayer toAdd = blueQueue.remove();
+                            toAssign.remove(toAdd);
+                            if (blueTeam.getSize() < maxQueue) {
+                                blueTeam.addPlayer(toAdd);
+                            } else {
+                                toAssign.add(0, toAdd);
+                            }
+                        }
+                    }
+
+                    // Assign remaining players
+                    for (MissileWarsPlayer player : toAssign) {
+                        // Ignore if player is a spectator
+                        if (spectators.contains(player)) {
+                            continue;
+                        }
+                        if (blueTeam.getSize() <= redTeam.getSize()) {
+                            if (blueTeam.getSize() >= maxSize) {
+                                ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+                            } else {
+                                blueTeam.addPlayer(player);
+                            }
+                        } else {
+                            if (redTeam.getSize() >= maxSize) {
+                                ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+                            } else {
+                                redTeam.addPlayer(player);
+                            }
+                        }
+                    }
+
+                    // Start deck distribution for each team and send messages
+                    redTeam.scheduleDeckItems();
+                    redTeam.distributeGear();
+                    redTeam.sendTitle("classic-start");
+                    redTeam.sendSound("game-start");
+                    blueTeam.scheduleDeckItems();
+                    blueTeam.distributeGear();
+                    blueTeam.sendTitle("classic-start");
+                    blueTeam.sendSound("game-start");
+                }
+            }.runTaskLater(plugin, 5L);
+        });
 
         running = true;
         return true;
