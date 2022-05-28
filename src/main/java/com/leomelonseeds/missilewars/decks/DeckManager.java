@@ -117,7 +117,6 @@ public class DeckManager {
             addEnch(weapon, "sharpness", deck, json);
             addEnch(weapon, "flame", deck, json);
             addEnch(weapon, "punch", deck, json);
-            addEnch(weapon, "power", deck, json);
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
             addEnch(boots, "fire_protection", deck, json);
             gear.add(boots);
