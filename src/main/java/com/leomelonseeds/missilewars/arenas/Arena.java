@@ -1194,7 +1194,7 @@ public class Arena implements ConfigurationSerializable {
 
                 sql.updateClassicStats(uuid, won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
                 sql.updateWinstreak(uuid, mapType, won);
-                sql.updateExp(uuid, amountEarned);
+                RankUtils.addExp(player.getMCPlayer(), amountEarned);
 
                 String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));

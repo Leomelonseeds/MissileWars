@@ -385,7 +385,7 @@ public class DeckManager {
             id = "utility";
         }
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
-                PersistentDataType.STRING, name + "_" + level);
+                PersistentDataType.STRING, name + "-" + level);
         
         // Setup item meta for potions
         if (name.equals("splash")) {
@@ -393,7 +393,7 @@ public class DeckManager {
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
             itemMeta = pmeta;
-        } else if (name.equals("harming")) {
+        } else if (name.equals("lingering_harming")) {
             int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
             int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
             PotionMeta pmeta = (PotionMeta) itemMeta;

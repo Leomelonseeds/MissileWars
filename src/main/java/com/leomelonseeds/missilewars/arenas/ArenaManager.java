@@ -382,8 +382,8 @@ public class ArenaManager {
             vSkin.setSkinPersistent("vanguard", schematicConfig.getString("lobby.npc-pos.vanguard.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.vanguard.value"));
             CommandTrait vCommand = new CommandTrait();
-            vCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open vanguard %player%",
-                    CommandTrait.Hand.BOTH));
+            vCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck vanguard",
+                    CommandTrait.Hand.BOTH).player(true));
             vanguard.addTrait(vCommand);
 
             arenaWorld.loadChunk(vLoc.getChunk());
@@ -400,8 +400,8 @@ public class ArenaManager {
             sSkin.setSkinPersistent("sentinel", schematicConfig.getString("lobby.npc-pos.sentinel.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.sentinel.value"));
             CommandTrait sCommand = new CommandTrait();
-            sCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open sentinel %player%",
-                    CommandTrait.Hand.BOTH));
+            sCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck sentinel",
+                    CommandTrait.Hand.BOTH).player(true));
             sentinel.addTrait(sCommand);
 
             arenaWorld.loadChunk(sLoc.getChunk());
@@ -418,8 +418,8 @@ public class ArenaManager {
             bSkin.setSkinPersistent("berserker", schematicConfig.getString("lobby.npc-pos.berserker.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.berserker.value"));
             CommandTrait bCommand = new CommandTrait();
-            bCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open berserker %player%",
-                    CommandTrait.Hand.BOTH));
+            bCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck berserker",
+                    CommandTrait.Hand.BOTH).player(true));
             berserker.addTrait(bCommand);
 
             arenaWorld.loadChunk(bLoc.getChunk());
@@ -436,8 +436,8 @@ public class ArenaManager {
             aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.architect.value"));
             CommandTrait aCommand = new CommandTrait();
-            aCommand.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open architect %player%",
-                    CommandTrait.Hand.BOTH));
+            aCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck architect",
+                    CommandTrait.Hand.BOTH).player(true));
             architect.addTrait(aCommand);
 
             arenaWorld.loadChunk(aLoc.getChunk());

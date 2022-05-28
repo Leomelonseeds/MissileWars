@@ -122,11 +122,11 @@ public class DeckCustomizer implements MWInventory {
         if (slot == 26) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
                 if (confirm) {
-                    init.getJSONObject(deck).put(preset, jsonManager.getDefaultPreset(deck));
+                    JSONObject def = jsonManager.getDefaultPreset(deck);
                     int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
                     int level = RankUtils.getRankLevel(exp);
-                    int sp = presetjson.getInt("skillpoints") + level;
-                    presetjson.put("skillpoints", sp);
+                    def.put("skillpoints", def.getInt("skillpoints") + level);
+                    init.getJSONObject(deck).put(preset, def);
                     updateInventory();
                 }
                 return;
@@ -179,14 +179,15 @@ public class DeckCustomizer implements MWInventory {
         
         String storedName = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
                 PersistentDataType.STRING);
-        String[] args = storedName.split("_");
+        String[] args = storedName.split("-");
         String name = args[0];
-        String[] args2 = name.split("\\.");
-        String realname = args2[args2.length - 1];
         int level = Integer.parseInt(args[1]);
         
+        String args2[] = name.split("\\.");
+        String realname = args2[args2.length - 1];
+        
         // Unlock a locked item
-        if (item.getType() == Material.getMaterial(itemConfig.getString("intangibles.locked"))) {
+        if (item.getType().toString().equals(itemConfig.getString("intangibles.locked"))) {
             double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
             int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
             if (bal >= cost) {
@@ -197,6 +198,7 @@ public class DeckCustomizer implements MWInventory {
                         } else if (init.getJSONObject(deck).has(realname)) {
                             init.getJSONObject(deck).put(realname, true);
                         }
+                        MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
                         updateInventory();
                     }
                 });
@@ -211,7 +213,7 @@ public class DeckCustomizer implements MWInventory {
         // Upgrade/downgade missiles/utility/enchants
         for (String s : items) {
             JSONObject cjson = presetjson.getJSONObject(s);
-            if (cjson.has(name)) {
+            if (cjson.has(realname)) {
                 processClick(sp, name, level, cjson, type, realname);
                 return;
             }

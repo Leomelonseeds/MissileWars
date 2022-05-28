@@ -210,4 +210,22 @@ public class JSONManager {
         String json = defaultPresets.get(deck).toString();
         return new JSONObject(json);
     }
+    
+    /**
+     * Check if player has some ability selected. 
+     * If so, return the level. If not, return 0.
+     * 
+     * @param player
+     * @param ability
+     * @return
+     */
+    public int getAbility(UUID uuid, String ability) {
+        JSONObject json = getPlayerPreset(uuid);
+        for (String s : new String[] {"gpassive", "passive", "ability"}) {
+            if (json.getJSONObject(s).getString("selected").equals("ability")) {
+                return json.getJSONObject(s).getInt("level");
+            }
+        }
+        return 0;
+    }
 }

@@ -61,6 +61,14 @@ messages:
     - "&fThanks for playing!"
     - "&b========================================"
   earn-currency: "&7You earned &c%umw_amount_earned% &amokens &7and &6experience &7this game."
+  rankup: 
+    - "&b========================================"
+    - "&6&lRANK UP &7- %previous% &f-> %current%"
+    - "&aCongratulations! &fYou now have &b%sp%"
+    - "&ftotal Skillpoints available to spend"
+    - "&ffor each preset."
+    - "&b========================================"
+  rankup-others: "&b%umw_focus% &franked up from %previous% &fto %current%&f!"
   canopy-cancel: "&cYour canopy teleportation was cancelled!"
   canopy-fail: "&cYou can only use a canopy while standing!"
   canopy-activate: "&7Teleporting in 1 second..."
@@ -133,7 +141,7 @@ titles:
     subtitle: "&71 portal remaining"
     length: 60
   enemy-portals-destroyed:
-    title: "&5Enemy Portal Destroyed"
+    title: "&5Enemy Portals Destroyed"
     subtitle: "&7Waiting for tie..."
     length: 100
   own-portals-destroyed:

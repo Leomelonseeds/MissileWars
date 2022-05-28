@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -290,77 +289,8 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             return true;
         }
-
+        
         if (action.equalsIgnoreCase("Deck")) {
-
-            Player player = (Player) sender;
-
-            Arena arena = arenaManager.getArena(player.getUniqueId());
-
-            if (!(arena == null || arena.getTeam(player.getUniqueId()).equals("no team"))) {
-                sendErrorMsg(sender, "You cannot change decks while playing.");
-                return true;
-            }
-
-            if (args.length < 2) {
-                sendErrorMsg(sender, "Usage: /mw deck Vanguard/Berserker/Sentinel/Architect [Preset]");
-                return true;
-            }
-
-            String deck = StringUtils.capitalize(args[1].toLowerCase());
-
-            if (!plugin.getDeckManager().getDecks().contains(deck)) {
-                sendErrorMsg(sender, "Please specify a valid deck!");
-                return true;
-            }
-            
-            String preset = null;
-            if (args.length == 3) {
-                preset = args[2];
-                if (!plugin.getDeckManager().getPresets().contains(preset)) {
-                    sendErrorMsg(sender, "Please specify a valid preset!");
-                    return true;
-                }
-            }
-
-            // Update deck in cache
-            JSONObject currentDeck = plugin.getJSON().getPlayer(player.getUniqueId());
-            currentDeck.put("Deck", deck);
-            if (preset != null) {
-                currentDeck.put("Preset", preset);
-            } else {
-                currentDeck.put("Preset", "A");
-            }
-
-            sendSuccessMsg(sender, "Set your deck to " + deck + "!");
-
-            return true;
-        }
-        
-        if (action.equalsIgnoreCase("Give")) {
-            // Ensure sender has permission
-            if (!sender.hasPermission("umw.give")) {
-                sendErrorMsg(sender, "You do not have permission to do that!");
-                return true;
-            }
-            
-            if (args.length != 4) {
-                sendErrorMsg(sender, "Usage: /mw give [player] [item] [level]");
-                return true;
-            }
-
-            try {
-                Player player = Bukkit.getPlayer(args[1]);
-                int level = Integer.parseInt(args[3]);
-                ItemStack item = plugin.getDeckManager().createItem(args[2], level, false);
-                player.getInventory().addItem(item);
-            } catch (Exception e) {
-                sendErrorMsg(sender, "Bad arguments!");
-                return true;
-            }
-        }
-        
-        if (action.equalsIgnoreCase("TestDeck")) {
 
             Player player = (Player) sender;
 

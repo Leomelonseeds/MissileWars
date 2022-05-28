@@ -78,7 +78,7 @@ public class SchematicManager {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
-        String [] args = structureName.split("_");
+        String [] args = structureName.split("-");
         int level = Integer.parseInt(args[1]);
 
         // Attempt to get structure file
@@ -178,7 +178,7 @@ public class SchematicManager {
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Temp hotfix for structure rail rotation bug
-        if (redMissile && structureName.contains("cruiser_2")) {
+        if (redMissile && structureName.contains("cruiser-2")) {
             Location railLoc = spawnLoc.add(0, 1, -8);
             Block block = railLoc.getBlock();
             block.setType(Material.POWERED_RAIL);

@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -168,5 +169,40 @@ public class RankUtils {
         int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
 
         return prefix + nick + " " + getRankSymbol(exp);
+    }
+    
+    /**
+     * Add some exp to the player.
+     * 
+     * @param player
+     * @param exp
+     */
+    public static void addExp(Player player, int exp) {
+        int current = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+        int currentlevel = getRankLevel(current);
+        int newexp = current + exp;
+        int newlevel = getRankLevel(newexp);
+        
+        if (newlevel > currentlevel) {
+            ConfigUtils.sendConfigSound("rankup", player);
+            for (String s : ConfigUtils.getConfigTextList("messages.rankup", null, null, null)) {
+                s = s.replaceAll("%previous%", getRankName(current));
+                s = s.replaceAll("%current%", getRankName(newexp));
+                s = s.replaceAll("%sp%", ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints") + newlevel + "");
+                
+                player.sendMessage(s);
+            }
+            String othermessage = ConfigUtils.getConfigText("messages.rankup-others", null, null, player);
+            othermessage = othermessage.replaceAll("%previous%", getRankName(current));
+            othermessage = othermessage.replaceAll("%current%", getRankName(newexp));
+            
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!p.getName().equals(player.getName())) {
+                    p.sendMessage(othermessage);
+                }
+            }
+        }
+
+        MissileWarsPlugin.getPlugin().getSQL().updateExp(player.getUniqueId(), exp);
     }
 }

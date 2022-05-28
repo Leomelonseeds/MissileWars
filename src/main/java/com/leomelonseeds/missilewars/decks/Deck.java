@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.JSONManager;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -34,6 +35,8 @@ public class Deck {
     private List<ItemStack> pool;
     /** Make game more skill dependent */
     private Deque<ItemStack> lastTwo;
+    
+    private JSONManager jsonmanager;
 
     /**
      * Generate a deck from a given set of gear, utils, and missiles.
@@ -51,6 +54,8 @@ public class Deck {
         combined.addAll(utility);
         this.pool = combined;
         lastTwo = new ArrayDeque<>();
+        
+        jsonmanager = MissileWarsPlugin.getPlugin().getJSON();
     }
     
     public String getName() {
@@ -89,6 +94,8 @@ public class Deck {
      */
     public boolean hasInventorySpace(Player player) {
         int limit = MissileWarsPlugin.getPlugin().getConfig().getInt("inventory-limit");
+        int hoarder = jsonmanager.getAbility(player.getUniqueId(), "hoarder");
+        limit += hoarder;
 
         // Count multiples of item in inventory
         for (ItemStack poolItem : pool) {
@@ -102,21 +109,52 @@ public class Deck {
         // Give random item if under limit
         return limit > 0;
     }
+    
+    /**
+     * Give a pool item that's not the first item
+     * 
+     * @param player
+     */
+    public void givePoolItem(Player player) {
+        givePoolItem(player, false);
+    }
 
     /**
      * Give a random item from the pool to a given player if they have space.
      *
      * @param player the player to give the pool item too
      */
-    public void givePoolItem(Player player) {
+    public void givePoolItem(Player player, Boolean first) {
         // Ensure Deck has pool items
         if (pool.isEmpty()) {
             return;
         }
+        
+        int missilespec = jsonmanager.getAbility(player.getUniqueId(), "missilespec");
+        int utilityspec = jsonmanager.getAbility(player.getUniqueId(), "utilityspec");
+        
+        // Calculate chance based on ability
         double chance = 0.375;
+        double add = 0;
+        if (missilespec > 0) {
+            add = -1 * (double) ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage");
+        } else if (utilityspec > 0) {
+            add = (double) ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage");
+        }
+        chance += add;
         List<ItemStack> toUse = rand.nextDouble() < chance ? utility : missiles;
-        ItemStack poolItem;
+        
+        // Check on first item, global passive
+        if (first) {
+            if (jsonmanager.getAbility(player.getUniqueId(), "missilespec") == 3) {
+                toUse = missiles;
+            } else if (jsonmanager.getAbility(player.getUniqueId(), "utilityspec") == 3) {
+                toUse = utility;
+            }
+        }
+        
         // Don't give players the same item twice
+        ItemStack poolItem;
         do {
             poolItem = toUse.get(rand.nextInt(toUse.size()));
         } while (lastTwo.contains(poolItem));
