@@ -288,7 +288,7 @@ public class ArenaGameruleListener implements Listener {
         
         if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
             ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 0, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
             return;
         }
         

@@ -396,8 +396,9 @@ public class CustomItemListener implements Listener {
                 Location spawnLoc = player.getEyeLocation().clone().add(distance);
                 if (SchematicManager.spawnNBTStructure("canopy-1", spawnLoc, isRedTeam(player), mapName)) {
                     // Teleport and give slowness
-                    player.teleport(spawnLoc.toCenterLocation().add(0, -0.5, 0));
-                    player.getLocation().setPitch(90);
+                    Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
+                    loc.setPitch(90);
+                    player.teleport(loc);
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
                     
                     // Freeze player for a bit
