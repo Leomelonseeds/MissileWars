@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -17,9 +18,12 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -256,5 +260,36 @@ public class ArenaGameruleListener implements Listener {
             event.setCancelled(true);
         }
     }
-
+    
+    @EventHandler
+    public void givePoison(PlayerMoveEvent event) {
+        if (!MissileWarsPlugin.getPlugin().getConfig().getBoolean("experimental.poison")) {
+            return;
+        }
+        
+        Player player = event.getPlayer();
+        
+        if (player.getGameMode() != GameMode.SURVIVAL) {
+            return;
+        }
+        
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+        
+        double toohigh = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-high");
+        
+        if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
+            ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 0, false));
+            return;
+        }
+        
+        if (event.getTo().getBlockY() <= toohigh - 1 && event.getFrom().getBlockY() >= toohigh) {
+            player.removePotionEffect(PotionEffectType.POISON);
+            return;
+        }
+    }
 }

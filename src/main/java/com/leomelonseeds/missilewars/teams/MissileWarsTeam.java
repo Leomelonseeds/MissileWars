@@ -258,6 +258,7 @@ public class MissileWarsTeam {
             InventoryUtils.clearInventory(mcPlayer);
             player.resetPlayer();
             mcPlayer.removePotionEffect(PotionEffectType.FAST_DIGGING);
+            mcPlayer.removePotionEffect(PotionEffectType.POISON);
         }
     }
 

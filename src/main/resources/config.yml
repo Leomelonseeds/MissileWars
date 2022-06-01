@@ -3,6 +3,8 @@ mysql:
   password: ""
   url: "example:3306/ultima"
   
+experimental:
+  poison: true
 
 # Blocks that cannot intersect bounding boxes of schematics
 # Players also cannot right click on these blocks with items.

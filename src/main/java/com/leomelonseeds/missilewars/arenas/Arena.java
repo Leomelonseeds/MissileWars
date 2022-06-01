@@ -656,10 +656,14 @@ public class Arena implements ConfigurationSerializable {
                 
                 if (!running) {
                     if (!redQueue.contains(player)) {
-                        blueQueue.remove(player);
-                        redQueue.add(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
-                        removeSpectator(player);
+                        if (redQueue.size() >= getCapacity() / 2) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                        } else {
+                            blueQueue.remove(player);
+                            redQueue.add(player);
+                            ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
+                            removeSpectator(player);
+                        }
                     } else {
                         redQueue.remove(player);
                         ConfigUtils.sendConfigMessage("messages.queue-leave-red", player.getMCPlayer(), this, null);
@@ -703,10 +707,14 @@ public class Arena implements ConfigurationSerializable {
                 
                 if (!running) {
                     if (!blueQueue.contains(player)) {
-                        redQueue.remove(player);
-                        blueQueue.add(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
-                        removeSpectator(player);
+                        if (blueQueue.size() >= getCapacity() / 2) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                        } else {
+                            redQueue.remove(player);
+                            blueQueue.add(player);
+                            ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
+                            removeSpectator(player);
+                        }
                     } else {
                         blueQueue.remove(player);
                         ConfigUtils.sendConfigMessage("messages.queue-leave-blue", player.getMCPlayer(), this, null);
@@ -738,7 +746,7 @@ public class Arena implements ConfigurationSerializable {
     public void addSpectator(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (running && !blueTeam.containsPlayer(uuid) && !redTeam.containsPlayer(uuid)) {
+                if (!blueTeam.containsPlayer(uuid) && !redTeam.containsPlayer(uuid)) {
                     announceMessage("messages.spectate-join-others", player);
                     spectators.add(player);
                     redQueue.remove(player);
@@ -896,7 +904,9 @@ public class Arena implements ConfigurationSerializable {
             // Assign players to teams based on queue (which removes their items)
             List<MissileWarsPlayer> toAssign = new ArrayList<>();
             for (MissileWarsPlayer player : players) {
-                toAssign.add(player);
+                if (!spectators.contains(player)) {
+                    toAssign.add(player);
+                }
             }
             Collections.shuffle(toAssign);
             double maxSize = getCapacity() / 2;

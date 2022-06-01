@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -379,8 +380,16 @@ public class CustomItemListener implements Listener {
                 Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
                 Location spawnLoc = player.getEyeLocation().clone().add(distance);
                 if (SchematicManager.spawnNBTStructure("canopy-1", spawnLoc, isRedTeam(player), mapName)) {
+                    // Teleport and give slowness
                     player.teleport(spawnLoc.toCenterLocation().add(0, -0.5, 0));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
+                    
+                    // Freeze player for a bit
+                    canopy_freeze.add(player);
+                    Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                        canopy_freeze.remove(player);
+                    }, 20);
+                    
                     hand.setAmount(hand.getAmount() - 1);
                     for (Player players : player.getWorld().getPlayers()) {
                         ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
@@ -395,6 +404,7 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
     }
 
+    Set<Player> canopy_freeze = new HashSet<>();
     Map<Location, Integer> canopy_extensions = new HashMap<>();
 
     private void despawnCanopy(Location loc, int duration) {
@@ -419,6 +429,12 @@ public class CustomItemListener implements Listener {
     public void canopyCancel(PlayerMoveEvent e) {
 
         Player player = e.getPlayer();
+        
+        // Stop players from moving a second after canopy spawn
+        if (canopy_freeze.contains(player)) {
+            e.setCancelled(true);
+            return;
+        }
 
         if (!canopy_cooldown.contains(player.getUniqueId())) {
             return;
