@@ -22,6 +22,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -285,6 +286,7 @@ public class ArenaManager {
         // Create Arena world
         logger.log(Level.INFO, "Generating arena world for " + name);
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        arenaCreator.type(WorldType.FLAT);
         arenaCreator.generator(new VoidChunkGenerator());
         World arenaWorld = arenaCreator.createWorld();
         assert arenaWorld != null;
