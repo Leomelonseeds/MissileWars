@@ -674,11 +674,11 @@ public class Arena implements ConfigurationSerializable {
                     } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && redTeam.getSize() >= getCapacity() / 2) {
                         ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
                     } else {
+                        removeSpectator(player);
                         blueTeam.removePlayer(player);
                         redTeam.addPlayer(player);
                         redTeam.giveItems(player);
                         player.giveDeckGear();
-                        removeSpectator(player);
                         announceMessage("messages.queue-join-red", player);
                     }
                 }
@@ -725,11 +725,11 @@ public class Arena implements ConfigurationSerializable {
                     } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && blueTeam.getSize() >= getCapacity() / 2) {
                         ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
                     } else {
+                        removeSpectator(player);
                         redTeam.removePlayer(player);
                         blueTeam.addPlayer(player);
                         blueTeam.giveItems(player);
                         player.giveDeckGear();
-                        removeSpectator(player);
                         announceMessage("messages.queue-join-blue", player);
                     }
                 }

@@ -134,6 +134,11 @@ public class ArenaGameruleListener implements Listener {
         if (damager == null) {
             return;
         }
+        
+        if (CustomItemListener.canopy_freeze.contains(damager)) {
+            event.setCancelled(true);
+            return;
+        }
 
         // Stop event if damager and damaged are on same team
         if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId())) &&

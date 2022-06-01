@@ -177,6 +177,11 @@ public class CustomItemListener implements Listener {
         if (playerArena == null) {
             return;
         }
+        
+        if (canopy_freeze.contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
 
         ItemStack hand = getItemUsed(player);
         Block clicked = event.getClickedBlock();
@@ -252,6 +257,11 @@ public class CustomItemListener implements Listener {
         if (playerArena == null) {
             return;
         }
+        
+        if (canopy_freeze.contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
 
         ItemStack hand = getItemUsed(player);
         // Handle splash potion through other methods
@@ -320,6 +330,11 @@ public class CustomItemListener implements Listener {
     public void architectLeaves(BlockPlaceEvent event) {
 
         Player player = event.getPlayer();
+        
+        if (canopy_freeze.contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
 
         Arena playerArena = getPlayerArena(player);
         if ((playerArena == null) || !event.getItemInHand().getType().toString().contains("LEAVES")) {
@@ -382,13 +397,14 @@ public class CustomItemListener implements Listener {
                 if (SchematicManager.spawnNBTStructure("canopy-1", spawnLoc, isRedTeam(player), mapName)) {
                     // Teleport and give slowness
                     player.teleport(spawnLoc.toCenterLocation().add(0, -0.5, 0));
+                    player.getLocation().setPitch(90);
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
                     
                     // Freeze player for a bit
                     canopy_freeze.add(player);
                     Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
                         canopy_freeze.remove(player);
-                    }, 20);
+                    }, 30);
                     
                     hand.setAmount(hand.getAmount() - 1);
                     for (Player players : player.getWorld().getPlayers()) {
@@ -404,7 +420,7 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
     }
 
-    Set<Player> canopy_freeze = new HashSet<>();
+    public static Set<Player> canopy_freeze = new HashSet<>();
     Map<Location, Integer> canopy_extensions = new HashMap<>();
 
     private void despawnCanopy(Location loc, int duration) {
@@ -458,10 +474,18 @@ public class CustomItemListener implements Listener {
             return;
         }
         Projectile thrown = event.getEntity();
+        
         if (!(thrown.getShooter() instanceof Player)) {
             return;
         }
+        
         Player thrower = (Player) thrown.getShooter();
+        
+        if (canopy_freeze.contains(thrower)) {
+            event.setCancelled(true);
+            return;
+        }
+        
         Arena playerArena = getPlayerArena(thrower);
         if (playerArena == null) {
             return;

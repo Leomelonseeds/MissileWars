@@ -104,10 +104,11 @@ public class ArenaInventoryListener implements Listener {
             event.setCancelled(true);
             return;
         }
-
-        // Stop drops of gear items
-        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
-        if (mwPlayer.getDeck().getGear().contains(event.getItemDrop().getItemStack())) {
+        
+        String item = event.getItemDrop().getItemStack().toString();
+        
+        // Make sure we allow gear items to be used
+        if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE")) {
             event.setCancelled(true);
         }
     }
