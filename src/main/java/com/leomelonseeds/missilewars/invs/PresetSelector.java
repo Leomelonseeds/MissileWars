@@ -127,6 +127,13 @@ public class PresetSelector implements MWInventory {
             String p = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING);
             if (type == ClickType.RIGHT) {
+                if (player.hasPermission("umw.autoselect")) {
+                    // Choose preset
+                    playerJson.put("Deck", deck);
+                    playerJson.put("Preset", p);
+                    ConfigUtils.sendConfigSound("change-preset", player);
+                    updateInventory();
+                }
                 // Open deck customizer
                 new DeckCustomizer(player, deck, p);
             } else if (type == ClickType.LEFT) {
