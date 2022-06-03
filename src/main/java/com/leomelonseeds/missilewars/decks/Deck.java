@@ -172,6 +172,13 @@ public class Deck {
             return;
         }
         
+        // Check if can add to offhand
+        ItemStack offhand = player.getInventory().getItemInOffHand();
+        if (offhand.getType().toString().equals(poolItem.getType().toString())) {
+            offhand.setAmount(offhand.getAmount() + poolItem.getAmount());
+            return;
+        }
+        
         player.getInventory().addItem(poolItem);
     }
     

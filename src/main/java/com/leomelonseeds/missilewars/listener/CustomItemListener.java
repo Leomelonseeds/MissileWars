@@ -407,6 +407,13 @@ public class CustomItemListener implements Listener {
                         canopy_freeze.remove(player);
                     }, 30);
                     
+                    // Check if can give poison
+                    double toohigh = ConfigUtils.getMapNumber(playerArena.getMapType(), playerArena.getMapName(), "too-high");
+                    if (loc.getBlockY() >= toohigh) {
+                        ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
+                    }
+                    
                     hand.setAmount(hand.getAmount() - 1);
                     for (Player players : player.getWorld().getPlayers()) {
                         ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
