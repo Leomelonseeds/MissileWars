@@ -22,8 +22,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.json.JSONObject;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -105,6 +107,24 @@ public class ArenaGameruleListener implements Listener {
             ConfigUtils.sendConfigMessage("messages.spawn-obstructed", player, null, null);
             player.teleport(playerArena.getPlayerSpawn(player));
         }
+        
+        // Re-give haste if player using architect with haste
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayerPreset(player.getUniqueId());
+        if (!json.has("haste")) {
+            return;
+        }
+        
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item == null || item.getType() != Material.IRON_PICKAXE) {
+            return;
+        }
+        
+        int level = json.getInt("haste");
+        if (level <= 0) {
+            return;
+        }
+        
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
 
     /** Handle friendly fire. */

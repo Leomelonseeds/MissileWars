@@ -61,10 +61,6 @@ public class ArenaInventoryListener implements Listener {
     /** Stop players from changing their armor/bow items. */
     @EventHandler
     public void stopItemMoving(InventoryClickEvent event) {
-        // Obtain player
-        if (!(event.getClickedInventory() instanceof PlayerInventory)) {
-            return;
-        }
         
         Player player = (Player) event.getWhoClicked();
 
@@ -78,6 +74,11 @@ public class ArenaInventoryListener implements Listener {
         // Stop crafting
         if (event.getClickedInventory() instanceof CraftingInventory) {
             event.setCancelled(true);
+            return;
+        }
+        
+        // Obtain player
+        if (!(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
         }
 
