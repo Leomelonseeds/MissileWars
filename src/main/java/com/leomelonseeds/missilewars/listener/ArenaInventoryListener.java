@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -70,7 +71,13 @@ public class ArenaInventoryListener implements Listener {
         // Check if player is in an active arena
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
-        if (arena == null || !arena.isRunning()) {
+        if (arena == null) {
+            return;
+        }
+        
+        // Stop crafting
+        if (event.getClickedInventory() instanceof CraftingInventory) {
+            event.setCancelled(true);
             return;
         }
 

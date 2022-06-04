@@ -168,10 +168,6 @@ public class CustomItemListener implements Listener {
         // Check if player is trying to place a structure item
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
-        
-        if (player.getGameMode() != GameMode.SURVIVAL) {
-            return;
-        }
 
         Arena playerArena = getPlayerArena(player);
         if (playerArena == null) {
@@ -195,8 +191,14 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        // Stop if not left-click on block
+        // Stop if not right-click on block
         if (!event.getAction().toString().contains("RIGHT")) {
+            return;
+        }
+        
+        // Stop if spectator
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            event.setCancelled(true);
             return;
         }
         
