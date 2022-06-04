@@ -62,6 +62,7 @@ messages:
     - "&fThanks for playing!"
     - "&b========================================"
   earn-currency: "&7You earned &c%umw_amount_earned% &amokens &7and &6experience &7this game."
+  earn-none-time: "&cYour stats for this game were not counted due to limited participation."
   rankup: 
     - "&b========================================"
     - "&6&lRANK UP &7- %previous% &f-> %current%"

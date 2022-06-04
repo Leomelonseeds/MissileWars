@@ -338,7 +338,7 @@ piranha:
       x: -2
       y: -4
       z: 4
-    speed: 1.7
+    speed: 2.0
     tnt: 23
     spcost: 4
 
@@ -863,12 +863,12 @@ canopy:
     y: -2
     z: -3
   1:
-    distance: 8
+    distance: 6
   2: 
-    distance: 12
+    distance: 9
     spcost: 2
   3: 
-    distance: 16
+    distance: 12
     spcost: 2
 
 creeper:
@@ -922,14 +922,14 @@ leaves:
   - "&bAmount: %amount%"
   1:
     item: JUNGLE_LEAVES
-    amount: 4
+    amount: 8
   2:
     item: AZALEA_LEAVES
-    amount: 6
+    amount: 12
     spcost: 2
   3:
     item: FLOWERING_AZALEA_LEAVES
-    amount: 8
+    amount: 16
     spcost: 2
   
 lingering_harming:
@@ -993,7 +993,7 @@ Vanguard:
         spcost: 1
       2: 
         level: 3
-        spcost: 1
+        spcost: 2
       3:
         level: 5
         spcost: 2
@@ -1024,11 +1024,6 @@ Sentinel:
       1:
         level: 1
         spcost: 1
-    power:
-      cost: 1500
-      1: 
-        level: 1
-        spcost: 2
     punch:
       cost: 1500
       1: 
@@ -1263,13 +1258,13 @@ gpassive:
     - "&7recieve a missile when the game starts."
     cost: 2000
     1:
-      percentage: 6
+      percentage: 5
       spcost: 1
     2:
-      percentage: 12.5
+      percentage: 10
       spcost: 2
     3: 
-      percentage: 19
+      percentage: 15
       spcost: 2
   utilityspec:
     name: "&5Utility Specialist"
@@ -1284,10 +1279,10 @@ gpassive:
       percentage: 6
       spcost: 1
     2:
-      percentage: 12.5
+      percentage: 12
       spcost: 2
     3: 
-      percentage: 19
+      percentage: 18
       spcost: 2
   hoarder:
     name: "&5Hoarder"
