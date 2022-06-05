@@ -135,48 +135,50 @@ public class SchematicManager {
         int sizez = structure.getSize().getBlockZ();
         
         // Checks if the missile intersects with an obsidian/barrier structure
-        if (redMissile) {
-            for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
-                for (int y = spawny; y < spawny + sizey; y++) {
-                    for (int x = spawnx; x > spawnx - sizex; x--) {
-                        // Only check the FRAME of the missile. Otherwise, continue
-                        if (z == spawnz - sizez + 1 || z == spawnz) {
-                            if ((y < spawny + sizey - 1 && y > spawny) && 
-                                (x > spawnx - sizex + 1 && x < spawnx)) {
+        if (!structureName.contains("obsidian")) {
+            if (redMissile) {
+                for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
+                    for (int y = spawny; y < spawny + sizey; y++) {
+                        for (int x = spawnx; x > spawnx - sizex; x--) {
+                            // Only check the FRAME of the missile. Otherwise, continue
+                            if (z == spawnz - sizez + 1 || z == spawnz) {
+                                if ((y < spawny + sizey - 1 && y > spawny) && 
+                                    (x > spawnx - sizex + 1 && x < spawnx)) {
+                                    continue;
+                                }
+                            } else if ((y < spawny + sizey - 1 && y > spawny) ||
+                                       (x > spawnx - sizex + 1 && x < spawnx)) {
                                 continue;
                             }
-                        } else if ((y < spawny + sizey - 1 && y > spawny) ||
-                                   (x > spawnx - sizex + 1 && x < spawnx)) {
-                            continue;
-                        }
-                        Location l = new Location(loc.getWorld(), x, y, z);
-                        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
-                        for (String s : cancel) {
-                            if (l.getBlock().getType() == Material.getMaterial(s)) {
-                                return false;
+                            Location l = new Location(loc.getWorld(), x, y, z);
+                            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+                            for (String s : cancel) {
+                                if (l.getBlock().getType() == Material.getMaterial(s)) {
+                                    return false;
+                                }
                             }
                         }
                     }
                 }
-            }
-        } else {
-            for (int z = spawnz + sizez - 1; z >= spawnz; z--) {
-                for (int y = spawny; y < spawny + sizey; y++) {
-                    for (int x = spawnx; x < spawnx + sizex; x++) {
-                        if (z == spawnz + sizez - 1 || z == spawnz) {
-                            if ((y < spawny + sizey - 1 && y > spawny) && 
-                                (x < spawnx + sizex - 1 && x > spawnx)) {
+            } else {
+                for (int z = spawnz + sizez - 1; z >= spawnz; z--) {
+                    for (int y = spawny; y < spawny + sizey; y++) {
+                        for (int x = spawnx; x < spawnx + sizex; x++) {
+                            if (z == spawnz + sizez - 1 || z == spawnz) {
+                                if ((y < spawny + sizey - 1 && y > spawny) && 
+                                    (x < spawnx + sizex - 1 && x > spawnx)) {
+                                    continue;
+                                }
+                            } else if ((y < spawny + sizey - 1 && y > spawny) ||
+                                       (x < spawnx + sizex - 1 && x > spawnx)) {
                                 continue;
                             }
-                        } else if ((y < spawny + sizey - 1 && y > spawny) ||
-                                   (x < spawnx + sizex - 1 && x > spawnx)) {
-                            continue;
-                        }
-                        Location l = new Location(loc.getWorld(), x, y, z);
-                        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
-                        for (String s : cancel) {
-                            if (l.getBlock().getType() == Material.getMaterial(s)) {
-                                return false;
+                            Location l = new Location(loc.getWorld(), x, y, z);
+                            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+                            for (String s : cancel) {
+                                if (l.getBlock().getType() == Material.getMaterial(s)) {
+                                    return false;
+                                }
                             }
                         }
                     }
