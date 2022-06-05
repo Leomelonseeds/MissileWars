@@ -23,6 +23,8 @@ These new items have been split into 4 different Decks (kits), each with 5 diffe
 * **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
 
 Each deck can be upgraded and customized to your liking, with up to 3 presets available, and by default 14 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your rng probabilities. The possibilities are pretty much endless.
+![image](https://user-images.githubusercontent.com/17891302/172035160-7b004f57-35cc-4ee4-a233-d24430ca11f5.png)
+
 
 ## New Maps
 4+ new maps, each changing the gameplay in fun and inventive ways, have been added. New maps are also being worked on.
