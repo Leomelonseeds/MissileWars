@@ -692,14 +692,14 @@ public class CustomItemListener implements Listener {
                 public void run() {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
-                            SchematicManager.spawnNBTStructure("obsidianshieldclear-1", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshieldclear-1", location, red, mapName, false);
                             for (Player player : location.getWorld().getPlayers()) {
                                 ConfigUtils.sendConfigSound("break-obsidian-shield", player, location);
                             }
                         } else if (finalDuration % 2 == 0) {
-                            SchematicManager.spawnNBTStructure("obsidianshielddeplete-1", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshielddeplete-1", location, red, mapName, false);
                         } else {
-                            SchematicManager.spawnNBTStructure("obsidianshield-1", location, red, mapName);
+                            SchematicManager.spawnNBTStructure("obsidianshield-1", location, red, mapName, false);
                         }
                     }
                 }

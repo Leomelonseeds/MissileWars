@@ -54,6 +54,10 @@ public class SchematicManager {
         }
         return vector;
     }
+    
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
+        return spawnNBTStructure(structureName, loc, redMissile, mapName, true);
+    }
 
     /**
      * Spawn a structure at a given location with a given rotation.
@@ -62,9 +66,10 @@ public class SchematicManager {
      * @param loc the location to spawn the structure (pre-offset)
      * @param redMissile if the NBT structure is a red missile
      * @param mapName The name of the Arena map the NBT structure is being spawned in
+     * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
+    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName, Boolean checkCollision) {
 
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
@@ -135,7 +140,7 @@ public class SchematicManager {
         int sizez = structure.getSize().getBlockZ();
         
         // Checks if the missile intersects with an obsidian/barrier structure
-        if (!structureName.contains("shielddeplete") && !structureName.contains("shieldclear")) {
+        if (checkCollision) {
             if (redMissile) {
                 for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
                     for (int y = spawny; y < spawny + sizey; y++) {
