@@ -135,7 +135,7 @@ public class SchematicManager {
         int sizez = structure.getSize().getBlockZ();
         
         // Checks if the missile intersects with an obsidian/barrier structure
-        if (!structureName.contains("obsidian")) {
+        if (!structureName.contains("shielddeplete") && !structureName.contains("shieldclear")) {
             if (redMissile) {
                 for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
                     for (int y = spawny; y < spawny + sizey; y++) {
