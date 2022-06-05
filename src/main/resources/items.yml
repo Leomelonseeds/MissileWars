@@ -41,7 +41,7 @@ lightning:
 cruiser:
   1:
     file: 'cruiser.nbt'
-    item: BLAZE_SPAWN_EGG
+    item: TROPICAL_FISH_SPAWN_EGG
     name: "&6☢ Cruiser ⚡"
     lore:
     - ""
@@ -57,7 +57,7 @@ cruiser:
     tnt: 11
   2:
     file: 'thunderbolt.nbt'
-    item: BLAZE_SPAWN_EGG
+    item: TROPICAL_FISH_SPAWN_EGG
     name: "&6☢ &lThunderbolt &6⚡"
     lore:
     - ""
@@ -380,8 +380,8 @@ supporter:
 warhead: 
   1:
     file: 'warhead.nbt'
-    item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ Warhead &6&l☣"
+    item: CHICKEN_SPAWN_EGG
+    name: "&c☢ Warhead &c&l☣"
     lore:
     - ""
     - "&7The activation TNT on this missile entered"
@@ -395,8 +395,8 @@ warhead:
     tnt: 27
   2:
     file: 'bullet.nbt'
-    item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ &lBullet ☣"
+    item: CHICKEN_SPAWN_EGG
+    name: "&c☢ &lBullet ☣"
     lore:
     - ""
     - "&7This absolutely insane missile should"
@@ -413,8 +413,8 @@ warhead:
 juggernaut:
   1:
     file: 'juggernaut.nbt'
-    item: CHICKEN_SPAWN_EGG
-    name: "&c☢ Juggernaut &c&l☣"
+    item: GHAST_SPAWN_EGG
+    name: "&f☢ Juggernaut &f&l☣"
     lore:
     - ""
     - "&7High-yield piston-propelled face removal."
@@ -427,8 +427,8 @@ juggernaut:
     tnt: 23
   2:
     file: 'meganaut.nbt'
-    item: CHICKEN_SPAWN_EGG
-    name: "&c☢ &lMeganaut &c&l☣"
+    item: GHAST_SPAWN_EGG
+    name: "&f☢ &lMeganaut &f&l☣"
     lore:
     - ""
     - "&7This Juggernaut-derived behemoth will"

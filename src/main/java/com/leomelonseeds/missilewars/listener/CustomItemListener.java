@@ -224,15 +224,6 @@ public class CustomItemListener implements Listener {
         
         event.setCancelled(true);
 
-        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
-
-        for (String s : cancel) {
-        	if (clicked.getType() == Material.getMaterial(s)) {
-            	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-        		return;
-        	}
-        }
-
         // Place structure
         String mapName = "default-map";
         if (playerArena.getMapName() != null) {

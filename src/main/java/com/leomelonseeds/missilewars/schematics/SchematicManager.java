@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.schematics;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -104,16 +105,8 @@ public class SchematicManager {
             return false;
         }
 
-        int bluespawnz = (int) Math.floor(ConfigUtils.getMapNumber("classic", mapName, "blue-spawn.z"));
-        int redspawnz = (int) Math.floor(ConfigUtils.getMapNumber("classic", mapName, "red-spawn.z"));
-
         // Apply offset
         Location spawnLoc = loc.clone();
-
-        // Cancel if attempt to grief team spawnpoint
-        if (spawnLoc.getBlockZ() == bluespawnz || spawnLoc.getBlockZ() == redspawnz) {
-            return false;
-        }
 
         Vector offset;
         if (structureConfig.contains(args[0] + ".offset")) {
@@ -140,38 +133,55 @@ public class SchematicManager {
         int sizex = structure.getSize().getBlockX();
         int sizey = structure.getSize().getBlockY();
         int sizez = structure.getSize().getBlockZ();
-
-        int barrierx = plugin.getConfig().getInt("barrier.center.x");
-
-        int portalx1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x1") - 1;
-        int portalx2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4") + 1;
-        int portaly1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1") - 1;
-        int portaly2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4") + 1;
-
-        int portalredz = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.red-z");
-        int portalbluez = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.blue-z");
-
-
-        // Do not place if hitbox would intersect with barrier
-        if (!redMissile && spawnx + sizex > barrierx) {
-            return false;
-        } else if (redMissile && spawnx >= barrierx) {
-            return false;
-        }
-
-        // Do not place if hitbox would intersect with a portal
-        if (!redMissile &&
-                ((spawnz <= portalredz && spawnz + sizez > portalredz) ||
-                (spawnz <= portalbluez && spawnz + sizez > portalbluez)) &&
-                spawnx <= portalx2 && spawnx + sizex > portalx1 &&
-                spawny <= portaly2 && spawny + sizey > portaly1) {
-            return false;
-        } else if (redMissile &&
-                ((spawnz >= portalbluez && spawnz - sizez < portalbluez) ||
-                (spawnz >= portalredz && spawnz - sizez < portalredz)) &&
-                spawnx >= portalx1 && spawnx - sizex < portalx2 &&
-                spawny <= portaly2 && spawny + sizey > portaly1) {
-            return false;
+        
+        // Checks if the missile intersects with an obsidian/barrier structure
+        if (redMissile) {
+            for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
+                for (int y = spawny; y < spawny + sizey; y++) {
+                    for (int x = spawnx; x > spawnx - sizex; x--) {
+                        // Only check the FRAME of the missile. Otherwise, continue
+                        if (z == spawnz - sizez + 1 || z == spawnz) {
+                            if ((y < spawny + sizey - 1 && y > spawny) && 
+                                (x > spawnx - sizex + 1 && x < spawnx)) {
+                                continue;
+                            }
+                        } else if ((y < spawny + sizey - 1 && y > spawny) ||
+                                   (x > spawnx - sizex + 1 && x < spawnx)) {
+                            continue;
+                        }
+                        Location l = new Location(loc.getWorld(), x, y, z);
+                        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+                        for (String s : cancel) {
+                            if (l.getBlock().getType() == Material.getMaterial(s)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int z = spawnz + sizez - 1; z >= spawnz; z--) {
+                for (int y = spawny; y < spawny + sizey; y++) {
+                    for (int x = spawnx; x < spawnx + sizex; x++) {
+                        if (z == spawnz + sizez - 1 || z == spawnz) {
+                            if ((y < spawny + sizey - 1 && y > spawny) && 
+                                (x < spawnx + sizex - 1 && x > spawnx)) {
+                                continue;
+                            }
+                        } else if ((y < spawny + sizey - 1 && y > spawny) ||
+                                   (x < spawnx + sizex - 1 && x > spawnx)) {
+                            continue;
+                        }
+                        Location l = new Location(loc.getWorld(), x, y, z);
+                        List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+                        for (String s : cancel) {
+                            if (l.getBlock().getType() == Material.getMaterial(s)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         //Place structure
