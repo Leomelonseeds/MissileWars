@@ -2,10 +2,12 @@ package com.leomelonseeds.missilewars.utilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +26,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.title.Title;
 
 /** Utility Class for acquiring data from config files. */
 public class ConfigUtils {
@@ -205,6 +208,33 @@ public class ConfigUtils {
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
         player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
+    }
+    
+    /**
+     * Send the team a title at a given path.
+     *
+     * @param path the path
+     */
+    public static void sendTitle(String path, Player player) {
+        // Find titles and subtitles from config
+        String title = getConfigText("titles." + path + ".title", null, null, null);
+        List<String> subtitles = getConfigTextList("titles." + path + ".subtitle", null,
+                null, null);
+        String subtitle;
+        if (!subtitles.isEmpty()) {
+            subtitle = subtitles.get(new Random().nextInt(subtitles.size()));
+        } else {
+            subtitle = getConfigText("titles." + path + ".subtitle", null, null,
+                    null);
+        }
+
+        int length = Integer.parseInt(getConfigText("titles." + path + ".length", null, null, null));
+        
+        Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(length * 50), Duration.ofMillis(1000));
+        Title finalTitle = Title.title(Component.text(title), Component.text(subtitle), times);
+
+        player.showTitle(finalTitle);
+        sendConfigSound(path, player);
     }
 
     /**

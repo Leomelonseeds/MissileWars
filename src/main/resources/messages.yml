@@ -171,6 +171,10 @@ titles:
     title: "&4Portals Destroyed"
     subtitle: "&7Waiting for tie..."
     length: 100
+  video:
+    title: "&aPlease,"
+    subtitle: "&b↓ &fWatch the video in chat &b↓"
+    length: 200
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  

@@ -405,11 +405,13 @@ public class MissileWarsCommand implements CommandExecutor {
             Player player = (Player) sender;
             if (s.equals("new")) {
                 Bukkit.getLogger().log(Level.INFO, player.getName() + " is new to Missile Wars.");
+                ConfigUtils.sendTitle("video", player);
                 ConfigUtils.sendConfigMessage("messages.tutorial-new", player, null, null);
                 return true;
             }
             if (s.equals("decks")) {
                 Bukkit.getLogger().log(Level.INFO, player.getName() + " has played Missile Wars.");
+                ConfigUtils.sendTitle("video", player);
                 ConfigUtils.sendConfigMessage("messages.tutorial-decks", player, null, null);
                 return true;
             }

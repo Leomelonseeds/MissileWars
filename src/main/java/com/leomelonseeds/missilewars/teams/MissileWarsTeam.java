@@ -1,10 +1,7 @@
 package com.leomelonseeds.missilewars.teams;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,9 +22,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
 
 /** Represents a team of Missile Wars Players. */
 public class MissileWarsTeam {
@@ -309,28 +303,10 @@ public class MissileWarsTeam {
      * @param path the path
      */
     public void sendTitle(String path) {
-        // Find titles and subtitles from config
-        String title = ConfigUtils.getConfigText("titles." + path + ".title", null, null, null);
-        List<String> subtitles = ConfigUtils.getConfigTextList("titles." + path + ".subtitle", null,
-                null, null);
-        String subtitle;
-        if (!subtitles.isEmpty()) {
-            subtitle = subtitles.get(new Random().nextInt(subtitles.size()));
-        } else {
-            subtitle = ConfigUtils.getConfigText("titles." + path + ".subtitle", null, null,
-                    null);
-        }
-
-        int length = Integer.parseInt(ConfigUtils.getConfigText("titles." + path + ".length", null, null, null));
-        
-        Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(length * 50), Duration.ofMillis(1000));
-        Title finalTitle = Title.title(Component.text(title), Component.text(subtitle), times);
-
         // Send titles to players
         for (MissileWarsPlayer member : members) {
         	Player player = member.getMCPlayer();
-            player.showTitle(finalTitle);
-            ConfigUtils.sendConfigSound(path, player);
+            ConfigUtils.sendTitle(path, player);
         }
     }
 
