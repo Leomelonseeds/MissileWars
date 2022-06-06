@@ -915,6 +915,7 @@ public class Arena implements ConfigurationSerializable {
             // Teleport all players to center to remove lobby minigame items/dismount
             for (MissileWarsPlayer player : players) {
                 player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+                player.getMCPlayer().closeInventory();
             }
             
             new BukkitRunnable() {
