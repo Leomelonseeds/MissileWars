@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +25,7 @@ import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
@@ -52,6 +54,18 @@ public class ArenaInventoryListener implements Listener {
     @EventHandler
     public void unregisterCustomInventories(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
+        
+        // Stop stupid people from exiting the tutorial GUI
+        if (ConfigUtils.toPlain(event.getView().title()).contains("Have you played Missile Wars")) {
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                if (!player.hasPermission("umw.tutorial")) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bossshop open tutorial " + player.getName());
+                }
+            }, 5);
+            return;
+        }
+        
+        // Unregister
         InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
         if (manager.getInventory(player) instanceof MWInventory) {
             manager.removePlayer(player);
