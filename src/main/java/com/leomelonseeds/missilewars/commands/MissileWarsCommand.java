@@ -394,6 +394,22 @@ public class MissileWarsCommand implements CommandExecutor {
             new PresetSelector(player, deck);
             return true;
         }
+        
+        if (action.equalsIgnoreCase("tutorial")) {
+            if (args.length != 2) {
+                return true;
+            }
+            String s = args[1];
+            Player player = (Player) sender;
+            if (s.equals("new")) {
+                ConfigUtils.sendConfigMessage("messages.tutorial-new", player, null, null);
+                return true;
+            }
+            if (s.equals("decks")) {
+                ConfigUtils.sendConfigMessage("messages.tutorial-decks", player, null, null);
+                return true;
+            }
+        }
 
         return true;
     }

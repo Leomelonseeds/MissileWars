@@ -98,3 +98,11 @@ rankup:
   sound: ENTITY_PLAYER_LEVELUP
   volume: 1.0
   pitch: 1.0
+tutorial-new:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 1.0
+  pitch: 1.0
+tutorial-decks:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 1.0
+  pitch: 1.0

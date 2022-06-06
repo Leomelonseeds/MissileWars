@@ -77,6 +77,22 @@ messages:
   canopy-blocked: "&cSomething is blocking your teleportation path!"
   purchase-unsuccessful: "&cYou don't have enough for this purchase!"
   cannot-purchase: "&cYou may only choose one passive/ability per category!"
+  tutorial-new:
+    - "&b========================================"
+    - "&6Welcome to &d&lMissile &5&lWars"
+    - "&fPlease, watch &a1 minute &fof this tutorial video:"
+    - "&b&nhttps://www.youtube.com/watch?v=TedrlnNimcU"
+    - "&fI'm &cserious. &fYou're already wasting time checking"
+    - "&fout this niche gamemode. Better learn how to play :)"
+    - "&b========================================"
+  tutorial-decks:
+    - "&b========================================"
+    - "&6Welcome to &5&lUltima's &d&lMissile Wars"
+    - "&fPlease, watch this introduction to &3Decks&f:"
+    - "&b&nhttps://www.youtube.com/watch?v=TedrlnNimcU&t=76"
+    - "&fI've had enough of explaining this to every"
+    - "&fsingle one of you :)"
+    - "&b========================================"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -101,6 +117,8 @@ titles:
       - "✌"
       - "flex it to your friends"
       - "me when i"
+      - ":skull:"
+      - "it's morbin' time"
     length: 120
   defeat:
     title: "&c&lDefeat"
@@ -119,6 +137,8 @@ titles:
       - "try again"
       - "not even close"
       - "feelsbadman"
+      - ":sadpepe:"
+      - "pain"
     length: 120
   tie:
     title: "&e&lTie"
@@ -129,10 +149,11 @@ titles:
       - "epic &f&mfail"
       - "close enough"
       - "time for a rematch"
-      - "stalemate"
+      - "very stale, mate"
       - "the real winner is me"
       - "bruh"
       - "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too"
+      - "All that work, just for a tie"
     length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
