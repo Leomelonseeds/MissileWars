@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -286,6 +287,7 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
+    /** Experimental setting to give players poison if they go too high */
     @EventHandler
     public void givePoison(PlayerMoveEvent event) {
         if (!MissileWarsPlugin.getPlugin().getConfig().getBoolean("experimental.poison")) {
@@ -307,8 +309,12 @@ public class ArenaGameruleListener implements Listener {
         double toohigh = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-high");
         
         if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
-            ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                if (player.getLocation().getBlockY() >= toohigh) {
+                    ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
+                }
+            }, 10);
             return;
         }
         
