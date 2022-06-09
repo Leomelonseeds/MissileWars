@@ -80,9 +80,12 @@ public class PresetSelector implements MWInventory {
             
             meta.lore(ConfigUtils.toComponent(lore));
             item.setItemMeta(meta);
-            // Slots 11, 13, 15
-            inv.setItem(i * 2 + 11, item);
+            // Slots 10, 12, 14
+            inv.setItem(i * 2 + 10, item);
         }
+        
+        ItemStack ranked = MissileWarsPlugin.getPlugin().getDeckManager().createItem("ranked", 0, false);
+        inv.setItem(16, ranked);
         
         // Add bottom panes
         for (int i = 27; i < 36; i++) {
@@ -142,6 +145,12 @@ public class PresetSelector implements MWInventory {
                 playerJson.put("Preset", p);
                 ConfigUtils.sendConfigSound("change-preset", player);
                 updateInventory();
+            }
+        }
+        
+        else if (item.getType() == Material.getMaterial(itemConfig.getString("ranked.item"))) {
+            if (type == ClickType.RIGHT) {
+                new RankedDeckCustomizer(player, deck);
             }
         }
     }

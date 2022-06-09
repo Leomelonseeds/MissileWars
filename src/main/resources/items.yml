@@ -1144,6 +1144,7 @@ Architect:
 
 # Stuff relating to Deck GUI
 default-skillpoints: 14
+default-skillpoints-ranked: 16
 
 intangibles:
   locked: RED_STAINED_GLASS_PANE
@@ -1159,14 +1160,17 @@ indicators:
     item: TNT
     name: "&c&lMissiles"
     slot: 0
+    rankedslot: 0
   utility:
     item: REPEATER
     name: "&9&lUtility"
     slot: 9
+    rankedslot: 9
   enchants:
     item: ENCHANTED_BOOK
     name: "&3&lGear Enchantments"
     slot: 18
+    rankedslot: 18
   gpassive:
     item: PURPLE_DYE
     name: "&5&lGlobal Passive"
@@ -1195,6 +1199,7 @@ indicators:
     - "&cor 'Reset Preset' options below to claim"
     - "&cadditional skillpoints from MW ranks."
     slot: 8
+    rankedslot: 8
   skillpoints:
     item: EMERALD
     name: "&aRemaining Skillpoints: &f%sp%"
@@ -1203,6 +1208,7 @@ indicators:
     - "&cClick to downgrade all items"
     - "&cand return all skillpoints."
     slot: 17
+    rankedslot: 17
   reset:
     item: BARRIER
     name: "&cReset Preset"
@@ -1216,6 +1222,7 @@ indicators:
     item: RED_STAINED_GLASS_PANE
     name: "&cBack"
     slot: 53
+    rankedslot: 26
   
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
@@ -1240,6 +1247,19 @@ preset:
   - "&cRight-click &7to edit this preset"
   loreselect: "&aSelected"
   lorenotselect: "&cLeft-click &7to select this preset"
+
+ranked:
+  item: ENCHANTED_BOOK
+  name: "&3&lRanked Preset"
+  lore:
+  - ""
+  - "&7This is the &3ranked &7preset for this"
+  - "&7deck. This preset is only used in &3ranked"
+  - "&7games, and is automatically selected based"
+  - "&7on your deck. &eAbilities &7and &6passives"
+  - "&7are &cdisabled &7in this deck."
+  - ""
+  - "&cRight-click &7to edit this preset"
   
 enchants:
   name: "&b%enchant%"

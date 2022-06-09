@@ -98,6 +98,11 @@ public class JSONManager {
                             newJson.getJSONObject(deck).put(preset, defaultpreset);
                         }
                     }
+                    
+                    // Create ranked preset if not exist
+                    if (!deckjson.has("R")) {
+                        deckjson.put("R", createRankedPreset(defaultpreset));
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -107,6 +112,30 @@ public class JSONManager {
             
             playerCache.put(uuid, newJson);
         });
+    }
+    
+    /**
+     * Creates a ranked preset from a default preset
+     * 
+     * @param json
+     * @return
+     */
+    private JSONObject createRankedPreset(JSONObject json) {
+        for (String key : json.keySet()) {
+            if (json.get(key) instanceof Integer) {
+                json.put(key, 0);
+            }
+        }
+        for (String s : new String[] {"missiles", "utility"}) {
+            for (String key : json.getJSONObject(s).keySet()) {
+                json.getJSONObject(s).put(key, 1);
+            }
+        }
+        json.remove("ability");
+        json.remove("passive");
+        json.remove("gpassive");
+        json.put("skillpoints", ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints-ranked"));
+        return json;
     }
     
     /**
@@ -223,7 +252,7 @@ public class JSONManager {
     public int getAbility(UUID uuid, String ability) {
         JSONObject json = getPlayerPreset(uuid);
         for (String s : new String[] {"gpassive", "passive", "ability"}) {
-            if (json.getJSONObject(s).getString("selected").equals(ability)) {
+            if (json.has(s) && json.getJSONObject(s).getString("selected").equals(ability)) {
                 return json.getJSONObject(s).getInt("level");
             }
         }
