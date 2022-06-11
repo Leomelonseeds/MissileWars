@@ -22,9 +22,11 @@ public class ArenaSelector implements MWInventory {
 
     private Inventory inv;
     private Player player;
+    private String gamemode;
     
-    public ArenaSelector(Player player) {
+    public ArenaSelector(Player player, String gamemode) {
         this.player = player;
+        this.gamemode = gamemode;
         
         String title = ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null);
         inv = Bukkit.createInventory(null, 27, Component.text(title));
@@ -34,7 +36,7 @@ public class ArenaSelector implements MWInventory {
     // Create a list of all arenas from ArenaManager list
     @Override
     public void updateInventory() {
-        for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas()) {
+        for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
             ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
             assert arenaItemMeta != null;
@@ -58,16 +60,20 @@ public class ArenaSelector implements MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena selectedArena = manager.getArena(slot);
+        Arena selectedArena = manager.getArena(slot, gamemode);
         if (selectedArena == null) {
+            return;
+        }
+        
+        // Ensure player can play >:D
+        if (player.hasPermission("umw.new")) {
+            ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, null, null);
             return;
         }
 
         // Attempt to send player to arena
         if (selectedArena.joinPlayer(player)) {
             player.closeInventory();
-        } else {
-            ConfigUtils.sendConfigMessage("messages.arena-full", player, selectedArena, null);
         }
     }
 }

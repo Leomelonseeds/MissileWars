@@ -53,41 +53,41 @@ public class Arena implements ConfigurationSerializable {
     /** Comparator to sort by capacity */
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
     /** The arena name. */
-    private String name;
+    protected String name;
     /** The map for the arena. */
-    private String mapName;
+    protected String mapName;
     /** The gamemode type for the map for the arena. */
-    private String mapType;
+    protected String gamemode;
     /** The max number of players for this arena. */
-    private int capacity;
+    protected int capacity;
     /** The ids of the NPCs */
-    private List<Integer> npcs;
+    protected List<Integer> npcs;
     /** The list of all players currently in the arena. */
-    private Set<MissileWarsPlayer> players;
+    protected Set<MissileWarsPlayer> players;
     /** The list of all spectators currently in the arena. */
-    private Set<MissileWarsPlayer> spectators;
+    protected Set<MissileWarsPlayer> spectators;
     /** The queue to join the red team. Active before the game. */
-    private Queue<MissileWarsPlayer> redQueue;
+    protected Queue<MissileWarsPlayer> redQueue;
     /** The queue to join the blue team. Active before the game. */
-    private Queue<MissileWarsPlayer> blueQueue;
+    protected Queue<MissileWarsPlayer> blueQueue;
     /** The red team. */
-    private MissileWarsTeam redTeam;
+    protected MissileWarsTeam redTeam;
     /** The blue team. */
-    private MissileWarsTeam blueTeam;
+    protected MissileWarsTeam blueTeam;
     /** The start time of the game. In the future if game is yet to start, otherwise, in the past. */
-    private LocalDateTime startTime;
+    protected LocalDateTime startTime;
     /** Whether a game is currently running */
-    private boolean running;
+    protected boolean running;
     /** Are we waiting for a tie or no */
-    private boolean waitingForTie;
+    protected boolean waitingForTie;
     /** List of currently running tasks. */
-    private List<BukkitTask> tasks;
+    protected List<BukkitTask> tasks;
     /** Whether the arena is currently resetting the world. */
-    private boolean resetting;
+    protected boolean resetting;
     /** The current number of votes for each map. */
-    private Map<String, Integer> mapVotes;
+    protected Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
-    private Map<UUID, String> playerVotes;
+    protected Map<UUID, String> playerVotes;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -98,6 +98,7 @@ public class Arena implements ConfigurationSerializable {
     public Arena(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
+        this.gamemode = "classic";
         players = new HashSet<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
@@ -117,6 +118,7 @@ public class Arena implements ConfigurationSerializable {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
         serializedArena.put("capacity", capacity);
+        serializedArena.put("gamemode", gamemode);
         List<String> npcStrings = new ArrayList<>();
         for (int i : npcs) {
             npcStrings.add(Integer.toString(i));
@@ -133,6 +135,7 @@ public class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
+        gamemode = (String) serializedArena.get("gamemode");
         npcs = new ArrayList<>();
         String npcIDs = (String) serializedArena.get("npc");
         for (String s : npcIDs.split(",")) {
@@ -150,12 +153,10 @@ public class Arena implements ConfigurationSerializable {
      * Setup map voting for the next game.
      */
     public void setupMapVotes() {
-        mapType = "classic";
-
         // Add maps in map type to voting pool
         mapVotes = new HashMap<>();
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        for (String mapName : mapConfig.getConfigurationSection(mapType).getKeys(false)) {
+        for (String mapName : mapConfig.getConfigurationSection(gamemode).getKeys(false)) {
             mapVotes.put(mapName, 0);
         }
 
@@ -207,12 +208,12 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the current map type for this arena.
+     * Get the gamemode for this arena.
      *
      * @return the current map type for this arena
      */
-    public String getMapType() {
-        return mapType;
+    public String getGamemode() {
+        return gamemode;
     }
 
     /**
@@ -417,6 +418,13 @@ public class Arena implements ConfigurationSerializable {
 
         // Ensure world isn't resetting
         if (resetting) {
+            ConfigUtils.sendConfigMessage("messages.arena-full", player, this, null);
+            return false;
+        }
+        
+        // Ensure player can play >:D
+        if (player.hasPermission("umw.new")) {
+            ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, this, null);
             return false;
         }
 
@@ -424,6 +432,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Make sure another plugin hasn't cancelled the event
         if (player.getWorld().getName().equals("world")) {
+            ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
             return false;
         }
 
@@ -451,14 +460,27 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Check for game start
+        checkForStart();
+        return true;
+    }
+    
+    /**
+     * Checks if the game is ready to auto-start
+     */
+    public void checkForStart() {
         int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
-
-        return true;
     }
-
+    
+    /**
+     * Equivalent to starting with the default timer
+     */
+    public void scheduleStart() {
+        scheduleStart(MissileWarsPlugin.getPlugin().getConfig().getInt("lobby-wait-time"));
+    }
+    
     /**
      * Check if a player with a given UUID is in this Arena.
      *
@@ -764,9 +786,8 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /** Schedule the start of the game based on the config time. */
-    public void scheduleStart() {
+    public void scheduleStart(int secCountdown) {
     	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        int secCountdown = plugin.getConfig().getInt("lobby-wait-time");
 
         // Schedule the start of the game if not already running
         if (startTime == null) {
@@ -843,9 +864,9 @@ public class Arena implements ConfigurationSerializable {
 
         // Acquire red and blue spawns
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", mapType, mapName);
+        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", gamemode, mapName);
         Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", mapType, mapName);
+        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
         Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
         redSpawn.setYaw(180);
         blueSpawn.setWorld(getWorld());
@@ -859,20 +880,7 @@ public class Arena implements ConfigurationSerializable {
         // Game start
         startTime = LocalDateTime.now();
         long gameLength = getSecondsRemaining();
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!(blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
-                     (redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
-                    endGame(blueTeam);
-                } else if ((blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
-                          !(redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
-                    endGame(redTeam);
-                } else {
-                    endGame(null);
-                }
-            }
-        }.runTaskLater(plugin, gameLength * 20));
+        performGamemodeSetup();
 
         // Chaos time start
         int chaosStart = getChaosTime();
@@ -900,86 +908,112 @@ public class Arena implements ConfigurationSerializable {
 
         // Generate map.
         announceMessage("messages.starting", null);
-        SchematicManager.spawnFAWESchematic(mapName, getWorld(), mapType, (result) -> {
-            // Assign players to teams based on queue (which removes their items)
-            List<MissileWarsPlayer> toAssign = new ArrayList<>();
-            for (MissileWarsPlayer player : players) {
-                if (!spectators.contains(player)) {
-                    toAssign.add(player);
-                }
-            }
-            Collections.shuffle(toAssign);
-            double maxSize = getCapacity() / 2;
-            double maxQueue = Math.ceil((double) players.size() / 2);
-            
-            // Teleport all players to center to remove lobby minigame items/dismount
-            for (MissileWarsPlayer player : players) {
-                player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-                player.getMCPlayer().closeInventory();
-            }
-            
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    // Assign queued players. If a queue is larger than a team size put remaining
-                    // players into the front of the queue to be assigned first into random teams
-                    while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
-                        if (!redQueue.isEmpty()) {
-                            MissileWarsPlayer toAdd = redQueue.remove();
-                            toAssign.remove(toAdd);
-                            if (redTeam.getSize() < maxQueue) {
-                                redTeam.addPlayer(toAdd);
-                            } else {
-                                toAssign.add(0, toAdd);
-                            }
-                        }
-                        if (!blueQueue.isEmpty()) {
-                            MissileWarsPlayer toAdd = blueQueue.remove();
-                            toAssign.remove(toAdd);
-                            if (blueTeam.getSize() < maxQueue) {
-                                blueTeam.addPlayer(toAdd);
-                            } else {
-                                toAssign.add(0, toAdd);
-                            }
-                        }
-                    }
-
-                    // Assign remaining players
-                    for (MissileWarsPlayer player : toAssign) {
-                        // Ignore if player is a spectator
-                        if (spectators.contains(player)) {
-                            continue;
-                        }
-                        if (blueTeam.getSize() <= redTeam.getSize()) {
-                            if (blueTeam.getSize() >= maxSize) {
-                                ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
-                            } else {
-                                blueTeam.addPlayer(player);
-                            }
-                        } else {
-                            if (redTeam.getSize() >= maxSize) {
-                                ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
-                            } else {
-                                redTeam.addPlayer(player);
-                            }
-                        }
-                    }
-
-                    // Start deck distribution for each team and send messages
-                    redTeam.scheduleDeckItems();
-                    redTeam.distributeGear();
-                    redTeam.sendTitle("classic-start");
-                    redTeam.sendSound("game-start");
-                    blueTeam.scheduleDeckItems();
-                    blueTeam.distributeGear();
-                    blueTeam.sendTitle("classic-start");
-                    blueTeam.sendSound("game-start");
-                }
-            }.runTaskLater(plugin, 5L);
-        });
+        SchematicManager.spawnFAWESchematic(mapName, getWorld(), gamemode, result -> startTeams());
 
         running = true;
         return true;
+    }
+    
+    /**
+     * Gamemode-specific setups
+     */
+    public void performGamemodeSetup() {
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!(blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
+                     (redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
+                    endGame(blueTeam);
+                } else if ((blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
+                          !(redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
+                    endGame(redTeam);
+                } else {
+                    endGame(null);
+                }
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), getSecondsRemaining() * 20));
+    }
+    
+    /**
+     * Assigns players and starts the teams
+     */
+    public void startTeams() {
+        // Assign players to teams based on queue (which removes their items)
+        List<MissileWarsPlayer> toAssign = new ArrayList<>();
+        for (MissileWarsPlayer player : players) {
+            if (!spectators.contains(player)) {
+                toAssign.add(player);
+            }
+        }
+        Collections.shuffle(toAssign);
+        double maxSize = getCapacity() / 2;
+        double maxQueue = Math.ceil((double) players.size() / 2);
+        
+        // Teleport all players to center to remove lobby minigame items/dismount
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            player.getMCPlayer().closeInventory();
+        }
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Assign queued players. If a queue is larger than a team size put remaining
+                // players into the front of the queue to be assigned first into random teams
+                while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
+                    if (!redQueue.isEmpty()) {
+                        MissileWarsPlayer toAdd = redQueue.remove();
+                        toAssign.remove(toAdd);
+                        if (redTeam.getSize() < maxQueue) {
+                            redTeam.addPlayer(toAdd);
+                        } else {
+                            toAssign.add(0, toAdd);
+                        }
+                    }
+                    if (!blueQueue.isEmpty()) {
+                        MissileWarsPlayer toAdd = blueQueue.remove();
+                        toAssign.remove(toAdd);
+                        if (blueTeam.getSize() < maxQueue) {
+                            blueTeam.addPlayer(toAdd);
+                        } else {
+                            toAssign.add(0, toAdd);
+                        }
+                    }
+                }
+
+                // Assign remaining players
+                for (MissileWarsPlayer player : toAssign) {
+                    // Ignore if player is a spectator
+                    if (spectators.contains(player)) {
+                        continue;
+                    }
+                    if (blueTeam.getSize() <= redTeam.getSize()) {
+                        if (blueTeam.getSize() >= maxSize) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+                        } else {
+                            blueTeam.addPlayer(player);
+                        }
+                    } else {
+                        if (redTeam.getSize() >= maxSize) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+                        } else {
+                            redTeam.addPlayer(player);
+                        }
+                    }
+                }
+
+                // Send messages
+                redTeam.distributeGear();
+                redTeam.sendSound("game-start");
+                blueTeam.distributeGear();
+                blueTeam.sendSound("game-start");
+                redTeam.scheduleDeckItems();
+                redTeam.sendTitle("classic-start");
+                blueTeam.scheduleDeckItems();
+                blueTeam.sendTitle("classic-start");
+            }
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), 5L);
+        // Start deck distribution for each team and send messages
     }
 
     /** Remove Players from the map. */
@@ -1185,7 +1219,7 @@ public class Arena implements ConfigurationSerializable {
                     SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
     
                     sql.updateClassicStats(uuid, won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
-                    sql.updateWinstreak(uuid, mapType, won);
+                    sql.updateWinstreak(uuid, gamemode, won);
                     RankUtils.addExp(player.getMCPlayer(), amountEarned);
     
                     String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
@@ -1396,7 +1430,7 @@ public class Arena implements ConfigurationSerializable {
         // Find map from map name
         String mapId = null;
         for (String possibleMap : mapVotes.keySet()) {
-            if (ConfigUtils.getMapText(mapType, possibleMap, "name").equalsIgnoreCase(mapName)) {
+            if (ConfigUtils.getMapText(gamemode, possibleMap, "name").equalsIgnoreCase(mapName)) {
                 mapId = possibleMap;
             }
         }

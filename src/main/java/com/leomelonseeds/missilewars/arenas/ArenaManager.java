@@ -190,10 +190,12 @@ public class ArenaManager {
         }
         logger.log(Level.INFO, "Performing arena upgrades. This might take a while!");
         for (Arena arena : new ArrayList<>(getLoadedArenas())) {
-            String name = arena.getName();
+            String[] args = arena.getName().split("-");
+            String rawname = args[args.length - 1];
             int capacity = arena.getCapacity();
+            String gamemode = arena.getGamemode();
             removeArena(arena);
-            createArena(name, capacity);
+            createArena(rawname, gamemode, capacity);
         }
     }
 
@@ -204,11 +206,11 @@ public class ArenaManager {
      * @param index the index of the Arena
      * @return the Arena, or null if it doesn't exist
      */
-    public Arena getArena(int index) {
-        if (index < 0 || index >= loadedArenas.size()) {
+    public Arena getArena(int index, String gamemode) {
+        if (index < 0 || index >= getLoadedArenas(gamemode).size()) {
             return null;
         }
-        return loadedArenas.get(index);
+        return getLoadedArenas(gamemode).get(index);
     }
 
     /**
@@ -271,13 +273,29 @@ public class ArenaManager {
      * @param creator the creator of the world
      * @return true if the Arena was created, otherwise false
      */
-    public boolean createArena(String name, int capacity) {
+    public boolean createArena(String tempname, String gamemode, int capacity) {
 
     	Logger logger = Bukkit.getLogger();
+    	
+    	String name = gamemode + "-" + tempname;
 
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
             logger.log(Level.WARNING, "An arena with the name " + name + " already exists!");
+            return false;
+        }
+
+        // Register arena
+        Arena arena;
+        switch (gamemode) {
+        case "classic":
+            arena = new Arena(name, capacity);
+            break;
+        case "tourney":
+            arena = new TourneyArena(name, capacity);
+            break;
+        default:
+            logger.log(Level.WARNING, "Invalid arena type!");
             return false;
         }
 
@@ -459,8 +477,6 @@ public class ArenaManager {
                 }
             }
 
-            // Register arena
-            Arena arena = new Arena(name, capacity);
             loadedArenas.add(arena);
             NPC[] npcs = {redNPC, blueNPC, bartender, vanguard, berserker, sentinel, architect};
             for (NPC npc : npcs) {
@@ -527,6 +543,24 @@ public class ArenaManager {
     }
 
     /**
+     * Gets a list of the loaded arenas, by gamemode
+     *
+     * @return The list of loaded arenas
+     */
+    public List<Arena> getLoadedArenas(String gamemode) {
+        List<Arena> sortedArenas = new ArrayList<>();
+        for (Arena a : loadedArenas) {
+            if (a.getGamemode().equals(gamemode)) {
+                sortedArenas.add(a);
+            }
+        }
+        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity));
+        return sortedArenas;
+    }
+    
+
+
+    /**
      * Gets a list of the loaded arenas, sorted by highest capacity
      *
      * @return The list of loaded arenas
@@ -536,5 +570,4 @@ public class ArenaManager {
         sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity));
         return sortedArenas;
     }
-
 }

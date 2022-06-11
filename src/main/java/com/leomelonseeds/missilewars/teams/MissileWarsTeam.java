@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -133,17 +134,26 @@ public class MissileWarsTeam {
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
     }
-
+    
     /**
      * Add a player to the team.
      *
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
+        addPlayer(player, false);
+    }
+
+    /**
+     * Add a player to the team.
+     *
+     * @param player the player to add
+     */
+    public void addPlayer(MissileWarsPlayer player, Boolean ranked) {
 
         members.add(player);
-
-        player.setDeck(MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(player.getMCPlayerId()));
+        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId(), ranked));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
@@ -335,12 +345,12 @@ public class MissileWarsTeam {
         int y = location.getBlockY();
         int z = location.getBlockZ();
         String teamName = ChatColor.stripColor(name).toLowerCase();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
         if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
             shieldBlocksBroken += place ? -1 : 1;
             return true;
@@ -362,12 +372,12 @@ public class MissileWarsTeam {
 
         // Calculate volume
         String teamName = ChatColor.stripColor(name).toLowerCase();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), teamName + "-shield.z2");
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
         return (x2 - x1) * (y2 - y1) * (z2 - z1);
     }
 
@@ -381,4 +391,7 @@ public class MissileWarsTeam {
         return 100 * ((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
     }
 
+    public Boolean isChaos() {
+        return chaosMode;
+    }
 }

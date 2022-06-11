@@ -55,7 +55,7 @@ public class MapVoting implements MWInventory {
             int votes = arena.getMapVotes().get(mapName);
             mapItem.setAmount(Math.max(votes, 1));
             ItemMeta mapItemMeta = mapItem.getItemMeta();
-            String display = ConfigUtils.getMapText(arena.getMapType(), mapName, "name");
+            String display = ConfigUtils.getMapText(arena.getGamemode(), mapName, "name");
             mapItemMeta.displayName(Component.text(display));
             List<Component> lore = new ArrayList<>();
             for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {

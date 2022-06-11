@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.json.JSONObject;
@@ -174,7 +175,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         // Arena specific placeholders
 
         if (params.equalsIgnoreCase("arena")) {
-            return playerArena.getName();
+            return StringUtils.capitalize(playerArena.getName());
         }
 
         if (params.equalsIgnoreCase("gamemode")) {
@@ -204,7 +205,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         MissileWarsTeam blueTeam = playerArena.getBlueTeam();
 
         if (params.equalsIgnoreCase("map")) {
-            return ConfigUtils.getMapText(playerArena.getMapType(), playerArena.getMapName(), "name");
+            return ConfigUtils.getMapText(playerArena.getGamemode(), playerArena.getMapName(), "name");
         }
 
         if (params.equalsIgnoreCase("time_remaining")) {

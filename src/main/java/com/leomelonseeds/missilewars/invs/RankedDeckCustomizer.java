@@ -82,6 +82,9 @@ public class RankedDeckCustomizer implements MWInventory {
         for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
             ItemStack item = deckManager.createItem(deck + ".enchants." + key, presetjson.getInt(key), 
                         false, init, deck, true);
+            if (item.getType().toString().equals(itemConfig.getString("intangibles.locked"))) {
+                item.setType(Material.getMaterial(itemConfig.getString("intangibles.unlocked")));
+            }
             inv.setItem(index_e, item);
             index_e++;
         }
@@ -139,28 +142,6 @@ public class RankedDeckCustomizer implements MWInventory {
         
         String args2[] = name.split("\\.");
         String realname = args2[args2.length - 1];
-        
-        // Unlock a locked item
-        if (item.getType().toString().equals(itemConfig.getString("intangibles.locked"))) {
-            double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
-            int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
-            if (bal >= cost) {
-                new ConfirmAction("Purchase '" + realname + "'", player, this, (confirm) -> {
-                    if (confirm) {
-                        if (init.has(realname)) {
-                            init.put(realname, true);
-                        } else if (init.getJSONObject(deck).has(realname)) {
-                            init.getJSONObject(deck).put(realname, true);
-                        }
-                        MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
-                        updateInventory();
-                    }
-                });
-            } else {
-                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
-            }
-            return;
-        }
         
         int sp = presetjson.getInt("skillpoints");
         

@@ -106,3 +106,7 @@ tutorial-decks:
   sound: ENTITY_EXPERIENCE_ORB_PICKUP
   volume: 1.0
   pitch: 1.0
+watch-the-fucking-video:
+  sound: BLOCK_NOTE_BLOCK_BASS
+  volume: 1.0
+  pitch: 0.0

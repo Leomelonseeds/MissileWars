@@ -70,6 +70,14 @@ public class Deck {
     public List<ItemStack> getGear() {
         return gear;
     }
+    
+    public List<ItemStack> getMissiles() {
+        return missiles;
+    }
+    
+    public List<ItemStack> getUtility() {
+        return utility;
+    }
 
     /**
      * Give this Deck's gear to a given player.
@@ -92,10 +100,12 @@ public class Deck {
      * @param player the player to check space for
      * @return true if player has inventory space
      */
-    public boolean hasInventorySpace(Player player) {
+    public boolean hasInventorySpace(Player player, Boolean ranked) {
         int limit = MissileWarsPlugin.getPlugin().getConfig().getInt("inventory-limit");
-        int hoarder = jsonmanager.getAbility(player.getUniqueId(), "hoarder");
-        limit += hoarder;
+        if (!ranked) {
+            int hoarder = jsonmanager.getAbility(player.getUniqueId(), "hoarder");
+            limit += hoarder;
+        }
 
         // Count multiples of item in inventory
         for (ItemStack poolItem : pool) {
@@ -156,8 +166,8 @@ public class Deck {
         }
         
         Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
-        double toohigh = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-high");
-        double toofar = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-far");
+        double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
+        double toofar = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
         Location loc = player.getLocation();
         
         // Don't give item if they are out of bounds
@@ -167,7 +177,7 @@ public class Deck {
         }
         
         // Don't give item if their inventory space is full
-        if (!hasInventorySpace(player)) {
+        if (!hasInventorySpace(player, false)) {
             refuseItem(player, poolItem, "messages.inventory-limit");
             return;
         }
@@ -189,7 +199,7 @@ public class Deck {
      * @param poolItem
      * @param messagePath
      */
-    private void refuseItem(Player player, ItemStack poolItem, String messagePath) {
+    public void refuseItem(Player player, ItemStack poolItem, String messagePath) {
         String message = ConfigUtils.getConfigText(messagePath, player, null, null);
         String name;
         if (poolItem.getItemMeta().hasDisplayName()) {

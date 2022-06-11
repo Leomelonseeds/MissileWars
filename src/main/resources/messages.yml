@@ -5,7 +5,7 @@ messages:
   prefix: "&7"
   join-arena: "Joining %umw_arena%..."
   arena-full: "&cYou cannot join this arena!"
-  joined-arena: "Welcome! &aRight-click an NPC &7to join a team, and use &a/spawn &7to return to main lobby."
+  joined-arena: "Welcome! &7Use &c/red &7or &9/blue &7to join a team, &8/spectate &7to spectate, and &a/lobby &7to return to main lobby."
   joined-arena-others: "%umw_focus% &7joined the arena."
   joined-arena-lobby: "%umw_focus% &7joined arena &a%umw_arena%"
   leave-arena: "You left %umw_arena%"
@@ -25,6 +25,7 @@ messages:
   queue-join-error: "&cYou cannot join this team as the teams would be unbalanced."
   queue-join-full: "&cSorry, this team is full! Use /spectate to spectate the game."
   queue-join-time: "&cYou cannot queue at this time!"
+  queue-deny-tourney: "&c&l[!] &7Only staff members may queue players in this arena."
   lobby-countdown-start: "Minimum player requirements met. The game will start in &c%umw_time% &7seconds."
   lobby-countdown-full: "The lobby is full! The game will start in &c%umw_time% &7seconds."
   lobby-countdown-near: "Starting in &c%umw_time%..."
@@ -93,6 +94,8 @@ messages:
     - "&fI've had enough of explaining this to every"
     - "&fsingle one of you :)"
     - "&b========================================"
+  watch-the-fucking-video: "&c&l[!] &cYou cannot join an arena until you have watched the tutorial video!"
+  leave-parkour: "&c&l[!] &7Please leave the Parkour before joining an arena."
     
 titles:
   # Should be sent to players who join in the middle of a game as well

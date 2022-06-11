@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,12 +29,15 @@ public class JSONManager {
     
     private JSONObject defaultJson;
     private Map<String, JSONObject> defaultPresets;
+    private String[] allPresets;
 
     public JSONManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         playerCache = new HashMap<>();
         defaultPresets = new HashMap<>();
+        allPresets = new String[] {"A", "B", "C", "R"};
         periodicSave();
+        
         
         // Find and parse the default json object
         String dir = MissileWarsPlugin.getPlugin().getDataFolder().toString();
@@ -101,7 +105,7 @@ public class JSONManager {
                     
                     // Create ranked preset if not exist
                     if (!deckjson.has("R")) {
-                        deckjson.put("R", createRankedPreset(defaultpreset));
+                        deckjson.put("R", createRankedPreset(deck));
                     }
                 }
             } catch (JSONException e) {
@@ -120,7 +124,8 @@ public class JSONManager {
      * @param json
      * @return
      */
-    private JSONObject createRankedPreset(JSONObject json) {
+    private JSONObject createRankedPreset(String deck) {
+        JSONObject json = getDefaultPreset(deck);
         for (String key : json.keySet()) {
             if (json.get(key) instanceof Integer) {
                 json.put(key, 0);
@@ -154,7 +159,7 @@ public class JSONManager {
         }
         // Remove keys not existing in default
         for (String key : JSONObject.getNames(original)) {
-            if (!(updated.has(key) || plugin.getDeckManager().getPresets().contains(key))) {
+            if (!(updated.has(key) || Arrays.asList(allPresets).contains(key))) {
                 original.remove(key);
             }
         }

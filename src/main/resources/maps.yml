@@ -145,4 +145,55 @@ classic:
   shaolin-showdown:
     name: "&fShaolin Showdown"
     file: "ShaolinShowdown.schem"
-    too-high: 48
+    too-high: 48# Settings for the Default map. Persists unless overridden
+tourney:
+  default-map:
+    name: "&fDouble Layer"
+    file: "DoubleLayer.schem"
+    pos:
+      x: 0
+      y: 17
+      z: -65
+    blue-spawn:
+      x: 0.5
+      y: 17
+      z: -64.5
+    red-spawn:
+      x: 0.5
+      y: 17
+      z: 65.5
+    # Two corners of blue and red shield, to calculate shield health
+    # where shield health = non-air blocks/total volume * 100%
+    blue-shield:
+      x1: -26
+      y1: -13
+      z1: -65
+      x2: 26
+      y2: 16
+      z2: -42
+    red-shield:
+      x1: -26
+      y1: -13
+      z1: 42
+      x2: 26
+      y2: 16
+      z2: 65
+    # the measurements here ONLY include portal blocks, no obsidian
+    # only z coords differ between the two sides. x and y are exactly the same
+    # x1 and x3 should both be the WEST side (towards -x) of the portals
+    # y1 and y3 should both be the LOWER side of the portals
+    portal:
+      blue-z: -72
+      red-z: 72
+      # portal 1
+      x1: -21
+      y1: -8
+      x2: -1
+      y2: 12
+      # portal 2
+      x3: 1
+      y3: -8
+      x4: 21
+      y4: 12
+    too-high: 25
+    too-far: -45

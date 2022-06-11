@@ -401,7 +401,7 @@ public class CustomItemListener implements Listener {
                     }, 30);
                     
                     // Check if can give poison
-                    double toohigh = ConfigUtils.getMapNumber(playerArena.getMapType(), playerArena.getMapName(), "too-high");
+                    double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
                     if (loc.getBlockY() >= toohigh) {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));

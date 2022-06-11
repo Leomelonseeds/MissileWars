@@ -22,10 +22,10 @@
 				"lingering_harming": 2
 			},
 			"missiles": {
-				"piranha": 1,
+				"supersonic": 1,
 				"lightning": 1,
 				"cronullifier": 2,
-				"supersonic": 1,
+				"piranha": 1,
 				"tomahawk": 2
 			},
 			"ability": {
@@ -57,16 +57,16 @@
 			"flame": 1,
 			"sharpness": 0,
 			"utility": {
+				"torpedo": 2,
 				"obsidianshield": 2,
-				"arrows": 2,
-				"torpedo": 2
+				"arrows": 2
 			},
 			"missiles": {
-				"supporter": 1,
-				"guardian": 2,
+				"hilt": 1,
 				"gemini": 2,
+				"supporter": 1,
 				"sword": 1,
-				"hilt": 1
+				"guardian": 2
 			},
 			"ability": {
 				"selected": "None",
@@ -98,15 +98,15 @@
 			"quick_charge": 0,
 			"sharpness": 2,
 			"utility": {
+				"fireball": 2,
 				"creeper": 1,
-				"arrows": 2,
-				"fireball": 2
+				"arrows": 2
 			},
 			"missiles": {
 				"cruiser": 1,
+				"breaker": 1,
 				"warhead": 2,
 				"juggernaut": 1,
-				"breaker": 1,
 				"shieldbuster": 2
 			},
 			"ability": {
@@ -139,16 +139,16 @@
 			"efficiency": 0,
 			"haste": 0,
 			"utility": {
-				"shield": 2,
+				"leaves": 2,
 				"platform": 2,
-				"leaves": 2
+				"shield": 2
 			},
 			"missiles": {
-				"shipper": 2,
 				"slingshot": 2,
-				"citadel": 1,
+				"shipper": 2,
 				"pisces": 1,
-				"ant": 1
+				"ant": 1,
+				"citadel": 1
 			},
 			"ability": {
 				"selected": "None",

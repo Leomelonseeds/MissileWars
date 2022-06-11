@@ -58,11 +58,16 @@ public class DeckManager {
      * @param deck
      * @return
      */
-    public Deck getPlayerDeck(UUID uuid) {
+    public Deck getPlayerDeck(UUID uuid, Boolean ranked) {
         
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
-        JSONObject json = plugin.getJSON().getPlayerPreset(uuid);;
+        JSONObject json;
+        if (ranked) {
+            json = basejson.getJSONObject(deck).getJSONObject("R");
+        } else {
+            json = plugin.getJSON().getPlayerPreset(uuid);
+        }
         
         // There are 12 utility items in the game
         // Some items have their level determined on creation, while

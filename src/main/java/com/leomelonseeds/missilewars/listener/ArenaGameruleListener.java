@@ -306,7 +306,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        double toohigh = ConfigUtils.getMapNumber(arena.getMapType(), arena.getMapName(), "too-high");
+        double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
         
         if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
             Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {

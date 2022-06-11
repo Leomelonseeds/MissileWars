@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -68,7 +69,7 @@ public class ConfigUtils {
     private static String setPlaceholders(String msg, Player player, Arena arena, Player focus) {
         // Set umw arena placeholders
         if (arena != null) {
-            msg = msg.replaceAll("%umw_arena%", arena.getName());
+            msg = msg.replaceAll("%umw_arena%", StringUtils.capitalize(arena.getName()));
             msg = msg.replaceAll("%umw_arena_players%", "" + arena.getTotalPlayers());
             msg = msg.replaceAll("%umw_arena_active%", "" + arena.getNumPlayers());
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());

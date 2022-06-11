@@ -158,7 +158,7 @@ public class ArenaInventoryListener implements Listener {
        
 
         // Cancel event if player cannot pick up item based on their given deck
-        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer())) {
+        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer(), false)) {
             event.setCancelled(true);
             return;
         }
