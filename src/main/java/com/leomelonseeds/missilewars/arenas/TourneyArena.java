@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.arenas;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -21,6 +22,15 @@ public class TourneyArena extends Arena {
     public TourneyArena(String name, int capacity) {
         super(name, capacity);
         gamemode = "tourney";
+    }
+
+    /**
+     * Constructor from a serialized Arena.
+     *
+     * @param serializedArena the yml serialized Arena
+     */
+    public TourneyArena(Map<String, Object> serializedArena) {
+        super(serializedArena);
     }
     
     @Override

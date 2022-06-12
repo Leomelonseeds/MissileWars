@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -224,7 +225,7 @@ public class SchematicManager {
         // Acquire WE clipboard
         String possibleMapType = mapType == null ? "" : mapType + ".";
         if (!schematicConfig.contains(possibleMapType + schematicName + ".file")) {
-            System.out.println("No schem file found!");
+            Bukkit.getLogger().log(Level.SEVERE, "Could not find " + possibleMapType + schematicName + ".file");
             return false;
         }
         File schematicFile = new File(plugin.getDataFolder() + File.separator + "maps",
