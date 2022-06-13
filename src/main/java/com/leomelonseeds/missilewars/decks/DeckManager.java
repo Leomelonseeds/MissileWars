@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.decks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,20 +78,20 @@ public class DeckManager {
         // Items with level determined on use:
         // Fireball, Splash, Obsidian Shield, Canopy, Spawn Creeper
         
-        ArrayList<ItemStack> missiles = new ArrayList<>();
-        ArrayList<ItemStack> utility = new ArrayList<>();
-        ArrayList<ItemStack> gear = new ArrayList<>();
+        List<ItemStack> missiles = Arrays.asList(new ItemStack[5]);
+        List<ItemStack> utility = Arrays.asList(new ItemStack[3]);
+        List<ItemStack> gear = new ArrayList<>();
         
         // Create missiles
         for (String key : json.getJSONObject("missiles").keySet()) {
             ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
-            missiles.add(m);
+            missiles.set(itemsConfig.getInt(key + ".index"), m);
         }
         
         // Create utility
         for (String key : json.getJSONObject("utility").keySet()) {
             ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
-            utility.add(u);
+            utility.set(itemsConfig.getInt(key + ".index"), u);
         }
         
         // Create gear items

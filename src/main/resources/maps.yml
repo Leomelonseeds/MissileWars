@@ -145,7 +145,7 @@ classic:
   shaolin-showdown:
     name: "&fShaolin Showdown"
     file: "ShaolinShowdown.schem"
-    too-high: 48# Settings for the Default map. Persists unless overridden
+    too-high: 48
 tourney:
   default-map:
     name: "&fDouble Layer"
