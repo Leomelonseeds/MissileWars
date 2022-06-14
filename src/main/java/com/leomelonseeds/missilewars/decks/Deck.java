@@ -147,9 +147,9 @@ public class Deck {
         
         // Check on first item, global passive
         if (first) {
-            if (jsonmanager.getAbility(player.getUniqueId(), "missilespec") == 3) {
+            if (missilespec == 3) {
                 toUse = missiles;
-            } else if (jsonmanager.getAbility(player.getUniqueId(), "utilityspec") == 3) {
+            } else if (utilityspec == 3) {
                 toUse = utility;
             }
         }
