@@ -244,7 +244,7 @@ public class DeckManager {
      * @return
      */
     public ItemStack createItem(String name, int level, Boolean missile) {
-        return createItem(name, level, missile, null, null, false);
+        return createItem(name, level, missile, null, null, false, null);
     }
     
     /**
@@ -255,7 +255,7 @@ public class DeckManager {
      * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile, JSONObject playerjson, String deck, Boolean intangible) {
+    public ItemStack createItem(String name, int level, Boolean missile, JSONObject playerjson, String deck, Boolean intangible, String preset) {
         String realname = name;
         // If the name is a config path, find its real name
         if (name.contains(".")) {
@@ -355,8 +355,9 @@ public class DeckManager {
                 lore.add("&f");
                 JSONObject deckjson = playerjson.getJSONObject(deck);
                 // Add lore of unlocking possibility
-                if ((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
-                    (playerjson.has(realname) && !playerjson.getBoolean(realname))) {
+                if (((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
+                    (playerjson.has(realname) && !playerjson.getBoolean(realname))) &&
+                    !preset.equals("R")) {
                     int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
                     lore.add(itemsConfig.getString("text.locked1").replace("%cost%", cost + ""));
                     lore.add(itemsConfig.getString("text.locked2").replace("%cost%", cost + ""));

@@ -71,7 +71,7 @@ public class RankedDeckCustomizer implements MWInventory {
             int index = getIndex(s);
             for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
-                        s.equals("missiles"), init, deck, false);
+                        s.equals("missiles"), init, deck, false, preset);
                 inv.setItem(index, item);
                 index++;
             }
@@ -81,10 +81,7 @@ public class RankedDeckCustomizer implements MWInventory {
         int index_e = getIndex("enchants");
         for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
             ItemStack item = deckManager.createItem(deck + ".enchants." + key, presetjson.getInt(key), 
-                        false, init, deck, true);
-            if (item.getType().toString().equals(itemConfig.getString("intangibles.locked"))) {
-                item.setType(Material.getMaterial(itemConfig.getString("intangibles.unlocked")));
-            }
+                        false, init, deck, true, preset);
             inv.setItem(index_e, item);
             index_e++;
         }
