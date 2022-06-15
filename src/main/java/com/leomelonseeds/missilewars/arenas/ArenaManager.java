@@ -315,7 +315,6 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         arenaWorld.setGameRule(GameRule.KEEP_INVENTORY, true);
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
-        arenaWorld.setGameRule(GameRule.NATURAL_REGENERATION, false);
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
