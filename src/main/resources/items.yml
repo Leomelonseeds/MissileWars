@@ -21,7 +21,7 @@ lightning:
     offset:
       x: -1
       y: -4
-      z: 4
+      z: 5
     speed: 3.3
     tnt: 10
   2:
@@ -35,7 +35,7 @@ lightning:
     offset:
       x: -1
       y: -4
-      z: 4
+      z: 5
     speed: 3.3
     tnt: 18
     spcost: 3
@@ -90,7 +90,7 @@ hilt:
     - "&7packs incredible speed."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 3.3
     tnt: 10
@@ -106,7 +106,7 @@ hilt:
     - "&7shields."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 3.3
     tnt: 15
@@ -195,7 +195,7 @@ guardian:
     - "&7blocking fireballs, arrows, and traumatic memories."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 5
@@ -210,7 +210,7 @@ guardian:
     - "&7wide range of physical and emotional attacks."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 9
@@ -300,7 +300,7 @@ sword:
     - "&7Arrows won't be a problem for this one."
     offset:
       x: 0
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 8
@@ -348,7 +348,7 @@ piranha:
     - "&7wants to look like an anglerfish."
     offset:
       x: -2
-      y: -4
+      y: -5
       z: 4
     speed: 2.0
     tnt: 23
@@ -370,7 +370,7 @@ supporter:
     - "&7detonation."
     offset:
       x: -1
-      y: -5
+      y: -6
       z: 4
     speed: 1.7
     tnt: 17
@@ -384,7 +384,7 @@ supporter:
     - "&7you can blow up things behind you?"
     offset:
       x: -1
-      y: -5
+      y: -6
       z: 4
     speed: 1.7
     tnt: 25
@@ -403,7 +403,7 @@ warhead:
     - "&7piercing gaze of missile wars players."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 27
@@ -436,7 +436,7 @@ juggernaut:
     - "&7Insurance will not cover caused damage."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 23
@@ -451,7 +451,7 @@ juggernaut:
     - "&7Usage for transportation not recommended."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 32
@@ -504,7 +504,7 @@ shieldbuster:
     - "&7most such barriers."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 17
@@ -574,7 +574,7 @@ slingshot:
     - "&7launch a tnt. And to self-destruct."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 2.2
     tnt: 9
@@ -588,7 +588,7 @@ slingshot:
     - "&7two? Enough said (I ran out of ideas)"
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 2.2
     tnt: 14
@@ -606,7 +606,7 @@ citadel:
     - "&7the joys of becoming a turtle."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 2.0
     tnt: 9
@@ -623,7 +623,7 @@ citadel:
     - "&7up very well."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 2.0
     tnt: 16
@@ -655,7 +655,7 @@ pisces:
     - "&7Doesn't really do anything, just a cool fact."
     offset:
       x: -3
-      y: -4
+      y: -5
       z: 4
     speed: 1.7
     tnt: 24
@@ -673,7 +673,7 @@ ant:
     - "&7But fortunately, size doesn't matter in missile wars."
     offset:
       x: 0
-      y: -4
+      y: -6
       z: 4
     speed: 2.2
     tnt: 2
@@ -688,7 +688,7 @@ ant:
     - "&7them all up. Bit like my high school grades."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
     speed: 2.0
     tnt: 8

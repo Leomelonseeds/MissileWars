@@ -1,10 +1,13 @@
 package com.leomelonseeds.missilewars.arenas;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -95,6 +98,110 @@ public class TourneyArena extends Arena {
         // Check for game start
         checkForStart();
         return true;
+    }
+    
+    /**
+     * Enqueue a player with a given UUID to the red team.
+     *
+     * @param uuid the Player's UUID
+     */
+    @Override
+    public void enqueueRed(UUID uuid) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                
+               // Make sure people can't break the game
+                if (startTime != null) {
+                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                    if (time <= 2 && time >= -2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                        return;
+                    }
+                }
+                
+                if (!running) {
+                    if (!redQueue.contains(player)) {
+                        if (redQueue.size() >= getCapacity() / 2) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                        } else {
+                            blueQueue.remove(player);
+                            redQueue.add(player);
+                            ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
+                            removeSpectator(player);
+                        }
+                    } else {
+                        redQueue.remove(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-leave-red", player.getMCPlayer(), this, null);
+                    }
+                } else {
+                    if (!player.getMCPlayer().isOp() && redTeam.getSize() - blueTeam.getSize() >= 1) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
+                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && redTeam.getSize() >= getCapacity() / 2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                    } else {
+                        removeSpectator(player);
+                        blueTeam.removePlayer(player);
+                        redTeam.addPlayer(player, true);
+                        redTeam.giveItems(player);
+                        player.giveDeckGear();
+                        announceMessage("messages.queue-join-red", player);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Enqueue a player with a given UUID to the blue team.
+     *
+     * @param uuid the Player's UUID
+     */
+    @Override
+    public void enqueueBlue(UUID uuid) {
+        for (MissileWarsPlayer player : players) {
+            if (player.getMCPlayerId().equals(uuid)) {
+                
+                // Make sure people can't break the game
+                if (startTime != null) {
+                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                    if (time <= 2 && time >= -2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                        return;
+                    }
+                }
+                
+                if (!running) {
+                    if (!blueQueue.contains(player)) {
+                        if (blueQueue.size() >= getCapacity() / 2) {
+                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                        } else {
+                            redQueue.remove(player);
+                            blueQueue.add(player);
+                            ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
+                            removeSpectator(player);
+                        }
+                    } else {
+                        blueQueue.remove(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-leave-blue", player.getMCPlayer(), this, null);
+                    }
+                } else {
+                    if (!player.getMCPlayer().isOp() && blueTeam.getSize() - redTeam.getSize() >= 1) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
+                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && blueTeam.getSize() >= getCapacity() / 2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
+                    } else {
+                        removeSpectator(player);
+                        redTeam.removePlayer(player);
+                        blueTeam.addPlayer(player, true);
+                        blueTeam.giveItems(player);
+                        player.giveDeckGear();
+                        announceMessage("messages.queue-join-blue", player);
+                    }
+                }
+                break;
+            }
+        }
     }
     
     @Override
