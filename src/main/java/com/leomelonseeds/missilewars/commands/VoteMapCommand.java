@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 
 public class VoteMapCommand extends MissileWarsCommand implements CommandExecutor {
@@ -27,6 +28,12 @@ public class VoteMapCommand extends MissileWarsCommand implements CommandExecuto
             sendErrorMsg(player, "You are not in an arena!");
             return true;
         }
+        
+        if (playerArena instanceof TourneyArena) {
+            sendErrorMsg(player, "You cannot vote in this arena!");
+            return true;
+        }
+        
         if (playerArena.isRunning() || playerArena.isResetting()) {
             sendErrorMsg(player, "The game has already started!");
             return true;
