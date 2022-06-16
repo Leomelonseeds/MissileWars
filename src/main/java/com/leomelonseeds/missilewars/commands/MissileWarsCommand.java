@@ -390,29 +390,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 int level = Integer.parseInt(args[3]);
                 ItemStack item = plugin.getDeckManager().createItem(args[2], level, false);
                 player.getInventory().addItem(item);
-            } catch (Exception e) {
-                sendErrorMsg(sender, "Bad arguments!");
                 return true;
-            }
-        }
-        
-        if (action.equalsIgnoreCase("Give")) {
-            // Ensure sender has permission
-            if (!sender.hasPermission("umw.give")) {
-                sendErrorMsg(sender, "You do not have permission to do that!");
-                return true;
-            }
-
-            if (args.length != 4) {
-                sendErrorMsg(sender, "Usage: /mw give [player] [item] [level]");
-                return true;
-            }
-
-            try {
-                Player player = Bukkit.getPlayer(args[1]);
-                int level = Integer.parseInt(args[3]);
-                ItemStack item = plugin.getDeckManager().createItem(args[2], level, false);
-                player.getInventory().addItem(item);
             } catch (Exception e) {
                 sendErrorMsg(sender, "Bad arguments!");
                 return true;
