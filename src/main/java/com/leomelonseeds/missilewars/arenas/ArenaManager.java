@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -318,6 +319,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
+        arenaWorld.setDifficulty(Difficulty.HARD);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
