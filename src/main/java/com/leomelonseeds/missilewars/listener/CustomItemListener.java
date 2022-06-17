@@ -278,24 +278,24 @@ public class CustomItemListener implements Listener {
         }
 
         if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
-            List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
-
-            for (String s : cancel) {
-                if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
-                    event.setCancelled(true);
-                    ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                    return;
-                }
-            }
-
             if (utility.contains("creeper")) {
+                event.setCancelled(true);
+
+                // Can't place creepers on obsidian, otherwise broken game
+                List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
+                for (String s : cancel) {
+                    if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
+                        ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+                        return;
+                    }
+                }
+                
                 Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
                 Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
                 if (utility.contains("2")) {
                     creeper.setPowered(true);
                 }
                 hand.setAmount(hand.getAmount() - 1);
-                event.setCancelled(true);
                 return;
             }
         }
@@ -334,7 +334,17 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        // Stop spawngriefing
         Location loc = event.getBlockPlaced().getLocation();
+        
+        Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
+        Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
+        
+        if (loc.equals(s1) || loc.equals(s2)) {
+            event.setCancelled(true);
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+            return;
+        }
         
         new BukkitRunnable() {
             @Override
