@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -95,6 +96,15 @@ public class ArenaGameruleListener implements Listener {
             }
         }
 
+        // Un-obstruct spawns
+        Location spawn1 = playerArena.getPlayerSpawn(player);
+        Location spawn2 = spawn1.clone().add(0, 1, 0);
+        for (Location l : new Location[] {spawn1, spawn2}) {
+            if (l.getBlock().getType() != Material.AIR) {
+                l.getBlock().setType(Material.AIR);
+            }
+        }
+        
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
 
