@@ -259,21 +259,12 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equalsIgnoreCase("red_portals")) {
-            String firstPortal = redTeam.getFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            String secondPortal = redTeam.getSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            if (playerArena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED + "red" + ChatColor.RESET)) {
-                return firstPortal + secondPortal;
-            }
-            return secondPortal + firstPortal;
+            return redTeam.getRemainingPortals() + "";
         }
 
         if (params.equalsIgnoreCase("blue_portals")) {
-            String firstPortal = blueTeam.getFirstPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            String secondPortal = blueTeam.getSecondPortalStatus() ? ChatColor.WHITE + "⬛" : ChatColor.DARK_PURPLE + "⬛";
-            if (playerArena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.BLUE + "blue" + ChatColor.RESET)) {
-                return secondPortal + firstPortal;
-            }
-            return firstPortal + secondPortal;
+
+            return blueTeam.getRemainingPortals() + "";
         }
 
         return null; // Placeholder is unknown by the Expansion

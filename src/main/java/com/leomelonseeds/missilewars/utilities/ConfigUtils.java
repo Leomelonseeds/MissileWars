@@ -228,6 +228,19 @@ public class ConfigUtils {
             subtitle = getConfigText("titles." + path + ".subtitle", null, null,
                     null);
         }
+        
+        // Janky way of including team-based placeholders
+        Arena a = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        if (a != null) {
+            if (a.getTeam(player.getUniqueId()).contains("red")) {
+                if (subtitle.contains("umw_red")) {
+                    subtitle = subtitle.replace("red", "blue");
+                } else if (subtitle.contains("umw_blue")) {
+                    subtitle = subtitle.replace("blue", "red");
+                }
+            }
+            subtitle = PlaceholderAPI.setPlaceholders(player, subtitle);
+        }
 
         int length = Integer.parseInt(getConfigText("titles." + path + ".length", null, null, null));
         

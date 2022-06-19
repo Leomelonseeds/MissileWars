@@ -22,6 +22,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -918,20 +919,41 @@ public class Arena implements ConfigurationSerializable {
      * Gamemode-specific setups
      */
     public void performGamemodeSetup() {
+        // Setup a tie
         tasks.add(new BukkitRunnable() {
             @Override
             public void run() {
-                if (!(blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
-                     (redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
+                int blue = blueTeam.getRemainingPortals();
+                int red = redTeam.getRemainingPortals();
+                if (blue > red) {
                     endGame(blueTeam);
-                } else if ((blueTeam.getFirstPortalStatus() || blueTeam.getSecondPortalStatus()) &&
-                          !(redTeam.getFirstPortalStatus() || redTeam.getSecondPortalStatus())) {
+                } else if (red > blue) {
                     endGame(redTeam);
                 } else {
                     endGame(null);
                 }
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), getSecondsRemaining() * 20));
+        
+        // Setup portals
+        for (MissileWarsTeam team : new MissileWarsTeam[] {blueTeam, redTeam}) {
+            FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
+            ConfigurationSection config = maps.getConfigurationSection(gamemode + "." + mapName + "." + "portals");
+            if (config == null) {
+                config = maps.getConfigurationSection(gamemode + ".default-map.portals");
+            }
+            for (String s : config.getKeys(false)) {
+                double x = config.getDouble(s + ".x");
+                double y = config.getDouble(s + ".y");
+                double z = config.getDouble(s + ".z");
+                if (team == redTeam) {
+                    z = z * -1;
+                }
+                Location portalLoc = new Location(getWorld(), x, y, z);
+                MissileWarsPlugin.getPlugin().log("Registered portal at " + portalLoc);
+                team.getPortals().put(portalLoc, true);
+            }
+        }
     }
     
     /**
@@ -1121,10 +1143,8 @@ public class Arena implements ConfigurationSerializable {
         int shield_health = ranksConfig.getInt("experience.shield_health");
         int win = ranksConfig.getInt("experience.win");
 
-        int red_portal_amount = (blueTeam.getFirstPortalStatus() ? portal_broken : 0) +
-                (blueTeam.getSecondPortalStatus() ? portal_broken : 0);
-        int blue_portal_amount = (redTeam.getFirstPortalStatus() ? portal_broken : 0) +
-                (redTeam.getSecondPortalStatus() ? portal_broken : 0);
+        int red_portal_amount = (int) (portal_broken * ((double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
+        int blue_portal_amount = (int) (portal_broken * ((double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
 
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
@@ -1313,18 +1333,16 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Check if portal broke at blue or red z
+        MissileWarsTeam broketeam = blueTeam;
+        MissileWarsTeam enemy = redTeam;
         int z = location.getBlockZ();
-        if (z == Math.round(ConfigUtils.getMapNumber("classic", mapName, "portal.blue-z"))) {
-            // Register breaking of blue team's portal and send titles
-            if (blueTeam.registerPortalBreak(location) && blueTeam.hasLivingPortal()) {
-                blueTeam.sendTitle("own-portal-destroyed");
-                redTeam.sendTitle("enemy-portal-destroyed");
-            }
-        } else if (z == Math.round(ConfigUtils.getMapNumber("classic", mapName, "portal.red-z"))) {
-            if (redTeam.registerPortalBreak(location) && redTeam.hasLivingPortal()) {
-                redTeam.sendTitle("own-portal-destroyed");
-                blueTeam.sendTitle("enemy-portal-destroyed");
-            }
+        if (z > 0) {
+            broketeam = redTeam;
+            enemy = blueTeam;
+        }
+        if (broketeam.registerPortalBreak(location) && broketeam.hasLivingPortal()) {
+            broketeam.sendTitle("own-portal-destroyed");
+            enemy.sendTitle("enemy-portal-destroyed");
         }
         
         // Waiting for a tie in this case

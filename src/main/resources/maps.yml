@@ -107,23 +107,17 @@ classic:
       x2: 26
       y2: 16
       z2: 65
-    # the measurements here ONLY include portal blocks, no obsidian
-    # only z coords differ between the two sides. x and y are exactly the same
-    # x1 and x3 should both be the WEST side (towards -x) of the portals
-    # y1 and y3 should both be the LOWER side of the portals
-    portal:
-      blue-z: -72
-      red-z: 72
-      # portal 1
-      x1: -21
-      y1: -8
-      x2: -1
-      y2: 12
-      # portal 2
-      x3: 1
-      y3: -8
-      x4: 21
-      y4: 12
+    # Record EASTMOST (+x), UPPERMOST (+y) location of portal
+    # For z, just use abs on default blue portal z
+    portals:
+      1:
+        x: -1
+        y: 12
+        z: -72
+      2:
+        x: 21
+        y: 12
+        z: -72
     too-high: 25
     too-far: -45
   middle-ground:
@@ -146,6 +140,9 @@ classic:
     name: "&fShaolin Showdown"
     file: "ShaolinShowdown.schem"
     too-high: 48
+  tesseract:
+    name: "&f4D Fiasco"
+    file: "Tesseract.schem"
 tourney:
   default-map:
     name: "&fDouble Layer"
@@ -178,22 +175,14 @@ tourney:
       x2: 26
       y2: 16
       z2: 65
-    # the measurements here ONLY include portal blocks, no obsidian
-    # only z coords differ between the two sides. x and y are exactly the same
-    # x1 and x3 should both be the WEST side (towards -x) of the portals
-    # y1 and y3 should both be the LOWER side of the portals
-    portal:
-      blue-z: -72
-      red-z: 72
-      # portal 1
-      x1: -21
-      y1: -8
-      x2: -1
-      y2: 12
-      # portal 2
-      x3: 1
-      y3: -8
-      x4: 21
-      y4: 12
+    portals:
+      1:
+        x: -1
+        y: 12
+        z: -72
+      2:
+        x: 21
+        y: 12
+        z: -72
     too-high: 25
     too-far: -45

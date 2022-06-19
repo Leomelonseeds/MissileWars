@@ -171,11 +171,11 @@ titles:
     length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
-    subtitle: "&71 portal remains"
+    subtitle: "&f%umw_red_portals% &7portal(s) left"
     length: 60
   own-portal-destroyed:
     title: "&4Portal Destroyed"
-    subtitle: "&71 portal remaining"
+    subtitle: "&f%umw_blue_portals% &7portal(s) left"
     length: 60
   enemy-portals-destroyed:
     title: "&5Enemy Portals Destroyed"

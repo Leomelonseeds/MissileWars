@@ -1,7 +1,9 @@
 package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +27,10 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 /** Represents a team of Missile Wars Players. */
+/**
+ * @author leona
+ *
+ */
 public class MissileWarsTeam {
 
     /** The name of the team */
@@ -39,8 +45,8 @@ public class MissileWarsTeam {
     private BukkitTask poolItemRunnable;
     /** Whether the team's decks should be distributing items in chaos-mode. */
     private boolean chaosMode;
-    /** Whether the first and second portals are destroyed. Default to false. */
-    private boolean firstPortalDestroyed, secondPortalDestroyed;
+    /** Map containing locations and statuses of all portals */
+    private Map<Location, Boolean> portals;
     /** The number of shield blocks broken. */
     private int shieldBlocksBroken;
 
@@ -54,8 +60,13 @@ public class MissileWarsTeam {
     public MissileWarsTeam(String name, Arena arena, Location spawn) {
         this.name = name;
         this.members = new HashSet<>();
+        this.portals = new HashMap<>();
         this.spawn = spawn;
         this.arena = arena;
+    }
+    
+    public Map<Location, Boolean> getPortals() {
+        return portals;
     }
 
     /**
@@ -93,23 +104,24 @@ public class MissileWarsTeam {
     public int getShieldBlocksBroken() {
         return shieldBlocksBroken;
     }
-
+    
     /**
-     * Get whether the first portal has been destroyed
-     *
-     * @return true if portal destroyed
+     * Get remaining portals
+     * 
+     * @return
      */
-    public boolean getFirstPortalStatus() {
-        return firstPortalDestroyed;
+    public int getRemainingPortals() {
+        int count = 0;
+        for (Location loc : portals.keySet()) {
+            if (portals.get(loc)) {
+                count++;
+            }
+        }
+        return count;
     }
-
-    /**
-     * Get whether the second portal has been destroyed
-     *
-     * @return true if portal destroyed
-     */
-    public boolean getSecondPortalStatus() {
-        return secondPortalDestroyed;
+    
+    public int getTotalPortals() {
+        return portals.size();
     }
 
     /**
@@ -273,26 +285,15 @@ public class MissileWarsTeam {
      * @return true if a portal's broken status was changed
      */
     public boolean registerPortalBreak(Location loc) {
-        // Check if portal break was within location of first portal
-        String mapName = arena.getMapName();
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int x1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x1");
-        int y1 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y1");
-        int x2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x2");
-        int y2 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y2");
-        if (!firstPortalDestroyed && x1 <= x && x2 >= x && y1 <= y && y2 >= y) {
-            firstPortalDestroyed = true;
-            return true;
+        // Trace portal block to the most positive x and y positions
+        while (loc.clone().add(1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
+            loc.add(1, 0, 0);
         }
-
-        // Check if second portal was broken
-        int x3 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x3");
-        int y3 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y3");
-        int x4 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.x4");
-        int y4 = (int) ConfigUtils.getMapNumber("classic", mapName, "portal.y4");
-        if (!secondPortalDestroyed && x3 <= x && x4 >= x && y3 <= y && y4 >= y) {
-            secondPortalDestroyed = true;
+        while (loc.clone().add(0, 1, 0).getBlock().getType() != Material.OBSIDIAN) {
+            loc.add(0, 1, 0);
+        }
+        if (portals.get(loc)) {
+            portals.put(loc, false);
             return true;
         }
         return false;
@@ -304,7 +305,12 @@ public class MissileWarsTeam {
      * @return true if either the first or second portal for this team exists
      */
     public boolean hasLivingPortal() {
-        return !firstPortalDestroyed || !secondPortalDestroyed;
+        for (Location loc : portals.keySet()) {
+            if (portals.get(loc)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
