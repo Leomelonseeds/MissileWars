@@ -166,7 +166,7 @@ public class Deck {
         // Don't give players the same item twice
         ItemStack poolItem;
         do {
-            poolItem = toUse.get(rand.nextInt(toUse.size()));
+            poolItem = new ItemStack(toUse.get(rand.nextInt(toUse.size())));
         } while (lastTwo.contains(poolItem));
         // Add item to the list
         lastTwo.addFirst(poolItem);
