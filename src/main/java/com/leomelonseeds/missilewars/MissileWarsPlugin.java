@@ -261,7 +261,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
      *
      * @param message
      */
-    private void log(String message) {
+    public void log(String message) {
         Bukkit.getLogger().log(Level.INFO, "[MissileWars] " + message);
     }
 }

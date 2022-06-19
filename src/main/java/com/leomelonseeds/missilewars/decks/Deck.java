@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -106,14 +107,22 @@ public class Deck {
             int hoarder = jsonmanager.getAbility(player.getUniqueId(), "hoarder");
             limit += hoarder;
         }
+        
+        PlayerInventory inv = player.getInventory();
 
         // Count multiples of item in inventory
         for (ItemStack poolItem : pool) {
             int numOfItem = 1;
-            while (player.getInventory().containsAtLeast(poolItem, 1 + (numOfItem - 1) * poolItem.getAmount())) {
+            while (inv.containsAtLeast(poolItem, 1 + (numOfItem - 1) * poolItem.getAmount())) {
                 numOfItem++;
             }
             limit -= (numOfItem - 1);
+            // Check offhand
+            if (inv.getItemInOffHand().isSimilar(poolItem)) {
+                int offhand = inv.getItemInOffHand().getAmount();
+                int pool = poolItem.getAmount();
+                limit -= Math.ceil((double) offhand / pool);
+            }
         }
 
         // Give random item if under limit
@@ -184,9 +193,11 @@ public class Deck {
         
         // Check if can add to offhand
         ItemStack offhand = player.getInventory().getItemInOffHand();
-        if (offhand.getType().toString().equals(poolItem.getType().toString()) && offhand.getMaxStackSize() != 1) {
-            offhand.setAmount(offhand.getAmount() + poolItem.getAmount());
-            return;
+        if (offhand.isSimilar(poolItem)) {
+            while (offhand.getAmount() < offhand.getMaxStackSize()) {
+                offhand.add();
+                poolItem.subtract();
+            }
         }
         
         player.getInventory().addItem(poolItem);

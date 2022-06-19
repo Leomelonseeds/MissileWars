@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -20,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -41,7 +42,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
@@ -106,25 +106,6 @@ public class CustomItemListener implements Listener {
         return arena;
     }
     
-    /**
-     * Checks what item a player is using to account for offhand
-     * 
-     * @param player
-     * @return
-     */
-    private ItemStack getItemUsed(Player player) {
-        ItemStack hand = player.getInventory().getItemInMainHand();
-        ItemStack offhand = player.getInventory().getItemInOffHand();
-        MissileWarsPlayer mwPlayer = getPlayerArena(player).getPlayerInArena(player.getUniqueId());
-        if (mwPlayer.getDeck() == null) {
-            return new ItemStack(Material.AIR);
-        }
-        if (mwPlayer.getDeck().getGear().contains(hand) || hand.getType() == Material.AIR) {
-            return offhand;
-        }
-        return hand;
-    }
-    
     /** Give architect pickaxes the haste effect */
     @EventHandler
     public void giveHaste(PlayerItemHeldEvent event) {
@@ -162,11 +143,15 @@ public class CustomItemListener implements Listener {
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
 
-    /** Handle missile and other structure item spawning. */
+    /** Handle right clicking missiles and utility items */
     @EventHandler
-    public void useStructureItem(PlayerInteractEvent event) {
+    public void useItem(PlayerInteractEvent event) {
+        // Stop if not right-click
+        if (!event.getAction().toString().contains("RIGHT")) {
+            return;
+        }
+        
         // Check if player is trying to place a structure item
-    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
 
         Arena playerArena = getPlayerArena(player);
@@ -174,149 +159,117 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        // Check if player is frozen by a canopy
         if (canopy_freeze.contains(player)) {
             event.setCancelled(true);
             return;
         }
+        
+        PlayerInventory inv = player.getInventory();
 
-        ItemStack hand = getItemUsed(player);
+        ItemStack hand = inv.getItem(event.getHand());
+        
         Block clicked = event.getClickedBlock();
         String structureName = getStringFromItem(hand, "item-structure");
-        if (structureName == null) {
-            return;
-        }
-
-        // Switch to throwing logic if using a throwable
-        if (structureName.contains("shield-") || structureName.contains("platform-") || structureName.contains("torpedo-")) {
-            return;
-        }
-
-        // Stop if not right-click on block
-        if (!event.getAction().toString().contains("RIGHT")) {
+        String utility = getStringFromItem(hand, "item-utility");
+        if (structureName == null && utility == null) {
             return;
         }
         
-        // Stop if spectator
-        if (player.getGameMode() == GameMode.SPECTATOR) {
-            event.setCancelled(true);
-            return;
-        }
-        
-        // We can handle canopies now!
-        if (structureName.contains("canopy")) {
-            event.setCancelled(true);
-            if (canopy_cooldown.contains(player.getUniqueId())) {
+        // Spawn a structure item
+        if (structureName != null) {
+            // Switch to throwing logic if using a throwable
+            if (structureName.contains("shield-") || structureName.contains("platform-") || structureName.contains("torpedo-")) {
                 return;
             }
-            if (!player.isOnGround()) {
-                ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
+            
+            // We can handle canopies now!
+            if (structureName.contains("canopy")) {
+                event.setCancelled(true);
+                if (canopy_cooldown.contains(player.getUniqueId())) {
+                    return;
+                }
+                if (!player.isOnGround()) {
+                    ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
+                    return;
+                }
+                ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
+                canopy_cooldown.add(player.getUniqueId());
+                spawnCanopy(player, playerArena, structureName, hand);
                 return;
             }
-            ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
-            canopy_cooldown.add(player.getUniqueId());
-            spawnCanopy(player, playerArena, structureName);
-            return;
-        }
-        
-        if (clicked == null) {
-            return;
-        }
-        
-        event.setCancelled(true);
+            
+            if (clicked == null) {
+                return;
+            }
+            
+            event.setCancelled(true);
 
-        // Place structure
-        String mapName = "default-map";
-        if (playerArena.getMapName() != null) {
-            mapName = playerArena.getMapName();
+            // Place structure
+            String mapName = "default-map";
+            if (playerArena.getMapName() != null) {
+                mapName = playerArena.getMapName();
+            }
+            if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
+                hand.setAmount(hand.getAmount() - 1);
+                playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+            } else {
+                ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+            }
+            return;
         }
-        if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
-            hand.setAmount(hand.getAmount() - 1);
-            playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
-        } else {
-        	ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+        
+        // Spawn a utility item
+        else {
+            // Make sure we allow gear items to be used
+            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
+                return;
+            }
+
+            if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
+                if (utility.contains("creeper")) {
+                    event.setCancelled(true);
+
+                    // Can't place creepers on obsidian, otherwise broken game
+                    List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
+                    for (String s : cancel) {
+                        if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
+                            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+                            return;
+                        }
+                    }
+                    
+                    Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
+                    Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
+                    if (utility.contains("2")) {
+                        creeper.setPowered(true);
+                    }
+                    hand.setAmount(hand.getAmount() - 1);
+                    return;
+                }
+            }
+
+            // Spawn a fireball
+            if (utility.contains("fireball")) {
+                event.setCancelled(true);
+                Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
+                        .getEyeLocation().getDirection()), EntityType.FIREBALL);
+                float yield = (float) getItemStat(utility, "power");
+                fireball.setYield(yield);
+                fireball.setIsIncendiary(true);
+                fireball.setDirection(player.getEyeLocation().getDirection());
+                fireball.setShooter(player);
+                hand.setAmount(hand.getAmount() - 1);
+                for (Player players : player.getWorld().getPlayers()) {
+                     ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
+                }
+                playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+            }
         }
     }
 
     Set<UUID> canopy_cooldown = new HashSet<>();
     public static Map<Location, Integer> leaves = new HashMap<>();
-
-    /** Handle utilities utilization. */
-    @EventHandler
-    public void useUtility(PlayerInteractEvent event) {
-        // Check if player is trying to place a utility item
-        Player player = event.getPlayer();
-
-        Arena playerArena = getPlayerArena(player);
-        if (playerArena == null) {
-            return;
-        }
-        
-        if (canopy_freeze.contains(player)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        ItemStack hand = getItemUsed(player);
-        // Handle splash potion through other methods
-        if (hand.getType() == Material.SPLASH_POTION) {
-            return;
-        }
-        
-        String utility = getStringFromItem(hand, "item-utility");
-        if (utility == null) {
-            return;
-        }
-        
-        // Make sure we allow gear items to be used
-        if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
-            return;
-        }
-
-        // Stop if not left-click
-        if (!event.getAction().toString().contains("RIGHT_CLICK")) {
-            return;
-        }
-
-        if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
-            if (utility.contains("creeper")) {
-                event.setCancelled(true);
-
-                // Can't place creepers on obsidian, otherwise broken game
-                List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
-                for (String s : cancel) {
-                    if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
-                        ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                        return;
-                    }
-                }
-                
-                Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
-                Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
-                if (utility.contains("2")) {
-                    creeper.setPowered(true);
-                }
-                hand.setAmount(hand.getAmount() - 1);
-                return;
-            }
-        }
-
-        // Do proper action based on utility type
-        if (utility.contains("fireball")) {
-            event.setCancelled(true);
-            Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
-                    .getEyeLocation().getDirection()), EntityType.FIREBALL);
-            float yield = (float) getItemStat(utility, "power");
-            fireball.setYield(yield);
-            fireball.setIsIncendiary(true);
-            fireball.setDirection(player.getEyeLocation().getDirection());
-            fireball.setShooter(player);
-            hand.setAmount(hand.getAmount() - 1);
-            for (Player players : player.getWorld().getPlayers()) {
-            	 ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
-            }
-            playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
-        }
-    }
 
     // Check for architect leaves to despawn them after a while
     @EventHandler
@@ -356,7 +309,7 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 30 * 20);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, String utility) {
+    private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -372,8 +325,6 @@ public class CustomItemListener implements Listener {
                 if (!player.isOnline()) {
                     return;
                 }
-
-                ItemStack hand = getItemUsed(player);
 
                 // Ignore if player is not holding a canopy
                 if (hand.getType() != Material.ENDER_EYE) {
@@ -473,8 +424,6 @@ public class CustomItemListener implements Listener {
         }
     }
 
-    //private void despawnCanopy()
-
     /** Handle projectile items structure creation */
     @EventHandler
     public void useProjectile(ProjectileLaunchEvent event) {
@@ -484,7 +433,7 @@ public class CustomItemListener implements Listener {
               event.getEntity().getType() == EntityType.ENDER_PEARL)) {
             return;
         }
-        Projectile thrown = event.getEntity();
+        ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         
         if (!(thrown.getShooter() instanceof Player)) {
             return;
@@ -503,7 +452,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Check if player is holding a structure item
-        ItemStack hand = getItemUsed(thrower);
+        ItemStack hand = thrown.getItem();
         String structureName = getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
@@ -608,7 +557,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Check if player is holding a utility item
-        ItemStack hand = getItemUsed(thrower);
+        ItemStack hand = thrown.getItem();
         String utility = getStringFromItem(hand, "item-utility");
 
         // Make sure it's splash potion of water
