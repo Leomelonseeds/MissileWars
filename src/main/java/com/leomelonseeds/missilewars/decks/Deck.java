@@ -194,7 +194,7 @@ public class Deck {
         // Check if can add to offhand
         ItemStack offhand = player.getInventory().getItemInOffHand();
         if (offhand.isSimilar(poolItem)) {
-            while (offhand.getAmount() < offhand.getMaxStackSize()) {
+            while (offhand.getAmount() < offhand.getMaxStackSize() && offhand.getAmount() > 0) {
                 offhand.add();
                 poolItem.subtract();
             }
