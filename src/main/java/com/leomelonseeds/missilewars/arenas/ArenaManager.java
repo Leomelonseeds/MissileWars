@@ -319,7 +319,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
-        arenaWorld.setDifficulty(Difficulty.EASY);
+        arenaWorld.setDifficulty(Difficulty.NORMAL);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
