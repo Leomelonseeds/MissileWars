@@ -950,7 +950,6 @@ public class Arena implements ConfigurationSerializable {
                     z = z * -1;
                 }
                 Location portalLoc = new Location(getWorld(), x, y, z);
-                MissileWarsPlugin.getPlugin().log("Registered portal at " + portalLoc);
                 team.getPortals().put(portalLoc, true);
             }
         }
