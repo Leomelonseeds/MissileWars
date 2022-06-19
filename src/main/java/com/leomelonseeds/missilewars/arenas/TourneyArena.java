@@ -346,7 +346,7 @@ public class TourneyArena extends Arena {
                 // Check if can add to offhand
                 ItemStack offhand = player.getInventory().getItemInOffHand();
                 if (offhand.isSimilar(poolItem)) {
-                    while (offhand.getAmount() < offhand.getMaxStackSize() && offhand.getAmount() > 0) {
+                    while (offhand.getAmount() < offhand.getMaxStackSize() && poolItem.getAmount() > 0) {
                         offhand.add();
                         poolItem.subtract();
                     }
