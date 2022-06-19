@@ -353,7 +353,7 @@ public class CustomItemListener implements Listener {
                     Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
                     loc.setPitch(90);
                     player.teleport(loc);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5));
                     
                     // Freeze player for a bit
                     canopy_freeze.add(player);
