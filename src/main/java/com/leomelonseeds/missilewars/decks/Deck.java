@@ -144,7 +144,7 @@ public class Deck {
         int utilityspec = jsonmanager.getAbility(player.getUniqueId(), "utilityspec");
         
         // Calculate chance based on ability
-        double chance = 0.375;
+        double chance = 0.33;
         double add = 0;
         if (missilespec > 0) {
             add = -1 * Double.valueOf(ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage") + "") / 100;

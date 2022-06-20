@@ -312,7 +312,7 @@ public class TourneyArena extends Arena {
         Random random = new Random();
         int i_missile = random.nextInt(0, 5);
         int i_utility = random.nextInt(0, 3);
-        double chance = 0.375;
+        double chance = 0.33;
         double rng = random.nextDouble();
         for (MissileWarsPlayer mwplayer : players) {
             if (!getTeam(mwplayer.getMCPlayerId()).equals("no team")) {

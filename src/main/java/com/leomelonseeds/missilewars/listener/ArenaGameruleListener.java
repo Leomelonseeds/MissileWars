@@ -108,7 +108,7 @@ public class ArenaGameruleListener implements Listener {
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
 
-    /** Just in case a player somehow respawns in the lobby */
+    /** Just in case a player somehow respawns in the lobby. Also handles haste giving on death */
     @EventHandler
     public void onRespawn(PlayerPostRespawnEvent event) {
         Player player = event.getPlayer();
