@@ -340,8 +340,8 @@ public class ArenaManager {
             NPC redNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
                     ChatColor.RED + "" + ChatColor.BOLD + "Red Team");
             CommandTrait enqueueRed = new CommandTrait();
-            enqueueRed.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueuered %player%",
-                    CommandTrait.Hand.BOTH));
+            enqueueRed.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueuered",
+                    CommandTrait.Hand.BOTH).player(true));
             redNPC.addTrait(enqueueRed);
             SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
             redSheepTrait.setColor(DyeColor.RED);
@@ -358,8 +358,8 @@ public class ArenaManager {
             NPC blueNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
                     ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team");
             CommandTrait enqueueBlue = new CommandTrait();
-            enqueueBlue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueueblue %player%",
-                    CommandTrait.Hand.BOTH));
+            enqueueBlue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueueblue",
+                    CommandTrait.Hand.BOTH).player(true));
             blueNPC.addTrait(enqueueBlue);
             SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
             blueSheepTrait.setColor(DyeColor.BLUE);

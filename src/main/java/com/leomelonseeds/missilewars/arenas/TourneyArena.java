@@ -321,9 +321,9 @@ public class TourneyArena extends Arena {
                 List<ItemStack> utility = deck.getUtility();
                 ItemStack poolItem;
                 if (rng < chance) {
-                    poolItem = utility.get(i_utility);
+                    poolItem = new ItemStack(utility.get(i_utility));
                 } else {
-                    poolItem = missiles.get(i_missile);
+                    poolItem = new ItemStack(missiles.get(i_missile));
                 }
                 
                 Player player = mwplayer.getMCPlayer();
