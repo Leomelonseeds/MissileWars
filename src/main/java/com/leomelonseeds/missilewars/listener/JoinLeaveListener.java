@@ -34,7 +34,7 @@ public class JoinLeaveListener implements Listener {
             return;
         }
 
-        playerArena.removePlayer(player.getUniqueId());
+        playerArena.removePlayer(player.getUniqueId(), false);
     }
 
     /** Handle inventory loading on join */
@@ -69,7 +69,7 @@ public class JoinLeaveListener implements Listener {
 	        // Check 1 tick later to make 100% sure
 	        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
 	            if (player.getWorld().getName().equals("world")) {
-	                playerArena.removePlayer(player.getUniqueId());
+	                playerArena.removePlayer(player.getUniqueId(), true);
 	            }
 	        }, 1);
         }
