@@ -41,7 +41,6 @@ messages:
   game-end-reminder: "&c&l[!] &7The game will end in &c%umw_time_remaining%&7!"
   red-team-empty: "&cRed team &7is empty. &9Blue team &7will automatically win in 60 seconds."
   blue-team-empty: "&9Blue team &7is empty. &cRed team &7will automatically win in 60 seconds."
-  spawn-obstructed: "&c&l[!] &7Your spawn location was obstructed."
   # When a player on your team leaves and changes the arena item-frequency
   # setting, so the team recieves items quicker.
   buff-team: "You will recieve items faster because a teammate left."

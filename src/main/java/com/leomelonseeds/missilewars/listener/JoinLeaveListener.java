@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -66,12 +65,9 @@ public class JoinLeaveListener implements Listener {
 	        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
 	            return;
 	        }
-	        // Check 1 tick later to make 100% sure
-	        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-	            if (player.getWorld().getName().equals("world")) {
-	                playerArena.removePlayer(player.getUniqueId(), true);
-	            }
-	        }, 1);
+            if (player.getWorld().getName().equals("world")) {
+                playerArena.removePlayer(player.getUniqueId(), true);
+            }
         }
     }
 }

@@ -108,15 +108,14 @@ public class ArenaGameruleListener implements Listener {
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
 
-    /** Just in case a player somehow respawns in the lobby. Also handles haste giving on death */
+    /** Handles haste giving on death */
     @EventHandler
     public void onRespawn(PlayerPostRespawnEvent event) {
         Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena != null && event.getRespawnedLocation().getWorld().getName().equals("world")) {
-            ConfigUtils.sendConfigMessage("messages.spawn-obstructed", player, null, null);
-            player.teleport(playerArena.getPlayerSpawn(player));
+        if (playerArena == null) {
+            return;
         }
         
         // Re-give haste if player using architect with haste
