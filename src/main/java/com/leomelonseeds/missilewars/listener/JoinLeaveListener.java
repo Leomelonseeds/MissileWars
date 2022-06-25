@@ -44,8 +44,7 @@ public class JoinLeaveListener implements Listener {
     		return;
     	}
 
-    	// Load player data, making sure for new players that it happens after an entry for
-    	// them is created.
+    	// Load player data, making sure for new players that it happens after an entry for them is created.
     	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
             MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
             InventoryUtils.loadInventory(player);

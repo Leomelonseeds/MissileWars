@@ -1251,16 +1251,20 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             if (!player.getMCPlayer().hasPermission("umw.disablerequeue")) {
+                Boolean success = false;
                 for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
                     if (arena.getCapacity() == 20 && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
                         removePlayer(player.getMCPlayerId(), false);
                         arena.joinPlayer(player.getMCPlayer());
+                        success = true;
                         break;
                     }
                 }
-                ConfigUtils.sendConfigMessage("messages.requeue-failed", player.getMCPlayer(), null, null);
-                removePlayer(player.getMCPlayerId(), true);
+                if (!success) {
+                    ConfigUtils.sendConfigMessage("messages.requeue-failed", player.getMCPlayer(), null, null);
+                    removePlayer(player.getMCPlayerId(), true);
+                }
             } else {
                 removePlayer(player.getMCPlayerId(), true);
             }
@@ -1272,7 +1276,7 @@ public class Arena implements ConfigurationSerializable {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
     }
-
+    
     /** Reset the arena world. */
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
