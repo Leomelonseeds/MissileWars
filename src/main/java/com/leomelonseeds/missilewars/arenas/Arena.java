@@ -1250,12 +1250,14 @@ public class Arena implements ConfigurationSerializable {
     
     /** Remove Players from the map. */
     public void removePlayers() {
+        int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
         for (MissileWarsPlayer player : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
-            if (!player.getMCPlayer().hasPermission("umw.disablerequeue")) {
+            // Also only requeue if capacity is 20
+            if (!player.getMCPlayer().hasPermission("umw.disablerequeue") && capacity == cap) {
                 Boolean success = false;
                 for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
-                    if (arena.getCapacity() == 20 && arena.getNumPlayers() < arena.getCapacity() && 
+                    if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
                         removePlayer(player.getMCPlayerId(), false);
                         arena.joinPlayer(player.getMCPlayer());
