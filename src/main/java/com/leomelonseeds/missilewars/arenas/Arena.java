@@ -53,6 +53,8 @@ public class Arena implements ConfigurationSerializable {
 
     /** Comparator to sort by capacity */
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
+    /** Comparator to sort by capacity */
+    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
     /** The arena name. */
     protected String name;
     /** The map for the arena. */

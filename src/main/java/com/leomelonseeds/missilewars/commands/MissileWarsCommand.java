@@ -202,7 +202,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
             // Allow player to join the fullest arena, or specify an arena name
             if (args.length == 1) {
-                for (Arena arena : arenaManager.getLoadedArenas()) {
+                for (Arena arena : arenaManager.getLoadedArenas("classic", Arena.byPlayers)) {
                     if (arena.getNumPlayers() < arena.getCapacity() && !arena.isResetting()) {
                         arena.joinPlayer(player);
                         return true;

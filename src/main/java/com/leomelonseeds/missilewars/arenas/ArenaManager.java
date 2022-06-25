@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -542,20 +543,24 @@ public class ArenaManager {
         }
         return null;
     }
+    
+    public List<Arena> getLoadedArenas(String gamemode) {
+        return getLoadedArenas(gamemode, Arena.byCapacity);
+    }
 
     /**
      * Gets a list of the loaded arenas, by gamemode
      *
      * @return The list of loaded arenas
      */
-    public List<Arena> getLoadedArenas(String gamemode) {
+    public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
         List<Arena> sortedArenas = new ArrayList<>();
         for (Arena a : loadedArenas) {
             if (a.getGamemode().equals(gamemode)) {
                 sortedArenas.add(a);
             }
         }
-        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity));
+        sortedArenas.sort(Collections.reverseOrder(sortingType));
         return sortedArenas;
     }
     
