@@ -53,6 +53,8 @@ public class Arena implements ConfigurationSerializable {
 
     /** Comparator to sort by capacity */
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
+    /** Comparator to sort by capacity */
+    public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
     /** The arena name. */
     protected String name;
     /** The map for the arena. */
@@ -502,7 +504,7 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param uuid the UUID of the player
      */
-    public void removePlayer(UUID uuid) {
+    public void removePlayer(UUID uuid, Boolean tolobby) {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
@@ -535,30 +537,24 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Run proper clearing commands on the player
-        Arena arena = this;
+        if (tolobby) {
+            Arena arena = this;
+            Player mcPlayer = toRemove.getMCPlayer();
+        	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
+        	mcPlayer.setGameMode(GameMode.ADVENTURE);
+        	mcPlayer.setHealth(20);
+        	InventoryUtils.loadInventory(mcPlayer);
+            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
+            RankUtils.setPlayerExpBar(mcPlayer);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Player mcPlayer = toRemove.getMCPlayer();
-                if (mcPlayer != null) {
-                	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
-                	mcPlayer.setGameMode(GameMode.ADVENTURE);
-                	mcPlayer.setHealth(20);
-                	InventoryUtils.loadInventory(mcPlayer);
-                    ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
-                    RankUtils.setPlayerExpBar(mcPlayer);
+            // Notify discord
+            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+            discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + arena.getName()).queue();
 
-                    // Notify discord
-                    TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-                    discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + arena.getName()).queue();
-
-                    for (Player player : Bukkit.getWorld("world").getPlayers()) {
-                        ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
-                    }
-                }
+            for (Player player : Bukkit.getWorld("world").getPlayers()) {
+                ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
+        }
 
         checkEmpty();
 
@@ -890,8 +886,7 @@ public class Arena implements ConfigurationSerializable {
             public void run() {
                 blueTeam.setChaosMode(true);
                 redTeam.setChaosMode(true);
-                redTeam.broadcastConfigMsg("messages.chaos-mode", null);
-                blueTeam.broadcastConfigMsg("messages.chaos-mode", null);
+                announceMessage("messages.chaos-mode", null);
             }
         }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
 
@@ -1035,27 +1030,6 @@ public class Arena implements ConfigurationSerializable {
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 5L);
         // Start deck distribution for each team and send messages
-    }
-
-    /** Remove Players from the map. */
-    public void removePlayers() {
-        for (MissileWarsPlayer player : new HashSet<>(players)) {
-            removePlayer(player.getMCPlayerId());
-        }
-    }
-
-    /** Load this Arena's world from the disk. */
-    public void loadWorldFromDisk() {
-        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
-        arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
-    }
-
-    /** Reset the arena world. */
-    public void resetWorld() {
-        Bukkit.unloadWorld(getWorld(), false);
-        loadWorldFromDisk();
-        resetting = false;
-        setupMapVotes();
     }
 
     /**
@@ -1272,6 +1246,47 @@ public class Arena implements ConfigurationSerializable {
             resetWorld();
             startTime = null;
         }
+    }
+    
+    /** Remove Players from the map. */
+    public void removePlayers() {
+        int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
+        for (MissileWarsPlayer player : new HashSet<>(players)) {
+            // If DOES NOT HAVE the permission, then we DO REQUEUE the player
+            // Also only requeue if capacity is 20
+            if (!player.getMCPlayer().hasPermission("umw.disablerequeue") && capacity == cap) {
+                Boolean success = false;
+                for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
+                    if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
+                            (!arena.isRunning() && !arena.isResetting())) {
+                        removePlayer(player.getMCPlayerId(), false);
+                        arena.joinPlayer(player.getMCPlayer());
+                        success = true;
+                        break;
+                    }
+                }
+                if (!success) {
+                    ConfigUtils.sendConfigMessage("messages.requeue-failed", player.getMCPlayer(), null, null);
+                    removePlayer(player.getMCPlayerId(), true);
+                }
+            } else {
+                removePlayer(player.getMCPlayerId(), true);
+            }
+        }
+    }
+
+    /** Load this Arena's world from the disk. */
+    public void loadWorldFromDisk() {
+        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
+    }
+    
+    /** Reset the arena world. */
+    public void resetWorld() {
+        Bukkit.unloadWorld(getWorld(), false);
+        loadWorldFromDisk();
+        resetting = false;
+        setupMapVotes();
     }
 
     /**

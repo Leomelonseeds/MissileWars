@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -354,6 +355,14 @@ public class TourneyArena extends Arena {
                 
                 player.getInventory().addItem(poolItem);
             }
+        }
+    }
+    
+    /** Remove Players from the map. */
+    @Override
+    public void removePlayers() {
+        for (MissileWarsPlayer player : new HashSet<>(players)) {
+            removePlayer(player.getMCPlayerId(), true);
         }
     }
 }
