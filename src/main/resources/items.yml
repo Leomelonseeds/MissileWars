@@ -1043,6 +1043,39 @@ Vanguard:
       2: 
         level: 2
         spcost: 2
+  passive:
+    bhop:
+      name: "&eBunny"
+      lore:
+      - ""
+      - "&7Recieve permanent Jump Boost with"
+      - "&7amplifier %amplifier%"
+      cost: 600
+      1:
+        spcost: 2
+        amplifier: 0
+      2:
+        spcost: 1
+        amplifier: 1
+      3:
+        spcost: 2
+        amplifier: 2
+    adrenaline:
+      name: "&eAdrenaline"
+      lore:
+      - ""
+      - "&7Recieve Speed with amplifier %amplifier% &7for"
+      - "&71.5 seconds after spawning a missile."
+      cost: 800
+      1:
+        spcost: 1
+        amplifier: 0
+      2:
+        spcost: 2
+        amplifier: 1
+      3:
+        spcost: 2
+        amplifier: 2
 Sentinel:
   weapon:
     item: BOW
@@ -1081,6 +1114,46 @@ Sentinel:
       2:
         level: 2
         spcost: 1
+  passive:
+    longshot:
+      name: "&eLongshot"
+      lore:
+      - ""
+      - "&7Your arrows now favor long-range shots."
+      - "&7Arrows travelling more than 20m will do"
+      - "&7an &aadditional %plus% &7damage per block, up"
+      - "&7to a maximum of %max% &7extra damage. However,"
+      - "&7arrows will also do %minus% &cless &7damage"
+      - "&7per block less than 20m."
+      cost: 1000
+      1:
+        spcost: 1
+        plus: 0.1
+        max: 4
+      2:
+        spcost: 2
+        plus: 0.15
+        max: 8
+      3:
+        spcost: 2
+        plus: 0.2
+        max: 12
+    priest:
+      name: "&ePriest"
+      lore:
+      - ""
+      - "&7Teammates within %radius% &7blocks of you"
+      - "&7recieve regeneration I."
+      cost: 600
+      1:
+        spcost: 2
+        radius: 5
+      2:
+        spcost: 1
+        radius: 10
+      3:
+        spcost: 1
+        radius: 15
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1125,6 +1198,27 @@ Berserker:
       2: 
         level: 6
         spcost: 2
+  passive:
+    retaliation:
+      name: "&eRetaliation"
+      lore:
+      - ""
+      - "&7Always recieve a missile as the next item"
+      - "&7after dying to an enemy player."
+      cost: 750
+      1:
+        spcost: 5
+    booster:
+      name: "&eBooster"
+      lore:
+      - ""
+      - "&7Your fireballs now have an explosion power"
+      - "&7of 0. Instead, the explosive power is"
+      - "&7transferred to a knockback boost that"
+      - "&7depends on the level of your fireball."
+      cost: 1200
+      1:
+        spcost: 5
 Architect:
   weapon:
     item: IRON_PICKAXE
@@ -1173,6 +1267,39 @@ Architect:
       2: 
         level: 4
         spcost: 2
+  passive:
+    naturesblessing:
+      name: "&eNature's Blessing"
+      lore:
+      - ""
+      - "&7Placed leaves last %multiplier% times longer."
+      cost: 500
+      1: 
+        multipler: 2
+        spcost: 1
+      2: 
+        multipler: 2
+        spcost: 2
+      3: 
+        multipler: 2
+        spcost: 2
+    lazybuilder:
+      name: "&eLazy Builder"
+      lore:
+      - ""
+      - "&7For every 10% reduction in your shield health,"
+      - "&7compared to other utility, you have a %percentage%%"
+      - "&7extra chance to recieve leaves."
+      cost: 1000
+      1: 
+        percentage: 2
+        spcost: 1
+      2: 
+        percentage: 2
+        spcost: 2
+      3: 
+        percentage: 2
+        spcost: 2
    
 
 # Stuff relating to Deck GUI
@@ -1209,12 +1336,12 @@ indicators:
     name: "&5&lGlobal Passive"
     slot: 27
   ability:
-    item: YELLOW_DYE
-    name: "&e&lAbility &d(Coming Soon)"
+    item: ORANGE_DYE
+    name: "&6&lAbility &d(Coming Soon)"
     slot: 36
   passive:
-    item: ORANGE_DYE
-    name: "&6&lPassive &d(Coming Soon)"
+    item: YELLOW_DYE
+    name: "&e&lPassive"
     slot: 45
   info:
     item: COMPASS

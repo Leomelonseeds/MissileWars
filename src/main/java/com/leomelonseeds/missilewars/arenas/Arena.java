@@ -430,6 +430,11 @@ public class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, this, null);
             return false;
         }
+        
+        // Save inventory if player in world
+        if (player.getWorld().getName().equals("world")) {
+            InventoryUtils.saveInventory(player, true);
+        }
 
         player.teleport(getPlayerSpawn(player));
 
@@ -438,8 +443,7 @@ public class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
             return false;
         }
-
-        InventoryUtils.saveInventory(player, true);
+        
         InventoryUtils.clearInventory(player);
 
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
