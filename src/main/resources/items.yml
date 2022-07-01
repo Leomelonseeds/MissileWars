@@ -1295,10 +1295,10 @@ Architect:
         percentage: 2
         spcost: 1
       2: 
-        percentage: 2
+        percentage: 4
         spcost: 2
       3: 
-        percentage: 2
+        percentage: 6
         spcost: 2
    
 

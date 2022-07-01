@@ -1120,8 +1120,8 @@ public class Arena implements ConfigurationSerializable {
         int shield_health = ranksConfig.getInt("experience.shield_health");
         int win = ranksConfig.getInt("experience.win");
 
-        int red_portal_amount = (int) (portal_broken * ((double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
-        int blue_portal_amount = (int) (portal_broken * ((double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
+        int red_portal_amount = (int) (portal_broken * (1 - (double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
+        int blue_portal_amount = (int) (portal_broken * (1 - (double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
 
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
