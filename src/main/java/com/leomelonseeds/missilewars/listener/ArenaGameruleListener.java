@@ -296,13 +296,11 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
-    /** Experimental setting to give players poison if they go too high */
+    /** Experimental setting to give players poison if they go too high.
+     *  Also handle priest passive
+     */
     @EventHandler
-    public void givePoison(PlayerMoveEvent event) {
-        if (!MissileWarsPlugin.getPlugin().getConfig().getBoolean("experimental.poison")) {
-            return;
-        }
-        
+    public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         
         if (player.getGameMode() != GameMode.SURVIVAL) {
@@ -315,21 +313,31 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
-        
-        if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                if (player.getLocation().getBlockY() >= toohigh) {
-                    ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
-                }
-            }, 10);
-            return;
+        // Experimental poison 
+        if (MissileWarsPlugin.getPlugin().getConfig().getBoolean("experimental.poison")) {
+
+            double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
+            
+            if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
+                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                    if (player.getLocation().getBlockY() >= toohigh) {
+                        ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
+                    }
+                }, 10);
+                return;
+            }
+            
+            if (event.getTo().getBlockY() <= toohigh - 1 && event.getFrom().getBlockY() >= toohigh) {
+                player.removePotionEffect(PotionEffectType.POISON);
+                return;
+            }
         }
         
-        if (event.getTo().getBlockY() <= toohigh - 1 && event.getFrom().getBlockY() >= toohigh) {
-            player.removePotionEffect(PotionEffectType.POISON);
-            return;
+        int priest = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "priest");
+        if (priest > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Sentinel.passive.priest", priest, "amplifier");
+            // WIP
         }
     }
 }

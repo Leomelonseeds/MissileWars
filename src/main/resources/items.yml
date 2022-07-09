@@ -1272,34 +1272,37 @@ Architect:
       name: "&eNature's Blessing"
       lore:
       - ""
-      - "&7Placed leaves last %multiplier% times longer."
+      - "&7Placed leaves last %multiplier% times longer. In"
+      - "&7addition, for every 10% reduction in your shield"
+      - "&7health, you have a %percentage%% extra chance"
+      - "&7to receive leaves compared to other utility."
       cost: 500
       1: 
         multipler: 2
-        spcost: 1
-      2: 
-        multipler: 2
-        spcost: 2
-      3: 
-        multipler: 2
-        spcost: 2
-    lazybuilder:
-      name: "&eLazy Builder"
-      lore:
-      - ""
-      - "&7For every 10% reduction in your shield health,"
-      - "&7compared to other utility, you have a %percentage%%"
-      - "&7extra chance to recieve leaves."
-      cost: 1000
-      1: 
         percentage: 2
         spcost: 1
       2: 
+        multipler: 2
         percentage: 4
         spcost: 2
       3: 
+        multipler: 2
         percentage: 6
         spcost: 2
+    prickly:
+      name: "&ePrickly Projectiles"
+      lore:
+      - ""
+      - "&7Projectile utilities now do damage and"
+      - "&7knockback to enemy players instead of"
+      - "&7going through them. At level 2, each"
+      - "&7successful hit grants another of the"
+      - "&7same projectile item."
+      cost: 1000
+      1:
+        spcost: 2
+      2:
+        spcost: 3
    
 
 # Stuff relating to Deck GUI

@@ -7,9 +7,8 @@
 	"Vanguard": {
 		"feather_falling": false,
 		"fire_aspect": false,
-		"doublejump": false,
-		"hurl": false,
-		"bhop": false,
+		"infuse": false,
+		"bunny": false,
 		"adrenaline": false,
 		"defaultpreset": {
 			"skillpoints": 3,
@@ -86,9 +85,7 @@
 		"blast_protection": false,
 		"multishot": false,
 		"quick_charge": false,
-		"launcher": false,
-		"slam": false,
-		"resolve": false,
+		"hurl": false,
 		"retaliation": false,
 		"booster": false,
 		"defaultpreset": {
@@ -128,10 +125,8 @@
 		"efficiency": false,
 		"projectile_protection": false,
 		"utilitymaster": false,
-		"missilemaster": false,
-		"sidemonger": false,
+		"prickly": false,
 		"naturesblessing": false,
-		"lazybuilder": false,
 		"defaultpreset": {
 			"skillpoints": 3,
 			"projectile_protection": 0,

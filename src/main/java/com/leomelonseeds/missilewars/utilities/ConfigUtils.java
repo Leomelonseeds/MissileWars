@@ -340,6 +340,22 @@ public class ConfigUtils {
     }
     
     /**
+     * Acquire data for an ability
+     * 
+     * @param abilityPath
+     * @param stat
+     * @return
+     */
+    public static double getAbilityStat(String abilityPath, int level, String stat) {
+        Object o = getItemValue(abilityPath, level, stat);
+        if (o == null) {
+            return 0;
+        } else {
+            return Double.valueOf(o + "");
+        }
+    }
+    
+    /**
      * Get a line, translate it to a component.
      * 
      * @param line

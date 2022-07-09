@@ -212,6 +212,11 @@ public class CustomItemListener implements Listener {
             }
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
+                int adrenaline = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "adrenaline");
+                if (adrenaline > 0) {
+                    int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, level));
+                }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);

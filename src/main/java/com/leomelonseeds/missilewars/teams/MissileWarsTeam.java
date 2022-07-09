@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -176,6 +177,13 @@ public class MissileWarsTeam {
         ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
         giveItems(player);
         player.setJoinTime(LocalDateTime.now());
+        
+        // Apply passives n shit, if they exist
+        int bunny = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getMCPlayerId(), "bunny");
+        if (bunny > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
+        }
     }
 
     /**
@@ -273,8 +281,9 @@ public class MissileWarsTeam {
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
             player.resetPlayer();
-            mcPlayer.removePotionEffect(PotionEffectType.FAST_DIGGING);
-            mcPlayer.removePotionEffect(PotionEffectType.POISON);
+            for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
+                mcPlayer.removePotionEffect(effect.getType());
+            }
         }
     }
 
