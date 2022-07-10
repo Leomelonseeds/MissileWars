@@ -42,6 +42,7 @@ import com.leomelonseeds.missilewars.utilities.SQLManager;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import io.github.a5h73y.parkour.Parkour;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -438,8 +439,8 @@ public class Arena implements ConfigurationSerializable {
 
         player.teleport(getPlayerSpawn(player));
 
-        // Make sure another plugin hasn't cancelled the event
-        if (player.getWorld().getName().equals("world")) {
+        // Make sure player not in parkour
+        if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
             ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
             return false;
         }

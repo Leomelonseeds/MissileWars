@@ -1006,6 +1006,14 @@ arrows:
   3:
     amount: 4
     spcost: 2
+    
+elytra:
+  item: ELYTRA
+  name: "&dArcanic Wings"
+  lore:
+  - "&7An extra-dimensional artifact of"
+  - "&7bygone days, now imbued to the brim"
+  - "&7with preservative arcana."
 
 
 # Per-deck items/abilities
@@ -1129,14 +1137,17 @@ Sentinel:
       1:
         spcost: 1
         plus: 0.1
+        minus: 0.5
         max: 4
       2:
         spcost: 2
         plus: 0.15
+        minus: 0.75
         max: 8
       3:
         spcost: 2
         plus: 0.2
+        minus: 1
         max: 12
     priest:
       name: "&ePriest"

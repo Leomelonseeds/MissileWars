@@ -12,10 +12,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+
+import io.github.a5h73y.parkour.Parkour;
 
 /** Utility class mw inventory management */
 public class InventoryUtils {
@@ -44,6 +47,10 @@ public class InventoryUtils {
      * @param player
      */
     public static void saveInventory(Player player, Boolean async) {
+        if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
+            MissileWarsPlugin.getPlugin().log("Not saving player inventory since they are on a parkour");
+            return;
+        }
         Inventory inventory = player.getInventory();
         UUID uuid = player.getUniqueId();
         try {
@@ -94,6 +101,16 @@ public class InventoryUtils {
                     boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
                     if (!(i == 39 || i == 4 || (isPotion && empty))) {
                         inventory.setItem(i, invItem);
+                    }
+                }
+                // Add elytra if ranked
+                if (player.hasPermission("umw.elytra")) {
+                    if (!inventory.contains(Material.ELYTRA)) {
+                        ItemStack elytra = MissileWarsPlugin.getPlugin().getDeckManager().createItem("elytra", 0, false);
+                        ItemMeta meta = elytra.getItemMeta();
+                        meta.setUnbreakable(true);
+                        elytra.setItemMeta(meta);
+                        inventory.setItem(38, elytra);
                     }
                 }
             } catch (final Exception e) {

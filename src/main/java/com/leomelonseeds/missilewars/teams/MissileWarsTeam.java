@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -163,9 +164,11 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player, Boolean ranked) {
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         members.add(player);
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        DeckManager dm = plugin.getDeckManager();
         player.setDeck(dm.getPlayerDeck(player.getMCPlayerId(), ranked));
 
         // TP to team spawn and give armor
@@ -179,10 +182,38 @@ public class MissileWarsTeam {
         player.setJoinTime(LocalDateTime.now());
         
         // Apply passives n shit, if they exist
-        int bunny = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getMCPlayerId(), "bunny");
+        int bunny = plugin.getJSON().getAbility(player.getMCPlayerId(), "bunny");
         if (bunny > 0) {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
+        }
+        
+        // Sentinel priest
+        int priest = plugin.getJSON().getAbility(player.getMCPlayerId(), "priest");
+        if (priest > 0) {
+            Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
+            int radius = (int) ConfigUtils.getAbilityStat("Sentinel.passive.priest", priest, "radius");
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    String team = arena.getTeam(player.getMCPlayerId());
+                    if (!team.equals("no team")) {
+                        // For entities in radius, if it is player and in same team,
+                        // give that entity regeneration 1 for 1 second
+                        for (Entity e : mcPlayer.getNearbyEntities(radius, radius, radius)) {
+                            if (!(e instanceof Player)) {
+                                continue;
+                            }
+                            Player p = (Player) e;
+                            if (team.equals(arena.getTeam(p.getUniqueId()))) {
+                                p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, 0));
+                            }
+                        }
+                    } else {
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 10, 10);
         }
     }
 

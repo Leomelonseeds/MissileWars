@@ -1,5 +1,8 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -136,6 +140,29 @@ public class ArenaGameruleListener implements Listener {
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
+    
+    public static Map<Player, Location> bowShots = new HashMap<>();
+    
+    // Handle sentinel longshot bow shoot event
+    @EventHandler
+    public void onBowShoot(EntityShootBowEvent event) {
+        // Ensure we are handling a player in an arena
+        if (event.getEntityType() != EntityType.PLAYER) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if ((arena == null) || !arena.isRunning()) {
+            return;
+        }
+        
+        int longshot = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot");
+        if (longshot > 0) {
+            bowShots.put(player, player.getLocation());
+        }
+    }
+    
 
     /** Handle friendly fire. */
     @EventHandler
@@ -156,9 +183,33 @@ public class ArenaGameruleListener implements Listener {
         if (event.getDamager().getType() == EntityType.PLAYER) {
             damager = (Player) event.getDamager();
         } else if (event.getDamager() instanceof Projectile) {
+            // Do sentinel longshot checks
             Projectile projectile = (Projectile) event.getDamager();
             if (projectile.getShooter() instanceof Player) {
                 damager = (Player) projectile.getShooter();
+                if (projectile.getType() == EntityType.ARROW) {
+                    if (bowShots.containsKey(damager)) {
+                        int longshot = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot");
+                        int plus = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
+                        int minus = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "minus");
+                        int max = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
+                        double dmg = event.getDamage();
+                        double distance = bowShots.get(damager).distance(player.getLocation());
+                        int cutoff = 20;
+                        
+                        // Calculate damage
+                        if (distance >= cutoff) {
+                            double extradistance = distance - cutoff;
+                            double extradmg = Math.min(extradistance * plus, max);
+                            event.setDamage(dmg + extradmg);
+                        } else {
+                            double shortdistance = cutoff - distance;
+                            double shortdmg = shortdistance * minus;
+                            event.setDamage(Math.max(dmg - shortdmg, 1));
+                        }
+                    }
+                }
+                MissileWarsPlugin.getPlugin().log("Bowshot raw damage is " + event.getDamage());
             }
         }
         if (damager == null) {
@@ -332,12 +383,6 @@ public class ArenaGameruleListener implements Listener {
                 player.removePotionEffect(PotionEffectType.POISON);
                 return;
             }
-        }
-        
-        int priest = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "priest");
-        if (priest > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Sentinel.passive.priest", priest, "amplifier");
-            // WIP
         }
     }
 }
