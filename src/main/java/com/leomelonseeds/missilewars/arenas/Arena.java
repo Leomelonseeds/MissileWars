@@ -431,13 +431,6 @@ public class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, this, null);
             return false;
         }
-        
-        // Save inventory if player in world
-        if (player.getWorld().getName().equals("world")) {
-            InventoryUtils.saveInventory(player, true);
-        }
-
-        player.teleport(getPlayerSpawn(player));
 
         // Make sure player not in parkour
         if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
@@ -445,8 +438,13 @@ public class Arena implements ConfigurationSerializable {
             return false;
         }
         
-        InventoryUtils.clearInventory(player);
+        // Save inventory if player in world
+        if (player.getWorld().getName().equals("world")) {
+            InventoryUtils.saveInventory(player, true);
+        }
 
+        player.teleport(getPlayerSpawn(player));
+        InventoryUtils.clearInventory(player);
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         for (MissileWarsPlayer mwPlayer : players) {
