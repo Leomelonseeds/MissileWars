@@ -35,6 +35,53 @@ public class MissileWarsCommand implements CommandExecutor {
         String action = args[0];
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ArenaManager arenaManager = plugin.getArenaManager();
+        
+        // A command specifically used to test passives/abilities
+        if (action.equalsIgnoreCase("set")) {
+            // Ensure player is allowed to create an arena
+            if (!sender.hasPermission("umw.set")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            
+            if (args.length != 4) {
+                sendErrorMsg(sender, "Usage: /umw set [gpassive/passive/ability] [name] [level]");
+                return true;
+            }
+            
+            // The admin gotta be smart man
+            String type = args[1];
+            String name = args[2];
+            int level = 0;
+            try {
+                level = Integer.parseInt(args[3]);
+            } catch (NumberFormatException e) {
+                sendErrorMsg(sender, "You suck, use a number next time (" + args[3] + ")");
+                return true;
+            }
+            
+            JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
+            if (!json.has(type)) {
+                sendErrorMsg(sender, "You suck, use gpassive/passive/ability please");
+                return true; 
+            }
+            
+            // Make sure shit that isn't supposed to happen can't happen
+            if (name.equalsIgnoreCase("none")) {
+                name = "None";
+                level = 0;
+            }
+            
+            JSONObject actual = json.getJSONObject(type);
+            actual.put("selected", name);
+            actual.put("level", level);
+            
+            sendSuccessMsg(sender, "You set your " + type + " " + name + " to " + level);
+            return true; 
+        }
+        
         if (action.equalsIgnoreCase("DeleteArena")) {
             // Ensure player is allowed to create an arena
             if (!sender.hasPermission("umw.delete-arena")) {
