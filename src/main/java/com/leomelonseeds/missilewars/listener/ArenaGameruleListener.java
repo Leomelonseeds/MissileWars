@@ -21,6 +21,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -66,6 +68,33 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
     }
+    
+    // Handle player regen in boomlust
+    @EventHandler
+    public void onRegen(EntityRegainHealthEvent event) {
+        
+        if (event.getRegainReason() != RegainReason.SATIATED) { 
+            return; 
+        }
+        
+        //Check if entity is player
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        
+        // Check if player was killed in an Arena
+        Player player = (Player) event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena == null) {
+            return;
+        }
+        
+        // True means boomlust is active and player cannot regen
+        if (playerArena.getPlayerInArena(player.getUniqueId()).getBoomLustRegen()) {
+            event.setCancelled(true);
+        }
+    }
 
     /** Handle player deaths. */
     @EventHandler
@@ -85,6 +114,12 @@ public class ArenaGameruleListener implements Listener {
             if (!player.getKiller().equals(player)) {
                 killer.incrementKills();
                 ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
+            }
+            
+            // Berserker boomlust
+            if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "boomlust") > 0) {
+                playerArena.getPlayerInArena(player.getUniqueId()).setBoomLust(true);
+                playerArena.getPlayerInArena(player.getUniqueId()).setBoomLustRegen(true);
             }
         }
 
@@ -115,30 +150,37 @@ public class ArenaGameruleListener implements Listener {
     /** Handles haste giving on death */
     @EventHandler
     public void onRespawn(PlayerPostRespawnEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager manager = plugin.getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
             return;
         }
         
         // Re-give haste if player using architect with haste
-        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayerPreset(player.getUniqueId());
-        if (!json.has("haste")) {
-            return;
+        JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
+        if (json.has("haste")) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if (item == null || item.getType() != Material.IRON_PICKAXE) {
+                return;
+            }
+            
+            int level = json.getInt("haste");
+            if (level <= 0) {
+                return;
+            }
+            
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
         }
         
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null || item.getType() != Material.IRON_PICKAXE) {
-            return;
+        // Sentinel retaliate
+        if (plugin.getJSON().getAbility(player.getUniqueId(), "retaliate") > 0) {
+            playerArena.getPlayerInArena(player.getUniqueId()).setRetaliate(true);
         }
         
-        int level = json.getInt("haste");
-        if (level <= 0) {
-            return;
-        }
-        
-        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
+        // Reset boomlust
+        playerArena.getPlayerInArena(player.getUniqueId()).setBoomLustRegen(false);
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();

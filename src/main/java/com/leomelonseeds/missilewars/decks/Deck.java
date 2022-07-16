@@ -14,6 +14,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 
@@ -134,7 +135,10 @@ public class Deck {
      *
      * @param player the player to give the pool item too
      */
-    public void givePoolItem(Player player, Boolean first) {
+    public void givePoolItem(MissileWarsPlayer mwplayer, Boolean first) {
+        
+        Player player = mwplayer.getMCPlayer();
+        
         // Ensure Deck has pool items
         if (pool.isEmpty()) {
             return;
@@ -161,6 +165,18 @@ public class Deck {
             } else if (utilityspec == 3) {
                 toUse = utility;
             }
+        }
+        
+        // Check sentinel retaliate
+        if (mwplayer.getRetaliate()) {
+            toUse = utility;
+            mwplayer.setRetaliate(false);
+        }
+        
+        // Check berserker boomlust
+        if (mwplayer.getBoomLust()) {
+            toUse = missiles;
+            mwplayer.setBoomLust(false);
         }
         
         // Don't give players the same item twice

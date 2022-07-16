@@ -1117,10 +1117,10 @@ Sentinel:
     fire_protection:
       cost: 600
       1:
-        level: 1
+        level: 2
         spcost: 1
       2:
-        level: 2
+        level: 4
         spcost: 1
   passive:
     longshot:
@@ -1165,6 +1165,15 @@ Sentinel:
       3:
         spcost: 1
         radius: 15
+    retaliate:
+      name: "&eRetaliate"
+      lore:
+      - ""
+      - "&7Always recieve a utility as the next item"
+      - "&7after dying to an enemy player."
+      cost: 750
+      1:
+        spcost: 5
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1210,15 +1219,6 @@ Berserker:
         level: 6
         spcost: 2
   passive:
-    retaliation:
-      name: "&eRetaliation"
-      lore:
-      - ""
-      - "&7Always recieve a missile as the next item"
-      - "&7after dying to an enemy player."
-      cost: 750
-      1:
-        spcost: 5
     booster:
       name: "&eBooster"
       lore:
@@ -1228,6 +1228,17 @@ Berserker:
       - "&7transferred to a knockback boost that"
       - "&7depends on the level of your fireball."
       cost: 1200
+      1:
+        spcost: 5
+    boomlust:
+      name: "&eBoomlust"
+      lore:
+      - ""
+      - "&7Always recieve a missile as the next item"
+      - "&7after killing an enemy player. However,"
+      - "&7you will no longer naturally regenerate"
+      - "&7health until you die."
+      cost: 1000
       1:
         spcost: 5
 Architect:

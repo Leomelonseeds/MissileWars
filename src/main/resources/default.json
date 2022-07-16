@@ -49,6 +49,7 @@
 		"fissionarrow": false,
 		"longshot": false,
 		"priest": false,
+		"retaliate": false,
 		"defaultpreset": {
 			"skillpoints": 2,
 			"fire_protection": 0,
@@ -86,7 +87,7 @@
 		"multishot": false,
 		"quick_charge": false,
 		"hurl": false,
-		"retaliation": false,
+		"boomlust": false,
 		"booster": false,
 		"defaultpreset": {
 			"skillpoints": 3,
