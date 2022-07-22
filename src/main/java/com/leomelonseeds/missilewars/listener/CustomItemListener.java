@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -142,6 +143,8 @@ public class CustomItemListener implements Listener {
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
+    
+    public static ArrayList<Player> cooldown = new ArrayList<>();
 
     /** Handle right clicking missiles and utility items */
     @EventHandler
@@ -210,6 +213,13 @@ public class CustomItemListener implements Listener {
             if (playerArena.getMapName() != null) {
                 mapName = playerArena.getMapName();
             }
+            
+            // 0.5s cooldown
+            if (cooldown.contains(player)) {
+                ConfigUtils.sendConfigMessage("messages.missile-cooldown", player, null, null);
+                return;
+            }
+            
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
                 int adrenaline = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "adrenaline");
@@ -218,6 +228,14 @@ public class CustomItemListener implements Listener {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, level));
                 }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+                // 0.5s cooldown
+                cooldown.add(player);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        cooldown.remove(player);
+                    }
+                }.runTaskLater(MissileWarsPlugin.getPlugin(), 10);
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }

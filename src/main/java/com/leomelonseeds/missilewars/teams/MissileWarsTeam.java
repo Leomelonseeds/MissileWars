@@ -181,7 +181,7 @@ public class MissileWarsTeam {
         giveItems(player);
         player.setJoinTime(LocalDateTime.now());
         
-        // Apply passives n shit, if they exist
+        // Vanguard bunny
         int bunny = plugin.getJSON().getAbility(player.getMCPlayerId(), "bunny");
         if (bunny > 0) {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");

@@ -1052,7 +1052,7 @@ Vanguard:
         level: 2
         spcost: 2
   passive:
-    bhop:
+    bunny:
       name: "&eBunny"
       lore:
       - ""

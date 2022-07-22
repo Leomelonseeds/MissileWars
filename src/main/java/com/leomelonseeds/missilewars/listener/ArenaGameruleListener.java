@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,12 +116,17 @@ public class ArenaGameruleListener implements Listener {
             if (!player.getKiller().equals(player)) {
                 killer.incrementKills();
                 ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
-            }
-            
-            // Berserker boomlust
-            if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "boomlust") > 0) {
-                playerArena.getPlayerInArena(player.getUniqueId()).setBoomLust(true);
-                playerArena.getPlayerInArena(player.getUniqueId()).setBoomLustRegen(true);
+                
+                // Berserker boomlust
+                if (MissileWarsPlugin.getPlugin().getJSON().getAbility(killer.getMCPlayerId(), "boomlust") > 0) {
+                    playerArena.getPlayerInArena(killer.getMCPlayerId()).setBoomLust(true);
+                    playerArena.getPlayerInArena(killer.getMCPlayerId()).setBoomLustRegen(true);
+                }
+                
+                // Sentinel retaliate
+                if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "retaliate") > 0) {
+                    playerArena.getPlayerInArena(player.getUniqueId()).setRetaliate(true);
+                }
             }
         }
 
@@ -174,9 +181,10 @@ public class ArenaGameruleListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
         }
         
-        // Sentinel retaliate
-        if (plugin.getJSON().getAbility(player.getUniqueId(), "retaliate") > 0) {
-            playerArena.getPlayerInArena(player.getUniqueId()).setRetaliate(true);
+        int bunny = plugin.getJSON().getAbility(player.getUniqueId(), "bunny");
+        if (bunny > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
         }
         
         // Reset boomlust
@@ -199,8 +207,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        int longshot = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot");
-        if (longshot > 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
         }
     }
@@ -222,6 +229,7 @@ public class ArenaGameruleListener implements Listener {
 
         // Check if player is damaged by a player
         Player damager = null;
+        Boolean isProjectile = false;;
         if (event.getDamager().getType() == EntityType.PLAYER) {
             damager = (Player) event.getDamager();
         } else if (event.getDamager() instanceof Projectile) {
@@ -229,29 +237,7 @@ public class ArenaGameruleListener implements Listener {
             Projectile projectile = (Projectile) event.getDamager();
             if (projectile.getShooter() instanceof Player) {
                 damager = (Player) projectile.getShooter();
-                if (projectile.getType() == EntityType.ARROW) {
-                    if (bowShots.containsKey(damager)) {
-                        int longshot = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot");
-                        int plus = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
-                        int minus = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "minus");
-                        int max = (int) ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
-                        double dmg = event.getDamage();
-                        double distance = bowShots.get(damager).distance(player.getLocation());
-                        int cutoff = 20;
-                        
-                        // Calculate damage
-                        if (distance >= cutoff) {
-                            double extradistance = distance - cutoff;
-                            double extradmg = Math.min(extradistance * plus, max);
-                            event.setDamage(dmg + extradmg);
-                        } else {
-                            double shortdistance = cutoff - distance;
-                            double shortdmg = shortdistance * minus;
-                            event.setDamage(Math.max(dmg - shortdmg, 1));
-                        }
-                    }
-                }
-                MissileWarsPlugin.getPlugin().log("Bowshot raw damage is " + event.getDamage());
+                isProjectile = true;
             }
         }
         if (damager == null) {
@@ -267,6 +253,50 @@ public class ArenaGameruleListener implements Listener {
         if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId())) &&
            !arena.getTeam(player.getUniqueId()).equalsIgnoreCase("no team")) {
             event.setCancelled(true);
+            return;
+        }
+        
+        // Do arrowhealth/longshot calculations
+        if (isProjectile) {
+            // Do sentinel longshot checks
+            Projectile projectile = (Projectile) event.getDamager();
+            if (projectile.getShooter() instanceof Player) {
+                // Longshot calculations
+                if (projectile.getType() == EntityType.ARROW) {
+                    if (bowShots.containsKey(damager)) {
+                        int longshot = MissileWarsPlugin.getPlugin().getJSON().getAbility(damager.getUniqueId(), "longshot");
+                        double plus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
+                        double minus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "minus");
+                        double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
+                        double dmg = event.getDamage();
+                        double distance = bowShots.get(damager).distance(player.getLocation());
+                        double cutoff = 20;
+                        
+                        // Calculate damage
+                        if (distance >= cutoff) {
+                            double extradistance = distance - cutoff;
+                            double extradmg = Math.min(extradistance * plus, max);
+                            event.setDamage(dmg + extradmg);
+                        } else {
+                            double shortdistance = cutoff - distance;
+                            double shortdmg = shortdistance * minus;
+                            event.setDamage(Math.max(dmg - shortdmg, 1));
+                        }
+
+                        MissileWarsPlugin.getPlugin().log("Longshot: " + plus + " " + minus + " " + max + " " + dmg + " " + distance + " " + event.getDamage());
+                    }
+                }
+
+                // Arrowhealth message
+                if (player.getHealth() - event.getFinalDamage() > 0 && !player.equals(damager)) {
+                    DecimalFormat df = new DecimalFormat("0.0");
+                    df.setRoundingMode(RoundingMode.UP);
+                    String health = df.format(player.getHealth() - event.getFinalDamage());
+                    String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
+                    msg = msg.replace("%health%", health);
+                    damager.sendMessage(msg);
+                }
+            }
         }
     }
 

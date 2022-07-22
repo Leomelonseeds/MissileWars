@@ -97,6 +97,8 @@ messages:
   watch-the-fucking-video: "&c&l[!] &cYou cannot join an arena until you have watched the tutorial video!"
   leave-parkour: "&c&l[!] &7Please leave the Parkour before joining an arena."
   requeue-failed: "&c&l[!] &7All arenas were full, so you were put back into the lobby."
+  arrow-damage: "%umw_focus% &7is now on &f%health%❤"
+  missile-cooldown: "&c&l[!] &7You cannot place a missile yet!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
