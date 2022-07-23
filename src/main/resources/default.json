@@ -7,9 +7,11 @@
 	"Vanguard": {
 		"feather_falling": false,
 		"fire_aspect": false,
-		"infuse": false,
+		"endercanopy": false,
+		"dragonsblessing": false,
 		"bunny": false,
 		"adrenaline": false,
+		"lavasplash": false,
 		"defaultpreset": {
 			"skillpoints": 3,
 			"feather_falling": 0,
@@ -86,9 +88,9 @@
 		"blast_protection": false,
 		"multishot": false,
 		"quick_charge": false,
+		"missilesmith": false,
 		"hurl": false,
 		"boomlust": false,
-		"booster": false,
 		"defaultpreset": {
 			"skillpoints": 3,
 			"blast_protection": 0,

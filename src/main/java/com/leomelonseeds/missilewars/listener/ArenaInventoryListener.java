@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,10 +13,11 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -138,12 +140,13 @@ public class ArenaInventoryListener implements Listener {
     /** Manage item pickups. */
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         // Check if player is in Arena
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
         Player player = (Player) event.getEntity();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager manager = plugin.getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         if (arena == null) {
             return;
@@ -167,11 +170,35 @@ public class ArenaInventoryListener implements Listener {
         if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
             if (event.getItem().getItemStack().getType() == Material.ARROW) {
                 event.setCancelled(true);
+                return;
+            }
+        }
+        
+        if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
+            ItemStack item = event.getItem().getItemStack();
+            // Must be a missile
+            if (!item.getType().toString().contains("SPAWN_EGG")) {
+                return;
+            }
+            // Must have item structure data
+            if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
+                    new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
+                return;
+            }
+            
+            String[] args = item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(plugin,
+                    "item-structure"), PersistentDataType.STRING).split("-");
+            String name = args[0];
+            int level = Integer.parseInt(args[1]);
+            int maxlevel = plugin.getDeckManager().getMaxLevel(name);
+            
+            if (level < plugin.getDeckManager().getMaxLevel(name)) {
+                item = plugin.getDeckManager().createItem(name, maxlevel, true);
             }
         }
     }
-    
-    /** Manage arrow pickups. */
+   
+    /** Manage arrow pickups. 
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onArrowPickup(PlayerPickupArrowEvent event) {
@@ -194,7 +221,7 @@ public class ArenaInventoryListener implements Listener {
         if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
             event.setCancelled(true);
         }
-    }
+    } */
 
     /** Remove glass bottles after drinking potions */
     @EventHandler

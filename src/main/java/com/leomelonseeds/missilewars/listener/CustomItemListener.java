@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -618,11 +619,11 @@ public class CustomItemListener implements Listener {
 
         // Get data from item
         String[] args = customName.split(":");
+        Player thrower = (Player) event.getEntity().getShooter();
 
         // Handle hitting oak_wood to fully repair canopies
         if (hitBlock.getType() == Material.OAK_WOOD) {
             if (event.getEntity().getShooter() instanceof Player) {
-                Player thrower = (Player) event.getEntity().getShooter();
                 int extraduration = Integer.parseInt(args[2]);
                 Location key = hitBlock.getLocation();
                 if (canopy_extensions.containsKey(key)) {
@@ -648,7 +649,14 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        location.getBlock().setType(Material.WATER);
+        int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
+        double chance = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "percentage") / 100;
+        Random random = new Random();
+        if (random.nextDouble() < chance) {
+            location.getBlock().setType(Material.LAVA);
+        } else {
+            location.getBlock().setType(Material.WATER);
+        }
 
         // Remove water after while
         double duration = Double.parseDouble(args[1]);

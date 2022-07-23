@@ -1084,6 +1084,22 @@ Vanguard:
       3:
         spcost: 2
         amplifier: 2
+    lavasplash:
+      name: "&eLava Splash"
+      lore:
+      - ""
+      - "&7Grants a %percentage%% &7chance to spawn lava"
+      - "&7instead of water when throwing a splash."
+      cost: 1200
+      1:
+        spcost: 2
+        percentage: 25
+      2:
+        spcost: 1
+        percentage: 35
+      3:
+        spcost: 2
+        percentage: 50
 Sentinel:
   weapon:
     item: BOW
@@ -1219,17 +1235,6 @@ Berserker:
         level: 6
         spcost: 2
   passive:
-    booster:
-      name: "&eBooster"
-      lore:
-      - ""
-      - "&7Your fireballs now have an explosion power"
-      - "&7of 0. Instead, the explosive power is"
-      - "&7transferred to a knockback boost that"
-      - "&7depends on the level of your fireball."
-      cost: 1200
-      1:
-        spcost: 5
     boomlust:
       name: "&eBoomlust"
       lore:
@@ -1238,7 +1243,17 @@ Berserker:
       - "&7after killing an enemy player. However,"
       - "&7you will no longer naturally regenerate"
       - "&7health until you die."
-      cost: 1000
+      cost: 900
+      1:
+        spcost: 5
+    missilesmith:
+      name: "&eMissilesmith"
+      lore:
+      - ""
+      - "&7Any missiles given to you by other players"
+      - "&7will automatically be upgraded to their"
+      - "&7highest level."
+      cost: 1200
       1:
         spcost: 5
 Architect:

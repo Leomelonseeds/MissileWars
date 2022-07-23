@@ -235,6 +235,10 @@ public class ArenaGameruleListener implements Listener {
         } else if (event.getDamager() instanceof Projectile) {
             // Do sentinel longshot checks
             Projectile projectile = (Projectile) event.getDamager();
+            // Allow players to damage themselves with fireballs
+            if (projectile.getType() == EntityType.FIREBALL) {
+                return;
+            }
             if (projectile.getShooter() instanceof Player) {
                 damager = (Player) projectile.getShooter();
                 isProjectile = true;
