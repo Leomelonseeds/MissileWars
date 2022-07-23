@@ -1309,22 +1309,16 @@ Architect:
       name: "&eNature's Blessing"
       lore:
       - ""
-      - "&7Placed leaves last %multiplier% times longer. In"
-      - "&7addition, for every 10% reduction in your shield"
-      - "&7health, you have a %percentage%% extra chance"
-      - "&7to receive leaves compared to other utility."
+      - "&7Placed leaves last %multiplier% times longer."
       cost: 500
       1: 
         multipler: 2
-        percentage: 2
         spcost: 1
       2: 
-        multipler: 2
-        percentage: 4
+        multipler: 3
         spcost: 2
       3: 
-        multipler: 2
-        percentage: 6
+        multipler: 4
         spcost: 2
     prickly:
       name: "&ePrickly Projectiles"
@@ -1340,6 +1334,23 @@ Architect:
         spcost: 2
       2:
         spcost: 3
+    repairman:
+      name: "&eRepairman"
+      lore:
+      - ""
+      - "&7For every 10% reduction in your shield"
+      - "&7health, you have a %percentage%% extra chance"
+      - "&7to receive leaves compared to other utility."
+      cost: 500
+      1: 
+        percentage: 2
+        spcost: 1
+      2: 
+        percentage: 4
+        spcost: 2
+      3:
+        percentage: 6
+        spcost: 2
    
 
 # Stuff relating to Deck GUI

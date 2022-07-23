@@ -663,7 +663,7 @@ public class CustomItemListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (location.getBlock().getType() == Material.WATER) {
+                if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.LAVA) {
                     location.getBlock().setType(Material.AIR);
                 }
             }

@@ -130,6 +130,7 @@
 		"utilitymaster": false,
 		"prickly": false,
 		"naturesblessing": false,
+		"repairman": false,
 		"defaultpreset": {
 			"skillpoints": 3,
 			"projectile_protection": 0,

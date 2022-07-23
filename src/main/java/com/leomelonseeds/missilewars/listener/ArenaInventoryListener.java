@@ -176,6 +176,10 @@ public class ArenaInventoryListener implements Listener {
         
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
             ItemStack item = event.getItem().getItemStack();
+            // Can't be same player
+            if (event.getItem().getThrower() == player.getUniqueId()) {
+                return;
+            }
             // Must be a missile
             if (!item.getType().toString().contains("SPAWN_EGG")) {
                 return;
@@ -193,7 +197,9 @@ public class ArenaInventoryListener implements Listener {
             int maxlevel = plugin.getDeckManager().getMaxLevel(name);
             
             if (level < plugin.getDeckManager().getMaxLevel(name)) {
-                item = plugin.getDeckManager().createItem(name, maxlevel, true);
+                event.setCancelled(true);
+                event.getItem().remove();
+                player.getInventory().addItem(plugin.getDeckManager().createItem(name, maxlevel, true));
             }
         }
     }
