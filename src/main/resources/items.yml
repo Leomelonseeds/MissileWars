@@ -1144,11 +1144,11 @@ Sentinel:
       lore:
       - ""
       - "&7Your arrows now favor long-range shots."
-      - "&7Arrows travelling more than 20m will do"
+      - "&7Arrows travelling more than 25m will do"
       - "&7an &aadditional %plus% &7damage per block, up"
       - "&7to a maximum of %max% &7extra damage. However,"
       - "&7arrows will also do %minus% &cless &7damage"
-      - "&7per block less than 20m."
+      - "&7per block less than 25m."
       cost: 1000
       1:
         spcost: 1
