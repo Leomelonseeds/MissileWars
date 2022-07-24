@@ -74,7 +74,7 @@ public class JSONManager {
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
                 // Unlock everything for royal rank
-                if (Bukkit.getPlayer(uuid).hasPermission("group.royal")) {
+                if (Bukkit.getPlayer(uuid).hasPermission("umw.unlockall")) {
                     for (String key : newJson.keySet()) {
                         if (newJson.get(key) instanceof Boolean) {
                             newJson.put(key, true);
