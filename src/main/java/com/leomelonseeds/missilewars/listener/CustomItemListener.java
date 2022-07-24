@@ -561,6 +561,11 @@ public class CustomItemListener implements Listener {
         if (playerArena == null) {
             return;
         }
+        
+        // Check if prickly
+        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "prickly") > 0) {
+            return;
+        }
 
         // Make them go through entities
         if (event.getHitEntity() != null) {

@@ -1326,9 +1326,10 @@ Architect:
       - ""
       - "&7Projectile utilities now do damage and"
       - "&7knockback to enemy players instead of"
-      - "&7going through them. At level 2, each"
-      - "&7successful hit grants another of the"
-      - "&7same projectile item."
+      - "&7going through them. The knockback is"
+      - "&7multiplied by the level of the utility."
+      - "&7At level 2, each successful hit grants"
+      - "&7another of the same projectile item."
       cost: 1000
       1:
         spcost: 2
@@ -1382,17 +1383,19 @@ indicators:
     name: "&3&lGear Enchantments"
     slot: 18
     rankedslot: 18
-  gpassive:
-    item: PURPLE_DYE
-    name: "&5&lGlobal Passive"
-    slot: 27
-  ability:
-    item: ORANGE_DYE
-    name: "&6&lAbility &d(Coming Soon)"
-    slot: 36
   passive:
     item: YELLOW_DYE
     name: "&e&lPassive"
+    lore:
+      - "&7Perks that are always active"
+    slot: 27
+  gpassive:
+    item: PURPLE_DYE
+    name: "&5&lGlobal Passive"
+    slot: 36
+  ability:
+    item: ORANGE_DYE
+    name: "&6&lAbility &d(Coming Soon)"
     slot: 45
   info:
     item: COMPASS
