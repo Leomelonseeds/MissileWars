@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -166,14 +167,6 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        // Stop decks without bows to pick up arrows
-        if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
-            if (event.getItem().getItemStack().getType() == Material.ARROW) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
             ItemStack item = event.getItem().getItemStack();
             // Can't be same player
@@ -204,7 +197,7 @@ public class ArenaInventoryListener implements Listener {
         }
     }
    
-    /** Manage arrow pickups. 
+    /** Manage arrow pickups. */
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onArrowPickup(PlayerPickupArrowEvent event) {
@@ -227,7 +220,7 @@ public class ArenaInventoryListener implements Listener {
         if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
             event.setCancelled(true);
         }
-    } */
+    }
 
     /** Remove glass bottles after drinking potions */
     @EventHandler

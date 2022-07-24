@@ -5,6 +5,8 @@ mysql:
   
 experimental:
   poison: true
+  # in ticks
+  missile-cooldown: 8
 
 # Blocks that cannot intersect bounding boxes of schematics
 # Players also cannot right click on these blocks with items.

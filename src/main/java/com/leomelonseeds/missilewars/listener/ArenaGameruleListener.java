@@ -16,7 +16,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -391,28 +390,6 @@ public class ArenaGameruleListener implements Listener {
 
         // Register block break
         possibleArena.registerShieldBlockEdit(block.getLocation(), false);
-    }
-
-    /** Handle shield block breaks places. */
-    @EventHandler
-    public void onPlace(BlockPlaceEvent event) {
-        Block block = event.getBlock();
-        // Ensure it was in an arena world
-        String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
-        if (possibleArena == null) {
-            return;
-        }
-        
-        // Ain't no way bruh
-        if (block.getLocation().getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
-            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
-            event.setCancelled(true);
-            return;
-        }
-
-        // Register block break
-        possibleArena.registerShieldBlockEdit(block.getLocation(), true);
     }
 
     /** Stop chickens spawning from eggs */

@@ -320,6 +320,32 @@ public class ConfigUtils {
         }
     }
     
+    
+    /**
+     * Check if given location is in given arena with given team
+     * 
+     * @param arena
+     * @param location
+     * @param team
+     * @return
+     */
+    public static boolean inShield(Arena arena, Location location, String team) {
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        String teamName = ChatColor.stripColor(team).toLowerCase();
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
+        if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Acquire data for an item
      * 

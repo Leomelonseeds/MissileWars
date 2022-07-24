@@ -1312,13 +1312,13 @@ Architect:
       - "&7Placed leaves last %multiplier% times longer."
       cost: 500
       1: 
-        multipler: 2
+        multiplier: 2
         spcost: 1
       2: 
-        multipler: 3
+        multiplier: 3
         spcost: 2
       3: 
-        multipler: 4
+        multiplier: 4
         spcost: 2
     prickly:
       name: "&ePrickly Projectiles"
@@ -1341,7 +1341,7 @@ Architect:
       - "&7For every 10% reduction in your shield"
       - "&7health, you have a %percentage%% extra chance"
       - "&7to receive leaves compared to other utility."
-      cost: 500
+      cost: 800
       1: 
         percentage: 2
         spcost: 1
@@ -1507,13 +1507,13 @@ gpassive:
     - "&7recieve a utility when the game starts." 
     cost: 1200   
     1:
-      percentage: 6
+      percentage: 8
       spcost: 1
     2:
-      percentage: 12
+      percentage: 16
       spcost: 2
     3: 
-      percentage: 18
+      percentage: 24
       spcost: 2
   hoarder:
     name: "&5Hoarder"

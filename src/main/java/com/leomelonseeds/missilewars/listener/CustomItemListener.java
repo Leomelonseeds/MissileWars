@@ -150,6 +150,7 @@ public class CustomItemListener implements Listener {
     /** Handle right clicking missiles and utility items */
     @EventHandler
     public void useItem(PlayerInteractEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         // Stop if not right-click
         if (!event.getAction().toString().contains("RIGHT")) {
             return;
@@ -223,7 +224,7 @@ public class CustomItemListener implements Listener {
             
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
-                int adrenaline = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "adrenaline");
+                int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
                 if (adrenaline > 0) {
                     int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, level));
@@ -236,7 +237,7 @@ public class CustomItemListener implements Listener {
                     public void run() {
                         cooldown.remove(player);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), 10);
+                }.runTaskLater(plugin, plugin.getConfig().getInt("experimental.missile-cooldown"));
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }
@@ -255,7 +256,7 @@ public class CustomItemListener implements Listener {
                     event.setCancelled(true);
 
                     // Can't place creepers on obsidian, otherwise broken game
-                    List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
+                    List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                     for (String s : cancel) {
                         if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
                             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -298,8 +299,11 @@ public class CustomItemListener implements Listener {
     // Check for architect leaves to despawn them after a while
     @EventHandler
     public void architectLeaves(BlockPlaceEvent event) {
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         Player player = event.getPlayer();
+        Block block = event.getBlock();
         
         if (canopy_freeze.contains(player)) {
             event.setCancelled(true);
@@ -311,26 +315,59 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Stop spawngriefing
         Location loc = event.getBlockPlaced().getLocation();
+        
+        // no max height
+        if (block.getLocation().getBlockY() > plugin.getConfig().getInt("max-height")) {
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
+            event.setCancelled(true);
+            return;
+        }
         
         Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
         Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
         
+        // Stop spawngriefing
         if (loc.equals(s1) || loc.equals(s2)) {
             event.setCancelled(true);
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             return;
         }
+
+        // Register block place
+        playerArena.registerShieldBlockEdit(block.getLocation(), true);
         
+        int naturesblessing = plugin.getJSON().getAbility(player.getUniqueId(), "naturesblessing");
+        int durationMultiplier = 1;
+        if (naturesblessing > 0) {
+            durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
+        }
+        
+        // Remove leaves after 30 sec
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (loc.getBlock().getType().toString().contains("LEAVES")) {
+                // Must still be leaves
+                if (!loc.getBlock().getType().toString().contains("LEAVES")) {
+                    return;
+                }
+                
+                String team = playerArena.getTeam(player.getUniqueId());
+                
+                // No repairman = remove leaves
+                if (plugin.getJSON().getAbility(player.getUniqueId(), "repairman") == 0 ||
+                        !ConfigUtils.inShield(playerArena, loc, team)) {
                     loc.getBlock().setType(Material.AIR);
+                    return;
+                }
+                
+                String material = ChatColor.stripColor(team).toUpperCase() + "_STAINED_GLASS";
+                
+                if (ConfigUtils.inShield(playerArena, loc, team)) {
+                    loc.getBlock().setType(Material.getMaterial(material));
                 }
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 30 * 20);
+        }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
     }
 
     private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {

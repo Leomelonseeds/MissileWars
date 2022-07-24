@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -138,6 +139,7 @@ public class Deck {
     public void givePoolItem(MissileWarsPlayer mwplayer, Boolean first) {
         
         Player player = mwplayer.getMCPlayer();
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         
         // Ensure Deck has pool items
         if (pool.isEmpty()) {
@@ -178,11 +180,35 @@ public class Deck {
             toUse = missiles;
             mwplayer.setBoomLust(false);
         }
-        
+
+        Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
         // Don't give players the same item twice
         ItemStack poolItem;
         do {
-            poolItem = new ItemStack(toUse.get(rand.nextInt(toUse.size())));
+            // Check repairman, increase chance of getting leaves
+            int repairman = plugin.getJSON().getAbility(player.getUniqueId(), "repairman");
+            if (toUse == utility && repairman > 0) {
+                FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
+                double defaultchance = 0.33;
+                double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
+                double shieldhealthmultiplier;
+                if (arena.getTeam(player.getUniqueId()).contains("red")) {
+                    shieldhealthmultiplier = Math.floor((100 - arena.getRedTeam().getShieldHealth()) / 10);
+                } else {
+                    shieldhealthmultiplier = Math.floor((100 - arena.getBlueTeam().getShieldHealth()) / 10);
+                }
+                double leaveschance = defaultchance + percentage * shieldhealthmultiplier;
+                int leavesindex = itemsConfig.getInt("leaves.index");
+                if (rand.nextDouble() < leaveschance) {
+                    poolItem = new ItemStack(toUse.get(leavesindex));
+                } else {
+                    List<ItemStack> toUseCopy = new ArrayList<>(toUse);
+                    toUseCopy.remove(leavesindex);
+                    poolItem = new ItemStack(toUseCopy.get(rand.nextInt(2)));
+                }
+            } else {
+                poolItem = new ItemStack(toUse.get(rand.nextInt(toUse.size())));
+            }
         } while (lastTwo.contains(poolItem));
         // Add item to the list
         lastTwo.addFirst(poolItem);
@@ -190,7 +216,6 @@ public class Deck {
             lastTwo.removeLast();
         }
         
-        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
         double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
         double toofar = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
         Location loc = player.getLocation();
