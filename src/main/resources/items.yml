@@ -1309,7 +1309,7 @@ Architect:
       name: "&eNature's Blessing"
       lore:
       - ""
-      - "&7Placed leaves last %multiplier% times longer."
+      - "&7Placed leaves last %multiplier% &7times longer."
       cost: 500
       1: 
         multiplier: 2
@@ -1340,8 +1340,11 @@ Architect:
       lore:
       - ""
       - "&7For every 10% reduction in your shield"
-      - "&7health, you have a %percentage%% extra chance"
+      - "&7health, you have a %percentage%% &7extra chance"
       - "&7to receive leaves compared to other utility."
+      - "&7Additionally, instead of decaying, any leaves"
+      - "&7placed within your shield will instead turn"
+      - "&7into glass after 30 seconds."
       cost: 800
       1: 
         percentage: 2
@@ -1355,7 +1358,7 @@ Architect:
    
 
 # Stuff relating to Deck GUI
-default-skillpoints: 14
+default-skillpoints: 18
 default-skillpoints-ranked: 16
 
 intangibles:
@@ -1371,16 +1374,22 @@ indicators:
   missiles:
     item: TNT
     name: "&c&lMissiles"
+    lore:
+      - "&7Make your missiles stronger and faster"
     slot: 0
     rankedslot: 0
   utility:
     item: REPEATER
     name: "&9&lUtility"
+    lore:
+      - "&7Improve the effectiveness of utilities"
     slot: 9
     rankedslot: 9
   enchants:
     item: ENCHANTED_BOOK
     name: "&3&lGear Enchantments"
+    lore:
+      - "&7Enhance your weapons and armor"
     slot: 18
     rankedslot: 18
   passive:
@@ -1392,6 +1401,9 @@ indicators:
   gpassive:
     item: PURPLE_DYE
     name: "&5&lGlobal Passive"
+    lore:
+      - "&7Perks available to all decks"
+      - "&7that are always active"
     slot: 36
   ability:
     item: ORANGE_DYE

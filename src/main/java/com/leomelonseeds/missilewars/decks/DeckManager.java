@@ -323,7 +323,7 @@ public class DeckManager {
             }
             
             // Match all instances of placeholders 
-            Matcher matcher = Pattern.compile("%[^%]+%").matcher(line);
+            Matcher matcher = Pattern.compile("%[^% ]+%").matcher(line);
             Set<String> matches = new HashSet<>();
             while (matcher.find()) {
                 matches.add(matcher.group());
