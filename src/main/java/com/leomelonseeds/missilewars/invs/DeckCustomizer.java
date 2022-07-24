@@ -108,6 +108,22 @@ public class DeckCustomizer implements MWInventory {
             inv.setItem(index_g, item);
             index_g++;
         }
+        
+        // Normal passives and abilities
+        for (String p : new String[] {"passive"}) {
+            int index = getIndex(p);
+            JSONObject currentjson = presetjson.getJSONObject(p);
+            for (String key : itemConfig.getConfigurationSection(deck + "." + p).getKeys(false)) {
+                int level = 0;
+                if (currentjson.getString("selected").equals(key)) {
+                    level = currentjson.getInt("level");
+                }
+                ItemStack item = deckManager.createItem(deck + "." + p + "." + key, level, 
+                            false, init, deck, true, preset);
+                inv.setItem(index, item);
+                index++;
+            }
+        }
     }
 
     @Override
@@ -228,6 +244,15 @@ public class DeckCustomizer implements MWInventory {
         // Global Passive
         if (itemConfig.getConfigurationSection("gpassive").getKeys(false).contains(realname)) {
             processAbilityClick("gpassive", sp, name, realname, level, type);
+            return;
+        }
+        
+        // Passives or abilities
+        for (String p : new String[] {"passive"}) {
+            if (itemConfig.getConfigurationSection(deck + "." + p).getKeys(false).contains(realname)) {
+                processAbilityClick(p, sp, name, realname, level, type);
+                return;
+            }
         }
     }
 

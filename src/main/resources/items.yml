@@ -1006,6 +1006,14 @@ arrows:
   3:
     amount: 4
     spcost: 2
+    
+elytra:
+  item: ELYTRA
+  name: "&dArcanic Wings"
+  lore:
+  - "&7An extra-dimensional artifact of"
+  - "&7bygone days, now imbued to the brim"
+  - "&7with preservative arcana."
 
 
 # Per-deck items/abilities
@@ -1043,6 +1051,55 @@ Vanguard:
       2: 
         level: 2
         spcost: 2
+  passive:
+    bunny:
+      name: "&eBunny"
+      lore:
+      - ""
+      - "&7Recieve permanent Jump Boost with"
+      - "&7amplifier %amplifier%"
+      cost: 600
+      1:
+        spcost: 2
+        amplifier: 0
+      2:
+        spcost: 1
+        amplifier: 1
+      3:
+        spcost: 2
+        amplifier: 2
+    adrenaline:
+      name: "&eAdrenaline"
+      lore:
+      - ""
+      - "&7Recieve Speed with amplifier %amplifier% &7for"
+      - "&71.5 seconds after spawning a missile."
+      cost: 800
+      1:
+        spcost: 1
+        amplifier: 0
+      2:
+        spcost: 2
+        amplifier: 1
+      3:
+        spcost: 2
+        amplifier: 2
+    lavasplash:
+      name: "&eLava Splash"
+      lore:
+      - ""
+      - "&7Grants a %percentage%% &7chance to spawn lava"
+      - "&7instead of water when throwing a splash."
+      cost: 1200
+      1:
+        spcost: 2
+        percentage: 25
+      2:
+        spcost: 1
+        percentage: 35
+      3:
+        spcost: 2
+        percentage: 50
 Sentinel:
   weapon:
     item: BOW
@@ -1076,11 +1133,63 @@ Sentinel:
     fire_protection:
       cost: 600
       1:
-        level: 1
-        spcost: 1
-      2:
         level: 2
         spcost: 1
+      2:
+        level: 4
+        spcost: 1
+  passive:
+    longshot:
+      name: "&eLongshot"
+      lore:
+      - ""
+      - "&7Your arrows now favor long-range shots."
+      - "&7Arrows travelling more than 20m will do"
+      - "&7an &aadditional %plus% &7damage per block, up"
+      - "&7to a maximum of %max% &7extra damage. However,"
+      - "&7arrows will also do %minus% &cless &7damage"
+      - "&7per block less than 20m."
+      cost: 1000
+      1:
+        spcost: 1
+        plus: 0.1
+        minus: 0.5
+        max: 4
+      2:
+        spcost: 2
+        plus: 0.15
+        minus: 0.75
+        max: 8
+      3:
+        spcost: 2
+        plus: 0.2
+        minus: 1
+        max: 12
+    priest:
+      name: "&ePriest"
+      lore:
+      - ""
+      - "&7Teammates within %radius% &7blocks of you"
+      - "&7recieve regeneration I."
+      cost: 600
+      1:
+        spcost: 2
+        radius: 5
+      2:
+        spcost: 1
+        radius: 10
+      3:
+        spcost: 1
+        radius: 15
+    retaliate:
+      name: "&eRetaliate"
+      lore:
+      - ""
+      - "&7Always recieve a utility as the next item"
+      - "&7after dying to an enemy player."
+      cost: 750
+      1:
+        spcost: 5
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1125,6 +1234,28 @@ Berserker:
       2: 
         level: 6
         spcost: 2
+  passive:
+    boomlust:
+      name: "&eBoomlust"
+      lore:
+      - ""
+      - "&7Always recieve a missile as the next item"
+      - "&7after killing an enemy player. However,"
+      - "&7you will no longer naturally regenerate"
+      - "&7health until you die."
+      cost: 900
+      1:
+        spcost: 5
+    missilesmith:
+      name: "&eMissilesmith"
+      lore:
+      - ""
+      - "&7Any missiles given to you by other players"
+      - "&7will automatically be upgraded to their"
+      - "&7highest level."
+      cost: 1200
+      1:
+        spcost: 5
 Architect:
   weapon:
     item: IRON_PICKAXE
@@ -1173,10 +1304,61 @@ Architect:
       2: 
         level: 4
         spcost: 2
+  passive:
+    naturesblessing:
+      name: "&eNature's Blessing"
+      lore:
+      - ""
+      - "&7Placed leaves last %multiplier% &7times longer."
+      cost: 500
+      1: 
+        multiplier: 2
+        spcost: 1
+      2: 
+        multiplier: 3
+        spcost: 2
+      3: 
+        multiplier: 4
+        spcost: 2
+    prickly:
+      name: "&ePrickly Projectiles"
+      lore:
+      - ""
+      - "&7Projectile utilities now do damage and"
+      - "&7knockback to enemy players instead of"
+      - "&7going through them. The knockback is"
+      - "&7multiplied by the level of the utility."
+      - "&7At level 2, each successful hit grants"
+      - "&7another of the same projectile item."
+      cost: 1000
+      1:
+        spcost: 2
+      2:
+        spcost: 3
+    repairman:
+      name: "&eRepairman"
+      lore:
+      - ""
+      - "&7For every 10% reduction in your shield"
+      - "&7health, you have a %percentage%% &7extra chance"
+      - "&7to receive leaves compared to other utility."
+      - "&7Additionally, instead of decaying, any leaves"
+      - "&7placed within your shield will instead turn"
+      - "&7into glass after 30 seconds."
+      cost: 800
+      1: 
+        percentage: 2
+        spcost: 1
+      2: 
+        percentage: 4
+        spcost: 2
+      3:
+        percentage: 6
+        spcost: 2
    
 
 # Stuff relating to Deck GUI
-default-skillpoints: 14
+default-skillpoints: 18
 default-skillpoints-ranked: 16
 
 intangibles:
@@ -1192,29 +1374,40 @@ indicators:
   missiles:
     item: TNT
     name: "&c&lMissiles"
+    lore:
+      - "&7Make your missiles stronger and faster"
     slot: 0
     rankedslot: 0
   utility:
     item: REPEATER
     name: "&9&lUtility"
+    lore:
+      - "&7Improve the effectiveness of utilities"
     slot: 9
     rankedslot: 9
   enchants:
     item: ENCHANTED_BOOK
     name: "&3&lGear Enchantments"
+    lore:
+      - "&7Enhance your weapons and armor"
     slot: 18
     rankedslot: 18
+  passive:
+    item: YELLOW_DYE
+    name: "&e&lPassive"
+    lore:
+      - "&7Perks that are always active"
+    slot: 27
   gpassive:
     item: PURPLE_DYE
     name: "&5&lGlobal Passive"
-    slot: 27
-  ability:
-    item: YELLOW_DYE
-    name: "&e&lAbility &d(Coming Soon)"
+    lore:
+      - "&7Perks available to all decks"
+      - "&7that are always active"
     slot: 36
-  passive:
+  ability:
     item: ORANGE_DYE
-    name: "&6&lPassive &d(Coming Soon)"
+    name: "&6&lAbility &d(Coming Soon)"
     slot: 45
   info:
     item: COMPASS
@@ -1329,13 +1522,13 @@ gpassive:
     - "&7recieve a utility when the game starts." 
     cost: 1200   
     1:
-      percentage: 6
+      percentage: 8
       spcost: 1
     2:
-      percentage: 12
+      percentage: 16
       spcost: 2
     3: 
-      percentage: 18
+      percentage: 24
       spcost: 2
   hoarder:
     name: "&5Hoarder"

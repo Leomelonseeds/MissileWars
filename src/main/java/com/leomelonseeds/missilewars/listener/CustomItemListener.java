@@ -1,9 +1,11 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -142,10 +144,13 @@ public class CustomItemListener implements Listener {
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
     }
+    
+    public static ArrayList<Player> cooldown = new ArrayList<>();
 
     /** Handle right clicking missiles and utility items */
     @EventHandler
     public void useItem(PlayerInteractEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         // Stop if not right-click
         if (!event.getAction().toString().contains("RIGHT")) {
             return;
@@ -210,9 +215,29 @@ public class CustomItemListener implements Listener {
             if (playerArena.getMapName() != null) {
                 mapName = playerArena.getMapName();
             }
+            
+            // 0.5s cooldown
+            if (cooldown.contains(player)) {
+                ConfigUtils.sendConfigMessage("messages.missile-cooldown", player, null, null);
+                return;
+            }
+            
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
+                int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
+                if (adrenaline > 0) {
+                    int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, level));
+                }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+                // 0.5s cooldown
+                cooldown.add(player);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        cooldown.remove(player);
+                    }
+                }.runTaskLater(plugin, plugin.getConfig().getInt("experimental.missile-cooldown"));
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }
@@ -231,7 +256,7 @@ public class CustomItemListener implements Listener {
                     event.setCancelled(true);
 
                     // Can't place creepers on obsidian, otherwise broken game
-                    List<String> cancel = MissileWarsPlugin.getPlugin().getConfig().getStringList("cancel-schematic");
+                    List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                     for (String s : cancel) {
                         if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
                             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -274,8 +299,11 @@ public class CustomItemListener implements Listener {
     // Check for architect leaves to despawn them after a while
     @EventHandler
     public void architectLeaves(BlockPlaceEvent event) {
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         Player player = event.getPlayer();
+        Block block = event.getBlock();
         
         if (canopy_freeze.contains(player)) {
             event.setCancelled(true);
@@ -287,26 +315,59 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Stop spawngriefing
         Location loc = event.getBlockPlaced().getLocation();
+        
+        // no max height
+        if (block.getLocation().getBlockY() > plugin.getConfig().getInt("max-height")) {
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
+            event.setCancelled(true);
+            return;
+        }
         
         Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
         Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
         
+        // Stop spawngriefing
         if (loc.equals(s1) || loc.equals(s2)) {
             event.setCancelled(true);
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             return;
         }
+
+        // Register block place
+        playerArena.registerShieldBlockEdit(block.getLocation(), true);
         
+        int naturesblessing = plugin.getJSON().getAbility(player.getUniqueId(), "naturesblessing");
+        int durationMultiplier = 1;
+        if (naturesblessing > 0) {
+            durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
+        }
+        
+        // Remove leaves after 30 sec
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (loc.getBlock().getType().toString().contains("LEAVES")) {
+                // Must still be leaves
+                if (!loc.getBlock().getType().toString().contains("LEAVES")) {
+                    return;
+                }
+                
+                String team = playerArena.getTeam(player.getUniqueId());
+                
+                // No repairman = remove leaves
+                if (plugin.getJSON().getAbility(player.getUniqueId(), "repairman") == 0 ||
+                        !ConfigUtils.inShield(playerArena, loc, team)) {
                     loc.getBlock().setType(Material.AIR);
+                    return;
+                }
+                
+                String material = ChatColor.stripColor(team).toUpperCase() + "_STAINED_GLASS";
+                
+                if (ConfigUtils.inShield(playerArena, loc, team)) {
+                    loc.getBlock().setType(Material.getMaterial(material));
                 }
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 30 * 20);
+        }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
     }
 
     private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
@@ -500,6 +561,11 @@ public class CustomItemListener implements Listener {
         if (playerArena == null) {
             return;
         }
+        
+        // Check if prickly
+        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "prickly") > 0) {
+            return;
+        }
 
         // Make them go through entities
         if (event.getHitEntity() != null) {
@@ -595,11 +661,11 @@ public class CustomItemListener implements Listener {
 
         // Get data from item
         String[] args = customName.split(":");
+        Player thrower = (Player) event.getEntity().getShooter();
 
         // Handle hitting oak_wood to fully repair canopies
         if (hitBlock.getType() == Material.OAK_WOOD) {
             if (event.getEntity().getShooter() instanceof Player) {
-                Player thrower = (Player) event.getEntity().getShooter();
                 int extraduration = Integer.parseInt(args[2]);
                 Location key = hitBlock.getLocation();
                 if (canopy_extensions.containsKey(key)) {
@@ -625,14 +691,21 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        location.getBlock().setType(Material.WATER);
+        int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
+        double chance = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "percentage") / 100;
+        Random random = new Random();
+        if (random.nextDouble() < chance) {
+            location.getBlock().setType(Material.LAVA);
+        } else {
+            location.getBlock().setType(Material.WATER);
+        }
 
         // Remove water after while
         double duration = Double.parseDouble(args[1]);
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (location.getBlock().getType() == Material.WATER) {
+                if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.LAVA) {
                     location.getBlock().setType(Material.AIR);
                 }
             }

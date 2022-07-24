@@ -13,9 +13,11 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -162,9 +164,11 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player, Boolean ranked) {
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         members.add(player);
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        DeckManager dm = plugin.getDeckManager();
         player.setDeck(dm.getPlayerDeck(player.getMCPlayerId(), ranked));
 
         // TP to team spawn and give armor
@@ -176,6 +180,41 @@ public class MissileWarsTeam {
         ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
         giveItems(player);
         player.setJoinTime(LocalDateTime.now());
+        
+        // Vanguard bunny
+        int bunny = plugin.getJSON().getAbility(player.getMCPlayerId(), "bunny");
+        if (bunny > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
+        }
+        
+        // Sentinel priest
+        int priest = plugin.getJSON().getAbility(player.getMCPlayerId(), "priest");
+        if (priest > 0) {
+            Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
+            int radius = (int) ConfigUtils.getAbilityStat("Sentinel.passive.priest", priest, "radius");
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    String team = arena.getTeam(player.getMCPlayerId());
+                    if (!team.equals("no team")) {
+                        // For entities in radius, if it is player and in same team,
+                        // give that entity regeneration 1 for 1 second
+                        for (Entity e : mcPlayer.getNearbyEntities(radius, radius, radius)) {
+                            if (!(e instanceof Player)) {
+                                continue;
+                            }
+                            Player p = (Player) e;
+                            if (team.equals(arena.getTeam(p.getUniqueId()))) {
+                                p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, 0));
+                            }
+                        }
+                    } else {
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 10, 10);
+        }
     }
 
     /**
@@ -273,8 +312,9 @@ public class MissileWarsTeam {
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
             player.resetPlayer();
-            mcPlayer.removePotionEffect(PotionEffectType.FAST_DIGGING);
-            mcPlayer.removePotionEffect(PotionEffectType.POISON);
+            for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
+                mcPlayer.removePotionEffect(effect.getType());
+            }
         }
     }
 
@@ -347,21 +387,10 @@ public class MissileWarsTeam {
      */
     public boolean registerShieldBlockUpdate(Location location, boolean place) {
         // Check if block was in shield location
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
-        String teamName = ChatColor.stripColor(name).toLowerCase();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
-        if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
+        if (ConfigUtils.inShield(arena, location, name)) {
             shieldBlocksBroken += place ? -1 : 1;
             return true;
         }
-
         return false;
     }
 

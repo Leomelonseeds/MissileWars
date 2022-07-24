@@ -147,6 +147,14 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <!-- Parkour -->
+        <dependency>
+		    <groupId>com.github.A5H73Y</groupId>
+		    <artifactId>Parkour</artifactId>
+		    <version>7.0.5</version>
+		    <type>jar</type>
+		    <scope>provided</scope>
+		</dependency>
         <!-- WorldGuard -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

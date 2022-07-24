@@ -26,6 +26,11 @@ public class MissileWarsPlayer {
     private int missiles;
     /** The time that the player joined the game */
     private LocalDateTime joinTime;
+    
+    private boolean boomlust;
+    private boolean boomlustregen;
+    
+    private boolean retaliate;
 
 
     /**
@@ -35,6 +40,32 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
+    }
+    
+    // Boomlust related
+    public Boolean getBoomLust() {
+        return boomlust;
+    }
+    
+    public void setBoomLust(Boolean b) {
+        boomlust = b;
+    }
+    
+    public Boolean getBoomLustRegen() {
+        return boomlustregen;
+    }
+    
+    public void setBoomLustRegen(Boolean b) {
+        boomlustregen = b;
+    }
+    
+    // Retaliate related
+    public void setRetaliate(Boolean b) {
+        retaliate = b;
+    }
+    
+    public Boolean getRetaliate() {
+        return retaliate;
     }
 
     /**
@@ -136,6 +167,9 @@ public class MissileWarsPlayer {
         kills = 0;
         deaths = 0;
         deck = null;
+        boomlust = false;
+        boomlustregen = false;
+        retaliate = false;
     }
 
     /** Set the join time of this {@link MissileWarsPlayer} */
@@ -174,7 +208,7 @@ public class MissileWarsPlayer {
     /** Give the MC player an item from their Deck. */
     public void givePoolItem(Boolean first) {
         if (deck != null && getMCPlayer() != null) {
-            deck.givePoolItem(getMCPlayer(), first);
+            deck.givePoolItem(this, first);
         }
     }
 

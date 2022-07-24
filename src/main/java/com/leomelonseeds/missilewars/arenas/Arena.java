@@ -42,6 +42,7 @@ import com.leomelonseeds.missilewars.utilities.SQLManager;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import io.github.a5h73y.parkour.Parkour;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -431,17 +432,19 @@ public class Arena implements ConfigurationSerializable {
             return false;
         }
 
-        player.teleport(getPlayerSpawn(player));
-
-        // Make sure another plugin hasn't cancelled the event
-        if (player.getWorld().getName().equals("world")) {
+        // Make sure player not in parkour
+        if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
             ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
             return false;
         }
+        
+        // Save inventory if player in world
+        if (player.getWorld().getName().equals("world")) {
+            InventoryUtils.saveInventory(player, true);
+        }
 
-        InventoryUtils.saveInventory(player, true);
+        player.teleport(getPlayerSpawn(player));
         InventoryUtils.clearInventory(player);
-
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         for (MissileWarsPlayer mwPlayer : players) {
@@ -1116,8 +1119,8 @@ public class Arena implements ConfigurationSerializable {
         int shield_health = ranksConfig.getInt("experience.shield_health");
         int win = ranksConfig.getInt("experience.win");
 
-        int red_portal_amount = (int) (portal_broken * ((double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
-        int blue_portal_amount = (int) (portal_broken * ((double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
+        int red_portal_amount = (int) (portal_broken * (1 - (double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
+        int blue_portal_amount = (int) (portal_broken * (1 - (double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
 
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;

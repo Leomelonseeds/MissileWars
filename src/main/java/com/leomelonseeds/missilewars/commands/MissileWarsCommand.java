@@ -27,7 +27,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <CreateArena/DeleteArena/Join/Leave/OpenGameMenu/EnqueueRed/EnqueueBlue/ForceStart>");
+            sendErrorMsg(sender, "Usage: /umw <Join/Leave/Deck/EnqueueRed/EnqueueBlue>");
             return true;
         }
 
@@ -35,9 +35,88 @@ public class MissileWarsCommand implements CommandExecutor {
         String action = args[0];
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ArenaManager arenaManager = plugin.getArenaManager();
+        
+        // A command specifically used to test passives/abilities
+        if (action.equalsIgnoreCase("set")) {
+            // Ensure player is allowed to create an arena
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            
+            if (args.length != 4) {
+                sendErrorMsg(sender, "Usage: /umw set [gpassive/passive/ability] [name] [level]");
+                return true;
+            }
+            
+            // The admin gotta be smart man
+            String type = args[1];
+            String name = args[2];
+            int level = 0;
+            try {
+                level = Integer.parseInt(args[3]);
+            } catch (NumberFormatException e) {
+                sendErrorMsg(sender, "You suck, use a number next time (" + args[3] + ")");
+                return true;
+            }
+            
+            JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
+            if (!json.has(type)) {
+                sendErrorMsg(sender, "You suck, use gpassive/passive/ability please");
+                return true; 
+            }
+            
+            // Make sure shit that isn't supposed to happen can't happen
+            if (name.equalsIgnoreCase("none")) {
+                name = "None";
+                level = 0;
+            }
+            
+            JSONObject actual = json.getJSONObject(type);
+            actual.put("selected", name);
+            actual.put("level", level);
+            
+            sendSuccessMsg(sender, "You set your " + type + " " + name + " to " + level);
+            return true; 
+        }
+        
+        // A(nother) command specifically used to test passives/abilities
+        if (action.equalsIgnoreCase("view")) {
+            // Ensure player is allowed to create an arena
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            
+            if (args.length != 2) {
+                sendErrorMsg(sender, "Usage: /umw view [gpassive/passive/ability]");
+                return true;
+            }
+            
+            // The admin gotta be smart man
+            String type = args[1];
+            
+            JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
+            if (!json.has(type)) {
+                sendErrorMsg(sender, "You suck, use gpassive/passive/ability please");
+                return true; 
+            }
+            
+            JSONObject actual = json.getJSONObject(type);
+            String name = actual.getString("selected");
+            int level = actual.getInt("level");
+            
+            sendSuccessMsg(sender, "You have " + type + " " + name + " at " + level);
+            return true; 
+        }
+        
         if (action.equalsIgnoreCase("DeleteArena")) {
             // Ensure player is allowed to create an arena
-            if (!sender.hasPermission("umw.delete-arena")) {
+            if (!sender.hasPermission("umw.admin")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
             }
@@ -67,7 +146,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
         if (action.equalsIgnoreCase("CreateArena")) {
             // Ensure player is allowed to delete an arena
-            if (!sender.hasPermission("umw.create-arena")) {
+            if (!sender.hasPermission("umw.admin")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
             }
@@ -116,7 +195,12 @@ public class MissileWarsCommand implements CommandExecutor {
 
         // Clear inventories the umw way
         if (action.equalsIgnoreCase("clear")) {
-
+            // Ensure player is allowed
+            if (!sender.hasPermission("umw.staff")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
             if (args.length == 1) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
@@ -376,7 +460,7 @@ public class MissileWarsCommand implements CommandExecutor {
         
         if (action.equalsIgnoreCase("Give")) {
             // Ensure sender has permission
-            if (!sender.hasPermission("umw.give")) {
+            if (!sender.hasPermission("umw.admin")) {
                 sendErrorMsg(sender, "You do not have permission to do that!");
                 return true;
             }

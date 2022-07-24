@@ -18,7 +18,7 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 public class JoinLeaveListener implements Listener {
 
     /** Remove player from Arena if they DC. */
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onQuit(PlayerQuitEvent event) {
 
         // Save player deck configuration
