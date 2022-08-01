@@ -509,20 +509,20 @@ shieldbuster:
     speed: 1.7
     tnt: 17
   2:
-    file: 'shark.nbt'
+    file: 'excavator.nbt'
     item: WITCH_SPAWN_EGG
-    name: "&2☢ &lShark &2&l☣"
+    name: "&2☢ &lExcavator &2&l☣"
     lore:
     - ""
-    - "&7The Shark is nearly unstoppable, assuming it"
-    - "&7encounters no more than eleven shields, and no"
+    - "&7The Excavator is nearly unstoppable, assuming it"
+    - "&7encounters no more than nine shields, and no"
     - "&7one tries to stop it."
     offset:
       x: -1
       y: -5
       z: 4
     speed: 1.7
-    tnt: 10
+    tnt: 21
     spcost: 2
 
 
