@@ -694,8 +694,10 @@ public class CustomItemListener implements Listener {
         int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
         double chance = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "percentage") / 100;
         Random random = new Random();
+        int durationmultiplier = 1;
         if (random.nextDouble() < chance) {
             location.getBlock().setType(Material.LAVA);
+            durationmultiplier = 2;
         } else {
             location.getBlock().setType(Material.WATER);
         }
@@ -709,7 +711,7 @@ public class CustomItemListener implements Listener {
                     location.getBlock().setType(Material.AIR);
                 }
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20));
+        }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20 * durationmultiplier));
 
     }
 
