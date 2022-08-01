@@ -129,6 +129,20 @@ public class PresetSelector implements MWInventory {
         if (item.getType() == Material.getMaterial(itemConfig.getString("preset.item"))) {
             String p = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING);
+            
+            // Check permission for B
+            if (p.equals("B") && !player.hasPermission("umw.preset.b")) {
+                ConfigUtils.sendConfigMessage("messages.preset-b-locked", player, null, null);
+                return;
+            }
+            
+            // Check permission for C
+            if (p.equals("C") && !player.hasPermission("umw.preset.c")) {
+                ConfigUtils.sendConfigMessage("messages.preset-c-locked", player, null, null);
+                return;
+            }
+            
+            // Check clicktypes
             if (type == ClickType.RIGHT) {
                 if (player.hasPermission("umw.autoselect")) {
                     // Choose preset

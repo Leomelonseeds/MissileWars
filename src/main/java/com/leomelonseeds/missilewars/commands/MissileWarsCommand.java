@@ -507,6 +507,13 @@ public class MissileWarsCommand implements CommandExecutor {
             
             if (args.length == 3) {
                 String preset = args[2].toUpperCase();
+                
+                // Ensure sender has permission
+                if (!sender.hasPermission("umw.admin")) {
+                    sendErrorMsg(sender, "You do not have permission to do that!");
+                    return true;
+                }
+                
                 if (!plugin.getDeckManager().getPresets().contains(preset)) {
                     sendErrorMsg(sender, "Please specify a valid preset!");
                     return true;

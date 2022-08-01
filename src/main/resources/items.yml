@@ -936,11 +936,11 @@ fireball:
   2:
     power: 2
     multiply: 3
-    spcost: 1
+    spcost: 2
   3:
     power: 3
     multiply: 4
-    spcost: 2
+    spcost: 3
 
 leaves:
   index: 0
