@@ -41,40 +41,39 @@ lightning:
     spcost: 3
       
 
-cruiser:
+cuboid:
   index: 0
   1:
-    file: 'cruiser.nbt'
+    file: 'cuboid.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ Cruiser ⚡"
+    name: "&6☢ Cuboid ⚡"
     lore:
     - ""
-    - "&7This is not a cruise missile as the"
-    - "&7name may suggest. In fact, it is"
-    - "&7technically just a rocket, though a"
-    - "&7fast one at that."
+    - "&7Small, fast, and dense with explosives."
+    - "&7A bit like my friend Jeremy, minus the"
+    - "&7small, fast, and explosives part."
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
-    speed: 3.3
-    tnt: 11
+    speed: 2.2
+    tnt: 17
   2:
-    file: 'thunderbolt.nbt'
+    file: 'tesseract.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ &lThunderbolt &6⚡"
+    name: "&6☢ &lTesseract &6⚡"
     lore:
     - ""
-    - "&7Blink, and you'll miss it. And instantly die."
-    - "&7Detonates on impact. Hopefully before"
-    - "&7anyone shoots its 4 TNT Minecarts"
+    - "&7Unfortunately this missile isn't actually"
+    - "&7four-dimensional. I'm tired of writing"
+    - "&7jokes please i want to see my family"
     offset:
       x: -1
-      y: -4
+      y: -5
       z: 4
-    speed: 3.3
-    tnt: 13
-    spcost: 4
+    speed: 2.2
+    tnt: 26
+    spcost: 3
 
 hilt:
   index: 0

@@ -103,7 +103,7 @@
 				"arrows": 2
 			},
 			"missiles": {
-				"cruiser": 1,
+				"cuboid": 1,
 				"breaker": 1,
 				"warhead": 2,
 				"juggernaut": 1,
