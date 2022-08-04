@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +73,7 @@ public class JSONManager {
             }
             
             try {
+                FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
                 // Unlock everything for royal rank
@@ -96,8 +99,59 @@ public class JSONManager {
                         if (deckjson.has(preset)) {
                             JSONObject currentpreset = deckjson.getJSONObject(preset);
                             updateJson(currentpreset, defaultpreset);
-                            updateJson(currentpreset.getJSONObject("missiles"), defaultpreset.getJSONObject("missiles"));
-                            updateJson(currentpreset.getJSONObject("utility"), defaultpreset.getJSONObject("utility"));
+                            
+                            // Update json and calculate the amount of skillpoints the player should have remaining
+                            int finalsp = getMaxSkillpoints(uuid);
+                            // Anything not in this array is an enchantment
+                            List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints"});
+                            
+                            // Calculate sp spent on missiles and utility
+                            // Also updates their jsons
+                            for (String s : new String[] {"missiles", "utility"}) {
+                                JSONObject json = currentpreset.getJSONObject(s);
+                                updateJson(json, defaultpreset.getJSONObject(s));
+                                for (String k : json.keySet()) {
+                                    int level = json.getInt(k);
+                                    while (level > 1) {
+                                        int cost = itemConfig.getInt(k + "." + level + ".spcost");
+                                        finalsp -= cost;
+                                        level--;
+                                    }
+                                }
+                            }
+                            
+                            // Calculate sp spent on gpassives
+                            int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
+                            String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
+                            while (gpassivelevel > 0) {
+                                int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
+                                finalsp -= cost;
+                                gpassivelevel--;
+                            }
+                            
+                            // Calculate sp spent on abilities and passives
+                            for (String s : new String[] {"passive", "ability"}) {
+                                int level = currentpreset.getJSONObject(s).getInt("level");
+                                String ability = currentpreset.getJSONObject(s).getString("selected");
+                                while (level > 0) {
+                                    int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
+                                    finalsp -= cost;
+                                    level--;
+                                }
+                            }
+                            
+                            // Calculate sp spent on enchantments
+                            for (String k : currentpreset.keySet()) {
+                                if (!all.contains(k)) {
+                                    int level = currentpreset.getInt(k);
+                                    while (level > 0) {
+                                        int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
+                                        finalsp -= cost;
+                                        level--;
+                                    }
+                                }
+                            }
+                            currentpreset.put("skillpoints", finalsp);
                         } else {
                             newJson.getJSONObject(deck).put(preset, defaultpreset);
                         }
@@ -278,5 +332,19 @@ public class JSONManager {
                 pjson.put("skillpoints", pjson.getInt("skillpoints") + 1);
             }
         }
+    }
+    
+    /**
+     * Get max skillpoints a player may have
+     * 
+     * @param uuid
+     * @return
+     */
+    public int getMaxSkillpoints(UUID uuid) {
+        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+        int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(uuid);
+        int level = RankUtils.getRankLevel(exp);
+        int sp = itemConfig.getInt("default-skillpoints") + level;
+        return sp;
     }
 }

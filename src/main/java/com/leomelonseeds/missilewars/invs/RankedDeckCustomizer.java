@@ -90,26 +90,26 @@ public class RankedDeckCustomizer implements MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         // Back button
-        if (slot == 26) {
+        if (slot == itemConfig.getInt("indicators.back.rankedslot")) {
             new PresetSelector(player, deck);
             return;
         }
         
         // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
-        if (slot == 17) {
+        if (slot == itemConfig.getInt("indicators.skillpoints.rankedslot")) {
             new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
                 if (confirm) {
                     for (String key : presetjson.keySet()) {
                         if (presetjson.get(key) instanceof Integer) {
                             presetjson.put(key, 0);
                         }
-                        presetjson.put("skillpoints", itemConfig.getInt("default-skillpoints-ranked"));
                     }
                     for (String s : items) {
                         for (String key : presetjson.getJSONObject(s).keySet()) {
                             presetjson.getJSONObject(s).put(key, 1);
                         }
                     }
+                    presetjson.put("skillpoints", itemConfig.getInt("default-skillpoints-ranked"));
                     updateInventory();
                 }
                 return;

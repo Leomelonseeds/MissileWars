@@ -129,13 +129,13 @@ public class DeckCustomizer implements MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         // Back button
-        if (slot == 53) {
+        if (slot == itemConfig.getInt("indicators.back.slot")) {
             new PresetSelector(player, deck);
             return;
         }
         
         // Reset to default config
-        if (slot == 26) {
+        if (slot == itemConfig.getInt("indicators.reset.slot")) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
                 if (confirm) {
                     JSONObject def = jsonManager.getDefaultPreset(deck);
@@ -150,17 +150,13 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
-        if (slot == 17) {
+        if (slot == itemConfig.getInt("indicators.skillpoints.slot")) {
             new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
                 if (confirm) {
                     for (String key : presetjson.keySet()) {
                         if (presetjson.get(key) instanceof Integer) {
                             presetjson.put(key, 0);
                         }
-                        int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
-                        int level = RankUtils.getRankLevel(exp);
-                        int sp = itemConfig.getInt("default-skillpoints") + level;
-                        presetjson.put("skillpoints", sp);
                     }
                     for (String s : items) {
                         for (String key : presetjson.getJSONObject(s).keySet()) {
@@ -172,6 +168,7 @@ public class DeckCustomizer implements MWInventory {
                         j.put("selected", "None");
                         j.put("level", 0);
                     }
+                    presetjson.put("skillpoints", jsonManager.getMaxSkillpoints(player.getUniqueId()));
                     updateInventory();
                 }
                 return;
