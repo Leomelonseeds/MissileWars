@@ -151,7 +151,17 @@ public class JSONManager {
                                     }
                                 }
                             }
-                            currentpreset.put("skillpoints", finalsp);
+                            
+                            // Account for edge cases where finalsp may be below 0
+                            if (finalsp < 0) {
+                                String msg = ConfigUtils.getConfigText("messages.sp-negative", null, null, null);
+                                msg = msg.replace("%deck%", deck);
+                                msg = msg.replace("%preset%", preset);
+                                Bukkit.getPlayer(uuid).sendMessage(msg);
+                                newJson.getJSONObject(deck).put(preset, defaultpreset);
+                            } else {
+                                currentpreset.put("skillpoints", finalsp);
+                            }
                         } else {
                             newJson.getJSONObject(deck).put(preset, defaultpreset);
                         }

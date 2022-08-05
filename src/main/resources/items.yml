@@ -931,15 +931,12 @@ fireball:
   - "&bPower: %power%"
   1:
     power: 1
-    multiply: 2
   2:
     power: 2
-    multiply: 3
     spcost: 2
   3:
     power: 3
-    multiply: 4
-    spcost: 3
+    spcost: 2
 
 leaves:
   index: 0
