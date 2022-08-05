@@ -13,7 +13,7 @@
 		"adrenaline": false,
 		"lavasplash": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 6,
 			"feather_falling": 0,
 			"sharpness": 2,
 			"fire_aspect": 0,
@@ -53,7 +53,7 @@
 		"priest": false,
 		"retaliate": false,
 		"defaultpreset": {
-			"skillpoints": 2,
+			"skillpoints": 6,
 			"fire_protection": 0,
 			"punch": 0,
 			"flame": 1,
@@ -92,7 +92,7 @@
 		"hurl": false,
 		"boomlust": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 6,
 			"blast_protection": 0,
 			"multishot": 0,
 			"quick_charge": 0,
@@ -103,11 +103,11 @@
 				"arrows": 2
 			},
 			"missiles": {
-				"cuboid": 1,
+				"cuboid": 2,
 				"breaker": 1,
 				"warhead": 2,
 				"juggernaut": 1,
-				"shieldbuster": 2
+				"shieldbuster": 1
 			},
 			"ability": {
 				"selected": "None",
@@ -132,9 +132,9 @@
 		"naturesblessing": false,
 		"repairman": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 7,
 			"projectile_protection": 0,
-			"sharpness": 1,
+			"sharpness": 2,
 			"efficiency": 0,
 			"haste": 0,
 			"utility": {
