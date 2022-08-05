@@ -39,77 +39,6 @@ lightning:
     speed: 3.3
     tnt: 18
     spcost: 3
-      
-
-cuboid:
-  index: 0
-  1:
-    file: 'cuboid.nbt'
-    item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ Cuboid ⚡"
-    lore:
-    - ""
-    - "&7Small, fast, and dense with explosives."
-    - "&7A bit like my friend Jeremy, minus the"
-    - "&7small, fast, and explosives part."
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 2.2
-    tnt: 17
-  2:
-    file: 'tesseract.nbt'
-    item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ &lTesseract &6⚡"
-    lore:
-    - ""
-    - "&7Unfortunately this missile isn't actually"
-    - "&7four-dimensional. I'm tired of writing"
-    - "&7jokes please i want to see my family"
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 2.2
-    tnt: 26
-    spcost: 3
-
-hilt:
-  index: 0
-  1:
-    file: 'hilt.nbt'
-    item: RAVAGER_SPAWN_EGG
-    name: "&8☢ Hilt ⚡"
-    lore:
-    - ""
-    - "&7You may be wondering where the rest"
-    - "&7of this bladed weapon went. So are we."
-    - "&7Nonetheless, this compact missile"
-    - "&7packs incredible speed."
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 3.3
-    tnt: 10
-  2:
-    file: 'dagger.nbt'
-    item: RAVAGER_SPAWN_EGG
-    name: "&8☢ &lDagger &8⚡"
-    lore:
-    - ""
-    - "&7There, we found the rest of the weapon."
-    - "&7This missile carries the 5 TNT that the"
-    - "&7Hilt was missing. Just try to avoid"
-    - "&7shields."
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 3.3
-    tnt: 15
-    spcost: 3
 
 supersonic:
   index: 0
@@ -179,9 +108,115 @@ tomahawk:
     tnt: 16
     spcost: 3
 
+cronullifier:
+  index: 2
+  1:
+    file: 'chronullifier.nbt'
+    item: MAGMA_CUBE_SPAWN_EGG
+    name: "&e☢ Chronullifier ⚡"
+    lore:
+    - ""
+    - "&7Have you ever wanted an observer engine to be"
+    - "&70.2m/s faster? Me neither, but Chronos22's"
+    - "&7clever engineering did just that. Now to find"
+    - "&7a way to get girls 0.2m/s faster..."
+    offset:
+      x: -1
+      y: -5
+      z: 4
+    speed: 2.2
+    tnt: 14
+  2:
+    file: 'doubleought.nbt'
+    item: MAGMA_CUBE_SPAWN_EGG
+    name: "&e☢ &lDouble-Ought &e⚡"
+    lore:
+    - ""
+    - "&7Named after the most famous shotgun ammo, this"
+    - "&7(less famous) Minecraft missile, now with zero"
+    - "&7redstone blocks, is also known for its"
+    - "&7incredible violence."
+    offset:
+      x: -1
+      y: -5
+      z: 4
+    speed: 2.2
+    tnt: 25
+    spcost: 3
+
 
 # Sentinel missiles
 
+
+hilt:
+  index: 0
+  1:
+    file: 'hilt.nbt'
+    item: RAVAGER_SPAWN_EGG
+    name: "&8☢ Hilt ✟"
+    lore:
+    - ""
+    - "&7You may be wondering where the rest"
+    - "&7of this bladed weapon went. So are we."
+    - "&7Nonetheless, this compact missile"
+    - "&7packs incredible speed."
+    offset:
+      x: -1
+      y: -5
+      z: 4
+    speed: 3.3
+    tnt: 10
+  2:
+    file: 'dagger.nbt'
+    item: RAVAGER_SPAWN_EGG
+    name: "&8☢ &lDagger &8✟"
+    lore:
+    - ""
+    - "&7There, we found the rest of the weapon."
+    - "&7This missile carries the 5 TNT that the"
+    - "&7Hilt was missing. Just try to avoid"
+    - "&7shields."
+    offset:
+      x: -1
+      y: -5
+      z: 4
+    speed: 3.3
+    tnt: 15
+    spcost: 3
+
+supporter:
+  index: 2
+  1:
+    file: 'supporter.nbt'
+    item: BEE_SPAWN_EGG
+    name: "&e☢ Supporter ✟"
+    lore:
+    - ""
+    - "&7This missile wants to buy your Patreon."
+    - "&7It also launches TNT behind it upon"
+    - "&7detonation."
+    offset:
+      x: -1
+      y: -6
+      z: 4
+    speed: 1.7
+    tnt: 17
+  2:
+    file: 'auxiliary.nbt'
+    item: BEE_SPAWN_EGG
+    name: "&e☢ &lAuxiliary &e✟"
+    lore:
+    - ""
+    - "&7Why blow up things in front of you when"
+    - "&7you can blow up things behind you?"
+    offset:
+      x: -1
+      y: -6
+      z: 4
+    speed: 1.7
+    tnt: 25
+    spcost: 3
+    
 guardian:
   index: 4
   1:
@@ -247,42 +282,6 @@ gemini:
       z: 4
     speed: 2.0
     tnt: 12
-    spcost: 3
-
-cronullifier:
-  index: 2
-  1:
-    file: 'chronullifier.nbt'
-    item: MAGMA_CUBE_SPAWN_EGG
-    name: "&e☢ Chronullifier ✟"
-    lore:
-    - ""
-    - "&7Have you ever wanted an observer engine to be"
-    - "&70.2m/s faster? Me neither, but Chronos22's"
-    - "&7clever engineering did just that. Now to find"
-    - "&7a way to get girls 0.2m/s faster..."
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 2.2
-    tnt: 14
-  2:
-    file: 'doubleought.nbt'
-    item: MAGMA_CUBE_SPAWN_EGG
-    name: "&e☢ &lDouble-Ought &e✟"
-    lore:
-    - ""
-    - "&7Named after the most famous shotgun ammo, this"
-    - "&7(less famous) Minecraft missile, now with zero"
-    - "&7redstone blocks, is also known for its"
-    - "&7incredible violence."
-    offset:
-      x: -1
-      y: -5
-      z: 4
-    speed: 2.2
-    tnt: 25
     spcost: 3
 
 sword: 
@@ -356,37 +355,39 @@ piranha:
 
 # Berserker missiles
 
-supporter:
-  index: 2
+
+cuboid:
+  index: 0
   1:
-    file: 'supporter.nbt'
-    item: BEE_SPAWN_EGG
-    name: "&e☢ Supporter &e&l☣"
+    file: 'cuboid.nbt'
+    item: TROPICAL_FISH_SPAWN_EGG
+    name: "&6☢ Cuboid &6&l☣"
     lore:
     - ""
-    - "&7This missile wants to buy your Patreon."
-    - "&7It also launches TNT behind it upon"
-    - "&7detonation."
+    - "&7Small, fast, and dense with explosives."
+    - "&7A bit like my friend Jeremy, minus the"
+    - "&7small, fast, and explosives part."
     offset:
       x: -1
-      y: -6
+      y: -5
       z: 4
-    speed: 1.7
+    speed: 2.2
     tnt: 17
   2:
-    file: 'auxiliary.nbt'
-    item: BEE_SPAWN_EGG
-    name: "&e☢ &lAuxiliary ☣"
+    file: 'tesseract.nbt'
+    item: TROPICAL_FISH_SPAWN_EGG
+    name: "&6☢ &lTesseract ☣"
     lore:
     - ""
-    - "&7Why blow up things in front of you when"
-    - "&7you can blow up things behind you?"
+    - "&7Unfortunately this missile isn't actually"
+    - "&7four-dimensional. It's quite undefuseable"
+    - "&7though."
     offset:
       x: -1
-      y: -6
+      y: -5
       z: 4
-    speed: 1.7
-    tnt: 25
+    speed: 2.2
+    tnt: 26
     spcost: 3
 
 warhead: 
