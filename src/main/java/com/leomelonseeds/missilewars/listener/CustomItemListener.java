@@ -279,9 +279,17 @@ public class CustomItemListener implements Listener {
                 event.setCancelled(true);
                 Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
                         .getEyeLocation().getDirection()), EntityType.FIREBALL);
+                // Check for boosterball passive. Store passive by setting incendiary value
+                int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
+                if (boosterball > 0) {
+                    double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
+                    fireball.setIsIncendiary(false);
+                    fireball.customName(ConfigUtils.toComponent(multiplier + ""));
+                } else {
+                    fireball.setIsIncendiary(true);
+                }
                 float yield = (float) getItemStat(utility, "power");
                 fireball.setYield(yield);
-                fireball.setIsIncendiary(true);
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
                 hand.setAmount(hand.getAmount() - 1);

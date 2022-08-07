@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
@@ -239,8 +240,17 @@ public class ArenaGameruleListener implements Listener {
         } else if (event.getDamager() instanceof Projectile) {
             // Do sentinel longshot checks
             Projectile projectile = (Projectile) event.getDamager();
-            // Allow players to damage themselves with fireballs
+            // Allow players to damage anyone with fireballs
             if (projectile.getType() == EntityType.FIREBALL) {
+                // Check for boosterball and multiply knockback
+                Fireball fb = (Fireball) projectile;
+                if (!fb.isIncendiary()) {
+                    double multiplier = Double.parseDouble(ConfigUtils.toPlain(fb.customName()));
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        player.setVelocity(player.getVelocity().multiply(multiplier));
+                    }, 1);
+                } 
+                // Allow fb friendly fire
                 return;
             }
             if (projectile.getShooter() instanceof Player) {
@@ -407,8 +417,15 @@ public class ArenaGameruleListener implements Listener {
 
         // Ensure its actually a fireball
         if (entity == EntityType.FIREBALL) {
-            // Remove all portals from block list
-            event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
+            // Check for boosterball. If so, prevent block damage.
+            Fireball fb = (Fireball) event.getEntity();
+            if (!fb.isIncendiary()) {
+                event.blockList().clear();
+            }
+            // Otherwise, don't allow portals to be broken
+            else {
+                event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
+            }
         }
         // Check for TNT explosions of portals
         else if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||

@@ -523,7 +523,7 @@ shieldbuster:
       z: 4
     speed: 1.7
     tnt: 21
-    spcost: 2
+    spcost: 3
 
 
 # Architect missiles
@@ -1233,6 +1233,23 @@ Berserker:
         level: 6
         spcost: 2
   passive:
+    boosterball:
+      name: "&eBoosterball"
+      lore:
+      - ""
+      - "&7Fireballs no longer do damage to blocks."
+      - "&7Instead, The knockback players recieve"
+      - "&7from fireballs is multiplied by %multiplier%&7."
+      cost: 2000
+      1:
+        spcost: 1
+        multiplier: 1.25
+      2:
+        spcost: 2
+        multiplier: 1.5
+      3:
+        spcost: 2
+        multiplier: 1.75
     boomlust:
       name: "&eBoomlust"
       lore:

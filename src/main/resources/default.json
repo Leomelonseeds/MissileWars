@@ -91,6 +91,7 @@
 		"missilesmith": false,
 		"hurl": false,
 		"boomlust": false,
+		"boosterball": false,
 		"defaultpreset": {
 			"skillpoints": 6,
 			"blast_protection": 0,
