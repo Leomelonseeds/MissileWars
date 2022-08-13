@@ -31,6 +31,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
@@ -323,10 +324,10 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Location loc = event.getBlockPlaced().getLocation();
+        Location loc = block.getLocation();
         
         // no max height
-        if (block.getLocation().getBlockY() > plugin.getConfig().getInt("max-height")) {
+        if (loc.getBlockY() > plugin.getConfig().getInt("max-height")) {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
             event.setCancelled(true);
             return;
@@ -345,10 +346,24 @@ public class CustomItemListener implements Listener {
         // Register block place
         playerArena.registerShieldBlockEdit(block.getLocation(), true);
         
+        // Check passives
         int naturesblessing = plugin.getJSON().getAbility(player.getUniqueId(), "naturesblessing");
+        int repairman = plugin.getJSON().getAbility(player.getUniqueId(), "repairman");
         int durationMultiplier = 1;
+        String team = playerArena.getTeam(player.getUniqueId());
         if (naturesblessing > 0) {
             durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
+        } else if (repairman > 0) {
+            if (ConfigUtils.inShield(playerArena, loc, team)) {
+                double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
+                Random random = new Random();
+                if (random.nextDouble() < percentage) {
+                    ItemStack item = event.getItemInHand();
+                    item.setAmount(item.getAmount());
+                    EquipmentSlot slot = event.getHand();
+                    player.getInventory().setItem(slot, item);
+                }
+            }
         }
         
         // Remove leaves after 30 sec
@@ -360,11 +375,8 @@ public class CustomItemListener implements Listener {
                     return;
                 }
                 
-                String team = playerArena.getTeam(player.getUniqueId());
-                
                 // No repairman = remove leaves
-                if (plugin.getJSON().getAbility(player.getUniqueId(), "repairman") == 0 ||
-                        !ConfigUtils.inShield(playerArena, loc, team)) {
+                if (repairman == 0) {
                     loc.getBlock().setType(Material.AIR);
                     return;
                 }

@@ -1354,21 +1354,21 @@ Architect:
       name: "&eRepairman"
       lore:
       - ""
-      - "&7For every 10% reduction in your shield"
-      - "&7health, you have a %percentage%% &7extra chance"
-      - "&7to receive leaves compared to other utility."
-      - "&7Additionally, instead of decaying, any leaves"
-      - "&7placed within your shield will instead turn"
-      - "&7into glass after 30 seconds."
+      - "&7Placing leaves within your base has a"
+      - "&7%percentage%% &7chance of not consuming"
+      - "&7them from your inventory. Additionally,"
+      - "&7instead of decaying, leaves placed within"
+      - "&7your base will turn into glass after 30"
+      - "&7seconds."
       cost: 800
       1: 
-        percentage: 2
+        percentage: 50
         spcost: 1
       2: 
-        percentage: 4
+        percentage: 75
         spcost: 2
       3:
-        percentage: 6
+        percentage: 85
         spcost: 2
    
 

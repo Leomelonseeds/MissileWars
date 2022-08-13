@@ -136,13 +136,153 @@ classic:
   cubecrowd:
     name: "&fCube Crowd"
     file: "CubeCrowd.schem"
-  shaolin-showdown:
-    name: "&fShaolin Showdown"
-    file: "ShaolinShowdown.schem"
-    too-high: 48
   tesseract:
     name: "&f4D Fiasco"
     file: "Tesseract.schem"
+  divider:
+    name: "&fDivider"
+    file: "Divider.schem"
+    too-high: 22
+    portals:
+      1:
+        x: 22
+        y: 8
+        z: -72
+      2:
+        x: -9
+        y: 8
+        z: -72
+    blue-shield:
+      y1: -10
+      y2: 13
+    red-shield:
+      y1: -10
+      y2: 13
+  23andtnt:
+    name: "&f23andTNT"
+    file: "23andTNT.schem"
+    pos:
+      x: 0
+      y: 17
+      z: -45
+    blue-spawn:
+      x: 0.5
+      y: 17
+      z: -44.5
+    red-spawn:
+      x: 0.5
+      y: 17
+      z: 45.5
+    # Two corners of blue and red shield, to calculate shield health
+    # where shield health = non-air blocks/total volume * 100%
+    blue-shield:
+      x1: -26
+      y1: -13
+      z1: -45
+      x2: 26
+      y2: 16
+      z2: -31
+    red-shield:
+      x1: -26
+      y1: -13
+      z1: 31
+      x2: 26
+      y2: 16
+      z2: 45
+    portals:
+      1:
+        x: -16
+        y: 11
+        z: -52
+      2:
+        x: -16
+        y: 6
+        z: -52
+      3:
+        x: -16
+        y: 1
+        z: -52
+      4:
+        x: -16
+        y: -4
+        z: -52
+      1b:
+        x: 19
+        y: 11
+        z: -52
+      2b:
+        x: 19
+        y: 6
+        z: -52
+      3b:
+        x: 19
+        y: 1
+        z: -52
+      4b:
+        x: 19
+        y: -4
+        z: -52
+      1c:
+        x: -11
+        y: 11
+        z: -52
+      2c:
+        x: -6
+        y: 11
+        z: -52
+      3c:
+        x: -1
+        y: 11
+        z: -52
+      4c:
+        x: 4
+        y: 11
+        z: -52
+      5c:
+        x: 9
+        y: 11
+        z: -52
+      6c:
+        x: 14
+        y: 11
+        z: -52
+      1d:
+        x: -11
+        y: -4
+        z: -52
+      2d:
+        x: -6
+        y: -4
+        z: -52
+      3d:
+        x: -1
+        y: -4
+        z: -52
+      4d:
+        x: 4
+        y: -4
+        z: -52
+      5d:
+        x: 9
+        y: -4
+        z: -52
+      6d:
+        x: 14
+        y: -4
+        z: -52
+      1e:
+        x: -6
+        y: 6
+        z: -52
+      2e:
+        x: 4
+        y: 6
+        z: -52
+      3e:
+        x: 14
+        y: 6
+        z: -52
+        
 tourney:
   default-map:
     name: "&fDouble Layer"

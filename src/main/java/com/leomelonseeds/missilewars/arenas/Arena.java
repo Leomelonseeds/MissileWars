@@ -768,7 +768,7 @@ public class Arena implements ConfigurationSerializable {
     public void addSpectator(UUID uuid) {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayerId().equals(uuid)) {
-                if (!running || getTeam(uuid).equals("no team")) {
+                if (!(running || resetting) || getTeam(uuid).equals("no team")) {
                     announceMessage("messages.spectate-join-others", player);
                     spectators.add(player);
                     redQueue.remove(player);
