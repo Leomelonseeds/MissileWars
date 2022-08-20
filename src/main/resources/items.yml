@@ -594,39 +594,39 @@ slingshot:
     tnt: 14
     spcost: 3
 
-citadel:
+automaton:
   index: 4
   1:
-    file: 'citadel.nbt'
-    item: SILVERFISH_SPAWN_EGG
-    name: "&7☢ Citadel ⚒"
+    file: 'automaton.nbt'
+    item: STRAY_SPAWN_EGG
+    name: "&7☢ Automaton ⚒"
     lore:
     - ""
-    - "&7Hide in this missile's hatch and experience"
-    - "&7the joys of becoming a turtle."
+    - "&7This missile does not care. Provided you"
+    - "&7defuse it, it can and will keep going. Its"
+    - "&7probably trying to put itself out of its"
+    - "&7misery as fast as possible."
     offset:
       x: -1
-      y: -5
+      y: -4
       z: 4
     speed: 2.0
-    tnt: 9
+    tnt: 10
   2:
-    file: 'fortress.nbt'
-    item: SILVERFISH_SPAWN_EGG
-    name: "&7☢ &lFortress &7⚒"
+    file: 'revenant.nbt'
+    item: STRAY_SPAWN_EGG
+    name: "&7☢ &lRevenant &7⚒"
     lore:
     - ""
-    - "&7A literal flying fortress, but really in a more"
-    - "&7metaphorical sense because these missiles don't"
-    - "&7really 'fly' nor do they resemble fortresses."
-    - "&7Plus, it doesn't defend against itself blowing"
-    - "&7up very well."
+    - "&7Evtema3 called the engine for this missile"
+    - "&7a perpetual motion machine. Please meme"
+    - "&7on him if he ever gets on."
     offset:
       x: -1
       y: -5
       z: 4
     speed: 2.0
-    tnt: 16
+    tnt: 17
     spcost: 3
 
 pisces:
@@ -1339,12 +1339,12 @@ Architect:
       name: "&ePrickly Projectiles"
       lore:
       - ""
-      - "&7Projectile utilities now do damage and"
-      - "&7knockback to enemy players instead of"
-      - "&7going through them. The knockback is"
-      - "&7multiplied by the level of the utility."
-      - "&7At level 2, each successful hit grants"
-      - "&7another of the same projectile item."
+      - "&7Projectile utilities now do knockback"
+      - "&7enemy players instead of going through"
+      - "&7them. The knockback is multiplied by"
+      - "&7the level of the utility. At level 2,"
+      - "&7each successful hit grants another of"
+      - "&7the same projectile item."
       cost: 1000
       1:
         spcost: 2
