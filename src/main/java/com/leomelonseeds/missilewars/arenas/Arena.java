@@ -646,19 +646,6 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Remove the given player from the spectators list.
-     *
-     * @param player the player
-     */
-    public void removeSpectator(MissileWarsPlayer player) {
-        if (spectators.remove(player)) {
-            announceMessage("messages.spectate-leave-others", player);
-            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
-            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-        }
-    }
-
-    /**
      * Enqueue a player with a given UUID to the red team.
      *
      * @param uuid the Player's UUID
@@ -670,7 +657,7 @@ public class Arena implements ConfigurationSerializable {
                // Make sure people can't break the game
                 if (startTime != null) {
                     int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                    if (time <= 2 && time >= -2) {
+                    if (time <= 1 && time >= -1) {
                         ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                         return;
                     }
@@ -710,6 +697,20 @@ public class Arena implements ConfigurationSerializable {
     }
 
     /**
+     * Remove the given player from the spectators list.
+     *
+     * @param player the player
+     */
+    public void removeSpectator(MissileWarsPlayer player) {
+        if (spectators.remove(player)) {
+            announceMessage("messages.spectate-leave-others", player);
+            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
+            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            checkForStart();
+        }
+    }
+
+    /**
      * Enqueue a player with a given UUID to the blue team.
      *
      * @param uuid the Player's UUID
@@ -721,7 +722,7 @@ public class Arena implements ConfigurationSerializable {
                 // Make sure people can't break the game
                 if (startTime != null) {
                     int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                    if (time <= 2 && time >= -2) {
+                    if (time <= 1 && time >= -1) {
                         ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                         return;
                     }
@@ -773,6 +774,16 @@ public class Arena implements ConfigurationSerializable {
                     spectators.add(player);
                     redQueue.remove(player);
                     blueQueue.remove(player);
+                    
+                    // Cancel tasks if starting and below min players
+                    int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
+                    if (!running && startTime != null && players.size() < minPlayers) {
+                        for (BukkitTask task : tasks) {
+                            task.cancel();
+                        }
+                        startTime = null;
+                    }
+                    
                     Player mcPlayer = player.getMCPlayer();
                     mcPlayer.setGameMode(GameMode.SPECTATOR);
                     mcPlayer.sendActionBar(Component.text("Type /spectate to stop spectating"));
