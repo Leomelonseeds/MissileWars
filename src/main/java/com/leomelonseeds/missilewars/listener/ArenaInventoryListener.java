@@ -182,6 +182,12 @@ public class ArenaInventoryListener implements Listener {
                     new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
                 return;
             }
+            // Must not be a Berserker missile
+            for (ItemStack i : mwPlayer.getDeck().getMissiles()) {
+                if (i.isSimilar(item)) {
+                    return;
+                }
+            }
             
             String[] args = item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(plugin,
                     "item-structure"), PersistentDataType.STRING).split("-");

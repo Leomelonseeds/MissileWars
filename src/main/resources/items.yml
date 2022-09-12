@@ -1238,18 +1238,19 @@ Berserker:
       lore:
       - ""
       - "&7Fireballs no longer do damage to blocks."
-      - "&7Instead, The knockback players recieve"
-      - "&7from fireballs is multiplied by %multiplier%&7."
+      - "&7Instead, The horizontal knockback players"
+      - "&7will recieve from fireballs is multiplied"
+      - "&7by %multiplier%&7."
       cost: 2000
       1:
         spcost: 1
-        multiplier: 1.25
+        multiplier: 1.5
       2:
         spcost: 2
-        multiplier: 1.5
+        multiplier: 2
       3:
         spcost: 2
-        multiplier: 1.75
+        multiplier: 2.5
     boomlust:
       name: "&eBoomlust"
       lore:
@@ -1265,9 +1266,9 @@ Berserker:
       name: "&eMissilesmith"
       lore:
       - ""
-      - "&7Any missiles given to you by other players"
-      - "&7will automatically be upgraded to their"
-      - "&7highest level."
+      - "&7Any non-berserker missiles given to you" 
+      - "&7by other players will automatically be"
+      - "&7upgraded to their highest level."
       cost: 1200
       1:
         spcost: 5

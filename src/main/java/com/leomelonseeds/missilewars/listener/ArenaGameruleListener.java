@@ -247,7 +247,11 @@ public class ArenaGameruleListener implements Listener {
                 if (!fb.isIncendiary()) {
                     double multiplier = Double.parseDouble(ConfigUtils.toPlain(fb.customName()));
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        player.setVelocity(player.getVelocity().multiply(multiplier));
+                        Vector velocity = player.getVelocity();
+                        double velx = velocity.getX() * multiplier;
+                        double velz = velocity.getZ() * multiplier;
+                        double vely = velocity.getY();
+                        player.setVelocity(new Vector(velx, vely, velz));
                     }, 1);
                 } 
                 // Allow fb friendly fire
