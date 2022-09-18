@@ -132,6 +132,7 @@
 		"prickly": false,
 		"naturesblessing": false,
 		"repairman": false,
+		"deconstructor": false,
 		"defaultpreset": {
 			"skillpoints": 7,
 			"projectile_protection": 0,

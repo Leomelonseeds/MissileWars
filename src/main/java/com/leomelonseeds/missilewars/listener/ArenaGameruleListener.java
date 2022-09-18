@@ -4,6 +4,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -447,6 +448,7 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
+        Player player = event.getPlayer();
         // Ensure it was in an arena world
         String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
@@ -462,6 +464,21 @@ public class ArenaGameruleListener implements Listener {
 
         // Register block break
         possibleArena.registerShieldBlockEdit(block.getLocation(), false);
+        
+        // Check for deconstructor
+        if (player.getInventory().getItemInMainHand().getType() != Material.IRON_PICKAXE) {
+            return;
+        }
+        
+        int deconstructor = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "deconstructor");
+        if (deconstructor > 0) {
+            Random random = new Random();
+            double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
+            if (random.nextDouble() < percentage) {
+                ItemStack item = new ItemStack(block.getType());
+                possibleArena.getWorld().dropItemNaturally(block.getLocation(), item);
+            }
+        }
     }
 
     /** Stop chickens spawning from eggs */

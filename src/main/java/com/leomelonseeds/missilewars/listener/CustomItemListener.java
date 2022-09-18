@@ -381,10 +381,9 @@ public class CustomItemListener implements Listener {
                     return;
                 }
                 
-                String material = ChatColor.stripColor(team).toUpperCase() + "_STAINED_GLASS";
-                
+                // Replace blocks with endstone if repairman
                 if (ConfigUtils.inShield(playerArena, loc, team)) {
-                    loc.getBlock().setType(Material.getMaterial(material));
+                    loc.getBlock().setType(Material.END_STONE);
                 }
             }
         }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
