@@ -1375,9 +1375,12 @@ Architect:
       name: "&eDeconstructor"
       lore:
       - ""
-      - "&7Breaking blocks with your pickaxe has"
-      - "&7a &f%percentage%% &7chance of dropping"
+      - "&7Breaking missile blocks with your pickaxe"
+      - "&7has a %percentage%% &7chance of dropping"
       - "&7the block as an item."
+      - ""
+      - "&cDoes not work on glass, endstone, or"
+      - "&cleaves."
       cost: 2200
       1: 
         percentage: 10

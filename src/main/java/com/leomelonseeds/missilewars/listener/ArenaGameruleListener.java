@@ -470,6 +470,11 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        String type = block.getType().toString();
+        if (type.contains("END_STONE") || type.contains("LEAVES") || type.contains("GLASS")) {
+            return;
+        }
+        
         int deconstructor = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "deconstructor");
         if (deconstructor > 0) {
             Random random = new Random();
