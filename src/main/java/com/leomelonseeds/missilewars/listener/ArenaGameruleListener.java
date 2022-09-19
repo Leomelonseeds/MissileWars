@@ -499,6 +499,7 @@ public class ArenaGameruleListener implements Listener {
      */
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
         
         if (player.getGameMode() != GameMode.SURVIVAL) {
@@ -511,13 +512,26 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
+        // Straight up kill people
+        double tooLobby = plugin.getConfig().getDouble("barrier.center.x");
+        double wayTooHigh = plugin.getConfig().getDouble("max-height");
+        if (event.getTo().getBlockY() >= wayTooHigh || event.getTo().getBlockX() >= tooLobby) {
+            ConfigUtils.sendConfigMessage("messages.out-of-bounds-death", player, null, null);
+            player.setHealth(0);
+            return;
+        }
+        
         // Experimental poison 
-        if (MissileWarsPlugin.getPlugin().getConfig().getBoolean("experimental.poison")) {
+        if (plugin.getConfig().getBoolean("experimental.poison")) {
 
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
             
             if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
-                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (player.getLocation().getBlockY() >= toohigh) {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
