@@ -103,6 +103,7 @@ messages:
   preset-c-locked: "&c&l[!] &7You must have &b&lKNIGHT &7rank to use this preset!"
   sp-negative: "&c&l[!] &cYour %deck% Preset %preset% was reset due to skillpoint count being negative."
   out-of-bounds-death: "&c&l[!] &cWhere are you going?"
+  afk-removal: "&7%umw_focus% &7was removed from the arena for being AFK."
     
 titles:
   # Should be sent to players who join in the middle of a game as well

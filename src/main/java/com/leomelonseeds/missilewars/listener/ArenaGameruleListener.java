@@ -49,6 +49,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+import net.ess3.api.events.AfkStatusChangeEvent;
 import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
@@ -545,5 +546,24 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
         }
+    }
+    
+    // Kick afk players from arena
+    @EventHandler
+    public void onAFK(AfkStatusChangeEvent event) {
+        if (!event.getValue()) {
+            return;
+        }
+        
+        Player player = event.getAffected().getBase();
+        
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }   
+        
+        arena.announceMessage("messages.afk-removal", arena.getPlayerInArena(player.getUniqueId()));
+        arena.removePlayer(player.getUniqueId(), true);
     }
 }
