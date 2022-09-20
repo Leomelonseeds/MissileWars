@@ -30,6 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
@@ -1264,6 +1265,7 @@ public class Arena implements ConfigurationSerializable {
     
     /** Remove Players from the map. */
     public void removePlayers() {
+        Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
         for (MissileWarsPlayer player : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
@@ -1275,6 +1277,9 @@ public class Arena implements ConfigurationSerializable {
                             (!arena.isRunning() && !arena.isResetting())) {
                         removePlayer(player.getMCPlayerId(), false);
                         arena.joinPlayer(player.getMCPlayer());
+                        if (ess.getUser(player.getMCPlayer()).isAfk()) {
+                            arena.addSpectator(player.getMCPlayerId());
+                        }
                         success = true;
                         break;
                     }

@@ -561,9 +561,18 @@ public class ArenaGameruleListener implements Listener {
         Arena arena = arenaManager.getArena(player.getUniqueId());
         if (arena == null) {
             return;
-        }   
+        }
         
-        arena.announceMessage("messages.afk-removal", arena.getPlayerInArena(player.getUniqueId()));
+        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        if (arena.isSpectating(mwPlayer)) {
+            return;
+        }
+        
+        arena.announceMessage("messages.afk-removal", mwPlayer);
         arena.removePlayer(player.getUniqueId(), true);
     }
 }

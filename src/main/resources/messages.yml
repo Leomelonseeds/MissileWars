@@ -104,6 +104,7 @@ messages:
   sp-negative: "&c&l[!] &cYour %deck% Preset %preset% was reset due to skillpoint count being negative."
   out-of-bounds-death: "&c&l[!] &cWhere are you going?"
   afk-removal: "&7%umw_focus% &7was removed from the arena for being AFK."
+  afk-spectator: "&a&l[!] &7Since you were AFK, you have been automatically set to spectate."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
