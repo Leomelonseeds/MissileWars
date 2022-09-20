@@ -44,7 +44,17 @@ public class ArenaInventoryListener implements Listener {
         }
         
         Inventory inv = event.getClickedInventory();
-        if (inv == null || !inv.equals(event.getView().getTopInventory())){
+        
+        if (inv == null) {
+            return;
+        }
+        
+        if (inv.equals(event.getView().getBottomInventory()) && event.getClick().isShiftClick()) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (!inv.equals(event.getView().getTopInventory())){
             return; 
         }
         
