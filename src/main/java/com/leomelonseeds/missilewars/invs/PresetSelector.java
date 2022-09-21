@@ -62,6 +62,13 @@ public class PresetSelector implements MWInventory {
                 } else {
                     l = l.replaceAll("%gpassive%", "None");
                 }
+
+                String passive = current.getJSONObject("passive").getString("selected");
+                if (!passive.equals("None")) {
+                    l = l.replaceAll("%passive%", itemConfig.getString(deck + ".passive." + passive + ".name"));
+                } else {
+                    l = l.replaceAll("%passive%", "None");
+                }
                 lore.add(l);
             }
             

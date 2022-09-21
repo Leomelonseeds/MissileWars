@@ -1504,6 +1504,7 @@ preset:
   name: "&f&lPreset %preset%"
   lore:
   - ""
+  - "&7Passive: %passive%"
   - "&7Global Passive: %gpassive%"
   - ""
   - "&cRight-click &7to edit this preset"

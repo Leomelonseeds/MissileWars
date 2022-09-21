@@ -1267,29 +1267,31 @@ public class Arena implements ConfigurationSerializable {
     public void removePlayers() {
         Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-        for (MissileWarsPlayer player : new HashSet<>(players)) {
+        for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             // Also only requeue if capacity is 20
-            if (!player.getMCPlayer().hasPermission("umw.disablerequeue") && capacity == cap) {
+            Player player = mwPlayer.getMCPlayer();
+            if (!player.hasPermission("umw.disablerequeue") && capacity == cap) {
                 Boolean success = false;
                 for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
-                        removePlayer(player.getMCPlayerId(), false);
-                        arena.joinPlayer(player.getMCPlayer());
-                        if (ess.getUser(player.getMCPlayer()).isAfk()) {
-                            arena.addSpectator(player.getMCPlayerId());
+                        removePlayer(player.getUniqueId(), false);
+                        arena.joinPlayer(player);
+                        if (ess.getUser(player).isAfk()) {
+                            arena.addSpectator(player.getUniqueId());
+                            ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
                         }
                         success = true;
                         break;
                     }
                 }
                 if (!success) {
-                    ConfigUtils.sendConfigMessage("messages.requeue-failed", player.getMCPlayer(), null, null);
-                    removePlayer(player.getMCPlayerId(), true);
+                    ConfigUtils.sendConfigMessage("messages.requeue-failed", player, null, null);
+                    removePlayer(player.getUniqueId(), true);
                 }
             } else {
-                removePlayer(player.getMCPlayerId(), true);
+                removePlayer(player.getUniqueId(), true);
             }
         }
     }
