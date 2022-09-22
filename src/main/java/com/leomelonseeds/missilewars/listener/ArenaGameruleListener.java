@@ -171,6 +171,10 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
         // Re-give haste if player using architect with haste
         JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
         if (json.has("haste")) {
