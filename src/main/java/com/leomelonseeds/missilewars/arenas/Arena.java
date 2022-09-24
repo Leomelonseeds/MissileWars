@@ -525,7 +525,7 @@ public class Arena implements ConfigurationSerializable {
 
         // Cancel tasks if starting and below min players
         int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
-        if (!running && startTime != null && players.size() < minPlayers) {
+        if (!running && startTime != null && getNumPlayers() < minPlayers) {
             for (BukkitTask task : tasks) {
                 task.cancel();
             }
