@@ -340,8 +340,13 @@ public class ConfigUtils {
         int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
         int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
         int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
-        if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
-            return true;
+        if (x1 <= x && x <= x2 && y1 <= y && y <= y2) {
+            if (teamName.equals("red") && z1 <= z) {
+                return true;
+            }
+            if (teamName.equals("blue") && z <= z2) {
+                return true;
+            }
         }
         return false;
     }

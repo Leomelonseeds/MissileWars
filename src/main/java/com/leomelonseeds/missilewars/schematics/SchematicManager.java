@@ -196,6 +196,17 @@ public class SchematicManager {
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Temp hotfix for structure rail rotation bug
+        if (redMissile && structureName.contains("lifter-2")) {
+            Location railLoc = spawnLoc.add(-1, 2, -8);
+            Block block = railLoc.getBlock();
+            block.setType(Material.DETECTOR_RAIL);
+            RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
+            rail.setShape(Shape.EAST_WEST);
+            block.setBlockData(rail);
+            block.getState().update(true);
+        }
+        
+        /* Temp hotfix for structure rail rotation bug (unused missile)
         if (redMissile && structureName.contains("cruiser-2")) {
             Location railLoc = spawnLoc.add(0, 1, -8);
             Block block = railLoc.getBlock();
@@ -204,7 +215,7 @@ public class SchematicManager {
             rail.setShape(Shape.NORTH_SOUTH);
             block.setBlockData(rail);
             block.getState().update(true);
-        }
+        }*/
         return true;
     }
 

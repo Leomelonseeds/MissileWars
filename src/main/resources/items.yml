@@ -91,7 +91,7 @@ tomahawk:
       y: -4
       z: 4
     speed: 1.7
-    tnt: 12
+    tnt: 14
   2:
     file: 'tomatwo.nbt'
     item: ZOMBIE_SPAWN_EGG
@@ -105,7 +105,7 @@ tomahawk:
       y: -4
       z: 4
     speed: 2.0
-    tnt: 16
+    tnt: 17
     spcost: 3
 
 cronullifier:
@@ -661,31 +661,34 @@ pisces:
     tnt: 24
     spcost: 3
 
-ant:
+lifter:
   index: 3
   1:
-    file: 'ant.nbt'
-    item: ENDERMITE_SPAWN_EGG
-    name: "&0☢ Ant ⚒"
-    lore:
-    - ""
-    - "&7As the name implies, this missile is very small."
-    - "&7But fortunately, size doesn't matter in missile wars."
-    offset:
-      x: 0
-      y: -6
-      z: 4
-    speed: 2.2
-    tnt: 2
-  2:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
-    name: "&0☢ &lLifter &0⚒"
+    name: "&0☢ Lifter ⚒"
     lore:
     - ""
     - "&7This missile lifts its TNT (and occupants)"
     - "&7three blocks up into the air before blowing"
     - "&7them all up. Bit like my high school grades."
+    offset:
+      x: 0
+      y: -6
+      z: 4
+    speed: 2.0
+    tnt: 8
+  2:
+    file: 'icarus.nbt'
+    item: ENDERMITE_SPAWN_EGG
+    name: "&0☢ &lIcarus &0⚒"
+    lore:
+    - ""
+    - "&7Break the end rod to lift the minecart"
+    - "&7high in the sky and have it keep bouncing"
+    - "&7while the rest of the missile suffers."
+    - "&7Side effects may include funny fence"
+    - "&7gate noises."
     offset:
       x: -1
       y: -5
@@ -1359,8 +1362,8 @@ Architect:
       - "&7%percentage%% &7chance of not consuming"
       - "&7them from your inventory. Additionally,"
       - "&7instead of decaying, leaves placed within"
-      - "&7your base will turn into end stone after"
-      - "&730 seconds."
+      - "&7or behind your base will turn into end"
+      - "&7stone after 30 seconds."
       cost: 800
       1: 
         percentage: 50
