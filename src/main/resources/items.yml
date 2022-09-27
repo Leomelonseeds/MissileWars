@@ -142,40 +142,38 @@ cronullifier:
       z: 4
     speed: 2.2
     tnt: 25
-    spcost: 3
+    spcost: 4
 
 
 # Sentinel missiles
 
 
-hilt:
+concorde:
   index: 0
   1:
-    file: 'hilt.nbt'
+    file: 'concorde.nbt'
     item: RAVAGER_SPAWN_EGG
-    name: "&8☢ Hilt ✟"
+    name: "&8☢ Concorde ✟"
     lore:
     - ""
-    - "&7You may be wondering where the rest"
-    - "&7of this bladed weapon went. So are we."
-    - "&7Nonetheless, this compact missile"
-    - "&7packs incredible speed."
+    - "&7This compact, speedy missile is"
+    - "&7pretty explosive. Just like the"
+    - "&7plane it was named after."
     offset:
       x: -1
-      y: -5
+      y: -4
       z: 4
     speed: 3.3
-    tnt: 10
+    tnt: 8
   2:
-    file: 'dagger.nbt'
+    file: 'valkyrie.nbt'
     item: RAVAGER_SPAWN_EGG
-    name: "&8☢ &lDagger &8✟"
+    name: "&8☢ &lValkyrie &8✟"
     lore:
     - ""
-    - "&7There, we found the rest of the weapon."
-    - "&7This missile carries the 5 TNT that the"
-    - "&7Hilt was missing. Just try to avoid"
-    - "&7shields."
+    - "&7This one was renamed from the Broadsword"
+    - "&7to the Hilt to the Dagger... enough with"
+    - "&7the sword names already smh"
     offset:
       x: -1
       y: -5
