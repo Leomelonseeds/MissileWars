@@ -3,8 +3,10 @@ package com.leomelonseeds.missilewars.listener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -48,7 +50,9 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import net.kyori.adventure.text.Component;
 
@@ -578,5 +582,40 @@ public class ArenaGameruleListener implements Listener {
         
         arena.announceMessage("messages.afk-removal", mwPlayer);
         arena.removePlayer(player.getUniqueId(), true);
+    }
+    
+    Set<Player> saidGG = new HashSet<>();
+    
+    // Add exp if GG
+    @EventHandler
+    public void onChat(AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        if (saidGG.contains(player)) {
+            return;
+        }
+         
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if (arena == null) {
+            return;
+        }
+        
+        if (!arena.isResetting()) {
+            return;
+        }
+        
+        String message = ConfigUtils.toPlain(event.message());
+        if (!message.equalsIgnoreCase("gg")) {
+            return;
+        }
+        
+        RankUtils.addExp(player, 1);
+        ConfigUtils.sendConfigMessage("messages.gg-exp", player, null, null);
+        saidGG.add(player);
+        
+        long waitTime = MissileWarsPlugin.getPlugin().getConfig().getInt("victory-wait-time") * 20L;
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            saidGG.remove(player);
+        }, waitTime);
     }
 }

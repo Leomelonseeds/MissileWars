@@ -93,6 +93,8 @@ public class Arena implements ConfigurationSerializable {
     protected Map<String, Integer> mapVotes;
     /** Connect players and their votes. */
     protected Map<UUID, String> playerVotes;
+    /** A task for if we are waiting for a game to auto-end */
+    protected BukkitTask autoEnd;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -599,6 +601,29 @@ public class Arena implements ConfigurationSerializable {
 
         return true;
     }
+    
+    /**
+     * Checks if the game is not empty, and cancels game end task if so
+     */
+    public void checkNotEmpty() {
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return;
+        }
+        
+        if (!running || redTeam == null || blueTeam == null) {
+            return;
+        }
+        
+        if (redTeam.getSize() <= 0 || blueTeam.getSize() <= 0) {
+            return;
+        }
+        
+        if (autoEnd == null) {
+            return;
+        }
+        
+        autoEnd.cancel();
+    }
 
     /**
      * Checks if the game is empty, and ends game if so
@@ -609,30 +634,32 @@ public class Arena implements ConfigurationSerializable {
             return;
         }
 
-        if (running && redTeam != null && blueTeam != null) {
-            if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
-                endGame(null);
-            } else if (redTeam.getSize() <= 0) {
-                announceMessage("messages.red-team-empty", null);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (running && redTeam.getSize() <= 0) {
-                            endGame(blueTeam);
-                        }
+        if (!running || redTeam == null || blueTeam == null) {
+            return;
+        }
+        
+        if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
+            endGame(null);
+        } else if (redTeam.getSize() <= 0) {
+            announceMessage("messages.red-team-empty", null);
+            autoEnd = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (running && redTeam.getSize() <= 0) {
+                        endGame(blueTeam);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
-            } else if (blueTeam.getSize() <= 0) {
-                announceMessage("messages.blue-team-empty", null);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (running && blueTeam.getSize() <= 0) {
-                            endGame(redTeam);
-                        }
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
+        } else if (blueTeam.getSize() <= 0) {
+            announceMessage("messages.blue-team-empty", null);
+            autoEnd = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (running && blueTeam.getSize() <= 0) {
+                        endGame(redTeam);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
-            }
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), 60 * 20L);
         }
     }
 
@@ -689,25 +716,12 @@ public class Arena implements ConfigurationSerializable {
                         redTeam.addPlayer(player);
                         redTeam.giveItems(player);
                         player.giveDeckGear();
+                        checkNotEmpty();
                         announceMessage("messages.queue-join-red", player);
                     }
                 }
                 break;
             }
-        }
-    }
-
-    /**
-     * Remove the given player from the spectators list.
-     *
-     * @param player the player
-     */
-    public void removeSpectator(MissileWarsPlayer player) {
-        if (spectators.remove(player)) {
-            announceMessage("messages.spectate-leave-others", player);
-            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
-            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-            checkForStart();
         }
     }
 
@@ -754,11 +768,26 @@ public class Arena implements ConfigurationSerializable {
                         blueTeam.addPlayer(player);
                         blueTeam.giveItems(player);
                         player.giveDeckGear();
+                        checkNotEmpty();
                         announceMessage("messages.queue-join-blue", player);
                     }
                 }
                 break;
             }
+        }
+    }
+
+    /**
+     * Remove the given player from the spectators list.
+     *
+     * @param player the player
+     */
+    public void removeSpectator(MissileWarsPlayer player) {
+        if (spectators.remove(player)) {
+            announceMessage("messages.spectate-leave-others", player);
+            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
+            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            checkForStart();
         }
     }
 
@@ -1255,7 +1284,7 @@ public class Arena implements ConfigurationSerializable {
                 public void run() {
                     resetWorld();
                 }
-            }.runTaskLater(plugin, waitTime + 40L);
+            }.runTaskLater(plugin, waitTime + 60L);
         } else {
             removePlayers();
             resetWorld();
