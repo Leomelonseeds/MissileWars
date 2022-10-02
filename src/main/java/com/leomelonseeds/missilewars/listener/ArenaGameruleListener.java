@@ -604,6 +604,10 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
         String message = ConfigUtils.toPlain(event.message());
         if (!message.equalsIgnoreCase("gg")) {
             return;
