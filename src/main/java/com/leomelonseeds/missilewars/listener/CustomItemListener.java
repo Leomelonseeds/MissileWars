@@ -25,6 +25,7 @@ import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -162,7 +163,14 @@ public class CustomItemListener implements Listener {
 
         Arena playerArena = getPlayerArena(player);
         if (playerArena == null) {
-            return;
+            // Prevent players from accessing normal chests
+            if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+                return;
+            }
+            
+            if (event.getClickedBlock().getType() == Material.CHEST) {
+                event.setCancelled(true);
+            }
         }
         
         // Check if player is frozen by a canopy
