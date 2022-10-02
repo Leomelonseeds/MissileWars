@@ -32,9 +32,9 @@ public class InventoryUtils {
     public static void clearInventory(Player player) {
         Inventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getSize(); i++) {
-            ItemStack current = inventory.getItem(i);
-            boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
-            if (!(i == 39 || isPotion)) {
+            Material current = inventory.getItem(i).getType();
+            boolean isPotion = current != null && current == Material.POTION ? true : false;
+            if (!(i == 39 || isPotion) || (i == 39 && current.toString().contains("HELMET"))) {
                 inventory.clear(i);
             }
         }
