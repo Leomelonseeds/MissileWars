@@ -182,6 +182,11 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        if (playerArena.isWaitingForTie()) {
+            event.setCancelled(true);
+            return;
+        }
+        
         // Spawn a structure item
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
