@@ -302,7 +302,7 @@ public class ArenaGameruleListener implements Listener {
                         double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
                         double dmg = event.getDamage();
                         double distance = bowShots.get(damager).distance(player.getLocation());
-                        double cutoff = 25;
+                        double cutoff = 20;
                         
                         // Calculate damage
                         if (distance >= cutoff) {

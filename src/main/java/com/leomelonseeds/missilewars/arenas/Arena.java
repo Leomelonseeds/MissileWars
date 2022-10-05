@@ -591,7 +591,7 @@ public class Arena implements ConfigurationSerializable {
                 ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
             }
         } else {
-            return false;
+            removePlayer(player.getUniqueId(), true);
         }
 
         checkEmpty();

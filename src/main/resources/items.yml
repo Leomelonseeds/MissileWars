@@ -682,11 +682,11 @@ lifter:
     name: "&0☢ &lIcarus &0⚒"
     lore:
     - ""
-    - "&7Break the end rod to lift the minecart"
-    - "&7high in the sky and have it keep bouncing"
-    - "&7while the rest of the missile suffers."
-    - "&7Side effects may include funny fence"
-    - "&7gate noises."
+    - "&7Break the TNT in front of the fence to lift"
+    - "&7the minecart high in the sky and have it"
+    - "&7keep bouncing while the rest of the missile"
+    - "&7suffers. Side effects may include funny"
+    - "&7fence gate noises."
     offset:
       x: -1
       y: -5
@@ -1143,26 +1143,26 @@ Sentinel:
       lore:
       - ""
       - "&7Your arrows now favor long-range shots."
-      - "&7Arrows travelling more than 25m will do"
+      - "&7Arrows travelling more than 20m will do"
       - "&7an &aadditional %plus% &7damage per block, up"
       - "&7to a maximum of %max% &7extra damage. However,"
       - "&7arrows will also do %minus% &cless &7damage"
-      - "&7per block less than 25m."
+      - "&7per block less than 20m."
       cost: 1000
       1:
         spcost: 1
-        plus: 0.1
-        minus: 0.5
+        plus: 0.05
+        minus: 0.2
         max: 4
       2:
         spcost: 2
-        plus: 0.15
-        minus: 0.75
+        plus: 0.10
+        minus: 0.4
         max: 8
       3:
         spcost: 2
-        plus: 0.2
-        minus: 1
+        plus: 0.15
+        minus: 0.6
         max: 12
     priest:
       name: "&ePriest"
