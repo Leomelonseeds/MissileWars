@@ -240,6 +240,15 @@ public class Arena implements ConfigurationSerializable {
     public boolean isResetting() {
         return resetting;
     }
+    
+    /**
+     * Check if game is waiting for a tie
+     * 
+     * @return
+     */
+    public boolean isWaitingForTie() {
+        return waitingForTie;
+    }
 
     /**
      * Get the number of seconds remaining when chaos time activates.
