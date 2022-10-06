@@ -1071,7 +1071,7 @@ Vanguard:
       lore:
       - ""
       - "&7Recieve Speed with amplifier %amplifier% &7for"
-      - "&71.5 seconds after spawning a missile."
+      - "&73 seconds after spawning a missile."
       cost: 800
       1:
         spcost: 1

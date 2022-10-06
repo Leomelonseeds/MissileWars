@@ -241,7 +241,7 @@ public class CustomItemListener implements Listener {
                 int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
                 if (adrenaline > 0) {
                     int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, level));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, level));
                 }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 // 0.5s cooldown
