@@ -1316,10 +1316,10 @@ Architect:
     projectile_protection:
       cost: 1200
       1: 
-        level: 2
+        level: 3
         spcost: 1
       2: 
-        level: 4
+        level: 6
         spcost: 2
   passive:
     naturesblessing:

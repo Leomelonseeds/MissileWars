@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
@@ -25,7 +26,6 @@ import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -163,14 +163,7 @@ public class CustomItemListener implements Listener {
 
         Arena playerArena = getPlayerArena(player);
         if (playerArena == null) {
-            // Prevent players from accessing normal chests
-            if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-                return;
-            }
-            
-            if (event.getClickedBlock().getType() == Material.CHEST) {
-                event.setCancelled(true);
-            }
+            return;
         }
         
         // Check if player is frozen by a canopy
@@ -179,10 +172,9 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        // Check if player used a structure or utility
         PlayerInventory inv = player.getInventory();
-
         ItemStack hand = inv.getItem(event.getHand());
-        
         Block clicked = event.getClickedBlock();
         String structureName = getStringFromItem(hand, "item-structure");
         String utility = getStringFromItem(hand, "item-utility");
@@ -190,7 +182,16 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        // Check if game is waiting for tie
         if (playerArena.isWaitingForTie()) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Disable if player just died
+        int sinceDeath = player.getStatistic(Statistic.TIME_SINCE_DEATH);
+        int respawnDisable = plugin.getConfig().getInt("respawn-disable");
+        if (sinceDeath <= respawnDisable) {
             event.setCancelled(true);
             return;
         }

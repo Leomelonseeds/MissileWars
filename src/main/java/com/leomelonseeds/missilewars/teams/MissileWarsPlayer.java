@@ -29,7 +29,6 @@ public class MissileWarsPlayer {
     
     private boolean boomlust;
     private boolean boomlustregen;
-    
     private boolean retaliate;
 
 
@@ -43,28 +42,28 @@ public class MissileWarsPlayer {
     }
     
     // Boomlust related
-    public Boolean getBoomLust() {
+    public boolean getBoomLust() {
         return boomlust;
     }
     
-    public void setBoomLust(Boolean b) {
+    public void setBoomLust(boolean b) {
         boomlust = b;
     }
     
-    public Boolean getBoomLustRegen() {
+    public boolean getBoomLustRegen() {
         return boomlustregen;
     }
     
-    public void setBoomLustRegen(Boolean b) {
+    public void setBoomLustRegen(boolean b) {
         boomlustregen = b;
     }
     
     // Retaliate related
-    public void setRetaliate(Boolean b) {
+    public void setRetaliate(boolean b) {
         retaliate = b;
     }
     
-    public Boolean getRetaliate() {
+    public boolean getRetaliate() {
         return retaliate;
     }
 
