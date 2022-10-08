@@ -1,8 +1,6 @@
 package com.leomelonseeds.missilewars.decks;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +34,8 @@ public class Deck {
     /** Combined for ease of use */
     private List<ItemStack> pool;
     /** Make game more skill dependent */
-    private Deque<ItemStack> lastTwo;
+    private List<ItemStack> missilePool;
+    private List<ItemStack> utilityPool;
     
     private JSONManager jsonmanager;
 
@@ -55,7 +54,8 @@ public class Deck {
         List<ItemStack> combined = new ArrayList<>(missiles);
         combined.addAll(utility);
         this.pool = combined;
-        lastTwo = new ArrayDeque<>();
+        missilePool = new ArrayList<>(missiles);
+        utilityPool = new ArrayList<>(utility);
         
         jsonmanager = MissileWarsPlugin.getPlugin().getJSON();
     }
@@ -157,41 +157,40 @@ public class Deck {
             add = Double.valueOf(ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage") + "") / 100;
         }
         chance += add;
-        List<ItemStack> toUse = rand.nextDouble() < chance ? utility : missiles;
+        List<ItemStack> toUse = rand.nextDouble() < chance ? utilityPool : missilePool;
         
         // Check on first item, global passive
         if (first) {
             if (missilespec == 3) {
-                toUse = missiles;
+                toUse = missilePool;
             } else if (utilityspec == 3) {
-                toUse = utility;
+                toUse = utilityPool;
             }
         }
         
         // Check sentinel retaliate
         if (mwplayer.getRetaliate()) {
-            toUse = utility;
+            toUse = utilityPool;
             mwplayer.setRetaliate(false);
         }
         
         // Check berserker boomlust
         if (mwplayer.getBoomLust()) {
-            toUse = missiles;
+            toUse = missilePool;
             mwplayer.setBoomLust(false);
+        }
+        
+        // Set poolitem, and restock if empty
+        ItemStack poolItem = toUse.remove(rand.nextInt(toUse.size()));
+        if (toUse.isEmpty()) {
+            if (toUse == missilePool) {
+                missilePool = new ArrayList<>(missiles);
+            } else {
+                utilityPool = new ArrayList<>(utility);
+            }
         }
 
         Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
-        // Don't give players the same item twice
-        ItemStack poolItem;
-        do {
-            poolItem = new ItemStack(toUse.get(rand.nextInt(toUse.size())));
-        } while (lastTwo.contains(poolItem));
-        // Add item to the list
-        lastTwo.addFirst(poolItem);
-        if (lastTwo.size() > 2) {
-            lastTwo.removeLast();
-        }
-        
         double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
         double toofar = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
         Location loc = player.getLocation();

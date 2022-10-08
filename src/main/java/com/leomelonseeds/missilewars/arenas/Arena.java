@@ -586,7 +586,8 @@ public class Arena implements ConfigurationSerializable {
         Player player = Bukkit.getPlayer(uuid);
 
         if (!isRunning() || redTeam == null || blueTeam == null) {
-            return false;
+            removePlayer(player.getUniqueId(), true);
+            return true;
         }
 
         if (redTeam.containsPlayer(uuid)) {
