@@ -49,6 +49,7 @@ public class ArenaSelector implements MWInventory {
     // Create a list of all arenas from ArenaManager list
     @Override
     public void updateInventory() {
+        inv.clear();
         for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
             ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
