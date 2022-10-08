@@ -1188,7 +1188,7 @@ Sentinel:
       - "&7after dying to an enemy player."
       cost: 750
       1:
-        spcost: 5
+        spcost: 4
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1247,10 +1247,10 @@ Berserker:
         spcost: 1
         multiplier: 1.5
       2:
-        spcost: 2
+        spcost: 1
         multiplier: 2
       3:
-        spcost: 2
+        spcost: 1
         multiplier: 2.5
     boomlust:
       name: "&eBoomlust"

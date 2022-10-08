@@ -142,9 +142,10 @@ public class ArenaGameruleListener implements Listener {
 
         Component deathMessage = event.deathMessage();
         event.deathMessage(Component.text(""));
+        String team = playerArena.getTeam(player.getUniqueId());
 
         // Count death if player is on a team
-        if (!playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+        if (!team.equals("no team")) {
             MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
             missileWarsPlayer.incrementDeaths();
             for (Player p : player.getWorld().getPlayers()) {
@@ -155,7 +156,15 @@ public class ArenaGameruleListener implements Listener {
         // Un-obstruct spawns
         Location spawn1 = playerArena.getPlayerSpawn(player);
         Location spawn2 = spawn1.clone().add(0, 1, 0);
-        for (Location l : new Location[] {spawn1, spawn2}) {
+        Location spawn3 = spawn1.clone().add(1, 0, 0);
+        Location spawn4 = spawn1.clone().add(-1, 0, 0);
+        Location spawn5 = spawn1;
+        if (team.contains("red")) {
+            spawn5 = spawn1.clone().add(0, 0, -1);
+        } else if (team.contains("blue")) {
+            spawn5 = spawn1.clone().add(0, 0, 1);
+        }
+        for (Location l : new Location[] {spawn1, spawn2, spawn3, spawn4, spawn5}) {
             if (l.getBlock().getType() != Material.AIR) {
                 l.getBlock().setType(Material.AIR);
             }
