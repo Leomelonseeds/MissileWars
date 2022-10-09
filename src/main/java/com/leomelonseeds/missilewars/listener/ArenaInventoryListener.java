@@ -95,6 +95,21 @@ public class ArenaInventoryListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         if (arena == null) {
+            // Stop guests from using elytra
+            Inventory inv = event.getClickedInventory();
+            if (inv == null) {
+                return;
+            }
+            
+            int slot = event.getSlot();
+            if (inv.getItem(slot) == null) {
+                return;
+            }
+            
+            if (inv.getItem(slot).getType() == Material.ELYTRA) {
+                event.setCancelled(true);
+            }
+            
             return;
         }
         
