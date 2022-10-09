@@ -181,7 +181,7 @@ public class Deck {
         }
         
         // Set poolitem, and restock if empty
-        ItemStack poolItem = toUse.remove(rand.nextInt(toUse.size()));
+        ItemStack poolItem = new ItemStack(toUse.remove(rand.nextInt(toUse.size())));
         if (toUse.isEmpty()) {
             if (toUse == missilePool) {
                 missilePool = new ArrayList<>(missiles);
