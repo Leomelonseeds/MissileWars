@@ -96,6 +96,10 @@ public class ArenaInventoryListener implements Listener {
         Arena arena = manager.getArena(player.getUniqueId());
         if (arena == null) {
             // Stop guests from using elytra
+            if (player.hasPermission("umw.elytra")) {
+                return;
+            }
+            
             Inventory inv = event.getClickedInventory();
             if (inv == null) {
                 return;
