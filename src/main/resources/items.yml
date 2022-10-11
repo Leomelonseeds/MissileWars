@@ -671,8 +671,8 @@ lifter:
     - "&7three blocks up into the air before blowing"
     - "&7them all up. Bit like my high school grades."
     offset:
-      x: 0
-      y: -6
+      x: -1
+      y: -5
       z: 4
     speed: 2.0
     tnt: 8
@@ -689,7 +689,7 @@ lifter:
     - "&7fence gate noises."
     offset:
       x: -1
-      y: -5
+      y: -4
       z: 4
     speed: 2.0
     tnt: 8
