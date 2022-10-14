@@ -158,6 +158,36 @@ classic:
     red-shield:
       y1: -10
       y2: 13
+  coppercastle:
+    name: "&fCopper Castle"
+    file: "CopperCastle.schem"
+    portals:
+      1: 
+        x: -10
+        y: 11
+        z: -72
+      2: 
+        x: 8
+        y: 11
+        z: -72
+      3: 
+        x: 17
+        y: 11
+        z: -72
+    blue-shield:
+      x1: -23
+      y1: -9
+      z1: -65
+      x2: 23
+      y2: 16
+      z2: -51
+    red-shield:
+      x1: -23
+      y1: -9
+      z1: 51
+      x2: 23
+      y2: 16
+      z2: 65
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"

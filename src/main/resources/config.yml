@@ -15,6 +15,17 @@ cancel-schematic:
   - OBSIDIAN
   - CRYING_OBSIDIAN
   - NETHER_PORTAL
+
+# Blocks that can be collected with the Deconstructor passive
+# Check is contains, so no color specifications needed
+deconstructor-blocks:
+  - SLIME_BLOCK
+  - REDSTONE_BLOCK
+  - PISTON
+  - OBSERVER
+  - HONEY_BLOCK
+  - GLAZED_TERRACOTTA
+  - CONCRETE
  
 # Things cannot be placed higher than this
 max-height: 256

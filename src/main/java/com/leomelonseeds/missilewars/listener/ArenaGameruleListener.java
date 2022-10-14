@@ -4,6 +4,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -465,11 +466,12 @@ public class ArenaGameruleListener implements Listener {
     /** Handle shield block breaks breaks. */
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Block block = event.getBlock();
         Player player = event.getPlayer();
         // Ensure it was in an arena world
         String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        Arena possibleArena = plugin.getArenaManager().getArena(possibleArenaName);
         if (possibleArena == null) {
             return;
         }
@@ -488,19 +490,31 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        String type = block.getType().toString();
-        if (type.contains("END_STONE") || type.contains("LEAVES") || type.contains("GLASS")) {
+        int deconstructor = plugin.getJSON().getAbility(player.getUniqueId(), "deconstructor");
+        if (deconstructor <= 0) {
             return;
         }
         
-        int deconstructor = MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "deconstructor");
-        if (deconstructor > 0) {
-            Random random = new Random();
-            double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
-            if (random.nextDouble() < percentage) {
-                ItemStack item = new ItemStack(block.getType());
-                possibleArena.getWorld().dropItemNaturally(block.getLocation(), item);
+        // Check if deconstructor can break block
+        String type = block.getType().toString();
+        List<String> whitelist = plugin.getConfig().getStringList("deconstructor-blocks");
+        boolean proceed = false;
+        for (String b : whitelist) {
+            if (type.contains(b)) {
+                proceed = true;
+                break;
             }
+        }
+        
+        if (!proceed) {
+            return;
+        }
+        
+        Random random = new Random();
+        double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
+        if (random.nextDouble() < percentage) {
+            ItemStack item = new ItemStack(block.getType());
+            possibleArena.getWorld().dropItemNaturally(block.getLocation(), item);
         }
     }
 
