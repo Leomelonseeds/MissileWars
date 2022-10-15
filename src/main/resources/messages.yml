@@ -206,6 +206,9 @@ titles:
     title: "&4Portals Destroyed"
     subtitle: "&7Waiting for tie..."
     length: 100
+  chaos-mode:
+    title: "&0&o&lChaos mode"
+    subtitle: "2x the items, 4x the fun"
   video:
     title: "&aPlease,"
     subtitle: "&b↓ &fWatch the video in chat &b↓"

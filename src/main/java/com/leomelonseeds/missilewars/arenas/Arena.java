@@ -940,6 +940,8 @@ public class Arena implements ConfigurationSerializable {
             public void run() {
                 blueTeam.setChaosMode(true);
                 redTeam.setChaosMode(true);
+                blueTeam.sendTitle("chaos-mode");
+                redTeam.sendTitle("chaos-mode");
                 announceMessage("messages.chaos-mode", null);
             }
         }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
