@@ -729,28 +729,44 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
-        double chance = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "percentage") / 100;
-        Random random = new Random();
-        int durationmultiplier = 1;
-        if (random.nextDouble() < chance) {
-            location.getBlock().setType(Material.LAVA);
-            durationmultiplier = 2;
-        } else {
-            location.getBlock().setType(Material.WATER);
-        }
-
-        // Remove water after while
         double duration = Double.parseDouble(args[1]);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.LAVA) {
-                    location.getBlock().setType(Material.AIR);
+        int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
+        if (lavasplash <= 0) {
+            location.getBlock().setType(Material.WATER);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (location.getBlock().getType() == Material.WATER) {
+                        location.getBlock().setType(Material.AIR);
+                    }
                 }
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20 * durationmultiplier));
-
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20));
+            return;
+        }
+        
+        // Lava splash manager
+        double durationmultiplier = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "multiplier");
+        int radius = (int) ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "radius");
+        List<Location> locations = new ArrayList<>();
+        locations.add(location);
+        if (radius == 1) {
+            locations.add(location.clone().add(1, 0, 0));
+            locations.add(location.clone().add(-1, 0, 0));
+            locations.add(location.clone().add(0, 0, 1));
+            locations.add(location.clone().add(0, 0, -1));
+        }
+        
+        // Spawn and then remove lavasplash after a while
+        for (Location l : locations) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (l.getBlock().getType() == Material.LAVA) {
+                        l.getBlock().setType(Material.AIR);
+                    }
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20 * durationmultiplier));
+        }
     }
 
     /** Clears obsidian shield after a certain amount of time */
