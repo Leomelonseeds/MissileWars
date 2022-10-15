@@ -579,7 +579,14 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
-    // Kick afk players from arena
+    /**
+     * Kick AFK players. Conditions for successful kick:
+     * - Be in a team in a running game
+     * - Be in the waiting lobby while game is not running
+     * In all other cases, player is fine.
+     * `
+     * @param event
+     */
     @EventHandler
     public void onAFK(AfkStatusChangeEvent event) {
         if (!event.getValue()) {
@@ -594,12 +601,13 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
+        if (arena.isSpectating(mwPlayer)) {
             return;
         }
         
-        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
-        if (arena.isSpectating(mwPlayer)) {
+        // Kick players only if they are in pre-game and not spectating
+        if (arena.getTeam(player.getUniqueId()).equals("no team") && (arena.isRunning() || arena.isResetting())) {
             return;
         }
         

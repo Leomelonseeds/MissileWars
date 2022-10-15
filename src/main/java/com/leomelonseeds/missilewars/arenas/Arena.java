@@ -1315,11 +1315,23 @@ public class Arena implements ConfigurationSerializable {
                 for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
+                        // Check for auto-set to spectate
+                        boolean spectate = false;
+                        boolean afk = ess.getUser(player).isAfk();
+                        if ((spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating")) || afk) {
+                            spectate = true;
+                        }
+                        
+                        // Switch player arenas
                         removePlayer(player.getUniqueId(), false);
                         arena.joinPlayer(player);
-                        if (ess.getUser(player).isAfk()) {
+                        
+                        // Auto-spectate checks
+                        if (spectate) {
                             arena.addSpectator(player.getUniqueId());
-                            ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
+                            if (afk) {
+                                ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
+                            }
                         }
                         success = true;
                         break;
