@@ -1058,13 +1058,13 @@ Vanguard:
       - "&7amplifier %amplifier%"
       cost: 600
       1:
-        spcost: 2
+        spcost: 1
         amplifier: 0
       2:
-        spcost: 1
+        spcost: 2
         amplifier: 1
       3:
-        spcost: 2
+        spcost: 3
         amplifier: 2
     adrenaline:
       name: "&eAdrenaline"
