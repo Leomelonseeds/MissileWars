@@ -91,6 +91,12 @@ public class DeckManager {
         // Create utility
         for (String key : json.getJSONObject("utility").keySet()) {
             ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
+            // Change color of lava splash
+            if (u.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
+                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
+                pmeta.setColor(Color.ORANGE);
+                u.setItemMeta(pmeta);
+            }
             utility.set(itemsConfig.getInt(key + ".index"), u);
         }
         
