@@ -758,6 +758,7 @@ public class CustomItemListener implements Listener {
         
         // Spawn and then remove lavasplash after a while
         for (Location l : locations) {
+            l.getBlock().setType(Material.LAVA);
             new BukkitRunnable() {
                 @Override
                 public void run() {

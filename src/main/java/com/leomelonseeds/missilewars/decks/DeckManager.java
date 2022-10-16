@@ -94,6 +94,9 @@ public class DeckManager {
             // Change color of lava splash
             if (u.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
                 PotionMeta pmeta = (PotionMeta) u.getItemMeta();
+                String name = ConfigUtils.toPlain(pmeta.displayName());
+                name = name.replaceFirst("9", "6");  // Make name orange
+                pmeta.displayName(ConfigUtils.toComponent(name));
                 pmeta.setColor(Color.ORANGE);
                 u.setItemMeta(pmeta);
             }

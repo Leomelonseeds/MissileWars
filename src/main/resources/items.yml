@@ -348,7 +348,7 @@ piranha:
       z: 4
     speed: 2.0
     tnt: 23
-    spcost: 4
+    spcost: 3
 
 
 # Berserker missiles
