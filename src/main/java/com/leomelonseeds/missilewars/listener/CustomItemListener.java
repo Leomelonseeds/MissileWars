@@ -725,13 +725,12 @@ public class CustomItemListener implements Listener {
         BlockFace face = event.getHitBlockFace();
         Location location = event.getHitBlock().getRelative(face).getLocation();
 
-        if (location.getBlock().getType() != Material.AIR) {
-            return;
-        }
-
         double duration = Double.parseDouble(args[1]);
         int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
         if (lavasplash <= 0) {
+            if (location.getBlock().getType() != Material.AIR) {
+                return;
+            }
             location.getBlock().setType(Material.WATER);
             new BukkitRunnable() {
                 @Override
@@ -758,6 +757,9 @@ public class CustomItemListener implements Listener {
         
         // Spawn and then remove lavasplash after a while
         for (Location l : locations) {
+            if (l.getBlock().getType() != Material.AIR) {
+                continue;
+            }
             l.getBlock().setType(Material.LAVA);
             new BukkitRunnable() {
                 @Override

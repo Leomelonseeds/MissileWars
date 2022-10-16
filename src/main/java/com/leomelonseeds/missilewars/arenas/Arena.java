@@ -602,6 +602,7 @@ public class Arena implements ConfigurationSerializable {
             }
         } else {
             removePlayer(player.getUniqueId(), true);
+            return true;
         }
 
         checkEmpty();
