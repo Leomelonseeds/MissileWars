@@ -229,6 +229,21 @@ public class ArenaManager {
         }
         return null;
     }
+    
+    /**
+     * Get an arena by world
+     * 
+     * @param world
+     * @return
+     */
+    public Arena getArena(World world) {
+        for (Arena arena : loadedArenas) {
+            if (arena.getWorld().equals(world)) {
+                return arena;
+            }
+        }
+        return null;
+    }
 
     /**
      * Create the waiting lobby region for a specific team.

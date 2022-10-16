@@ -294,6 +294,20 @@ public class Arena implements ConfigurationSerializable {
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
     }
+    
+    /**
+     * Get all players that the arena thinks are participating
+     * as Player objects
+     * 
+     * @return
+     */
+    public Set<Player> getPlayers() {
+        Set<Player> result = new HashSet<>();
+        for (MissileWarsPlayer mwp : players) {
+            result.add(mwp.getMCPlayer());
+        }
+        return result;
+    }
 
     /**
      * Get a {@link MissileWarsPlayer} in this arena from a given UUID.
@@ -1326,7 +1340,6 @@ public class Arena implements ConfigurationSerializable {
     
     /** Remove Players from the map. */
     public void removePlayers() {
-        Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player

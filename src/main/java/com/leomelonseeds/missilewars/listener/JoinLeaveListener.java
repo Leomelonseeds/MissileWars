@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +12,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
@@ -40,9 +42,7 @@ public class JoinLeaveListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
     	Player player = event.getPlayer();
-    	if (!player.getWorld().getName().equals("world")) {
-    		return;
-    	}
+    	player.teleport(ConfigUtils.getSpawnLocation());
 
     	// Load player data, making sure for new players that it happens after an entry for them is created.
     	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
@@ -57,15 +57,57 @@ public class JoinLeaveListener implements Listener {
     public void onWorldChange(PlayerChangedWorldEvent event) {
 
     	Player player = event.getPlayer();
+    	World from = event.getFrom();
+    	World to = player.getWorld();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        
+        // Idk why this check is here but whatever
+        if (from.equals(to)) {
+            return;
+        }
 
-        if (event.getFrom().getName().contains("mwarena")) {
-	        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-	        Arena playerArena = manager.getArena(player.getUniqueId());
-	        if (playerArena == null || player.getWorld().equals(playerArena.getWorld())) {
-	            return;
-	        }
-            if (player.getWorld().getName().equals("world")) {
-                playerArena.removePlayer(player.getUniqueId(), true);
+        if (from.getName().contains("mwarena")) {
+            Arena fromArena = manager.getArena(from);
+            if (fromArena == null) {
+                return;
+            }
+            
+            // Arena to arena transfers
+            if (to.getName().contains("mwarena")) {
+    	        Arena toArena = manager.getArena(player.getUniqueId());
+    	        if (toArena == null) {
+    	            return;
+    	        }
+    	        
+    	        if (fromArena.getPlayers().contains(player)) {
+    	            fromArena.removePlayer(player.getUniqueId(), false);
+    	        }
+    	        
+    	        if (!toArena.getPlayers().contains(player)) {
+    	            toArena.joinPlayer(player);
+    	        }
+    	        return;
+            }
+            
+            // Arena to world transfer
+            if (to.getName().equals("world")) {
+                if (fromArena.getPlayers().contains(player)) {
+                    fromArena.removePlayer(player.getUniqueId(), true);
+                }
+                return;
+            }
+            return;
+        }
+        
+        // World to arena transfers
+        if (from.getName().equals("world") && to.getName().contains("mwarena")) {
+            Arena toArena = manager.getArena(player.getUniqueId());
+            if (toArena == null) {
+                return;
+            }
+            
+            if (!toArena.getPlayers().contains(player)) {
+                toArena.joinPlayer(player);
             }
         }
     }
