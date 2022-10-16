@@ -479,9 +479,16 @@ public class Arena implements ConfigurationSerializable {
 
         // Check for game start
         checkForStart();
-
+        
+        // Check for AFK
+        Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        if (ess.getUser(player).isAfk()) {
+            addSpectator(player.getUniqueId());
+            ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
+        }
+        
         // Auto-join team if setting turned on
-        if (!player.hasPermission("umw.disableautoteam") && running) {
+        else if (!player.hasPermission("umw.disableautoteam") && running) {
             if (getRedTeam().getSize() < getBlueTeam().getSize()) {
                 enqueueRed(player.getUniqueId());
             } else {
@@ -1332,8 +1339,7 @@ public class Arena implements ConfigurationSerializable {
                             (!arena.isRunning() && !arena.isResetting())) {
                         // Check for auto-set to spectate
                         boolean spectate = false;
-                        boolean afk = ess.getUser(player).isAfk();
-                        if ((spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating")) || afk) {
+                        if (spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating")) {
                             spectate = true;
                         }
                         
@@ -1344,9 +1350,6 @@ public class Arena implements ConfigurationSerializable {
                         // Auto-spectate checks
                         if (spectate) {
                             arena.addSpectator(player.getUniqueId());
-                            if (afk) {
-                                ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
-                            }
                         }
                         success = true;
                         break;
