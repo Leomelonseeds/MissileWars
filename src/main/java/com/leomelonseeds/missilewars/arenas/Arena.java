@@ -479,6 +479,15 @@ public class Arena implements ConfigurationSerializable {
 
         // Check for game start
         checkForStart();
+
+        // Auto-join team if setting turned on
+        if (!player.hasPermission("umw.disableautoteam") && running) {
+            if (getRedTeam().getSize() < getBlueTeam().getSize()) {
+                enqueueRed(player.getUniqueId());
+            } else {
+                enqueueBlue(player.getUniqueId());
+            }
+        }
         return true;
     }
     
@@ -486,6 +495,9 @@ public class Arena implements ConfigurationSerializable {
      * Checks if the game is ready to auto-start
      */
     public void checkForStart() {
+        if (running) {
+            return;
+        }
         int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
