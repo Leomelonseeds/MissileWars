@@ -36,6 +36,7 @@ public class JoinLeaveListener implements Listener {
         }
 
         playerArena.removePlayer(player.getUniqueId(), false);
+        player.teleport(ConfigUtils.getSpawnLocation());
     }
 
     /** Handle inventory loading on join */

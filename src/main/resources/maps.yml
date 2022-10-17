@@ -188,6 +188,38 @@ classic:
       x2: 23
       y2: 16
       z2: 65
+  formal:
+    name: "&fFormal"
+    file: "Formal.schem"
+    pos:
+      x: 0
+      y: 33
+      z: -63
+    blue-spawn:
+      x: 0.5
+      y: 34
+      z: -62.5
+    red-spawn:
+      x: 0.5
+      y: 17
+      z: 63.5
+    portals:
+      1: 
+        x: 4
+        y: 24
+        z: -72
+      2: 
+        x: -12
+        y: 12
+        z: -72
+      3: 
+        x: 10
+        y: 12
+        z: -72
+      4: 
+        x: 21
+        y: 12
+        z: -72
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"

@@ -209,6 +209,7 @@ titles:
   chaos-mode:
     title: "&0&o&lChaos mode"
     subtitle: "2x the items, 4x the fun"
+    length: 100
   video:
     title: "&aPlease,"
     subtitle: "&b↓ &fWatch the video in chat &b↓"
