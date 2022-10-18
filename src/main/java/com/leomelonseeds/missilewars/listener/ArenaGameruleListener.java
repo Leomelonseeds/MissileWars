@@ -631,7 +631,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (!arena.isResetting()) {
+        if (!(arena.isResetting() || arena.isWaitingForTie())) {
             return;
         }
         
@@ -640,17 +640,21 @@ public class ArenaGameruleListener implements Listener {
         }
         
         String message = ConfigUtils.toPlain(event.message());
-        if (!message.equalsIgnoreCase("gg")) {
-            return;
+        String[] possibleMessages = {"good game", "gg", "ggs"};
+        for (String s : possibleMessages) {
+            if (message.equalsIgnoreCase(s)) {
+                // Add 1 EXP to player
+                RankUtils.addExp(player, 1);
+                ConfigUtils.sendConfigMessage("messages.gg-exp", player, null, null);
+                saidGG.add(player);
+                
+                // Disallow giving xp for as long as victory wait time
+                long waitTime = MissileWarsPlugin.getPlugin().getConfig().getInt("victory-wait-time") * 20L;
+                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                    saidGG.remove(player);
+                }, waitTime);
+                return;
+            }
         }
-        
-        RankUtils.addExp(player, 1);
-        ConfigUtils.sendConfigMessage("messages.gg-exp", player, null, null);
-        saidGG.add(player);
-        
-        long waitTime = MissileWarsPlugin.getPlugin().getConfig().getInt("victory-wait-time") * 20L;
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            saidGG.remove(player);
-        }, waitTime);
     }
 }
