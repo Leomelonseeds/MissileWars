@@ -27,6 +27,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -263,18 +264,21 @@ public class SchematicManager {
         } else {
             spawnPos = getVector(schematicConfig, "pos", mapType, schematicName);
         }
+        
+        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                EditSession editSession = WorldEdit.getInstance().newEditSession((com.sk89q.worldedit.world.World) world);
-                @SuppressWarnings("resource")
-                Operation operation = new ClipboardHolder(clipboard)
-                        .createPaste(editSession)
-                        .to(BlockVector3.at(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()))
-                        .copyEntities(true)
-                        .build();
-                Operations.complete(operation);
+                try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                    @SuppressWarnings("resource")
+                    Operation operation = new ClipboardHolder(clipboard)
+                            .createPaste(editSession)
+                            .to(BlockVector3.at(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()))
+                            .copyEntities(true)
+                            .build();
+                    Operations.complete(operation);
+                }
                 if (callback != null) {
                     new BukkitRunnable() {
                         @Override
