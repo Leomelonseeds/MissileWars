@@ -36,6 +36,18 @@ public class MissileWarsCommand implements CommandExecutor {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ArenaManager arenaManager = plugin.getArenaManager();
         
+        // Reload all config files
+        if (action.equalsIgnoreCase("reload")) {
+            // Ensure player is allowed to reload
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            ConfigUtils.reloadConfigs();
+            sendSuccessMsg(sender, "Files reloaded.");
+        }
+        
         // A command specifically used to test passives/abilities
         if (action.equalsIgnoreCase("set")) {
             // Ensure player is allowed to create an arena

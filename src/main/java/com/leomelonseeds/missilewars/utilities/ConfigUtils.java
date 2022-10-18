@@ -57,6 +57,15 @@ public class ConfigUtils {
         configCache.put(configName, config);
         return config;
     }
+    
+    /**
+     * Reloads main config and clears cache of all configs.
+     * Does not reload the default.json
+     */
+    public static void reloadConfigs() {
+        MissileWarsPlugin.getPlugin().reloadConfig();
+        configCache.clear();
+    }
 
     /**
      * Set placeholders onto a message.
