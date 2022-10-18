@@ -25,12 +25,16 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 
 /** A class to handle loading/placing of NBT and WorldEdit schematics */
 public class SchematicManager {
@@ -263,8 +267,14 @@ public class SchematicManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                clipboard.paste(BukkitAdapter.adapt(world),
-                        Vector3.toBlockPoint(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()));
+                EditSession editSession = WorldEdit.getInstance().newEditSession((com.sk89q.worldedit.world.World) world);
+                @SuppressWarnings("resource")
+                Operation operation = new ClipboardHolder(clipboard)
+                        .createPaste(editSession)
+                        .to(BlockVector3.at(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()))
+                        .copyEntities(true)
+                        .build();
+                Operations.complete(operation);
                 if (callback != null) {
                     new BukkitRunnable() {
                         @Override

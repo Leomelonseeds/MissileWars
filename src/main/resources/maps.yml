@@ -136,9 +136,6 @@ classic:
   cubecrowd:
     name: "&fCube Crowd"
     file: "CubeCrowd.schem"
-  tesseract:
-    name: "&f4D Fiasco"
-    file: "Tesseract.schem"
   divider:
     name: "&fDivider"
     file: "Divider.schem"
@@ -221,6 +218,48 @@ classic:
         x: 21
         y: 12
         z: -72
+  swept:
+    name: "&fSwept"
+    file: "Swept.schem"
+    pos:
+      x: 0
+      y: 17
+      z: -63
+    blue-spawn:
+      x: 0.5
+      y: 17
+      z: -62.5
+    red-spawn:
+      x: 0.5
+      y: 17
+      z: 63.5
+    portals:
+      1: 
+        x: -15
+        y: 8
+        z: -92
+      2: 
+        x: 7
+        y: 9
+        z: -97
+      3: 
+        x: 25
+        y: 8
+        z: -92
+    blue-shield:
+      x1: -30
+      y1: -16
+      z1: -90
+      x2: 30
+      y2: 16
+      z2: -47
+    red-shield:
+      x1: -30
+      y1: -16
+      z1: 90
+      x2: 30
+      y2: 16
+      z2: 47
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"
