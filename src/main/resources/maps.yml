@@ -256,10 +256,10 @@ classic:
     red-shield:
       x1: -30
       y1: -16
-      z1: 90
+      z1: 47
       x2: 30
       y2: 16
-      z2: 47
+      z2: 90
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"
