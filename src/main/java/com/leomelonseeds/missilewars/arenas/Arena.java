@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -90,7 +92,7 @@ public class Arena implements ConfigurationSerializable {
     /** Whether the arena is currently resetting the world. */
     protected boolean resetting;
     /** The current number of votes for each map. */
-    protected Map<String, Integer> mapVotes;
+    protected SortedMap<String, Integer> mapVotes;
     /** Connect players and their votes. */
     protected Map<UUID, String> playerVotes;
     /** A task for if we are waiting for a game to auto-end */
@@ -161,7 +163,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public void setupMapVotes() {
         // Add maps in map type to voting pool
-        mapVotes = new HashMap<>();
+        mapVotes = new TreeMap<>();
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
         for (String mapName : mapConfig.getConfigurationSection(gamemode).getKeys(false)) {
             mapVotes.put(mapName, 0);
@@ -1053,7 +1055,7 @@ public class Arena implements ConfigurationSerializable {
         }
         Collections.shuffle(toAssign);
         double maxSize = getCapacity() / 2;
-        double maxQueue = Math.ceil((double) players.size() / 2);
+        double maxQueue = Math.ceil((double) (players.size() - spectators.size()) / 2);
         
         // Teleport all players to center to remove lobby minigame items/dismount
         for (MissileWarsPlayer player : players) {

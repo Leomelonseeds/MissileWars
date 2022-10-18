@@ -191,9 +191,10 @@ classic:
   formal:
     name: "&fFormal"
     file: "Formal.schem"
+    too-high: 37
     pos:
       x: 0
-      y: 33
+      y: 34
       z: -63
     blue-spawn:
       x: 0.5
@@ -201,7 +202,7 @@ classic:
       z: -62.5
     red-spawn:
       x: 0.5
-      y: 17
+      y: 34
       z: 63.5
     portals:
       1: 
