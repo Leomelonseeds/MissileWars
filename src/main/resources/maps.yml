@@ -120,6 +120,22 @@ classic:
         z: -72
     too-high: 25
     too-far: -45
+  light-smog:
+    name: "&fLight Smog"
+    file: "LightSmog.schem"
+    portals:
+      1: 
+        x: -12
+        y: 12
+        z: -72
+      2: 
+        x: 10
+        y: 12
+        z: -72
+      3: 
+        x: 21
+        y: 12
+        z: -72
   middle-ground:
     name: "&fMiddle Ground"
     file: "MiddleGround.schem"
