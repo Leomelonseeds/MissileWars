@@ -13,7 +13,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -188,30 +187,25 @@ public class MissileWarsTeam {
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
         }
         
-        // Sentinel priest
-        int priest = plugin.getJSON().getAbility(player.getMCPlayerId(), "priest");
-        if (priest > 0) {
+        // Sentinel warden
+        int warden = plugin.getJSON().getAbility(player.getMCPlayerId(), "warden");
+        if (warden > 0) {
             Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
-            int radius = (int) ConfigUtils.getAbilityStat("Sentinel.passive.priest", priest, "radius");
+            int amplifier = (int) ConfigUtils.getAbilityStat("Sentinel.passive.warden", warden, "amplifier");
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     String team = arena.getTeam(player.getMCPlayerId());
-                    if (!team.equals("no team")) {
-                        // For entities in radius, if it is player and in same team,
-                        // give that entity regeneration 1 for 1 second
-                        for (Entity e : mcPlayer.getNearbyEntities(radius, radius, radius)) {
-                            if (!(e instanceof Player)) {
-                                continue;
-                            }
-                            Player p = (Player) e;
-                            if (team.equals(arena.getTeam(p.getUniqueId()))) {
-                                p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, 0));
-                            }
-                        }
-                    } else {
+                    // Cancel if no team
+                    if (team.equals("no team")) {
                         this.cancel();
+                        return;
                     }
+                    // Don't allow if not in base
+                    if (ConfigUtils.inShield(arena, mcPlayer.getLocation(), team, 5)) {
+                        return;
+                    }
+                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amplifier));
                 }
             }.runTaskTimer(plugin, 10, 10);
         }

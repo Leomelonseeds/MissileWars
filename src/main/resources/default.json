@@ -10,10 +10,9 @@
 		"endercanopy": false,
 		"dragonsblessing": false,
 		"bunny": false,
-		"adrenaline": false,
 		"lavasplash": false,
 		"defaultpreset": {
-			"skillpoints": 6,
+			"skillpoints": 3,
 			"feather_falling": 0,
 			"sharpness": 2,
 			"fire_aspect": 0,
@@ -34,8 +33,8 @@
 				"level": 0
 			},
 			"passive": {
-				"selected": "None",
-				"level": 0
+				"selected": "adrenaline",
+				"level": 2
 			},
 			"gpassive": {
 				"selected": "None",
@@ -45,15 +44,13 @@
 	},
 	"Sentinel": {
 		"fire_protection": false,
-		"punch": false,
 		"sharpness": false,
 		"forksmash": false,
 		"fissionarrow": false,
 		"longshot": false,
-		"priest": false,
-		"retaliate": false,
+		"warden": false,
 		"defaultpreset": {
-			"skillpoints": 6,
+			"skillpoints": 2,
 			"fire_protection": 0,
 			"punch": 0,
 			"flame": 1,
@@ -75,8 +72,8 @@
 				"level": 0
 			},
 			"passive": {
-				"selected": "None",
-				"level": 0
+				"selected": "punch",
+				"level": 1
 			},
 			"gpassive": {
 				"selected": "None",
@@ -90,10 +87,9 @@
 		"quick_charge": false,
 		"missilesmith": false,
 		"hurl": false,
-		"boomlust": false,
 		"boosterball": false,
 		"defaultpreset": {
-			"skillpoints": 6,
+			"skillpoints": 3,
 			"blast_protection": 0,
 			"multishot": 0,
 			"quick_charge": 0,
@@ -115,8 +111,8 @@
 				"level": 0
 			},
 			"passive": {
-				"selected": "None",
-				"level": 0
+				"selected": "slownessarrows",
+				"level": 2
 			},
 			"gpassive": {
 				"selected": "None",
@@ -129,12 +125,11 @@
 		"efficiency": false,
 		"projectile_protection": false,
 		"utilitymaster": false,
-		"prickly": false,
 		"naturesblessing": false,
 		"repairman": false,
 		"deconstructor": false,
 		"defaultpreset": {
-			"skillpoints": 7,
+			"skillpoints": 4,
 			"projectile_protection": 0,
 			"sharpness": 2,
 			"efficiency": 0,
@@ -156,8 +151,8 @@
 				"level": 0
 			},
 			"passive": {
-				"selected": "None",
-				"level": 0
+				"selected": "prickly",
+				"level": 2
 			},
 			"gpassive": {
 				"selected": "None",

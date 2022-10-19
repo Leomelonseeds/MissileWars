@@ -1050,22 +1050,6 @@ Vanguard:
         level: 2
         spcost: 2
   passive:
-    bunny:
-      name: "&eBunny"
-      lore:
-      - ""
-      - "&7Recieve permanent Jump Boost with"
-      - "&7amplifier %amplifier%"
-      cost: 600
-      1:
-        spcost: 1
-        amplifier: 0
-      2:
-        spcost: 2
-        amplifier: 1
-      3:
-        spcost: 3
-        amplifier: 2
     adrenaline:
       name: "&eAdrenaline"
       lore:
@@ -1081,6 +1065,22 @@ Vanguard:
         amplifier: 1
       3:
         spcost: 2
+        amplifier: 2
+    bunny:
+      name: "&eBunny"
+      lore:
+      - ""
+      - "&7Recieve permanent Jump Boost with"
+      - "&7amplifier %amplifier%"
+      cost: 600
+      1:
+        spcost: 1
+        amplifier: 0
+      2:
+        spcost: 2
+        amplifier: 1
+      3:
+        spcost: 3
         amplifier: 2
     lavasplash:
       name: "&eLava Splash"
@@ -1116,11 +1116,6 @@ Sentinel:
       1:
         level: 1
         spcost: 1
-    punch:
-      cost: 1500
-      1: 
-        level: 1
-        spcost: 2
     sharpness:
       cost: 400
       1: 
@@ -1141,17 +1136,23 @@ Sentinel:
         level: 4
         spcost: 1
   passive:
+    punch:
+      name: "&ePunch"
+      lore:
+      - ""
+      - "&7Adds Punch I to your bow."
+      1:
+        spcost: 4
     longshot:
       name: "&eLongshot"
       lore:
       - ""
       - "&7Your arrows now favor long-range shots."
-      - "&7Arrows travelling more than 20m will do"
-      - "&7an &aadditional %plus% &7damage per block, up"
-      - "&7to a maximum of %max% &7extra damage. However,"
-      - "&7arrows will also do %minus% &cless &7damage"
-      - "&7per block less than 20m."
-      cost: 1000
+      - "&7Arrows travelling more than %cutoff%m &7will do"
+      - "&7an additional %plus% &7damage per block, up"
+      - "&7to a maximum of %max% &7extra damage."
+      cost: 1500
+      cutoff: 20
       1:
         spcost: 1
         plus: 0.05
@@ -1160,38 +1161,27 @@ Sentinel:
       2:
         spcost: 2
         plus: 0.10
-        minus: 0.4
         max: 8
       3:
         spcost: 2
         plus: 0.15
-        minus: 0.6
         max: 12
-    priest:
-      name: "&ePriest"
+    warden:
+      name: "&eGuard"
       lore:
       - ""
-      - "&7Teammates within %radius% &7blocks of you"
-      - "&7recieve regeneration I."
-      cost: 600
+      - "&7Receive Strength with amplifier %amplifier%"
+      - "&7while within your base."
+      cost: 900
       1:
-        spcost: 2
-        radius: 5
+        spcost: 1
+        amplifier: 2
       2:
-        spcost: 1
-        radius: 10
+        spcost: 2
+        amplifier: 3
       3:
-        spcost: 1
-        radius: 15
-    retaliate:
-      name: "&eRetaliate"
-      lore:
-      - ""
-      - "&7Always recieve a utility as the next item"
-      - "&7after dying to an enemy player."
-      cost: 750
-      1:
-        spcost: 4
+        spcost: 2
+        amplifier: 4
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1237,6 +1227,25 @@ Berserker:
         level: 6
         spcost: 2
   passive:
+    slownessarrows:
+      name: "&eSlowness Arrows"
+      lore:
+      - ""
+      - "&7Instead of normal arrows, recieve arrows"
+      - "&7of slowness with amplifier of %amplifier%"
+      - "&7and duration of %duration% &7seconds."
+      1:
+        spcost: 1
+        amplifier: 0
+        duration: 1
+      2:
+        spcost: 2
+        amplifier: 0
+        duration: 3
+      3:
+        spcost: 2
+        amplifier: 1
+        duration: 3
     boosterball:
       name: "&eBoosterball"
       lore:
@@ -1255,17 +1264,6 @@ Berserker:
       3:
         spcost: 1
         multiplier: 2.5
-    boomlust:
-      name: "&eBoomlust"
-      lore:
-      - ""
-      - "&7Always recieve a missile as the next item"
-      - "&7after killing an enemy player. However,"
-      - "&7you will no longer naturally regenerate"
-      - "&7health until you die."
-      cost: 900
-      1:
-        spcost: 5
     missilesmith:
       name: "&eMissilesmith"
       lore:
@@ -1325,6 +1323,25 @@ Architect:
         level: 6
         spcost: 2
   passive:
+    prickly:
+      name: "&ePrickly Projectiles"
+      lore:
+      - ""
+      - "&7Projectile utilities now do knockback"
+      - "&7enemy players instead of going through"
+      - "&7them. each successful hit grants another"
+      - "&7of the same projectile item. Knockback"
+      - "&7is multiplied by the level of the utility,"
+      - "&7up to %multiplier%x."
+      1:
+        spcost: 1
+        multiplier: 1
+      2:
+        spcost: 2
+        multiplier: 2
+      3:
+        spcost: 2
+        multiplier: 3
     naturesblessing:
       name: "&eNature's Blessing"
       lore:
@@ -1340,21 +1357,6 @@ Architect:
       3: 
         multiplier: 4
         spcost: 2
-    prickly:
-      name: "&ePrickly Projectiles"
-      lore:
-      - ""
-      - "&7Projectile utilities now do knockback"
-      - "&7enemy players instead of going through"
-      - "&7them. The knockback is multiplied by"
-      - "&7the level of the utility. At level 2,"
-      - "&7each successful hit grants another of"
-      - "&7the same projectile item."
-      cost: 1000
-      1:
-        spcost: 2
-      2:
-        spcost: 3
     repairman:
       name: "&eRepairman"
       lore:

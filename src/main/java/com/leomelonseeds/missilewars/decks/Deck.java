@@ -168,18 +168,6 @@ public class Deck {
             }
         }
         
-        // Check sentinel retaliate
-        if (mwplayer.getRetaliate()) {
-            toUse = utilityPool;
-            mwplayer.setRetaliate(false);
-        }
-        
-        // Check berserker boomlust
-        if (mwplayer.getBoomLust()) {
-            toUse = missilePool;
-            mwplayer.setBoomLust(false);
-        }
-        
         // Set poolitem, and restock if empty
         ItemStack poolItem = new ItemStack(toUse.remove(rand.nextInt(toUse.size())));
         if (toUse.isEmpty()) {
