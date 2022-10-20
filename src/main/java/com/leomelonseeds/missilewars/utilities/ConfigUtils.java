@@ -329,9 +329,8 @@ public class ConfigUtils {
         }
     }
     
-    
     /**
-     * Check if given location is in given arena with given team
+     * inShield with no biases
      * 
      * @param arena
      * @param location
@@ -339,6 +338,20 @@ public class ConfigUtils {
      * @return
      */
     public static boolean inShield(Arena arena, Location location, String team) {
+        return inShield(arena, location, team, 0);
+    }
+    
+    
+    /**
+     * Check if given location is in given arena with given team
+     * 
+     * @param arena
+     * @param location
+     * @param team
+     * @param bias Number of blocks on all directions of shield that are also counted
+     * @return
+     */
+    public static boolean inShield(Arena arena, Location location, String team, int bias) {
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
@@ -349,13 +362,10 @@ public class ConfigUtils {
         int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
         int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
         int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
-        if (x1 <= x && x <= x2 && y1 <= y && y <= y2) {
-            if (teamName.equals("red") && z1 <= z) {
-                return true;
-            }
-            if (teamName.equals("blue") && z <= z2) {
-                return true;
-            }
+        if (x1 - bias <= x && x <= x2 + bias && 
+            y1 - bias <= y && y <= y2 + bias &&
+            z1 - bias <= z && z <= z2 + bias) {
+            return true;
         }
         return false;
     }

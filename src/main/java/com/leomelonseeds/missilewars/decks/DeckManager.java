@@ -100,6 +100,15 @@ public class DeckManager {
                 pmeta.setColor(Color.ORANGE);
                 u.setItemMeta(pmeta);
             }
+            // Give slowness arrows in case of berserker
+            int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
+            if (u.getType() == Material.ARROW && slowarrow > 0) {
+                int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
+                int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
+                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
+                pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
+                u.setItemMeta(pmeta);
+            }
             utility.set(itemsConfig.getInt(key + ".index"), u);
         }
         
@@ -131,7 +140,9 @@ public class DeckManager {
         {
             addEnch(weapon, "sharpness", deck, json);
             addEnch(weapon, "flame", deck, json);
-            addEnch(weapon, "punch", deck, json);
+            if (plugin.getJSON().getAbility(uuid, "punch") > 0) {
+                weapon.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+            }
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
             addEnch(boots, "fire_protection", deck, json);
             gear.add(boots);
@@ -407,14 +418,12 @@ public class DeckManager {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
-            itemMeta = pmeta;
         } else if (name.equals("lingering_harming")) {
             int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
             int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
             pmeta.setColor(Color.PURPLE);
-            itemMeta = pmeta;
         } 
         item.setItemMeta(itemMeta);
         return item;

@@ -374,7 +374,7 @@ public class CustomItemListener implements Listener {
         if (naturesblessing > 0) {
             durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
         } else if (repairman > 0) {
-            if (ConfigUtils.inShield(playerArena, loc, team)) {
+            if (ConfigUtils.inShield(playerArena, loc, team, 5)) {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {

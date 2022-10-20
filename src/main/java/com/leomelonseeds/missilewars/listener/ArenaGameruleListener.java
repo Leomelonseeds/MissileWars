@@ -29,8 +29,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -81,33 +79,6 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
     }
-    
-    // Handle player regen in boomlust
-    @EventHandler
-    public void onRegen(EntityRegainHealthEvent event) {
-        
-        if (event.getRegainReason() != RegainReason.SATIATED) { 
-            return; 
-        }
-        
-        //Check if entity is player
-        if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
-        
-        // Check if player was killed in an Arena
-        Player player = (Player) event.getEntity();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
-            return;
-        }
-        
-        // True means boomlust is active and player cannot regen
-        if (playerArena.getPlayerInArena(player.getUniqueId()).getBoomLustRegen()) {
-            event.setCancelled(true);
-        }
-    }
 
     /** Handle player deaths. */
     @EventHandler
@@ -120,6 +91,10 @@ public class ArenaGameruleListener implements Listener {
         	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation(), true);
             return;
         }
+        
+        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
 
         // Find killer and increment kills
         if (player.getKiller() != null) {
@@ -127,17 +102,6 @@ public class ArenaGameruleListener implements Listener {
             if (!player.getKiller().equals(player)) {
                 killer.incrementKills();
                 ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
-                
-                // Berserker boomlust
-                if (MissileWarsPlugin.getPlugin().getJSON().getAbility(killer.getMCPlayerId(), "boomlust") > 0) {
-                    playerArena.getPlayerInArena(killer.getMCPlayerId()).setBoomLust(true);
-                    playerArena.getPlayerInArena(killer.getMCPlayerId()).setBoomLustRegen(true);
-                }
-                
-                // Sentinel retaliate
-                if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "retaliate") > 0) {
-                    playerArena.getPlayerInArena(player.getUniqueId()).setRetaliate(true);
-                }
             }
         }
 
@@ -210,9 +174,6 @@ public class ArenaGameruleListener implements Listener {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
         }
-        
-        // Reset boomlust
-        playerArena.getPlayerInArena(player.getUniqueId()).setBoomLustRegen(false);
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();
@@ -308,24 +269,17 @@ public class ArenaGameruleListener implements Listener {
                     if (bowShots.containsKey(damager)) {
                         int longshot = plugin.getJSON().getAbility(damager.getUniqueId(), "longshot");
                         double plus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
-                        double minus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "minus");
                         double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
                         double dmg = event.getDamage();
                         double distance = bowShots.get(damager).distance(player.getLocation());
-                        double cutoff = 20;
+                        double cutoff = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "cutoff");
                         
                         // Calculate damage
                         if (distance >= cutoff) {
                             double extradistance = distance - cutoff;
                             double extradmg = Math.min(extradistance * plus, max);
                             event.setDamage(dmg + extradmg);
-                        } else {
-                            double shortdistance = cutoff - distance;
-                            double shortdmg = shortdistance * minus;
-                            event.setDamage(Math.max(dmg - shortdmg, 1));
                         }
-
-                        plugin.log("Longshot: " + plus + " " + minus + " " + max + " " + dmg + " " + distance + " " + event.getDamage());
                     }
 
                     // Arrowhealth message
@@ -356,6 +310,7 @@ public class ArenaGameruleListener implements Listener {
 
                     ThrowableProjectile proj = (ThrowableProjectile) projectile;
                     ItemStack item = proj.getItem();
+                    int maxmultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.prickly", prickly, "multiplier");
                     
                     // Make sure its custom item
                     if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
@@ -367,7 +322,7 @@ public class ArenaGameruleListener implements Listener {
                     String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
                             "item-structure"), PersistentDataType.STRING);
                     String[] args = itemString.split("-");
-                    int multiplier = Integer.parseInt(args[1]);
+                    int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
                     
                     // Set custom damage and knockback
                     event.setDamage(0.0001);
@@ -379,10 +334,8 @@ public class ArenaGameruleListener implements Listener {
                         player.setVelocity(new Vector(velx, vely, velz));
                     }, 1);
                     
-                    // Give item back if level is 1
-                    if (prickly > 1) {
-                        damager.getInventory().addItem(item);
-                    }
+                    // Give item back on successful hit
+                    damager.getInventory().addItem(item);
                 }
             }
         }
