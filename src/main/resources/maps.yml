@@ -152,6 +152,49 @@ classic:
   cubecrowd:
     name: "&fCube Crowd"
     file: "CubeCrowd.schem"
+    pos:
+      x: 0
+      y: 14
+      z: 0
+    blue-spawn:
+      x: 0.5
+      y: 18
+      z: -63.5
+    red-spawn:
+      x: 0.5
+      y: 18
+      z: 64.5
+    blue-shield:
+      x1: -25
+      x2: 25
+    red-shield:
+      x1: -25
+      x2: 25
+    portals:
+      1:
+        x: -11
+        y: 13
+        z: -71
+      2:
+        x: 9
+        y: 13
+        z: -71
+      3:
+        x: 21
+        y: 13
+        z: -71
+      4:
+        x: -11
+        y: 1
+        z: -71
+      5:
+        x: 9
+        y: 1
+        z: -71
+      6:
+        x: 21
+        y: 1
+        z: -71
   divider:
     name: "&fDivider"
     file: "Divider.schem"
