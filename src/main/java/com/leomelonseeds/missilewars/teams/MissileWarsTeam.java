@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +52,8 @@ public class MissileWarsTeam {
     private Map<Location, Boolean> portals;
     /** The number of shield blocks broken. */
     private int shieldBlocksBroken;
+    /** The number of shield blocks in total */
+    private int shieldVolume;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -64,6 +68,40 @@ public class MissileWarsTeam {
         this.portals = new HashMap<>();
         this.spawn = spawn;
         this.arena = arena;
+        this.shieldBlocksBroken = 0;
+        
+        // Temp value while async calculations run
+        shieldVolume = 23850;
+        
+        // Calculate total shield blocks async
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+            // Ignore if arena not running
+            if (arena == null || !(arena.isRunning() || arena.isResetting())) {
+                shieldVolume = 1;
+            }
+
+            // Get locations
+            String teamName = ChatColor.stripColor(name).toLowerCase();
+            int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
+            int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
+            int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
+            int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
+            int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
+            int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
+            
+            // Calculate volume by adding up all non-air locations
+            for (int x = x1; x <= x2; x++) {
+                for (int y = y1; y <= y2; y++) {
+                    for (int z = z1; z <= z2; z++) {
+                        Location l = new Location(arena.getWorld(), x, y, z);
+                        Block b = l.getBlock();
+                        if (b.getType() != Material.AIR) {
+                            shieldVolume++;
+                        }
+                    }
+                }
+            }
+        });
     }
     
     public Map<Location, Boolean> getPortals() {
@@ -394,20 +432,7 @@ public class MissileWarsTeam {
      * @return the shield volume for this team in the current map
      */
     public int getShieldVolume() {
-        // Ignore if arena not running
-        if (arena == null || !(arena.isRunning() || arena.isResetting())) {
-            return 1;
-        }
-
-        // Calculate volume
-        String teamName = ChatColor.stripColor(name).toLowerCase();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
-        return (x2 - x1) * (y2 - y1) * (z2 - z1);
+        return shieldVolume;
     }
 
     /**
@@ -416,7 +441,7 @@ public class MissileWarsTeam {
      * @return the shield health as a percentage
      */
     public double getShieldHealth() {
-        int totalBlocks = getShieldVolume();
+        int totalBlocks = shieldVolume;
         return 100 * ((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
     }
 
