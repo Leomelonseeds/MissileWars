@@ -92,6 +92,10 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
+        Component deathMessage = event.deathMessage();
+        event.deathMessage(Component.text(""));
+        
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }
@@ -105,17 +109,11 @@ public class ArenaGameruleListener implements Listener {
             }
         }
 
-        Component deathMessage = event.deathMessage();
-        event.deathMessage(Component.text(""));
-        String team = playerArena.getTeam(player.getUniqueId());
-
         // Count death if player is on a team
-        if (!team.equals("no team")) {
-            MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
-            missileWarsPlayer.incrementDeaths();
-            for (Player p : player.getWorld().getPlayers()) {
-                p.sendMessage(deathMessage);
-            }
+        MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
+        missileWarsPlayer.incrementDeaths();
+        for (Player p : player.getWorld().getPlayers()) {
+            p.sendMessage(deathMessage);
         }
 
         // Un-obstruct spawns
@@ -125,19 +123,15 @@ public class ArenaGameruleListener implements Listener {
         Location spawn4 = spawn1.clone().add(-1, 0, 0);
         Location spawn5 = spawn1.clone().add(0, 0, 1);
         Location spawn6 = spawn1.clone().add(0, 0, -1);
-        if (team.contains("red")) {
-            spawn5 = spawn1.clone().add(0, 0, -1);
-        } else if (team.contains("blue")) {
-            spawn5 = spawn1.clone().add(0, 0, 1);
+        for (Location l : new Location[] {spawn1, spawn2}) {
+            l.getBlock().setType(Material.AIR);
         }
-        for (Location l : new Location[] {spawn1, spawn2, spawn3, spawn4, spawn5, spawn6}) {
+        for (Location l : new Location[] {spawn3, spawn4, spawn5, spawn6}) {
             Block b = l.getBlock();
             if (b.getType() == Material.WATER || b.getType() == Material.LAVA) {
                 b.setType(Material.AIR);
             }
         }
-        
-        player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
     }
 
     /** Handles haste giving on death */
