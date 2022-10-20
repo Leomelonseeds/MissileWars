@@ -225,9 +225,7 @@ public class ArenaInventoryListener implements Listener {
             int maxlevel = plugin.getDeckManager().getMaxLevel(name);
             
             if (level < plugin.getDeckManager().getMaxLevel(name)) {
-                event.setCancelled(true);
-                event.getItem().remove();
-                player.getInventory().addItem(plugin.getDeckManager().createItem(name, maxlevel, true));
+                event.getItem().setItemStack(plugin.getDeckManager().createItem(name, maxlevel, true));
             }
         }
     }
@@ -243,8 +241,8 @@ public class ArenaInventoryListener implements Listener {
         if (arena == null) {
             return;
         }
-        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         Deck deck = mwPlayer.getDeck();
         
         if (deck == null) {
@@ -254,6 +252,17 @@ public class ArenaInventoryListener implements Listener {
         // Stop decks without bows to pick up arrows
         if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
             event.setCancelled(true);
+            return;
+        }
+        
+        // Check slowness arrow pickups
+        ItemStack pickedUp = event.getItem().getItemStack();
+        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "slownessarrows") > 0 &&
+                pickedUp.getType() == Material.TIPPED_ARROW) {
+            int index = ConfigUtils.getConfigFile("items.yml").getInt("arrows.index");
+            ItemStack tippedArrow = new ItemStack(deck.getUtility().get(index));
+            tippedArrow.setAmount(pickedUp.getAmount());
+            event.getItem().setItemStack(tippedArrow);
         }
     }
 

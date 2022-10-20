@@ -34,8 +34,12 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 
 /** A class to handle loading/placing of NBT and WorldEdit schematics */
 public class SchematicManager {
@@ -255,6 +259,7 @@ public class SchematicManager {
             e.printStackTrace();
             return false;
         }
+        
 
         // Paste WE clipboard
         Vector spawnPos;
@@ -276,8 +281,20 @@ public class SchematicManager {
                             .createPaste(editSession)
                             .to(BlockVector3.at(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()))
                             .copyEntities(true)
+                            .ignoreAirBlocks(true)
                             .build();
                     Operations.complete(operation);
+                    
+                    // LightSmog epic random TNT
+                    if (schematicName.equals("light-smog")) {
+                        Region region = new CuboidRegion(weWorld, BlockVector3.at(34, -16, -21), BlockVector3.at(-34, 32, 21));
+                        BlockState tnt = BukkitAdapter.adapt(Material.TNT.createBlockData());
+                        BlockState blackStainedGlass = BukkitAdapter.adapt(Material.BLACK_STAINED_GLASS.createBlockData());
+                        RandomPattern pattern = new RandomPattern();
+                        pattern.add(tnt, 0.5);
+                        pattern.add(blackStainedGlass, 99.5);
+                        editSession.setBlocks(region, pattern);
+                    }
                 }
                 if (callback != null) {
                     new BukkitRunnable() {

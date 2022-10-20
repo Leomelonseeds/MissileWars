@@ -1348,7 +1348,7 @@ public class Arena implements ConfigurationSerializable {
                 public void run() {
                     resetWorld();
                 }
-            }.runTaskLater(plugin, waitTime + 60L);
+            }.runTaskLater(plugin, waitTime + 100L);
         } else {
             removePlayers();
             resetWorld();
