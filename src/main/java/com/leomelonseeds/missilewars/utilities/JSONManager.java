@@ -139,7 +139,8 @@ public class JSONManager {
                             for (String s : new String[] {"passive", "ability"}) {
                                 int level = currentpreset.getJSONObject(s).getInt("level");
                                 String ability = currentpreset.getJSONObject(s).getString("selected");
-                                Set<String> abilities = itemConfig.getConfigurationSection(deck + "." + s).getKeys(false);
+                                // Change ".passive" to "." + s when abilities come out
+                                Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
                                 if (level > 0 && !abilities.contains(ability)) {
                                     currentpreset.getJSONObject(s).put("selected", "None");
                                     currentpreset.getJSONObject(s).put("level", 0);
