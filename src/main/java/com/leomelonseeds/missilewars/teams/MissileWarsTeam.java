@@ -225,6 +225,13 @@ public class MissileWarsTeam {
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
         }
         
+        // Vanguard adrenaline
+        int adrenaline = plugin.getJSON().getAbility(player.getMCPlayerId(), "adrenaline");
+        if (adrenaline > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, level));
+        }
+        
         // Sentinel warden
         int warden = plugin.getJSON().getAbility(player.getMCPlayerId(), "warden");
         if (warden > 0) {
