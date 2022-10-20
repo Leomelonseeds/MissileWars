@@ -439,14 +439,25 @@ public class Arena implements ConfigurationSerializable {
     public int getCapacity() {
         return capacity;
     }
+    
+    /**
+     * Join a player without setting them to spectator mode
+     * 
+     * @param player
+     * @return
+     */
+    public boolean joinPlayer(Player player) {
+        return joinPlayer(player, false);
+    }
 
     /**
      * Attempt to add a player to the Arena.
      *
      * @param player the player
+     * @param asSpectator whether the player should be set to spectator mode
      * @return true if the player joined the Arena, otherwise false
      */
-    public boolean joinPlayer(Player player) {
+    public boolean joinPlayer(Player player, boolean asSpectator) {
 
         // Ensure world isn't resetting
         if (resetting) {
@@ -492,15 +503,17 @@ public class Arena implements ConfigurationSerializable {
         for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
         }
-
-        // Check for game start
-        checkForStart();
         
         // Check for AFK
         Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         if (ess.getUser(player).isAfk()) {
             addSpectator(player.getUniqueId());
             ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
+        }
+        
+        // Auto spectate if asSpectator
+        else if (asSpectator) {
+            addSpectator(player.getUniqueId());
         }
         
         // Auto-join team if setting turned on
@@ -511,6 +524,9 @@ public class Arena implements ConfigurationSerializable {
                 enqueueBlue(player.getUniqueId());
             }
         }
+
+        // Check for game start
+        checkForStart();
         return true;
     }
     
@@ -1352,21 +1368,9 @@ public class Arena implements ConfigurationSerializable {
                 for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
-                        // Check for auto-set to spectate
-                        boolean spectate = false;
-                        if (spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating")) {
-                            spectate = true;
-                        }
-                        
                         // Switch player arenas
                         removePlayer(player.getUniqueId(), false);
-                        arena.joinPlayer(player);
-                        
-                        // Auto-spectate checks
-                        if (spectate) {
-                            arena.addSpectator(player.getUniqueId());
-                        }
-                        success = true;
+                        arena.joinPlayer(player, spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating"));
                         break;
                     }
                 }
