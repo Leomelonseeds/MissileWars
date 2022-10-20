@@ -1156,16 +1156,15 @@ Sentinel:
       1:
         spcost: 1
         plus: 0.05
-        minus: 0.2
-        max: 4
+        max: 2
       2:
         spcost: 2
         plus: 0.10
-        max: 8
+        max: 4
       3:
         spcost: 2
         plus: 0.15
-        max: 12
+        max: 6
     warden:
       name: "&eWarden"
       lore:
@@ -1175,13 +1174,13 @@ Sentinel:
       cost: 900
       1:
         spcost: 1
-        amplifier: 1
+        amplifier: 0
       2:
         spcost: 2
-        amplifier: 2
+        amplifier: 1
       3:
         spcost: 2
-        amplifier: 3
+        amplifier: 2
 Berserker:
   weapon:
     item: CROSSBOW
