@@ -106,6 +106,7 @@ messages:
   afk-removal: "&7%umw_focus% &7was removed from the arena for being AFK."
   afk-spectator: "&a&l[!] &7Since you were AFK, you have been automatically set to spectate."
   gg-exp: "&d+1 EXP"
+  start-failed: "&c&l[!] &cThe game failed to start! Please contact an admin."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
