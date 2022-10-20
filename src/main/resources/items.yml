@@ -1167,7 +1167,7 @@ Sentinel:
         plus: 0.15
         max: 12
     warden:
-      name: "&eGuard"
+      name: "&eWarden"
       lore:
       - ""
       - "&7Receive Strength with amplifier %amplifier%"
@@ -1175,13 +1175,13 @@ Sentinel:
       cost: 900
       1:
         spcost: 1
-        amplifier: 2
+        amplifier: 1
       2:
         spcost: 2
-        amplifier: 3
+        amplifier: 2
       3:
         spcost: 2
-        amplifier: 4
+        amplifier: 3
 Berserker:
   weapon:
     item: CROSSBOW

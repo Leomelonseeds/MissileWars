@@ -205,6 +205,10 @@ classic:
     name: "&fFormal"
     file: "Formal.schem"
     too-high: 37
+    blue-shield:
+      y2: 34
+    red-shield:
+      y2: 34
     pos:
       x: 0
       y: 34

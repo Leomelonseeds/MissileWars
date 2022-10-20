@@ -240,7 +240,7 @@ public class MissileWarsTeam {
                         return;
                     }
                     // Don't allow if not in base
-                    if (ConfigUtils.inShield(arena, mcPlayer.getLocation(), team, 5)) {
+                    if (!ConfigUtils.inShield(arena, mcPlayer.getLocation(), team, 5)) {
                         return;
                     }
                     mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amplifier));
