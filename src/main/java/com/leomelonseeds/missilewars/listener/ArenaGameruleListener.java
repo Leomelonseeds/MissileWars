@@ -123,15 +123,17 @@ public class ArenaGameruleListener implements Listener {
         Location spawn2 = spawn1.clone().add(0, 1, 0);
         Location spawn3 = spawn1.clone().add(1, 0, 0);
         Location spawn4 = spawn1.clone().add(-1, 0, 0);
-        Location spawn5 = spawn1;
+        Location spawn5 = spawn1.clone().add(0, 0, 1);
+        Location spawn6 = spawn1.clone().add(0, 0, -1);
         if (team.contains("red")) {
             spawn5 = spawn1.clone().add(0, 0, -1);
         } else if (team.contains("blue")) {
             spawn5 = spawn1.clone().add(0, 0, 1);
         }
-        for (Location l : new Location[] {spawn1, spawn2, spawn3, spawn4, spawn5}) {
-            if (l.getBlock().getType() != Material.AIR) {
-                l.getBlock().setType(Material.AIR);
+        for (Location l : new Location[] {spawn1, spawn2, spawn3, spawn4, spawn5, spawn6}) {
+            Block b = l.getBlock();
+            if (b.getType() == Material.WATER || b.getType() == Material.LAVA) {
+                b.setType(Material.AIR);
             }
         }
         
