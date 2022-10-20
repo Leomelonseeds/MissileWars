@@ -5,7 +5,7 @@ messages:
   prefix: "&7"
   join-arena: "Joining %umw_arena%..."
   arena-full: "&cYou cannot join this arena!"
-  joined-arena: "&a&l[!] &7Welcome! Use &c/red &7or &9/blue &7to join a team, &8/spectate &7to spectate, and &a/lobby &7to return to main lobby."
+  joined-arena: "&a&l[!] &7Welcome! Use &c/red &7or &9/blue &7to join a team, &8/spectate &7to spectate, and &a/leave &7to return to main lobby."
   joined-arena-ranked: "&a&l[!] &7You are in a &branked &7lobby. When the game starts, the &branked &7preset of your selected deck will be used."
   joined-arena-others: "%umw_focus% &7joined the arena."
   joined-arena-lobby: "%umw_focus% &7joined arena &a%umw_arena%"
