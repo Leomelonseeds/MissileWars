@@ -245,11 +245,6 @@ public class CustomItemListener implements Listener {
             
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
-                int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
-                if (adrenaline > 0) {
-                    int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, level));
-                }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 // 0.5s cooldown
                 cooldown.add(player);
