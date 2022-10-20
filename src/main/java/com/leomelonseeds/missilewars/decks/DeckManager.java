@@ -105,6 +105,7 @@ public class DeckManager {
             if (u.getType() == Material.ARROW && slowarrow > 0) {
                 int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
                 int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
+                u.setType(Material.TIPPED_ARROW);
                 PotionMeta pmeta = (PotionMeta) u.getItemMeta();
                 pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
                 u.setItemMeta(pmeta);
