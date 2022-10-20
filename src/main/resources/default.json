@@ -52,7 +52,6 @@
 		"defaultpreset": {
 			"skillpoints": 2,
 			"fire_protection": 0,
-			"punch": 0,
 			"flame": 1,
 			"sharpness": 0,
 			"utility": {
