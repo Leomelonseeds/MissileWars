@@ -245,11 +245,6 @@ public class CustomItemListener implements Listener {
             
             if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
                 hand.setAmount(hand.getAmount() - 1);
-                int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
-                if (adrenaline > 0) {
-                    int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, level));
-                }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 // 0.5s cooldown
                 cooldown.add(player);
@@ -613,7 +608,7 @@ public class CustomItemListener implements Listener {
     }
 
     /** Handle spawning of utility structures */
-    public void spawnUtility(String structureName, Location spawnLoc, Player thrower, Projectile thrown, Arena playerArena) {
+    public void spawnUtility(String structureName, Location spawnLoc, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
         String mapName = "default-map";
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
@@ -633,6 +628,16 @@ public class CustomItemListener implements Listener {
             } 
             for (Player players : thrower.getWorld().getPlayers()) {
                 ConfigUtils.sendConfigSound(sound, players, spawnLoc);
+            }
+            // Repairman
+            int repairman = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "repairman");
+            if (repairman > 0) {
+                double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
+                Random random = new Random();
+                if (random.nextDouble() < percentage) {
+                    ItemStack item = thrown.getItem();
+                    thrower.getInventory().addItem(item);
+                }
             }
         } else {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);

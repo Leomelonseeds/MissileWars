@@ -1054,9 +1054,8 @@ Vanguard:
       name: "&eAdrenaline"
       lore:
       - ""
-      - "&7Recieve Speed with amplifier %amplifier% &7for"
-      - "&73 seconds after spawning a missile."
-      cost: 800
+      - "&7Recieve permanent Speed with"
+      - "&7amplifier %amplifier%&7."
       1:
         spcost: 1
         amplifier: 0
@@ -1064,7 +1063,7 @@ Vanguard:
         spcost: 2
         amplifier: 1
       3:
-        spcost: 2
+        spcost: 3
         amplifier: 2
     bunny:
       name: "&eBunny"
@@ -1072,7 +1071,7 @@ Vanguard:
       - ""
       - "&7Recieve permanent Jump Boost with"
       - "&7amplifier %amplifier%"
-      cost: 600
+      cost: 1500
       1:
         spcost: 1
         amplifier: 0
@@ -1171,16 +1170,13 @@ Sentinel:
       - ""
       - "&7Receive Strength with amplifier %amplifier%"
       - "&7while within your base."
-      cost: 900
+      cost: 1000
       1:
-        spcost: 1
+        spcost: 2
         amplifier: 0
       2:
-        spcost: 2
+        spcost: 3
         amplifier: 1
-      3:
-        spcost: 2
-        amplifier: 2
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1360,12 +1356,11 @@ Architect:
       name: "&eRepairman"
       lore:
       - ""
-      - "&7Placing leaves within your base has a"
-      - "&7%percentage%% &7chance of not consuming"
-      - "&7them from your inventory. Additionally,"
-      - "&7instead of decaying, leaves placed within"
-      - "&7or behind your base will turn into end"
-      - "&7stone after 30 seconds."
+      - "&7Placing leaves, shields, and platforms"
+      - "&7within your base has a %percentage%% &7chance"
+      - "&7of not consuming them from your inventory."
+      - "&7Additionally, leaves placed within your"
+      - "&7base will decay into end stone."
       cost: 800
       1: 
         percentage: 50

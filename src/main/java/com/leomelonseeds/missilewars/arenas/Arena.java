@@ -910,7 +910,9 @@ public class Arena implements ConfigurationSerializable {
             tasks.add(new BukkitRunnable() {
                 @Override
                 public void run() {
-                    start();
+                    if (!start()) {
+                        announceMessage("messages.start-failed", null);
+                    }
                 }
             }.runTaskLater(plugin, secCountdown * 20));
 
@@ -965,57 +967,61 @@ public class Arena implements ConfigurationSerializable {
             mapName = mapsWithTopVotes.get(new Random().nextInt(mapsWithTopVotes.size()));
         }
 
-        // Acquire red and blue spawns
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", gamemode, mapName);
-        Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-        Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
-        Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
-        redSpawn.setYaw(180);
-        blueSpawn.setWorld(getWorld());
-        redSpawn.setWorld(getWorld());
+        // Generate map.
+        announceMessage("messages.starting", null);
+        boolean success = SchematicManager.spawnFAWESchematic(mapName, getWorld(), gamemode, result -> {
+            // Acquire red and blue spawns
+            FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
+            Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", gamemode, mapName);
+            Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
+            Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
+            Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
+            redSpawn.setYaw(180);
+            blueSpawn.setWorld(getWorld());
+            redSpawn.setWorld(getWorld());
 
-        // Setup scoreboard and teams
-        blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
-        redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red",this , redSpawn);
-        
-        // Setup game timers
-        // Game start
-        startTime = LocalDateTime.now();
-        long gameLength = getSecondsRemaining();
-        performGamemodeSetup();
+            // Setup scoreboard and teams
+            blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
+            redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red", this, redSpawn);
+            
+            // Setup game timers
+            // Game start
+            startTime = LocalDateTime.now();
+            long gameLength = getSecondsRemaining();
+            performGamemodeSetup();
 
-        // Chaos time start
-        int chaosStart = getChaosTime();
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                blueTeam.setChaosMode(true);
-                redTeam.setChaosMode(true);
-                blueTeam.sendTitle("chaos-mode");
-                redTeam.sendTitle("chaos-mode");
-                announceMessage("messages.chaos-mode", null);
-            }
-        }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
-
-        // Game is 1800 seconds long.
-        int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
-
-        for (int i : reminderTimes) {
+            // Chaos time start
+            int chaosStart = getChaosTime();
             tasks.add(new BukkitRunnable() {
                 @Override
                 public void run() {
-                    announceMessage("messages.game-end-reminder", null);
+                    blueTeam.setChaosMode(true);
+                    redTeam.setChaosMode(true);
+                    blueTeam.sendTitle("chaos-mode");
+                    redTeam.sendTitle("chaos-mode");
+                    announceMessage("messages.chaos-mode", null);
                 }
-            }.runTaskLater(plugin, i * 20));
+            }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
+
+            // Game is 1800 seconds long.
+            int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
+
+            for (int i : reminderTimes) {
+                tasks.add(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        announceMessage("messages.game-end-reminder", null);
+                    }
+                }.runTaskLater(plugin, i * 20));
+            }
+            startTeams();
+        });
+
+        if (success) {
+            running = true;
+            return true;
         }
-
-        // Generate map.
-        announceMessage("messages.starting", null);
-        SchematicManager.spawnFAWESchematic(mapName, getWorld(), gamemode, result -> startTeams());
-
-        running = true;
-        return true;
+        return false;
     }
     
     /**
