@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -120,19 +121,29 @@ public class JSONManager {
                                 }
                             }
                             
-                            // Calculate sp spent on gpassives
+                            // Calculate sp spent on gpassives, and delete if gpassive not exist
                             int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
                             String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
+                            Set<String> passives = itemConfig.getConfigurationSection("gpassive").getKeys(false);
+                            if (gpassivelevel > 0 && !passives.contains(gpassive)) {
+                                currentpreset.getJSONObject("gpassive").put("selected", "None");
+                                currentpreset.getJSONObject("gpassive").put("level", 0);
+                            }
                             while (gpassivelevel > 0) {
                                 int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
                                 finalsp -= cost;
                                 gpassivelevel--;
                             }
                             
-                            // Calculate sp spent on abilities and passives
+                            // Calculate sp spent on abilities and passives, and delete if not exist
                             for (String s : new String[] {"passive", "ability"}) {
                                 int level = currentpreset.getJSONObject(s).getInt("level");
                                 String ability = currentpreset.getJSONObject(s).getString("selected");
+                                Set<String> abilities = itemConfig.getConfigurationSection(deck + "." + s).getKeys(false);
+                                if (level > 0 && !abilities.contains(ability)) {
+                                    currentpreset.getJSONObject(s).put("selected", "None");
+                                    currentpreset.getJSONObject(s).put("level", 0);
+                                }
                                 while (level > 0) {
                                     int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
                                     finalsp -= cost;
