@@ -1375,8 +1375,9 @@ public class Arena implements ConfigurationSerializable {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
                         // Switch player arenas
+                        boolean spectate = spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating");
                         removePlayer(player.getUniqueId(), false);
-                        arena.joinPlayer(player, spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating"));
+                        arena.joinPlayer(player, spectate);
                         success = true;
                         break;
                     }

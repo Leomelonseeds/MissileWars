@@ -90,17 +90,19 @@ public class MissileWarsTeam {
             int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
             
             // Calculate volume by adding up all non-air locations
+            int tempShieldVolume = 0;
             for (int x = x1; x <= x2; x++) {
                 for (int y = y1; y <= y2; y++) {
                     for (int z = z1; z <= z2; z++) {
                         Location l = new Location(arena.getWorld(), x, y, z);
                         Block b = l.getBlock();
                         if (b.getType() != Material.AIR) {
-                            shieldVolume++;
+                            tempShieldVolume++;
                         }
                     }
                 }
             }
+            shieldVolume = tempShieldVolume;
         });
     }
     
