@@ -170,6 +170,12 @@ public class ArenaGameruleListener implements Listener {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
         }
+        
+        int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
+        if (adrenaline > 0) {
+            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
+        }
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();
