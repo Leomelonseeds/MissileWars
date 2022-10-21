@@ -1175,7 +1175,7 @@ Sentinel:
         spcost: 2
         amplifier: 0
       2:
-        spcost: 3
+        spcost: 2
         amplifier: 1
 Berserker:
   weapon:
