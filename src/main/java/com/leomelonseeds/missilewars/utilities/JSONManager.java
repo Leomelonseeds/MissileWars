@@ -112,7 +112,12 @@ public class JSONManager {
                                 JSONObject json = currentpreset.getJSONObject(s);
                                 updateJson(json, defaultpreset.getJSONObject(s));
                                 for (String k : json.keySet()) {
+                                    int maxLevel = plugin.getDeckManager().getMaxLevel(k);
                                     int level = json.getInt(k);
+                                    if (level > maxLevel) {
+                                        json.put(k, maxLevel);
+                                        level = maxLevel;
+                                    }
                                     while (level > 1) {
                                         int cost = itemConfig.getInt(k + "." + level + ".spcost");
                                         finalsp -= cost;
@@ -122,17 +127,23 @@ public class JSONManager {
                             }
                             
                             // Calculate sp spent on gpassives, and delete if gpassive not exist
-                            int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
                             String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
+                            int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
                             Set<String> passives = itemConfig.getConfigurationSection("gpassive").getKeys(false);
-                            if (gpassivelevel > 0 && !passives.contains(gpassive)) {
+                            if (!passives.contains(gpassive)) {
                                 currentpreset.getJSONObject("gpassive").put("selected", "None");
                                 currentpreset.getJSONObject("gpassive").put("level", 0);
-                            }
-                            while (gpassivelevel > 0) {
-                                int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
-                                finalsp -= cost;
-                                gpassivelevel--;
+                            } else {
+                                int maxLevel = plugin.getDeckManager().getMaxLevel("gpassive." + gpassive);
+                                if (gpassivelevel > maxLevel) {
+                                    currentpreset.getJSONObject("gpassive").put("level", maxLevel);
+                                    gpassivelevel = maxLevel;
+                                }
+                                while (gpassivelevel > 0) {
+                                    int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
+                                    finalsp -= cost;
+                                    gpassivelevel--;
+                                }
                             }
                             
                             // Calculate sp spent on abilities and passives, and delete if not exist
@@ -141,14 +152,21 @@ public class JSONManager {
                                 String ability = currentpreset.getJSONObject(s).getString("selected");
                                 // Change ".passive" to "." + s when abilities come out
                                 Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
-                                if (level > 0 && !abilities.contains(ability)) {
+                                if (!abilities.contains(ability)) {
                                     currentpreset.getJSONObject(s).put("selected", "None");
                                     currentpreset.getJSONObject(s).put("level", 0);
                                 }
-                                while (level > 0) {
-                                    int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
-                                    finalsp -= cost;
-                                    level--;
+                                else {
+                                    int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".passive." + ability);
+                                    if (level > maxLevel) {
+                                        currentpreset.getJSONObject(s).put("level", maxLevel);
+                                        level = maxLevel;
+                                    }
+                                    while (level > 0) {
+                                        int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
+                                        finalsp -= cost;
+                                        level--;
+                                    }
                                 }
                             }
                             
@@ -156,6 +174,11 @@ public class JSONManager {
                             for (String k : currentpreset.keySet()) {
                                 if (!all.contains(k)) {
                                     int level = currentpreset.getInt(k);
+                                    int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
+                                    if (level > maxLevel) {
+                                        currentpreset.put(k, maxLevel);
+                                        level = maxLevel;
+                                    }
                                     while (level > 0) {
                                         int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
                                         finalsp -= cost;
