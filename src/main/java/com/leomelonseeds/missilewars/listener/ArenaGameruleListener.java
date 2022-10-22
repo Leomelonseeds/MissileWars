@@ -165,6 +165,7 @@ public class ArenaGameruleListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
         }
         
+        // Regive vanguard passives
         int bunny = plugin.getJSON().getAbility(player.getUniqueId(), "bunny");
         if (bunny > 0) {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
@@ -174,7 +175,7 @@ public class ArenaGameruleListener implements Listener {
         int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
         if (adrenaline > 0) {
             int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, level));
         }
     }
     
