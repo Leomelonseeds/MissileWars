@@ -42,6 +42,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SQLManager;
+import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -97,6 +98,8 @@ public class Arena implements ConfigurationSerializable {
     protected Map<UUID, String> playerVotes;
     /** A task for if we are waiting for a game to auto-end */
     protected BukkitTask autoEnd;
+    /** The tracker for all missiles and utilities */
+    protected Tracker tracker;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -114,6 +117,7 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
+        tracker = new Tracker();
         setupMapVotes();
     }
 
@@ -155,6 +159,7 @@ public class Arena implements ConfigurationSerializable {
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
+        tracker = new Tracker();
         setupMapVotes();
     }
 
@@ -896,7 +901,7 @@ public class Arena implements ConfigurationSerializable {
         if (startTime == null) {
 
             // Respawns citizens if they are not present
-            if (getWorld().getEntityCount() < 9) {
+            if (getWorld().getEntityCount() - spectators.size() < 9) {
                 try {
                     ((Citizens) CitizensAPI.getPlugin()).reload();
                 } catch (NPCLoadException e) {
@@ -1402,6 +1407,7 @@ public class Arena implements ConfigurationSerializable {
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
+        tracker.clear();
         resetting = false;
         setupMapVotes();
     }

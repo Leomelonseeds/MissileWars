@@ -631,7 +631,7 @@ public class CustomItemListener implements Listener {
             }
             // Repairman
             int repairman = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "repairman");
-            if (repairman > 0) {
+            if (repairman > 0 && ConfigUtils.inShield(playerArena, spawnLoc, playerArena.getTeam(thrower.getUniqueId()), 5)) {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
@@ -644,6 +644,8 @@ public class CustomItemListener implements Listener {
         }
         if (!thrown.isDead()) {
             thrown.remove();
+            ItemStack item = thrown.getItem();
+            thrower.getInventory().addItem(item);
         }
     }
 

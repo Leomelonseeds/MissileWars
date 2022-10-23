@@ -143,6 +143,7 @@ titles:
       - "have you considered going outside?"
       - "top 10 anime battles"
       - "me when never felt a woman's touch"
+      - "also try Minecraft!"
     length: 120
   defeat:
     title: "&c&lDefeat"
@@ -175,6 +176,7 @@ titles:
       - "maybe the real missiles were the friends we made along the way"
       - "Disclaimer: Ultima does not condone recreational drug use"
       - "You must train for another 100 years"
+      - "also try Minecraft!"
     length: 120
   tie:
     title: "&e&lTie"
@@ -190,6 +192,7 @@ titles:
       - "bruh"
       - "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too"
       - "All that work, just for a tie"
+      - "also try Minecraft!"
     length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
