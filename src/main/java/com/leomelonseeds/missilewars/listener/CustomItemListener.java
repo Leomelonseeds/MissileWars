@@ -168,7 +168,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Check if gamemode survival
-        if (player.getGameMode() != GameMode.SURVIVAL) {
+        if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.ADVENTURE) {
             return;
         }
         
@@ -285,7 +285,7 @@ public class CustomItemListener implements Listener {
                     if (utility.contains("2")) {
                         creeper.setPowered(true);
                     }
-                    creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + " Creeper"));
+                    creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + " &7Creeper"));
                     creeper.setCustomNameVisible(true);
                     hand.setAmount(hand.getAmount() - 1);
                     return;
