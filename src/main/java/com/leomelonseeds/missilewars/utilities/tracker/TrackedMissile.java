@@ -18,6 +18,9 @@ public class TrackedMissile extends Tracked {
     
     public static final Map<Double, Integer> speeds = new HashMap<>();
     public static final int minPistonEvents = 2;
+    public static final int minPistons = 1;
+    public static final int minStickyPistons = 1;
+    public static final int minSlimeBlocks = 2;
     
     private String name;
     private int pistonEventCount;
@@ -87,6 +90,7 @@ public class TrackedMissile extends Tracked {
         
         int stickyPistonCount = 0;
         int pistonCount = 0;
+        int slimeCount = 0;
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y++) {
                 for (int z = z1; z <= z2; z++) {
@@ -96,8 +100,10 @@ public class TrackedMissile extends Tracked {
                         pistonCount++;
                     } else if (b.getType() == Material.STICKY_PISTON) {
                         stickyPistonCount++;
+                    } else if (b.getType() == Material.SLIME_BLOCK) {
+                        slimeCount++;
                     }
-                    if (stickyPistonCount >= 1 && pistonCount >= 1) {
+                    if (stickyPistonCount >= minStickyPistons && pistonCount >= minPistons && slimeCount >= minSlimeBlocks) {
                         return false;
                     }
                 }
