@@ -1427,7 +1427,7 @@ public class Arena implements ConfigurationSerializable {
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
-        tracker.clear();
+        stopTrackers();
         resetting = false;
         setupMapVotes();
     }

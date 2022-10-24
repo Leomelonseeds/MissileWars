@@ -23,10 +23,6 @@ public class Tracker {
         tracked = new ArrayList<>();
     }
     
-    public void clear() {
-        tracked.clear();
-    }
-    
     public void add(Tracked t) {
         tracked.add(t);
     }
@@ -40,12 +36,13 @@ public class Tracker {
     }
     
     /**
-     * Stops all tasks
+     * Stops all tasks and removes all tracked missiles
      */
     public void stopAll() {
         for (Tracked t : tracked) {
             t.cancelTasks();
         }
+        tracked.clear();
     }
     
     /**
