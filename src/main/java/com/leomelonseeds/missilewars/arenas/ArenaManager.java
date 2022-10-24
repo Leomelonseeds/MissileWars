@@ -63,7 +63,7 @@ import net.citizensnpcs.trait.VillagerProfession;
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
 
-    private MissileWarsPlugin plugin;
+    private final MissileWarsPlugin plugin;
 
     /** A list of all loaded arenas. */
     private List<Arena> loadedArenas;
