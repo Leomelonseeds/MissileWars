@@ -529,14 +529,11 @@ public class ArenaManager {
             logger.log(Level.INFO, "Arena " + name + " generated. World will save in 10 seconds.");
 
             // Wait to ensure schematic is spawned
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    arenaWorld.save();
-                    logger.log(Level.INFO, "Saving new arena " + name);
-                    logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
-                }
-            }.runTaskLater(plugin, 200);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                arenaWorld.save();
+                logger.log(Level.INFO, "Saving new arena " + name);
+                logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
+            }, 200);
 
         })) {
             logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
