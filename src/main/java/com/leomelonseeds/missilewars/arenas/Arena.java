@@ -191,6 +191,13 @@ public class Arena implements ConfigurationSerializable {
     }
     
     /**
+     * Stops all async tasks from trackers
+     */
+    public void stopTrackers() {
+        tracker.stopAll();
+    }
+    
+    /**
      * Self-explanatory?
      * 
      * @return
@@ -1522,9 +1529,9 @@ public class Arena implements ConfigurationSerializable {
         // Send messages if player found, and is on opposite team
         String msg;
         if (!(player == null || broketeam.containsPlayer(player.getUniqueId()) || getTeam(player.getUniqueId()).equals("no team"))) {
-            msg = ConfigUtils.getConfigText("messages.portal-broken-player", null, null, player);
+            msg = ConfigUtils.getConfigText("messages.portal-broke-player", null, null, player);
         } else {
-            msg = ConfigUtils.getConfigText("messages.portal-broken", null, null, null);
+            msg = ConfigUtils.getConfigText("messages.portal-broke", null, null, null);
         }
         msg = msg.replace("%team%", broketeam.getName());
         for (MissileWarsPlayer mwPlayer : players) {

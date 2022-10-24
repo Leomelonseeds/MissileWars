@@ -31,8 +31,21 @@ public class Tracker {
         tracked.add(t);
     }
     
+    public boolean contains(Tracked t) {
+        return tracked.contains(t);
+    }
+    
     public void remove(Tracked t) {
         tracked.remove(t);
+    }
+    
+    /**
+     * Stops all tasks
+     */
+    public void stopAll() {
+        for (Tracked t : tracked) {
+            t.cancelTasks();
+        }
     }
     
     /**
@@ -65,13 +78,14 @@ public class Tracker {
      * @param e
      */
     public void registerExplosionEvent(EntityExplodeEvent e) {
-        if (e.getEntityType() != EntityType.PRIMED_TNT) {
-            return;
-        }
-        Location l = e.getLocation();
-        for (Tracked t : tracked) {
-            if (t.contains(l)) {
-                t.registerExplosion();
+        EntityType entity = e.getEntityType();
+        if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
+                entity == EntityType.CREEPER) {
+            Location l = e.getLocation();
+            for (Tracked t : new ArrayList<>(tracked)) {
+                if (t.contains(l)) {
+                    t.registerExplosion();
+                }
             }
         }
     }
@@ -89,15 +103,15 @@ public class Tracker {
             Tracked source = null;
             // Check for collisions. If none, set source to missile tracked itself
             // Iterate in reverse to check for most recently spawned missile
-            for (int i = tracked.size() - 1; i >= 0; i--) {
-                Tracked t = tracked.get(i);
+            for (Tracked t : tracked) {
                 if (t.contains(l)) {
                     source = t;
+                    MissileWarsPlugin.getPlugin().log("A TNT prime event's source could possibly be " + t.getPlayer().getName());
                     // Check for tracked objects that have collided with the given one
                     for (int j = tracked.size() - 1; j >= 0; j--) {
                         Tracked t2 = tracked.get(j);
                         // Cannot be the same one
-                        if (t2.equals(t2)) {
+                        if (t.equals(t2)) {
                             continue;
                         }
                         // Cannot be going in the same direction
@@ -106,6 +120,7 @@ public class Tracker {
                         }
                         if (t.contains(t2)) {
                             source = t2;
+                            MissileWarsPlugin.getPlugin().log("A TNT prime event's source was changed to " + t2.getPlayer().getName());
                             break;
                         }
                     }
@@ -113,21 +128,22 @@ public class Tracker {
                 }
             }
             if (source == null) {
+                MissileWarsPlugin.getPlugin().log("A TNT prime event's source could not be determined.");
                 return;
             }
             MissileWarsPlugin.getPlugin().log("A TNT prime event's source was determined to be a tracked object spawned by " + source.getPlayer().getName());
             // Set the TNTPrimed in this location to use the player as source
             Tracked result = source;
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.getScheduler().runTask(plugin, () -> {
                 for (Entity e : l.getNearbyEntities(1, 1, 1)) {
                     if (!(e instanceof TNTPrimed)) {
                         continue;
                     }
                     TNTPrimed tnt = (TNTPrimed) e;
                     tnt.setSource(result.getPlayer());
-                    MissileWarsPlugin.getPlugin().log("A TNT's source was set to " + result.getPlayer().getName());
+                    MissileWarsPlugin.getPlugin().log("A TNT's source was finally set to " + result.getPlayer().getName());
                 }
-            }, 1);
+            });
         });
     }
 }

@@ -643,11 +643,11 @@ public class CustomItemListener implements Listener {
             }
         } else {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
+            ItemStack item = thrown.getItem();
+            thrower.getInventory().addItem(item);
         }
         if (!thrown.isDead()) {
             thrown.remove();
-            ItemStack item = thrown.getItem();
-            thrower.getInventory().addItem(item);
         }
     }
 

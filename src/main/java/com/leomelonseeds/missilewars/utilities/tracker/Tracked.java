@@ -1,10 +1,14 @@
 package com.leomelonseeds.missilewars.utilities.tracker;
 
-import org.bukkit.Bukkit;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -14,11 +18,12 @@ public abstract class Tracked {
     
     public static final int maxExplosions = 1;
     
+    protected List<BukkitTask> removalTasks;
     protected Player player;
     protected Location pos1;
     protected Location pos2;
     protected BlockFace direction;
-    private Tracker tracker;
+    protected Tracker tracker;
     private int explosions;
     
     public Tracked(Player player, Location pos1, Location pos2, BlockFace direction) {
@@ -26,6 +31,8 @@ public abstract class Tracked {
         this.pos2 = pos2;
         this.direction = direction;
         this.explosions = 0;
+        this.player = player;
+        this.removalTasks = new ArrayList<>();
         
         ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
@@ -33,11 +40,23 @@ public abstract class Tracked {
         tracker.add(this);
         
         // Tracker removal task
-        Bukkit.getScheduler().runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
-            if (testForRemoval()) {
-                remove();
+        removalTasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (testForRemoval()) {
+                    remove();
+                }
             }
-        }, 100, 100);
+        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 100, 100));
+    }
+    
+    /**
+     * Cancels the tracker removal task
+     */
+    public void cancelTasks() {
+        for (BukkitTask task : removalTasks) {
+            task.cancel();
+        }
     }
     
     /**
@@ -111,6 +130,7 @@ public abstract class Tracked {
     
     public void remove() {
         tracker.remove(this);
+        cancelTasks();
     }
     
     public Player getPlayer() {

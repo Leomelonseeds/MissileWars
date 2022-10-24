@@ -110,6 +110,7 @@ public class ArenaManager {
 
         // Unload each Arena
         for (Arena arena : loadedArenas) {
+            arena.stopTrackers();
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
 

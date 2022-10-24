@@ -20,6 +20,7 @@ import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
 import com.leomelonseeds.missilewars.listener.JoinLeaveListener;
+import com.leomelonseeds.missilewars.listener.TrackerListener;
 import com.leomelonseeds.missilewars.listener.WorldCreationListener;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -79,7 +80,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
         Bukkit.getPluginManager().registerEvents(new WorldCreationListener(), this);
-        // Bukkit.getPluginManager().registerEvents(new TrackerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TrackerListener(), this);
         log("Commands and events loaded.");
 
         // Load decks
@@ -126,12 +127,12 @@ public final class MissileWarsPlugin extends JavaPlugin {
      * Setup missile speeds for user in TrackedMissile
      */
     private void setupSpeeds() {
-        TrackedMissile.speeds.put("1.7", 12);
-        TrackedMissile.speeds.put("2.0", 10);
-        TrackedMissile.speeds.put("2.2", 9);
-        TrackedMissile.speeds.put("2.5", 8);
-        TrackedMissile.speeds.put("3.3", 6);
-        TrackedMissile.speeds.put("4.4", 9);
+        TrackedMissile.speeds.put(1.7, 12);
+        TrackedMissile.speeds.put(2.0, 10);
+        TrackedMissile.speeds.put(2.2, 9);
+        TrackedMissile.speeds.put(2.5, 8);
+        TrackedMissile.speeds.put(3.3, 6);
+        TrackedMissile.speeds.put(4.4, 9);
     }
 
     /**
