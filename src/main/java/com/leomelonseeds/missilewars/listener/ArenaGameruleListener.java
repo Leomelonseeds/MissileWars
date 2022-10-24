@@ -413,7 +413,7 @@ public class ArenaGameruleListener implements Listener {
             event.blockList().forEach(block -> {
                 // Register portal brake if block was broken
                 if (block.getType() == Material.NETHER_PORTAL) {
-                    possibleArena.registerPortalBreak(block.getLocation());
+                    possibleArena.registerPortalBreak(block.getLocation(), event.getEntity());
                 }
             });
         }

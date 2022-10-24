@@ -27,7 +27,11 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -175,6 +179,15 @@ public class Arena implements ConfigurationSerializable {
         }
 
         playerVotes = new HashMap<>();
+    }
+    
+    /**
+     * Gets the arena's missile/utility tracker
+     * 
+     * @return
+     */
+    public Tracker getTracker() {
+        return tracker;
     }
     
     /**
@@ -986,8 +999,8 @@ public class Arena implements ConfigurationSerializable {
             redSpawn.setWorld(getWorld());
 
             // Setup scoreboard and teams
-            blueTeam = new MissileWarsTeam(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue", this, blueSpawn);
-            redTeam = new MissileWarsTeam(ChatColor.RED + "" + ChatColor.BOLD + "Red", this, redSpawn);
+            blueTeam = new MissileWarsTeam(ChatColor.BLUE + "blue", this, blueSpawn);
+            redTeam = new MissileWarsTeam(ChatColor.RED + "red", this, redSpawn);
             
             // Setup game timers
             // Game start
@@ -1463,7 +1476,7 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param location the location
      */
-    public void registerPortalBreak(Location location) {
+    public void registerPortalBreak(Location location, Entity entity) {
         // Ignore if game not running
         if (!running) {
             return;
@@ -1477,9 +1490,45 @@ public class Arena implements ConfigurationSerializable {
             broketeam = redTeam;
             enemy = blueTeam;
         }
-        if (broketeam.registerPortalBreak(location) && broketeam.hasLivingPortal()) {
+        
+        // Check if portal break was registered
+        if (!broketeam.registerPortalBreak(location)) {
+            return;
+        }
+        
+        // Check if team still has living portals
+        if (broketeam.hasLivingPortal()) {
             broketeam.sendTitle("own-portal-destroyed");
             enemy.sendTitle("enemy-portal-destroyed");
+        }
+        
+        // Check if has associated player
+        Player player = null;
+        if (entity.getType() == EntityType.CREEPER) {
+            Creeper creeper = (Creeper) entity;
+            if (creeper.isCustomNameVisible()) {
+                String name = ChatColor.stripColor(ConfigUtils.toPlain(creeper.customName()));
+                String[] args = name.split(" ");
+                player = Bukkit.getPlayer(args[0]);
+            }
+        } else if (entity.getType() == EntityType.PRIMED_TNT) {
+            TNTPrimed tnt = (TNTPrimed) entity;
+            MissileWarsPlugin.getPlugin().log("A TNT prime broke a portal - source: " + tnt.getSource());
+            if (tnt.getSource() instanceof Player) {
+                player = (Player) tnt.getSource();
+            }
+        }
+        
+        // Send messages if player found, and is on opposite team
+        String msg;
+        if (!(player == null || broketeam.containsPlayer(player.getUniqueId()) || getTeam(player.getUniqueId()).equals("no team"))) {
+            msg = ConfigUtils.getConfigText("messages.portal-broken-player", null, null, player);
+        } else {
+            msg = ConfigUtils.getConfigText("messages.portal-broken", null, null, null);
+        }
+        msg = msg.replace("%team%", broketeam.getName());
+        for (MissileWarsPlayer mwPlayer : players) {
+            mwPlayer.getMCPlayer().sendMessage(msg);
         }
         
         // Waiting for a tie in this case

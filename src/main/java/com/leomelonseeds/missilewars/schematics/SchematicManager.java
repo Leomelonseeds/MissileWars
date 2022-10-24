@@ -12,11 +12,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Rail.Shape;
 import org.bukkit.block.data.type.RedstoneRail;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
@@ -25,6 +27,8 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
+import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
+import com.leomelonseeds.missilewars.utilities.tracker.TrackedUtility;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -64,22 +68,20 @@ public class SchematicManager {
         }
         return vector;
     }
-    
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName) {
-        return spawnNBTStructure(structureName, loc, redMissile, mapName, true);
-    }
 
     /**
      * Spawn a structure at a given location with a given rotation.
      *
+     * @param player the player who spawned the structure
      * @param structureName the name of the structure
      * @param loc the location to spawn the structure (pre-offset)
      * @param redMissile if the NBT structure is a red missile
      * @param mapName The name of the Arena map the NBT structure is being spawned in
+     * @param isMissile whether the structure is a missile or a utility
      * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(String structureName, Location loc, boolean redMissile, String mapName, Boolean checkCollision) {
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision) {
 
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
@@ -201,8 +203,38 @@ public class SchematicManager {
             }
         }
 
-        //Place structure
+        // Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
+        
+        // Add structure to tracker list
+        if (player != null) {
+            World world = loc.getWorld();
+            Location pos1;
+            Location pos2;
+            BlockFace direction;
+            if (rotation == StructureRotation.NONE) {
+                pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
+                pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
+                direction = BlockFace.SOUTH;
+            } else if (rotation == StructureRotation.CLOCKWISE_180) {
+                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
+                pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
+                direction = BlockFace.NORTH;
+            } else if (rotation == StructureRotation.CLOCKWISE_90) {
+                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
+                pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
+                direction = BlockFace.WEST;
+            } else {
+                pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
+                pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
+                direction = BlockFace.EAST;
+            }
+            if (isMissile) {
+                new TrackedMissile(args[0], level, player, pos1, pos2, direction);
+            } else {
+                new TrackedUtility(args[0], level, player, pos1, pos2, direction);
+            }
+        }
         
         // Temp hotfix for structure rail rotation bug
         if (redMissile && structureName.contains("lifter-2")) {

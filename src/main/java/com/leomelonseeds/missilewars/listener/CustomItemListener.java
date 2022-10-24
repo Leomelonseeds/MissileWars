@@ -243,7 +243,7 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
-            if (SchematicManager.spawnNBTStructure(structureName, clicked.getLocation(), isRedTeam(player), mapName)) {
+            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 hand.setAmount(hand.getAmount() - 1);
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 // 0.5s cooldown
@@ -285,6 +285,8 @@ public class CustomItemListener implements Listener {
                     if (utility.contains("2")) {
                         creeper.setPowered(true);
                     }
+                    creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + " Creeper"));
+                    creeper.setCustomNameVisible(true);
                     hand.setAmount(hand.getAmount() - 1);
                     return;
                 }
@@ -442,7 +444,7 @@ public class CustomItemListener implements Listener {
                 // Finally spawn canopy
                 Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
                 Location spawnLoc = player.getEyeLocation().clone().add(distance);
-                if (SchematicManager.spawnNBTStructure("canopy-1", spawnLoc, isRedTeam(player), mapName)) {
+                if (SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
                     // Teleport and give slowness
                     Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
                     loc.setPitch(90);
@@ -613,7 +615,7 @@ public class CustomItemListener implements Listener {
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
         }
-        if (SchematicManager.spawnNBTStructure(structureName, spawnLoc, isRedTeam(thrower), mapName)) {
+        if (SchematicManager.spawnNBTStructure(thrower, structureName, spawnLoc, isRedTeam(thrower), mapName, false, true)) {
             playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
             String sound = "none";
             if (structureName.contains("obsidianshield")) {
@@ -722,7 +724,7 @@ public class CustomItemListener implements Listener {
                 // map name doesn't matter here because the canopy has already been spawned,
                 // we therefore know that the structure was placed successfully and do not need
                 // to perform validity checks based on the map
-                SchematicManager.spawnNBTStructure("canopy-1", newSpawn, isRedTeam(thrower), "default-map");
+                SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), "default-map", false, false);
                 thrower.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7This canopy will now last &a" +
                             extraduration + " &7seconds longer."));
             }
@@ -790,14 +792,14 @@ public class CustomItemListener implements Listener {
                 public void run() {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
-                            SchematicManager.spawnNBTStructure("obsidianshieldclear-1", location, red, mapName, false);
+                            SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
                             for (Player player : location.getWorld().getPlayers()) {
                                 ConfigUtils.sendConfigSound("break-obsidian-shield", player, location);
                             }
                         } else if (finalDuration % 2 == 0) {
-                            SchematicManager.spawnNBTStructure("obsidianshielddeplete-1", location, red, mapName, false);
+                            SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
                         } else {
-                            SchematicManager.spawnNBTStructure("obsidianshield-1", location, red, mapName, false);
+                            SchematicManager.spawnNBTStructure(null, "obsidianshield-1", location, red, mapName, false, false);
                         }
                     }
                 }

@@ -106,6 +106,10 @@ public class MissileWarsTeam {
         });
     }
     
+    public String getName() {
+        return name;
+    }
+    
     public Map<Location, Boolean> getPortals() {
         return portals;
     }

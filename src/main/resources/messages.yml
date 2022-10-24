@@ -107,6 +107,8 @@ messages:
   afk-spectator: "&a&l[!] &7Since you were AFK, you have been automatically set to spectate."
   gg-exp: "&d+1 EXP"
   start-failed: "&c&l[!] &cThe game failed to start! Please contact an admin."
+  portal-broke-player: "&5&l[!] &7A %team% &7portal was broken by %umw_focus%&7."
+  portal-broke: "&5&l[!] &7A %team% &7portal was broken."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
