@@ -93,7 +93,7 @@ public class ArenaManager {
         }
 
         // Load worlds for arenas
-        assert loadedArenas != null;
+        if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
             arena.loadWorldFromDisk();
