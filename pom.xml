@@ -172,7 +172,7 @@
             <artifactId>worldguardextraflags</artifactId>
             <version>4.1.5</version>
             <scope>system</scope>
-            <systemPath>${basedir}\WorldGuardExtraFlags.jar</systemPath>
+            <systemPath>${basedir}/WorldGuardExtraFlags.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>

@@ -63,7 +63,7 @@ import net.citizensnpcs.trait.VillagerProfession;
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
 
-    private MissileWarsPlugin plugin;
+    private final MissileWarsPlugin plugin;
 
     /** A list of all loaded arenas. */
     private List<Arena> loadedArenas;
@@ -93,7 +93,7 @@ public class ArenaManager {
         }
 
         // Load worlds for arenas
-        assert loadedArenas != null;
+        if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
             arena.loadWorldFromDisk();
@@ -529,14 +529,11 @@ public class ArenaManager {
             logger.log(Level.INFO, "Arena " + name + " generated. World will save in 10 seconds.");
 
             // Wait to ensure schematic is spawned
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    arenaWorld.save();
-                    logger.log(Level.INFO, "Saving new arena " + name);
-                    logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
-                }
-            }.runTaskLater(plugin, 200);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                arenaWorld.save();
+                logger.log(Level.INFO, "Saving new arena " + name);
+                logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
+            }, 200);
 
         })) {
             logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
