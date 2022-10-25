@@ -257,6 +257,7 @@ public class MissileWarsTeam {
                         return;
                     }
                     mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amplifier));
+                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, amplifier));
                 }
             }.runTaskTimer(plugin, 10, 10);
         }

@@ -1529,6 +1529,7 @@ public class Arena implements ConfigurationSerializable {
         String msg;
         if (!(player == null || broketeam.containsPlayer(player.getUniqueId()) || getTeam(player.getUniqueId()).equals("no team"))) {
             msg = ConfigUtils.getConfigText("messages.portal-broke-player", null, null, player);
+            getPlayerInArena(player.getUniqueId()).addToMVP(1);
         } else {
             msg = ConfigUtils.getConfigText("messages.portal-broke", null, null, null);
         }

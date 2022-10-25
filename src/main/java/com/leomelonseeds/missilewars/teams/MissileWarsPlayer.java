@@ -16,6 +16,8 @@ public class MissileWarsPlayer {
     private UUID playerId;
     /** The current deck the player has selected. */
     private Deck deck;
+    /** The mvp stat of whatever gamemode the player is in */
+    private int mvpStat;
     /** The number of kills the player has. */
     private int kills;
     /** The number of deaths the player has. */
@@ -71,6 +73,14 @@ public class MissileWarsPlayer {
      */
     public Player getMCPlayer() {
         return Bukkit.getPlayer(playerId);
+    }
+    
+    public int getMVP() {
+        return mvpStat;
+    }
+    
+    public void addToMVP(int add) {
+        mvpStat += add;
     }
 
     /**

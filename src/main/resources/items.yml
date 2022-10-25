@@ -1168,15 +1168,19 @@ Sentinel:
       name: "&eWarden"
       lore:
       - ""
-      - "&7Receive Strength with amplifier %amplifier%"
-      - "&7while within your base."
+      - "&7Receive Strength and Resistance with"
+      - "&7amplifier %amplifier% &7while in your"
+      - "&7base."
       cost: 1000
       1:
-        spcost: 2
+        spcost: 1
         amplifier: 0
       2:
         spcost: 2
         amplifier: 1
+      3:
+        spcost: 2
+        amplifier: 2
 Berserker:
   weapon:
     item: CROSSBOW
