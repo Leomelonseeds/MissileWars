@@ -104,13 +104,14 @@ public class Tracker {
                     if (((TrackedMissile) t).isInMotion()) {
                         for (int j = tracked.size() - 1; j >= 0; j--) {
                             Tracked t2 = tracked.get(j);
-                            // Cannot be the same one
-                            if (t.equals(t2)) {
-                                continue;
-                            }
                             // Cannot be going in the same direction
                             if (t2.getDirection() == t.getDirection()) {
                                 continue;
+                            }
+                            // If we got here, then there is no recently spawned structure
+                            // that triggered this primer.
+                            if (t.equals(t2)) {
+                                break;
                             }
                             if (t.contains(t2)) {
                                 source = t2;
