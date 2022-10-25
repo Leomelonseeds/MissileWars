@@ -55,10 +55,7 @@ public class Tracker {
         BlockFace direction = e.getDirection();
         Material material = e.getBlock().getType();
         for (Tracked t : tracked) {
-            if (t instanceof TrackedMissile) {
-                if (t.contains(e.getBlock().getLocation())) {
-                    continue;
-                }
+            if (t instanceof TrackedMissile && t.contains(e.getBlock().getLocation())) {
                 TrackedMissile missile = (TrackedMissile) t;
                 if ((material == Material.PISTON && direction == missile.getDirection()) ||
                     (material == Material.STICKY_PISTON && direction == missile.getDirection().getOppositeFace())) {

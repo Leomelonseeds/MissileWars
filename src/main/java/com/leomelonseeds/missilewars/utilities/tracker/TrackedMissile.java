@@ -46,6 +46,7 @@ public class TrackedMissile extends Tracked {
     private void updatePosition() {
         // Checks if piston events were detected
         if (pistonEventCount < minPistonEvents) {
+            MissileWarsPlugin.getPlugin().log("A " + name + " stopped moving.");
             inMotion = false;
             return;
         }
@@ -57,9 +58,11 @@ public class TrackedMissile extends Tracked {
         
         pos1.add(dir);
         pos2.add(dir);
-        inMotion = true;
         pistonEventCount = 0;
-        MissileWarsPlugin.getPlugin().log("A " + name + " spawned by player " + player.getName() + " moved forward by " + dir.toString());
+        if (!inMotion) {
+            MissileWarsPlugin.getPlugin().log("A " + name + " started moving.");
+            inMotion = true;
+        }
     }
     
     @Override

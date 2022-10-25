@@ -1520,7 +1520,6 @@ public class Arena implements ConfigurationSerializable {
             }
         } else if (entity.getType() == EntityType.PRIMED_TNT) {
             TNTPrimed tnt = (TNTPrimed) entity;
-            MissileWarsPlugin.getPlugin().log("A TNT prime broke a portal - source: " + tnt.getSource());
             if (tnt.getSource() instanceof Player) {
                 player = (Player) tnt.getSource();
             }

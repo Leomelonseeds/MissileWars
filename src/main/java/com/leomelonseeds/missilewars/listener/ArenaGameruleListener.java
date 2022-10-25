@@ -10,11 +10,13 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -104,7 +106,9 @@ public class ArenaGameruleListener implements Listener {
         // Find killer and increment kills
         if (player.getKiller() != null) {
             MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
-            if (!player.getKiller().equals(player)) {
+            String team1 = playerArena.getTeam(player.getUniqueId());
+            String team2 = playerArena.getTeam(player.getKiller().getUniqueId());
+            if (!(player.getKiller().equals(player) || team1.equals(team2))) {
                 killer.incrementKills();
                 ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
             }
@@ -203,6 +207,7 @@ public class ArenaGameruleListener implements Listener {
     
 
     /** Handle friendly fire + other things */
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
@@ -246,7 +251,22 @@ public class ArenaGameruleListener implements Listener {
                 damager = (Player) projectile.getShooter();
                 isProjectile = true;
             }
+        } else if (event.getDamager().getType() == EntityType.CREEPER) {
+            Creeper creeper = (Creeper) event.getDamager();
+            Player spawner = null;
+            if (creeper.isCustomNameVisible()) {
+                String name = ChatColor.stripColor(ConfigUtils.toPlain(creeper.customName()));
+                String[] args = name.split(" ");
+                spawner = Bukkit.getPlayer(args[0]);
+            }
+            if (spawner != null) {
+                EntityDamageEvent newDamage = new EntityDamageByEntityEvent(spawner, player, DamageCause.ENTITY_EXPLOSION, 0.0001);
+                player.setLastDamageCause(newDamage);
+                Bukkit.getServer().getPluginManager().callEvent(newDamage);
+                return;
+            }
         }
+        
         if (damager == null) {
             return;
         }
