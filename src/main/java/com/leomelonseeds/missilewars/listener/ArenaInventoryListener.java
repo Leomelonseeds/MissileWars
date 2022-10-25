@@ -90,6 +90,9 @@ public class ArenaInventoryListener implements Listener {
     public void stopItemMoving(InventoryClickEvent event) {
         
         Player player = (Player) event.getWhoClicked();
+        if (event.getCurrentItem() == null) {
+            return;
+        }
 
         // Check if player is in an active arena
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
@@ -100,17 +103,7 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
             
-            Inventory inv = event.getClickedInventory();
-            if (inv == null) {
-                return;
-            }
-            
-            int slot = event.getSlot();
-            if (inv.getItem(slot) == null) {
-                return;
-            }
-            
-            if (inv.getItem(slot).getType() == Material.ELYTRA) {
+            if (event.getCurrentItem().getType() == Material.ELYTRA) {
                 event.setCancelled(true);
             }
             
