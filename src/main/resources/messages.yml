@@ -58,6 +58,7 @@ messages:
   classic-end:
     - "&b========================================"
     - "&a&lWINNER &7- %umw_winning_team%"
+    - "&5Most Portals Destroyed (%umw_most_mvp_amount%): %umw_most_mvp%"
     - "&cMost Kills (%umw_most_kills_amount%): %umw_most_kills%"
     - "&eMost Deaths (%umw_most_deaths_amount%): %umw_most_deaths%"
     - "&fThanks for playing!"

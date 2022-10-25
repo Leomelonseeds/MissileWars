@@ -1252,27 +1252,34 @@ public class Arena implements ConfigurationSerializable {
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
         int use_utility = ranksConfig.getInt("experience.use_utility");
         int kill = ranksConfig.getInt("experience.kill");
-        int portal_broken = ranksConfig.getInt("experience.portal_broken");
+        double portal_broken = (double) blueTeam.getTotalPortals() / ranksConfig.getInt("experience.portal_broken");
         int shield_health = ranksConfig.getInt("experience.shield_health");
         int win = ranksConfig.getInt("experience.win");
-
-        int red_portal_amount = (int) (portal_broken * (1 - (double) blueTeam.getRemainingPortals() / blueTeam.getTotalPortals()));
-        int blue_portal_amount = (int) (portal_broken * (1 - (double) redTeam.getRemainingPortals() / redTeam.getTotalPortals()));
 
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
 
-        // Find players with most deaths and kills
+        // Find players with mvp, most deaths, and kills
+        List<MissileWarsPlayer> mvp = new ArrayList<>();
         List<MissileWarsPlayer> mostKills = new ArrayList<>();
         List<MissileWarsPlayer> mostDeaths = new ArrayList<>();
         for (MissileWarsPlayer player : players) {
             if (!getTeam(player.getMCPlayerId()).equals("no team")) {
+                // Top MVPs
+                if (mvp.isEmpty() || mvp.get(0).getMVP() < player.getMVP()) {
+                    mvp.clear();
+                    mvp.add(player);
+                } else if (mvp.get(0).getMVP() == player.getMVP()) {
+                    mvp.add(player);
+                }
+                // Top kills
                 if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
                     mostKills.clear();
                     mostKills.add(player);
                 } else if (mostKills.get(0).getKills() == player.getKills()) {
                     mostKills.add(player);
                 }
+                // Top deaths
                 if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
                     mostDeaths.clear();
                     mostDeaths.add(player);
@@ -1282,7 +1289,13 @@ public class Arena implements ConfigurationSerializable {
             }
         }
 
-        // Produce most kills/deaths list
+        // Produce most mvp/kills/deaths list
+        List<String> mostMVPList = new ArrayList<>();
+        for (MissileWarsPlayer player : mvp) {
+            mostMVPList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
+        }
+        String most_mvp = String.join(", ", mostMVPList);
+        
         List<String> mostKillsList = new ArrayList<>();
         for (MissileWarsPlayer player : mostKills) {
             mostKillsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
@@ -1295,6 +1308,7 @@ public class Arena implements ConfigurationSerializable {
         }
         String most_deaths = String.join(", ", mostDeathsList);
 
+        int most_mvp_amount = mvp.isEmpty() ? 0 : mvp.get(0).getKills();
         int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
         int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getDeaths();
 
@@ -1310,8 +1324,10 @@ public class Arena implements ConfigurationSerializable {
             // Send win message
             for (String s : winningMessages) {
                 s = s.replaceAll("%umw_winning_team%", winner);
+                s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
                 s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
                 s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
+                s = s.replaceAll("%umw_most_mvp%", most_mvp);
                 s = s.replaceAll("%umw_most_kills%", most_kills);
                 s = s.replaceAll("%umw_most_deaths%", most_deaths);
                 player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
@@ -1330,15 +1346,16 @@ public class Arena implements ConfigurationSerializable {
                 if (playTime > 40) {
                     playerAmount = spawn_missile * player.getMissiles() +
                                    use_utility * player.getUtility() +
-                                   kill * player.getKills();
+                                   kill * player.getKills() +
+                                   (int) (portal_broken * player.getMVP());
                     if (blueTeam.containsPlayer(uuid)) {
-                        teamAmount = blue_portal_amount + blue_shield_health_amount;
+                        teamAmount = blue_shield_health_amount;
                         if (winningTeam == blueTeam) {
                             teamAmount += win;
                             won = 1;
                         }
                     } else {
-                        teamAmount = red_portal_amount + red_shield_health_amount;
+                        teamAmount = red_shield_health_amount;
                         if (winningTeam == redTeam) {
                             teamAmount += win;
                             won = 1;
@@ -1351,7 +1368,7 @@ public class Arena implements ConfigurationSerializable {
                     // Update player stats
                     SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
     
-                    sql.updateClassicStats(uuid, won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
+                    sql.updateClassicStats(uuid, player.getMVP(), won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
                     sql.updateWinstreak(uuid, gamemode, won);
                     RankUtils.addExp(player.getMCPlayer(), amountEarned);
     

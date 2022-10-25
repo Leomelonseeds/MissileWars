@@ -83,6 +83,7 @@ public class SQLManager {
                     """
                     CREATE TABLE IF NOT EXISTS umw_stats_classic(
                             uuid CHAR(36) NOT NULL,
+                            portals INT DEFAULT 0 NOT NULL,
                             wins INT DEFAULT 0 NOT NULL,
                             games INT DEFAULT 0 NOT NULL,
                             kills INT DEFAULT 0 NOT NULL,
@@ -258,13 +259,14 @@ public class SQLManager {
      * @param missiles
      * @param utility
      */
-    public void updateClassicStats(UUID uuid, int wins, int games, int kills, int missiles, int utility, int deaths) {
+    public void updateClassicStats(UUID uuid, int portals, int wins, int games, int kills, int missiles, int utility, int deaths) {
         scheduler.runTaskAsynchronously(plugin, () -> {
             try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                     """
-                    INSERT INTO umw_stats_classic(uuid, wins, games, kills, missiles, utility, deaths)
-                    VALUES(?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO umw_stats_classic(uuid, portals, wins, games, kills, missiles, utility, deaths)
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE
+                    portals = portals + VALUES(portals),
                     wins = wins + VALUES(wins),
                     games = games + VALUES(games),
                     kills = kills + VALUES(kills),
@@ -274,12 +276,13 @@ public class SQLManager {
                     """
             )) {
                 stmt.setString(1, uuid.toString());
-                stmt.setInt(2, wins);
-                stmt.setInt(3, games);
-                stmt.setInt(4, kills);
-                stmt.setInt(5, missiles);
-                stmt.setInt(6, utility);
-                stmt.setInt(7, deaths);
+                stmt.setInt(2, portals);
+                stmt.setInt(3, wins);
+                stmt.setInt(4, games);
+                stmt.setInt(5, kills);
+                stmt.setInt(6, missiles);
+                stmt.setInt(7, utility);
+                stmt.setInt(8, deaths);
                 stmt.execute();
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Failed to update stats for " + Bukkit.getPlayer(uuid).getName());
