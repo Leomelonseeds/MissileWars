@@ -13,7 +13,7 @@ There are now 4 different Decks (kits), each with 5 different missiles, 3 unique
 * **Sentinel** - A defense specialist, with sturdy missiles and utility items like the torpedo and obsidian shield.
 * **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
 
-Each deck can be upgraded and customized to your liking, with up to 3 presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless.
+Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless.
 
 Hours have been spent balancing each item and passive. Any build you can come up with may be just as viable as the next. Counter strong builds with ones of your own, and find strategies to master the use of each deck.
 ![image](https://user-images.githubusercontent.com/17891302/172035160-7b004f57-35cc-4ee4-a233-d24430ca11f5.png)
@@ -40,14 +40,17 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 * **Cube Crowd** - The dumbest map name represents our coolest idea, a skygrid style field of blocks to chill on.
 ![](https://i.imgur.com/zKrGraC.jpg)
 
-## Gameplay
+## Gameplay & QOL
 Here are just a few of the most important features that you might not have seen before.
-* You now need to blow up *all* enemy portals to win
+* You now need to blow up *all* enemy portals to win (and there can be many :).
 * A tracker system associates portal breaks and kills from TNT to yourself. Blocked a missile with a shield or your own missile? That's your kill. Sniped someone with a Slingshot missile? That's your kill.
-* An endstone shield has been added to the center back of each team's base to make it harder to blow up both portals at once
-* Berserker fireballs now have greater explosion power to counter Architect shieldstacking
-* Each deck has a different weapon item (Golden Sword, Crossbow, Bow, Pickaxe) to improve variety and make sure decks are balanced
-* Most Rocket Riders missiles were nerfed in terms of TNT
+* A rankup and stats system has been added. Gain more skillpoints with each rankup to use in your decks, and climb the leaderboards.
+* A 30 minute game timer, after which the team with the most portals remaining wins. Chaos mode starts when there are 10 minutes remaining, with 2x item speed.
+* Receive multiple of one item, with a cap at 6 items (unless you upgrade the Hoarder passive).
+* A cooldown of 0.4 seconds between each missile spawn.
+* Auto-queue into the next game after the current game ends.
+* Use /votemap to pick your favorite map.
+* Use /settings to customize your queueing options.
 
 ## Roadmap
 Why stop here? Missile Wars is in active development. Here are the features I have planned out:
