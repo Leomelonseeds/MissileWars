@@ -50,6 +50,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
+import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.ess3.api.events.AfkStatusChangeEvent;
@@ -386,6 +387,9 @@ public class ArenaGameruleListener implements Listener {
         if (possibleArena == null) {
             return;
         }
+        
+        Tracker t = possibleArena.getTracker();
+        t.registerExplosionEvent(event);
 
         // Check for shield breaks
         event.blockList().forEach(block -> {

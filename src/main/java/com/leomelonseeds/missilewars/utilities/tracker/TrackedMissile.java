@@ -41,8 +41,6 @@ public class TrackedMissile extends Tracked {
                updatePosition();
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), timer, timer));
-        
-        MissileWarsPlugin.getPlugin().log("Tracking a new missile spawned by player " + player.getName());
     }
     
     private void updatePosition() {
@@ -61,6 +59,7 @@ public class TrackedMissile extends Tracked {
         pos2.add(dir);
         inMotion = true;
         pistonEventCount = 0;
+        MissileWarsPlugin.getPlugin().log("A " + name + " spawned by player " + player.getName() + " moved forward by " + dir.toString());
     }
     
     @Override
@@ -109,7 +108,6 @@ public class TrackedMissile extends Tracked {
                 }
             }
         }
-        MissileWarsPlugin.getPlugin().log("A missile spawned by player " + player.getName() + " tested positive for removal by emptiness.");
         return true;
     }
 }

@@ -4,7 +4,6 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason;
@@ -46,19 +45,5 @@ public class TrackerListener implements Listener {
         
         Tracker t = arena.getTracker();
         t.registerPistonEvent(e);
-    }
-    
-    @EventHandler
-    public void tntExploded(EntityExplodeEvent e) {
-        // Get arena
-        World world = e.getEntity().getWorld();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(world);
-        if (arena == null) {
-            return;
-        }
-        
-        Tracker t = arena.getTracker();
-        t.registerExplosionEvent(e);
     }
 }

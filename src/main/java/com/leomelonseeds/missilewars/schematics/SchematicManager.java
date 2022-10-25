@@ -217,12 +217,12 @@ public class SchematicManager {
                 pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
                 direction = BlockFace.SOUTH;
             } else if (rotation == StructureRotation.CLOCKWISE_180) {
-                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
-                pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
-                direction = BlockFace.NORTH;
-            } else if (rotation == StructureRotation.CLOCKWISE_90) {
                 pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
                 pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
+                direction = BlockFace.NORTH;
+            } else if (rotation == StructureRotation.CLOCKWISE_90) {
+                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
+                pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
                 direction = BlockFace.WEST;
             } else {
                 pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);

@@ -23,8 +23,6 @@ public class TrackedUtility extends Tracked {
                 remove();
             }, duration * 20);
         }
-        
-        MissileWarsPlugin.getPlugin().log("Tracking a new utility spawned by player " + player.getName());
     }
 
     @Override
@@ -51,7 +49,6 @@ public class TrackedUtility extends Tracked {
                 }
             }
         }
-        MissileWarsPlugin.getPlugin().log("A utility spawned by player " + player.getName() + " tested positive for removal by emptiness.");
         return true;
     }
 

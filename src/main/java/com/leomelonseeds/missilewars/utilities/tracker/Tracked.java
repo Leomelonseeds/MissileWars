@@ -64,9 +64,7 @@ public abstract class Tracked {
      */
     public void registerExplosion() {
         explosions++;
-        MissileWarsPlugin.getPlugin().log("An explosion was logged for a tracked object spawned by " + player.getName());
         if (explosions > maxExplosions) {
-            MissileWarsPlugin.getPlugin().log("A tracked object spawned by player " + player.getName() + " tested positive for removal by explosion.");
             remove();
         }
     }
