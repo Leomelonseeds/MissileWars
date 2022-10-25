@@ -1308,7 +1308,7 @@ public class Arena implements ConfigurationSerializable {
         }
         String most_deaths = String.join(", ", mostDeathsList);
 
-        int most_mvp_amount = mvp.isEmpty() ? 0 : mvp.get(0).getKills();
+        int most_mvp_amount = mvp.isEmpty() ? 0 : mvp.get(0).getMVP();
         int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
         int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getDeaths();
 
