@@ -393,7 +393,7 @@ public class CustomItemListener implements Listener {
                 }
                 
                 // No repairman/outside base = remove leaves
-                if (repairman == 0 || !ConfigUtils.inShield(playerArena, loc, team)) {
+                if (repairman == 0 || !ConfigUtils.inShield(playerArena, loc, team, 5)) {
                     loc.getBlock().setType(Material.AIR);
                     return;
                 }

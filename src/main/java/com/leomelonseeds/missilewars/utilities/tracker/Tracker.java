@@ -95,27 +95,29 @@ public class Tracker {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Tracked source = null;
-            // Check for collisions. If none, set source to missile tracked itself
-            // Iterate in reverse to check for most recently spawned missile
+            // Check if any missile contains this primed TNT location
             for (Tracked t : tracked) {
-                if (t.contains(l)) {
+                if (t.contains(l) && t instanceof TrackedMissile) {
                     source = t;
                     MissileWarsPlugin.getPlugin().log("A TNT prime event's source could possibly be " + t.getPlayer().getName());
-                    // Check for tracked objects that have collided with the given one
-                    for (int j = tracked.size() - 1; j >= 0; j--) {
-                        Tracked t2 = tracked.get(j);
-                        // Cannot be the same one
-                        if (t.equals(t2)) {
-                            continue;
-                        }
-                        // Cannot be going in the same direction
-                        if (t2.getDirection() == t.getDirection()) {
-                            continue;
-                        }
-                        if (t.contains(t2)) {
-                            source = t2;
-                            MissileWarsPlugin.getPlugin().log("A TNT prime event's source was changed to " + t2.getPlayer().getName());
-                            break;
+                    // If missile is moving, check for collisions that caused this primer
+                    // Iterate in reverse to check for most recently spawned missile
+                    if (((TrackedMissile) t).isInMotion()) {
+                        for (int j = tracked.size() - 1; j >= 0; j--) {
+                            Tracked t2 = tracked.get(j);
+                            // Cannot be the same one
+                            if (t.equals(t2)) {
+                                continue;
+                            }
+                            // Cannot be going in the same direction
+                            if (t2.getDirection() == t.getDirection()) {
+                                continue;
+                            }
+                            if (t.contains(t2)) {
+                                source = t2;
+                                MissileWarsPlugin.getPlugin().log("A TNT prime event's source was changed to " + t2.getPlayer().getName());
+                                break;
+                            }
                         }
                     }
                     break;

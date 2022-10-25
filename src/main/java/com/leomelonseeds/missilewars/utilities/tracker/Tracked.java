@@ -19,6 +19,7 @@ public abstract class Tracked {
     public static final int maxExplosions = 1;
     
     protected List<BukkitTask> removalTasks;
+    protected String name;
     protected Player player;
     protected Location pos1;
     protected Location pos2;
@@ -26,7 +27,8 @@ public abstract class Tracked {
     protected Tracker tracker;
     private int explosions;
     
-    public Tracked(Player player, Location pos1, Location pos2, BlockFace direction) {
+    public Tracked(String name, Player player, Location pos1, Location pos2, BlockFace direction) {
+        this.name = name;
         this.pos1 = pos1;
         this.pos2 = pos2;
         this.direction = direction;
@@ -129,6 +131,10 @@ public abstract class Tracked {
     public void remove() {
         tracker.remove(this);
         cancelTasks();
+    }
+    
+    public String getName() {
+        return name;
     }
     
     public Player getPlayer() {

@@ -15,7 +15,7 @@ public class TrackedUtility extends Tracked {
     public static final int minBlocksBeforeRemoval = 5;
 
     public TrackedUtility(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction) {
-        super(player, pos1, pos2, direction);
+        super(name, player, pos1, pos2, direction);
         
         if (name.contains("obsidianshield")) {
             int duration = (int) ConfigUtils.getItemValue(name, level, "duration");

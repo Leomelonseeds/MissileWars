@@ -10,13 +10,11 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -250,20 +248,6 @@ public class ArenaGameruleListener implements Listener {
             if (projectile.getShooter() instanceof Player) {
                 damager = (Player) projectile.getShooter();
                 isProjectile = true;
-            }
-        } else if (event.getDamager().getType() == EntityType.CREEPER) {
-            Creeper creeper = (Creeper) event.getDamager();
-            Player spawner = null;
-            if (creeper.isCustomNameVisible()) {
-                String name = ChatColor.stripColor(ConfigUtils.toPlain(creeper.customName()));
-                String[] args = name.split(" ");
-                spawner = Bukkit.getPlayer(args[0]);
-            }
-            if (spawner != null) {
-                EntityDamageEvent newDamage = new EntityDamageByEntityEvent(spawner, player, DamageCause.ENTITY_EXPLOSION, 0.0001);
-                player.setLastDamageCause(newDamage);
-                Bukkit.getServer().getPluginManager().callEvent(newDamage);
-                return;
             }
         }
         

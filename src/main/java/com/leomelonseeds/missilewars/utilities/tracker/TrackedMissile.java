@@ -22,15 +22,13 @@ public class TrackedMissile extends Tracked {
     public static final int minStickyPistons = 1;
     public static final int minSlimeBlocks = 2;
     
-    private String name;
     private int pistonEventCount;
     private boolean inMotion;
     
     public TrackedMissile(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction) {
-        super(player, pos1, pos2, direction);
-        this.name = name;
+        super(name, player, pos1, pos2, direction);
         this.pistonEventCount = 0;
-        this.inMotion = true;
+        this.inMotion = false;
         
         double speed = (double) ConfigUtils.getItemValue(name, level, "speed");
         int timer = speeds.get(speed);
@@ -45,7 +43,7 @@ public class TrackedMissile extends Tracked {
     
     private void updatePosition() {
         // Checks if piston events were detected
-        if (pistonEventCount < minPistonEvents) {
+        if (pistonEventCount < minPistonEvents && inMotion) {
             MissileWarsPlugin.getPlugin().log("A " + name + " stopped moving.");
             inMotion = false;
             return;
@@ -112,5 +110,9 @@ public class TrackedMissile extends Tracked {
             }
         }
         return true;
+    }
+    
+    public boolean isInMotion() {
+        return inMotion;
     }
 }
