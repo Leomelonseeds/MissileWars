@@ -371,7 +371,7 @@ public class CustomItemListener implements Listener {
         if (naturesblessing > 0) {
             durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
         } else if (repairman > 0) {
-            if (ConfigUtils.inShield(playerArena, loc, team, 5)) {
+            if (ConfigUtils.inShield(playerArena, loc, team, 6)) {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
@@ -393,7 +393,7 @@ public class CustomItemListener implements Listener {
                 }
                 
                 // No repairman/outside base = remove leaves
-                if (repairman == 0 || !ConfigUtils.inShield(playerArena, loc, team, 5)) {
+                if (repairman == 0 || !ConfigUtils.inShield(playerArena, loc, team, 6)) {
                     loc.getBlock().setType(Material.AIR);
                     return;
                 }
@@ -574,19 +574,15 @@ public class CustomItemListener implements Listener {
     /** Utility should go through players */
     @EventHandler
     public void handleUtilityCollisions(ProjectileHitEvent event) {
-        // Ensure we are tracking a utility thrown by a player
-        if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
-              event.getEntity().getType() == EntityType.EGG ||
-              event.getEntity().getType() == EntityType.ENDER_PEARL ||
-              event.getEntity().getType() == EntityType.SPLASH_POTION)) {
-            return;
-        }
-
         Projectile thrown = event.getEntity();
-
         // Make sure a player threw this projectile
         // If it has a custom name, it definitely is a missile wars item
-        if (!(thrown.getShooter() instanceof Player) || (thrown.customName() == null)) {
+        if (!(thrown.getShooter() instanceof Player)) {
+            return;
+        }
+        
+        // Make sure projectile hit an entity
+        if (event.getHitEntity() == null) {
             return;
         }
 
@@ -597,16 +593,30 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Check if prickly
+        // Always disallow projectiles to collide with players of same team
+        if (event.getHitEntity().getType() == EntityType.PLAYER) {
+            Player hit = (Player) event.getHitEntity();
+            String team1 = playerArena.getTeam(thrower.getUniqueId());
+            String team2 = playerArena.getTeam(hit.getUniqueId());
+            if (team1.equals(team2)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
+        // Here, either players on different teams or hit entity not player
+        // Allow collisions if arrow or fireball
+        if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.FIREBALL) {
+            return;
+        }
+        
+        // Allow collisions if prickly projectiles
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "prickly") > 0) {
             return;
         }
 
-        // Make them go through entities
-        if (event.getHitEntity() != null) {
-            event.setCancelled(true);
-            return;
-        }
+        // Otherwise, also cancel all collisions
+        event.setCancelled(true);
     }
 
     /** Handle spawning of utility structures */

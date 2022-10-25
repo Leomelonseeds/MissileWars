@@ -91,7 +91,6 @@ public class Tracker {
      * @return
      */
     public void assignPrimeSource(Location l) {
-        MissileWarsPlugin.getPlugin().log("A TNT prime event was passed to the Tracker");
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Tracked source = null;
@@ -99,7 +98,6 @@ public class Tracker {
             for (Tracked t : tracked) {
                 if (t.contains(l) && t instanceof TrackedMissile) {
                     source = t;
-                    MissileWarsPlugin.getPlugin().log("A TNT prime event's source could possibly be " + t.getPlayer().getName());
                     // If missile is moving, check for collisions that caused this primer
                     // Iterate in reverse to check for most recently spawned missile
                     if (((TrackedMissile) t).isInMotion()) {
@@ -115,7 +113,6 @@ public class Tracker {
                             }
                             if (t.contains(t2)) {
                                 source = t2;
-                                MissileWarsPlugin.getPlugin().log("A TNT prime event's source was changed to " + t2.getPlayer().getName());
                                 break;
                             }
                         }
@@ -124,10 +121,8 @@ public class Tracker {
                 }
             }
             if (source == null) {
-                MissileWarsPlugin.getPlugin().log("A TNT prime event's source could not be determined.");
                 return;
             }
-            MissileWarsPlugin.getPlugin().log("A TNT prime event's source was determined to be a tracked object spawned by " + source.getPlayer().getName());
             // Set the TNTPrimed in this location to use the player as source
             Tracked result = source;
             Bukkit.getScheduler().runTask(plugin, () -> {
@@ -137,7 +132,6 @@ public class Tracker {
                     }
                     TNTPrimed tnt = (TNTPrimed) e;
                     tnt.setSource(result.getPlayer());
-                    MissileWarsPlugin.getPlugin().log("A TNT's source was finally set to " + result.getPlayer().getName());
                 }
             });
         });

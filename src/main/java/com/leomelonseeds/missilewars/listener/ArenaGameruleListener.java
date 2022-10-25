@@ -205,7 +205,6 @@ public class ArenaGameruleListener implements Listener {
     
 
     /** Handle friendly fire + other things */
-    @SuppressWarnings("deprecation")
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
