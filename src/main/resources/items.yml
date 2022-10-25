@@ -1169,8 +1169,7 @@ Sentinel:
       lore:
       - ""
       - "&7Receive Strength and Resistance with"
-      - "&7amplifier %amplifier% &7while in your"
-      - "&7base."
+      - "&7amplifier %amplifier% &7while in your base."
       cost: 1000
       1:
         spcost: 1

@@ -94,8 +94,9 @@ public class Tracker {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Tracked source = null;
-            // Check if any missile contains this primed TNT location
-            for (Tracked t : tracked) {
+            // Check if any most recently spawned missile contains this primed TNT location
+            for (int i = tracked.size() - 1; i >= 0; i--) {
+                Tracked t = tracked.get(i);
                 if (t.contains(l) && t instanceof TrackedMissile) {
                     source = t;
                     // If missile is moving, check for collisions that caused this primer
