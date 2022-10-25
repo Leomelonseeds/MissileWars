@@ -1188,6 +1188,7 @@ public class Arena implements ConfigurationSerializable {
         for (BukkitTask task : tasks) {
             task.cancel();
         }
+        stopTrackers();
         running = false;
         resetting = true;
         waitingForTie = false;
@@ -1427,7 +1428,6 @@ public class Arena implements ConfigurationSerializable {
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
-        stopTrackers();
         resetting = false;
         setupMapVotes();
     }
