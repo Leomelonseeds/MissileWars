@@ -1542,11 +1542,14 @@ public class Arena implements ConfigurationSerializable {
             }
         }
         
-        // Send messages if player found, and is on opposite team
+        // Send messages if player found
         String msg;
-        if (!(player == null || broketeam.containsPlayer(player.getUniqueId()) || getTeam(player.getUniqueId()).equals("no team"))) {
+        if (!(player == null || getTeam(player.getUniqueId()).equals("no team"))) {
             msg = ConfigUtils.getConfigText("messages.portal-broke-player", null, null, player);
-            getPlayerInArena(player.getUniqueId()).addToMVP(1);
+            // Only add to stats if on opposite team
+            if (enemy.containsPlayer(player.getUniqueId())) {
+                getPlayerInArena(player.getUniqueId()).addToMVP(1);
+            }
         } else {
             msg = ConfigUtils.getConfigText("messages.portal-broke", null, null, null);
         }
