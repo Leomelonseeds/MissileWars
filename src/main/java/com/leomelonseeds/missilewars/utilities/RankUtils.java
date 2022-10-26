@@ -40,7 +40,7 @@ public class RankUtils {
                 return i;
             }
         }
-        return 0;
+        return 10;
     }
 
     /**
