@@ -593,18 +593,21 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Always disallow projectiles to collide with players of same team
-        if (event.getHitEntity().getType() == EntityType.PLAYER) {
-            Player hit = (Player) event.getHitEntity();
-            String team1 = playerArena.getTeam(thrower.getUniqueId());
-            String team2 = playerArena.getTeam(hit.getUniqueId());
-            if (team1.equals(team2)) {
-                event.setCancelled(true);
-                return;
-            }
+        // We're only handling utility collisions against players
+        if (event.getHitEntity().getType() != EntityType.PLAYER) {
+            return;
         }
         
-        // Here, either players on different teams or hit entity not player
+        // Always disallow projectiles to collide with players of same team
+        Player hit = (Player) event.getHitEntity();
+        String team1 = playerArena.getTeam(thrower.getUniqueId());
+        String team2 = playerArena.getTeam(hit.getUniqueId());
+        if (team1.equals(team2)) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Here, players must be on different teams
         // Allow collisions if arrow or fireball
         if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.FIREBALL) {
             return;
