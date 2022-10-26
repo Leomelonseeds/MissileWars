@@ -6,7 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent;
-import com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
@@ -24,13 +23,8 @@ public class TrackerListener implements Listener {
             return;
         }
         
-        // Only handle prime by redstone
-        if (e.getReason() != PrimeReason.REDSTONE) {
-            return;
-        }
-        
         Tracker t = arena.getTracker();
-        t.assignPrimeSource(e.getBlock().getLocation());
+        t.assignPrimeSource(e);
     }
     
     @EventHandler

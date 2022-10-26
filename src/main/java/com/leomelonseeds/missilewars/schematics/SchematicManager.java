@@ -230,9 +230,9 @@ public class SchematicManager {
                 direction = BlockFace.EAST;
             }
             if (isMissile) {
-                new TrackedMissile(args[0], level, player, pos1, pos2, direction);
+                new TrackedMissile(args[0], level, player, pos1, pos2, direction, redMissile);
             } else {
-                new TrackedUtility(args[0], level, player, pos1, pos2, direction);
+                new TrackedUtility(args[0], level, player, pos1, pos2, direction, redMissile);
             }
         }
         

@@ -16,24 +16,20 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 
 public abstract class Tracked {
     
-    public static final int maxExplosions = 1;
-    
     protected List<BukkitTask> removalTasks;
-    protected String name;
     protected Player player;
     protected Location pos1;
     protected Location pos2;
     protected BlockFace direction;
     protected Tracker tracker;
-    private int explosions;
+    private boolean isRed;
     
-    public Tracked(String name, Player player, Location pos1, Location pos2, BlockFace direction) {
-        this.name = name;
+    public Tracked(Player player, Location pos1, Location pos2, BlockFace direction, boolean isRed) {
         this.pos1 = pos1;
         this.pos2 = pos2;
         this.direction = direction;
-        this.explosions = 0;
         this.player = player;
+        this.isRed = isRed;
         this.removalTasks = new ArrayList<>();
         
         ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
@@ -58,16 +54,6 @@ public abstract class Tracked {
     public void cancelTasks() {
         for (BukkitTask task : removalTasks) {
             task.cancel();
-        }
-    }
-    
-    /**
-     * Remove if more than 2 TNT explosions have been registered here
-     */
-    public void registerExplosion() {
-        explosions++;
-        if (explosions > maxExplosions) {
-            remove();
         }
     }
     
@@ -133,8 +119,8 @@ public abstract class Tracked {
         cancelTasks();
     }
     
-    public String getName() {
-        return name;
+    public boolean isRed() {
+        return isRed;
     }
     
     public Player getPlayer() {

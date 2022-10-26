@@ -24,11 +24,13 @@ public class TrackedMissile extends Tracked {
     
     private int pistonEventCount;
     private boolean inMotion;
+    private String name;
     
-    public TrackedMissile(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction) {
-        super(name, player, pos1, pos2, direction);
+    public TrackedMissile(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction, boolean isRed) {
+        super(player, pos1, pos2, direction, isRed);
         this.pistonEventCount = 0;
         this.inMotion = false;
+        this.name = name;
         
         double speed = (double) ConfigUtils.getItemValue(name, level, "speed");
         int timer = speeds.get(speed);

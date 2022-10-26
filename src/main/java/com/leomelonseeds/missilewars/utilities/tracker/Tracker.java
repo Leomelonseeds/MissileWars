@@ -8,12 +8,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 
+import com.destroystokyo.paper.event.block.TNTPrimeEvent;
+import com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class Tracker {
     
@@ -66,38 +68,33 @@ public class Tracker {
     }
     
     /**
-     * Registers an explosion to all missiles/utility that contain
-     * the location of the event
-     * 
-     * @param e
-     */
-    public void registerExplosionEvent(EntityExplodeEvent e) {
-        EntityType entity = e.getEntityType();
-        if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
-                entity == EntityType.CREEPER) {
-            Location l = e.getLocation();
-            for (Tracked t : new ArrayList<>(tracked)) {
-                if (t.contains(l)) {
-                    t.registerExplosion();
-                }
-            }
-        }
-    }
-    
-    /**
      * Gets the most likely prime source given a tnt prime location
      * 
      * @param l
      * @return
      */
-    public void assignPrimeSource(Location l) {
+    public void assignPrimeSource(TNTPrimeEvent event) {
+        // Check if explosion or redstone related event
+        PrimeReason reason = event.getReason();
+        if (!(reason == PrimeReason.REDSTONE || reason == PrimeReason.EXPLOSION)) {
+            return;
+        }
+        Location l = event.getBlock().getLocation();
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Tracked source = null;
             // Check if any most recently spawned missile contains this primed TNT location
             for (int i = tracked.size() - 1; i >= 0; i--) {
                 Tracked t = tracked.get(i);
-                if (t.contains(l) && t instanceof TrackedMissile) {
+                if (t instanceof TrackedMissile && t.contains(l)) {
+                    // Shortcut if explosion occurs for an embedded missile
+                    if (reason == PrimeReason.EXPLOSION) {
+                        if (isEmbedded(t)) {
+                            source = t;
+                            break;
+                        }
+                        continue;
+                    }
                     source = t;
                     // If missile is moving, check for collisions that caused this primer
                     // Iterate in reverse to check for most recently spawned missile
@@ -137,5 +134,13 @@ public class Tracker {
                 }
             });
         });
+    }
+    
+    // Checks whether the given tracked object is embedded in the opponent's base
+    private boolean isEmbedded(Tracked t) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        Arena arena = plugin.getArenaManager().getArena(t.getPos1().getWorld());
+        String oppositeTeam = t.isRed() ? "blue" : "red";
+        return ConfigUtils.inShield(arena, t.getPos1(), oppositeTeam) || ConfigUtils.inShield(arena, t.getPos2(), oppositeTeam);
     }
 }
