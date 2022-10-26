@@ -1252,7 +1252,7 @@ public class Arena implements ConfigurationSerializable {
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
         int use_utility = ranksConfig.getInt("experience.use_utility");
         int kill = ranksConfig.getInt("experience.kill");
-        double portal_broken = (double) blueTeam.getTotalPortals() / ranksConfig.getInt("experience.portal_broken");
+        double portal_broken = (double) ranksConfig.getInt("experience.portal_broken") / blueTeam.getTotalPortals();
         int shield_health = ranksConfig.getInt("experience.shield_health");
         int win = ranksConfig.getInt("experience.win");
 
