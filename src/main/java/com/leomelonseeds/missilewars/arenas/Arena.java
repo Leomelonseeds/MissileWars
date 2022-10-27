@@ -1532,7 +1532,7 @@ public class Arena implements ConfigurationSerializable {
             Creeper creeper = (Creeper) entity;
             if (creeper.isCustomNameVisible()) {
                 String name = ChatColor.stripColor(ConfigUtils.toPlain(creeper.customName()));
-                String[] args = name.split(" ");
+                String[] args = name.split("'");
                 player = Bukkit.getPlayer(args[0]);
             }
         } else if (entity.getType() == EntityType.PRIMED_TNT) {
