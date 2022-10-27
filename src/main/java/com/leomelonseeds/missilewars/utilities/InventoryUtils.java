@@ -102,7 +102,7 @@ public class InventoryUtils {
                     boolean empty = invItem == null;
                     ItemStack current = inventory.getItem(i);
                     boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
-                    if (!(i == 39 || i == 4 || (isPotion && empty))) {
+                    if (!(i == 39 || (isPotion && empty))) {
                         inventory.setItem(i, invItem);
                     }
                 }

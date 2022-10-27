@@ -97,18 +97,13 @@ public class Tracker {
                     }
                     source = t;
                     // If missile is moving, check for collisions that caused this primer
-                    // Iterate in reverse to check for most recently spawned missile
+                    // Iterate in reverse to check for more recently spawned missile
                     if (((TrackedMissile) t).isInMotion()) {
-                        for (int j = tracked.size() - 1; j >= 0; j--) {
+                        for (int j = tracked.size() - 1; j > i; j--) {
                             Tracked t2 = tracked.get(j);
-                            // Cannot be going in the same direction
-                            if (t2.getDirection() == t.getDirection()) {
+                            // Cannot be the same team
+                            if (t.isRed() == t2.isRed()) {
                                 continue;
-                            }
-                            // If we got here, then there is no recently spawned structure
-                            // that triggered this primer.
-                            if (t.equals(t2)) {
-                                break;
                             }
                             if (t.contains(t2)) {
                                 source = t2;

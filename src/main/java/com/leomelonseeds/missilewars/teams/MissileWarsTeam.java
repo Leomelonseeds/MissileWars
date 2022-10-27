@@ -378,7 +378,7 @@ public class MissileWarsTeam {
         while (loc.clone().add(0, 1, 0).getBlock().getType() != Material.OBSIDIAN) {
             loc.add(0, 1, 0);
         }
-        if (portals.get(loc)) {
+        if (portals.get(loc) != null) {
             portals.put(loc, false);
             return true;
         }
