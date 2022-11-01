@@ -1,17 +1,22 @@
 package com.leomelonseeds.missilewars.utilities.tracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason;
@@ -19,12 +24,15 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+/* Tracks missiles, utilities, and TNT minecarts to be used for tracking kills/portal breaks */
 public class Tracker {
     
     List<Tracked> tracked;
+    Map<ExplosiveMinecart, Player> minecarts;
     
     public Tracker() {
         tracked = new ArrayList<>();
+        minecarts = new HashMap<>();
     }
     
     public void add(Tracked t) {
@@ -47,6 +55,28 @@ public class Tracker {
             t.cancelTasks();
         }
         tracked.clear();
+        minecarts.clear();
+    }
+    
+    public void registerTNTMinecart(ExplosiveMinecart cart, Player player) {
+        minecarts.put(cart, player);
+    }
+    
+    public Player getTNTMinecartSource(ExplosiveMinecart cart) {
+        return minecarts.get(cart);
+    }
+    
+    /**
+     * Registers an explosion, used for tnt minecarts
+     * 
+     * @param e
+     */
+    public void registerExplosion(EntityExplodeEvent e) {
+        if (e.getEntityType() != EntityType.MINECART_TNT) {
+            return;
+        }
+        ExplosiveMinecart cart = (ExplosiveMinecart) e.getEntity();
+        minecarts.remove(cart);
     }
     
     /**

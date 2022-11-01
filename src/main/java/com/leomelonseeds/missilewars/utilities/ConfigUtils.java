@@ -19,7 +19,12 @@ import org.bukkit.SoundCategory;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -29,7 +34,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 
-/** Utility Class for acquiring data from config files. */
+/** Utility Class for acquiring data from config files, and other useful functions. */
 public class ConfigUtils {
 
     // Map of open cached config files
@@ -437,5 +442,34 @@ public class ConfigUtils {
      */
     public static String toPlain(Component component) {
         return PlainTextComponentSerializer.plainText().serialize(component);
+    }
+    
+    /**
+     * Gets the cause/associated player of a spawned entity
+     * mainly used for tracking kills and broken portals
+     * 
+     * @param killerEntity
+     * @param arena
+     * @return
+     */
+    public static Player getAssociatedPlayer(Entity killerEntity, Arena arena) {
+        Player player = null;
+        if (killerEntity.getType() == EntityType.CREEPER) {
+            Creeper creeper = (Creeper) killerEntity;
+            if (creeper.isCustomNameVisible()) {
+                String name = ChatColor.stripColor(toPlain(creeper.customName()));
+                String[] args = name.split("'");
+                player = Bukkit.getPlayer(args[0]);
+            }
+        } else if (killerEntity.getType() == EntityType.PRIMED_TNT) {
+            TNTPrimed tnt = (TNTPrimed) killerEntity;
+            if (tnt.getSource() instanceof Player) {
+                player = (Player) tnt.getSource();
+            }
+        } else if (killerEntity.getType() == EntityType.MINECART_TNT) {
+            ExplosiveMinecart cart = (ExplosiveMinecart) killerEntity;
+            player = arena.getTracker().getTNTMinecartSource(cart);
+        }
+        return player;
     }
 }

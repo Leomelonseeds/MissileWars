@@ -19,12 +19,14 @@ import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -565,7 +567,7 @@ public class CustomItemListener implements Listener {
                     if (!thrower.isOnline()) {
                         return;
                     }
-                    spawnUtility(structureName, thrown.getLocation(), thrower, thrown, playerArena);
+                    spawnUtility(structureName, thrower, thrown, playerArena);
                 }
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
@@ -623,7 +625,8 @@ public class CustomItemListener implements Listener {
     }
 
     /** Handle spawning of utility structures */
-    public void spawnUtility(String structureName, Location spawnLoc, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
+    public void spawnUtility(String structureName, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
+        Location spawnLoc = thrown.getLocation();
         String mapName = "default-map";
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
@@ -640,6 +643,12 @@ public class CustomItemListener implements Listener {
                 sound = "spawn-shield";
             } else if (structureName.contains("torpedo")) {
                 sound = "spawn-torpedo";
+                // Register all spawned TNT minecarts into the tracker
+                for (Entity e : spawnLoc.getNearbyEntities(2, 2, 2)) {
+                    if (e.getType() == EntityType.MINECART_TNT) {
+                        playerArena.getTracker().registerTNTMinecart((ExplosiveMinecart) e, thrower);
+                    }
+                }
             } 
             for (Player players : thrower.getWorld().getPlayers()) {
                 ConfigUtils.sendConfigSound(sound, players, spawnLoc);

@@ -420,6 +420,9 @@ public class ArenaGameruleListener implements Listener {
                 }
             });
         }
+        
+        // Register explosion to tracker
+        possibleArena.getTracker().registerExplosion(event);
     }
 
     /** Handle shield block breaks breaks. */

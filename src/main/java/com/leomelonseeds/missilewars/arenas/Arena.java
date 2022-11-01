@@ -27,11 +27,8 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -1527,20 +1524,7 @@ public class Arena implements ConfigurationSerializable {
         }
         
         // Check if has associated player
-        Player player = null;
-        if (entity.getType() == EntityType.CREEPER) {
-            Creeper creeper = (Creeper) entity;
-            if (creeper.isCustomNameVisible()) {
-                String name = ChatColor.stripColor(ConfigUtils.toPlain(creeper.customName()));
-                String[] args = name.split("'");
-                player = Bukkit.getPlayer(args[0]);
-            }
-        } else if (entity.getType() == EntityType.PRIMED_TNT) {
-            TNTPrimed tnt = (TNTPrimed) entity;
-            if (tnt.getSource() instanceof Player) {
-                player = (Player) tnt.getSource();
-            }
-        }
+        Player player = ConfigUtils.getAssociatedPlayer(entity, this);
         
         // Send messages if player found
         String msg;
