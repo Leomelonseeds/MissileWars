@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.utilities.tracker;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -25,12 +26,14 @@ public class TrackedMissile extends Tracked {
     private int pistonEventCount;
     private boolean inMotion;
     private String name;
+    private Player blockBrokePlayer;
     
     public TrackedMissile(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction, boolean isRed) {
         super(player, pos1, pos2, direction, isRed);
         this.pistonEventCount = 0;
         this.inMotion = false;
         this.name = name;
+        this.blockBrokePlayer = null;
         
         double speed = (double) ConfigUtils.getItemValue(name, level, "speed");
         int timer = speeds.get(speed);
@@ -59,6 +62,21 @@ public class TrackedMissile extends Tracked {
         pos2.add(dir);
         pistonEventCount = 0;
         inMotion = true;
+    }
+    
+    public Player getBlockBroke() {
+        return blockBrokePlayer;
+    }
+    
+    // Register first player to break block for 1 second. Others aren't counted.
+    public void registerBlockBroke(Player breaker) {
+        if (blockBrokePlayer != null) {
+            return;
+        }
+        blockBrokePlayer = breaker;
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            blockBrokePlayer = null;
+        }, 20);
     }
     
     @Override
