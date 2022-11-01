@@ -1379,27 +1379,21 @@ public class Arena implements ConfigurationSerializable {
         }
 
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
-
-        // Remove all players after a short time or immediately if none exist
-        if (plugin.isEnabled() && players.size() > 0) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    removePlayers();
-                    startTime = null;
-                }
-            }.runTaskLater(plugin, waitTime);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    resetWorld();
-                }
-            }.runTaskLater(plugin, waitTime + 100L);
-        } else {
-            removePlayers();
-            resetWorld();
-            startTime = null;
+        
+        if (!plugin.isEnabled()) {
+            return;
         }
+
+        // Remove all players after a short time, then reset the world a bit after
+        startTime = null;
+        if (players.size() > 0) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                removePlayers();
+            }, waitTime);
+        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            resetWorld();
+        }, waitTime + 100L);
     }
     
     /** Remove Players from the map. */
