@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -181,7 +183,16 @@ public class ArenaInventoryListener implements Listener {
         if (deck == null) {
             return;
         }
-       
+        
+        // Allow pickup if item is a deconstructor block
+        ItemStack item = event.getItem().getItemStack();
+        List<String> accepted = plugin.getConfig().getStringList("deconstructor-blocks");
+        String material = item.getType().toString();
+        for (String s : accepted) {
+            if (material.contains(s)) {
+                return;
+            }
+        }
 
         // Cancel event if player cannot pick up item based on their given deck
         if (!deck.hasInventorySpace(mwPlayer.getMCPlayer(), false)) {
@@ -190,7 +201,6 @@ public class ArenaInventoryListener implements Listener {
         }
         
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
-            ItemStack item = event.getItem().getItemStack();
             // Can't be same player
             if (event.getItem().getThrower() == player.getUniqueId()) {
                 return;
