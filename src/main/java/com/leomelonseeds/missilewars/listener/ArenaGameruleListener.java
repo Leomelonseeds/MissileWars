@@ -438,6 +438,9 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Register event with areana's tracker
+        possibleArena.getTracker().registerBlockBreakEvent(event);
+        
         // Fix dumb bug. No break obsidian
         if (block.getType().toString().contains("OBSIDIAN")) {
             event.setCancelled(true);
