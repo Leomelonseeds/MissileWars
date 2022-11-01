@@ -76,7 +76,16 @@ public class Tracker {
             return;
         }
         ExplosiveMinecart cart = (ExplosiveMinecart) e.getEntity();
-        minecarts.remove(cart);
+        Player source = minecarts.remove(cart);
+        // Sets source of other tnts
+        for (Entity entity : cart.getNearbyEntities(3, 3, 3)) {
+            if (entity.getType() == EntityType.PRIMED_TNT) {
+                TNTPrimed tnt = (TNTPrimed) entity;
+                if (tnt.getSource() == null) {
+                    tnt.setSource(source);
+                }
+            }
+        }
     }
     
     /**
