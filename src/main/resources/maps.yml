@@ -323,6 +323,56 @@ classic:
       x2: 30
       y2: 16
       z2: 90
+  butterflies:
+    name: "&fButterflies"
+    file: "Butterflies.schem"
+    pos:
+      x: 0
+      y: 19
+      z: 0
+    blue-spawn:
+      x: 0.5
+      y: 17
+      z: -66.5
+    red-spawn:
+      x: 0.5
+      y: 17
+      z: 67.5
+    portals:
+      1: 
+        x: 10
+        y: 15
+        z: -75
+      2: 
+        x: -23
+        y: -1
+        z: -60
+      3: 
+        x: -4
+        y: -1
+        z: -60
+      4: 
+        x: 7
+        y: -1
+        z: -60
+      5: 
+        x: 26
+        y: -1
+        z: -60
+    blue-shield:
+      x1: -28
+      y1: -7
+      z1: -74
+      x2: 28
+      y2: 19
+      z2: -39
+    red-shield:
+      x1: -28
+      y1: -7
+      z1: 39
+      x2: 28
+      y2: 19
+      z2: 74
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"
