@@ -150,7 +150,7 @@ public class PresetSelector implements MWInventory {
             }
             
             // Check clicktypes
-            if (type == ClickType.RIGHT || type == ClickType.SHIFT_LEFT) {
+            if (type == ClickType.RIGHT) {
                 if (player.hasPermission("umw.autoselect")) {
                     // Choose preset
                     playerJson.put("Deck", deck);

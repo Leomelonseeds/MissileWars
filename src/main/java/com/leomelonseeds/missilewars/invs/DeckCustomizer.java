@@ -308,7 +308,7 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Right click to downgrade.
-        if (type == ClickType.RIGHT || type == ClickType.SHIFT_LEFT) {
+        if (type == ClickType.RIGHT) {
             // Enchantments have min level 0
             if (level <= (name.contains(".") ? 0 : 1)) {
                 return;
