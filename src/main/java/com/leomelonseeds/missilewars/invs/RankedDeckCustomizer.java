@@ -213,7 +213,7 @@ public class RankedDeckCustomizer implements MWInventory {
         }
         
         // Right click to downgrade.
-        if (type == ClickType.RIGHT) {
+        if (type == ClickType.RIGHT || type == ClickType.SHIFT_LEFT) {
             // Enchantments have min level 0
             if (level <= (name.contains(".") ? 0 : 1)) {
                 return;
