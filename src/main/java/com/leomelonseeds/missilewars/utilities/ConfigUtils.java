@@ -46,13 +46,13 @@ public class ConfigUtils {
      * @param configName
      * @return
      */
-    public static FileConfiguration getConfigFile(String configName) {
+    public static FileConfiguration getConfigFile(String configName, String directory) {
         // Check for config file in cache
         if (configCache.containsKey(configName)) {
             return configCache.get(configName);
         }
 
-        File file = new File(MissileWarsPlugin.getPlugin().getDataFolder().toString(), configName);
+        File file = new File(MissileWarsPlugin.getPlugin().getDataFolder().toString() + directory, configName);
         FileConfiguration config = new YamlConfiguration();
         try {
             config.load(file);
@@ -61,6 +61,10 @@ public class ConfigUtils {
         }
         configCache.put(configName, config);
         return config;
+    }
+    
+    public static FileConfiguration getConfigFile(String configName) {
+        return getConfigFile(configName, "");
     }
     
     /**
