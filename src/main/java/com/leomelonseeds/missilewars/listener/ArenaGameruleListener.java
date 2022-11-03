@@ -29,6 +29,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -62,6 +64,38 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onHunger(FoodLevelChangeEvent event) {
         if (event.getEntity().getWorld().getName().contains("mwarena_")) {
+            event.setCancelled(true);
+        }
+    }
+    
+    // Stop players from regen health in opponent base
+    @EventHandler
+    public void onRegen(EntityRegainHealthEvent event) {
+
+        if (event.getRegainReason() != RegainReason.SATIATED) { 
+            return; 
+        }
+
+        //Check if entity is player
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        // Check if player is in arena
+        Player player = (Player) event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena == null) {
+            return;
+        }
+        
+        String team = playerArena.getTeam(player.getUniqueId());
+        if (team.equals("no team")) {
+            return;
+        }
+        
+        String opponentTeam = team.contains("red") ? "blue" : "red";
+        if (ConfigUtils.inShield(playerArena, player.getLocation(), opponentTeam, 8)) {
             event.setCancelled(true);
         }
     }
