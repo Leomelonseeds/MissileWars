@@ -1154,16 +1154,16 @@ Sentinel:
       cutoff: 20
       1:
         spcost: 1
-        plus: 0.05
-        max: 2
-      2:
-        spcost: 2
         plus: 0.10
         max: 4
-      3:
+      2:
         spcost: 2
         plus: 0.15
         max: 6
+      3:
+        spcost: 2
+        plus: 0.20
+        max: 8
     warden:
       name: "&eWarden"
       lore:
