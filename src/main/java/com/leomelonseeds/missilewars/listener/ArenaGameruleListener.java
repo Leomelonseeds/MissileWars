@@ -199,6 +199,10 @@ public class ArenaGameruleListener implements Listener {
         
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
+            // 5 seconds should be enough for a bow shot, riiiight
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                bowShots.remove(player);
+            }, 100);
         }
     }
     
@@ -272,7 +276,7 @@ public class ArenaGameruleListener implements Listener {
             if (projectile.getShooter() instanceof Player) {
                 // Longshot calculations
                 if (projectile.getType() == EntityType.ARROW) {
-                    if (bowShots.containsKey(damager)) {
+                    if (bowShots.containsKey(damager) && bowShots.get(damager).getWorld().equals(damager.getWorld())) {
                         int longshot = plugin.getJSON().getAbility(damager.getUniqueId(), "longshot");
                         double plus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
                         double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
@@ -286,6 +290,8 @@ public class ArenaGameruleListener implements Listener {
                             double extradmg = Math.min(extradistance * plus, max);
                             event.setDamage(dmg + extradmg);
                         }
+                        
+                        bowShots.remove(damager);
                     }
 
                     // Arrowhealth message
