@@ -51,6 +51,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -149,7 +150,7 @@ public class ArenaGameruleListener implements Listener {
         MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
         missileWarsPlayer.incrementDeaths();
         for (Player p : player.getWorld().getPlayers()) {
-            p.sendMessage(deathMessage);
+            p.sendMessage(CosmeticUtils.getDeathMessage(player, player.getKiller()));
         }
 
         // Un-obstruct spawns

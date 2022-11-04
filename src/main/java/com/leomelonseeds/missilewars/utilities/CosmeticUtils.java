@@ -29,6 +29,7 @@ public class CosmeticUtils {
             for (String s : possible) {
                 if (damageCause.contains(s)) {
                     result = getFromConfig(messages, format, "death." + s);
+                    break;
                 }
             }
         } else {
@@ -37,6 +38,7 @@ public class CosmeticUtils {
             for (String s : possible) {
                 if (damageCause.contains(s)) {
                     result = getFromConfig(messages, format, "kill.other");
+                    break;
                 }
             }
             result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
