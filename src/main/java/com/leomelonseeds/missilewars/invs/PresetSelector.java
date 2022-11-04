@@ -88,11 +88,12 @@ public class PresetSelector implements MWInventory {
             meta.lore(ConfigUtils.toComponent(lore));
             item.setItemMeta(meta);
             // Slots 10, 12, 14
-            inv.setItem(i * 2 + 10, item);
+            // NO RANKED PRESET AT THE MOMENT, PUT 10 INSTEAD OF 11 IF ADDED BACK
+            inv.setItem(i * 2 + 11, item);
         }
         
-        ItemStack ranked = MissileWarsPlugin.getPlugin().getDeckManager().createItem("ranked", 0, false);
-        inv.setItem(16, ranked);
+        // ItemStack ranked = MissileWarsPlugin.getPlugin().getDeckManager().createItem("ranked", 0, false);
+        // inv.setItem(16, ranked);
         
         // Add bottom panes
         for (int i = 27; i < 36; i++) {

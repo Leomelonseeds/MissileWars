@@ -88,7 +88,7 @@ public class JSONManager {
                 for (String deck : plugin.getDeckManager().getDecks()) {
                     JSONObject deckjson = newJson.getJSONObject(deck);
                     updateJson(deckjson, defaultJson.getJSONObject(deck));
-                    if (Bukkit.getPlayer(uuid).hasPermission("group.royal")) {
+                    if (Bukkit.getPlayer(uuid).hasPermission("umw.unlockall")) {
                         for (String key : deckjson.keySet()) {
                             if (deckjson.get(key) instanceof Boolean) {
                                 deckjson.put(key, true);
@@ -198,14 +198,17 @@ public class JSONManager {
                                 currentpreset.put("skillpoints", finalsp);
                             }
                         } else {
-                            newJson.getJSONObject(deck).put(preset, defaultpreset);
+                            // Only load presets player has permissions for to save on storage
+                            if (Bukkit.getPlayer(uuid) != null && Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase())) {
+                                newJson.getJSONObject(deck).put(preset, defaultpreset);
+                            }
                         }
                     }
                     
                     // Create ranked preset if not exist
-                    if (!deckjson.has("R")) {
-                        deckjson.put("R", createRankedPreset(deck));
-                    }
+                    // if (!deckjson.has("R")) {
+                    //    deckjson.put("R", createRankedPreset(deck));
+                    // }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
