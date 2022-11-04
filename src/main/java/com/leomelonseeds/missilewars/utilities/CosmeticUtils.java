@@ -43,10 +43,10 @@ public class CosmeticUtils {
                 }
             }
             result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
-            if (damageCause.contains("entity") || damageCause.contains("projectile")) {
+            if (damageCause.equals("entity") || damageCause.equals("projectile")) {
                 ItemStack item = killer.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR && item.hasItemMeta()) {
-                    String name = ConfigUtils.toPlain(item.displayName());
+                    String name = ConfigUtils.toPlain(item.displayName()).replaceAll("[|]", "");
                     result += messages.getString("weapon").replace("%item%", name);
                 }
             }
