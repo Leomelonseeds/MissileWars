@@ -49,15 +49,18 @@ public class CosmeticUtils {
             result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
             
             // Add item name if one of these death causes
-            String[] itemCauses = {"void", "attack", "fall", "magic", "projectile"};
-            for (String cause : itemCauses) {
-                if (damageCause.contains(cause)) {
-                    ItemStack item = killer.getInventory().getItemInMainHand();
-                    if (item.getType() != Material.AIR && item.hasItemMeta()) {
-                        String name = ConfigUtils.toPlain(item.displayName());
-                        result += messages.getString("weapon").replace("%item%", name.replaceAll("\\[|\\]", ""));
+            if (!dead.equals(killer)) {
+                String[] itemCauses = {"void", "attack", "fall", "magic", "projectile"};
+                for (String cause : itemCauses) {
+                    if (damageCause.contains(cause)) {
+                        ItemStack item = killer.getInventory().getItemInMainHand();
+                        if (item.getType() != Material.AIR && item.hasItemMeta()) {
+                            String name = ConfigUtils.toPlain(item.displayName());
+                            String using = getFromConfig(messages, format, "weapon");
+                            result += using.replace("%item%", name.replaceAll("\\[|\\]", ""));
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }

@@ -1,5 +1,5 @@
-weapon: " &7using %item%"
 default:
+  weapon: " &7using %item%"
   death:
     void: "%dead% &7fell into the void"
     fire: "%dead% &7burnt to death"
@@ -19,4 +19,4 @@ default:
     projectile: "%dead% &7was shot by %killer%"
     magic: "%dead% &7was intoxicated by %killer%"
     thorns: "%dead% &7was pricked to death by %killer%"
-    other: "%dead% &7was killed by %killer%"
+    other: "%dead% &7was somehow killed by %killer%"
