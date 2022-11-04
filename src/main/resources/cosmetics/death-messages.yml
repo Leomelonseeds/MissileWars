@@ -1,0 +1,22 @@
+weapon: " &7using %item%"
+default:
+  death:
+    void: "%player% &7fell into the void"
+    fire: "%player% &7burnt to death"
+    lava: "%player% &7tried to swim in lava"
+    suffocation: "%player% &7was suffocated by a missile"
+    fall: "%player% &7hit the ground too hard"
+    explosion: "%player% &7blew up"
+    drowning: "%player% &7drowned"
+    other: "%player% &7somehow died"
+  kill:
+    void: "%dead% &7was knocked into the void by %player%"
+    explosion: "%dead% &7was blown up by %player%"
+    fall: "%dead% &7was knocked off a cliff by %player%"
+    fire: "%dead% &7was burned to death by %player%"
+    lava: "%dead% &7tried to swim in lava to escape %player%"
+    entity: "%dead% &7was killed by %player%"
+    projectile: "%dead% &7was shot by %player%"
+    magic: "%dead% &7was intoxicated by %player%"
+    thorns: "%dead% &7was pricked to death by %player%"
+    other: "%dead% &7was killed by %player%"
