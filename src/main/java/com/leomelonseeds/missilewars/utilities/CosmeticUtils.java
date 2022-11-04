@@ -6,6 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.json.JSONObject;
+
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
 import net.kyori.adventure.text.Component;
 
@@ -22,9 +25,9 @@ public class CosmeticUtils {
     public static Component getDeathMessage(Player dead, Player killer) {
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
         String damageCause = dead.getLastDamageCause().getCause().toString().toLowerCase();
-        String format = "default";
         String result;
         if (killer == null) {
+            String format = getFormat("death-messages", dead);
             Set<String> possible = messages.getConfigurationSection("default.death").getKeys(false);
             result = getFromConfig(messages, format, "death.other");
             for (String s : possible) {
@@ -34,6 +37,7 @@ public class CosmeticUtils {
                 }
             }
         } else {
+            String format = getFormat("death-messages", killer);
             Set<String> possible = messages.getConfigurationSection("default.kill").getKeys(false);
             result = getFromConfig(messages, format, "kill.other");
             for (String s : possible) {
@@ -70,4 +74,9 @@ public class CosmeticUtils {
         }
     }
 
+    // Get the player's selected cosmetic
+    private static String getFormat(String cosmetic, Player player) {
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+        return json.getString(cosmetic);
+    }
 }

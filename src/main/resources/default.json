@@ -4,6 +4,7 @@
 	"missilespec": false,
 	"utilityspec": false,
 	"hoarder": false,
+	"death-messages": "default",
 	"Vanguard": {
 		"feather_falling": false,
 		"fire_aspect": false,
