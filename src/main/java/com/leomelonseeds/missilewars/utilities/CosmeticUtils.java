@@ -37,7 +37,7 @@ public class CosmeticUtils {
             result = getFromConfig(messages, format, "kill.other");
             for (String s : possible) {
                 if (damageCause.contains(s)) {
-                    result = getFromConfig(messages, format, "kill.other");
+                    result = getFromConfig(messages, format, "kill." + s);
                     break;
                 }
             }

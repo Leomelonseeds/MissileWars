@@ -128,7 +128,6 @@ public class ArenaGameruleListener implements Listener {
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
-        Component deathMessage = event.deathMessage();
         event.deathMessage(Component.text(""));
         
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
@@ -146,7 +145,7 @@ public class ArenaGameruleListener implements Listener {
             }
         }
 
-        // Count death if player is on a team
+        // Count death if player is on a team, and send custom death message
         MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
         missileWarsPlayer.incrementDeaths();
         for (Player p : player.getWorld().getPlayers()) {
