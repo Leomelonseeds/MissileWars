@@ -97,111 +97,122 @@ public class JSONManager {
                     }
                     JSONObject defaultpreset = defaultPresets.get(deck);
                     for (String preset : plugin.getDeckManager().getPresets()) {
-                        if (deckjson.has(preset)) {
-                            JSONObject currentpreset = deckjson.getJSONObject(preset);
-                            updateJson(currentpreset, defaultpreset);
-                            
-                            // Update json and calculate the amount of skillpoints the player should have remaining
-                            int finalsp = getMaxSkillpoints(uuid);
-                            // Anything not in this array is an enchantment
-                            List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints"});
-                            
-                            // Calculate sp spent on missiles and utility
-                            // Also updates their jsons
-                            for (String s : new String[] {"missiles", "utility"}) {
-                                JSONObject json = currentpreset.getJSONObject(s);
-                                updateJson(json, defaultpreset.getJSONObject(s));
-                                for (String k : json.keySet()) {
-                                    int maxLevel = plugin.getDeckManager().getMaxLevel(k);
-                                    int level = json.getInt(k);
-                                    if (level > maxLevel) {
-                                        json.put(k, maxLevel);
-                                        level = maxLevel;
-                                    }
-                                    while (level > 1) {
-                                        int cost = itemConfig.getInt(k + "." + level + ".spcost");
-                                        finalsp -= cost;
-                                        level--;
-                                    }
-                                }
+                        // Only load presets player has permissions for to save on storage
+                        boolean hasPreset = Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase());
+                        if (!deckjson.has(preset) && !hasPreset) {
+                            continue;
+                        }
+                        
+                        // Remove preset if it exists
+                        if (!hasPreset) {
+                            if (deckjson.has(preset)) {
+                                deckjson.remove(preset);
                             }
-                            
-                            // Calculate sp spent on gpassives, and delete if gpassive not exist
-                            String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
-                            int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
-                            Set<String> passives = itemConfig.getConfigurationSection("gpassive").getKeys(false);
-                            if (!passives.contains(gpassive)) {
-                                currentpreset.getJSONObject("gpassive").put("selected", "None");
-                                currentpreset.getJSONObject("gpassive").put("level", 0);
-                            } else {
-                                int maxLevel = plugin.getDeckManager().getMaxLevel("gpassive." + gpassive);
-                                if (gpassivelevel > maxLevel) {
-                                    currentpreset.getJSONObject("gpassive").put("level", maxLevel);
-                                    gpassivelevel = maxLevel;
+                            continue;
+                        }
+                        
+                        // Paste preset if deck doesn't contain it
+                        if (!deckjson.has(preset)) {
+                            newJson.getJSONObject(deck).put(preset, defaultpreset);
+                        }
+                        
+                        // Update json and calculate amount of skillpoints player should have remaining
+                        JSONObject currentpreset = deckjson.getJSONObject(preset);
+                        updateJson(currentpreset, defaultpreset);
+                        int finalsp = getMaxSkillpoints(uuid);
+                        // Anything not in this array is an enchantment
+                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints"});
+                        
+                        // Calculate sp spent on missiles and utility
+                        // Also updates their jsons
+                        for (String s : new String[] {"missiles", "utility"}) {
+                            JSONObject json = currentpreset.getJSONObject(s);
+                            updateJson(json, defaultpreset.getJSONObject(s));
+                            for (String k : json.keySet()) {
+                                int maxLevel = plugin.getDeckManager().getMaxLevel(k);
+                                int level = json.getInt(k);
+                                if (level > maxLevel) {
+                                    json.put(k, maxLevel);
+                                    level = maxLevel;
                                 }
-                                while (gpassivelevel > 0) {
-                                    int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
+                                while (level > 1) {
+                                    int cost = itemConfig.getInt(k + "." + level + ".spcost");
                                     finalsp -= cost;
-                                    gpassivelevel--;
+                                    level--;
                                 }
                             }
-                            
-                            // Calculate sp spent on abilities and passives, and delete if not exist
-                            for (String s : new String[] {"passive", "ability"}) {
-                                int level = currentpreset.getJSONObject(s).getInt("level");
-                                String ability = currentpreset.getJSONObject(s).getString("selected");
-                                // Change ".passive" to "." + s when abilities come out
-                                Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
-                                if (!abilities.contains(ability)) {
-                                    currentpreset.getJSONObject(s).put("selected", "None");
-                                    currentpreset.getJSONObject(s).put("level", 0);
-                                }
-                                else {
-                                    int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".passive." + ability);
-                                    if (level > maxLevel) {
-                                        currentpreset.getJSONObject(s).put("level", maxLevel);
-                                        level = maxLevel;
-                                    }
-                                    while (level > 0) {
-                                        int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
-                                        finalsp -= cost;
-                                        level--;
-                                    }
-                                }
-                            }
-                            
-                            // Calculate sp spent on enchantments
-                            for (String k : currentpreset.keySet()) {
-                                if (!all.contains(k)) {
-                                    int level = currentpreset.getInt(k);
-                                    int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
-                                    if (level > maxLevel) {
-                                        currentpreset.put(k, maxLevel);
-                                        level = maxLevel;
-                                    }
-                                    while (level > 0) {
-                                        int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
-                                        finalsp -= cost;
-                                        level--;
-                                    }
-                                }
-                            }
-                            
-                            // Account for edge cases where finalsp may be below 0
-                            if (finalsp < 0) {
-                                String msg = ConfigUtils.getConfigText("messages.sp-negative", null, null, null);
-                                msg = msg.replace("%deck%", deck);
-                                msg = msg.replace("%preset%", preset);
-                                Bukkit.getPlayer(uuid).sendMessage(msg);
-                                newJson.getJSONObject(deck).put(preset, defaultpreset);
-                            } else {
-                                currentpreset.put("skillpoints", finalsp);
-                            }
+                        }
+                        
+                        // Calculate sp spent on gpassives, and delete if gpassive not exist
+                        String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
+                        int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
+                        Set<String> passives = itemConfig.getConfigurationSection("gpassive").getKeys(false);
+                        if (!passives.contains(gpassive)) {
+                            currentpreset.getJSONObject("gpassive").put("selected", "None");
+                            currentpreset.getJSONObject("gpassive").put("level", 0);
                         } else {
-                            // Only load presets player has permissions for to save on storage
-                            if (Bukkit.getPlayer(uuid) != null && Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase())) {
-                                newJson.getJSONObject(deck).put(preset, defaultpreset);
+                            int maxLevel = plugin.getDeckManager().getMaxLevel("gpassive." + gpassive);
+                            if (gpassivelevel > maxLevel) {
+                                currentpreset.getJSONObject("gpassive").put("level", maxLevel);
+                                gpassivelevel = maxLevel;
                             }
+                            while (gpassivelevel > 0) {
+                                int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
+                                finalsp -= cost;
+                                gpassivelevel--;
+                            }
+                        }
+                        
+                        // Calculate sp spent on abilities and passives, and delete if not exist
+                        for (String s : new String[] {"passive", "ability"}) {
+                            int level = currentpreset.getJSONObject(s).getInt("level");
+                            String ability = currentpreset.getJSONObject(s).getString("selected");
+                            // Change ".passive" to "." + s when abilities come out
+                            Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
+                            if (!abilities.contains(ability)) {
+                                currentpreset.getJSONObject(s).put("selected", "None");
+                                currentpreset.getJSONObject(s).put("level", 0);
+                            }
+                            else {
+                                int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".passive." + ability);
+                                if (level > maxLevel) {
+                                    currentpreset.getJSONObject(s).put("level", maxLevel);
+                                    level = maxLevel;
+                                }
+                                while (level > 0) {
+                                    int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
+                                    finalsp -= cost;
+                                    level--;
+                                }
+                            }
+                        }
+                        
+                        // Calculate sp spent on enchantments
+                        for (String k : currentpreset.keySet()) {
+                            if (!all.contains(k)) {
+                                int level = currentpreset.getInt(k);
+                                int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
+                                if (level > maxLevel) {
+                                    currentpreset.put(k, maxLevel);
+                                    level = maxLevel;
+                                }
+                                while (level > 0) {
+                                    int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
+                                    finalsp -= cost;
+                                    level--;
+                                }
+                            }
+                        }
+                        
+                        // Account for edge cases where finalsp may be below 0
+                        if (finalsp < 0) {
+                            String msg = ConfigUtils.getConfigText("messages.sp-negative", null, null, null);
+                            msg = msg.replace("%deck%", deck);
+                            msg = msg.replace("%preset%", preset);
+                            Bukkit.getPlayer(uuid).sendMessage(msg);
+                            newJson.getJSONObject(deck).put(preset, defaultpreset);
+                        } else {
+                            currentpreset.put("skillpoints", finalsp);
                         }
                     }
                     
