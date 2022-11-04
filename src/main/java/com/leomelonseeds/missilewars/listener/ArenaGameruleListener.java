@@ -134,22 +134,29 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
 
-        // Find killer and increment kills
-        if (player.getKiller() != null) {
-            MissileWarsPlayer killer = playerArena.getPlayerInArena(player.getKiller().getUniqueId());
-            String team1 = playerArena.getTeam(player.getUniqueId());
-            String team2 = playerArena.getTeam(player.getKiller().getUniqueId());
-            if (!(player.getKiller().equals(player) || team1.equals(team2))) {
-                killer.incrementKills();
-                ConfigUtils.sendConfigSound("player-kill", killer.getMCPlayer());
-            }
+        // Count death if player is on a team
+        playerArena.getPlayerInArena(player.getUniqueId()).incrementDeaths();
+        
+        // Find the player's killer
+        Player killer = player.getKiller();
+        if (killer == null && player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) player.getLastDamageCause();
+            killer = ConfigUtils.getAssociatedPlayer(damageEvent.getDamager(), playerArena);
         }
 
-        // Count death if player is on a team, and send custom death message
-        MissileWarsPlayer missileWarsPlayer = playerArena.getPlayerInArena(player.getUniqueId());
-        missileWarsPlayer.incrementDeaths();
+        // Find killer and increment kills
+        if (killer != null) {
+            String team1 = playerArena.getTeam(player.getUniqueId());
+            String team2 = playerArena.getTeam(killer.getUniqueId());
+            if (!(killer.equals(player) || team1.equals(team2))) {
+                playerArena.getPlayerInArena(killer.getUniqueId()).incrementKills();
+                ConfigUtils.sendConfigSound("player-kill", killer);
+            }
+        }
+        
+        // Send death message
         for (Player p : player.getWorld().getPlayers()) {
-            p.sendMessage(CosmeticUtils.getDeathMessage(player, player.getKiller()));
+            p.sendMessage(CosmeticUtils.getDeathMessage(player, killer));
         }
 
         // Un-obstruct spawns

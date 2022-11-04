@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.Component;
 
+/** Various statistic and cosmetic related methods */
 public class CosmeticUtils {
     
     /**

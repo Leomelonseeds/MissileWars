@@ -76,8 +76,9 @@ public class Tracker {
             return;
         }
         ExplosiveMinecart cart = (ExplosiveMinecart) e.getEntity();
-        Player source = minecarts.remove(cart);
+        Player source = minecarts.get(cart);
         // Sets source of other tnts
+        // Also remove after 1 tick to give other events time to register this cart
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             for (Entity entity : cart.getNearbyEntities(3, 3, 3)) {
                 if (entity.getType() == EntityType.PRIMED_TNT) {
@@ -87,6 +88,7 @@ public class Tracker {
                     }
                 }
             }
+            minecarts.remove(cart);
         }, 1);
     }
     
