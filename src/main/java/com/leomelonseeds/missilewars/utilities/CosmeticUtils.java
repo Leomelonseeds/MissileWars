@@ -78,6 +78,31 @@ public class CosmeticUtils {
         return ConfigUtils.toComponent(result);
     }
     
+    /**
+     * Get a portal break message depending on killer
+     * 
+     * @param killer
+     * @param brokeTeam
+     * @return
+     */
+    public static Component getPortalMessage(Player killer, String brokeTeam) {
+        if (killer == null) {
+            return ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.portal-broke", null, null, null)
+                    .replace("%team%", brokeTeam));
+        }
+        FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
+        String prefix = "&5&l[!] ";
+        String format = getFormat("death-messages", killer);
+        String result = getFromConfig(messages, format, "portal");
+        result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
+        if (format.equals("rainbow")) {
+            return Component.text(ChatColor.translateAlternateColorCodes('&', prefix))
+                    .append(toRainbow(ChatColor.translateAlternateColorCodes('&', result)));
+        }
+        result = prefix + result;
+        return ConfigUtils.toComponent(result);
+    }
+    
     // Get from config or return default if not found
     private static String getFromConfig(FileConfiguration config, String format, String path) {
         if (config.contains(format + "." + path)) {

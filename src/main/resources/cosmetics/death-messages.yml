@@ -1,5 +1,6 @@
 default:
   weapon: " &7using %item%"
+  portal: "&7A %team% &7portal was broken by %killer%"
   death:
     void: "%dead% &7fell into the void"
     fire: "%dead% &7burnt to death"
@@ -22,6 +23,7 @@ default:
     other: "%dead% &7was somehow killed by %killer%"
 arch:
   weapon: ""
+  portal: "&7A %team% &7portal was broken by %killer%&7, who uses Arch btw"
   death:
     void: "%dead% &7fell into the void. They use Arch btw"
     fire: "%dead% &7burnt to death. They use Arch btw"
@@ -43,6 +45,7 @@ arch:
     thorns: "%dead% &7was pricked to death by %killer%&7, who uses Arch btw"
     other: "%dead% &7was somehow killed by %killer%&7, who uses Arch btw"
 morbin:
+  portal: "&7A %team% &7portal was morbed by %killer%"
   death:
     void: "%dead% &7morbed into the void"
     fire: "%dead% &7was morbed by fire"

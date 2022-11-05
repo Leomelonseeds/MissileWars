@@ -40,6 +40,7 @@ import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SQLManager;
@@ -1521,17 +1522,13 @@ public class Arena implements ConfigurationSerializable {
         Player player = ConfigUtils.getAssociatedPlayer(entity, this);
         
         // Send messages if player found
-        String msg;
-        if (!(player == null || getTeam(player.getUniqueId()).equals("no team"))) {
-            msg = ConfigUtils.getConfigText("messages.portal-broke-player", null, null, player);
+        if (!getTeam(player.getUniqueId()).equals("no team")) {
             // Only add to stats if on opposite team
             if (enemy.containsPlayer(player.getUniqueId())) {
                 getPlayerInArena(player.getUniqueId()).addToMVP(1);
             }
-        } else {
-            msg = ConfigUtils.getConfigText("messages.portal-broke", null, null, null);
         }
-        msg = msg.replace("%team%", broketeam.getName());
+        Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());
         for (MissileWarsPlayer mwPlayer : players) {
             mwPlayer.getMCPlayer().sendMessage(msg);
         }
