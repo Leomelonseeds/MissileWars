@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.utilities;
 
-import java.awt.Color;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -12,6 +11,10 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.util.HSVLike;
 import net.md_5.bungee.api.ChatColor;
 
 /** Various statistic and cosmetic related methods */
@@ -70,7 +73,7 @@ public class CosmeticUtils {
         result = result.replace("%dead%", ConfigUtils.getFocusName(dead));
         // Rainbow if rainbow
         if (format.equals("rainbow")) {
-            result = toRainbow(result);
+            return toRainbow(ChatColor.translateAlternateColorCodes('&', result));
         }
         return ConfigUtils.toComponent(result);
     }
@@ -90,26 +93,18 @@ public class CosmeticUtils {
         return json.getString(cosmetic);
     }
     
-    // Makes a text rainbow. Thanks IridiumColorAPI!
-    private static String toRainbow(String input) {
-        // Returns an array of colors depending on input length
+    // Makes a text rainbow.
+    private static TextComponent toRainbow(String input) {
         String stripped = ChatColor.stripColor(input);
-        int step = stripped.length();
-        ChatColor[] colors = new ChatColor[stripped.length()];
-        double colorStep = (1.00 / step);
-        for (int i = 0; i < step; i++) {
-            Color color = Color.getHSBColor((float) (colorStep * i), 1, 1);
-            colors[i] = ChatColor.of(color);
-        }
-        
-        // Apply color to each character
-        StringBuilder stringBuilder = new StringBuilder();
+        Builder result = Component.text();
         String[] characters = stripped.split("");
-        int outIndex = 0;
+        int charsBeforeFlip = 21;
+        double step = (double) 1 / charsBeforeFlip;
         for (int i = 0; i < characters.length; i++) {
-            stringBuilder.append(colors[outIndex++]).append(characters[i]);
+            float hsv = (float) (step * i - Math.floor(step * i));
+            result.append(Component.text().content(characters[i]).color(TextColor.color(HSVLike.hsvLike(hsv, 1, 1))));
         }
         
-        return stringBuilder.toString();
+        return result.build();
     }
 }
