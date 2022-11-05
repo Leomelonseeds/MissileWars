@@ -52,7 +52,7 @@ public class CosmeticUtils {
             String toUse = "locked";
             if (json.getString(cosmetic).equals(s)) {
                 toUse = "selected";
-                item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                meta.addEnchant(Enchantment.DURABILITY, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             } else if (hasPermission(player, cosmetic, s)) {
                 toUse = "not-selected";
@@ -146,6 +146,7 @@ public class CosmeticUtils {
         String format = getFormat("death-messages", killer);
         String result = getFromConfig(messages, format, "portal");
         result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
+        result = result.replace("%team%", brokeTeam);
         if (format.equals("rainbow")) {
             return Component.text(ChatColor.translateAlternateColorCodes('&', prefix))
                     .append(toRainbow(ChatColor.translateAlternateColorCodes('&', result)));
