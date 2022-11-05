@@ -20,3 +20,47 @@ default:
     magic: "%dead% &7was intoxicated by %killer%"
     thorns: "%dead% &7was pricked to death by %killer%"
     other: "%dead% &7was somehow killed by %killer%"
+arch:
+  weapon: ""
+  death:
+    void: "%dead% &7fell into the void. They use Arch btw"
+    fire: "%dead% &7burnt to death. They use Arch btw"
+    lava: "%dead% &7tried to swim in lava. They use Arch btw"
+    suffocation: "%dead% &7was suffocated by a missile. They use Arch btw"
+    fall: "%dead% &7hit the ground too hard. They use Arch btw"
+    explosion: "%dead% &7blew up. They use Arch btw"
+    drowning: "%dead% &7drowned. They use Arch btw"
+    other: "%dead% &7somehow died. They use Arch btw"
+  kill:
+    void: "%dead% &7was knocked into the void by %killer%&7, who uses Arch btw"
+    explosion: "%dead% &7was blown up by %killer%&7, who uses Arch btw"
+    fall: "%dead% &7was knocked off a cliff by %killer%&7, who uses Arch btw"
+    fire: "%dead% &7was burned to death by %killer%&7, who uses Arch btw"
+    lava: "%dead% &7tried to swim in lava to escape %killer%&7, who uses Arch btw"
+    entity: "%dead% &7was killed by %killer%&7, who uses Arch btw"
+    projectile: "%dead% &7was shot by %killer%&7, who uses Arch btw"
+    magic: "%dead% &7was intoxicated by %killer%&7, who uses Arch btw"
+    thorns: "%dead% &7was pricked to death by %killer%&7, who uses Arch btw"
+    other: "%dead% &7was somehow killed by %killer%&7, who uses Arch btw"
+morbin:
+  death:
+    void: "%dead% &7morbed into the void"
+    fire: "%dead% &7was morbed by fire"
+    lava: "%dead% &7was morbed by lava"
+    suffocation: "%dead% &7was morbed by a missile"
+    fall: "%dead% &7morbed into the ground too hard"
+    explosion: "%dead% &7blew into a morbillion pieces"
+  kill:
+    void: "%dead% &7was morbed into the void by %killer%"
+    explosion: "%dead% &7was blown into a morbillion pieces by %killer%"
+    fall: "%dead% &7was morbed off a cliff by %killer%"
+    fire: "%dead% &7was morbed by %killer%'s &7fire"
+    lava: "%dead% &7was morbed by %killer%'s &7lava"
+    entity: "%dead% &7was morbed by %killer%"
+    projectile: "%dead% &7was morbow'd by %killer%"
+    magic: "%dead% &7was morbed by %killer%'s &7potion"
+    thorns: "%dead% &7was morbed by %killer%'s &7thorns"
+    other: "%dead% &7was somehow morbed by %killer%"
+rainbow:
+  weapon: ""
+  

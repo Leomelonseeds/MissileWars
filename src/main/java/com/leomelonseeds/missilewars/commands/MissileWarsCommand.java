@@ -48,6 +48,35 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // A command used to set player cosmetics
+        if (action.equalsIgnoreCase("cosmetic")) {
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            
+            if (args.length != 3) {
+                sendErrorMsg(sender, "Usage: /umw cosmetic [cosmetic] [name]");
+                return true;
+            }
+            
+            // The admin gotta be smart man
+            String type = args[1];
+            String name = args[2];
+            JSONObject json = plugin.getJSON().getPlayer(player.getUniqueId());
+            if (!json.has(type)) {
+                sendErrorMsg(sender, "You suck, use an actual cosmetic please");
+                return true; 
+            }
+            
+            json.put(type, name);
+            
+            sendSuccessMsg(sender, "You set your cosmetic " + type + " to " + name);
+            return true; 
+        }
+        
         // A command specifically used to test passives/abilities
         if (action.equalsIgnoreCase("set")) {
             // Ensure player is allowed to create an arena

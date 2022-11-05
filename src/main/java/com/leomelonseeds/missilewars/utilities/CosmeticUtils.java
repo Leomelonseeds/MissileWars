@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.awt.Color;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
 
 /** Various statistic and cosmetic related methods */
 public class CosmeticUtils {
@@ -25,9 +27,10 @@ public class CosmeticUtils {
     public static Component getDeathMessage(Player dead, Player killer) {
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
         String damageCause = dead.getLastDamageCause().getCause().toString().toLowerCase();
+        String format;
         String result;
         if (killer == null) {
-            String format = getFormat("death-messages", dead);
+            format = getFormat("death-messages", dead);
             Set<String> possible = messages.getConfigurationSection("default.death").getKeys(false);
             result = getFromConfig(messages, format, "death.other");
             for (String s : possible) {
@@ -37,7 +40,7 @@ public class CosmeticUtils {
                 }
             }
         } else {
-            String format = getFormat("death-messages", killer);
+            format = getFormat("death-messages", killer);
             Set<String> possible = messages.getConfigurationSection("default.kill").getKeys(false);
             result = getFromConfig(messages, format, "kill.other");
             for (String s : possible) {
@@ -65,6 +68,10 @@ public class CosmeticUtils {
             }
         }
         result = result.replace("%dead%", ConfigUtils.getFocusName(dead));
+        // Rainbow if rainbow
+        if (format.equals("rainbow")) {
+            result = toRainbow(result);
+        }
         return ConfigUtils.toComponent(result);
     }
     
@@ -81,5 +88,28 @@ public class CosmeticUtils {
     private static String getFormat(String cosmetic, Player player) {
         JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         return json.getString(cosmetic);
+    }
+    
+    // Makes a text rainbow. Thanks IridiumColorAPI!
+    private static String toRainbow(String input) {
+        // Returns an array of colors depending on input length
+        String stripped = ChatColor.stripColor(input);
+        int step = stripped.length();
+        ChatColor[] colors = new ChatColor[stripped.length()];
+        double colorStep = (1.00 / step);
+        for (int i = 0; i < step; i++) {
+            Color color = Color.getHSBColor((float) (colorStep * i), 1, 1);
+            colors[i] = ChatColor.of(color);
+        }
+        
+        // Apply color to each character
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] characters = stripped.split("");
+        int outIndex = 0;
+        for (int i = 0; i < characters.length; i++) {
+            stringBuilder.append(colors[outIndex++]).append(characters[i]);
+        }
+        
+        return stringBuilder.toString();
     }
 }
