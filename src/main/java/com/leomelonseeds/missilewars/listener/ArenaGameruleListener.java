@@ -128,6 +128,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
+        Component deathMessage = event.deathMessage();
         event.deathMessage(Component.text(""));
         
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
@@ -156,7 +157,11 @@ public class ArenaGameruleListener implements Listener {
         
         // Send death message
         for (Player p : player.getWorld().getPlayers()) {
-            p.sendMessage(CosmeticUtils.getDeathMessage(player, killer));
+            if (p.hasPermission("umw.vanilladeathmessages")) {
+                p.sendMessage(deathMessage);
+            } else {
+                p.sendMessage(CosmeticUtils.getDeathMessage(player, killer));
+            }
         }
 
         // Un-obstruct spawns
