@@ -47,27 +47,37 @@ public class PresetSelector implements MWInventory {
         // Add preset items
         for (int i = 0; i < presets.size(); i++) {
             String p = presets.get(i);
-            JSONObject current = playerJson.getJSONObject(deck).getJSONObject(p);
             
             ItemStack item = new ItemStack(Material.getMaterial(itemConfig.getString("preset.item")));
             ItemMeta meta = item.getItemMeta();
-            
             meta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.name").replace("%preset%", p)));
             
+            // Fill item lore with passive info
             List<String> lore = new ArrayList<>();
-            for (String l : itemConfig.getStringList("preset.lore")) {
-                String gpassive = current.getJSONObject("gpassive").getString("selected");
-                if (!gpassive.equals("None")) {
-                    l = l.replaceAll("%gpassive%", itemConfig.getString("gpassive." + gpassive + ".name"));
-                } else {
-                    l = l.replaceAll("%gpassive%", "None");
-                }
+            JSONObject current = null;
+            if (playerJson.getJSONObject(deck).has(p)) {
+                current = playerJson.getJSONObject(deck).getJSONObject(p);
+            }
 
-                String passive = current.getJSONObject("passive").getString("selected");
-                if (!passive.equals("None")) {
-                    l = l.replaceAll("%passive%", itemConfig.getString(deck + ".passive." + passive + ".name"));
-                } else {
+            // Use null if player doesn't have the json, otherwise do manual replacements
+            for (String l : itemConfig.getStringList("preset.lore")) {
+                if (current == null) {
+                    l = l.replaceAll("%gpassive%", "None");
                     l = l.replaceAll("%passive%", "None");
+                } else {
+                    String gpassive = current.getJSONObject("gpassive").getString("selected");
+                    if (!gpassive.equals("None")) {
+                        l = l.replaceAll("%gpassive%", itemConfig.getString("gpassive." + gpassive + ".name"));
+                    } else {
+                        l = l.replaceAll("%gpassive%", "None");
+                    }
+
+                    String passive = current.getJSONObject("passive").getString("selected");
+                    if (!passive.equals("None")) {
+                        l = l.replaceAll("%passive%", itemConfig.getString(deck + ".passive." + passive + ".name"));
+                    } else {
+                        l = l.replaceAll("%passive%", "None");
+                    }
                 }
                 lore.add(l);
             }

@@ -387,8 +387,10 @@ public class JSONManager {
         DeckManager deckmanager = MissileWarsPlugin.getPlugin().getDeckManager();
         for (String d : deckmanager.getDecks()) {
             for (String p : deckmanager.getPresets()) {
-                JSONObject pjson = json.getJSONObject(d).getJSONObject(p);
-                pjson.put("skillpoints", pjson.getInt("skillpoints") + 1);
+                if (json.getJSONObject(d).has(p)) {
+                    JSONObject pjson = json.getJSONObject(d).getJSONObject(p);
+                    pjson.put("skillpoints", pjson.getInt("skillpoints") + 1); 
+                }  
             }
         }
     }
