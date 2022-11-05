@@ -247,3 +247,15 @@ inventories:
       lore:
         - "&7Votes: &c%umw_map_votes%"
         - "&cLeft-click &7to vote!"
+  cosmetics:
+    locked:
+      - ""
+      - "&4Locked"
+    not-selected:
+      - ""
+      - "&eClick to select!"
+    selected: 
+      - ""
+      - "&aSelected!"
+    death-messages:
+      title: "Kill/Death Messages"

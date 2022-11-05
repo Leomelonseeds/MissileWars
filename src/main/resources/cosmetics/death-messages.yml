@@ -1,4 +1,11 @@
 default:
+  menu-item:
+    item: PAPER
+    name: "&fDefault"
+    lore:
+    - ""
+    - "&7The good old death messages."
+    - "&7What's not to like?"
   weapon: " &7using %item%"
   portal: "&7A %team% &7portal was broken by %killer%"
   death:
@@ -22,6 +29,12 @@ default:
     thorns: "%dead% &7was pricked to death by %killer%"
     other: "%dead% &7was somehow killed by %killer%"
 arch:
+  menu-item:
+    item: TUBE_CORAL
+    name: "&bAverage Arch Linux user"
+    lore:
+    - ""
+    - "&7'I use Arch btw'"
   weapon: ""
   portal: "&7A %team% &7portal was broken by %killer%&7, who uses Arch btw"
   death:
@@ -45,6 +58,12 @@ arch:
     thorns: "%dead% &7was pricked to death by %killer%&7, who uses Arch btw"
     other: "%dead% &7was somehow killed by %killer%&7, who uses Arch btw"
 morbin:
+  menu-item:
+    item: ROTTEN_FLESH
+    name: "&8Morbius"
+    lore:
+    - ""
+    - "&7It's morbin' time"
   portal: "&7A %team% &7portal was morbed by %killer%"
   death:
     void: "%dead% &7morbed into the void"
@@ -65,5 +84,12 @@ morbin:
     thorns: "%dead% &7was morbed by %killer%'s &7thorns"
     other: "%dead% &7was somehow morbed by %killer%"
 rainbow:
+  menu-item:
+    item: RED_DYE
+    name: "&cr&6a&ei&an&9b&do&5w"
+    lore:
+    - ""
+    - "&7Become extremely fancy, and maybe"
+    - "&7acquire a leprechaun along the way."
   weapon: ""
   

@@ -1,11 +1,17 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -19,6 +25,45 @@ import net.md_5.bungee.api.ChatColor;
 
 /** Various statistic and cosmetic related methods */
 public class CosmeticUtils {
+    
+    /**
+     * Get the item stack for a cosmetic item
+     * 
+     * @return
+     */
+    public static List<ItemStack> getCosmeticItems(Player player, String cosmetic) {
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+        FileConfiguration cosmetics = ConfigUtils.getConfigFile(cosmetic + ".yml", "/cosmetics");
+        FileConfiguration messages = ConfigUtils.getConfigFile("messages.yml");
+        List<ItemStack> result = new ArrayList<>();
+        for (String s : cosmetics.getKeys(false)) {
+            // Get item
+            ConfigurationSection section = cosmetics.getConfigurationSection(s + ".menu-item");
+            ItemStack item = new ItemStack(Material.getMaterial(section.getString("item")));
+            ItemMeta meta = item.getItemMeta();
+            
+            // Display name + lore
+            meta.displayName(ConfigUtils.toComponent(section.getString("name")));
+            List<String> lore = section.getStringList("lore");
+            
+            // Add extra lore
+            String toUse = "locked";
+            if (json.getString(cosmetic).equals(s)) {
+                toUse = "selected";
+                item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            } else if (player.hasPermission("umw." + cosmetic + "." + s) || s.equals("default")) {
+                toUse = "not-selected";
+            }
+            lore.addAll(messages.getStringList("inventories.cosmetics." + toUse));
+            
+            // Finally create item
+            meta.lore(ConfigUtils.toComponent(lore));
+            item.setItemMeta(meta);
+            result.add(item);
+        }
+        return result;
+    }
     
     /**
      * Get a death message depending on a player and a killer
