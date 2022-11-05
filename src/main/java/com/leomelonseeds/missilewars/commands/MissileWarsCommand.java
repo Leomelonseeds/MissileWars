@@ -17,6 +17,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
+import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.PresetSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -50,30 +51,22 @@ public class MissileWarsCommand implements CommandExecutor {
         
         // A command used to set player cosmetics
         if (action.equalsIgnoreCase("cosmetic")) {
-            if (!sender.hasPermission("umw.admin")) {
-                sendErrorMsg(sender, "You do not have permission to do that!");
-                return true;
-            }
-            
             Player player = (Player) sender;
             
-            if (args.length != 3) {
-                sendErrorMsg(sender, "Usage: /umw cosmetic [cosmetic] [name]");
+            if (args.length != 2) {
+                sendErrorMsg(sender, "Usage: /umw cosmetic [cosmetic]");
                 return true;
             }
             
             // The admin gotta be smart man
             String type = args[1];
-            String name = args[2];
             JSONObject json = plugin.getJSON().getPlayer(player.getUniqueId());
             if (!json.has(type)) {
-                sendErrorMsg(sender, "You suck, use an actual cosmetic please");
+                sendErrorMsg(sender, "Please enter a valid cosmetic type");
                 return true; 
             }
             
-            json.put(type, name);
-            
-            sendSuccessMsg(sender, "You set your cosmetic " + type + " to " + name);
+            new CosmeticMenu(player, type);
             return true; 
         }
         

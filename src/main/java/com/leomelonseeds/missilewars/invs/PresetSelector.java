@@ -151,12 +151,14 @@ public class PresetSelector implements MWInventory {
             // Check permission for B
             if (p.equals("B") && !player.hasPermission("umw.preset.b")) {
                 ConfigUtils.sendConfigMessage("messages.preset-b-locked", player, null, null);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
             }
             
             // Check permission for C
             if (p.equals("C") && !player.hasPermission("umw.preset.c")) {
                 ConfigUtils.sendConfigMessage("messages.preset-c-locked", player, null, null);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
             }
             

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -52,10 +54,14 @@ public class CosmeticUtils {
                 toUse = "selected";
                 item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            } else if (player.hasPermission("umw." + cosmetic + "." + s) || s.equals("default")) {
+            } else if (hasPermission(player, cosmetic, s)) {
                 toUse = "not-selected";
             }
             lore.addAll(messages.getStringList("inventories.cosmetics." + toUse));
+            
+            // Add meta to store name of cosmetic item
+            meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "name"),
+                    PersistentDataType.STRING, s);
             
             // Finally create item
             meta.lore(ConfigUtils.toComponent(lore));
@@ -146,6 +152,22 @@ public class CosmeticUtils {
         }
         result = prefix + result;
         return ConfigUtils.toComponent(result);
+    }
+    
+    /**
+     * Checks if player has permission for a specific cosmetic item. Returns true
+     * if the cosmetic item is the default one
+     * 
+     * @param player
+     * @param cosmetic
+     * @param name
+     * @return
+     */
+    public static boolean hasPermission(Player player, String cosmetic, String name) {
+        if (name.equals("default")) {
+            return true;
+        }
+        return player.hasPermission("umw." + cosmetic + "." + name);
     }
     
     // Get from config or return default if not found

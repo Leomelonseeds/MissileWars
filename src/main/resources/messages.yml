@@ -109,6 +109,8 @@ messages:
   gg-exp: "&d+1 EXP"
   start-failed: "&c&l[!] &cThe game failed to start! Please contact an admin."
   portal-broke: "&5&l[!] &7A %team% &7portal was broken."
+  cosmetic-locked: "&c&l[!] &cYou do not own this cosmetic."
+  cosmetic-selected: "&a&l[!] &aCosmetic successfully selected."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
