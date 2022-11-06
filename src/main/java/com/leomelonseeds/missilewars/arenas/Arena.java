@@ -1522,7 +1522,7 @@ public class Arena implements ConfigurationSerializable {
         Player player = ConfigUtils.getAssociatedPlayer(entity, this);
         
         // Send messages if player found
-        if (!getTeam(player.getUniqueId()).equals("no team")) {
+        if (player != null && !getTeam(player.getUniqueId()).equals("no team")) {
             // Only add to stats if on opposite team
             if (enemy.containsPlayer(player.getUniqueId())) {
                 getPlayerInArena(player.getUniqueId()).addToMVP(1);
