@@ -155,12 +155,14 @@ public class ArenaGameruleListener implements Listener {
             }
         }
         
+        
         // Send death message
+        Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer);
         for (Player p : player.getWorld().getPlayers()) {
             if (p.hasPermission("umw.vanilladeathmessages")) {
                 p.sendMessage(deathMessage);
             } else {
-                p.sendMessage(CosmeticUtils.getDeathMessage(player, killer));
+                p.sendMessage(customDeathMessage);
             }
         }
 
