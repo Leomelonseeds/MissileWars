@@ -85,6 +85,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             int level = RankUtils.getRankLevel(exp);
             int max = 10;
 
+            if (params.equalsIgnoreCase("rank_level")) {
+                return Integer.toString(level);
+            }
+            
             if (params.equalsIgnoreCase("rank_exp_total")) {
                 return Integer.toString(exp);
             }
