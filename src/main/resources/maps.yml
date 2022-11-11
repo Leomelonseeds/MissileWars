@@ -120,6 +120,87 @@ classic:
         z: -72
     too-high: 25
     too-far: -45
+  traffic-light-cake:
+    name: "&fTraffic Light Cake"
+    file: "TrafficLightCake.schem"
+    pos:
+      x: 0
+      y: 17
+      z: 0
+    blue-shield:
+      x1: -25
+      y1: -13
+      z1: -65
+      x2: 25
+      y2: 20
+      z2: -49
+    red-shield:
+      x1: -25
+      y1: -13
+      z1: 49
+      x2: 25
+      y2: 20
+      z2: 65
+    portals:
+      1: 
+        x: -10
+        y: 16
+        z: -72
+      2: 
+        x: 8
+        y: 11
+        z: -72
+      3: 
+        x: 24
+        y: 6
+        z: -72
+  umbrella-beach:
+    name: "&fUmbrella Beach"
+    file: "UmbrellaBeach.schem"
+    pos:
+      x: 0
+      y: 17
+      z: 0
+    blue-shield:
+      z1: -66
+      z2: -45
+    red-shield:
+      z1: 45
+      z2: 66
+  darkness-fortress:
+    name: "&fDarkness Fortress"
+    file: "DarknessFortress.schem"
+    pos:
+      x: 0
+      y: 19
+      z: 0
+    blue-shield:
+      x1: -24
+      y1: -11
+      z1: -65
+      x2: 24
+      y2: 22
+      z2: -44
+    red-shield:
+      x1: -24
+      y1: -11
+      z1: 44
+      x2: 24
+      y2: 22
+      z2: 65
+    portals:
+      1: 
+        x: -9
+        y: 14
+        z: -72
+      2: 
+        x: 7
+        y: 14
+        z: -72
+      3: 
+        x: 21
+        y: 14
+        z: -72
   light-smog:
     name: "&fLight Smog"
     file: "LightSmog.schem"
@@ -373,6 +454,32 @@ classic:
       x2: 28
       y2: 19
       z2: 74
+  towers:
+    name: "&fTowers"
+    file: "Towers.schem"
+    pos:
+      x: 0
+      y: 17
+      z: 0
+    blue-spawn:
+      z: -76.5
+    red-spawn:
+      z: 77.5
+    portals:
+      1:
+        x: -1
+        y: 12
+        z: -84
+      2:
+        x: 21
+        y: 12
+        z: -84
+    blue-shield:
+      z1: -77
+      z2: -62
+    red-shield:
+      z1: 62
+      z2: 77
   23andtnt:
     name: "&f23andTNT"
     file: "23andTNT.schem"
