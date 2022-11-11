@@ -212,7 +212,7 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level - 1));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, (level - 1) * 2));
         }
         
         // Regive vanguard passives

@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -223,6 +224,22 @@ public class MissileWarsTeam {
         ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
         giveItems(player);
         player.setJoinTime(LocalDateTime.now());
+     
+        // Architect Haste
+        JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
+        if (json.has("haste")) {
+            ItemStack item = mcPlayer.getInventory().getItemInMainHand();
+            if (item == null || item.getType() != Material.IRON_PICKAXE) {
+                return;
+            }
+            
+            int level = json.getInt("haste");
+            if (level <= 0) {
+                return;
+            }
+            
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, (level - 1) * 2));
+        }
         
         // Vanguard bunny
         int bunny = plugin.getJSON().getAbility(player.getMCPlayerId(), "bunny");
