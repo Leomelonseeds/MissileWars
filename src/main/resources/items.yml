@@ -1307,10 +1307,10 @@ Architect:
     haste:
       cost: 1400
       1: 
-        level: 1
+        level: 2
         spcost: 1
       2: 
-        level: 2
+        level: 4
         spcost: 2
     projectile_protection:
       cost: 1200
