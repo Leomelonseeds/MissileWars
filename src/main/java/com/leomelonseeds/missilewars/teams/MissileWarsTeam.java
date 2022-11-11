@@ -238,7 +238,7 @@ public class MissileWarsTeam {
                 return;
             }
             
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, (level - 1) * 2));
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
         }
         
         // Vanguard bunny

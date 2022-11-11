@@ -147,7 +147,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, (level - 1) * 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
     }
     
     public static ArrayList<Player> cooldown = new ArrayList<>();
