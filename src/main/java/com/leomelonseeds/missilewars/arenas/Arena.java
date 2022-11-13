@@ -557,7 +557,7 @@ public class Arena implements ConfigurationSerializable {
      * Checks if the game is ready to auto-start
      */
     public void checkForStart() {
-        if (running) {
+        if (running || resetting) {
             return;
         }
         int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
@@ -1313,6 +1313,19 @@ public class Arena implements ConfigurationSerializable {
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
         long gameTime = Duration.between(startTime, endTime).toSeconds();
+        
+        // Calculate win message
+        List<String> actualWinMessages = new ArrayList<>();
+        for (String s : winningMessages) {
+            s = s.replaceAll("%umw_winning_team%", winner);
+            s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
+            s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
+            s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
+            s = s.replaceAll("%umw_most_mvp%", most_mvp);
+            s = s.replaceAll("%umw_most_kills%", most_kills);
+            s = s.replaceAll("%umw_most_deaths%", most_deaths);
+            actualWinMessages.add(ChatColor.translateAlternateColorCodes('&', s));
+        }
 
         // Update stats for each player
         for (MissileWarsPlayer player : players) {
@@ -1320,15 +1333,8 @@ public class Arena implements ConfigurationSerializable {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
 
             // Send win message
-            for (String s : winningMessages) {
-                s = s.replaceAll("%umw_winning_team%", winner);
-                s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
-                s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
-                s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
-                s = s.replaceAll("%umw_most_mvp%", most_mvp);
-                s = s.replaceAll("%umw_most_kills%", most_kills);
-                s = s.replaceAll("%umw_most_deaths%", most_deaths);
-                player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', s));
+            for (String s : actualWinMessages) {
+                player.getMCPlayer().sendMessage(s);
             }
 
             // -1 = TIE, 0 = LOST, 1 = WIN
