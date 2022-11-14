@@ -241,25 +241,21 @@ public class MissileWarsTeam {
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
         }
         
-        // Vanguard bunny
-        int bunny = plugin.getJSON().getAbility(player.getMCPlayerId(), "bunny");
-        if (bunny > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
-        }
-        
-        // Vanguard adrenaline
-        int adrenaline = plugin.getJSON().getAbility(player.getMCPlayerId(), "adrenaline");
-        if (adrenaline > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, level));
-        }
-        
-        // Sentinel warden
-        int warden = plugin.getJSON().getAbility(player.getMCPlayerId(), "warden");
-        if (warden > 0) {
+        // Passive activation
+        String passive = json.getJSONObject("passive").getString("selected");
+        int level = json.getJSONObject("passive").getInt("level");
+        switch (passive) {
+        case "bunny":
+            int bamp = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", level, "amplifier");
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, bamp));
+            break;
+        case "adrenaline":
+            int aamp = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", level, "amplifier");
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, aamp));
+            break;
+        case "warden":
             Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
-            int amplifier = (int) ConfigUtils.getAbilityStat("Sentinel.passive.warden", warden, "amplifier");
+            int amplifier = (int) ConfigUtils.getAbilityStat("Sentinel.passive.warden", level, "amplifier");
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -277,6 +273,9 @@ public class MissileWarsTeam {
                     mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, amplifier));
                 }
             }.runTaskTimer(plugin, 10, 10);
+            break;
+        default:
+            return;
         }
     }
 

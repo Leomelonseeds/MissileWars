@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
@@ -186,11 +187,14 @@ public final class MissileWarsPlugin extends JavaPlugin {
         jsonManager.saveAll(false);
         log("Player decks saved!");
         
-        // Save all player inventories
+        // Save all player inventories + remove potion effects
         log("Saving player inventories...");
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (getArenaManager().getArena(player.getUniqueId()) == null) {
                 InventoryUtils.saveInventory(player, false);
+            }
+            for (PotionEffect effect : player.getActivePotionEffects()){
+                player.removePotionEffect(effect.getType());
             }
         }
         log("Player inventories saved!");
