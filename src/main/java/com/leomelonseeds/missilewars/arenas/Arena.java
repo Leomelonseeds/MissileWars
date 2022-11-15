@@ -360,10 +360,10 @@ public class Arena implements ConfigurationSerializable {
             return "no team";
         }
         if (redTeam.containsPlayer(uuid)) {
-            return ChatColor.RED + "red" + ChatColor.RESET;
+            return "red";
         }
         if (blueTeam.containsPlayer(uuid)) {
-            return ChatColor.BLUE + "blue" + ChatColor.RESET;
+            return "blue";
         }
         return "no team";
     }
@@ -1004,8 +1004,8 @@ public class Arena implements ConfigurationSerializable {
             redSpawn.setWorld(getWorld());
 
             // Setup scoreboard and teams
-            blueTeam = new MissileWarsTeam(ChatColor.BLUE + "blue", this, blueSpawn);
-            redTeam = new MissileWarsTeam(ChatColor.RED + "red", this, redSpawn);
+            blueTeam = new MissileWarsTeam("blue", this, blueSpawn);
+            redTeam = new MissileWarsTeam("red", this, redSpawn);
             
             // Setup game timers
             // Game start

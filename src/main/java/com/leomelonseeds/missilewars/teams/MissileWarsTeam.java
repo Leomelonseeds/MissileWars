@@ -82,13 +82,12 @@ public class MissileWarsTeam {
             }
 
             // Get locations
-            String teamName = ChatColor.stripColor(name).toLowerCase();
-            int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
-            int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
-            int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
-            int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
-            int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
-            int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
+            int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.x1");
+            int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.x2");
+            int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.y1");
+            int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.y2");
+            int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.z1");
+            int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.z2");
             
             // Calculate volume by adding up all non-air locations
             int tempShieldVolume = 0;
@@ -259,14 +258,13 @@ public class MissileWarsTeam {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    String team = arena.getTeam(player.getMCPlayerId());
                     // Cancel if no team
-                    if (team.equals("no team")) {
+                    if (!containsPlayer(player.getMCPlayerId())) {
                         this.cancel();
                         return;
                     }
                     // Don't allow if not in base
-                    if (!ConfigUtils.inShield(arena, mcPlayer.getLocation(), team, 5)) {
+                    if (!ConfigUtils.inShield(arena, mcPlayer.getLocation(), name, 5)) {
                         return;
                     }
                     mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amplifier));

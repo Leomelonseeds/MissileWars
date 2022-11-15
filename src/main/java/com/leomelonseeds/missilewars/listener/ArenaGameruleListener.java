@@ -311,8 +311,8 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Stop event if damager and damaged are on same team
-        if (arena.getTeam(player.getUniqueId()).equalsIgnoreCase(arena.getTeam(damager.getUniqueId())) &&
-           !arena.getTeam(player.getUniqueId()).equalsIgnoreCase("no team")) {
+        if (arena.getTeam(player.getUniqueId()).equals(arena.getTeam(damager.getUniqueId())) &&
+           !arena.getTeam(player.getUniqueId()).equals("no team")) {
             event.setCancelled(true);
             return;
         }
@@ -406,8 +406,7 @@ public class ArenaGameruleListener implements Listener {
     public void onPortalCreate(PortalCreateEvent event) {
 
         // Ensure it was in an arena world
-        String possibleArenaName = event.getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getWorld());
         if (possibleArena == null) {
             return;
         }
@@ -425,8 +424,7 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Ensure it was in an arena world
-        String possibleArenaName = event.getPlayer().getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getPlayer().getWorld());
         if (possibleArena == null) {
             return;
         }
@@ -438,8 +436,7 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         // Ensure it was in an arena world
-        String possibleArenaName = event.getEntity().getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(possibleArenaName);
+        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getEntity().getWorld());
         if (possibleArena == null) {
             return;
         }
@@ -486,8 +483,7 @@ public class ArenaGameruleListener implements Listener {
         Block block = event.getBlock();
         Player player = event.getPlayer();
         // Ensure it was in an arena world
-        String possibleArenaName = block.getWorld().getName().replace("mwarena_", "");
-        Arena possibleArena = plugin.getArenaManager().getArena(possibleArenaName);
+        Arena possibleArena = plugin.getArenaManager().getArena(block.getWorld());
         if (possibleArena == null) {
             return;
         }

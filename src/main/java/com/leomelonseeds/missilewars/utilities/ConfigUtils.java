@@ -101,10 +101,16 @@ public class ConfigUtils {
             }
             msg = msg.replaceAll("%umw_arena_status%", status);
             if (player != null) {
-                msg = msg.replaceAll("%umw_team%", arena.getTeam(player.getUniqueId()));
                 msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
+                if (msg.contains("%umw_team%")) {
+                    String team = arena.getTeam(player.getUniqueId()) + ChatColor.RESET;
+                    if (team.equals("red")) {
+                        msg = msg.replaceAll("%umw_team%", ChatColor.RED + team);
+                    } else if (team.equals("blue")) {
+                        msg = msg.replaceAll("%umw_team%", ChatColor.BLUE + team);
+                    }
+                }
             }
-            // TODO: Implement placeholders for during game and end of game
         }
 
         // Set umw arena-less placeholders
@@ -364,13 +370,12 @@ public class ConfigUtils {
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        String teamName = ChatColor.stripColor(team).toLowerCase();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), teamName + "-shield.z2");
+        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y2");
+        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z1");
+        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z2");
         if (x1 - bias <= x && x <= x2 + bias && 
             y1 - bias <= y && y <= y2 + bias &&
             z1 - bias <= z && z <= z2 + bias) {
