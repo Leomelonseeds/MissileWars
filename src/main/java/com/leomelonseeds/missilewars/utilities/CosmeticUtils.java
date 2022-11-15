@@ -132,7 +132,7 @@ public class CosmeticUtils {
                     String teamKiller = arena.getTeam(killerID);
                     String teamDead = arena.getTeam(dead.getUniqueId());
                     if (teamKiller != teamDead) {
-                        int kills = sql.getStatSync(killerID, "overall", "kills") + arena.getPlayerInArena(killerID).getKills();
+                        int kills = sql.getStatSync(killerID, "kills", "overall") + arena.getPlayerInArena(killerID).getKills();
                         result += "&7's kill &e#" + kills;
                     }
                 }
@@ -173,7 +173,7 @@ public class CosmeticUtils {
             if (arena != null) {
                 String teamKiller = arena.getTeam(killerID);
                 if (teamKiller != brokeTeam) {
-                    int portals = sql.getStatSync(killerID, "classic", "portals") + arena.getPlayerInArena(killerID).getMVP();
+                    int portals = sql.getStatSync(killerID, "portals", "classic") + arena.getPlayerInArena(killerID).getMVP();
                     result += "&7's portal break &e#" + portals;
                 }
             }
