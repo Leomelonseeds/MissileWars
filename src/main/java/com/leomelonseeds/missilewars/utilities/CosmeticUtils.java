@@ -102,9 +102,27 @@ public class CosmeticUtils {
             for (String s : possible) {
                 if (damageCause.contains(s)) {
                     result = getFromConfig(messages, format, "kill." + s);
+                    
+                    // Add kill count if flex
+                    if (format.equals("flex")) {
+                        UUID killerID = killer.getUniqueId();
+                        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(killerID);
+                        SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
+                        if (arena != null) {
+                            String teamKiller = arena.getTeam(killerID);
+                            String teamDead = arena.getTeam(dead.getUniqueId());
+                            if (!teamKiller.equals(teamDead)) {
+                                int kills = sql.getStatSync(killerID, "kills", "overall") + arena.getPlayerInArena(killerID).getKills();
+                                result += "&7's kill &e#" + kills;
+                            } else {
+                                result = getFromConfig(messages, "default", "kill." + s);
+                            }
+                        }
+                    }
                     break;
                 }
             }
+            
             result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
             
             // Add item name if one of these death causes
@@ -122,23 +140,10 @@ public class CosmeticUtils {
                     }
                 }
             }
-            
-            // Add kill count if flex
-            if (format.equals("flex")) {
-                UUID killerID = killer.getUniqueId();
-                Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(killerID);
-                SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
-                if (arena != null) {
-                    String teamKiller = arena.getTeam(killerID);
-                    String teamDead = arena.getTeam(dead.getUniqueId());
-                    if (teamKiller != teamDead) {
-                        int kills = sql.getStatSync(killerID, "kills", "overall") + arena.getPlayerInArena(killerID).getKills();
-                        result += "&7's kill &e#" + kills;
-                    }
-                }
-            }
         }
+        
         result = result.replace("%dead%", ConfigUtils.getFocusName(dead));
+        
         // Rainbow if rainbow
         if (format.equals("rainbow")) {
             return toRainbow(ChatColor.translateAlternateColorCodes('&', result));
@@ -162,9 +167,7 @@ public class CosmeticUtils {
         String prefix = "&5&l[!] ";
         String format = getFormat("death-messages", killer);
         String result = getFromConfig(messages, format, "portal");
-        result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
-        result = result.replace("%team%", brokeTeam);
-        
+
         // Portal count if flex
         if (format.equals("flex")) {
             UUID killerID = killer.getUniqueId();
@@ -172,12 +175,17 @@ public class CosmeticUtils {
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
             if (arena != null) {
                 String teamKiller = arena.getTeam(killerID);
-                if (teamKiller != brokeTeam) {
+                if (!teamKiller.equals(brokeTeam)) {
                     int portals = sql.getStatSync(killerID, "portals", "classic") + arena.getPlayerInArena(killerID).getMVP();
                     result += "&7's portal break &e#" + portals;
+                } else {
+                    result = getFromConfig(messages, "default", "portal");
                 }
             }
         }
+        
+        result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
+        result = result.replace("%team%", brokeTeam);
         
         // Add rainbow if rainbow
         if (format.equals("rainbow")) {
