@@ -95,8 +95,7 @@ public class CustomItemListener implements Listener {
         boolean redTeam = false;
         Arena arena = getPlayerArena(player);
         if (arena != null) {
-            redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase(ChatColor.RED +
-                    "red" + ChatColor.RESET);
+            redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase("red");
         }
         return redTeam;
     }
