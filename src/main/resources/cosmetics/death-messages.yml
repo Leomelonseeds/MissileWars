@@ -86,10 +86,81 @@ morbin:
 rainbow:
   menu-item:
     item: RED_DYE
-    name: "&cr&6a&ei&an&9b&do&5w"
+    name: "&cR&6a&ei&an&9b&do&5w"
     lore:
     - ""
     - "&7Become extremely fancy, and maybe"
     - "&7acquire a leprechaun along the way."
   weapon: ""
-  
+glorious:
+  menu-item:
+    item: GOLD_INGOT
+    name: "&6Glorious"
+    lore:
+    - ""
+    - "&7Do you play bedwars? Maybe you'll"
+    - "&7want these then."
+  portal: "&7A %team% &7portal was &6broken &7by %killer%"
+  death:
+    void: "%dead% &7fell into the &6void"
+    fire: "%dead% &6burnt &7to death"
+    lava: "%dead% &7tried to swim in &6lava"
+    suffocation: "%dead% &7was &6suffocated &7by a missile"
+    fall: "%dead% &7hit the &6ground &7too hard"
+    explosion: "%dead% &6blew up"
+    drowning: "%dead% &6drowned"
+    other: "%dead% &7somehow &6died"
+  kill:
+    void: "%dead% &7was knocked into the &6void &7by %killer%"
+    explosion: "%dead% &7was &6blown up &7by %killer%"
+    fall: "%dead% &7was knocked off a &6cliff &7by %killer%"
+    fire: "%dead% &7was &6burned &7to death by %killer%"
+    lava: "%dead% &7was &6melted &7by %killer%"
+    entity: "%dead% &7was &6killed &7by %killer%"
+    projectile: "%dead% &7was &6shot &7by %killer%"
+    magic: "%dead% &7was &6intoxicated &7by %killer%"
+    thorns: "%dead% &7was &6pricked &7to death by %killer%"
+    other: "%dead% &7was somehow &6killed &7by %killer%"
+flex:
+  menu-item:
+    item: REDSTONE_TORCH
+    name: "&eFlex"
+    lore:
+    - ""
+    - "&7Show your kill count for every"
+    - "&7kill. Make them feel inferior."
+  weapon: ""
+  portal: "&7A %team% &7portal was %killer%"
+  kill:
+    void: "%dead% &7was knocked into the void as %killer%"
+    explosion: "%dead% &7was blown up as %killer%"
+    fall: "%dead% &7was knocked off a cliff as %killer%"
+    fire: "%dead% &7was burned to death as %killer%"
+    lava: "%dead% &7was melted as %killer%"
+    entity: "%dead% &7was killed as %killer%"
+    projectile: "%dead% &7was shot as %killer%"
+    magic: "%dead% &7was intoxicated as %killer%"
+    thorns: "%dead% &7was pricked to death as %killer%"
+    other: "%dead% &7was somehow killed as %killer%"
+love:
+  menu-item:
+    item: PINK_TULIP
+    name: "&dLovey Dovey"
+    lore:
+    - ""
+    - "&7I love you! But you die now."
+  portal: "&7A %team% &7portal was &dravished &7by %killer%"
+  death:
+    void: "%dead% &7fell out of &dlove"
+    fire: "%dead%&7's soul was &dconsumed"
+    suffocation: "%dead% &7was &dhugged &7too hard by a missile"
+    fall: "%dead% &dfell &7for the ground"
+    explosion: "%dead%&7's heart was shattered"
+  kill:
+    void: "%dead% &7fell out of &dlove &7with %killer%"
+    explosion: "%dead%&7's heart was &dshattered &7by %killer%"
+    fall: "%dead% &dcrushed &7too hard on %killer%"
+    fire: "%dead%&7's soul was &dconsumed &7by %killer%"
+    entity: "%dead% &7was &dsnuggled &7to death by %killer%"
+    projectile: "%killer% &7shot &dCupid's arrow &7into %dead%&7's heart"
+    magic: "%dead% &7was &dintoxicated &7by %killer%"
