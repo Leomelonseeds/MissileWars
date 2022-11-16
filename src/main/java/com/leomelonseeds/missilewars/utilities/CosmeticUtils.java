@@ -185,7 +185,7 @@ public class CosmeticUtils {
         }
         
         result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
-        result = result.replace("%team%", brokeTeam);
+        result = result.replace("%team%", (brokeTeam.equals("red") ? ChatColor.RED : ChatColor.BLUE) + brokeTeam);
         
         // Add rainbow if rainbow
         if (format.equals("rainbow")) {
