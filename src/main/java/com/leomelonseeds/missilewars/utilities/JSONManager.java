@@ -108,6 +108,9 @@ public class JSONManager {
                             if (deckjson.has(preset)) {
                                 deckjson.remove(preset);
                             }
+                            if (newJson.getString("Preset").equals(preset)) {
+                                newJson.put("Preset", "A");
+                            }
                             continue;
                         }
                         
