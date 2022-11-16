@@ -1492,8 +1492,8 @@ indicators:
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
   locked2: "&cLeft-click &7to purchase"
-  upgradable: "&cLeft-click &7to upgrade &c(-%spcost%sp)"
-  downgradable: "&cRight-click &7to downgrade &a(+%spcost%sp)"
+  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
+  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
   actuallevel: " &7- &8%current%/%max%"
