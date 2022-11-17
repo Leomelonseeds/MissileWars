@@ -247,6 +247,7 @@ public class CustomItemListener implements Listener {
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 hand.setAmount(hand.getAmount() - 1);
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+                ConfigUtils.sendConfigSound("spawn-missile", player);
                 // 0.5s cooldown
                 cooldown.add(player);
                 new BukkitRunnable() {

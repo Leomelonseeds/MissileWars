@@ -12,10 +12,14 @@ tie:
   pitch: 0.7
 enemy-portal-destroyed:
   sound: ENTITY_ZOMBIE_VILLAGER_CURE
-  volume: 1.0
+  volume: 0.8
   pitch: 0.8
 own-portal-destroyed:
   sound: ENTITY_LIGHTNING_BOLT_THUNDER
+  volume: 1.0
+  pitch: 1.0
+spawn-missile:
+  sound: ITEM_FLINTANDSTEEL_USE
   volume: 1.0
   pitch: 1.0
 lobby-countdown-start:
