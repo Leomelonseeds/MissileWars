@@ -400,7 +400,6 @@ public class ArenaManager {
             // Make him look at players
             LookClose lookPlayerTrait = bartender.getOrAddTrait(LookClose.class);
             lookPlayerTrait.lookClose(true);
-            lookPlayerTrait.setRange(10);
             // Setup Villager Profession
             VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
             profession.setProfession(Villager.Profession.NITWIT);
