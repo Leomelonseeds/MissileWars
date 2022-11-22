@@ -33,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -335,6 +334,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+        arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setDifficulty(Difficulty.NORMAL);
         WorldBorder border = arenaWorld.getWorldBorder();
