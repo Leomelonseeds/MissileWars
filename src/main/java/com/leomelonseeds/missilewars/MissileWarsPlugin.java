@@ -12,9 +12,6 @@ import org.bukkit.potion.PotionEffect;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
-import com.leomelonseeds.missilewars.commands.MissileWarsCommand;
-import com.leomelonseeds.missilewars.commands.SpectateCommand;
-import com.leomelonseeds.missilewars.commands.VoteMapCommand;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
@@ -75,8 +72,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         // Load commands and events
         log("Loading commands and events...");
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
-        getCommand("Spectate").setExecutor(new SpectateCommand());
-        getCommand("VoteMap").setExecutor(new VoteMapCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);

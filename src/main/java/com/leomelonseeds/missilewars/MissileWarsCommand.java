@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.commands;
+package com.leomelonseeds.missilewars;
 
 import java.util.logging.Level;
 
@@ -12,13 +12,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
-import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.CosmeticMenu;
+import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.PresetSelector;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -28,7 +29,7 @@ public class MissileWarsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Send info if no action taken
         if (args.length == 0) {
-            sendErrorMsg(sender, "Usage: /umw <Join/Leave/Deck/EnqueueRed/EnqueueBlue>");
+            sendErrorMsg(sender, "Usage: /umw <Join/Leave/Spectate/Votemap/Deck/EnqueueRed/EnqueueBlue>");
             return true;
         }
 
@@ -47,6 +48,62 @@ public class MissileWarsCommand implements CommandExecutor {
             
             ConfigUtils.reloadConfigs();
             sendSuccessMsg(sender, "Files reloaded.");
+        }
+        
+        if (action.equalsIgnoreCase("votemap")) {
+            // Ensure user is a player
+            if (!(sender instanceof Player)) {
+                sendErrorMsg(sender, "You are not a player!");
+            }
+            Player player = (Player) sender;
+
+            // Ensure player is in an arena that is not running
+            Arena playerArena = arenaManager.getArena(player.getUniqueId());
+            if (playerArena == null) {
+                sendErrorMsg(player, "You are not in an arena!");
+                return true;
+            }
+            
+            if (playerArena instanceof TourneyArena) {
+                sendErrorMsg(player, "You cannot vote in this arena!");
+                return true;
+            }
+            
+            if (playerArena.isRunning() || playerArena.isResetting()) {
+                sendErrorMsg(player, "The game has already started!");
+                return true;
+            }
+
+            // Open voting menu
+            new MapVoting(player);
+
+            return true;
+        }
+        
+        if (action.equalsIgnoreCase("spectate")) {
+            if (!(sender instanceof Player)) {
+                sendErrorMsg(sender, "You must be a player");
+                return true;
+            }
+            Player player = (Player) sender;
+
+            // Try to find Arena
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            if (arena == null) {
+                sendErrorMsg(player, "You are not in an arena!");
+                return true;
+            }
+
+            // Check if player is currently spectating
+            MissileWarsPlayer missileWarsPlayer = arena.getPlayerInArena(player.getUniqueId());
+            if (arena.isSpectating(missileWarsPlayer)) {
+                arena.removeSpectator(missileWarsPlayer);
+                return true;
+            }
+
+            // Allow player to spectate
+            arena.addSpectator(player.getUniqueId());
+            return true;
         }
         
         // A command used to set player cosmetics
