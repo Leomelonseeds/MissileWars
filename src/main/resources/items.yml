@@ -87,7 +87,7 @@ tomahawk:
     - "&7The first missile ever built. What's that?"
     - "&7Sidewinder? No, we don't talk about that."
     offset:
-      x: -1
+      x: 0
       y: -4
       z: 4
     speed: 1.7
