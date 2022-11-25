@@ -79,7 +79,7 @@ public class MissileWarsTeam {
         // Register team
         team = arena.getScoreboard().registerNewTeam(name);
         team.displayName(ConfigUtils.toComponent("&cRED"));
-        team.color(NamedTextColor.RED);
+        team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
         
         // Temp value while async calculations run
         shieldVolume = 23850;
