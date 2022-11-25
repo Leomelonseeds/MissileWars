@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -80,6 +81,8 @@ public class MissileWarsTeam {
         team = arena.getScoreboard().registerNewTeam(name);
         team.displayName(ConfigUtils.toComponent("&cRED"));
         team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
+        
+        Bukkit.getLogger().log(Level.INFO, "New team " + team + " created for scoreboard " + arena.getScoreboard());
         
         // Temp value while async calculations run
         shieldVolume = 23850;
