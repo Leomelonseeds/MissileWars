@@ -31,6 +31,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
@@ -102,6 +103,8 @@ public class Arena implements ConfigurationSerializable {
     protected BukkitTask autoEnd;
     /** The tracker for all missiles and utilities */
     protected Tracker tracker;
+    /** A scoreboard to manage teams */
+    protected Scoreboard sb;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -120,6 +123,7 @@ public class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
         tracker = new Tracker();
+        sb = Bukkit.getScoreboardManager().getNewScoreboard();
         setupMapVotes();
     }
 
@@ -162,6 +166,7 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         tracker = new Tracker();
+        sb = Bukkit.getScoreboardManager().getNewScoreboard();
         setupMapVotes();
     }
 
@@ -177,6 +182,10 @@ public class Arena implements ConfigurationSerializable {
         }
 
         playerVotes = new HashMap<>();
+    }
+    
+    public Scoreboard getScoreboard() {
+        return sb;
     }
     
     /**
@@ -1445,6 +1454,7 @@ public class Arena implements ConfigurationSerializable {
         loadWorldFromDisk();
         resetting = false;
         setupMapVotes();
+        sb = Bukkit.getScoreboardManager().getNewScoreboard();
     }
 
     /**
@@ -1627,11 +1637,15 @@ public class Arena implements ConfigurationSerializable {
      *
      * @param id the player's UUID
      * @param mapName the name map the player is voting for
+     * @param negative if the vote is a negative vote
      * @return the name of the map the player voted for, otherwise null
      */
-    public String registerVote(UUID id, String mapName) {
+    public String registerVote(UUID id, String mapName, boolean negative) {
 
         int votes = Bukkit.getPlayer(id).hasPermission("umw.extravote") ? 2 : 1;
+        if (negative) {
+            votes *= -1;
+        }
 
         // Remove previous vote
         if (playerVotes.containsKey(id)) {

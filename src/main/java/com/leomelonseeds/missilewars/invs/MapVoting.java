@@ -87,7 +87,7 @@ public class MapVoting implements MWInventory {
             return;
         }
         String map = ConfigUtils.toPlain(clicked.getItemMeta().displayName());
-        String mapVotedFor = arena.registerVote(player.getUniqueId(), map);
+        String mapVotedFor = arena.registerVote(player.getUniqueId(), map, type == ClickType.RIGHT);
         player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
         manager.getInventory(player).updateInventory();
     }

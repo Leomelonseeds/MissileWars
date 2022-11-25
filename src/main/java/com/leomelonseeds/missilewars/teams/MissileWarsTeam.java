@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Team;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -29,6 +30,8 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /** Represents a team of Missile Wars Players. */
 /**
@@ -55,6 +58,8 @@ public class MissileWarsTeam {
     private int shieldBlocksBroken;
     /** The number of shield blocks in total */
     private int shieldVolume;
+    /** Register this team to a vanilla team */
+    private Team team;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -70,6 +75,11 @@ public class MissileWarsTeam {
         this.spawn = spawn;
         this.arena = arena;
         this.shieldBlocksBroken = 0;
+        
+        // Register team
+        team = arena.getScoreboard().registerNewTeam(name);
+        team.displayName(ConfigUtils.toComponent("&cRED"));
+        team.color(NamedTextColor.RED);
         
         // Temp value while async calculations run
         shieldVolume = 23850;
@@ -216,6 +226,7 @@ public class MissileWarsTeam {
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
+        team.addPlayer(mcPlayer);
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
@@ -369,6 +380,7 @@ public class MissileWarsTeam {
     public void removePlayer(MissileWarsPlayer player) {
         if (members.contains(player)) {
         	Player mcPlayer = player.getMCPlayer();
+        	team.removePlayer(mcPlayer);
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
             player.resetPlayer();
