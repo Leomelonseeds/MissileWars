@@ -11,10 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -95,16 +92,14 @@ public class Arena implements ConfigurationSerializable {
     protected List<BukkitTask> tasks;
     /** Whether the arena is currently resetting the world. */
     protected boolean resetting;
-    /** The current number of votes for each map. */
-    protected SortedMap<String, Integer> mapVotes;
-    /** Connect players and their votes. */
-    protected Map<UUID, String> playerVotes;
     /** A task for if we are waiting for a game to auto-end */
     protected BukkitTask autoEnd;
     /** The tracker for all missiles and utilities */
     protected Tracker tracker;
     /** A scoreboard to manage teams */
     protected Scoreboard sb;
+    /** The vote manager for this arena */
+    protected VoteManager voteManager;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -124,7 +119,7 @@ public class Arena implements ConfigurationSerializable {
         npcs = new ArrayList<>();
         tracker = new Tracker();
         sb = Bukkit.getScoreboardManager().getNewScoreboard();
-        setupMapVotes();
+        voteManager = new VoteManager(this);
     }
 
     /**
@@ -167,21 +162,7 @@ public class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         tracker = new Tracker();
         sb = Bukkit.getScoreboardManager().getNewScoreboard();
-        setupMapVotes();
-    }
-
-    /**
-     * Setup map voting for the next game.
-     */
-    public void setupMapVotes() {
-        // Add maps in map type to voting pool
-        mapVotes = new TreeMap<>();
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        for (String mapName : mapConfig.getConfigurationSection(gamemode).getKeys(false)) {
-            mapVotes.put(mapName, 0);
-        }
-
-        playerVotes = new HashMap<>();
+        voteManager = new VoteManager(this);
     }
     
     public Scoreboard getScoreboard() {
@@ -203,15 +184,6 @@ public class Arena implements ConfigurationSerializable {
     public void stopTrackers() {
         tracker.stopAll();
     }
-    
-    /**
-     * Self-explanatory?
-     * 
-     * @return
-     */
-    public Map<String, Integer> getMapVotes() {
-        return mapVotes;
-    }
 
     public void addNPC(int id) {
         npcs.add(id);
@@ -219,6 +191,10 @@ public class Arena implements ConfigurationSerializable {
 
     public List<Integer> getNPCs() {
         return npcs;
+    }
+    
+    public VoteManager getVoteManager() {
+        return voteManager;
     }
 
     /**
@@ -606,12 +582,7 @@ public class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
         players.remove(toRemove);
-
-        if (playerVotes != null && playerVotes.containsKey(uuid)) {
-            String toChange = playerVotes.get(uuid);
-            mapVotes.put(toChange, mapVotes.get(toChange) - (Bukkit.getPlayer(uuid).hasPermission("umw.extravote") ? 2 : 1));
-            playerVotes.remove(uuid);
-        }
+        voteManager.removePlayer(toRemove.getMCPlayer());
 
         for (MissileWarsPlayer mwPlayer : players) {
             ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
@@ -979,25 +950,7 @@ public class Arena implements ConfigurationSerializable {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Select Map
-        mapName = "default-map";
-        List<String> mapsWithTopVotes = new LinkedList<>();
-        for (String map : mapVotes.keySet()) {
-            if (mapsWithTopVotes.isEmpty()) {
-                mapsWithTopVotes.add(map);
-            } else {
-                String previousTop = mapsWithTopVotes.get(0);
-                if (mapVotes.get(previousTop) == mapVotes.get(map)) {
-                    mapsWithTopVotes.add(map);
-                } else if (mapVotes.get(previousTop) < mapVotes.get(map)) {
-                    mapsWithTopVotes.clear();
-                    mapsWithTopVotes.add(map);
-                }
-            }
-        }
-        if (!mapsWithTopVotes.isEmpty()) {
-            // Set map to random map with top votes
-            mapName = mapsWithTopVotes.get(new Random().nextInt(mapsWithTopVotes.size()));
-        }
+        mapName = voteManager.getVotedMap();
 
         // Generate map.
         announceMessage("messages.starting", null);
@@ -1450,7 +1403,7 @@ public class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(getWorld(), false);
         loadWorldFromDisk();
         resetting = false;
-        setupMapVotes();
+        voteManager = new VoteManager(this);
         sb = Bukkit.getScoreboardManager().getNewScoreboard();
     }
 
@@ -1628,44 +1581,4 @@ public class Arena implements ConfigurationSerializable {
             blueTeam.registerShieldBlockUpdate(location, place);
         }
     }
-
-    /**
-     * Register a player's map vote, removing any of their previous votes.
-     *
-     * @param id the player's UUID
-     * @param mapName the name map the player is voting for
-     * @param negative if the vote is a negative vote
-     * @return the name of the map the player voted for, otherwise null
-     */
-    public String registerVote(UUID id, String mapName, boolean negative) {
-
-        int votes = Bukkit.getPlayer(id).hasPermission("umw.extravote") ? 2 : 1;
-        if (negative) {
-            votes *= -1;
-        }
-
-        // Remove previous vote
-        if (playerVotes.containsKey(id)) {
-            String previousVote = playerVotes.remove(id);
-            mapVotes.put(previousVote, mapVotes.get(previousVote) - votes);
-        }
-
-        // Find map from map name
-        String mapId = null;
-        for (String possibleMap : mapVotes.keySet()) {
-            if (ConfigUtils.getMapText(gamemode, possibleMap, "name").equalsIgnoreCase(mapName)) {
-                mapId = possibleMap;
-            }
-        }
-
-        // Stop if invalid map
-        if (mapId == null) {
-            return null;
-        }
-
-        mapVotes.put(mapId, mapVotes.get(mapId) + votes);
-        playerVotes.put(id, mapId);
-        return mapName;
-    }
-
 }

@@ -50,9 +50,9 @@ public class MapVoting implements MWInventory {
     public void updateInventory() {
         Arena arena = getPlayerArena(player);
         inv.clear();
-        for (String mapName : arena.getMapVotes().keySet()) {
+        for (String mapName : arena.getVoteManager().getVotes().keySet()) {
             ItemStack mapItem = new ItemStack(Material.PAPER);
-            int votes = arena.getMapVotes().get(mapName);
+            int votes = arena.getVoteManager().getVotes().get(mapName);
             mapItem.setAmount(Math.max(votes, 1));
             ItemMeta mapItemMeta = mapItem.getItemMeta();
             String display = ConfigUtils.getMapText(arena.getGamemode(), mapName, "name");
@@ -87,8 +87,8 @@ public class MapVoting implements MWInventory {
             return;
         }
         String map = ConfigUtils.toPlain(clicked.getItemMeta().displayName());
-        String mapVotedFor = arena.registerVote(player.getUniqueId(), map, type == ClickType.RIGHT);
-        player.sendMessage(ChatColor.GREEN + "Voted for " + mapVotedFor);
-        manager.getInventory(player).updateInventory();
+        arena.getVoteManager().registerVote(player, map, type == ClickType.RIGHT);
+        player.sendMessage(ChatColor.GREEN + "Voted for " + map);
+        updateInventory();
     }
 }
