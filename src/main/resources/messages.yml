@@ -248,7 +248,9 @@ inventories:
       name: "&f%umw_map%"
       lore:
         - "&7Votes: &c%umw_map_votes%"
-        - "&cLeft-click &7to vote!"
+        - ""
+        - "&cLeft-click &7to upvote"
+        - "&cRight-click &7to downvote"
   cosmetics:
     locked:
       - ""

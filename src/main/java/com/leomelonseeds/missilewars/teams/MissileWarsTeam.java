@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -78,11 +77,9 @@ public class MissileWarsTeam {
         this.shieldBlocksBroken = 0;
         
         // Register team
-        team = arena.getScoreboard().registerNewTeam(name);
-        team.displayName(ConfigUtils.toComponent("&cRED"));
+        team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(arena.getName() + "." + name);
+        team.displayName(name.equals("red") ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
         team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
-        
-        Bukkit.getLogger().log(Level.INFO, "New team " + team + " created for scoreboard " + arena.getScoreboard());
         
         // Temp value while async calculations run
         shieldVolume = 23850;
@@ -117,6 +114,10 @@ public class MissileWarsTeam {
             }
             shieldVolume = tempShieldVolume;
         });
+    }
+    
+    public void unregisterTeam() {
+        team.unregister();
     }
     
     public String getName() {

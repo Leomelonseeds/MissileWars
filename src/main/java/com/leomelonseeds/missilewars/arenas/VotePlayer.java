@@ -31,8 +31,16 @@ public class VotePlayer {
         int maxVotes = player.hasPermission("umw.extravote") ? 2 : 1;
         int voteAmount = negative ? -1 : 1;
         
-        votes.add(new Vote(map, voteAmount));
+        // Check for a vote that resets a previous vote
+        for (Vote vote : new ArrayList<>(votes)) {
+            if (vote.getAmount() * -1 == voteAmount) {
+                votes.remove(vote);
+                return vote;
+            }
+        }
+
         
+        votes.add(new Vote(map, voteAmount));
         if (votes.size() > maxVotes) {
             return votes.remove(0);
         }

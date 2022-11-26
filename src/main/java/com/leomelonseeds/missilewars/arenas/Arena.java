@@ -28,7 +28,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
@@ -96,8 +95,6 @@ public class Arena implements ConfigurationSerializable {
     protected BukkitTask autoEnd;
     /** The tracker for all missiles and utilities */
     protected Tracker tracker;
-    /** A scoreboard to manage teams */
-    protected Scoreboard sb;
     /** The vote manager for this arena */
     protected VoteManager voteManager;
 
@@ -118,7 +115,6 @@ public class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
         tracker = new Tracker();
-        sb = Bukkit.getScoreboardManager().getNewScoreboard();
         voteManager = new VoteManager(this);
     }
 
@@ -161,12 +157,7 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         tracker = new Tracker();
-        sb = Bukkit.getScoreboardManager().getNewScoreboard();
         voteManager = new VoteManager(this);
-    }
-    
-    public Scoreboard getScoreboard() {
-        return sb;
     }
     
     /**
@@ -597,6 +588,7 @@ public class Arena implements ConfigurationSerializable {
             startTime = null;
         }
 
+        toRemove.getMCPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         spectators.remove(toRemove);
         blueQueue.remove(toRemove);
         redQueue.remove(toRemove);
@@ -1362,7 +1354,7 @@ public class Arena implements ConfigurationSerializable {
         }, waitTime + 100L);
     }
     
-    /** Remove Players from the map. */
+    /** Remove Players from the map and unregister scoreboard teams */
     public void removePlayers() {
         int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
@@ -1404,7 +1396,8 @@ public class Arena implements ConfigurationSerializable {
         loadWorldFromDisk();
         resetting = false;
         voteManager = new VoteManager(this);
-        sb = Bukkit.getScoreboardManager().getNewScoreboard();
+        redTeam.unregisterTeam();
+        blueTeam.unregisterTeam();
     }
 
     /**

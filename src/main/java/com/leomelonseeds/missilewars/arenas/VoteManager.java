@@ -72,21 +72,24 @@ public class VoteManager {
      */
     public void registerVote(Player player, String map, boolean reverse) {
         VotePlayer vPlayer = getVoter(player);
+        int voteAmount = reverse ? -1 : 1;
         
         if (vPlayer == null) {
             vPlayer = new VotePlayer(player);
             playerVotes.add(vPlayer);
-            
         }
-        
-        // Update votes
-        allVotes.put(map, allVotes.get(map) + (reverse ? -1 : 1));
         
         // Remove previous vote if exists
         Vote previous = vPlayer.addVote(map, reverse);
         if (previous != null) {
             removeVote(previous);
+            if (previous.getAmount() < 0 ^ reverse) {
+                 voteAmount = 0;
+            }
         }
+        
+        // Update votes
+        allVotes.put(map, allVotes.get(map) + voteAmount);   
     }
     
     /**

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -51,18 +52,28 @@ public class MapVoting implements MWInventory {
         Arena arena = getPlayerArena(player);
         inv.clear();
         for (String mapName : arena.getVoteManager().getVotes().keySet()) {
+            // Set item + amount
             ItemStack mapItem = new ItemStack(Material.PAPER);
             int votes = arena.getVoteManager().getVotes().get(mapName);
             mapItem.setAmount(Math.max(votes, 1));
+            
+            // Set display name to map name
             ItemMeta mapItemMeta = mapItem.getItemMeta();
             String display = ConfigUtils.getMapText(arena.getGamemode(), mapName, "name");
             mapItemMeta.displayName(Component.text(display));
+            
+            // Add lore
             List<Component> lore = new ArrayList<>();
             for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {
                 String sn = s.replaceAll("%umw_map_votes%", "" + votes);
                 lore.add(Component.text(sn));
             }
             mapItemMeta.lore(lore);
+            
+            // Add map name meta
+            mapItemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"),
+                    PersistentDataType.STRING, mapName);
+            
             mapItem.setItemMeta(mapItemMeta);
             inv.addItem(mapItem);
         }
@@ -81,14 +92,19 @@ public class MapVoting implements MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         Arena arena = getPlayerArena(player);
-        
         ItemStack clicked = inv.getItem(slot);
-        if (clicked == null || !clicked.hasItemMeta() || !clicked.getItemMeta().hasDisplayName()) {
+        
+        // Get meta
+        ItemMeta meta = clicked.getItemMeta();
+        if (!meta.getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"))) {
             return;
         }
-        String map = ConfigUtils.toPlain(clicked.getItemMeta().displayName());
+        
+        // Get map name
+        String map = meta.getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"),
+                PersistentDataType.STRING);
         arena.getVoteManager().registerVote(player, map, type == ClickType.RIGHT);
-        player.sendMessage(ChatColor.GREEN + "Voted for " + map);
+        ConfigUtils.sendConfigSound("use-skillpoint", player);
         updateInventory();
     }
 }
