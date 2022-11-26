@@ -1400,6 +1400,7 @@ public class Arena implements ConfigurationSerializable {
     /** Reset the arena world. */
     public void resetWorld() {
         Bukkit.unloadWorld(getWorld(), false);
+        unregisterTeams();
         loadWorldFromDisk();
         resetting = false;
         voteManager = new VoteManager(this);
