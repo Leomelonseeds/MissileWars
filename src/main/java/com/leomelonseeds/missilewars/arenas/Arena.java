@@ -160,6 +160,13 @@ public class Arena implements ConfigurationSerializable {
         voteManager = new VoteManager(this);
     }
     
+    public void unregisterTeams() {
+        if (redTeam != null && blueTeam != null) {
+            redTeam.unregisterTeam();
+            blueTeam.unregisterTeam();
+        }
+    }
+    
     /**
      * Gets the arena's missile/utility tracker
      * 
