@@ -77,9 +77,13 @@ public class MissileWarsTeam {
         this.shieldBlocksBroken = 0;
         
         // Register team
-        team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(arena.getName() + "." + name);
-        team.displayName(name.equals("red") ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
-        team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
+        String teamName = arena.getName() + "." + name;
+        team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
+        if (team == null) {
+            team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(arena.getName() + "." + name);
+            team.displayName(name.equals("red") ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
+            team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
+        }
         
         // Temp value while async calculations run
         shieldVolume = 23850;

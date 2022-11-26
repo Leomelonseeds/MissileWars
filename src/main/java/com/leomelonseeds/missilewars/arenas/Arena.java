@@ -1354,7 +1354,7 @@ public class Arena implements ConfigurationSerializable {
         }, waitTime + 100L);
     }
     
-    /** Remove Players from the map and unregister scoreboard teams */
+    /** Remove Players from the map */
     public void removePlayers() {
         int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
@@ -1396,8 +1396,6 @@ public class Arena implements ConfigurationSerializable {
         loadWorldFromDisk();
         resetting = false;
         voteManager = new VoteManager(this);
-        redTeam.unregisterTeam();
-        blueTeam.unregisterTeam();
     }
 
     /**
