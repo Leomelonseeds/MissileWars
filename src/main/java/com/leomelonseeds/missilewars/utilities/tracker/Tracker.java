@@ -81,7 +81,7 @@ public class Tracker {
         }
         
         // Must be in arena
-        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(e.getEntity().getWorld());
+        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(exploded.getWorld());
         if (arena == null) {
             return;
         }

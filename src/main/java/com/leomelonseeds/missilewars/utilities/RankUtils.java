@@ -146,7 +146,7 @@ public class RankUtils {
             int rank = getRankLevel(exp);
             double progress = getExpProgress(exp);
             player.setLevel(rank);
-            player.setExp((float) progress);
+            player.setExp((float) Math.min(progress, 1));
 
         });
     }
