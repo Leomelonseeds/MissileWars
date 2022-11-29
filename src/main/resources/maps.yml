@@ -162,6 +162,44 @@ classic:
         x: 19
         y: 11
         z: -71
+  biblically-accurate-map:
+    name: "&fBiblically Accurate Map"
+    file: "BiblicallyAccurateMap.schem"
+    pos:
+      x: 0
+      y: 17
+      z: 0
+    portals:
+      1: 
+        x: -14
+        y: 12
+        z: -72
+      2: 
+        x: -1
+        y: 12
+        z: -72
+      3: 
+        x: 12
+        y: 12
+        z: -72
+      4: 
+        x: 21
+        y: 12
+        z: -72
+    blue-shield:
+      x1: -33
+      y1: -16
+      z1: -38
+      x2: 33
+      y2: 21
+      z2: -65
+    red-shield:
+      x1: -33
+      y1: -16
+      z1: 65
+      x2: 33
+      y2: 21
+      z2: 38
   traffic-light-cake:
     name: "&fTraffic Light Cake"
     file: "TrafficLightCake.schem"
