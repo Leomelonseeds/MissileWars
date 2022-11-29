@@ -98,7 +98,7 @@ public class Tracker {
             for (Entity entity : exploded.getNearbyEntities(3, 3, 3)) {
                 if (entity.getType() == EntityType.PRIMED_TNT) {
                     TNTPrimed tnt = (TNTPrimed) entity;
-                    if (tnt.getSource() == null) {
+                    if (tnt.getSource() == null || tnt.getSource().getType() == EntityType.CREEPER) {
                         tnt.setSource(source);
                     }
                 }
