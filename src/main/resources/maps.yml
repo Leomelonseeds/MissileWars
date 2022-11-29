@@ -189,17 +189,17 @@ classic:
     blue-shield:
       x1: -33
       y1: -16
-      z1: -38
+      z1: -65
       x2: 33
       y2: 21
-      z2: -65
+      z2: -38
     red-shield:
       x1: -33
       y1: -16
-      z1: 65
+      z1: 38
       x2: 33
       y2: 21
-      z2: 38
+      z2: 65
   traffic-light-cake:
     name: "&fTraffic Light Cake"
     file: "TrafficLightCake.schem"
