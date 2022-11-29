@@ -896,14 +896,11 @@ public class Arena implements ConfigurationSerializable {
 
         // Schedule the start of the game if not already running
         if (startTime == null) {
-
-            // Respawns citizens if they are not present
-            if (getWorld().getEntityCount() - spectators.size() < 9) {
-                try {
-                    ((Citizens) CitizensAPI.getPlugin()).reload();
-                } catch (NPCLoadException e) {
-                    Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
-                }
+            // Respawns citizens
+            try {
+                ((Citizens) CitizensAPI.getPlugin()).reload();
+            } catch (NPCLoadException e) {
+                Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
             }
 
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
