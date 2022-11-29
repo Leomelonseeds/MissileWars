@@ -163,7 +163,7 @@ classic:
         y: 11
         z: -71
   biblically-accurate-map:
-    name: "&fBiblically Accurate Map"
+    name: "&fBiblically Accurate"
     file: "BiblicallyAccurateMap.schem"
     pos:
       x: 0
