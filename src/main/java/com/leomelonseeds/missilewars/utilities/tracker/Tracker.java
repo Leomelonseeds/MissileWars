@@ -67,20 +67,35 @@ public class Tracker {
     }
     
     /**
-     * Registers an explosion, used for tnt minecarts
+     * Registers an explosion, used for tnt minecarts/creepers
      * 
      * @param e
      */
     public void registerExplosion(EntityExplodeEvent e) {
-        if (e.getEntityType() != EntityType.MINECART_TNT) {
+        Entity exploded = e.getEntity();
+        EntityType type = e.getEntityType();
+        
+        // Must be tnt minecart/creeper
+        if (type != EntityType.CREEPER && type != EntityType.MINECART_TNT) {
             return;
         }
-        ExplosiveMinecart cart = (ExplosiveMinecart) e.getEntity();
-        Player source = minecarts.get(cart);
-        // Sets source of other tnts
-        // Also remove after 1 tick to give other events time to register this cart
+        
+        // Must be in arena
+        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(e.getEntity().getWorld());
+        if (arena == null) {
+            return;
+        }
+        
+        // Must have a source
+        Player source = ConfigUtils.getAssociatedPlayer(exploded, arena);
+        if (source == null) {
+            return;
+        }
+        
+        // Register tnt around
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            for (Entity entity : cart.getNearbyEntities(3, 3, 3)) {
+            // Set source
+            for (Entity entity : exploded.getNearbyEntities(3, 3, 3)) {
                 if (entity.getType() == EntityType.PRIMED_TNT) {
                     TNTPrimed tnt = (TNTPrimed) entity;
                     if (tnt.getSource() == null) {
@@ -88,7 +103,12 @@ public class Tracker {
                     }
                 }
             }
-            minecarts.remove(cart);
+            
+            // Remove from tracker if tnt minecart
+            if (type == EntityType.MINECART_TNT) {
+                ExplosiveMinecart cart = (ExplosiveMinecart) exploded;
+                minecarts.remove(cart);
+            }
         }, 1);
     }
     
