@@ -595,7 +595,6 @@ public class Arena implements ConfigurationSerializable {
             startTime = null;
         }
 
-        toRemove.getMCPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         spectators.remove(toRemove);
         blueQueue.remove(toRemove);
         redQueue.remove(toRemove);
@@ -1386,6 +1385,13 @@ public class Arena implements ConfigurationSerializable {
                 removePlayer(player.getUniqueId(), true);
             }
         }
+        
+        // Just in case there are stragglers somehow
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            for (Player player : getWorld().getPlayers()) {
+                player.teleport(ConfigUtils.getSpawnLocation());
+            }
+        }, 1);
     }
 
     /** Load this Arena's world from the disk. */
