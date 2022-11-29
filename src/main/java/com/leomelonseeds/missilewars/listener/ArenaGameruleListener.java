@@ -113,6 +113,14 @@ public class ArenaGameruleListener implements Listener {
         if (event.getCause() == DamageCause.VOID) {
             event.setDamage(40.0);
         }
+        
+        // Stop fall damage on game start
+        Player player = (Player) event.getEntity();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena != null && playerArena.getSecondsUntilStart() >= -1) {
+            event.setCancelled(true);
+        }
     }
 
     /** Handle player deaths. */
