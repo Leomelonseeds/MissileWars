@@ -288,7 +288,8 @@ public class ArenaGameruleListener implements Listener {
             Projectile projectile = (Projectile) event.getDamager();
             // Allow players to damage anyone with fireballs
             if (projectile.getType() == EntityType.FIREBALL) {
-                // Check for boosterball and multiply knockback
+                // Check for boosterball (non-incendiary fireball) and multiply knockback
+                // If not boosterball, deal no damage to entities
                 Fireball fb = (Fireball) projectile;
                 if (!fb.isIncendiary()) {
                     double multiplier = Double.parseDouble(ConfigUtils.toPlain(fb.customName()));
@@ -299,7 +300,9 @@ public class ArenaGameruleListener implements Listener {
                         double vely = velocity.getY();
                         player.setVelocity(new Vector(velx, vely, velz));
                     }, 1);
-                } 
+                } else {
+                    event.setDamage(0.0001);
+                }
                 // Allow fb friendly fire
                 return;
             }

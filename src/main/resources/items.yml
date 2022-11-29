@@ -930,6 +930,9 @@ fireball:
   - "&7making of this utility. Technically."
   - "&7They died instantly and painlessly."
   - ""
+  - "&dNote that non-boosterball fireballs"
+  - "&ddo no explosion damage to players."
+  - ""
   - "&bPower: %power%"
   1:
     power: 1
@@ -1249,18 +1252,19 @@ Berserker:
       lore:
       - ""
       - "&7Fireballs no longer do damage to blocks."
-      - "&7Instead, The horizontal knockback players"
-      - "&7will recieve from fireballs is multiplied"
-      - "&7by %multiplier%&7."
+      - "&7Instead, they now do full explosion damage"
+      - "&7to players. Additionally, the horizontal"
+      - "&7knockback players receieve from fireballs"
+      - "&7is multiplied by %multiplier%&7."
       cost: 2000
       1:
-        spcost: 1
+        spcost: 2
         multiplier: 1.5
       2:
         spcost: 1
         multiplier: 2
       3:
-        spcost: 1
+        spcost: 2
         multiplier: 2.5
     missilesmith:
       name: "&eMissilesmith"
