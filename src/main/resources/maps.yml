@@ -120,6 +120,70 @@ classic:
         z: -72
     too-high: 25
     too-far: -45
+  tnt:
+    name: "&fTrinitrotoluene"
+    file: "TNT.schem"
+    portals:
+      1: 
+        x: 7
+        y: 11
+        z: -72
+    blue-shield:
+      x1: -32
+      y1: -15
+      z1: -65
+      x2: 32
+      y2: 16
+      z2: -34
+    red-shield:
+      x1: -32
+      y1: -15
+      z1: 34
+      x2: 32
+      y2: 16
+      z2: 65
+  your-reality:
+    name: "&fYour Reality"
+    file: "YourReality.schem"
+    pos:
+      x: 0
+      y: 17
+      z: -64
+    blue-spawn:
+      z: -63.5
+    red-spawn:
+      z: 64.5
+    portals:
+      1: 
+        x: 7
+        y: 11
+        z: -71
+      2: 
+        x: -9
+        y: -7
+        z: -71
+      3: 
+        x: 7
+        y: -4
+        z: -71
+      4: 
+        x: 19
+        y: -7
+        z: -71
+    blue-shield:
+      x1: -21
+      y1: -23
+      z1: -66
+      x2: 21
+      y2: 19
+      z2: -48
+    red-shield:
+      x1: -21
+      y1: -23
+      z1: 48
+      x2: 21
+      y2: 19
+      z2: 66
   miku:
     name: "&fMiku"
     file: "Miku.schem"
