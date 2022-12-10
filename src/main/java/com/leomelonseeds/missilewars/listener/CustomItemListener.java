@@ -29,6 +29,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -226,6 +227,17 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
+            
+            // Check if a block was clicked, including a moving block
+            if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+                for (int i = 1; i <= 4; i++) {
+                    Block temp = player.getTargetBlock(i);
+                    if (temp.getType() == Material.MOVING_PISTON) {
+                        clicked = temp;
+                        break;
+                    }
+                }
+            }
             if (clicked == null) {
                 return;
             }

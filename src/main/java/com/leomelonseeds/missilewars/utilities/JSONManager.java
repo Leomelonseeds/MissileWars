@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +75,11 @@ public class JSONManager {
             }
             
             try {
+                if (Bukkit.getPlayer(uuid) == null) {
+                    return;
+                }
+                Player player = Bukkit.getPlayer(uuid);
+                
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
                 // Recursively update json file
                 updateJson(newJson, defaultJson);
@@ -88,7 +94,7 @@ public class JSONManager {
                 for (String deck : plugin.getDeckManager().getDecks()) {
                     JSONObject deckjson = newJson.getJSONObject(deck);
                     updateJson(deckjson, defaultJson.getJSONObject(deck));
-                    if (Bukkit.getPlayer(uuid).hasPermission("umw.unlockall")) {
+                    if (player.hasPermission("umw.unlockall")) {
                         for (String key : deckjson.keySet()) {
                             if (deckjson.get(key) instanceof Boolean) {
                                 deckjson.put(key, true);
@@ -212,7 +218,7 @@ public class JSONManager {
                             String msg = ConfigUtils.getConfigText("messages.sp-negative", null, null, null);
                             msg = msg.replace("%deck%", deck);
                             msg = msg.replace("%preset%", preset);
-                            Bukkit.getPlayer(uuid).sendMessage(msg);
+                            player.sendMessage(msg);
                             newJson.getJSONObject(deck).put(preset, defaultpreset);
                         } else {
                             currentpreset.put("skillpoints", finalsp);
