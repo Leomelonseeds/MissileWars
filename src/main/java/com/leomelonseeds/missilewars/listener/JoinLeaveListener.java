@@ -8,6 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -44,6 +46,12 @@ public class JoinLeaveListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
     	Player player = event.getPlayer();
     	player.teleport(ConfigUtils.getSpawnLocation());
+        for (PotionEffect effect : player.getActivePotionEffects()){
+            if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE) {
+                continue;
+            }
+            player.removePotionEffect(effect.getType());
+        }
 
     	// Load player data, making sure for new players that it happens after an entry for them is created.
     	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
