@@ -1422,7 +1422,7 @@ indicators:
     slot: 0
     rankedslot: 0
   utility:
-    item: REPEATER
+    item: COMPARATOR
     name: "&9&lUtility"
     lore:
       - "&7Improve the effectiveness of utilities"
@@ -1507,29 +1507,115 @@ text:
   - "&cTNT: %tnt%"
 
 preset:
-  item: BOOK
-  name: "&f&lPreset %preset%"
-  lore:
-  - ""
-  - "&7Passive: %passive%"
-  - "&7Global Passive: %gpassive%"
-  - ""
-  - "&cRight-click &7to edit this preset"
-  loreselect: "&aSelected"
-  lorenotselect: "&cLeft-click &7to select this preset"
-
-ranked:
-  item: ENCHANTED_BOOK
-  name: "&3&lRanked Preset"
-  lore:
-  - ""
-  - "&7This is the &3ranked &7preset for this"
-  - "&7deck. This preset is only used in &3ranked"
-  - "&7games, and is automatically selected based"
-  - "&7on your deck. &eAbilities &7and &6passives"
-  - "&7are &cdisabled &7in this deck."
-  - ""
-  - "&cRight-click &7to edit this preset"
+  info:
+    Architect:
+      item: NETHER_STAR
+      name: "&2&lArchitect"
+      lore:
+      - ""
+      - "&7Professional Missile Wars gameplay"
+      - ""
+      - "&6Gear:"
+      - "&7Iron Pickaxe"
+      - "&7Chainmail Boots"
+      - ""
+      - "&cMissiles:"
+      - "&7Slasher, Slingshot, Citadel, Pisces, Ant"
+      - ""
+      - "&9Utility:"
+      - "&7Shield, Platform, Leaves"
+      - ""
+      - "&cClick &7to use this deck."
+    Vanguard:
+      item: NETHER_STAR
+      name: "&6&lVanguard"
+      lore:
+      - ""
+      - "&7I am speed."
+      - ""
+      - "&6Gear:"
+      - "&7Golden Sword"
+      - "&7Golden Boots"
+      - ""
+      - "&cMissiles:"
+      - "&7Lightning, Chronullifier, Supersonic,"
+      - "&7Piranha, Tomahawk"
+      - ""
+      - "&9Utility:"
+      - "&7Canopy, Splash, Lingering Harming"
+      - ""
+      - "&cClick &7to use this deck."
+    Sentinel:
+      item: NETHER_STAR
+      name: "&b&lSentinel"
+      lore:
+      - ""
+      - "&7With its especially sturdy missiles, the"
+      - "&7sentinel defends against all forms of"
+      - "&7emotional damage."
+      - ""
+      - "&6Gear:"
+      - "&7Bow"
+      - "&7Iron Boots"
+      - ""
+      - "&cMissiles:"
+      - "&7Guardian, Gemini, Hilt, Sword, Supporter"
+      - ""
+      - "&9Utility:"
+      - "&7Torpedo, Obsidian Shield, Arrows"
+      - ""
+      - "&cClick &7to use this deck."
+    Berserker:
+      item: NETHER_STAR
+      name: "&c&lBerserker"
+      lore:
+      - ""
+      - "&7TNT go boom"
+      - ""
+      - "&6Gear:"
+      - "&7Crossbow"
+      - "&7Diamond Boots"
+      - ""
+      - "&cMissiles"
+      - "&7Cruiser, Warhead, Juggernaut, Breaker,"
+      - "&7Shieldbuster"
+      - ""
+      - "&9Utility:"
+      - "&7Fireball, Spawn Creeper, Arrows"
+      - ""
+      - "&cClick &7to use this deck."
+  normal:
+    item: BOOK
+    name: "&f&lPreset %preset%"
+    lore:
+    - ""
+    - "&7Passive: %passive%"
+    - "&7Global Passive: %gpassive%"
+    - ""
+    loreselect: "&aSelected"
+    lorenotselect: "&cClick &7to select this preset"
+  edit:
+    item: REPEATER
+    name: "&7&lEdit Preset"
+    lore:
+    - ""
+    - "&7Edit this preset to change the levels of"
+    - "&7your missiles, utility, and enchantments,"
+    - "&7and purchase passives and abilities."
+    - ""
+    - "&cClick &7to edit this preset"
+  ranked:
+    item: ENCHANTED_BOOK
+    name: "&3&lRanked Preset"
+    lore:
+    - ""
+    - "&7This is the &3ranked &7preset for this"
+    - "&7deck. This preset is only used in &3ranked"
+    - "&7games, and is automatically selected based"
+    - "&7on your deck. &eAbilities &7and &6passives"
+    - "&7are &cdisabled &7in this deck."
+    - ""
+    - "&cRight-click &7to edit this preset"
   
 enchants:
   name: "&b%enchant%"
