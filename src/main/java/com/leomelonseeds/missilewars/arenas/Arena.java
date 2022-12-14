@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +27,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -489,7 +493,7 @@ public class Arena implements ConfigurationSerializable {
         }
 
         player.teleport(getPlayerSpawn(player));
-        InventoryUtils.clearInventory(player);
+        InventoryUtils.clearInventory(player, true);
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         for (MissileWarsPlayer mwPlayer : players) {
@@ -509,6 +513,14 @@ public class Arena implements ConfigurationSerializable {
         for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
         }
+        
+        // Give player items
+        ItemStack leave = MissileWarsPlugin.getPlugin().getDeckManager().createItem("held.to-lobby", 0, false);
+        addHeldMeta(leave, "leave");
+        player.getInventory().setItem(8, leave);
+        ItemStack votemap = MissileWarsPlugin.getPlugin().getDeckManager().createItem("held.votemap", 0, false);
+        addHeldMeta(votemap, "votemap");
+        player.getInventory().setItem(4, votemap);
         
         // Check for AFK
         Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
@@ -534,6 +546,13 @@ public class Arena implements ConfigurationSerializable {
         // Check for game start
         checkForStart();
         return true;
+    }
+    
+    private void addHeldMeta(ItemStack item, String s) {
+        ItemMeta meta = item.getItemMeta();
+        meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
+                PersistentDataType.STRING, s);
+        item.setItemMeta(meta);
     }
     
     /**
@@ -777,7 +796,6 @@ public class Arena implements ConfigurationSerializable {
                         removeSpectator(player);
                         blueTeam.removePlayer(player);
                         redTeam.addPlayer(player);
-                        redTeam.giveItems(player);
                         player.giveDeckGear();
                         checkNotEmpty();
                         announceMessage("messages.queue-join-red", player);
@@ -829,7 +847,6 @@ public class Arena implements ConfigurationSerializable {
                         removeSpectator(player);
                         redTeam.removePlayer(player);
                         blueTeam.addPlayer(player);
-                        blueTeam.giveItems(player);
                         player.giveDeckGear();
                         checkNotEmpty();
                         announceMessage("messages.queue-join-blue", player);

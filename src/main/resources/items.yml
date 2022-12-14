@@ -1398,6 +1398,22 @@ Architect:
       3:
         percentage: 25
         spcost: 2
+        
+# Held items 
+held:
+  main-menu:
+    item: COMPASS
+    name: "&bMain Menu &7(Right Click)"
+    lore:
+    - ""
+    - "&7Why are you looking here it"
+    - "&7clearly says to right click"
+  votemap:
+    item: MAP
+    name: "&aMap Voting"
+  to-lobby:
+    item: BARRIER
+    name: "&bReturn to Lobby"
    
 
 # Stuff relating to Deck GUI

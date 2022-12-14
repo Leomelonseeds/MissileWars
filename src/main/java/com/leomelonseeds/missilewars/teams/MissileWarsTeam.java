@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -203,14 +202,6 @@ public class MissileWarsTeam {
         }
         return false;
     }
-
-    public void giveItems(MissileWarsPlayer player) {
-        // TP to team spawn and give armor
-        Player mcPlayer = player.getMCPlayer();
-        InventoryUtils.clearInventory(mcPlayer);
-        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-    }
     
     /**
      * Add a player to the team.
@@ -241,8 +232,10 @@ public class MissileWarsTeam {
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
+        InventoryUtils.clearInventory(mcPlayer, true);
+        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
-        giveItems(player);
         player.setJoinTime(LocalDateTime.now());
      
         // Architect Haste
@@ -325,7 +318,7 @@ public class MissileWarsTeam {
     private ItemStack createColoredArmor(Material type) {
         ItemStack item = new ItemStack(type);
         LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
-        meta.setColor(DyeColor.valueOf(ChatColor.stripColor(name).toUpperCase()).getColor());
+        meta.setColor(DyeColor.valueOf(name.toUpperCase()).getColor());
         meta.setUnbreakable(true);
         item.setItemMeta(meta);
         return item;

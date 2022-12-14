@@ -49,6 +49,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
@@ -163,9 +164,35 @@ public class CustomItemListener implements Listener {
         
         // Check if player is trying to place a structure item
         Player player = event.getPlayer();
-
+        PlayerInventory inv = player.getInventory();
+        ItemStack hand = inv.getItem(event.getHand());
         Arena playerArena = getPlayerArena(player);
+        String held = getStringFromItem(hand, "held");
         if (playerArena == null) {
+            // Player is using a held item
+            if (held == null) {
+                return;
+            }
+            
+            // Must be holding main menu item
+            if (!held.equals("main-menu")) {
+                return;
+            }
+            
+            event.setCancelled(true);
+            String command = "bossshop open menu " + player.getName();
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+            return;
+        }
+        
+        // Player is using a held item inside an arena
+        if (held != null) {
+            event.setCancelled(true);
+            if (held.equals("leave")) {
+                playerArena.removePlayer(player.getUniqueId(), true);
+            } else if (held.equals("votemap")) {
+                new MapVoting(player);
+            }
             return;
         }
         
@@ -181,8 +208,6 @@ public class CustomItemListener implements Listener {
         }
         
         // Check if player used a structure or utility
-        PlayerInventory inv = player.getInventory();
-        ItemStack hand = inv.getItem(event.getHand());
         Block clicked = event.getClickedBlock();
         String structureName = getStringFromItem(hand, "item-structure");
         String utility = getStringFromItem(hand, "item-utility");
@@ -616,7 +641,7 @@ public class CustomItemListener implements Listener {
         Player hit = (Player) event.getHitEntity();
         String team1 = playerArena.getTeam(thrower.getUniqueId());
         String team2 = playerArena.getTeam(hit.getUniqueId());
-        if (team1.equals(team2)) {
+        if (!team1.equals("no team") && team1.equals(team2)) {
             event.setCancelled(true);
             return;
         }

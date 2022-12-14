@@ -31,6 +31,7 @@ import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
@@ -95,6 +96,12 @@ public class ArenaInventoryListener implements Listener {
         if (event.getCurrentItem() == null) {
             return;
         }
+        
+        ItemStack item = event.getCurrentItem();
+        if (InventoryUtils.isHeldItem(item)) {
+            event.setCancelled(true);
+            return;
+        }
 
         // Check if player is in an active arena
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
@@ -105,7 +112,7 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
             
-            if (event.getCurrentItem().getType() == Material.ELYTRA) {
+            if (item.getType() == Material.ELYTRA) {
                 event.setCancelled(true);
             }
             
@@ -131,7 +138,7 @@ public class ArenaInventoryListener implements Listener {
         
         // Cancel shift-clicking creeper heads
         if (event.getClick() == ClickType.SHIFT_LEFT) {
-            if (event.getCurrentItem().getType() == Material.CREEPER_HEAD) {
+            if (item.getType() == Material.CREEPER_HEAD) {
                 event.setCancelled(true);
             }
         }
@@ -140,6 +147,12 @@ public class ArenaInventoryListener implements Listener {
     /** Manage item dropping. */
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
+        // Cancel if dropping custom item
+        if (InventoryUtils.isHeldItem(event.getItemDrop().getItemStack())) {
+            event.setCancelled(true);
+            return;
+        }
+
         // Check if player is in Arena
         Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();

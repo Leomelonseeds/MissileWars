@@ -143,7 +143,6 @@ public class TourneyArena extends Arena {
                         removeSpectator(player);
                         blueTeam.removePlayer(player);
                         redTeam.addPlayer(player, true);
-                        redTeam.giveItems(player);
                         player.giveDeckGear();
                         announceMessage("messages.queue-join-red", player);
                     }
@@ -195,7 +194,6 @@ public class TourneyArena extends Arena {
                         removeSpectator(player);
                         redTeam.removePlayer(player);
                         blueTeam.addPlayer(player, true);
-                        blueTeam.giveItems(player);
                         player.giveDeckGear();
                         announceMessage("messages.queue-join-blue", player);
                     }
