@@ -338,6 +338,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
+        arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setDifficulty(Difficulty.NORMAL);
         WorldBorder border = arenaWorld.getWorldBorder();
