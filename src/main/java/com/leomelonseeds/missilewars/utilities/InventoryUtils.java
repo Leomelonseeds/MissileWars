@@ -55,7 +55,7 @@ public class InventoryUtils {
             }
             
             // Don't clear hats
-            if (i == 39 && current.getType().toString().contains("HELMET")) {
+            if (i == 39 && !current.getType().toString().contains("HELMET")) {
                 continue;
             }
             
