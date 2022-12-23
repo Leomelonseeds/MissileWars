@@ -1318,41 +1318,42 @@ public class Arena implements ConfigurationSerializable {
             UUID uuid = player.getMCPlayerId();
             if (!getTeam(uuid).equals("no team")) {
                 long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
-                if (playTime > 40) {
-                    playerAmount = spawn_missile * player.getMissiles() +
-                                   use_utility * player.getUtility() +
-                                   kill * player.getKills() +
-                                   (int) (portal_broken * player.getMVP());
-                    if (blueTeam.containsPlayer(uuid)) {
-                        teamAmount = blue_shield_health_amount;
-                        if (winningTeam == blueTeam) {
-                            teamAmount += win;
-                            won = 1;
-                        }
-                    } else {
-                        teamAmount = red_shield_health_amount;
-                        if (winningTeam == redTeam) {
-                            teamAmount += win;
-                            won = 1;
-                        }
-                    }
-                    
-                    double percentPlayed = (double) playTime / gameTime;
-                    amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
-    
-                    // Update player stats
-                    SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
-    
-                    sql.updateClassicStats(uuid, player.getMVP(), won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
-                    sql.updateWinstreak(uuid, gamemode, won);
-                    RankUtils.addExp(player.getMCPlayer(), amountEarned);
-    
-                    String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-                    player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
-                    econ.depositPlayer(player.getMCPlayer(), amountEarned);
-                } else {
+                if (playTime <= 40) {
                     ConfigUtils.sendConfigMessage("messages.earn-none-time", player.getMCPlayer(), null, null);
+                    continue;
                 }
+                
+                playerAmount = spawn_missile * player.getMissiles() +
+                               use_utility * player.getUtility() +
+                               kill * player.getKills() +
+                               (int) (portal_broken * player.getMVP());
+                if (blueTeam.containsPlayer(uuid)) {
+                    teamAmount = blue_shield_health_amount;
+                    if (winningTeam == blueTeam) {
+                        teamAmount += win;
+                        won = 1;
+                    }
+                } else {
+                    teamAmount = red_shield_health_amount;
+                    if (winningTeam == redTeam) {
+                        teamAmount += win;
+                        won = 1;
+                    }
+                }
+                
+                double percentPlayed = (double) playTime / gameTime;
+                amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
+
+                // Update player stats
+                SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
+
+                sql.updateClassicStats(uuid, player.getMVP(), won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
+                sql.updateWinstreak(uuid, gamemode, won);
+                RankUtils.addExp(player.getMCPlayer(), amountEarned);
+
+                String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
+                player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
+                econ.depositPlayer(player.getMCPlayer(), amountEarned);
             }
         }
 

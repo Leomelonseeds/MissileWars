@@ -178,7 +178,8 @@ public class RankUtils {
      * @param exp
      */
     public static void addExp(Player player, int exp) {
-        int current = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        int current = plugin.getSQL().getExpSync(player.getUniqueId());
         int currentlevel = getRankLevel(current);
         int newexp = current + exp;
         int newlevel = getRankLevel(newexp);
@@ -201,10 +202,11 @@ public class RankUtils {
                     p.sendMessage(othermessage);
                 }
             }
+            plugin.log(othermessage);
             
-            MissileWarsPlugin.getPlugin().getJSON().rankUp(player.getUniqueId());
+            plugin.getJSON().rankUp(player.getUniqueId());
         }
 
-        MissileWarsPlugin.getPlugin().getSQL().updateExp(player.getUniqueId(), exp);
+        plugin.getSQL().updateExp(player.getUniqueId(), exp);
     }
 }
