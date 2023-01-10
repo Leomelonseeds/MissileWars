@@ -120,16 +120,16 @@ classic:
         z: -72
     too-high: 25
     too-far: -45
-  book:
+  Book:
     name: "&fBooks"
     file: "Book.schem"
     pos: 
-      x: 0
-      y: 17 
+      x: 0 
+      y: 16 
       z: 0
     portals:
       1: 
-        x: 21
+        x: -14
         y: 12
         z: -72
       2: 
@@ -137,7 +137,7 @@ classic:
         y: 12
         z: -72
       3: 
-        x: -14
+        x: 21
         y: 12
         z: -72
     blue-shield:
@@ -150,8 +150,8 @@ classic:
     red-shield:
       x1: -28
       y1: -13
-      z1: -65
-      x2: 42
+      z1: 42
+      x2: 28
       y2: 17
       z2: 65
   trinitrotoluene:
@@ -425,10 +425,18 @@ classic:
       z: 64.5
     blue-shield:
       x1: -25
+      y1: -13
+      z1: -65
       x2: 25
+      y2: 16
+      z2: -47
     red-shield:
       x1: -25
+      y1: -13
+      z1: 47
       x2: 25
+      y2: 16
+      z2: 65
     portals:
       1:
         x: -11
