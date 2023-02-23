@@ -202,7 +202,7 @@ public class RankUtils {
                     p.sendMessage(othermessage);
                 }
             }
-            plugin.log(othermessage);
+            plugin.log(othermessage + " (added " + exp + " exp)");
             
             plugin.getJSON().rankUp(player.getUniqueId());
         }

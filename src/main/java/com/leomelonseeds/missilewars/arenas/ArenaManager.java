@@ -366,7 +366,7 @@ public class ArenaManager {
             redNPC.addTrait(enqueueRed);
             SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
             redSheepTrait.setColor(DyeColor.RED);
-            redNPC.data().setPersistent(NPC.SILENT_METADATA, true);
+            redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
 
             arenaWorld.loadChunk(redLoc.getChunk());
             redNPC.spawn(redLoc);
@@ -384,7 +384,7 @@ public class ArenaManager {
             blueNPC.addTrait(enqueueBlue);
             SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
             blueSheepTrait.setColor(DyeColor.BLUE);
-            blueNPC.data().setPersistent(NPC.SILENT_METADATA, true);
+            redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
 
             arenaWorld.loadChunk(blueLoc.getChunk());
             blueNPC.spawn(blueLoc);
@@ -407,7 +407,7 @@ public class ArenaManager {
             // Setup Villager Profession
             VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
             profession.setProfession(Villager.Profession.NITWIT);
-            bartender.data().setPersistent(NPC.SILENT_METADATA, true);
+            redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
 
             arenaWorld.loadChunk(barLoc.getChunk());
             bartender.spawn(barLoc);
