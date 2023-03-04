@@ -14,7 +14,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
@@ -134,22 +133,6 @@ public class Tracker {
     }
     
     /**
-     * Registers the break event to the most recent missile found
-     * 
-     * @param e
-     */
-    public void registerBlockBreakEvent(BlockBreakEvent e) {
-        Player player = e.getPlayer();
-        for (int i = tracked.size() - 1; i >= 0; i--) {
-            Tracked t = tracked.get(i);
-            if (t instanceof TrackedMissile && t.contains(e.getBlock().getLocation()) && !isEmbedded(t)) {
-                ((TrackedMissile) t).registerBlockBroke(player);
-                break;
-            }
-        }
-    }
-    
-    /**
      * Gets the most likely prime source given a tnt prime location
      * 
      * @param l
@@ -191,12 +174,8 @@ public class Tracker {
                 continue;
             }
 
-            // If missile is moving, first check for recent blockbreaks registered to the missile
-            // Then check for collisions to other objects, which override the blockbreak
+            // Check for collisions to other objects, which override the blockbreak
             // Iterate in reverse to check for more recently spawned missile
-            if (tm.getBlockBroke() != null) {
-                igniter = tm.getBlockBroke();
-            }
             for (int j = tracked.size() - 1; j > i; j--) {
                 Tracked t2 = tracked.get(j);
                 // Cannot be the same team

@@ -510,9 +510,6 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        // Register event with arena's tracker
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> possibleArena.getTracker().registerBlockBreakEvent(event));
-        
         // Fix dumb bug. No break obsidian
         if (block.getType().toString().contains("OBSIDIAN")) {
             event.setCancelled(true);

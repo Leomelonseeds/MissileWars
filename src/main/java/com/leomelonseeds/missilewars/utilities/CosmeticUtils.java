@@ -161,7 +161,7 @@ public class CosmeticUtils {
     public static Component getPortalMessage(Player killer, String brokeTeam) {
         if (killer == null) {
             return ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.portal-broke", null, null, null)
-                    .replace("%team%", brokeTeam));
+                    .replace("%team%", (brokeTeam.equals("red") ? ChatColor.RED : ChatColor.BLUE) + brokeTeam));
         }
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
         String prefix = "&5&l[!] ";
