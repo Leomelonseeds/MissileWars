@@ -53,7 +53,13 @@ public class PresetSelector implements MWInventory {
             
             ItemStack item = new ItemStack(Material.getMaterial(itemConfig.getString("preset.normal.item")));
             ItemMeta meta = item.getItemMeta();
-            meta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.normal.name").replace("%preset%", p)));
+            String name = itemConfig.getString("preset.normal.name").replace("%preset%", p);
+            if (p.equals("B")) {
+                name += " &8(requires &e&lESQUIRE&8)";
+            } else if (p.equals("C")) {
+                name += " &8(requires &b&lKNIGHT&8)";
+            }
+            meta.displayName(ConfigUtils.toComponent(name));
             
             // Fill item lore with passive info
             List<String> lore = new ArrayList<>();
