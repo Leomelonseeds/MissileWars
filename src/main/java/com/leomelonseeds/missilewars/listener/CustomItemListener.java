@@ -248,7 +248,7 @@ public class CustomItemListener implements Listener {
                 }
                 ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
                 canopy_cooldown.add(player.getUniqueId());
-                spawnCanopy(player, playerArena, structureName, hand);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> spawnCanopy(player, playerArena, structureName), 20L); 
                 return;
             }
             
@@ -358,7 +358,7 @@ public class CustomItemListener implements Listener {
         }
     }
 
-    Set<UUID> canopy_cooldown = new HashSet<>();
+    public static Set<UUID> canopy_cooldown = new HashSet<>();
     public static Map<Location, Integer> leaves = new HashMap<>();
 
     // Check for architect leaves to despawn them after a while
@@ -444,77 +444,75 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                // Make sure the canopy spawn hasn't already been cancelled
-                if (!canopy_cooldown.contains(player.getUniqueId())) {
-                    return;
-                }
-
-                canopy_cooldown.remove(player.getUniqueId());
-
-                // Ignore offline players. Obviously
-                if (!player.isOnline()) {
-                    return;
-                }
-
-                // Ignore if player is not holding a canopy
-                if (hand.getType() != Material.ENDER_EYE) {
-                    ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
-                    return;
-                }
-
-                String mapName = "default-map";
-                if (playerArena.getMapName() != null) {
-                    mapName = playerArena.getMapName();
-                }
-
-                int canopy_distance = (int) getItemStat(utility, "distance");
-
-                // Ignore if player would be going through wall
-                if (player.getTargetBlock(null, canopy_distance + 3).getType() != Material.AIR) {
-                    ConfigUtils.sendConfigMessage("messages.canopy-blocked", player, null, null);
-                    return;
-                }
-
-                // Finally spawn canopy
-                Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
-                Location spawnLoc = player.getEyeLocation().clone().add(distance);
-                if (SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
-                    // Teleport and give slowness
-                    Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
-                    loc.setPitch(90);
-                    player.teleport(loc);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5));
-                    
-                    // Freeze player for a bit
-                    canopy_freeze.add(player);
-                    Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                        canopy_freeze.remove(player);
-                    }, 30);
-                    
-                    // Check if can give poison
-                    double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
-                    if (loc.getBlockY() >= toohigh) {
-                        ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
-                    }
-                    
-                    hand.setAmount(hand.getAmount() - 1);
-                    for (Player players : player.getWorld().getPlayers()) {
-                        ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
-                    }
-                    playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
-                    despawnCanopy(spawnLoc, 5);
-                } else {
-                    ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                }
-
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
+    private void spawnCanopy(Player player, Arena playerArena, String utility) {
+        // Make sure the canopy spawn hasn't already been cancelled
+        if (!canopy_cooldown.contains(player.getUniqueId())) {
+            return;
+        }
+    
+        canopy_cooldown.remove(player.getUniqueId());
+    
+        // Ignore offline players. Obviously
+        if (!player.isOnline()) {
+            return;
+        }
+    
+        // Ignore if player is not holding a canopy
+        PlayerInventory playerInv = player.getInventory();
+        Material main = playerInv.getItemInMainHand().getType();
+        Material off = playerInv.getItemInOffHand().getType();
+        if (!(main == Material.ENDER_EYE || off == Material.ENDER_EYE)) {
+            ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
+            return;
+        }
+        ItemStack hand = main == Material.ENDER_EYE ? playerInv.getItemInMainHand() : playerInv.getItemInOffHand();
+    
+        String mapName = "default-map";
+        if (playerArena.getMapName() != null) {
+            mapName = playerArena.getMapName();
+        }
+    
+        int canopy_distance = (int) getItemStat(utility, "distance");
+    
+        // Ignore if player would be going through wall
+        if (player.getTargetBlock(null, canopy_distance + 3).getType() != Material.AIR) {
+            ConfigUtils.sendConfigMessage("messages.canopy-blocked", player, null, null);
+            return;
+        }
+    
+        // Finally spawn canopy
+        Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
+        Location spawnLoc = player.getEyeLocation().clone().add(distance);
+        if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
+            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+            return;
+        }
+            
+        // Teleport and give slowness
+        Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
+        loc.setPitch(90);
+        player.teleport(loc);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5));
+        
+        // Freeze player for a bit
+        canopy_freeze.add(player);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            canopy_freeze.remove(player);
+        }, 30);
+        
+        // Check if can give poison
+        double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
+        if (loc.getBlockY() >= toohigh) {
+            ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
+        }
+        
+        hand.setAmount(hand.getAmount() - 1);
+        for (Player players : player.getWorld().getPlayers()) {
+            ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
+        }
+        playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+        despawnCanopy(spawnLoc, 5);
     }
 
     public static Set<Player> canopy_freeze = new HashSet<>();

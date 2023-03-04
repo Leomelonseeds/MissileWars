@@ -1341,7 +1341,7 @@ public class Arena implements ConfigurationSerializable {
                     }
                 }
                 
-                double percentPlayed = (double) playTime / gameTime;
+                double percentPlayed = Math.min(1, (double) playTime / gameTime);
                 amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
 
                 // Update player stats

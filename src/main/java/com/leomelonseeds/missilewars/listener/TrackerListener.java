@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +10,6 @@ import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
-import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 public class TrackerListener implements Listener {
     
@@ -23,8 +23,8 @@ public class TrackerListener implements Listener {
             return;
         }
         
-        Tracker t = arena.getTracker();
-        t.assignPrimeSource(e);
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
+                () -> arena.getTracker().assignPrimeSource(e));
     }
     
     @EventHandler
@@ -37,7 +37,7 @@ public class TrackerListener implements Listener {
             return;
         }
         
-        Tracker t = arena.getTracker();
-        t.registerPistonEvent(e);
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
+                () -> arena.getTracker().registerPistonEvent(e));
     }
 }

@@ -142,7 +142,7 @@ public class Tracker {
         Player player = e.getPlayer();
         for (int i = tracked.size() - 1; i >= 0; i--) {
             Tracked t = tracked.get(i);
-            if (t instanceof TrackedMissile && t.contains(e.getBlock().getLocation())) {
+            if (t instanceof TrackedMissile && t.contains(e.getBlock().getLocation()) && !isEmbedded(t)) {
                 ((TrackedMissile) t).registerBlockBroke(player);
                 break;
             }
@@ -163,58 +163,56 @@ public class Tracker {
         }
         Location l = event.getBlock().getLocation();
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            Player igniter = null;
-            // Check if any most recently spawned missile contains this primed TNT location
-            for (int i = tracked.size() - 1; i >= 0; i--) {
-                Tracked t = tracked.get(i);
-                if (t instanceof TrackedMissile && t.contains(l)) {
-                    TrackedMissile tm = (TrackedMissile) t;
-                    // Shortcut if explosion occurs for an embedded missile
-                    if (reason == PrimeReason.EXPLOSION) {
-                        if (isEmbedded(tm)) {
-                            igniter = tm.getPlayer();
+        Player igniter = null;
+        // Check if any most recently spawned missile contains this primed TNT location
+        for (int i = tracked.size() - 1; i >= 0; i--) {
+            Tracked t = tracked.get(i);
+            if (t instanceof TrackedMissile && t.contains(l)) {
+                TrackedMissile tm = (TrackedMissile) t;
+                // Shortcut if explosion occurs for an embedded missile
+                if (reason == PrimeReason.EXPLOSION) {
+                    if (isEmbedded(tm)) {
+                        igniter = tm.getPlayer();
+                        break;
+                    }
+                    continue;
+                }
+                igniter = tm.getPlayer();
+                // If missile is moving, first check for recent blockbreaks registered to the missile
+                // Then check for collisions to other objects, which override the blockbreak
+                // Iterate in reverse to check for more recently spawned missile
+                if (tm.isInMotion()) {
+                    if (tm.getBlockBroke() != null) {
+                        igniter = tm.getBlockBroke();
+                    }
+                    for (int j = tracked.size() - 1; j > i; j--) {
+                        Tracked t2 = tracked.get(j);
+                        // Cannot be the same team
+                        if (tm.isRed() == t2.isRed()) {
+                            continue;
+                        }
+                        if (tm.contains(t2)) {
+                            igniter = t2.getPlayer();
                             break;
                         }
-                        continue;
                     }
-                    igniter = tm.getPlayer();
-                    // If missile is moving, first check for recent blockbreaks registered to the missile
-                    // Then check for collisions to other objects, which override the blockbreak
-                    // Iterate in reverse to check for more recently spawned missile
-                    if (tm.isInMotion()) {
-                        if (tm.getBlockBroke() != null) {
-                            igniter = tm.getBlockBroke();
-                        }
-                        for (int j = tracked.size() - 1; j > i; j--) {
-                            Tracked t2 = tracked.get(j);
-                            // Cannot be the same team
-                            if (tm.isRed() == t2.isRed()) {
-                                continue;
-                            }
-                            if (tm.contains(t2)) {
-                                igniter = t2.getPlayer();
-                                break;
-                            }
-                        }
-                    }
-                    break;
                 }
+                break;
             }
-            if (igniter == null) {
-                return;
-            }
-            // Set the TNTPrimed in this location to use the player as source
-            Player result = igniter;
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                for (Entity e : l.getNearbyEntities(1, 1, 1)) {
-                    if (!(e instanceof TNTPrimed)) {
-                        continue;
-                    }
-                    TNTPrimed tnt = (TNTPrimed) e;
-                    tnt.setSource(result);
+        }
+        if (igniter == null) {
+            return;
+        }
+        // Set the TNTPrimed in this location to use the player as source
+        Player result = igniter;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Entity e : l.getNearbyEntities(1, 1, 1)) {
+                if (!(e instanceof TNTPrimed)) {
+                    continue;
                 }
-            });
+                TNTPrimed tnt = (TNTPrimed) e;
+                tnt.setSource(result);
+            }
         });
     }
     
