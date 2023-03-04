@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.listener;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
@@ -298,6 +300,17 @@ public class ArenaInventoryListener implements Listener {
                 }
             }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
         }
+    }
+    
+    // Kill canopy cooldown if item switch
+    @EventHandler
+    public void onSwitch(PlayerItemHeldEvent e) {
+        UUID player = e.getPlayer().getUniqueId();
+        if (!CustomItemListener.canopy_cooldown.contains(player)) {
+            return;
+        }
+        ConfigUtils.sendConfigMessage("messages.canopy-cancel", e.getPlayer(), null, null);
+        CustomItemListener.canopy_cooldown.remove(e.getPlayer().getUniqueId());
     }
 
 }

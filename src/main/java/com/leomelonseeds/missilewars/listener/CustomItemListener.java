@@ -248,7 +248,7 @@ public class CustomItemListener implements Listener {
                 }
                 ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
                 canopy_cooldown.add(player.getUniqueId());
-                Bukkit.getScheduler().runTaskLater(plugin, () -> spawnCanopy(player, playerArena, structureName), 20L); 
+                Bukkit.getScheduler().runTaskLater(plugin, () -> spawnCanopy(player, playerArena, structureName, hand), 20L); 
                 return;
             }
             
@@ -444,7 +444,7 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, String utility) {
+    private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
         // Make sure the canopy spawn hasn't already been cancelled
         if (!canopy_cooldown.contains(player.getUniqueId())) {
             return;
@@ -456,16 +456,6 @@ public class CustomItemListener implements Listener {
         if (!player.isOnline()) {
             return;
         }
-    
-        // Ignore if player is not holding a canopy
-        PlayerInventory playerInv = player.getInventory();
-        Material main = playerInv.getItemInMainHand().getType();
-        Material off = playerInv.getItemInOffHand().getType();
-        if (!(main == Material.ENDER_EYE || off == Material.ENDER_EYE)) {
-            ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
-            return;
-        }
-        ItemStack hand = main == Material.ENDER_EYE ? playerInv.getItemInMainHand() : playerInv.getItemInOffHand();
     
         String mapName = "default-map";
         if (playerArena.getMapName() != null) {

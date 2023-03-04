@@ -164,45 +164,57 @@ public class Tracker {
         Location l = event.getBlock().getLocation();
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player igniter = null;
-        // Check if any most recently spawned missile contains this primed TNT location
-        for (int i = tracked.size() - 1; i >= 0; i--) {
+        
+        // Check if any oldest missile contained the tnt
+        for (int i = 0; i < tracked.size(); i++) {
             Tracked t = tracked.get(i);
-            if (t instanceof TrackedMissile && t.contains(l)) {
-                TrackedMissile tm = (TrackedMissile) t;
-                // Shortcut if explosion occurs for an embedded missile
-                if (reason == PrimeReason.EXPLOSION) {
-                    if (isEmbedded(tm)) {
-                        igniter = tm.getPlayer();
-                        break;
-                    }
-                    continue;
-                }
+            if (!(t instanceof TrackedMissile && t.contains(l))) {
+                continue;
+            }
+            TrackedMissile tm = (TrackedMissile) t;
+            
+            // Shortcut if explosion occurs for an embedded missile
+            if (isEmbedded(tm)) {
                 igniter = tm.getPlayer();
-                // If missile is moving, first check for recent blockbreaks registered to the missile
-                // Then check for collisions to other objects, which override the blockbreak
-                // Iterate in reverse to check for more recently spawned missile
-                if (tm.isInMotion()) {
-                    if (tm.getBlockBroke() != null) {
-                        igniter = tm.getBlockBroke();
-                    }
-                    for (int j = tracked.size() - 1; j > i; j--) {
-                        Tracked t2 = tracked.get(j);
-                        // Cannot be the same team
-                        if (tm.isRed() == t2.isRed()) {
-                            continue;
-                        }
-                        if (tm.contains(t2)) {
-                            igniter = t2.getPlayer();
-                            break;
-                        }
-                    }
-                }
                 break;
             }
+            
+            // Otherwise if it gets ignited by another tnt ignore
+            if (reason == PrimeReason.EXPLOSION) {
+                continue;
+            }
+            
+            // If missile is not moving, then should probably check other
+            // tracked objects before confirming the igniters identity
+            igniter = tm.getPlayer();
+            if (!tm.isInMotion()) {
+                continue;
+            }
+
+            // If missile is moving, first check for recent blockbreaks registered to the missile
+            // Then check for collisions to other objects, which override the blockbreak
+            // Iterate in reverse to check for more recently spawned missile
+            if (tm.getBlockBroke() != null) {
+                igniter = tm.getBlockBroke();
+            }
+            for (int j = tracked.size() - 1; j > i; j--) {
+                Tracked t2 = tracked.get(j);
+                // Cannot be the same team
+                if (tm.isRed() == t2.isRed()) {
+                    continue;
+                }
+                if (tm.contains(t2)) {
+                    igniter = t2.getPlayer();
+                    break;
+                }
+            }
+            break;
         }
+        
         if (igniter == null) {
             return;
         }
+        
         // Set the TNTPrimed in this location to use the player as source
         Player result = igniter;
         Bukkit.getScheduler().runTask(plugin, () -> {
