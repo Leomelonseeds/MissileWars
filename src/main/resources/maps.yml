@@ -379,6 +379,7 @@ classic:
         x: 21
         y: 14
         z: -72
+    too-high: 28
   light-smog:
     name: "&fLight Smog"
     file: "LightSmog.schem"
@@ -640,6 +641,7 @@ classic:
       x2: 28
       y2: 19
       z2: 74
+    too-high: 28
   towers:
     name: "&fTowers"
     file: "Towers.schem"
