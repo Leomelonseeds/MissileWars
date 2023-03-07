@@ -4,7 +4,7 @@ experience:
   # does not include shooting bow/crossbow
   # only count successful utilizations (eg structure was spawned)
   use_utility: 1
-  kill: 5
+  kill: 3
   # max amount to give for broken portals (this number * (portals broken / total portals) = exp)
   portal_broken: 40
   # every 10% of shield health opponent lost gives this much
@@ -58,9 +58,9 @@ ranks:
     color: "&6"
     symbol: "(⚜)"
   9:
-    name: "&4&lEmperor ☬"
+    name: "&4&lEmperor 🔥"
     color: "&4"
-    symbol: "(☬)"
+    symbol: "(🔥)"
   10:
     name: "&0&k&l[ &c&lO&d&lv&6&le&e&lr&a&ll&b&lo&9&lr&5&ld &0&k&l]"
     color: "&0"
