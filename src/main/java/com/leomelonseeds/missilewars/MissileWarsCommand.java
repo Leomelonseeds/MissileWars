@@ -83,7 +83,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 }
                 
                 String map = args[3];
-                if (args[4].equals("rotation") || !maps.contains(args[1] + "." + map)) {
+                if (map.equals("rotation") || !maps.contains(args[1] + "." + map)) {
                     sendErrorMsg(sender, "The map you specified is invalid");
                     return true;
                 }
@@ -116,7 +116,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 
                 ConfigUtils.reloadConfigs();
             case "list":
-                sendSuccessMsg(sender, "Current " + args[1] + " maps: " + String.join(",", cur));
+                sendSuccessMsg(sender, "Current " + args[1] + " maps: " + String.join(", ", cur));
                 return true;
             }
             
