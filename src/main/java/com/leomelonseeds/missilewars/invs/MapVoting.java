@@ -30,7 +30,8 @@ public class MapVoting implements MWInventory {
         this.player = player;
         
         String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
-        inv = Bukkit.createInventory(null, 27, Component.text(title));
+        int size = getPlayerArena(player).getVoteManager().getVotes().size();
+        inv = Bukkit.createInventory(null, (int) Math.ceil((double) size / 9) * 9, Component.text(title));
         manager.registerInventory(player, this);
         
         // Refresh inventory once in a while
