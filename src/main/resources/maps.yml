@@ -76,6 +76,28 @@ lobby:
 
 # Settings for the Default map. Persists unless overridden
 classic:
+  rotation:
+    - default-map
+    - book
+    - trinitrotoluene
+    - your-reality
+    - miku
+    - biblically-accurate
+    - traffic-light-cake
+    - umbrella-beach
+    - darkness-fortress
+    - light-smog
+    - middle-ground
+    - double-layer
+    - minefield
+    - cubecrowd
+    - divider
+    - coppercastle
+    - formal
+    - swept
+    - butterflies
+    - towers
+    - 23andtnt
   default-map:
     name: "&fStandoff"
     file: "DefaultMap.schem"
@@ -120,7 +142,7 @@ classic:
         z: -72
     too-high: 25
     too-far: -45
-  Book:
+  book:
     name: "&fBooks"
     file: "Book.schem"
     pos: 
@@ -260,7 +282,7 @@ classic:
         x: 19
         y: 11
         z: -71
-  biblically-accurate-map:
+  biblically-accurate:
     name: "&fBiblically Accurate"
     file: "BiblicallyAccurateMap.schem"
     pos:

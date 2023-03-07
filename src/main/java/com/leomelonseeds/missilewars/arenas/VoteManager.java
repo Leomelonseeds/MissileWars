@@ -24,7 +24,7 @@ public class VoteManager {
         
         // Add all arena maps to the list
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        for (String m : mapConfig.getConfigurationSection(arena.getGamemode()).getKeys(false)) {
+        for (String m : mapConfig.getStringList(arena.getGamemode() + ".rotation")) {
             allVotes.put(m, 0);
         }
     }

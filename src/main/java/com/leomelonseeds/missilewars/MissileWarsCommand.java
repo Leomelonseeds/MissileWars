@@ -1,5 +1,8 @@
 package com.leomelonseeds.missilewars;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
@@ -8,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -48,6 +52,74 @@ public class MissileWarsCommand implements CommandExecutor {
             
             ConfigUtils.reloadConfigs();
             sendSuccessMsg(sender, "Files reloaded.");
+        }
+        
+        // Make changes to map rotation
+        if (action.equalsIgnoreCase("rotation")) {
+            // Ensure player is allowed
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            if (args.length < 3) {
+                sendErrorMsg(sender, "Usage: /umw rotation [gamemode] list/add/remove");
+                return true;
+            }
+            
+            FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
+            if (!maps.contains(args[1] + ".rotation")) {
+                sendErrorMsg(sender, "That gamemode doesn't exist (yet?)");
+                return true;
+            }
+            
+            List<String> cur = maps.getStringList(args[1] + ".rotation");
+            switch (args[2]) {
+            case "add":
+            case "remove":
+                if (args.length < 4) {
+                    sendErrorMsg(sender, "Please specify a map!");
+                    return true;
+                }
+                
+                String map = args[3];
+                if (args[4].equals("rotation") || !maps.contains(args[1] + "." + map)) {
+                    sendErrorMsg(sender, "The map you specified is invalid");
+                    return true;
+                }
+                
+                if (args[2].equals("add")) {
+                    if (cur.contains(map)) {
+                        sendErrorMsg(sender, "That map is already in the rotation!");
+                        return true;
+                    }
+                    cur.add(map);
+                    sendSuccessMsg(sender, "Added " + map + " to the rotation.");
+                } else {
+                    if (!cur.contains(map)) {
+                        sendErrorMsg(sender, "That map is not in rotation!");
+                        return true;
+                    }
+                    cur.remove(map);
+                    sendSuccessMsg(sender, "Removed " + map + " from the rotation.");
+                }
+                
+                maps.set(args[1] + ".rotation", cur);
+                File file = new File(plugin.getDataFolder().toString(), "maps.yml");
+                try {
+                    maps.save(file);
+                } catch (IOException e) {
+                    sendErrorMsg(sender, "Couldn't save the map file for some reason!");
+                    e.printStackTrace();
+                    return true;
+                }
+                
+                ConfigUtils.reloadConfigs();
+            case "list":
+                sendSuccessMsg(sender, "Current " + args[1] + " maps: " + String.join(",", cur));
+                return true;
+            }
+            
         }
         
         if (action.equalsIgnoreCase("votemap")) {

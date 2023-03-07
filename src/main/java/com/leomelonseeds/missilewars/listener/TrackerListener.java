@@ -37,7 +37,6 @@ public class TrackerListener implements Listener {
             return;
         }
         
-        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
-                () -> arena.getTracker().registerPistonEvent(e));
+        arena.getTracker().registerPistonEvent(e);
     }
 }
