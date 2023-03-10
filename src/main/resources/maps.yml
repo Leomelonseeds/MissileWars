@@ -1,6 +1,6 @@
 # Settings for the lobby
 lobby:
-  file: "WaitingLobby.schem"
+  file: WaitingLobby.schem
   pos:
     x: 85
     y: 3
@@ -26,26 +26,26 @@ lobby:
       x: 68.5
       y: -2.5
       z: 5.5
-      value: "ewogICJ0aW1lc3RhbXAiIDogMTY0MDI2NjMzNzUyNCwKICAicHJvZmlsZUlkIiA6ICI2OTBkMDM2OGM2NTE0OGM5ODZjMzEwN2FjMmRjNjFlYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ5emZyXzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2E1ZWUxMTNiZTE5YTg1MzBmYjEzYTE0ZDNkZDRkOTM0ZTlkM2U5MWZiMjFjM2U3NGY3NzFmMjY4NjQzNjdlNCIKICAgIH0KICB9Cn0="
-      signature: "Kth9XjK+z2SPRe3PqFD8aiYGW+eJVzu31FRnyzFDUwfmT2YYzWN9q3nfYHTDS9so8AFB0v4HwVpHwvHCmWtefLCHRkCm1sQxP5/lEClNETcLfPdNqHEl6Mb7XsUUOpMYImbBL5DJC7B0ghL7TpdVnGTiSsTr6hOxpHTi6cC0akSfUGAh8I3A6aD8gwXfD55RFLYtMHwnOK7pqEat2uSghLVT9sX24LAun5NBMU6+A5j4DUM1vDowTymH3jJU41fM0PQvfV6dkJOT4ngFH0W8bXNGdJSeHDQWnPWBksS7n6DH9zHTJHzG0pw6cVX345oVr0Bc+Lo9D3lxeE9qpo7AeJTHq5RoM8sHDt3u7rf0VonMCmLdb3SlbB7AyXQuOQIe/kL68VB+X4cybjcdkAHWHTnEUjogBLa+WtpgofATPFLPBWn3Mrl41kftLPNwudDfR0JHCyPgAyQHg3DdFmWeIZiUIn5u0+hqA5mj+exFzEj1b3EJhrR1oaySjlLpWuRsKVPXXfERlGqPt3HJYloKzrmluC6V09fb3z1DLwXvSXSxTkEcNjspPQqLUsBNXP35tVWAI9niZWFOXWWSQ4SGE8m2u3CXxwCUHkv3n8qNP8s0+qsXL8G5vWnuewF4evDdTp+er7KUl9njuRzdMFyR1dWjj0vc8JlmQftbmAuLy94="
+      value: ewogICJ0aW1lc3RhbXAiIDogMTY0MDI2NjMzNzUyNCwKICAicHJvZmlsZUlkIiA6ICI2OTBkMDM2OGM2NTE0OGM5ODZjMzEwN2FjMmRjNjFlYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ5emZyXzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2E1ZWUxMTNiZTE5YTg1MzBmYjEzYTE0ZDNkZDRkOTM0ZTlkM2U5MWZiMjFjM2U3NGY3NzFmMjY4NjQzNjdlNCIKICAgIH0KICB9Cn0=
+      signature: Kth9XjK+z2SPRe3PqFD8aiYGW+eJVzu31FRnyzFDUwfmT2YYzWN9q3nfYHTDS9so8AFB0v4HwVpHwvHCmWtefLCHRkCm1sQxP5/lEClNETcLfPdNqHEl6Mb7XsUUOpMYImbBL5DJC7B0ghL7TpdVnGTiSsTr6hOxpHTi6cC0akSfUGAh8I3A6aD8gwXfD55RFLYtMHwnOK7pqEat2uSghLVT9sX24LAun5NBMU6+A5j4DUM1vDowTymH3jJU41fM0PQvfV6dkJOT4ngFH0W8bXNGdJSeHDQWnPWBksS7n6DH9zHTJHzG0pw6cVX345oVr0Bc+Lo9D3lxeE9qpo7AeJTHq5RoM8sHDt3u7rf0VonMCmLdb3SlbB7AyXQuOQIe/kL68VB+X4cybjcdkAHWHTnEUjogBLa+WtpgofATPFLPBWn3Mrl41kftLPNwudDfR0JHCyPgAyQHg3DdFmWeIZiUIn5u0+hqA5mj+exFzEj1b3EJhrR1oaySjlLpWuRsKVPXXfERlGqPt3HJYloKzrmluC6V09fb3z1DLwXvSXSxTkEcNjspPQqLUsBNXP35tVWAI9niZWFOXWWSQ4SGE8m2u3CXxwCUHkv3n8qNP8s0+qsXL8G5vWnuewF4evDdTp+er7KUl9njuRzdMFyR1dWjj0vc8JlmQftbmAuLy94=
     sentinel:
       x: 68.5
       y: -2.5
       z: 2.5
-      value: "ewogICJ0aW1lc3RhbXAiIDogMTYwNjUwMjEyMjE4NiwKICAicHJvZmlsZUlkIiA6ICI0YjVkN2MxMTZlM2E0ZDYzYTVhMzMxNTdkZDZkNjdiOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJfSGF2ZW50eSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lM2YzMGJlMGZhMzkyNTQxZGNkMzhiNTc0ODU0ZGRhN2UxZjU5NDkwY2FkZDNhZWZlYzYxMzI3NjBjZDdhN2RhIgogICAgfQogIH0KfQ=="
-      signature: "GisPXHDpYtjk+q7I2M2m3zgegRwnafjZCgvPjjQeBQVKBdRS0H3sGmK5h1SReW3c6xLzFaA5xQaxRTeM97EfwhZg++9038ZyiPJFlvLwqY+YyvKOUQ6OB2MKPKGhrqTxA0rD4LsH2F3K+wiArByIKURaPlFzVz6bZKI2HIz8hNjEB77qHPz7QzXTunzZKDkBo0vGyvM5mJU5gpLtHo8ZcSy/4QmOPo8q80sqWdEhcvsbppi0cq7HsVQ2gPMNXYBdbqtO3yFetg6euu7p3YfgYqoNWuqgqxTg71Ey3wa/rVRYMpQoHa74F9LdkcNdQlX4rg24DUVfXeP+5/37o33RjnzFUPyFhP62ErLMdHe7hjPO+UN3KQbrAyzn7OLmn3hcYIVV5cXOovLF/rQuGUmE4Vu0lSPLUTpmOF2t8qEJ8WkbvddwiEL9l0h9x22bPbucjRJ134/f/IRCwO/kOu2DvcGJ49glER8Us4kP/gKASjAg/nEbHkCwapqxH/dTnfosTGCO3PtCxNVrj2YMyseWymizDTa63Z7n0WT35rWQtO3Cr55NQy/iRLzMiv6RsKBwsDaKfEEaE+O98oC6cmNKSBkV9Y8m7RQl1CtkiG3Xx4AOzjZWH+WpEJ1Vj4HJmNoFZlnByI6x9idLpiYGi900cHl3/01TgxS2/YTuEm7WEbw="
+      value: ewogICJ0aW1lc3RhbXAiIDogMTYwNjUwMjEyMjE4NiwKICAicHJvZmlsZUlkIiA6ICI0YjVkN2MxMTZlM2E0ZDYzYTVhMzMxNTdkZDZkNjdiOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJfSGF2ZW50eSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lM2YzMGJlMGZhMzkyNTQxZGNkMzhiNTc0ODU0ZGRhN2UxZjU5NDkwY2FkZDNhZWZlYzYxMzI3NjBjZDdhN2RhIgogICAgfQogIH0KfQ==
+      signature: GisPXHDpYtjk+q7I2M2m3zgegRwnafjZCgvPjjQeBQVKBdRS0H3sGmK5h1SReW3c6xLzFaA5xQaxRTeM97EfwhZg++9038ZyiPJFlvLwqY+YyvKOUQ6OB2MKPKGhrqTxA0rD4LsH2F3K+wiArByIKURaPlFzVz6bZKI2HIz8hNjEB77qHPz7QzXTunzZKDkBo0vGyvM5mJU5gpLtHo8ZcSy/4QmOPo8q80sqWdEhcvsbppi0cq7HsVQ2gPMNXYBdbqtO3yFetg6euu7p3YfgYqoNWuqgqxTg71Ey3wa/rVRYMpQoHa74F9LdkcNdQlX4rg24DUVfXeP+5/37o33RjnzFUPyFhP62ErLMdHe7hjPO+UN3KQbrAyzn7OLmn3hcYIVV5cXOovLF/rQuGUmE4Vu0lSPLUTpmOF2t8qEJ8WkbvddwiEL9l0h9x22bPbucjRJ134/f/IRCwO/kOu2DvcGJ49glER8Us4kP/gKASjAg/nEbHkCwapqxH/dTnfosTGCO3PtCxNVrj2YMyseWymizDTa63Z7n0WT35rWQtO3Cr55NQy/iRLzMiv6RsKBwsDaKfEEaE+O98oC6cmNKSBkV9Y8m7RQl1CtkiG3Xx4AOzjZWH+WpEJ1Vj4HJmNoFZlnByI6x9idLpiYGi900cHl3/01TgxS2/YTuEm7WEbw=
     berserker:
       x: 68.5
       y: -2.5
       z: -1.5
-      value: "ewogICJ0aW1lc3RhbXAiIDogMTY1MTY4NDQ4OTk2NiwKICAicHJvZmlsZUlkIiA6ICIyM2YxYTU5ZjQ2OWI0M2RkYmRiNTM3YmZlYzEwNDcxZiIsCiAgInByb2ZpbGVOYW1lIiA6ICIyODA3IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkMWE2MDViNjIyNDQyMWU0NzZkY2UwZjJjMmJlMTk4NjM1MTU3YmE0YWIyNjdiZjkyMTVlNjRkNjZmNGRmYTkiCiAgICB9CiAgfQp9"
-      signature: "bRm1tFW4ZDeNu0OWgweEknox9Fg1jCpgfyk5hJJk0q1PZSklHaoTlMLtu9466e1C0uiREEwwEuXP9HJhL+UVIxW5WCr0r14eQvifEkUfUXv0PEmLgANjhIX6QcGqutwsH27gd1byqEvXKR9W/Fq9Ksd4dK3x/hAqChGcKjNzNs1IdJvaj2JH43hOny8FIrwHwCv1QbBfRXxFO/zb55QN3IYJImMvw1/RxAW3i2Z4pL11JDgsPs9js520jiJGUJrkCtCe+Tp+PWVhz7Fxh3ADAne0fsfLHzubkIf+gvEh8xxjjZWB3GQMWlOXq/JipSnCb9Byyu/VuaHyU7ldTgO1pLL9Td1H/A0z8Y7aQ6ajfN5LdiXKCEs363667kJlo3ElL5dHzrCVPesgMDioESYii+EQU2spECNupUXQNsYJgZ4u0z0zHBoYeq+U/NiMqFPZwhTIrh+iIhm4KjRDaUNud9Daz11iq6aP11egKAbSjlxNdvmxTqGByjIofv6+qbnTQ6nzYKngyhOHjsYuxIF6CjT7D8YusDx/SH+D6mRZoSmQ7MBGYrOupCFj/73gcPkR1PxnbSLlyrfXg1NKKaKaBoOIyDI5pu9RcbeNYgRvodSAIivIRHfI3R/reF8CZ9jDSlNSeDWtKbtcAcatqgCO1ixYruVc5OjY+P/7W2xOgVM="
+      value: ewogICJ0aW1lc3RhbXAiIDogMTY1MTY4NDQ4OTk2NiwKICAicHJvZmlsZUlkIiA6ICIyM2YxYTU5ZjQ2OWI0M2RkYmRiNTM3YmZlYzEwNDcxZiIsCiAgInByb2ZpbGVOYW1lIiA6ICIyODA3IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkMWE2MDViNjIyNDQyMWU0NzZkY2UwZjJjMmJlMTk4NjM1MTU3YmE0YWIyNjdiZjkyMTVlNjRkNjZmNGRmYTkiCiAgICB9CiAgfQp9
+      signature: bRm1tFW4ZDeNu0OWgweEknox9Fg1jCpgfyk5hJJk0q1PZSklHaoTlMLtu9466e1C0uiREEwwEuXP9HJhL+UVIxW5WCr0r14eQvifEkUfUXv0PEmLgANjhIX6QcGqutwsH27gd1byqEvXKR9W/Fq9Ksd4dK3x/hAqChGcKjNzNs1IdJvaj2JH43hOny8FIrwHwCv1QbBfRXxFO/zb55QN3IYJImMvw1/RxAW3i2Z4pL11JDgsPs9js520jiJGUJrkCtCe+Tp+PWVhz7Fxh3ADAne0fsfLHzubkIf+gvEh8xxjjZWB3GQMWlOXq/JipSnCb9Byyu/VuaHyU7ldTgO1pLL9Td1H/A0z8Y7aQ6ajfN5LdiXKCEs363667kJlo3ElL5dHzrCVPesgMDioESYii+EQU2spECNupUXQNsYJgZ4u0z0zHBoYeq+U/NiMqFPZwhTIrh+iIhm4KjRDaUNud9Daz11iq6aP11egKAbSjlxNdvmxTqGByjIofv6+qbnTQ6nzYKngyhOHjsYuxIF6CjT7D8YusDx/SH+D6mRZoSmQ7MBGYrOupCFj/73gcPkR1PxnbSLlyrfXg1NKKaKaBoOIyDI5pu9RcbeNYgRvodSAIivIRHfI3R/reF8CZ9jDSlNSeDWtKbtcAcatqgCO1ixYruVc5OjY+P/7W2xOgVM=
     architect:
       x: 68.5
       y: -2.5
       z: -4.5
-      value: "ewogICJ0aW1lc3RhbXAiIDogMTYwODI0MjkyMTA5OCwKICAicHJvZmlsZUlkIiA6ICI0NWY3YTJlNjE3ODE0YjJjODAwODM5MmRmN2IzNWY0ZiIsCiAgInByb2ZpbGVOYW1lIiA6ICJfSnVzdERvSXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjNlNGNhNTU2MDliZWRiNzM0YzMyZTA0ZDQwZDNlMThkNDQyNGE3MTk3OGM1OWUyNDkyYzg2ZDRmNDFjNDQ0ZSIKICAgIH0KICB9Cn0="
-      signature: "JgQO9FYg20lqQiqah6eaE4a3BG5sQ9aDnz3KblkKP+ln5MIyGu87C7UboJo8Uezt29d6q49XgOLfsTUVSCTZ32dFv0In7mx7vpdNDKDeXuVS6kCzDDcrC545OP9uIFGKFH3ZKu9jo0m8SXZBtL7v3CDizIuOefk7nSmFOn2FF/s9AzC4ypL/uLmuQLiz6dc3MdjMX1gl2yKIpTtZtQLNHcELuR0qDZ3t7J4qv9ItKTLcFHle7PaaGd+4O0kIsyG4LQIqQyBIm/dc4q9xMmOKlV7jgI/n8Kbylk0fWK6bzZzfGdFJX3odFkx3nMXW1FJd9+E3UXKlqkNtNg+oqs3ihVI/8LepzfgK49wHw4glVB1VrjXkl5xClSu2uajHtuc8KSnkbkBwyBU0MUzAEBofSZ6Af+lX6NTzb1rwVDcTDnDrOHKXZ8N9COeQXvc9jXB1jOr5XhGZMFvjiDnCpsPPb+9Qvm7eGWUULQM7EC1MCNg18ZLE0t63fG8HuPfKWypxaVP+NSvkn/QItjMev5TGSAp+twlWhxo8xUEqUXncIcab7O75y+S7uytnf4K3ba31LLUpy3Rz7zhzUKbI38diTGaChB4pieDLe1J0AkqCzt4av32/hy0EG5sv3kqq+6DDCsHN6GFoxFyMo3Eb0iWO2kDY9sTAJ5lWV7GKkdGDFzc="
+      value: ewogICJ0aW1lc3RhbXAiIDogMTYwODI0MjkyMTA5OCwKICAicHJvZmlsZUlkIiA6ICI0NWY3YTJlNjE3ODE0YjJjODAwODM5MmRmN2IzNWY0ZiIsCiAgInByb2ZpbGVOYW1lIiA6ICJfSnVzdERvSXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjNlNGNhNTU2MDliZWRiNzM0YzMyZTA0ZDQwZDNlMThkNDQyNGE3MTk3OGM1OWUyNDkyYzg2ZDRmNDFjNDQ0ZSIKICAgIH0KICB9Cn0=
+      signature: JgQO9FYg20lqQiqah6eaE4a3BG5sQ9aDnz3KblkKP+ln5MIyGu87C7UboJo8Uezt29d6q49XgOLfsTUVSCTZ32dFv0In7mx7vpdNDKDeXuVS6kCzDDcrC545OP9uIFGKFH3ZKu9jo0m8SXZBtL7v3CDizIuOefk7nSmFOn2FF/s9AzC4ypL/uLmuQLiz6dc3MdjMX1gl2yKIpTtZtQLNHcELuR0qDZ3t7J4qv9ItKTLcFHle7PaaGd+4O0kIsyG4LQIqQyBIm/dc4q9xMmOKlV7jgI/n8Kbylk0fWK6bzZzfGdFJX3odFkx3nMXW1FJd9+E3UXKlqkNtNg+oqs3ihVI/8LepzfgK49wHw4glVB1VrjXkl5xClSu2uajHtuc8KSnkbkBwyBU0MUzAEBofSZ6Af+lX6NTzb1rwVDcTDnDrOHKXZ8N9COeQXvc9jXB1jOr5XhGZMFvjiDnCpsPPb+9Qvm7eGWUULQM7EC1MCNg18ZLE0t63fG8HuPfKWypxaVP+NSvkn/QItjMev5TGSAp+twlWhxo8xUEqUXncIcab7O75y+S7uytnf4K3ba31LLUpy3Rz7zhzUKbI38diTGaChB4pieDLe1J0AkqCzt4av32/hy0EG5sv3kqq+6DDCsHN6GFoxFyMo3Eb0iWO2kDY9sTAJ5lWV7GKkdGDFzc=
   main-region:
     min:
       x: 100
@@ -77,30 +77,17 @@ lobby:
 # Settings for the Default map. Persists unless overridden
 classic:
   rotation:
-    - default-map
-    - book
-    - trinitrotoluene
-    - your-reality
-    - miku
-    - biblically-accurate
-    - traffic-light-cake
-    - umbrella-beach
-    - darkness-fortress
-    - light-smog
-    - middle-ground
-    - double-layer
-    - minefield
-    - cubecrowd
-    - divider
-    - coppercastle
-    - formal
-    - swept
-    - butterflies
-    - towers
-    - 23andtnt
+  - default-map
+  - umbrella-beach
+  - double-layer
+  - cubecrowd
+  - towers
+  - 23andtnt
+  - coppercastle
+  - traffic-light-cake
   default-map:
-    name: "&fStandoff"
-    file: "DefaultMap.schem"
+    name: '&fStandoff'
+    file: DefaultMap.schem
     pos:
       x: 0
       y: 17
@@ -132,33 +119,33 @@ classic:
     # Record EASTMOST (+x), UPPERMOST (+y) location of portal
     # For z, just use abs on default blue portal z
     portals:
-      1:
+      '1':
         x: -1
         y: 12
         z: -72
-      2:
+      '2':
         x: 21
         y: 12
         z: -72
     too-high: 25
     too-far: -45
   book:
-    name: "&fBooks"
-    file: "Book.schem"
-    pos: 
-      x: 0 
-      y: 16 
+    name: '&fBooks'
+    file: Book.schem
+    pos:
+      x: 0
+      y: 16
       z: 0
     portals:
-      1: 
+      '1':
         x: -14
         y: 12
         z: -72
-      2: 
+      '2':
         x: 12
         y: 12
         z: -72
-      3: 
+      '3':
         x: 21
         y: 12
         z: -72
@@ -177,10 +164,10 @@ classic:
       y2: 17
       z2: 65
   trinitrotoluene:
-    name: "&fTrinitrotoluene"
-    file: "TNT.schem"
+    name: '&fTrinitrotoluene'
+    file: TNT.schem
     portals:
-      1: 
+      '1':
         x: 21
         y: 12
         z: -72
@@ -199,8 +186,8 @@ classic:
       y2: 16
       z2: 65
   your-reality:
-    name: "&fYour Reality"
-    file: "YourReality.schem"
+    name: '&fYour Reality'
+    file: YourReality.schem
     pos:
       x: 0
       y: 17
@@ -210,19 +197,19 @@ classic:
     red-spawn:
       z: 64.5
     portals:
-      1: 
+      '1':
         x: 7
         y: 11
         z: -71
-      2: 
+      '2':
         x: -9
         y: -7
         z: -71
-      3: 
+      '3':
         x: 7
         y: -4
         z: -71
-      4: 
+      '4':
         x: 19
         y: -7
         z: -71
@@ -241,8 +228,8 @@ classic:
       y2: 19
       z2: 66
   miku:
-    name: "&fMiku"
-    file: "Miku.schem"
+    name: '&fMiku'
+    file: Miku.schem
     pos:
       x: 0
       y: 16
@@ -262,47 +249,47 @@ classic:
       x1: -24
       y1: -23
       z1: 48
-      x2: 24 
+      x2: 24
       y2: 17
       z2: 65
     portals:
-      1:
+      '1':
         x: -9
         y: 11
         z: -71
-      2:
+      '2':
         x: 7
         y: 11
         z: -71
-      3:
+      '3':
         x: 7
         y: -4
         z: -71
-      4:
+      '4':
         x: 19
         y: 11
         z: -71
   biblically-accurate:
-    name: "&fBiblically Accurate"
-    file: "BiblicallyAccurateMap.schem"
+    name: '&fBiblically Accurate'
+    file: BiblicallyAccurateMap.schem
     pos:
       x: 0
       y: 17
       z: 0
     portals:
-      1: 
+      '1':
         x: -14
         y: 12
         z: -72
-      2: 
+      '2':
         x: -1
         y: 12
         z: -72
-      3: 
+      '3':
         x: 12
         y: 12
         z: -72
-      4: 
+      '4':
         x: 21
         y: 12
         z: -72
@@ -321,8 +308,8 @@ classic:
       y2: 21
       z2: 65
   traffic-light-cake:
-    name: "&fTraffic Light Cake"
-    file: "TrafficLightCake.schem"
+    name: '&fTraffic Light Cake'
+    file: TrafficLightCake.schem
     pos:
       x: 0
       y: 17
@@ -342,21 +329,21 @@ classic:
       y2: 20
       z2: 65
     portals:
-      1: 
+      '1':
         x: -10
         y: 16
         z: -72
-      2: 
+      '2':
         x: 8
         y: 11
         z: -72
-      3: 
+      '3':
         x: 24
         y: 6
         z: -72
   umbrella-beach:
-    name: "&fUmbrella Beach"
-    file: "UmbrellaBeach.schem"
+    name: '&fUmbrella Beach'
+    file: UmbrellaBeach.schem
     pos:
       x: 0
       y: 17
@@ -368,8 +355,8 @@ classic:
       z1: 45
       z2: 66
   darkness-fortress:
-    name: "&fDarkness Fortress"
-    file: "DarknessFortress.schem"
+    name: '&fDarkness Fortress'
+    file: DarknessFortress.schem
     pos:
       x: 0
       y: 19
@@ -389,51 +376,51 @@ classic:
       y2: 22
       z2: 65
     portals:
-      1: 
+      '1':
         x: -9
         y: 14
         z: -72
-      2: 
+      '2':
         x: 7
         y: 14
         z: -72
-      3: 
+      '3':
         x: 21
         y: 14
         z: -72
     too-high: 28
   light-smog:
-    name: "&fLight Smog"
-    file: "LightSmog.schem"
+    name: '&fLight Smog'
+    file: LightSmog.schem
     portals:
-      1: 
+      '1':
         x: -12
         y: 12
         z: -72
-      2: 
+      '2':
         x: 10
         y: 12
         z: -72
-      3: 
+      '3':
         x: 21
         y: 12
         z: -72
   middle-ground:
-    name: "&fMiddle Ground"
-    file: "MiddleGround.schem"
+    name: '&fMiddle Ground'
+    file: MiddleGround.schem
   double-layer:
-    name: "&fDouble Layer"
-    file: "DoubleLayer.schem"
+    name: '&fDouble Layer'
+    file: DoubleLayer.schem
     blue-shield:
       z2: -42
     red-shield:
       z1: 42
   minefield:
-    name: "&fMinefield"
-    file: "Minefield.schem"
+    name: '&fMinefield'
+    file: Minefield.schem
   cubecrowd:
-    name: "&fCube Crowd"
-    file: "CubeCrowd.schem"
+    name: '&fCube Crowd'
+    file: CubeCrowd.schem
     pos:
       x: 0
       y: 14
@@ -461,40 +448,40 @@ classic:
       y2: 16
       z2: 65
     portals:
-      1:
+      '1':
         x: -11
         y: 13
         z: -71
-      2:
+      '2':
         x: 9
         y: 13
         z: -71
-      3:
+      '3':
         x: 21
         y: 13
         z: -71
-      4:
+      '4':
         x: -11
         y: 1
         z: -71
-      5:
+      '5':
         x: 9
         y: 1
         z: -71
-      6:
+      '6':
         x: 21
         y: 1
         z: -71
   divider:
-    name: "&fDivider"
-    file: "Divider.schem"
+    name: '&fDivider'
+    file: Divider.schem
     too-high: 22
     portals:
-      1:
+      '1':
         x: 22
         y: 8
         z: -72
-      2:
+      '2':
         x: -9
         y: 8
         z: -72
@@ -505,18 +492,18 @@ classic:
       y1: -10
       y2: 13
   coppercastle:
-    name: "&fCopper Castle"
-    file: "CopperCastle.schem"
+    name: '&fCopper Castle'
+    file: CopperCastle.schem
     portals:
-      1: 
+      '1':
         x: -10
         y: 11
         z: -72
-      2: 
+      '2':
         x: 8
         y: 11
         z: -72
-      3: 
+      '3':
         x: 17
         y: 11
         z: -72
@@ -535,8 +522,8 @@ classic:
       y2: 16
       z2: 65
   formal:
-    name: "&fFormal"
-    file: "Formal.schem"
+    name: '&fFormal'
+    file: Formal.schem
     too-high: 37
     blue-shield:
       y2: 34
@@ -555,25 +542,25 @@ classic:
       y: 34
       z: 63.5
     portals:
-      1: 
+      '1':
         x: 4
         y: 24
         z: -72
-      2: 
+      '2':
         x: -12
         y: 12
         z: -72
-      3: 
+      '3':
         x: 10
         y: 12
         z: -72
-      4: 
+      '4':
         x: 21
         y: 12
         z: -72
   swept:
-    name: "&fSwept"
-    file: "Swept.schem"
+    name: '&fSwept'
+    file: Swept.schem
     pos:
       x: 0
       y: 17
@@ -587,15 +574,15 @@ classic:
       y: 17
       z: 63.5
     portals:
-      1: 
+      '1':
         x: -14
         y: 8
         z: -92
-      2: 
+      '2':
         x: 7
         y: 9
         z: -97
-      3: 
+      '3':
         x: 25
         y: 8
         z: -92
@@ -614,8 +601,8 @@ classic:
       y2: 16
       z2: 90
   butterflies:
-    name: "&fButterflies"
-    file: "Butterflies.schem"
+    name: '&fButterflies'
+    file: Butterflies.schem
     pos:
       x: 0
       y: 19
@@ -629,23 +616,23 @@ classic:
       y: 17
       z: 67.5
     portals:
-      1: 
+      '1':
         x: 10
         y: 15
         z: -75
-      2: 
+      '2':
         x: -23
         y: -1
         z: -60
-      3: 
+      '3':
         x: -4
         y: -1
         z: -60
-      4: 
+      '4':
         x: 7
         y: -1
         z: -60
-      5: 
+      '5':
         x: 26
         y: -1
         z: -60
@@ -665,8 +652,8 @@ classic:
       z2: 74
     too-high: 28
   towers:
-    name: "&fTowers"
-    file: "Towers.schem"
+    name: '&fTowers'
+    file: Towers.schem
     pos:
       x: 0
       y: 17
@@ -676,11 +663,11 @@ classic:
     red-spawn:
       z: 77.5
     portals:
-      1:
+      '1':
         x: -1
         y: 12
         z: -84
-      2:
+      '2':
         x: 21
         y: 12
         z: -84
@@ -690,9 +677,59 @@ classic:
     red-shield:
       z1: 62
       z2: 77
+  mountains:
+    name: '&fMountains'
+    file: Mountains.schem
+    pos:
+      x: 0
+      y: 17
+      z: 0
+    blue-spawn:
+      z: -75.5
+    red-spawn:
+      z: 76.5
+    portals:
+      '1':
+        x: 13
+        y: 11
+        z: -83
+      '2':
+        x: -1
+        y: 4
+        z: -83
+      '3':
+        x: 13
+        y: 4
+        z: -83
+      '4':
+        x: -8
+        y: -10
+        z: -83
+      '5':
+        x: 6
+        y: -10
+        z: -83
+      '6':
+        x: 13
+        y: -10
+        z: -83
+    blue-shield:
+      x1: -17
+      y1: -20
+      z1: -76
+      x2: 17
+      y2: 16
+      z2: -62
+    red-shield:
+      x1: -17
+      y1: -20
+      z1: 62
+      x2: 17
+      y2: 16
+      z2: 76
   23andtnt:
-    name: "&f23andTNT"
-    file: "23andTNT.schem"
+    name: '&f23andTNT'
+    file: 23andTNT.schem
     pos:
       x: 0
       y: 17
@@ -722,19 +759,19 @@ classic:
       y2: 16
       z2: 45
     portals:
-      1:
+      '1':
         x: -16
         y: 11
         z: -52
-      2:
+      '2':
         x: -16
         y: 6
         z: -52
-      3:
+      '3':
         x: -16
         y: 1
         z: -52
-      4:
+      '4':
         x: -16
         y: -4
         z: -52
@@ -814,11 +851,11 @@ classic:
         x: 14
         y: 6
         z: -52
-        
+
 tourney:
   default-map:
-    name: "&fDouble Layer"
-    file: "DoubleLayer.schem"
+    name: '&fDouble Layer'
+    file: DoubleLayer.schem
     pos:
       x: 0
       y: 17
@@ -848,11 +885,11 @@ tourney:
       y2: 16
       z2: 65
     portals:
-      1:
+      '1':
         x: -1
         y: 12
         z: -72
-      2:
+      '2':
         x: 21
         y: 12
         z: -72
