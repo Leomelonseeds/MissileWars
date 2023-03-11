@@ -235,7 +235,7 @@ public class MissileWarsTeam {
         InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        ConfigUtils.sendConfigMessage("messages.classic-start", mcPlayer, null, null);
+        ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         player.setJoinTime(LocalDateTime.now());
      
         // Architect Haste

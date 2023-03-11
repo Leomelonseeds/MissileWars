@@ -160,12 +160,8 @@ public class TrainingArena extends Arena {
 
         // Send messages
         redTeam.distributeGear();
-        redTeam.sendSound("game-start");
         blueTeam.distributeGear();
-        blueTeam.sendSound("game-start");
         redTeam.scheduleDeckItems();
-        redTeam.sendTitle(gamemode + "-start");
         blueTeam.scheduleDeckItems();
-        blueTeam.sendTitle(gamemode + "-start");
     }
 }
