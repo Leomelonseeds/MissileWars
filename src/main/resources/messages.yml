@@ -111,6 +111,9 @@ messages:
   portal-broke: "&5&l[!] &7A %team% &7portal was broken."
   cosmetic-locked: "&c&l[!] &cYou do not own this cosmetic."
   cosmetic-selected: "&a&l[!] &aCosmetic successfully selected."
+  training-blue-only: "&c&l[!] &7You can only be on &9blue &7in the training arena."
+  joined-training: "&a&l[!] &7Welcome to the training arena! No stats will be affected here. When you're done, use &a/leave &7to return to the lobby."
+  nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
     
 titles:
   # Should be sent to players who join in the middle of a game as well

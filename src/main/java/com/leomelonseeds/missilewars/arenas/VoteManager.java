@@ -27,6 +27,11 @@ public class VoteManager {
         for (String m : mapConfig.getStringList(arena.getGamemode() + ".rotation")) {
             allVotes.put(m, 0);
         }
+        
+        // Troll for training arena
+        if (arena instanceof TrainingArena) {
+            allVotes.put("default-map", 9999);
+        }
     }
     
     // Get voter

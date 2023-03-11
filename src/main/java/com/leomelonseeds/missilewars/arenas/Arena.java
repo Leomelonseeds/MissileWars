@@ -548,7 +548,7 @@ public class Arena implements ConfigurationSerializable {
         return true;
     }
     
-    private void addHeldMeta(ItemStack item, String s) {
+    protected void addHeldMeta(ItemStack item, String s) {
         ItemMeta meta = item.getItemMeta();
         meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
                 PersistentDataType.STRING, s);
@@ -985,33 +985,8 @@ public class Arena implements ConfigurationSerializable {
             // Setup game timers
             // Game start
             startTime = LocalDateTime.now();
-            long gameLength = getSecondsRemaining();
+            performTimeSetup();
             performGamemodeSetup();
-
-            // Chaos time start
-            int chaosStart = getChaosTime();
-            tasks.add(new BukkitRunnable() {
-                @Override
-                public void run() {
-                    blueTeam.setChaosMode(true);
-                    redTeam.setChaosMode(true);
-                    blueTeam.sendTitle("chaos-mode");
-                    redTeam.sendTitle("chaos-mode");
-                    announceMessage("messages.chaos-mode", null);
-                }
-            }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
-
-            // Game is 1800 seconds long.
-            int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
-
-            for (int i : reminderTimes) {
-                tasks.add(new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        announceMessage("messages.game-end-reminder", null);
-                    }
-                }.runTaskLater(plugin, i * 20));
-            }
             
             // Teleport all players to center to remove lobby minigame items/dismount
             for (MissileWarsPlayer player : players) {
@@ -1031,9 +1006,37 @@ public class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Gamemode-specific setups
+     * Time specific setup
      */
-    public void performGamemodeSetup() {
+    protected void performTimeSetup() {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        
+        // Chaos time start
+        long gameLength = getSecondsRemaining();
+        int chaosStart = getChaosTime();
+        tasks.add(new BukkitRunnable() {
+            @Override
+            public void run() {
+                blueTeam.setChaosMode(true);
+                redTeam.setChaosMode(true);
+                blueTeam.sendTitle("chaos-mode");
+                redTeam.sendTitle("chaos-mode");
+                announceMessage("messages.chaos-mode", null);
+            }
+        }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
+
+        // Game is 1800 seconds long.
+        int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
+
+        for (int i : reminderTimes) {
+            tasks.add(new BukkitRunnable() {
+                @Override
+                public void run() {
+                    announceMessage("messages.game-end-reminder", null);
+                }
+            }.runTaskLater(plugin, i * 20));
+        }
+        
         // Setup a tie
         tasks.add(new BukkitRunnable() {
             @Override
@@ -1048,8 +1051,13 @@ public class Arena implements ConfigurationSerializable {
                     endGame(null);
                 }
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), getSecondsRemaining() * 20));
-        
+        }.runTaskLater(plugin, getSecondsRemaining() * 20));
+    }
+    
+    /**
+     * Gamemode-specific setups
+     */
+    protected void performGamemodeSetup() {
         // Setup portals
         for (MissileWarsTeam team : new MissileWarsTeam[] {blueTeam, redTeam}) {
             FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
@@ -1073,7 +1081,7 @@ public class Arena implements ConfigurationSerializable {
     /**
      * Assigns players and starts the teams
      */
-    public void startTeams() {
+    protected void startTeams() {
         // Assign players to teams based on queue (which removes their items)
         List<MissileWarsPlayer> toAssign = new ArrayList<>();
         for (MissileWarsPlayer player : players) {
