@@ -2,16 +2,16 @@
 ![](https://cdn.discordapp.com/attachments/358673756836855810/958149582120968262/2022-03-28_16.36.03.png)
 A new, fresh installment of the classic gamemode made by Cubehamster and Sethbling, where slimeblock TNT flying machines are used to bust through enemy shields and blow up their nether portals. Join with your friends now at play.ultimamc.net
 
-All the original, best features of Missile Wars are here - but with 4 different customizable decks, 40+ different missiles, 10+ new maps, and a whole host of gameplay additions and improvements, you won't be forgetting this version any time soon.
+All the original, best features of Missile Wars are here - but with 4 customizable classes or decks, 40+ different missiles, 20+ new maps, and a whole host of gameplay additions and improvements, you won't be forgetting this version any time soon.
 
 *Do not try to compile and use this plugin on your own server. It will not work.*
 
 ## Decks
 There are now 4 different Decks (kits), each with 5 different missiles, 3 unique utility items, and its own weapon:
-* **Vanguard** - A speed-focused deck that contains the fastest missiles in the game, in addition to (nerfed) mobility items like the Canopy and Splash.
-* **Berserker** - With all the most explosive missiles, you don't want a Berserker getting to your side.
-* **Sentinel** - A defense specialist, with sturdy missiles and utility items like the torpedo and obsidian shield.
-* **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle.
+* **Vanguard** - A speed-focused deck that contains the fastest missiles in the game, in addition to (nerfed) mobility items like the Canopy and Splash. Includes a gold sword that can be upgraded with sharpness and fire aspect.
+* **Berserker** - With all the most explosive missiles, you don't want a Berserker getting to your side. Utilities include creepers and fireballs, and a handy crossbow with multishot, quick charge, and sharpness available.
+* **Sentinel** - A defense specialist, with sturdy missiles and utility items like the sky-mine torpedo and obsidian shield. Includes a flame bow that can be enchanted with sharpness and punch.
+* **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle. Has an iron pickaxe that can be upgraded with sharpness, efficiency, and a custom haste enchantment.
 
 Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless.
 
@@ -30,7 +30,7 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 * **Spawn Creeper**
 
 ## New Maps
-10+ new maps, each changing the gameplay in fun and inventive ways, have been added. New maps are also being worked on.
+20+ new maps, each changing the gameplay in fun and inventive ways, have been added. Up to 8 maps are available at one time and rotate weekly, while new maps are constantly being worked on.
 * **Double Layer** - The classic map, but with thicker bases. What could go wrong?
 ![](https://i.imgur.com/ZXzhell.jpg)
 * **Middle Ground** - An extra base, smack in the middle of the map.
@@ -46,6 +46,7 @@ Here are just a few of the most important features that you might not have seen 
 * A tracker system associates portal breaks and kills from TNT to yourself. Blocked a missile with a shield or your own missile? That's your kill. Sniped someone with a Slingshot missile? That's your kill.
 * A rankup and stats system has been added. Gain more skillpoints with each rankup to use in your decks, and climb the leaderboards.
 * A 30 minute game timer, after which the team with the most portals remaining wins. Chaos mode starts when there are 10 minutes remaining, with 2x item speed.
+* Item spawn timer adjusts to team size to balance unfair teams: 1 player = 12 seconds, 2 players = 14 seconds, 3+ players = 16 seconds.
 * Receive multiple of one item, with a cap at 6 items (unless you upgrade the Hoarder passive).
 * A cooldown of 0.4 seconds between each missile spawn.
 * Auto-queue into the next game after the current game ends.
@@ -54,7 +55,8 @@ Here are just a few of the most important features that you might not have seen 
 
 ## Roadmap
 Why stop here? Missile Wars is in active development. Here are the features I have planned out:
-* Each deck will have different abilities
+* A training arena with no time limit
+* Passives that require team interaction
 * New gamemode: Capture the Flag
 * New gamemode: Domination
 * Private games with custom settings (creatable by ROYAL rank players only)
