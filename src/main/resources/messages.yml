@@ -117,11 +117,10 @@ messages:
   training-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &d&lTraining"
-    - "&f- Recieve &cmissile&f/&9utility &fevery few seconds."
-    - "&f- &aRight click &fyour spawn eggs on &3blocks"
-    - "   &fto create missiles."
     - "&f- &fPractice riding and defending missiles."
     - "&f- &fNo stats are recorded."
+    - "&f- &fThere is no time limit."
+    - "&f- &fUse &a/leave &fto change your deck."
     - "&b========================================"
     
 titles:

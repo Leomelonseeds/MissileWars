@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -235,7 +236,11 @@ public class MissileWarsTeam {
         InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
-        ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
+        if (arena instanceof TrainingArena) {
+            ConfigUtils.sendConfigMessage("messages.training-start", mcPlayer, null, null);
+        } else {
+            ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
+        }
         player.setJoinTime(LocalDateTime.now());
      
         // Architect Haste
