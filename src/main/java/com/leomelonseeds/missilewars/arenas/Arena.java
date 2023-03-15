@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -50,9 +49,6 @@ import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.a5h73y.parkour.Parkour;
-import net.citizensnpcs.Citizens;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.exception.NPCLoadException;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 
@@ -916,12 +912,13 @@ public class Arena implements ConfigurationSerializable {
 
         // Schedule the start of the game if not already running
         if (startTime == null) {
+            /*
             // Respawns citizens
             try {
                 ((Citizens) CitizensAPI.getPlugin()).reload();
             } catch (NPCLoadException e) {
                 Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
-            }
+            }*/
 
             startTime = LocalDateTime.now().plusSeconds(secCountdown);
             String startMsg = "messages.lobby-countdown-start";
