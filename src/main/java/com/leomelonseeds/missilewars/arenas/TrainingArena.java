@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -132,7 +133,11 @@ public class TrainingArena extends Arena {
     }
     
     @Override
-    protected void calculateStats(MissileWarsTeam winningTeam) {}
+    protected void calculateStats(MissileWarsTeam winningTeam) {
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+        }
+    }
     
     // Spawn a missile in a random location at red base
     private void spawnMissileRandomly(Map<String, Integer> missiles) {
@@ -158,6 +163,6 @@ public class TrainingArena extends Arena {
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
         long timer = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3))) * 20;
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), timer * 5 / 8);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), timer * 8 / 5);
     }
 }
