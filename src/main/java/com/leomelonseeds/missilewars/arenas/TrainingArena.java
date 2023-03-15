@@ -24,7 +24,6 @@ public class TrainingArena extends Arena {
     
     public TrainingArena() {
         super("training", 100);
-        this.gamemode = "training";
     }
 
     @Override
@@ -86,7 +85,7 @@ public class TrainingArena extends Arena {
             return;
         }
         if (getNumPlayers() >= 1) {
-            scheduleStart(5);
+            scheduleStart(6);
         }
     }
     
