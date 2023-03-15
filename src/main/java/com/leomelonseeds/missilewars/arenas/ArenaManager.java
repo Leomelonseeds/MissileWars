@@ -54,6 +54,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.Gravity;
 import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.SkinTrait;
@@ -297,7 +298,11 @@ public class ArenaManager {
 
     	Logger logger = Bukkit.getLogger();
     	
-    	String name = gamemode + "-" + tempname;
+    	String n = gamemode + "-" + tempname;
+    	if (gamemode.equals("training")) {
+    	    n = "training";
+    	}
+    	String name = n;
 
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
@@ -356,6 +361,8 @@ public class ArenaManager {
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, result -> {
 
             logger.log(Level.INFO, "Lobby generated!");
+            Gravity gravity = new Gravity();
+            gravity.gravitate(true);
 
             // Spawn red NPC
             Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red", null, null);
@@ -370,6 +377,7 @@ public class ArenaManager {
             SheepTrait redSheepTrait = redNPC.getOrAddTrait(SheepTrait.class);
             redSheepTrait.setColor(DyeColor.RED);
             redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
+            redNPC.addTrait(gravity);
 
             arenaWorld.loadChunk(redLoc.getChunk());
             redNPC.spawn(redLoc);
@@ -387,7 +395,8 @@ public class ArenaManager {
             blueNPC.addTrait(enqueueBlue);
             SheepTrait blueSheepTrait = blueNPC.getOrAddTrait(SheepTrait.class);
             blueSheepTrait.setColor(DyeColor.BLUE);
-            redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
+            blueNPC.data().setPersistent(NPC.Metadata.SILENT, true);
+            blueNPC.addTrait(gravity);
 
             arenaWorld.loadChunk(blueLoc.getChunk());
             blueNPC.spawn(blueLoc);
@@ -410,7 +419,8 @@ public class ArenaManager {
             // Setup Villager Profession
             VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
             profession.setProfession(Villager.Profession.NITWIT);
-            redNPC.data().setPersistent(NPC.Metadata.SILENT, true);
+            bartender.data().setPersistent(NPC.Metadata.SILENT, true);
+            bartender.addTrait(gravity); 
 
             arenaWorld.loadChunk(barLoc.getChunk());
             bartender.spawn(barLoc);
@@ -429,6 +439,7 @@ public class ArenaManager {
             vCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck vanguard",
                     CommandTrait.Hand.BOTH).player(true));
             vanguard.addTrait(vCommand);
+            vanguard.addTrait(gravity);
 
             arenaWorld.loadChunk(vLoc.getChunk());
             vanguard.spawn(vLoc);
@@ -447,6 +458,7 @@ public class ArenaManager {
             sCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck sentinel",
                     CommandTrait.Hand.BOTH).player(true));
             sentinel.addTrait(sCommand);
+            sentinel.addTrait(gravity);
 
             arenaWorld.loadChunk(sLoc.getChunk());
             sentinel.spawn(sLoc);
@@ -465,6 +477,7 @@ public class ArenaManager {
             bCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck berserker",
                     CommandTrait.Hand.BOTH).player(true));
             berserker.addTrait(bCommand);
+            berserker.addTrait(gravity);
 
             arenaWorld.loadChunk(bLoc.getChunk());
             berserker.spawn(bLoc);
@@ -483,6 +496,7 @@ public class ArenaManager {
             aCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck architect",
                     CommandTrait.Hand.BOTH).player(true));
             architect.addTrait(aCommand);
+            architect.addTrait(gravity);
 
             arenaWorld.loadChunk(aLoc.getChunk());
             architect.spawn(aLoc);
