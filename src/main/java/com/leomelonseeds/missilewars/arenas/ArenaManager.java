@@ -314,6 +314,9 @@ public class ArenaManager {
         case "tourney":
             arena = new TourneyArena(name, capacity);
             break;
+        case "training":
+            arena = new TrainingArena();
+            break;
         default:
             logger.log(Level.WARNING, "Invalid arena type!");
             return false;

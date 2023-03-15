@@ -112,8 +112,17 @@ messages:
   cosmetic-locked: "&c&l[!] &cYou do not own this cosmetic."
   cosmetic-selected: "&a&l[!] &aCosmetic successfully selected."
   training-blue-only: "&c&l[!] &7You can only be on &9blue &7in the training arena."
-  joined-training: "&a&l[!] &7Welcome to the training arena! No stats will be affected here. When you're done, use &a/leave &7to return to the lobby."
+  joined-training: "&a&l[!] &7You are in the training arena. No stats will be affected here."
   nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
+  training-start:
+    - "&b========================================"
+    - "&d&lMissile &5&lWars &7- &d&lTraining"
+    - "&f- Recieve &cmissile&f/&9utility &fevery few seconds."
+    - "&f- &aRight click &fyour spawn eggs on &3blocks"
+    - "   &fto create missiles."
+    - "&f- &fPractice riding and defending missiles."
+    - "&f- &fNo stats are recorded."
+    - "&b========================================"
     
 titles:
   # Should be sent to players who join in the middle of a game as well

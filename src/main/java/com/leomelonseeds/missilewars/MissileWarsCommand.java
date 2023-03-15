@@ -449,6 +449,14 @@ public class MissileWarsCommand implements CommandExecutor {
 
             // Allow player to join the fullest arena, or specify an arena name
             if (args.length == 1) {
+                // Join training if nobody online
+                if (Bukkit.getOnlinePlayers().size() == 1 && !player.hasPermission("umw.disableautotraining")) {
+                    ConfigUtils.sendConfigMessage("messages.nobody-on", player, null, null);
+                    arenaManager.getArena("training-1").joinPlayer(player);
+                    return true;
+                }
+                
+                // Otherwise join fullest arena
                 int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
                 for (Arena arena : arenaManager.getLoadedArenas("classic", Arena.byPlayers)) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && !arena.isResetting()) {

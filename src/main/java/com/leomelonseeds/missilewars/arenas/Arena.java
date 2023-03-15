@@ -521,7 +521,15 @@ public class Arena implements ConfigurationSerializable {
         ItemStack votemap = MissileWarsPlugin.getPlugin().getDeckManager().createItem("held.votemap", 0, false);
         addHeldMeta(votemap, "votemap");
         player.getInventory().setItem(4, votemap);
-        
+
+        // Check for game start
+        postJoin(player, asSpectator);
+        checkForStart();
+        return true;
+    }
+    
+    // Post-join actions that may differ by arena
+    protected void postJoin(Player player, boolean asSpectator) { 
         // Check for AFK
         Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         if (ess.getUser(player).isAfk()) {
@@ -542,13 +550,9 @@ public class Arena implements ConfigurationSerializable {
                 enqueueBlue(player.getUniqueId());
             }
         }
-
-        // Check for game start
-        checkForStart();
-        return true;
     }
     
-    protected void addHeldMeta(ItemStack item, String s) {
+    private void addHeldMeta(ItemStack item, String s) {
         ItemMeta meta = item.getItemMeta();
         meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
                 PersistentDataType.STRING, s);
@@ -1175,7 +1179,6 @@ public class Arena implements ConfigurationSerializable {
         // Produce winner/discord messages
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         String discordMessage;
-        String winner;
 
         // Notify players and discord users of win
         if (winningTeam == null) {
@@ -1185,7 +1188,6 @@ public class Arena implements ConfigurationSerializable {
 
             // Set notify messages
             discordMessage = ":pencil: A game was tied in arena " + this.getName();
-            winner = "&e&lNONE";
         } else if (winningTeam == blueTeam) {
             // Send titles
             blueTeam.sendTitle("victory");
@@ -1200,8 +1202,6 @@ public class Arena implements ConfigurationSerializable {
             }
             String blueWinners = String.join(", ", blueList);
             discordMessage = ":tada: Team **blue** (" + blueWinners + ") has won a game in arena " + this.getName();
-
-            winner = "&9&lBLUE";
         } else {
             // Send titles
             redTeam.sendTitle("victory");
@@ -1216,14 +1216,34 @@ public class Arena implements ConfigurationSerializable {
             }
             String redWinners = String.join(", ", redList);
             discordMessage = ":tada: Team **red** (" + redWinners + ") has won a game in arena " + this.getName();
-
-            winner = "&c&lRED";
         }
 
         discordChannel.sendMessage(discordMessage).queue();
+        
+        calculateStats(winningTeam);
 
+        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
+        
+        if (!plugin.isEnabled()) {
+            return;
+        }
+
+        // Remove all players after a short time, then reset the world a bit after
+        startTime = null;
+        if (players.size() > 0) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                removePlayers();
+            }, waitTime);
+        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            resetWorld();
+        }, waitTime + 100L);
+    }
+    
+    // Calculate and store all player stats from the game
+    protected void calculateStats(MissileWarsTeam winningTeam) {
         // Setup player variables
-        List<String> winningMessages = ConfigUtils.getConfigTextList("messages.classic-end", null, null, null);
+        List<String> winningMessages = ConfigUtils.getConfigTextList("messages." + gamemode + "-end", null, null, null);
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
         FileConfiguration ranksConfig = ConfigUtils.getConfigFile("ranks.yml");
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
@@ -1295,6 +1315,7 @@ public class Arena implements ConfigurationSerializable {
         
         // Calculate win message
         List<String> actualWinMessages = new ArrayList<>();
+        String winner = winningTeam == null ? "&e&lNONE" : winningTeam == blueTeam ? "&9&lBLUE" : "&c&lRED";
         for (String s : winningMessages) {
             s = s.replaceAll("%umw_winning_team%", winner);
             s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
@@ -1349,7 +1370,7 @@ public class Arena implements ConfigurationSerializable {
                     }
                 }
                 
-                double percentPlayed = Math.min(1, (double) playTime / gameTime);
+                double percentPlayed = (double) playTime / gameTime;
                 amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
 
                 // Update player stats
@@ -1364,23 +1385,6 @@ public class Arena implements ConfigurationSerializable {
                 econ.depositPlayer(player.getMCPlayer(), amountEarned);
             }
         }
-
-        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
-        
-        if (!plugin.isEnabled()) {
-            return;
-        }
-
-        // Remove all players after a short time, then reset the world a bit after
-        startTime = null;
-        if (players.size() > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                removePlayers();
-            }, waitTime);
-        }
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            resetWorld();
-        }, waitTime + 100L);
     }
     
     /** Remove Players from the map */

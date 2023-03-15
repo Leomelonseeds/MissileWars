@@ -87,8 +87,8 @@ public class MissileWarsTeam {
         // Temp value while async calculations run
         shieldVolume = 23850;
         
-        // Calculate total shield blocks async
-        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+        // Calculate total shield blocks async, do later to make sure maps is actually there
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
             // Ignore if arena not running
             if (arena == null || !(arena.isRunning() || arena.isResetting())) {
                 shieldVolume = 1;
@@ -116,7 +116,7 @@ public class MissileWarsTeam {
                 }
             }
             shieldVolume = tempShieldVolume;
-        });
+        }, 20L);
     }
     
     public void unregisterTeam() {
@@ -488,7 +488,8 @@ public class MissileWarsTeam {
      */
     public double getShieldHealth() {
         int totalBlocks = shieldVolume;
-        return 100 * ((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
+        double percentage = Math.abs((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
+        return Math.min(100 * percentage, 100);
     }
 
     public Boolean isChaos() {

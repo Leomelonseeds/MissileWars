@@ -30,7 +30,7 @@ public class VoteManager {
         
         // Troll for training arena
         if (arena instanceof TrainingArena) {
-            allVotes.put("default-map", 9999);
+            allVotes.put("default-map", 64);
         }
     }
     
