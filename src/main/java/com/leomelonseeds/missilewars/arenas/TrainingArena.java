@@ -26,6 +26,10 @@ public class TrainingArena extends Arena {
         super("training", 100);
     }
 
+    public TrainingArena(Map<String, Object> serializedArena) {
+        super(serializedArena);
+    }
+
     @Override
     public void enqueueRed(UUID uuid) {
         for (MissileWarsPlayer player : players) {
