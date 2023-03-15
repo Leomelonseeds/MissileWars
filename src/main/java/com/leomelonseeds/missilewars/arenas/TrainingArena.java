@@ -167,6 +167,9 @@ public class TrainingArena extends Arena {
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
         int time = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3)));
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), (20 * time * 8) / 5);
+        
+        // Adjust for tick, multiply by 8/5 to simulate missile randomness, divide by num players to simulate equal teams
+        long interval = 20 * time * 8 / 5 / players;
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
     }
 }
