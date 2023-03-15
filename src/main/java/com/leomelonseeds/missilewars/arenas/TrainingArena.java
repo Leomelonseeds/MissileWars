@@ -141,6 +141,10 @@ public class TrainingArena extends Arena {
     
     // Spawn a missile in a random location at red base
     private void spawnMissileRandomly(Map<String, Integer> missiles) {
+        if (!running) {
+            return;
+        }
+        
         int players = blueTeam.getSize();
         if (players > 0) {
             int x1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x1");
@@ -162,7 +166,7 @@ public class TrainingArena extends Arena {
         
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        long timer = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3))) * 20;
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), timer * 8 / 5);
+        int time = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3)));
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), (20 * time * 8) / 5);
     }
 }
