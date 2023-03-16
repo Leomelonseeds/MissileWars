@@ -170,7 +170,7 @@ public class TrainingArena extends Arena {
         
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
-        long interval = 20 * time / players;
+        long interval = Math.max(20, 20 * time / Math.max(players, 1));
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
     }
 }
