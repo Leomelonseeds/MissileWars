@@ -155,7 +155,7 @@ public class TrainingArena extends Arena {
             
             Random random = new Random();
             int x = random.nextInt(x1, x2 + 1);
-            int y = random.nextInt(y1, y2 + 1);
+            int y = random.nextInt() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
             
             List<String> m = new ArrayList<>(missiles.keySet());
             String missile = m.get(random.nextInt(m.size()));
@@ -168,8 +168,9 @@ public class TrainingArena extends Arena {
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
         int time = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3)));
         
-        // Adjust for tick, multiply by 8/5 to simulate missile randomness, divide by num players to simulate equal teams
-        long interval = 20 * time * 8 / 5 / players;
+        // Adjust for tick, divide by num players to simulate equal teams.
+        // Do not simulate missile randomness because that's boring
+        long interval = 20 * time / players;
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
     }
 }
