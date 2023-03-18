@@ -589,7 +589,7 @@ public class ArenaManager {
     public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
         List<Arena> sortedArenas = new ArrayList<>();
         for (Arena a : loadedArenas) {
-            if (a.getGamemode().equals(gamemode)) {
+            if (a.getGamemode().equals(gamemode) && !(a instanceof TrainingArena)) {
                 sortedArenas.add(a);
             }
         }
