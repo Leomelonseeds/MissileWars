@@ -452,7 +452,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 // Join training if nobody online
                 if (Bukkit.getOnlinePlayers().size() == 1 && !player.hasPermission("umw.disableautotraining")) {
                     ConfigUtils.sendConfigMessage("messages.nobody-on", player, null, null);
-                    arenaManager.getArena("training-1").joinPlayer(player);
+                    arenaManager.getArena("training").joinPlayer(player);
                     return true;
                 }
                 
