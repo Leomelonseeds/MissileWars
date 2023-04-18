@@ -5,9 +5,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.schematics.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
@@ -37,6 +48,53 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
+    }
+    
+    /**
+     * Missile preview feature
+     */
+    public void missilePreview(String team) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (team == "no team") {
+                    this.cancel();
+                    return;
+                }
+                
+                Player player = getMCPlayer();
+                if (player.hasPermission("umw.disablepreview")) {
+                    this.cancel();
+                    return;
+                }
+                
+                Block target = player.getTargetBlock(null, 4);
+                if (target.getType() == Material.AIR) {
+                    return;
+                }
+
+                PlayerInventory inv = player.getInventory();
+                ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
+                ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
+                ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
+                if (hand == null) {
+                    return;
+                }
+                
+                String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
+                if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
+                        structureName.contains("torpedo-") || structureName.contains("canopy")) {
+                    return;
+                }
+                
+                // At this point, we know the player is holding a missile item facing a block
+                Location loc = target.getLocation();
+                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == "red");
+                player.spawnParticle(Particle.VILLAGER_HAPPY, spawns[0], 10);
+                player.spawnParticle(Particle.VILLAGER_HAPPY, spawns[1], 10);
+            }
+        }.runTaskTimerAsynchronously(plugin, 20, 20);
     }
 
     /**

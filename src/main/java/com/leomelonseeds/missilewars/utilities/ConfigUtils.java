@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -25,6 +26,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -480,5 +483,21 @@ public class ConfigUtils {
             player = arena.getTracker().getTNTMinecartSource(cart);
         }
         return player;
+    }
+    
+    /**
+     * Get string data from custom item
+     * 
+     * @param item
+     * @param id
+     * @return
+     */
+    public static String getStringFromItem(ItemStack item, String id) {
+        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
+                PersistentDataType.STRING)) {
+            return null;
+        }
+        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
+                id), PersistentDataType.STRING);
     }
 }

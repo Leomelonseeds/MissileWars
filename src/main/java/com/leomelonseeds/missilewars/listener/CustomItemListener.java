@@ -14,7 +14,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -39,7 +38,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -68,22 +66,6 @@ public class CustomItemListener implements Listener {
     private double getItemStat(String name, String stat) {
         String[] args = name.split("-");
         return Double.valueOf(ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat) + "");
-    }
-
-    /**
-     * Get string data from custom item
-     * 
-     * @param item
-     * @param id
-     * @return
-     */
-    private String getStringFromItem(ItemStack item, String id) {
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
-                PersistentDataType.STRING)) {
-            return null;
-        }
-        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
-                id), PersistentDataType.STRING);
     }
 
     /**
@@ -167,7 +149,7 @@ public class CustomItemListener implements Listener {
         PlayerInventory inv = player.getInventory();
         ItemStack hand = inv.getItem(event.getHand());
         Arena playerArena = getPlayerArena(player);
-        String held = getStringFromItem(hand, "held");
+        String held = ConfigUtils.getStringFromItem(hand, "held");
         if (playerArena == null) {
             // Player is using a held item
             if (held == null) {
@@ -209,8 +191,8 @@ public class CustomItemListener implements Listener {
         
         // Check if player used a structure or utility
         Block clicked = event.getClickedBlock();
-        String structureName = getStringFromItem(hand, "item-structure");
-        String utility = getStringFromItem(hand, "item-utility");
+        String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
+        String utility = ConfigUtils.getStringFromItem(hand, "item-utility");
         if (structureName == null && utility == null) {
             return;
         }
@@ -576,7 +558,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a structure item
         ItemStack hand = thrown.getItem();
-        String structureName = getStringFromItem(hand, "item-structure");
+        String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
         }
@@ -718,7 +700,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a utility item
         ItemStack hand = thrown.getItem();
-        String utility = getStringFromItem(hand, "item-utility");
+        String utility = ConfigUtils.getStringFromItem(hand, "item-utility");
 
         // Make sure it's splash potion of water
         if (utility == null || !thrown.getEffects().isEmpty()) {

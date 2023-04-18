@@ -996,6 +996,7 @@ public class Arena implements ConfigurationSerializable {
             for (MissileWarsPlayer player : players) {
                 player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
                 player.getMCPlayer().closeInventory();
+                player.missilePreview(getTeam(player.getMCPlayerId()));
             }
             
             // Register teams and set running state to true

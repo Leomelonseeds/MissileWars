@@ -250,6 +250,94 @@ public class SchematicManager {
         }*/
         return true;
     }
+    
+    /**
+     * Returns the 2 positions in which this missile will be spawned. Contains tons of
+     * duplicated code which I am very unproud of
+     * 
+     * @param structureName
+     * @param loc
+     * @param redMissile
+     * @return
+     */
+    public static Location[] getCorners(String structureName, Location loc, boolean redMissile) {
+        // Attempt to get structure file
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
+        String [] args = structureName.split("-");
+        int level = Integer.parseInt(args[1]);
+
+        // Attempt to get structure file
+        if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
+            return null;
+        }
+        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
+        if (fileName == null) {
+            return null;
+        }
+        if (redMissile) {
+            fileName = fileName.replaceAll(".nbt", "_red.nbt");
+        }
+        File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
+                fileName);
+
+        // Load structure data
+        StructureManager manager = Bukkit.getStructureManager();
+        Structure structure;
+        try {
+            structure = manager.loadStructure(structureFile);
+        } catch (IOException e) {
+            return null;
+        }
+
+        // Apply offset
+        Location spawnLoc = loc.clone();
+
+        Vector offset;
+        if (structureConfig.contains(args[0] + ".offset")) {
+            offset = getVector(structureConfig, args[0] + ".offset", null, null);
+        } else {
+            offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
+        }
+        // Flip z if on red team
+        StructureRotation rotation = StructureRotation.NONE;
+        
+        // Normal red missile offset adjustment
+        if (redMissile) {
+            offset.setZ(offset.getZ() * -1);
+            offset.setX(offset.getX() * -1);
+            rotation = StructureRotation.CLOCKWISE_180;
+        }
+        spawnLoc = spawnLoc.add(offset);
+
+        int spawnx = spawnLoc.getBlockX();
+        int spawny = spawnLoc.getBlockY();
+        int spawnz = spawnLoc.getBlockZ();
+
+        int sizex = structure.getSize().getBlockX();
+        int sizey = structure.getSize().getBlockY();
+        int sizez = structure.getSize().getBlockZ();
+        
+        // Add structure to tracker list
+        World world = loc.getWorld();
+        Location pos1;
+        Location pos2;
+        if (rotation == StructureRotation.NONE) {
+            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
+            pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
+        } else if (rotation == StructureRotation.CLOCKWISE_180) {
+            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
+            pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
+        } else if (rotation == StructureRotation.CLOCKWISE_90) {
+            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
+            pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
+        } else {
+            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
+            pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
+        }
+        
+        return new Location[] {pos1, pos2};
+    }
 
     /**
      * Spawn a WorldEdit schematic in a given world. The "maps.yml" file should have data on the spawn location and
