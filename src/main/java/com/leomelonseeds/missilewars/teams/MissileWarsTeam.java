@@ -242,6 +242,7 @@ public class MissileWarsTeam {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
         player.setJoinTime(LocalDateTime.now());
+        player.missilePreview(arena);
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

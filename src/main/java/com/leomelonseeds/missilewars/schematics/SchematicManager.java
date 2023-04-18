@@ -336,7 +336,7 @@ public class SchematicManager {
             pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
         }
         
-        return new Location[] {pos1, pos2};
+        return new Location[] {pos1.toCenterLocation(), pos2.toCenterLocation()};
     }
 
     /**
