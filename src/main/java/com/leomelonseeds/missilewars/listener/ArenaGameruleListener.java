@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -672,23 +673,20 @@ public class ArenaGameruleListener implements Listener {
         if (arena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }
-        
+
         String message = ConfigUtils.toPlain(event.message());
-        String[] possibleMessages = {"good game", "gg", "ggs"};
-        for (String s : possibleMessages) {
-            if (message.equalsIgnoreCase(s)) {
-                // Add 1 EXP to player
-                RankUtils.addExp(player, 1);
-                ConfigUtils.sendConfigMessage("messages.gg-exp", player, null, null);
-                saidGG.add(player);
-                
-                // Disallow giving xp for as long as victory wait time
-                long waitTime = MissileWarsPlugin.getPlugin().getConfig().getInt("victory-wait-time") * 20L;
-                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                    saidGG.remove(player);
-                }, waitTime);
-                return;
-            }
+        if (Pattern.matches("good game|g+s*(wp)?!*", message.toLowerCase())) {
+            // Add 1 EXP to player
+            RankUtils.addExp(player, 1);
+            ConfigUtils.sendConfigMessage("messages.gg-exp", player, null, null);
+            saidGG.add(player);
+            
+            // Disallow giving xp for as long as victory wait time
+            long waitTime = MissileWarsPlugin.getPlugin().getConfig().getInt("victory-wait-time") * 20L;
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                saidGG.remove(player);
+            }, waitTime);
+            return;
         }
     }
     
