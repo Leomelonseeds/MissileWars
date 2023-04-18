@@ -597,6 +597,19 @@ public class ArenaManager {
         return sortedArenas;
     }
     
+    /**
+     * Get total number of players playing a gamemode
+     * 
+     * @param gamemode
+     * @return
+     */
+    public int getPlayers(String gamemode) {
+        int count = 0;
+        for (Arena a : getLoadedArenas(gamemode)) {
+            count += a.getTotalPlayers();
+        }
+        return count;
+    }
 
 
     /**

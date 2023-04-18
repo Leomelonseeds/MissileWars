@@ -171,6 +171,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
             return null;
         }
+        
+        if (params.equalsIgnoreCase("count")) {
+            return Integer.toString(manager.getPlayers(params.split("_")[2]));
+        }
 
         if (params.equalsIgnoreCase("arena")) {
             return playerArena == null ? "Lobby" : StringUtils.capitalize(playerArena.getName());
