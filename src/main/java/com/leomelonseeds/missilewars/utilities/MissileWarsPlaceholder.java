@@ -172,15 +172,15 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
 
+        if (params.equalsIgnoreCase("arena")) {
+            return playerArena == null ? "Lobby" : StringUtils.capitalize(playerArena.getName());
+        }
+
         if (playerArena == null) {
             return null;
         }
 
         // Arena specific placeholders
-
-        if (params.equalsIgnoreCase("arena")) {
-            return StringUtils.capitalize(playerArena.getName());
-        }
 
         if (params.equalsIgnoreCase("gamemode")) {
             return ChatColor.GREEN + "Classic";
