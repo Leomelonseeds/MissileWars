@@ -545,9 +545,9 @@ public class Arena implements ConfigurationSerializable {
         // Auto-join team if setting turned on
         else if (!player.hasPermission("umw.disableautoteam") && running) {
             if (getRedTeam().getSize() < getBlueTeam().getSize()) {
-                enqueueRed(player.getUniqueId());
+                enqueue(player.getUniqueId(), "red");
             } else {
-                enqueueBlue(player.getUniqueId());
+                enqueue(player.getUniqueId(), "blue");
             }
         }
     }
@@ -758,106 +758,62 @@ public class Arena implements ConfigurationSerializable {
     public boolean isSpectating(MissileWarsPlayer player) {
         return spectators.contains(player);
     }
-
+    
     /**
-     * Enqueue a player with a given UUID to the red team.
+     * Enqueue a player with a given UUID to a team
      *
      * @param uuid the Player's UUID
+     * @param team use "red" or "blue"
      */
-    public void enqueueRed(UUID uuid) {
+    public void enqueue(UUID uuid, String team) {
         for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                
-               // Make sure people can't break the game
-                if (startTime != null) {
-                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                    if (time <= 1 && time >= -1) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                        return;
-                    }
+            if (!player.getMCPlayerId().equals(uuid)) {
+                continue;
+            }
+            
+            // Make sure people can't break the game
+            if (startTime != null) {
+                int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                if (time <= 1 && time >= -1) {
+                    ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                    return;
                 }
-                
-                if (!running) {
-                    if (!redQueue.contains(player)) {
-                        if (redQueue.size() >= getCapacity() / 2) {
-                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
-                        } else {
-                            blueQueue.remove(player);
-                            redQueue.add(player);
-                            ConfigUtils.sendConfigMessage("messages.queue-waiting-red", player.getMCPlayer(), this, null);
-                            removeSpectator(player);
-                        }
+            }
+            
+            Player mcPlayer = player.getMCPlayer();
+            if (!running) {
+                Queue<MissileWarsPlayer> queue = team.equals("red") ? redQueue : blueQueue;
+                Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : blueQueue;
+                if (!queue.contains(player)) {
+                    if (queue.size() >= getCapacity() / 2) {
+                        ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
                     } else {
-                        redQueue.remove(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-leave-red", player.getMCPlayer(), this, null);
+                        otherQueue.remove(player);
+                        queue.add(player);
+                        ConfigUtils.sendConfigMessage("messages.queue-waiting-" + team, mcPlayer, this, null);
+                        removeSpectator(player);
                     }
                 } else {
-                    if (!player.getMCPlayer().isOp() && redTeam.getSize() - blueTeam.getSize() >= 1) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
-                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && redTeam.getSize() >= getCapacity() / 2) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
-                    } else {
-                        removeSpectator(player);
-                        blueTeam.removePlayer(player);
-                        redTeam.addPlayer(player);
-                        player.giveDeckGear();
-                        checkNotEmpty();
-                        announceMessage("messages.queue-join-red", player);
-                    }
+                    queue.remove(player);
+                    ConfigUtils.sendConfigMessage("messages.queue-leave-" + team, mcPlayer, this, null);
                 }
-                break;
-            }
-        }
-    }
-
-    /**
-     * Enqueue a player with a given UUID to the blue team.
-     *
-     * @param uuid the Player's UUID
-     */
-    public void enqueueBlue(UUID uuid) {
-        for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                
-                // Make sure people can't break the game
-                if (startTime != null) {
-                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                    if (time <= 1 && time >= -1) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                        return;
-                    }
-                }
-                
-                if (!running) {
-                    if (!blueQueue.contains(player)) {
-                        if (blueQueue.size() >= getCapacity() / 2) {
-                            ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
-                        } else {
-                            redQueue.remove(player);
-                            blueQueue.add(player);
-                            ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
-                            removeSpectator(player);
-                        }
-                    } else {
-                        blueQueue.remove(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-leave-blue", player.getMCPlayer(), this, null);
-                    }
+            } else {
+                MissileWarsTeam joinTeam = team.equals("red") ? redTeam : blueTeam;
+                MissileWarsTeam otherTeam = team.equals("red") ? blueTeam : redTeam;
+                if (!mcPlayer.isOp() && joinTeam.getSize() - otherTeam.getSize() >= 1) {
+                    ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
+                } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
+                    ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
                 } else {
-                    if (!player.getMCPlayer().isOp() && blueTeam.getSize() - redTeam.getSize() >= 1) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-error", player.getMCPlayer(), this, null);
-                    } else if (!player.getMCPlayer().hasPermission("umw.joinfull") && blueTeam.getSize() >= getCapacity() / 2) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), this, null);
-                    } else {
-                        removeSpectator(player);
-                        redTeam.removePlayer(player);
-                        blueTeam.addPlayer(player);
-                        player.giveDeckGear();
-                        checkNotEmpty();
-                        announceMessage("messages.queue-join-blue", player);
-                    }
+                    removeSpectator(player);
+                    blueTeam.removePlayer(player);
+                    redTeam.addPlayer(player);
+                    player.giveDeckGear();
+                    checkNotEmpty();
+                    announceMessage("messages.queue-join-" + team, player);
                 }
-                break;
             }
+            break;
         }
     }
 
@@ -1175,6 +1131,9 @@ public class Arena implements ConfigurationSerializable {
         waitingForTie = false;
         redTeam.stopDeckItems();
         blueTeam.stopDeckItems();
+        if (!plugin.isEnabled()) {
+            return;
+        }
 
         // Produce winner/discord messages
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
@@ -1188,47 +1147,29 @@ public class Arena implements ConfigurationSerializable {
 
             // Set notify messages
             discordMessage = ":pencil: A game was tied in arena " + this.getName();
-        } else if (winningTeam == blueTeam) {
-            // Send titles
-            blueTeam.sendTitle("victory");
-            redTeam.sendTitle("defeat");
-
-            // Set notify messages
-            List<String> blueList = new ArrayList<>();
-            for (MissileWarsPlayer player : players) {
-                if (blueTeam.containsPlayer(player.getMCPlayerId())) {
-                    blueList.add(player.getMCPlayer().getName());
-                }
-            }
-            String blueWinners = String.join(", ", blueList);
-            discordMessage = ":tada: Team **blue** (" + blueWinners + ") has won a game in arena " + this.getName();
         } else {
             // Send titles
-            redTeam.sendTitle("victory");
-            blueTeam.sendTitle("defeat");
+            MissileWarsTeam losingTeam = winningTeam == redTeam ? blueTeam : redTeam;
+            winningTeam.sendTitle("victory");
+            losingTeam.sendTitle("defeat");
 
             // Set notify messages
-            List<String> redList = new ArrayList<>();
-            for (MissileWarsPlayer player : players) {
-                if (redTeam.containsPlayer(player.getMCPlayerId())) {
-                    redList.add(player.getMCPlayer().getName());
-                }
+            List<String> winList = new ArrayList<>();
+            for (MissileWarsPlayer player : winningTeam.getMembers()) {
+                winList.add(player.getMCPlayer().getName());
             }
-            String redWinners = String.join(", ", redList);
-            discordMessage = ":tada: Team **red** (" + redWinners + ") has won a game in arena " + this.getName();
+            String winners = String.join(", ", winList);
+            discordMessage = ":tada: Team **" + winningTeam.getName() + "** (" + winners + ") has won a game in arena " + this.getName();
         }
-
         discordChannel.sendMessage(discordMessage).queue();
         
+        for (MissileWarsPlayer player : players) {
+            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
-        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
-        
-        if (!plugin.isEnabled()) {
-            return;
-        }
-
         // Remove all players after a short time, then reset the world a bit after
+        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
         startTime = null;
         if (players.size() > 0) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -1329,9 +1270,6 @@ public class Arena implements ConfigurationSerializable {
 
         // Update stats for each player
         for (MissileWarsPlayer player : players) {
-
-            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
-
             // Send win message
             for (String s : actualWinMessages) {
                 player.getMCPlayer().sendMessage(s);

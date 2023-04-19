@@ -479,9 +479,15 @@ public class MissileWarsCommand implements CommandExecutor {
             sendErrorMsg(sender, "All arenas are full! Please open the menu and choose one to spectate.");
             return true;
         }
-
-        // Queue for red team
-        if (action.equalsIgnoreCase("EnqueueRed")) {
+        
+        // Queue for a team
+        if (action.toLowerCase().contains("enqueue")) {
+            String team = action.substring(7);
+            if (!(team.equalsIgnoreCase("red") || team.equalsIgnoreCase("blue"))) {
+                sendErrorMsg(sender, "Please use enqueuered or enqueueblue!");
+                return true;
+            }
+            
             if (args.length == 1) {
                 Player player = (Player) sender;
                 // Check if player is in arena
@@ -501,7 +507,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
                 
-                arena.enqueueRed(player.getUniqueId());
+                arena.enqueue(player.getUniqueId(), team);
                 return true;
             }
             
@@ -525,58 +531,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
 
-            // Enqueue for red team
-            arena.enqueueRed(target.getUniqueId());
-            return true;
-        }
-
-        // Queue for blue team
-        if (action.equalsIgnoreCase("EnqueueBlue")) {
-            if (args.length == 1) {
-                Player player = (Player) sender;
-                // Check if player is in arena
-                Arena arena = arenaManager.getArena(player.getUniqueId());
-                if (arena == null) {
-                    sendErrorMsg(sender, "You are not in an arena!");
-                    return true;
-                }
-                
-                if (arena instanceof TourneyArena) {
-                    ConfigUtils.sendConfigMessage("messages.queue-deny-tourney", player, null, null);
-                    return true;
-                }
-                
-                if (!(arena.getTeam(player.getUniqueId()).equals("no team") || sender.hasPermission("umw.enqueue"))) {
-                    sendErrorMsg(sender, "You are already on a team!");
-                    return true;
-                }
-                
-                arena.enqueueBlue(player.getUniqueId());
-                return true;
-            }
-            
-            // Ensure player is allowed
-            if (!sender.hasPermission("umw.staff")) {
-                sendErrorMsg(sender, "You do not have permission to do that!");
-                return true;
-            }
-
-            // Check if opening for another player
-            Player target = getCommandTarget(args, sender);
-            if (target == null) {
-                sendErrorMsg(sender, "No target found!");
-                return true;
-            }
-
-            // Check if player is in arena
-            Arena arena = arenaManager.getArena(target.getUniqueId());
-            if (arena == null) {
-                sendErrorMsg(sender, "Target is not in an arena");
-                return true;
-            }
-
-            // Enqueue for red team
-            arena.enqueueBlue(target.getUniqueId());
+            arena.enqueue(target.getUniqueId(), team);
             return true;
         }
 

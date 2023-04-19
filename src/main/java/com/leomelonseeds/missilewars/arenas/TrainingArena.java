@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -32,43 +31,39 @@ public class TrainingArena extends Arena {
     }
 
     @Override
-    public void enqueueRed(UUID uuid) {
+    public void enqueue(UUID uuid, String team) {
         for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
+            if (!player.getMCPlayerId().equals(uuid)) {
+                continue;
+            }
+            
+            if (team.equals("red")) {
                 ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
                 return;
             }
-        }
-    }
-    
-    @Override
-    public void enqueueBlue(UUID uuid) {
-        for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                
-                // Make sure people can't break the game
-                if (startTime != null) {
-                    int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
-                    if (time <= 1 && time >= -1) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                        return;
-                    }
+            
+            // Make sure people can't break the game
+            if (startTime != null) {
+                int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                if (time <= 1 && time >= -1) {
+                    ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                    return;
                 }
-                
-                if (!running) {
-                    blueQueue.add(player);
-                    ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
-                    removeSpectator(player);
-                } else {
-                    removeSpectator(player);
-                    redTeam.removePlayer(player);
-                    blueTeam.addPlayer(player);
-                    player.giveDeckGear();
-                    checkNotEmpty();
-                    announceMessage("messages.queue-join-blue", player);
-                }
-                break;
             }
+            
+            if (!running) {
+                blueQueue.add(player);
+                ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
+                removeSpectator(player);
+            } else {
+                removeSpectator(player);
+                redTeam.removePlayer(player);
+                blueTeam.addPlayer(player);
+                player.giveDeckGear();
+                checkNotEmpty();
+                announceMessage("messages.queue-join-blue", player);
+            }
+            break;
         }
     }
     
@@ -80,7 +75,7 @@ public class TrainingArena extends Arena {
         
         // Auto-join team if setting turned on
         if (!player.hasPermission("umw.disableautoteam") && running) {
-            enqueueBlue(player.getUniqueId());
+            enqueue(player.getUniqueId(), "blue");
         }
     }
     
@@ -113,7 +108,7 @@ public class TrainingArena extends Arena {
                 missiles.put(key, amount);
             }
         }
-        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), 100L);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), 100L);
     }
     
     @Override
@@ -133,11 +128,7 @@ public class TrainingArena extends Arena {
     }
     
     @Override
-    protected void calculateStats(MissileWarsTeam winningTeam) {
-        for (MissileWarsPlayer player : players) {
-            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
-        }
-    }
+    protected void calculateStats(MissileWarsTeam winningTeam) {}
     
     // Spawn a missile in a random location at red base
     private void spawnMissileRandomly(Map<String, Integer> missiles) {
@@ -171,6 +162,6 @@ public class TrainingArena extends Arena {
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
         long interval = Math.max(20, 20 * time / Math.max(players, 1));
-        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
     }
 }

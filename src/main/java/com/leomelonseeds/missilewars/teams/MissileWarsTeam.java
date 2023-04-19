@@ -133,6 +133,10 @@ public class MissileWarsTeam {
     public Map<Location, Boolean> getPortals() {
         return portals;
     }
+    
+    public Set<MissileWarsPlayer> getMembers() {
+        return members;
+    }
 
     /**
      * Get the size of the team.
