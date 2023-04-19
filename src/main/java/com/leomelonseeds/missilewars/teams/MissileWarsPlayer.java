@@ -5,9 +5,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -99,6 +101,7 @@ public class MissileWarsPlayer {
                 double y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
                 double z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
                 double z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
+                DustOptions dustOptions = new DustOptions(Color.LIME, 1.0F);
                 for (double x = x1; x <= x2; x++) {
                     for (double y = y1; y <= y2; y++) {
                         for (double z = z1; z <= z2; z++) {
@@ -106,7 +109,7 @@ public class MissileWarsPlayer {
                             boolean isY = y == y1 || y == y2;
                             boolean isZ = z == z1 || z == z2;
                             if (isX ? (isY || isZ) : (isY && isZ)) {
-                                player.spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 1);
+                                player.spawnParticle(Particle.REDSTONE, x, y, z, 1, dustOptions);
                             }
                         }
                     }
