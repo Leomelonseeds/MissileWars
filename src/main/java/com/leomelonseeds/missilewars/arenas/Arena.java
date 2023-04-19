@@ -1220,7 +1220,7 @@ public class Arena implements ConfigurationSerializable {
 
         discordChannel.sendMessage(discordMessage).queue();
         
-        calculateStats(winningTeam);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
         

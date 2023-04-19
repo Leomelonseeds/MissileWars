@@ -113,7 +113,7 @@ public class TrainingArena extends Arena {
                 missiles.put(key, amount);
             }
         }
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), 100L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), 100L);
     }
     
     @Override
@@ -171,6 +171,6 @@ public class TrainingArena extends Arena {
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
         long interval = Math.max(20, 20 * time / Math.max(players, 1));
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
     }
 }
