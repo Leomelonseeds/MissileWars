@@ -115,7 +115,7 @@ public class MissileWarsPlayer {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20, 20);
+        }.runTaskTimerAsynchronously(plugin, 20, 10);
     }
 
     /**
