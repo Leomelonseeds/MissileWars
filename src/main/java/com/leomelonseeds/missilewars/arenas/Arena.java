@@ -1544,11 +1544,13 @@ public class Arena implements ConfigurationSerializable {
             return;
         }
 
-        // Only attempt blue update if red unchanged
-        if (location.getBlockZ() > 0) {
-            redTeam.registerShieldBlockUpdate(location, place);
-        } else {
-            blueTeam.registerShieldBlockUpdate(location, place);
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+            // Only attempt blue update if red unchanged
+            if (location.getBlockZ() > 0) {
+                redTeam.registerShieldBlockUpdate(location, place);
+            } else {
+                blueTeam.registerShieldBlockUpdate(location, place);
+            }
+        });
     }
 }

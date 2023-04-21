@@ -1,6 +1,8 @@
 package com.leomelonseeds.missilewars.utilities.tracker;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,8 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 /* Tracks missiles, utilities, and TNT minecarts to be used for tracking kills/portal breaks */
 public class Tracker {
     
-    List<Tracked> tracked;
-    Map<ExplosiveMinecart, Player> minecarts;
+    private List<Tracked> tracked;
+    private Map<ExplosiveMinecart, Player> minecarts;
     
     public Tracker() {
         tracked = new ArrayList<>();
@@ -44,6 +46,13 @@ public class Tracker {
     
     public void remove(Tracked t) {
         tracked.remove(t);
+    }
+    
+    /**
+     * @return an unmodifiable collection of the tracked objects in the tracker
+     */
+    public Collection<Tracked> getMissiles() {
+        return Collections.unmodifiableCollection(tracked);
     }
     
     /**

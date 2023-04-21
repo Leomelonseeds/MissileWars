@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
+import com.leomelonseeds.missilewars.utilities.tracker.Tracked;
+import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
 
 public class TrainingArena extends Arena {
     
@@ -108,7 +112,7 @@ public class TrainingArena extends Arena {
                 missiles.put(key, amount);
             }
         }
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), 100L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissile(missiles), 40L);
     }
     
     @Override
@@ -130,38 +134,98 @@ public class TrainingArena extends Arena {
     @Override
     protected void calculateStats(MissileWarsTeam winningTeam) {}
     
-    // Spawn a missile in a random location at red base
-    private void spawnMissileRandomly(Map<String, Integer> missiles) {
+    // Spawn a missile based on a few conditions at the red base
+    private void spawnMissile(Map<String, Integer> missiles) {
         if (!running) {
             return;
         }
-        
-        int players = blueTeam.getSize();
-        if (players > 0) {
-            int x1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x1");
-            int x2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x2");
-            int y1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y1");
-            int y2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y2");
-            int z = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.z1");
-            
-            Random random = new Random();
-            int x = random.nextInt(x1, x2 + 1);
-            int y = random.nextInt() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
-            
-            List<String> m = new ArrayList<>(missiles.keySet());
-            String missile = m.get(random.nextInt(m.size()));
-            int level = random.nextInt(missiles.get(missile)) + 1;
-            Location loc = new Location(getWorld(), x, y, z);
-            SchematicManager.spawnNBTStructure(null, missile + "-" + level, loc, true, mapName, true, false);
+
+        // Schedule next iteration later if nobody online
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        int playercount = blueTeam.getSize();
+        if (playercount <= 0) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> spawnMissile(missiles), 10 * 20L);
+            return;
         }
+        
+        // Get maximum ranked player
+        int maxLevel = 0;
+        for (MissileWarsPlayer player : players) {
+            int level = RankUtils.getRankLevel(plugin.getSQL().getExpSync(player.getMCPlayerId()));
+            if (level > maxLevel) {
+                maxLevel = level;
+            }
+        }
+
+        // Get shield coordinates
+        int x1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y2");
+        int z = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.z1");
+        
+        // Find random missile
+        Random random = new Random();
+        List<String> m = new ArrayList<>(missiles.keySet());
+        String missile = m.get(random.nextInt(m.size()));
+        int level = random.nextInt(missiles.get(missile)) + 1;
+
+        // Spawn missile randomly, with bias towards top of shield
+        int x = random.nextInt(x1, x2 + 1);
+        int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
+        Location loc = new Location(getWorld(), x, y, z);
+        
+        // Just a code block that I can break out of :)
+        do {
+            // The higher level you are, the higher chance of defense, starting at 50%
+            if (random.nextDouble() > 0.5 + maxLevel * 0.05) {
+                break;
+            }
+            
+            // Find closest missile to red base
+            Collection<Tracked> tracked = tracker.getMissiles();
+            TrackedMissile toDefend = null; 
+            int maxtz = 0; // Larger z = closer to red base
+            for (Tracked t : tracked) {
+                if (!(t instanceof TrackedMissile)) {
+                    continue;
+                }
+                
+                if (t.isRed()) {
+                    continue;
+                }
+                
+                int tz = Math.max(t.getPos1().getBlockZ(), t.getPos2().getBlockZ());
+                if (tz > maxtz) {
+                    maxtz = z;
+                    toDefend = (TrackedMissile) t;
+                }
+            }
+            
+            // No need to worry about defending if opponent is far off, or no blue missiles at all
+            if (maxtz <= 0 || toDefend == null) {
+                break;
+            }
+            
+            // Determine theoretical best location to spawn missile then adjust to actual limits
+            int spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
+            int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 5;
+            spawnx = Math.max(Math.min(spawnx, x2), x1);
+            spawny = Math.max(Math.min(spawny, y2), y1);
+            loc.set(spawnx, spawny, z);
+        } while (false);
+        
+        // Spawn missile
+        Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, loc, true, mapName, true, false));
         
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        int time = settings.getInt("item-frequency." + Math.max(1, Math.min(players, 3)));
+        int time = settings.getInt("item-frequency." + Math.max(1, Math.min(playercount, 3)));
         
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
-        long interval = Math.max(20, 20 * time / Math.max(players, 1));
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> spawnMissileRandomly(missiles), interval);
+        // Subtract one second for each level of the highest levelled player
+        int interval = Math.max(2, (time / Math.max(playercount, 1)) - maxLevel);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissile(missiles), interval * 20L);
     }
 }

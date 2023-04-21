@@ -61,23 +61,27 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
+                // If the player left, cancel task
                 String team = arena.getTeam(playerId);
                 if (team == "no team") {
                     this.cancel();
                     return;
                 }
 
+                // If player disabled preview, cancel task
                 Player player = getMCPlayer();
                 if (player.hasPermission("umw.disablepreview")) {
                     this.cancel();
                     return;
                 }
 
+                // Make sure player is aiming for a block
                 Block target = player.getTargetBlock(null, 4);
                 if (target.getType() == Material.AIR) {
                     return;
                 }
 
+                // Player must be holding item
                 PlayerInventory inv = player.getInventory();
                 ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
                 ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
@@ -86,6 +90,7 @@ public class MissileWarsPlayer {
                     return;
                 }
 
+                // Item must be a missile
                 String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
                 if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
                         structureName.contains("torpedo-") || structureName.contains("canopy")) {

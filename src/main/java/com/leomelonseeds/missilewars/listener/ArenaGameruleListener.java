@@ -465,14 +465,11 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Check for shield breaks
-        event.blockList().forEach(block -> {
-            // Register shield breaking
-            possibleArena.registerShieldBlockEdit(block.getLocation(), false);
-        });
-
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
+                () -> event.blockList().forEach(block -> possibleArena.registerShieldBlockEdit(block.getLocation(), false)));
+        
+        // Fireball checks
         EntityType entity = event.getEntityType();
-
-        // Ensure its actually a fireball
         if (entity == EntityType.FIREBALL) {
             // Check for boosterball. If so, prevent block damage.
             Fireball fb = (Fireball) event.getEntity();
