@@ -401,7 +401,7 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of seconds remaining in the game
      */
     public long getSecondsRemaining() {
-        if (startTime == null) {
+        if (startTime == null || !running) {
             return 0;
         }
         int totalSecs = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length") * 60;
@@ -1156,11 +1156,10 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
         }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam, startTime.plusHours(0)));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         // Remove all players after a short time, then reset the world a bit after
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
-        startTime = null;
         if (players.size() > 0) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 removePlayers();
@@ -1172,7 +1171,7 @@ public class Arena implements ConfigurationSerializable {
     }
     
     // Calculate and store all player stats from the game
-    protected void calculateStats(MissileWarsTeam winningTeam, LocalDateTime startTime) {
+    protected void calculateStats(MissileWarsTeam winningTeam) {
         // Setup player variables
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages." + gamemode + "-end", null, null, null);
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
@@ -1366,6 +1365,7 @@ public class Arena implements ConfigurationSerializable {
         unregisterTeams();
         loadWorldFromDisk();
         resetting = false;
+        startTime = null;
         voteManager = new VoteManager(this);
     }
 

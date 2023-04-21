@@ -177,7 +177,7 @@ public class TrainingArena extends Arena {
     }
     
     @Override
-    protected void calculateStats(MissileWarsTeam winningTeam, LocalDateTime startTime) {}
+    protected void calculateStats(MissileWarsTeam winningTeam) {}
     
     // Spawn a missile based on a few conditions at the red base
     private void spawnMissile(Map<String, Integer> missiles) {

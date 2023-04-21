@@ -33,7 +33,7 @@ public abstract class Tracked {
         this.removalTasks = new ArrayList<>();
         
         ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = arenaManager.getArena(player.getUniqueId());
+        Arena arena = arenaManager.getArena(pos1.getWorld());
         tracker = arena.getTracker();
         tracker.add(this);
         
