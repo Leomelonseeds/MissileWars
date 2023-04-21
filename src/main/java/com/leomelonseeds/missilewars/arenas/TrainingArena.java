@@ -5,15 +5,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
@@ -93,8 +97,49 @@ public class TrainingArena extends Arena {
         }
     }
     
+    // Reset training arena after 30 min
     @Override
-    public void checkEmpty() {}
+    public void checkEmpty() {
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return;
+        }
+
+        if (!running || redTeam == null || blueTeam == null) {
+            return;
+        }
+        
+        if (blueTeam.getSize() <= 0) {
+            autoEnd = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (running && blueTeam.getSize() <= 0) {
+                        endGame(null);
+                    }
+                }
+            }.runTaskLater(MissileWarsPlugin.getPlugin(), 30 * 60 * 20L);
+        }
+    }
+    
+    @Override
+    public void checkNotEmpty() {
+        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+            return;
+        }
+        
+        if (!running || redTeam == null || blueTeam == null) {
+            return;
+        }
+        
+        if (blueTeam.getSize() <= 0) {
+            return;
+        }
+        
+        if (autoEnd == null) {
+            return;
+        }
+        
+        autoEnd.cancel();
+    }
     
     @Override
     public String getTimeRemaining() {
@@ -169,36 +214,44 @@ public class TrainingArena extends Arena {
         List<String> m = new ArrayList<>(missiles.keySet());
         String missile = m.get(random.nextInt(m.size()));
         int level = random.nextInt(missiles.get(missile)) + 1;
-
-        // Spawn missile randomly, with bias towards top of shield
-        int x = random.nextInt(x1, x2 + 1);
-        int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
-        Location loc = new Location(getWorld(), x, y, z);
+        Location loc = null;
+        
+        // Setup various collections
+        Collection<Tracked> tracked = tracker.getMissiles();
+        Set<Tracked> blueMissiles = new HashSet<>();
+        Set<Tracked> redMissiles = new HashSet<>();
+        for (Tracked t : tracked) {
+            if (!(t instanceof TrackedMissile)) {
+                continue;
+            }
+            
+            if (t.isRed()) {
+                redMissiles.add(t);
+            } else {
+                blueMissiles.add(t);
+            }
+        }
         
         // Just a code block that I can break out of :)
         do {
+            // Don't torture new players
+            if (maxLevel < 1) {
+                break;
+            }
+            
             // The higher level you are, the higher chance of defense, starting at 50%
             if (random.nextDouble() > 0.5 + maxLevel * 0.05) {
                 break;
             }
             
             // Find closest missile to red base
-            Collection<Tracked> tracked = tracker.getMissiles();
-            TrackedMissile toDefend = null; 
+            Tracked toDefend = null; 
             int maxtz = 0; // Larger z = closer to red base
-            for (Tracked t : tracked) {
-                if (!(t instanceof TrackedMissile)) {
-                    continue;
-                }
-                
-                if (t.isRed()) {
-                    continue;
-                }
-                
+            for (Tracked t : blueMissiles) {
                 int tz = Math.max(t.getPos1().getBlockZ(), t.getPos2().getBlockZ());
                 if (tz > maxtz) {
-                    maxtz = z;
-                    toDefend = (TrackedMissile) t;
+                    maxtz = tz;
+                    toDefend = t;
                 }
             }
             
@@ -212,11 +265,41 @@ public class TrainingArena extends Arena {
             int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 5;
             spawnx = Math.max(Math.min(spawnx, x2), x1);
             spawny = Math.max(Math.min(spawny, y2), y1);
-            loc.set(spawnx, spawny, z);
+            Location defloc = new Location(getWorld(), spawnx, spawny, z);
+            
+            // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
+            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 20)) {
+                break;
+            }
+            
+            loc = defloc;
         } while (false);
         
+        // If all else fails, we just pick a random location
+        if (loc == null) {
+            // If portals destroyed, target the other portal
+            FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
+            Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(getWorld());
+            Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(getWorld());
+            if (p1.getBlock().getType() != Material.NETHER_PORTAL) {
+                x1 += 15; // p1 is negative x portal, so target positive X by increasing X
+            } else if (p2.getBlock().getType() != Material.NETHER_PORTAL) {
+                x2 -= 15; // and vice versa
+            }
+            
+            // Try at most a constant number of times to increase performance
+            int count = 0;
+            do {
+                int x = random.nextInt(x1, x2 + 1);
+                int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
+                loc = new Location(getWorld(), x, y, z);
+                count++;
+            } while (wouldCollide(loc, redMissiles) && count < 5);
+        }
+        
         // Spawn missile
-        Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, loc, true, mapName, true, false));
+        Location floc = loc;
+        Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));
         
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
@@ -227,5 +310,19 @@ public class TrainingArena extends Arena {
         // Subtract one second for each level of the highest levelled player
         int interval = Math.max(2, (time / Math.max(playercount, 1)) - maxLevel);
         Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissile(missiles), interval * 20L);
+    }
+    
+    // Algorithm to check if at a certain location, there already is a missile heading towards enemy base
+    private boolean wouldCollide(Location spawnloc, Set<Tracked> redMissiles) {
+        for (int z = spawnloc.getBlockZ() - 5; z >= 0; z -= 7) {
+            Location check1 = new Location(getWorld(), spawnloc.getX() + 1, spawnloc.getY() - 7, z);
+            Location check2 = new Location(getWorld(), spawnloc.getX() - 1, spawnloc.getY() - 4, z);
+            for (Tracked t : redMissiles) {
+                if (t.contains(check1) || t.contains(check2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
