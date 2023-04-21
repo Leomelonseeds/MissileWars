@@ -198,33 +198,31 @@ public class SchematicManager {
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Add structure to tracker list
-        if (player != null) {
-            World world = loc.getWorld();
-            Location pos1;
-            Location pos2;
-            BlockFace direction;
-            if (rotation == StructureRotation.NONE) {
-                pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
-                pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
-                direction = BlockFace.SOUTH;
-            } else if (rotation == StructureRotation.CLOCKWISE_180) {
-                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
-                pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
-                direction = BlockFace.NORTH;
-            } else if (rotation == StructureRotation.CLOCKWISE_90) {
-                pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
-                pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
-                direction = BlockFace.WEST;
-            } else {
-                pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
-                pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
-                direction = BlockFace.EAST;
-            }
-            if (isMissile) {
-                new TrackedMissile(args[0], level, player, pos1, pos2, direction, redMissile);
-            } else {
-                new TrackedUtility(args[0], level, player, pos1, pos2, direction, redMissile);
-            }
+        World world = loc.getWorld();
+        Location pos1;
+        Location pos2;
+        BlockFace direction;
+        if (rotation == StructureRotation.NONE) {
+            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
+            pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
+            direction = BlockFace.SOUTH;
+        } else if (rotation == StructureRotation.CLOCKWISE_180) {
+            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
+            pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
+            direction = BlockFace.NORTH;
+        } else if (rotation == StructureRotation.CLOCKWISE_90) {
+            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
+            pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
+            direction = BlockFace.WEST;
+        } else {
+            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
+            pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
+            direction = BlockFace.EAST;
+        }
+        if (isMissile) {
+            new TrackedMissile(args[0], level, player, pos1, pos2, direction, redMissile);
+        } else {
+            new TrackedUtility(args[0], level, player, pos1, pos2, direction, redMissile);
         }
         
         // Temp hotfix for structure rail rotation bug

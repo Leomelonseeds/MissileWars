@@ -165,6 +165,11 @@ public class Tracker {
             }
             TrackedMissile tm = (TrackedMissile) t;
             
+            // If tm doesn't have associated player, it's probably spawned by the training arena
+            if (tm.getPlayer() == null) {
+                return;
+            }
+            
             // Shortcut if explosion occurs for an embedded missile
             if (isEmbedded(tm)) {
                 igniter = tm.getPlayer();
@@ -183,7 +188,7 @@ public class Tracker {
                 continue;
             }
 
-            // Check for collisions to other objects, which override the blockbreak
+            // Check for collisions to other objects
             // Iterate in reverse to check for more recently spawned missile
             for (int j = tracked.size() - 1; j > i; j--) {
                 Tracked t2 = tracked.get(j);

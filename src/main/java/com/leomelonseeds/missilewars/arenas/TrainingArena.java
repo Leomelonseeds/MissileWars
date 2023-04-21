@@ -195,7 +195,7 @@ public class TrainingArena extends Arena {
         
         // Get maximum ranked player
         int maxLevel = 0;
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : blueTeam.getMembers()) {
             int level = RankUtils.getRankLevel(plugin.getSQL().getExpSync(player.getMCPlayerId()));
             if (level > maxLevel) {
                 maxLevel = level;
@@ -255,6 +255,8 @@ public class TrainingArena extends Arena {
                 }
             }
             
+            plugin.log("MAXTZ: " + maxtz);
+            
             // No need to worry about defending if opponent is far off, or no blue missiles at all
             if (maxtz <= 0 || toDefend == null) {
                 break;
@@ -262,13 +264,14 @@ public class TrainingArena extends Arena {
             
             // Determine theoretical best location to spawn missile then adjust to actual limits
             int spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
-            int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 5;
+            int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
             spawnx = Math.max(Math.min(spawnx, x2), x1);
             spawny = Math.max(Math.min(spawny, y2), y1);
             Location defloc = new Location(getWorld(), spawnx, spawny, z);
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
-            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 20)) {
+            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 10)) {
+                plugin.log("Defense collision prevented");
                 break;
             }
             
@@ -295,6 +298,7 @@ public class TrainingArena extends Arena {
                 loc = new Location(getWorld(), x, y, z);
                 count++;
             } while (wouldCollide(loc, redMissiles) && count < 5);
+            plugin.log("Spawn atts: " + count);
         }
         
         // Spawn missile
