@@ -844,16 +844,6 @@ public class Arena implements ConfigurationSerializable {
                     spectators.add(player);
                     redQueue.remove(player);
                     blueQueue.remove(player);
-                    
-                    // Cancel tasks if starting and below min players
-                    int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
-                    if (!running && startTime != null && getNumPlayers() < minPlayers) {
-                        for (BukkitTask task : tasks) {
-                            task.cancel();
-                        }
-                        startTime = null;
-                    }
-                    
                     Player mcPlayer = player.getMCPlayer();
                     mcPlayer.setGameMode(GameMode.SPECTATOR);
                     mcPlayer.sendActionBar(Component.text("Type /spectate to stop spectating"));
@@ -1166,7 +1156,7 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
         }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam, startTime.plusHours(0)));
 
         // Remove all players after a short time, then reset the world a bit after
         long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
@@ -1182,7 +1172,7 @@ public class Arena implements ConfigurationSerializable {
     }
     
     // Calculate and store all player stats from the game
-    protected void calculateStats(MissileWarsTeam winningTeam) {
+    protected void calculateStats(MissileWarsTeam winningTeam, LocalDateTime startTime) {
         // Setup player variables
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages." + gamemode + "-end", null, null, null);
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
@@ -1202,28 +1192,30 @@ public class Arena implements ConfigurationSerializable {
         List<MissileWarsPlayer> mostKills = new ArrayList<>();
         List<MissileWarsPlayer> mostDeaths = new ArrayList<>();
         for (MissileWarsPlayer player : players) {
-            if (!getTeam(player.getMCPlayerId()).equals("no team")) {
-                // Top MVPs
-                if (mvp.isEmpty() || mvp.get(0).getMVP() < player.getMVP()) {
-                    mvp.clear();
-                    mvp.add(player);
-                } else if (mvp.get(0).getMVP() == player.getMVP()) {
-                    mvp.add(player);
-                }
-                // Top kills
-                if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
-                    mostKills.clear();
-                    mostKills.add(player);
-                } else if (mostKills.get(0).getKills() == player.getKills()) {
-                    mostKills.add(player);
-                }
-                // Top deaths
-                if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
-                    mostDeaths.clear();
-                    mostDeaths.add(player);
-                } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
-                    mostDeaths.add(player);
-                }
+            if (getTeam(player.getMCPlayerId()).equals("no team")) {
+                continue;
+            }
+            
+            // Top MVPs
+            if (mvp.isEmpty() || mvp.get(0).getMVP() < player.getMVP()) {
+                mvp.clear();
+                mvp.add(player);
+            } else if (mvp.get(0).getMVP() == player.getMVP()) {
+                mvp.add(player);
+            }
+            // Top kills
+            if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
+                mostKills.clear();
+                mostKills.add(player);
+            } else if (mostKills.get(0).getKills() == player.getKills()) {
+                mostKills.add(player);
+            }
+            // Top deaths
+            if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
+                mostDeaths.clear();
+                mostDeaths.add(player);
+            } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
+                mostDeaths.add(player);
             }
         }
 
