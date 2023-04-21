@@ -17,7 +17,7 @@ public class TrackedUtility extends Tracked {
     public TrackedUtility(String name, int level, Player player, Location pos1, Location pos2, BlockFace direction, boolean isRed) {
         super(player, pos1, pos2, direction, isRed);
         
-        if (name.contains("obsidianshield")) {
+        if (name.contains("obsidianshield") && player != null) {
             int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
             Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
                 remove();

@@ -225,10 +225,10 @@ public class TrainingArena extends Arena {
                 continue;
             }
             
-            if (t.isRed()) {
-                redMissiles.add(t);
-            } else {
+            if (!t.isRed()) {
                 blueMissiles.add(t);
+            } else if (((TrackedMissile) t).isInMotion()) {
+                redMissiles.add(t);
             }
         }
         
@@ -255,14 +255,13 @@ public class TrainingArena extends Arena {
                 }
             }
             
-            plugin.log("MAXTZ: " + maxtz);
-            
             // No need to worry about defending if opponent is far off, or no blue missiles at all
             if (maxtz <= 0 || toDefend == null) {
                 break;
             }
             
             // Determine theoretical best location to spawn missile then adjust to actual limits
+            plugin.log("MAXTZ: " + maxtz);
             int spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
             int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
             spawnx = Math.max(Math.min(spawnx, x2), x1);
@@ -270,7 +269,7 @@ public class TrainingArena extends Arena {
             Location defloc = new Location(getWorld(), spawnx, spawny, z);
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
-            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 10)) {
+            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 15)) {
                 plugin.log("Defense collision prevented");
                 break;
             }

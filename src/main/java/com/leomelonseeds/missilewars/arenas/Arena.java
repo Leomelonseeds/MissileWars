@@ -401,7 +401,7 @@ public class Arena implements ConfigurationSerializable {
      * @return the number of seconds remaining in the game
      */
     public long getSecondsRemaining() {
-        if (startTime == null || !running) {
+        if (startTime == null || resetting) {
             return 0;
         }
         int totalSecs = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length") * 60;
@@ -783,7 +783,7 @@ public class Arena implements ConfigurationSerializable {
             Player mcPlayer = player.getMCPlayer();
             if (!running) {
                 Queue<MissileWarsPlayer> queue = team.equals("red") ? redQueue : blueQueue;
-                Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : blueQueue;
+                Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : redQueue;
                 if (!queue.contains(player)) {
                     if (queue.size() >= getCapacity() / 2) {
                         ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
@@ -806,8 +806,8 @@ public class Arena implements ConfigurationSerializable {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
                 } else {
                     removeSpectator(player);
-                    blueTeam.removePlayer(player);
-                    redTeam.addPlayer(player);
+                    otherTeam.removePlayer(player);
+                    joinTeam.addPlayer(player);
                     player.giveDeckGear();
                     checkNotEmpty();
                     announceMessage("messages.queue-join-" + team, player);
