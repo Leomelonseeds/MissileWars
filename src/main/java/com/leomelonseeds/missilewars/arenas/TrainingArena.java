@@ -289,7 +289,7 @@ public class TrainingArena extends Arena {
             Location defloc = new Location(getWorld(), spawnx, spawny, z);
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
-            if (wouldCollide(defloc, redMissiles, max) && (level < 3 || maxtz < z - 20)) {
+            if (wouldCollide(defloc, redMissiles, max, 1) && (level < 3 || maxtz < z - 20)) {
                 break;
             }
             
@@ -315,7 +315,7 @@ public class TrainingArena extends Arena {
                 int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
                 loc = new Location(getWorld(), x, y, z);
                 count++;
-            } while (wouldCollide(loc, redMissiles, 0) && count < 5);
+            } while (wouldCollide(loc, redMissiles, 0, 2) && count < 5);
         }
         
         // Spawn missile
@@ -334,14 +334,15 @@ public class TrainingArena extends Arena {
     }
     
     // Algorithm to check if at a certain location, there already is a missile heading towards enemy base
-    private boolean wouldCollide(Location spawnloc, Set<Tracked> redMissiles, int minz) {
+    // Higher radius = less conditions for missiles to spawn
+    private boolean wouldCollide(Location spawnloc, Set<Tracked> redMissiles, int minz, int rad) {
         for (int z = spawnloc.getBlockZ() - 4; z >= minz; z -= 7) {
             int x = spawnloc.getBlockX();
             int y = spawnloc.getBlockY() - 5;
             World world = getWorld();
             Location check1 = new Location(world, x, y, z);
-            Location check2 = new Location(world, x + 2, y + 3, z);
-            Location check3 = new Location(world, x - 2, y - 3, z);
+            Location check2 = new Location(world, x + rad, y + rad, z);
+            Location check3 = new Location(world, x - rad, y - rad, z);
             for (Tracked t : redMissiles) {
                 if (t.contains(check1) || t.contains(check2) || t.contains(check3)) {
                     return true;
