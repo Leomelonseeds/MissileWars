@@ -193,7 +193,7 @@ public class TrainingArena extends Arena {
             return;
         }
         
-        // Get maximum ranked player
+        // Get maximum ranked and distanced player
         int maxLevel = 0;
         for (MissileWarsPlayer player : blueTeam.getMembers()) {
             int level = RankUtils.getRankLevel(plugin.getSQL().getExpSync(player.getMCPlayerId()));
@@ -255,21 +255,40 @@ public class TrainingArena extends Arena {
                 }
             }
             
-            // No need to worry about defending if opponent is far off, or no blue missiles at all
-            if (maxtz <= 0 || toDefend == null) {
-                break;
+            // Find closest player to red base
+            Location closestPlayer = null;
+            int maxpz = 0;
+            for (MissileWarsPlayer player : blueTeam.getMembers()) {
+                Location mcpl = player.getMCPlayer().getLocation();
+                if (mcpl.getBlockZ() > maxpz) {
+                    maxpz = mcpl.getBlockZ();
+                    closestPlayer = mcpl;
+                }
             }
             
+            // No need to worry about defending if opponent is far off, or no blue missiles at all
+            int max = Math.max(maxpz, maxtz);
+            if (max == 0) {
+                break;
+            }
+
             // Determine theoretical best location to spawn missile then adjust to actual limits
-            plugin.log("MAXTZ: " + maxtz);
-            int spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
-            int spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
+            int spawnx = 0;
+            int spawny = 0;
+            if (maxpz >= maxtz) {
+                spawnx = closestPlayer.getBlockX();
+                spawny = closestPlayer.getBlockY() + 4;
+            } else {
+                spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
+                spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
+            }
+            
             spawnx = Math.max(Math.min(spawnx, x2), x1);
             spawny = Math.max(Math.min(spawny, y2), y1);
             Location defloc = new Location(getWorld(), spawnx, spawny, z);
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
-            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 15)) {
+            if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 20)) {
                 plugin.log("Defense collision prevented");
                 break;
             }
