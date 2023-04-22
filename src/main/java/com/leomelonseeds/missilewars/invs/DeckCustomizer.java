@@ -67,7 +67,11 @@ public class DeckCustomizer implements MWInventory {
         
         // Add panes and misc items
         for (int i = 0; i < 6; i++) {
-            inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_BARS)));
+            inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_NUGGET)));
+        }
+        
+        for (int i = 0; i < 6; i++) {
+            inv.setItem(i * 9 + 7, blankName(new ItemStack(Material.IRON_BARS)));
         }
         
         // Too lazy to come up with formula

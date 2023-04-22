@@ -401,6 +401,8 @@ public class DeckManager {
                             item.setType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
                         }
                     }
+                    
+                    lore.add(itemsConfig.getString("text.currentsp").replace("%sp%", deckjson.getJSONObject(preset).getInt("skillpoints") + ""));
                 }
             }
             itemMeta.lore(ConfigUtils.toComponent(lore));

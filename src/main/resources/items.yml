@@ -1477,17 +1477,13 @@ indicators:
     - "&7After unlocking an ability/passive,"
     - "&7purchase and upgrade it using"
     - "&aSkillpoints&7. Check the item below"
-    - "&7for your remaining skillpoints."
+    - "&7for your available skillpoints."
     - "&7You get one extra skillpoint per MW rank."
-    - ""
-    - "&cNote: You may use either the 'Skillpoints'"
-    - "&cor 'Reset Preset' options below to claim"
-    - "&cadditional skillpoints from MW ranks."
     slot: 8
     rankedslot: 8
   skillpoints:
     item: EMERALD
-    name: "&aRemaining Skillpoints: &f%sp%"
+    name: "&aAvailable Skillpoints: &f%sp%"
     lore:
     - ""
     - "&cClick to downgrade all items"
@@ -1517,6 +1513,7 @@ text:
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
   actuallevel: " &7- &8%current%/%max%"
+  currentsp: "&aAvailable Skillpoints: &f%sp%"
   missilestats:
   - ""
   - "&aSpeed: %speed%m/s"
