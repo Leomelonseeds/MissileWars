@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -277,7 +278,7 @@ public class TrainingArena extends Arena {
             int spawny = 0;
             if (maxpz >= maxtz) {
                 spawnx = closestPlayer.getBlockX();
-                spawny = closestPlayer.getBlockY() + 4;
+                spawny = closestPlayer.getBlockY() + 5;
             } else {
                 spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
                 spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
@@ -289,7 +290,6 @@ public class TrainingArena extends Arena {
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
             if (wouldCollide(defloc, redMissiles) && (level < 3 || maxtz < z - 20)) {
-                plugin.log("Defense collision prevented");
                 break;
             }
             
@@ -316,7 +316,6 @@ public class TrainingArena extends Arena {
                 loc = new Location(getWorld(), x, y, z);
                 count++;
             } while (wouldCollide(loc, redMissiles) && count < 5);
-            plugin.log("Spawn atts: " + count);
         }
         
         // Spawn missile
@@ -337,10 +336,14 @@ public class TrainingArena extends Arena {
     // Algorithm to check if at a certain location, there already is a missile heading towards enemy base
     private boolean wouldCollide(Location spawnloc, Set<Tracked> redMissiles) {
         for (int z = spawnloc.getBlockZ() - 5; z >= 0; z -= 7) {
-            Location check1 = new Location(getWorld(), spawnloc.getX() + 1, spawnloc.getY() - 7, z);
-            Location check2 = new Location(getWorld(), spawnloc.getX() - 1, spawnloc.getY() - 4, z);
+            int x = spawnloc.getBlockX();
+            int y = spawnloc.getBlockY() - 5;
+            World world = getWorld();
+            Location check1 = new Location(world, x, y, z);
+            Location check2 = new Location(world, x + 2, y + 3, z);
+            Location check3 = new Location(world, x - 2, y - 3, z);
             for (Tracked t : redMissiles) {
-                if (t.contains(check1) || t.contains(check2)) {
+                if (t.contains(check1) || t.contains(check2) || t.contains(check3)) {
                     return true;
                 }
             }
