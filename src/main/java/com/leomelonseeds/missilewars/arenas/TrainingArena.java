@@ -240,11 +240,6 @@ public class TrainingArena extends Arena {
                 break;
             }
             
-            // The higher level you are, the higher chance of defense, starting at 50%
-            if (random.nextDouble() > 0.5 + maxLevel * 0.05) {
-                break;
-            }
-            
             // Find closest missile to red base
             Tracked toDefend = null; 
             int maxtz = 0; // Larger z = closer to red base
@@ -274,11 +269,12 @@ public class TrainingArena extends Arena {
             }
 
             // Determine theoretical best location to spawn missile then adjust to actual limits
+            // Add a small bias onto player detection so defending against riders are prioritized
             int spawnx = 0;
             int spawny = 0;
-            if (maxpz >= maxtz) {
+            if (maxpz + 8 >= maxtz && closestPlayer != null) {
                 spawnx = closestPlayer.getBlockX();
-                spawny = closestPlayer.getBlockY() + 5;
+                spawny = closestPlayer.getBlockY() + 6;
             } else {
                 spawnx = (toDefend.getPos1().getBlockX() + toDefend.getPos2().getBlockX()) / 2;
                 spawny = Math.max(toDefend.getPos1().getBlockY(), toDefend.getPos2().getBlockY()) + 4;
