@@ -210,45 +210,44 @@ public class TourneyArena extends Arena {
         double chance = 0.33;
         double rng = random.nextDouble();
         for (MissileWarsPlayer mwplayer : players) {
-            if (!getTeam(mwplayer.getMCPlayerId()).equals("no team")) {
-                Deck deck = mwplayer.getDeck();
-                List<ItemStack> missiles = deck.getMissiles();
-                List<ItemStack> utility = deck.getUtility();
-                ItemStack poolItem;
-                if (rng < chance) {
-                    poolItem = new ItemStack(utility.get(i_utility));
-                } else {
-                    poolItem = new ItemStack(missiles.get(i_missile));
-                }
-                
-                Player player = mwplayer.getMCPlayer();
-                double toohigh = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-high");
-                double toofar = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-far");
-                Location loc = player.getLocation();
-                
-                // Don't give item if they are out of bounds
-                if (loc.getBlockY() > toohigh || loc.getBlockX() < toofar) {
-                    deck.refuseItem(player, poolItem, "messages.out-of-bounds");
-                    continue;
-                }
-                
-                // Don't give item if their inventory space is full
-                if (!mwplayer.getDeck().hasInventorySpace(player, true)) {
-                    deck.refuseItem(player, poolItem, "messages.inventory-limit");
-                    continue;
-                }
-                
-                // Check if can add to offhand
-                ItemStack offhand = player.getInventory().getItemInOffHand();
-                if (offhand.isSimilar(poolItem)) {
-                    while (offhand.getAmount() < offhand.getMaxStackSize() && poolItem.getAmount() > 0) {
-                        offhand.add();
-                        poolItem.subtract();
-                    }
-                }
-                
-                player.getInventory().addItem(poolItem);
+            if (getTeam(mwplayer.getMCPlayerId()).equals("no team")) {
+                continue;
             }
+            
+            Deck deck = mwplayer.getDeck();
+            List<ItemStack> toUse = rng < chance ? deck.getUtility() : deck.getMissiles();
+            int index = rng < chance ? i_utility : i_missile;
+            ItemStack poolItem = new ItemStack(toUse.get(index));
+            
+            Player player = mwplayer.getMCPlayer();
+            double toohigh = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-high");
+            double toofar = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-far");
+            Location loc = player.getLocation();
+            
+            // Don't give item if they are out of bounds
+            if (loc.getBlockY() > toohigh || loc.getBlockX() < toofar) {
+                deck.refuseItem(player, poolItem, "messages.out-of-bounds");
+                continue;
+            }
+            
+            // Don't give item if their inventory space is full
+            int space = deck.hasInventorySpace(player, poolItem);
+            if (space == 0) {
+                deck.refuseItem(player, poolItem, "messages.inventory-limit-" + (rng < chance ? "utility" : "missile"));
+                return;
+            }
+            poolItem.setAmount(space);
+            
+            // Check if can add to offhand
+            ItemStack offhand = player.getInventory().getItemInOffHand();
+            if (offhand.isSimilar(poolItem)) {
+                while (offhand.getAmount() < offhand.getMaxStackSize() && poolItem.getAmount() > 0) {
+                    offhand.add();
+                    poolItem.subtract();
+                }
+            }
+            
+            player.getInventory().addItem(poolItem);
         }
     }
     

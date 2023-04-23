@@ -31,8 +31,6 @@ public class Deck {
     private List<ItemStack> missiles;
     /** Utility items given by this deck during gameplay. */
     private List<ItemStack> utility;
-    /** Combined for ease of use */
-    private List<ItemStack> pool;
     /** Make game more skill dependent */
     private List<ItemStack> missilePool;
     private List<ItemStack> utilityPool;
@@ -51,9 +49,6 @@ public class Deck {
         this.gear = gear;
         this.missiles = missiles;
         this.utility = utility;
-        List<ItemStack> combined = new ArrayList<>(missiles);
-        combined.addAll(utility);
-        this.pool = combined;
         missilePool = new ArrayList<>(missiles);
         utilityPool = new ArrayList<>(utility);
         
@@ -95,39 +90,59 @@ public class Deck {
             }
         }
     }
-
+    
     /**
      * Check if a given player with this deck has inventory space for more items.
      *
      * @param player the player to check space for
-     * @return true if player has inventory space
+     * @param item the item that would be received
+     * @return the amount of the item the player can receive. 0 means no more space
      */
-    public boolean hasInventorySpace(Player player, Boolean ranked) {
-        int limit = MissileWarsPlugin.getPlugin().getConfig().getInt("inventory-limit");
-        if (!ranked) {
-            int hoarder = jsonmanager.getAbility(player.getUniqueId(), "hoarder");
-            limit += hoarder;
+    public int hasInventorySpace(Player player, ItemStack item) {
+        int mlimit = MissileWarsPlugin.getPlugin().getConfig().getInt("inventory-limit");
+        int ulimit = mlimit;
+        if (jsonmanager.getAbility(player.getUniqueId(), "missilespec") >= 2) {
+            mlimit++;
+            ulimit--;
+        } else if (jsonmanager.getAbility(player.getUniqueId(), "utilityspec") >= 2) {
+            ulimit++;
+            mlimit--;
+        }
+
+        // Check for missile limit. Since missiles always given out in 1s no need for complicated calcs
+        List<ItemStack> inv = summarizedContents(player.getInventory());
+        if (countPool(inv, "missile", item) >= mlimit) {
+            return 0;
         }
         
-        PlayerInventory inv = player.getInventory();
+        if (countPool(inv, "utility", item) >= ulimit) {
+            // It is guaranteed by countPool that item is a utility (mult > 0)
+            int mult = 0;
+            for (ItemStack u : utility) {
+                if (!u.isSimilar(item)) {
+                    continue;
+                }
 
-        // Count multiples of item in inventory
-        for (ItemStack poolItem : pool) {
-            int numOfItem = 1;
-            while (inv.containsAtLeast(poolItem, 1 + (numOfItem - 1) * poolItem.getAmount())) {
-                numOfItem++;
+                mult = u.getAmount();
+                if (mult == 1) {
+                    return 0; // If multiplier is 1 then we can't give extras of item
+                }
+                break;
             }
-            limit -= (numOfItem - 1);
-            // Check offhand
-            if (inv.getItemInOffHand().isSimilar(poolItem)) {
-                int offhand = inv.getItemInOffHand().getAmount();
-                int pool = poolItem.getAmount();
-                limit -= Math.ceil((double) offhand / pool);
+            
+            for (ItemStack i : inv) {
+                if (!i.isSimilar(item)) {
+                    continue;
+                } 
+                
+                // If remainder > 0, that means there is still some space for the item
+                return i.getAmount() % mult;
             }
+            return 0;
         }
 
-        // Give random item if under limit
-        return limit > 0;
+        // If its not missile or utility being picked up, allow
+        return item.getAmount();
     }
 
     /**
@@ -136,28 +151,20 @@ public class Deck {
      * @param player the player to give the pool item too
      */
     public void givePoolItem(MissileWarsPlayer mwplayer, Boolean first) {
-        
         Player player = mwplayer.getMCPlayer();
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        
-        // Ensure Deck has pool items
-        if (pool.isEmpty()) {
-            return;
-        }
-        
         int missilespec = jsonmanager.getAbility(player.getUniqueId(), "missilespec");
         int utilityspec = jsonmanager.getAbility(player.getUniqueId(), "utilityspec");
         
         // Calculate chance based on ability
         double chance = 0.33;
-        double add = 0;
         if (missilespec > 0) {
-            add = -1 * Double.valueOf(ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage") + "") / 100;
+            chance += -1 * Double.valueOf(ConfigUtils.getItemValue("gpassive.missilespec", missilespec, "percentage") + "") / 100;
         } else if (utilityspec > 0) {
-            add = Double.valueOf(ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage") + "") / 100;
+            chance += Double.valueOf(ConfigUtils.getItemValue("gpassive.utilityspec", utilityspec, "percentage") + "") / 100;
         }
-        chance += add;
-        List<ItemStack> toUse = rand.nextDouble() < chance ? utilityPool : missilePool;
+        double rng = rand.nextDouble();
+        List<ItemStack> toUse = rng < chance ? utilityPool : missilePool;
         
         // Check on first item, global passive
         if (first) {
@@ -190,10 +197,13 @@ public class Deck {
         }
         
         // Don't give item if their inventory space is full
-        if (!hasInventorySpace(player, false)) {
-            refuseItem(player, poolItem, "messages.inventory-limit");
+        // If inventory full, we can safely assume its not the first item received
+        int space = hasInventorySpace(player, poolItem);
+        if (space == 0) {
+            refuseItem(player, poolItem, "messages.inventory-limit-" + (rng < chance ? "utility" : "missile"));
             return;
         }
+        poolItem.setAmount(space);
         
         // Check if can add to offhand
         ItemStack offhand = player.getInventory().getItemInOffHand();
@@ -223,5 +233,53 @@ public class Deck {
             name = poolItem.getAmount() + "x " + StringUtils.capitalize(poolItem.getType().toString().toLowerCase());
         }
         player.sendMessage(message.replaceAll("%umw_item%", name));
+    }
+    
+    // Returns 0 if toCompare isn't a type. Pass in summarizedContents please
+    private int countPool(List<ItemStack> summed, String type, ItemStack toCompare) {
+        List<ItemStack> pool = type == "missile" ? missiles : utility;
+        int count = 0;
+        boolean isType = false;
+        for (ItemStack poolItem : pool) {
+            if (!isType && toCompare.isSimilar(poolItem)) {
+                isType = true;
+            }
+            
+            for (ItemStack i : summed) {
+                if (!poolItem.isSimilar(i)) {
+                    continue;
+                }
+                
+                count += Math.ceil((double) i.getAmount() / poolItem.getAmount());
+                break;
+            }
+        }
+        return isType ? count : 0;
+    }
+    
+    // Returns a list of compiled items in the player inventory
+    private List<ItemStack> summarizedContents(PlayerInventory inv) {
+        List<ItemStack> result = new ArrayList<>();
+        for (ItemStack i : inv.getContents()) {
+            if (i == null) {
+                continue;
+            }
+            
+            boolean added = false;
+            for (ItemStack existing : result) {
+                if (!existing.isSimilar(i)) {
+                    continue;
+                }
+                
+                existing.setAmount(existing.getAmount() + i.getAmount());
+                added = true;
+                break;
+            }
+            
+            if (!added) {
+                result.add(new ItemStack(i));
+            }
+        }
+        return result;
     }
 }
