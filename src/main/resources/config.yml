@@ -66,8 +66,8 @@ item-frequency:
   # 3 and above
   3: 25
 
-# Maximum number of missiles OR utility a player can have
-inventory-limit: 4
+# Maximum number of items available to players by default
+inventory-limit: 6
 
 # Amount of ticks items cannot be used after respawning
 respawn-disable: 10

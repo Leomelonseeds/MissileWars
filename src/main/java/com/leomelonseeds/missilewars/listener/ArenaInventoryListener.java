@@ -191,8 +191,10 @@ public class ArenaInventoryListener implements Listener {
         if (arena == null) {
             return;
         }
+        MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         
-        Deck deck = arena.getPlayerInArena(player.getUniqueId()).getDeck();
+        Deck deck = mwPlayer.getDeck();
+        
         if (deck == null) {
             return;
         }
@@ -208,23 +210,14 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Cancel event if player cannot pick up item based on their given deck
-        int space = deck.hasInventorySpace(player, item);
-        if (space == 0) {
+        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer(), false)) {
             event.setCancelled(true);
             return;
         }
         
-        int amt = item.getAmount();
-        if (space < amt) {
-            ItemStack drop = new ItemStack(item);
-            drop.setAmount(amt - space);
-            player.getWorld().dropItemNaturally(player.getLocation(), drop);
-            item.setAmount(space);
-        }
-        
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
             // Can't be same player
-            if (event.getItem().getThrower().equals(player.getUniqueId())) {
+            if (event.getItem().getThrower() == player.getUniqueId()) {
                 return;
             }
             // Must be a missile
@@ -237,7 +230,7 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
             // Must not be a Berserker missile
-            for (ItemStack i : deck.getMissiles()) {
+            for (ItemStack i : mwPlayer.getDeck().getMissiles()) {
                 if (i.isSimilar(item)) {
                     return;
                 }
@@ -248,9 +241,8 @@ public class ArenaInventoryListener implements Listener {
             String name = args[0];
             int level = Integer.parseInt(args[1]);
             int maxlevel = plugin.getDeckManager().getMaxLevel(name);
-            if (level < maxlevel) {
-                ItemStack missile = plugin.getDeckManager().createItem(name, maxlevel, true);
-                missile.setAmount(amt);
+            
+            if (level < plugin.getDeckManager().getMaxLevel(name)) {
                 event.getItem().setItemStack(plugin.getDeckManager().createItem(name, maxlevel, true));
             }
         }
