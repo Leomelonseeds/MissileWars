@@ -1088,13 +1088,9 @@ public class Arena implements ConfigurationSerializable {
         }
 
         // Send messages
-        redTeam.distributeGear();
         redTeam.sendSound("game-start");
-        blueTeam.distributeGear();
         blueTeam.sendSound("game-start");
-        redTeam.scheduleDeckItems();
         redTeam.sendTitle(gamemode + "-start");
-        blueTeam.scheduleDeckItems();
         blueTeam.sendTitle(gamemode + "-start");
     }
 
@@ -1119,8 +1115,6 @@ public class Arena implements ConfigurationSerializable {
         running = false;
         resetting = true;
         waitingForTie = false;
-        redTeam.stopDeckItems();
-        blueTeam.stopDeckItems();
         if (!plugin.isEnabled()) {
             return;
         }
@@ -1155,6 +1149,7 @@ public class Arena implements ConfigurationSerializable {
         
         for (MissileWarsPlayer player : players) {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
+            player.stopDeck();
         }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 

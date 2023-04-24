@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
@@ -264,20 +265,21 @@ public class MissileWarsPlayer {
     public int hashCode() {
         return Objects.hash(playerId);
     }
-    
-    
-    
-    /** Give the MC player an item from their Deck. */
-    public void givePoolItem(Boolean first) {
-        if (deck != null && getMCPlayer() != null) {
-            deck.givePoolItem(this, first);
-        }
-    }
 
     /** Give the MC player their Deck gear. */
     public void giveDeckGear() {
         if (deck != null && getMCPlayer() != null) {
             deck.giveGear(getMCPlayer());
+        }
+    }
+    
+    public void stopDeck() {
+        if (deck == null) {
+            return;
+        }
+        
+        for (DeckItem di : deck.getItems()) {
+            di.stop();
         }
     }
 

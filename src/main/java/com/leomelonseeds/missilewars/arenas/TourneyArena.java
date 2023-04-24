@@ -5,18 +5,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -24,6 +19,13 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 
+
+/**
+ * DO NOT USE: IN CONSTRUCTION
+ * 
+ * @author LEGEND
+ *
+ */
 public class TourneyArena extends Arena {
 
     public TourneyArena(String name, int capacity) {
@@ -159,8 +161,6 @@ public class TourneyArena extends Arena {
                         p.giveDeckGear();
                     }
                 }
-                givePoolItems();
-                scheduleItemsRanked();
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 5L);
         // Start deck distribution for each team and send messages
@@ -170,86 +170,7 @@ public class TourneyArena extends Arena {
      * Similar to normal deck distribution, except everyone gets the same things
      */
     public void scheduleItemsRanked() {
-        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        double timeBetween = 15;
-        if (blueTeam.isChaos()) {
-            timeBetween /= settings.getInt("chaos-mode.multiplier");
-        }
-
-        int secsBetween = (int) Math.floor(timeBetween);
-
-        // Setup level countdown till distribution
-        for (int secInCd = secsBetween; secInCd > 0; secInCd--) {
-            int finalSecInCd = secInCd;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (MissileWarsPlayer player : players) {
-                        player.getMCPlayer().setLevel(finalSecInCd);
-                    }
-                }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), (secsBetween - secInCd) * 20);
-        }
-
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                givePoolItems();
-                scheduleItemsRanked();
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(),  secsBetween * 20L));
-    }
-    
-    /**
-     * Gives items
-     */
-    protected void givePoolItems() {
-        Random random = new Random();
-        int i_missile = random.nextInt(0, 5);
-        int i_utility = random.nextInt(0, 3);
-        double chance = 0.33;
-        double rng = random.nextDouble();
-        for (MissileWarsPlayer mwplayer : players) {
-            if (!getTeam(mwplayer.getMCPlayerId()).equals("no team")) {
-                Deck deck = mwplayer.getDeck();
-                List<ItemStack> missiles = deck.getMissiles();
-                List<ItemStack> utility = deck.getUtility();
-                ItemStack poolItem;
-                if (rng < chance) {
-                    poolItem = new ItemStack(utility.get(i_utility));
-                } else {
-                    poolItem = new ItemStack(missiles.get(i_missile));
-                }
-                
-                Player player = mwplayer.getMCPlayer();
-                double toohigh = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-high");
-                double toofar = ConfigUtils.getMapNumber(getGamemode(), getMapName(), "too-far");
-                Location loc = player.getLocation();
-                
-                // Don't give item if they are out of bounds
-                if (loc.getBlockY() > toohigh || loc.getBlockX() < toofar) {
-                    deck.refuseItem(player, poolItem, "messages.out-of-bounds");
-                    continue;
-                }
-                
-                // Don't give item if their inventory space is full
-                if (!mwplayer.getDeck().hasInventorySpace(player, true)) {
-                    deck.refuseItem(player, poolItem, "messages.inventory-limit");
-                    continue;
-                }
-                
-                // Check if can add to offhand
-                ItemStack offhand = player.getInventory().getItemInOffHand();
-                if (offhand.isSimilar(poolItem)) {
-                    while (offhand.getAmount() < offhand.getMaxStackSize() && poolItem.getAmount() > 0) {
-                        offhand.add();
-                        poolItem.subtract();
-                    }
-                }
-                
-                player.getInventory().addItem(poolItem);
-            }
-        }
+        // Dummy method that doesn't do anything
     }
     
     /** Remove Players from the map. */

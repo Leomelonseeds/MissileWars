@@ -10,12 +10,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -70,19 +72,24 @@ public class DeckManager {
             json = plugin.getJSON().getPlayerPreset(uuid);
         }
         
-        List<ItemStack> missiles = Arrays.asList(new ItemStack[5]);
-        List<ItemStack> utility = Arrays.asList(new ItemStack[3]);
+        List<DeckItem> missiles = Arrays.asList(new DeckItem[5]);
+        List<DeckItem> utility = Arrays.asList(new DeckItem[3]);
         List<ItemStack> gear = new ArrayList<>();
+        Player player = Bukkit.getPlayer(uuid);
         
         // Create missiles
         for (String key : json.getJSONObject("missiles").keySet()) {
-            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
-            missiles.set(itemsConfig.getInt(key + ".index"), m);
+            int level = json.getJSONObject("missiles").getInt(key);
+            ItemStack m = createItem(key, level, true);
+            int max = (int) ConfigUtils.getItemValue(key, level, "max");
+            int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
+            missiles.set(itemsConfig.getInt(key + ".index"), new DeckItem(m, cd, max, player));
         }
         
         // Create utility
         for (String key : json.getJSONObject("utility").keySet()) {
-            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
+            int level = json.getJSONObject("utility").getInt(key);
+            ItemStack u = createItem(key, level, false);
             // Change color of lava splash
             if (u.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
                 PotionMeta pmeta = (PotionMeta) u.getItemMeta();
@@ -104,7 +111,9 @@ public class DeckManager {
                 pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
                 u.setItemMeta(pmeta);
             }
-            utility.set(itemsConfig.getInt(key + ".index"), u);
+            int max = (int) ConfigUtils.getItemValue(key, level, "max");
+            int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
+            utility.set(itemsConfig.getInt(key + ".index"), new DeckItem(u, cd, max, player));
         }
         
         // Create gear items

@@ -13,7 +13,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -332,57 +331,6 @@ public class MissileWarsTeam {
         meta.setUnbreakable(true);
         item.setItemMeta(meta);
         return item;
-    }
-
-    /** Give each {@link MissileWarsPlayer} their gear. */
-    public void distributeGear() {
-        for (MissileWarsPlayer player : members) {
-            player.giveDeckGear();
-            player.givePoolItem(true);
-        }
-    }
-
-    /** Schedule the distribution of in-game Deck items. */
-    public void scheduleDeckItems() {
-        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        double timeBetween = settings.getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
-        if (chaosMode) {
-            timeBetween /= settings.getInt("chaos-mode.multiplier");
-        }
-
-        int secsBetween = (int) Math.floor(timeBetween);
-
-        // Setup level countdown till distribution
-        for (int secInCd = secsBetween; secInCd > 0; secInCd--) {
-            int finalSecInCd = secInCd;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (MissileWarsPlayer player : members) {
-                        player.getMCPlayer().setLevel(finalSecInCd);
-                    }
-                }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), (secsBetween - secInCd) * 20);
-        }
-
-        poolItemRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Distribute items
-                for (MissileWarsPlayer player : members) {
-                    player.givePoolItem(false);
-                }
-                // Enqueue next distribution
-                scheduleDeckItems();
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(),  secsBetween * 20L);
-    }
-
-    /** Stop the distribution of in-game Deck items. */
-    public void stopDeckItems() {
-        if (poolItemRunnable != null) {
-            poolItemRunnable.cancel();
-        }
     }
 
     /**

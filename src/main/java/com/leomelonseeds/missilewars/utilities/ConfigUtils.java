@@ -500,4 +500,12 @@ public class ConfigUtils {
         return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
                 id), PersistentDataType.STRING);
     }
+    
+    // Determine if a player is out of bounds
+    public static boolean outOfBounds(Player player, Arena arena) {
+        double toohigh = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
+        double toofar = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
+        Location loc = player.getLocation();
+        return loc.getBlockY() > toohigh || loc.getBlockX() < toofar;
+    }
 }

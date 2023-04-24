@@ -169,12 +169,6 @@ public class TrainingArena extends Arena {
                 blueTeam.addPlayer(player);
             }
         }
-
-        // Send messages
-        redTeam.distributeGear();
-        blueTeam.distributeGear();
-        redTeam.scheduleDeckItems();
-        blueTeam.scheduleDeckItems();
     }
     
     @Override
