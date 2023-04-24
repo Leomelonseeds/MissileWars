@@ -66,8 +66,9 @@ item-frequency:
   # 3 and above
   3: 25
 
-# Maximum number of items available to players by default
-inventory-limit: 6
+# Default max items/cooldown (in seconds) if not specified for each item
+default-max: 1
+default-cooldown: 30
 
 # Amount of ticks items cannot be used after respawning
 respawn-disable: 10

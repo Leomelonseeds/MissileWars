@@ -950,18 +950,19 @@ leaves:
   - ""
   - "&7Since when could you walk on leaves?"
   - "&7I thought they would just deca-"
-  - ""
-  - "&bAmount: %amount%"
   1:
     item: JUNGLE_LEAVES
-    amount: 8
+    max: 8
+    cooldown: 5
   2:
     item: AZALEA_LEAVES
-    amount: 12
+    max: 8
+    cooldown: 5
     spcost: 2
   3:
     item: FLOWERING_AZALEA_LEAVES
-    amount: 16
+    max: 8
+    cooldown: 5
     spcost: 2
   
 lingering_harming:
@@ -997,15 +998,16 @@ arrows:
   - "&7of arrows are, but I decided not to,"
   - "&7and instead wasted your time reading"
   - "&7this description."
-  - ""
-  - "&bAmount: %amount%"
   1:
-    amount: 2
+    max: 2
+    cooldown: 10
   2:
-    amount: 3
+    max: 3
+    cooldown: 10
     spcost: 1
   3:
-    amount: 4
+    max: 4
+    cooldown: 10
     spcost: 3
     
 elytra:
@@ -1508,16 +1510,20 @@ indicators:
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
   locked2: "&cLeft-click &7to purchase"
-  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
-  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
   actuallevel: " &7- &8%current%/%max%"
-  currentsp: "&aAvailable Skillpoints: &f%sp%"
   missilestats:
   - ""
   - "&aSpeed: %speed%m/s"
   - "&cTNT: %tnt%"
+  itemstats:
+  - ""
+  - "&bCooldown: %cooldown%&fs"
+  - "&bLimit: %limit% &fitems"
+  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
+  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
+  currentsp: "&aAvailable Skillpoints: &f%sp%"
 
 preset:
   info:

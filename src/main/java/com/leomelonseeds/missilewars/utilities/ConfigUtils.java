@@ -373,12 +373,12 @@ public class ConfigUtils {
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z2");
+        int x1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x1");
+        int x2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x2");
+        int y1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y1");
+        int y2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y2");
+        int z1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z1");
+        int z2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z2");
         if (x1 - bias <= x && x <= x2 + bias && 
             y1 - bias <= y && y <= y2 + bias &&
             z1 - bias <= z && z <= z2 + bias) {

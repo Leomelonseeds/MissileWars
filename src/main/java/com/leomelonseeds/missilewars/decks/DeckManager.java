@@ -70,14 +70,6 @@ public class DeckManager {
             json = plugin.getJSON().getPlayerPreset(uuid);
         }
         
-        // There are 12 utility items in the game
-        // Some items have their level determined on creation, while
-        // some have their level determined on use
-        // Items with level determined on creation:
-        // Shield, Platform, Leaves, Arrows (both sentinel + berserk), Torpedo, Lingering Harming
-        // Items with level determined on use:
-        // Fireball, Splash, Obsidian Shield, Canopy, Spawn Creeper
-        
         List<ItemStack> missiles = Arrays.asList(new ItemStack[5]);
         List<ItemStack> utility = Arrays.asList(new ItemStack[3]);
         List<ItemStack> gear = new ArrayList<>();
