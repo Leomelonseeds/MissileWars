@@ -45,7 +45,7 @@ public class Deck {
     public List<ItemStack> getMissiles() {
         List<ItemStack> result = new ArrayList<>();
         for (DeckItem di : pool) {
-            ItemStack i = di.getItem();
+            ItemStack i = di.getInstanceItem();
             if (i.getType().toString().contains("SPAWN_EGG")) {
                 result.add(i);
             }

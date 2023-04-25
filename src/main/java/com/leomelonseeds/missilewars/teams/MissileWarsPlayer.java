@@ -166,7 +166,6 @@ public class MissileWarsPlayer {
         this.deck = deck;
         Player player = getMCPlayer();
         if (deck == null || player == null) {
-            MissileWarsPlugin.getPlugin().log("GUGU");
             return;
         }
 
@@ -180,7 +179,7 @@ public class MissileWarsPlayer {
         
         for (int i = 0; i < 8; i++) {
             DeckItem di = deck.getItems().get(i);
-            player.getInventory().setItem(i + 1, di.getItem());
+            player.getInventory().setItem(i + 1, di.getInstanceItem());
         }
     }
 

@@ -116,6 +116,7 @@ public class DeckItem {
      */
     public void initCooldown(int c) {
         if (curCooldown > 0) {
+            setVisualCooldown(c);
             return;
         }
         
@@ -228,8 +229,14 @@ public class DeckItem {
         int cd = Math.max((int) (c * 20) - 1, 0);
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             player.setCooldown(item.getType(), cd);
+            
+            // Due to the way crossbow loading and bow firing are handled,
+            // setting the item cooldowns for them differs slightly
             if (item.getType().toString().contains("ARROW")) {
                 player.setCooldown(Material.BOW, cd);
+                if (cd == 0) {
+                    player.setCooldown(Material.CROSSBOW, 0);
+                }
             }
         }, 1);
     }

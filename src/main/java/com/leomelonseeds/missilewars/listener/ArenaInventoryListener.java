@@ -338,7 +338,7 @@ public class ArenaInventoryListener implements Listener {
         // At this point, we know that it is either sentinel or berserker picking up the arrow
         // We then convert the itemstack directly into the corresponding type of the player deck
         for (DeckItem di : deck.getItems()) {
-            ItemStack i = di.getItem();
+            ItemStack i = di.getInstanceItem();
             if (!i.getType().toString().contains("ARROW")) {
                 continue;
             }
