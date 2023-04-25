@@ -14,10 +14,6 @@ public class Deck {
     private String name;
     /** Items given at the start of the game. */
     private List<ItemStack> gear;
-    /** Missiles given by this deck during gameplay. */
-    private List<DeckItem> missiles;
-    /** Utility items given by this deck during gameplay. */
-    private List<DeckItem> utility;
     /** Combined for ease of use */
     private List<DeckItem> pool;
 
@@ -28,14 +24,10 @@ public class Deck {
      * @param gear the gear for the Deck
      * @param pool the utilities, missiles and items given throughout the game
      */
-    public Deck(String name, List<ItemStack> gear, List<DeckItem> missiles, List<DeckItem> utility) {
+    public Deck(String name, List<ItemStack> gear, List<DeckItem> pool) {
         this.name = name;
         this.gear = gear;
-        this.missiles = missiles;
-        this.utility = utility;
-        List<DeckItem> combined = new ArrayList<>(missiles);
-        combined.addAll(utility);
-        this.pool = combined;
+        this.pool = pool;
     }
     
     public String getName() {
@@ -53,8 +45,11 @@ public class Deck {
     
     public List<ItemStack> getMissiles() {
         List<ItemStack> result = new ArrayList<>();
-        for (DeckItem di : missiles) {
-            result.add(di.getItem());
+        for (DeckItem di : pool) {
+            ItemStack i = di.getItem();
+            if (i.getType().toString().contains("SPAWN_EGG")) {
+                result.add(i);
+            }
         }
         return result;
     }

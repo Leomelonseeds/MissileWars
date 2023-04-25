@@ -399,11 +399,17 @@ public class ConfigUtils {
         
         if (itemsConfig.contains(item + "." + level + "." + get)) {
             return itemsConfig.get(item + "." + level + "." + get);
-        } else if (itemsConfig.contains(item + "." + get)) {
-            return itemsConfig.get(item + "." + get);
-        } else {
-            return null;
         }
+        
+        if (itemsConfig.contains(item + "." + get)) {
+            return itemsConfig.get(item + "." + get);
+        }
+        
+        if (get.equals("max") || get.equals("cooldown")) {
+            return MissileWarsPlugin.getPlugin().getConfig().getInt("default-" + get);
+        }
+        
+        return null;
     }
     
     /**
@@ -417,9 +423,9 @@ public class ConfigUtils {
         Object o = getItemValue(abilityPath, level, stat);
         if (o == null) {
             return 0;
-        } else {
-            return Double.valueOf(o + "");
         }
+        
+        return Double.valueOf(o + "");
     }
     
     /**

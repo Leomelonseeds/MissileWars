@@ -699,7 +699,7 @@ lifter:
 # Utility items
 
 splash:
-  index: 1
+  index: 6
   item: SPLASH_POTION
   name: "&9★ Splash %level% ⚡"
   lore:
@@ -734,7 +734,7 @@ novarocket:
   - "&7from a trailer park in Florida."
 
 shield:
-  index: 2
+  index: 7
   item: SNOWBALL
   name: "&f★ Shield %level% ⚒"
   lore:
@@ -769,7 +769,7 @@ shield:
     spcost: 2
 
 platform:
-  index: 1
+  index: 6
   item: SNOWBALL
   name: "&7★ Platform %level% ⚒"
   lore:
@@ -806,7 +806,7 @@ platform:
     spcost: 2
 
 torpedo:
-  index: 0
+  index: 5
   item: EGG
   name: "&0★ Torpedo %level% ✟"
   lore:
@@ -834,7 +834,7 @@ torpedo:
     spcost: 3
 
 obsidianshield:
-  index: 1
+  index: 6
   file: 'obsidian_shield.nbt'
   item: ENDER_PEARL
   name: "&5★ Obsidian Shield %level% ✟"
@@ -872,7 +872,7 @@ obsidianshieldclear:
     z: 0
 
 canopy:
-  index: 0
+  index: 5
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"
@@ -901,7 +901,7 @@ canopy:
     spcost: 2
 
 creeper:
-  index: 1
+  index: 6
   1:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper &a&l☣"
@@ -921,7 +921,7 @@ creeper:
     spcost: 3
 
 fireball:
-  index: 0
+  index: 5
   item: FIRE_CHARGE
   name: "&4★ Fireball %level% &4&l☣"
   lore:
@@ -944,7 +944,7 @@ fireball:
     spcost: 3
 
 leaves:
-  index: 0
+  index: 5
   name: "&2★ Leaves %level% ⚒"
   lore:
   - ""
@@ -966,7 +966,7 @@ leaves:
     spcost: 2
   
 lingering_harming:
-  index: 2
+  index: 7
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion %level% ⚡"
   lore:
@@ -988,7 +988,7 @@ lingering_harming:
     duration: 15
     spcost: 2
 arrows:
-  index: 2
+  index: 7
   item: ARROW
   name: "&fArrows"
   lore:
@@ -1420,7 +1420,6 @@ held:
 
 # Stuff relating to Deck GUI
 default-skillpoints: 18
-default-skillpoints-ranked: 16
 
 intangibles:
   locked: RED_STAINED_GLASS_PANE
@@ -1438,21 +1437,18 @@ indicators:
     lore:
       - "&7Make your missiles stronger and faster"
     slot: 0
-    rankedslot: 0
   utility:
     item: COMPARATOR
     name: "&9&lUtility"
     lore:
       - "&7Improve the effectiveness of utilities"
     slot: 9
-    rankedslot: 9
   enchants:
     item: ENCHANTED_BOOK
     name: "&3&lGear Enchantments"
     lore:
       - "&7Enhance your weapons and armor"
     slot: 18
-    rankedslot: 18
   passive:
     item: YELLOW_DYE
     name: "&e&lPassive"
@@ -1482,7 +1478,6 @@ indicators:
     - "&7for your available skillpoints."
     - "&7You get one extra skillpoint per MW rank."
     slot: 8
-    rankedslot: 8
   skillpoints:
     item: EMERALD
     name: "&aAvailable Skillpoints: &f%sp%"
@@ -1491,7 +1486,6 @@ indicators:
     - "&cClick to downgrade all items"
     - "&cand return all skillpoints."
     slot: 17
-    rankedslot: 17
   reset:
     item: BARRIER
     name: "&cReset Preset"
@@ -1505,7 +1499,6 @@ indicators:
     item: RED_STAINED_GLASS_PANE
     name: "&cBack"
     slot: 53
-    rankedslot: 26
   
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
@@ -1623,18 +1616,6 @@ preset:
     - "&7and purchase passives and abilities."
     - ""
     - "&cClick &7to edit this preset"
-  ranked:
-    item: ENCHANTED_BOOK
-    name: "&3&lRanked Preset"
-    lore:
-    - ""
-    - "&7This is the &3ranked &7preset for this"
-    - "&7deck. This preset is only used in &3ranked"
-    - "&7games, and is automatically selected based"
-    - "&7on your deck. &eAbilities &7and &6passives"
-    - "&7are &cdisabled &7in this deck."
-    - ""
-    - "&cRight-click &7to edit this preset"
   
 enchants:
   name: "&b%enchant%"

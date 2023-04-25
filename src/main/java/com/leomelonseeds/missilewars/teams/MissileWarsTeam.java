@@ -19,7 +19,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 import org.json.JSONObject;
 
@@ -47,8 +46,6 @@ public class MissileWarsTeam {
     private Set<MissileWarsPlayer> members;
     /** The spawn location for the team. */
     private Location spawn;
-    /** The current task for Deck pool item distribution. */
-    private BukkitTask poolItemRunnable;
     /** Whether the team's decks should be distributing items in chaos-mode. */
     private boolean chaosMode;
     /** Map containing locations and statuses of all portals */
@@ -206,28 +203,19 @@ public class MissileWarsTeam {
         }
         return false;
     }
-    
+
     /**
      * Add a player to the team.
      *
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
-        addPlayer(player, false);
-    }
-
-    /**
-     * Add a player to the team.
-     *
-     * @param player the player to add
-     */
-    public void addPlayer(MissileWarsPlayer player, Boolean ranked) {
         
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         members.add(player);
         DeckManager dm = plugin.getDeckManager();
-        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId(), ranked));
+        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId()));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();

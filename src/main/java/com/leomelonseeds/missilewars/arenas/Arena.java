@@ -808,7 +808,6 @@ public class Arena implements ConfigurationSerializable {
                     removeSpectator(player);
                     otherTeam.removePlayer(player);
                     joinTeam.addPlayer(player);
-                    player.giveDeckGear();
                     checkNotEmpty();
                     announceMessage("messages.queue-join-" + team, player);
                 }

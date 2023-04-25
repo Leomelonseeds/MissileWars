@@ -11,7 +11,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DeckItem {
     
     private ItemStack item;
-    private int cooldown; // in ticks
+    private int cooldown; // in seconds
     private int max;
     private int curCooldown;
     private Player player;
@@ -20,7 +20,7 @@ public class DeckItem {
     
     /**
      * @param item should correspond directly the player inventory's item
-     * @param cooldown must be a multiple of 2 (updates every 100ms)
+     * @param cooldown is in seconds
      * @param max
      */
     public DeckItem(ItemStack item, int cooldown, int max, Player player) {
@@ -43,23 +43,19 @@ public class DeckItem {
     }
     
     /**
-     * Invoke after item is used, check matches()
-     * Restocking the item if used should be handled
-     * before calling this. This method simply registers
-     * the cooldown changes
-     * 
-     * @param makeUnavailable whether the material cooldown should be applied
-     * 
-     * @return the cooldown after consuming in ticks, 0 if no cooldown
+     * Invoke after item is used or dropped, check matches()
      */
-    public int consume(boolean makeUnavailable) {
-        if (makeUnavailable) {
+    public void consume() {
+        if (item.getAmount() == 0) {
+            item.setAmount(1);
             unavailable = true;
-            player.setCooldown(item.getType(), cooldown);
+            setVisualCooldown(curCooldown > 0 ? curCooldown : cooldown);
         }
-        curCooldown = cooldown;
-        updateItem();
-        return cooldown;
+        
+        if (curCooldown == 0) {
+            curCooldown = cooldown;
+            updateItem();
+        }
     }
     
     // Item update task, handles giving items
@@ -69,17 +65,15 @@ public class DeckItem {
             if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
                 curCooldown = cooldown;
                 if (unavailable) {
-                    player.setCooldown(item.getType(), cooldown);
+                    setVisualCooldown(cooldown);
                 }
             } else if (curCooldown == 0) {
-                int amt = item.getAmount();
+                int amt = getActualAmount();
                 if (amt >= max) {
                     return;
                 }
                 
-                if (!unavailable) {
-                    item.setAmount(++amt);
-                }
+                item.setAmount(++amt);
                 unavailable = false;
                 
                 if (amt < max) {
@@ -87,10 +81,10 @@ public class DeckItem {
                     updateItem();
                 }
             } else {
-                curCooldown -= 2;
+                curCooldown--;
                 updateItem(); 
             }
-        }, 2);
+        }, 20L);
     }
     
     /**
@@ -103,25 +97,18 @@ public class DeckItem {
     }
     
     /**
-     * Set the cooldown of an item. If c is 0, the item will be 
-     * immediately available/given. The inputted value will be rounded
-     * down to the nearest multiple of 2. Only works if the item
-     * already has a cooldown.
+     * Set the cooldown of an item, use for game starts.
+     * Aadds visual cooldown of c. If 0 then no cooldown added
      */
-    public void setCurrentCooldown(int c) {
-        if (curCooldown == 0) {
+    public void initCooldown(int c) {
+        if (c == 0) {
             return;
         }
-        
-        if (c % 2 == 1) {
-            c--;
-        }
-        
-        if (unavailable()) {
-            player.setCooldown(item.getType(), c * 2);
-        }
-        
+
+        setVisualCooldown(c);
+        unavailable = true;
         curCooldown = c;
+        updateItem();
     }
     
     public int getCooldown() {
@@ -161,37 +148,45 @@ public class DeckItem {
         }
         
         curCooldown = 0;
-        player.setCooldown(item.getType(), 0);
+        setVisualCooldown(0);
     }
     
     /**
      * Assuming the item is already checked for matches(), instructs
-     * the item to pickup the specified amount.
+     * the item to pickup the specified amount (req >= 1). Cooldowns will continue
+     * if there is still space left in the stack afterwards.
      * 
      * @param amount
-     * @return the amount of items left over after the pickup, and -1 if unable to pickup
+     * @return the amount of items that can be picked up, and 0 if unable to pickup
      */
     public int pickup(int amount) {
-        if (item.getAmount() >= max) {
-            return -1;
+        int actamount = getActualAmount();
+        if (actamount >= max) {
+            return 0;
         }
-        
-        int actualAmount = unavailable ? 0 : item.getAmount();
-        int toPickup = Math.min(max - actualAmount, amount);
-        int leftOver = amount - toPickup;
         
         if (unavailable) {
-            player.setCooldown(item.getType(), 0);
+            setVisualCooldown(0);
         }
-        
-        item.setAmount(actualAmount + toPickup);
-        if (actualAmount + toPickup >= max) {
+
+        int toPickup = Math.min(max - actamount, amount);
+        if (actamount + toPickup >= max) {
             if (cooldownTask != null) {
                 cooldownTask.cancel();
             }
             curCooldown = 0;
         }
         
-        return leftOver;
+        return toPickup;
     }
- }
+    
+    // Returns 0 if on visual cooldown
+    private int getActualAmount() {
+        return unavailable ? 0 : item.getAmount();
+    }
+
+    // Sets a visual cooldown
+    private void setVisualCooldown(int c) {
+        player.setCooldown(item.getType(), c * 20);
+    }
+}

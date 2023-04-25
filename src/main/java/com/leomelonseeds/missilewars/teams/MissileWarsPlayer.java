@@ -126,11 +126,22 @@ public class MissileWarsPlayer {
 
     /**
      * Set the user's current {@link Deck}.
+     * Call when player joins the game. Gives player
+     * all deck items and such
      *
      * @param deck the deck to let this MissileWarsPlayer use
      */
     public void setDeck(Deck deck) {
         this.deck = deck;
+        Player player = getMCPlayer();
+        if (deck == null || player == null) {
+            return;
+        }
+        
+        deck.giveGear(getMCPlayer());
+        for (int i = 0; i < 8; i++) {
+            player.getInventory().setItem(i + 1, deck.getItems().get(i).getItem());
+        }
     }
 
     /**
@@ -267,7 +278,7 @@ public class MissileWarsPlayer {
     }
 
     /** Give the MC player their Deck gear. */
-    public void giveDeckGear() {
+    public void giveDeckGea() {
         if (deck != null && getMCPlayer() != null) {
             deck.giveGear(getMCPlayer());
         }

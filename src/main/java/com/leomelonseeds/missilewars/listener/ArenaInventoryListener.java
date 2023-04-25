@@ -29,6 +29,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -121,6 +122,16 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
+        // Stop from moving deck items
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        ClickType click = event.getClick();
+        if (mwp.getDeck().getDeckItem(item) != null) {
+            if (click == ClickType.LEFT || click == ClickType.RIGHT || click.toString().contains("DROP")) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
         // Stop crafting
         if (event.getClickedInventory() instanceof CraftingInventory) {
             event.setCancelled(true);
@@ -168,12 +179,20 @@ public class ArenaInventoryListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
-        String item = event.getItemDrop().getItemStack().toString();
-        
-        // Make sure we allow gear items to be used
+
+        // Handle dropping of deck items
+        ItemStack dropped = event.getItemDrop().getItemStack();
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        DeckItem di = mwp.getDeck().getDeckItem(dropped);
+        if (di != null) {
+            di.consume();
+        }
+       
+        // Make sure we don't allow gear items to be dropped
+        String item = dropped.getType().toString();
         if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE")) {
             event.setCancelled(true);
+            return;
         }
     }
 
@@ -191,10 +210,9 @@ public class ArenaInventoryListener implements Listener {
         if (arena == null) {
             return;
         }
+        
         MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
-        
         Deck deck = mwPlayer.getDeck();
-        
         if (deck == null) {
             return;
         }
@@ -210,9 +228,21 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Cancel event if player cannot pick up item based on their given deck
-        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer(), false)) {
-            event.setCancelled(true);
-            return;
+        DeckItem di = deck.getDeckItem(item);
+        if (di != null) {
+            int amount = item.getAmount();
+            int toPickup = di.pickup(amount);
+            if (toPickup == 0) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (amount > toPickup) {
+                ItemStack drop = new ItemStack(item);
+                drop.setAmount(amount - toPickup);
+                player.getWorld().dropItemNaturally(player.getLocation(), drop);
+                item.setAmount(toPickup);
+            }
         }
         
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
@@ -273,14 +303,23 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        // Check slowness arrow pickups
+        // At this point, we know that it is either sentinel or berserker picking up the arrow
+        // We then convert the itemstack directly into the corresponding type of the player deck
         ItemStack pickedUp = event.getItem().getItemStack();
-        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "slownessarrows") > 0 &&
-                pickedUp.getType() == Material.TIPPED_ARROW) {
-            int index = ConfigUtils.getConfigFile("items.yml").getInt("arrows.index");
-            ItemStack tippedArrow = new ItemStack(deck.getUtility().get(index));
-            tippedArrow.setAmount(pickedUp.getAmount());
-            event.getItem().setItemStack(tippedArrow);
+        for (DeckItem di : deck.getItems()) {
+            ItemStack i = di.getItem();
+            if (!i.getType().toString().contains("ARROW")) {
+                continue;
+            }
+            
+            if (i.getAmount() >= di.getMax()) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            pickedUp = new ItemStack(i);
+            pickedUp.setAmount(1);
+            di.pickup(1);
         }
     }
 

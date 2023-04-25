@@ -224,11 +224,6 @@ public class JSONManager {
                             currentpreset.put("skillpoints", finalsp);
                         }
                     }
-                    
-                    // Create ranked preset if not exist
-                    // if (!deckjson.has("R")) {
-                    //    deckjson.put("R", createRankedPreset(deck));
-                    // }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -238,31 +233,6 @@ public class JSONManager {
             
             playerCache.put(uuid, newJson);
         });
-    }
-    
-    /**
-     * Creates a ranked preset from a default preset
-     * 
-     * @param json
-     * @return
-     */
-    private JSONObject createRankedPreset(String deck) {
-        JSONObject json = getDefaultPreset(deck);
-        for (String key : json.keySet()) {
-            if (json.get(key) instanceof Integer) {
-                json.put(key, 0);
-            }
-        }
-        for (String s : new String[] {"missiles", "utility"}) {
-            for (String key : json.getJSONObject(s).keySet()) {
-                json.getJSONObject(s).put(key, 1);
-            }
-        }
-        json.remove("ability");
-        json.remove("passive");
-        json.remove("gpassive");
-        json.put("skillpoints", ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints-ranked"));
-        return json;
     }
     
     /**

@@ -61,59 +61,52 @@ public class DeckManager {
      * @param deck
      * @return
      */
-    public Deck getPlayerDeck(UUID uuid, Boolean ranked) {
+    public Deck getPlayerDeck(UUID uuid) {
         
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
-        JSONObject json;
-        if (ranked) {
-            json = basejson.getJSONObject(deck).getJSONObject("R");
-        } else {
-            json = plugin.getJSON().getPlayerPreset(uuid);
-        }
+        JSONObject json = plugin.getJSON().getPlayerPreset(uuid);
         
-        List<DeckItem> missiles = Arrays.asList(new DeckItem[5]);
-        List<DeckItem> utility = Arrays.asList(new DeckItem[3]);
+        // TODO: Custom deck orderings: array of 8 numbers
+        // Index + 1 = slot, array[index] = index value defined in items.yml
+        // Default: [0, 1, 2, 3, 4, 5, 6, 7]
+        // If for example 0 is assigned to 7, then the item with index 7 will be placed in 0
+        List<DeckItem> pool = Arrays.asList(new DeckItem[8]);
         List<ItemStack> gear = new ArrayList<>();
         Player player = Bukkit.getPlayer(uuid);
+        @SuppressWarnings("unchecked")
+        List<Integer> layout = (List<Integer>)(Object) json.getJSONArray("layout").toList();
         
-        // Create missiles
-        for (String key : json.getJSONObject("missiles").keySet()) {
-            int level = json.getJSONObject("missiles").getInt(key);
-            ItemStack m = createItem(key, level, true);
-            int max = (int) ConfigUtils.getItemValue(key, level, "max");
-            int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
-            missiles.set(itemsConfig.getInt(key + ".index"), new DeckItem(m, cd, max, player));
-        }
-        
-        // Create utility
-        for (String key : json.getJSONObject("utility").keySet()) {
-            int level = json.getJSONObject("utility").getInt(key);
-            ItemStack u = createItem(key, level, false);
-            // Change color of lava splash
-            if (u.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
-                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
-                String name = ConfigUtils.toPlain(pmeta.displayName());
-                name = name.replaceFirst("9", "6");  // Make name orange
-                pmeta.displayName(ConfigUtils.toComponent(name));
-                pmeta.setColor(Color.ORANGE);
-                u.setItemMeta(pmeta);
+        // Create pool items
+        for (String s : new String[] {"missiles", "utility"}) {
+            for (String key : json.getJSONObject(s).keySet()) {
+                int level = json.getJSONObject(s).getInt(key);
+                ItemStack i = createItem(key, level, s.equals("missiles"));
+                // Change color of lava splash
+                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
+                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
+                    String name = ConfigUtils.toPlain(pmeta.displayName());
+                    name = name.replaceFirst("9", "6");  // Make name orange
+                    pmeta.displayName(ConfigUtils.toComponent(name));
+                    pmeta.setColor(Color.ORANGE);
+                    i.setItemMeta(pmeta);
+                }
+                // Give slowness arrows in case of berserker
+                int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
+                if (i.getType() == Material.ARROW && slowarrow > 0) {
+                    int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
+                    int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
+                    i.setType(Material.TIPPED_ARROW);
+                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
+                    pmeta.setColor(Color.fromRGB(92, 110, 131));
+                    pmeta.displayName(ConfigUtils.toComponent("&fArrow of Slowness"));
+                    pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
+                    i.setItemMeta(pmeta);
+                }
+                int max = (int) ConfigUtils.getItemValue(key, level, "max");
+                int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
+                pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, player));
             }
-            // Give slowness arrows in case of berserker
-            int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
-            if (u.getType() == Material.ARROW && slowarrow > 0) {
-                int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
-                int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
-                u.setType(Material.TIPPED_ARROW);
-                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
-                pmeta.setColor(Color.fromRGB(92, 110, 131));
-                pmeta.displayName(ConfigUtils.toComponent("&fArrow of Slowness"));
-                pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
-                u.setItemMeta(pmeta);
-            }
-            int max = (int) ConfigUtils.getItemValue(key, level, "max");
-            int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
-            utility.set(itemsConfig.getInt(key + ".index"), new DeckItem(u, cd, max, player));
         }
         
         // Create gear items
@@ -175,7 +168,7 @@ public class DeckManager {
             item.setItemMeta(meta);
         }
         
-        return new Deck(deck, gear, missiles, utility);
+        return new Deck(deck, gear, pool);
     }
     
     /**
@@ -297,17 +290,12 @@ public class DeckManager {
         
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial(material));
-        if (deck == null) {
-            if (ConfigUtils.getItemValue(name, level, "amount") != null) {
-                item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
-            }
-            // Don't bother with arrows
-            if (name.equals("arrows")) {
-                return item;
-            }
-        } else {
+        if (deck != null) {
             // Make item count reflect its level
             item.setAmount(Math.max(level, 1));
+        } else if (name.equals("arrows")) {
+            // Don't bother anything with arrows
+            return item;
         }
         
         // Find item name and lore

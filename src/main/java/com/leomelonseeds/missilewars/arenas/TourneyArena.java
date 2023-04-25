@@ -6,18 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 
 
 /**
@@ -40,64 +32,6 @@ public class TourneyArena extends Arena {
      */
     public TourneyArena(Map<String, Object> serializedArena) {
         super(serializedArena);
-    }
-    
-    /**
-     * Attempt to add a player to the Arena.
-     *
-     * @param player the player
-     * @return true if the player joined the Arena, otherwise false
-     */
-    @Override
-    public boolean joinPlayer(Player player) {
-
-        // Ensure world isn't resetting
-        if (resetting) {
-            ConfigUtils.sendConfigMessage("messages.arena-full", player, this, null);
-            return false;
-        }
-        
-        // Ensure player can play >:D
-        if (player.hasPermission("umw.new")) {
-            ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, this, null);
-            return false;
-        }
-
-        player.teleport(getPlayerSpawn(player));
-
-        // Make sure another plugin hasn't cancelled the event
-        if (player.getWorld().getName().equals("world")) {
-            ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
-            return false;
-        }
-
-        InventoryUtils.saveInventory(player, true);
-        InventoryUtils.clearInventory(player);
-
-        ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
-
-        for (MissileWarsPlayer mwPlayer : players) {
-            ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
-        }
-
-        ConfigUtils.sendConfigMessage("messages.joined-arena", player, this, null);
-        ConfigUtils.sendConfigMessage("messages.joined-arena-ranked", player, this, null);
-        TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-        discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
-
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        players.add(new MissileWarsPlayer(player.getUniqueId()));
-        player.setBedSpawnLocation(getPlayerSpawn(player), true);
-        player.setGameMode(GameMode.ADVENTURE);
-
-        for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
-            ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
-        }
-
-        // Check for game start
-        checkForStart();
-        return true;
     }
     
     @Override
@@ -135,7 +69,7 @@ public class TourneyArena extends Arena {
                         MissileWarsPlayer toAdd = redQueue.remove();
                         toAssign.remove(toAdd);
                         if (redTeam.getSize() < maxQueue) {
-                            redTeam.addPlayer(toAdd, true);
+                            redTeam.addPlayer(toAdd);
                         } else {
                             toAssign.add(0, toAdd);
                         }
@@ -144,7 +78,7 @@ public class TourneyArena extends Arena {
                         MissileWarsPlayer toAdd = blueQueue.remove();
                         toAssign.remove(toAdd);
                         if (blueTeam.getSize() < maxQueue) {
-                            blueTeam.addPlayer(toAdd, true);
+                            blueTeam.addPlayer(toAdd);
                         } else {
                             toAssign.add(0, toAdd);
                         }
@@ -156,11 +90,6 @@ public class TourneyArena extends Arena {
                 blueTeam.sendSound("game-start");
                 redTeam.sendTitle("classic-start");
                 blueTeam.sendTitle("classic-start");
-                for (MissileWarsPlayer p : players) {
-                    if (!getTeam(p.getMCPlayerId()).equals("no team")) {
-                        p.giveDeckGear();
-                    }
-                }
             }
         }.runTaskLater(MissileWarsPlugin.getPlugin(), 5L);
         // Start deck distribution for each team and send messages
