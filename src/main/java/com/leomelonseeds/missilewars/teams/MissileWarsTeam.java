@@ -231,8 +231,9 @@ public class MissileWarsTeam {
 
         DeckManager dm = plugin.getDeckManager();
         player.setJoinTime(LocalDateTime.now());
-        player.missilePreview(arena);
         player.setDeck(dm.getPlayerDeck(player.getMCPlayerId()));
+        player.missilePreview(arena);
+        player.cooldownPreview(arena);
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

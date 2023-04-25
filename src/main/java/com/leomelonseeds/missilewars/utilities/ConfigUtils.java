@@ -509,6 +509,9 @@ public class ConfigUtils {
     
     // Determine if a player is out of bounds
     public static boolean outOfBounds(Player player, Arena arena) {
+        if (arena == null) {
+            return false;
+        }
         double toohigh = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
         double toofar = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
         Location loc = player.getLocation();

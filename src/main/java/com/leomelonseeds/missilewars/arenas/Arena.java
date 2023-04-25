@@ -601,7 +601,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public void removePlayer(UUID uuid, Boolean tolobby) {
         // Remove player from all teams and queues
-        MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
+        MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         players.remove(toRemove);
         voteManager.removePlayer(toRemove.getMCPlayer());
 
@@ -657,7 +657,7 @@ public class Arena implements ConfigurationSerializable {
      */
     public boolean leaveGame(UUID uuid) {
 
-        MissileWarsPlayer toRemove = new MissileWarsPlayer(uuid);
+        MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         Player player = Bukkit.getPlayer(uuid);
 
         if (!isRunning() || redTeam == null || blueTeam == null) {

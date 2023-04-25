@@ -36,7 +36,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -136,6 +135,7 @@ public class CustomItemListener implements Listener {
         }
         
         di.consume(makeUnavailable);
+        player.updateInventory();
     }
     
     /** Give architect pickaxes the haste effect */
@@ -190,6 +190,12 @@ public class CustomItemListener implements Listener {
         Player player = event.getPlayer();
         PlayerInventory inv = player.getInventory();
         ItemStack hand = inv.getItem(event.getHand());
+        if (player.hasCooldown(hand.getType())) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Check arena
         Arena playerArena = getPlayerArena(player);
         String held = ConfigUtils.getStringFromItem(hand, "held");
         if (playerArena == null) {
@@ -379,6 +385,7 @@ public class CustomItemListener implements Listener {
                      ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
                 }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+                return;
             }
             
             // Otherwise another utility was used, tell deck item to consume as well
@@ -443,9 +450,7 @@ public class CustomItemListener implements Listener {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    item.setAmount(item.getAmount());
-                    EquipmentSlot slot = event.getHand();
-                    player.getInventory().setItem(slot, item);
+                    item.setAmount(item.getAmount() + 1);
                 }
             }
         }

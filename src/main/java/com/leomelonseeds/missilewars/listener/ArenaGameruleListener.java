@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -429,7 +430,8 @@ public class ArenaGameruleListener implements Listener {
                     }, 1);
                     
                     // Give item back on successful hit
-                    damager.getInventory().addItem(item);
+                    Item newitem = damager.getWorld().dropItem(damager.getLocation(), item);
+                    newitem.setPickupDelay(0);
                 }
             }
         }

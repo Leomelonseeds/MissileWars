@@ -69,6 +69,7 @@ public class DeckItem {
                 
                 item.setAmount(++amt);
                 unavailable = false;
+                player.updateInventory();
                 
                 if (amt < max) {
                     curCooldown = cooldown;
@@ -199,8 +200,9 @@ public class DeckItem {
         return unavailable ? 0 : item.getAmount();
     }
 
-    // Sets a visual cooldown
+    // Sets a visual cooldown, do 1 tick later to allow some items to be used
     private void setVisualCooldown(double c) {
-        player.setCooldown(item.getType(), (int) (c * 20));
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
+        player.setCooldown(item.getType(), Math.max((int) (c * 20) - 1, 0)), 1);
     }
 }

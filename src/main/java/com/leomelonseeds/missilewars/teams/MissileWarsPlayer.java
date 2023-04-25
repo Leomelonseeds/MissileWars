@@ -123,6 +123,37 @@ public class MissileWarsPlayer {
             }
         }.runTaskTimerAsynchronously(plugin, 20, 10);
     }
+    
+    /**
+     * Similar to missile preview, but for item specific cooldowns
+     * Sets player exp bar level
+     */
+    public void cooldownPreview(Arena arena) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // If the player left, cancel task
+                String team = arena.getTeam(playerId);
+                if (team == "no team") {
+                    this.cancel();
+                    return;
+                }
+                
+                Player player = getMCPlayer();
+                ItemStack item = player.getInventory().getItemInMainHand();
+                DeckItem di = deck.getDeckItem(item);
+                if (di == null) {
+                    player.setLevel(0);
+                    player.setExp(0F);
+                    return;
+                }
+                
+                double cd = di.getCurrentCooldown();
+                player.setLevel((int) Math.ceil(cd));
+                player.setExp((float) (cd - Math.floor(cd - 0.5)));
+            }
+        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
+    }
 
     /**
      * Set the user's current {@link Deck}.

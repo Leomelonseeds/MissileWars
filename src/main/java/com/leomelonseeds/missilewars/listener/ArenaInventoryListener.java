@@ -198,6 +198,7 @@ public class ArenaInventoryListener implements Listener {
         if (dropped.getAmount() > 1) {
             player.getInventory().getItemInMainHand().setAmount(1);
             di.initCooldown(di.getCooldown());
+            player.updateInventory();
         } else {
             CustomItemListener.consumeItem(player, arena, hand, false);
         }
