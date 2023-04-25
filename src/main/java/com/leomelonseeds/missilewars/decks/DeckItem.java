@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.decks;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -19,7 +20,7 @@ public class DeckItem {
     boolean unavailable;
     
     /**
-     * @param item should correspond directly the player inventory's item
+     * @param item should correspond directly the player inventory's item (but its fine if it doesn't I guess)
      * @param cooldown is in seconds
      * @param max
      */
@@ -61,14 +62,15 @@ public class DeckItem {
     private void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (curCooldown == 0) {
+            if (curCooldown - 0.5 == 0) {
                 int amt = getActualAmount();
                 if (amt >= max) {
                     return;
                 }
                 
-                item.setAmount(++amt);
+                getItem().setAmount(++amt);
                 unavailable = false;
+                curCooldown = 0;
                 player.updateInventory();
                 
                 if (amt < max) {
@@ -77,7 +79,7 @@ public class DeckItem {
                 }
             } else if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
                 if (unavailable) {
-                    setVisualCooldown(cooldown);
+                    setVisualCooldown(curCooldown);
                 }
                 updateItem();
             } else {
@@ -109,9 +111,14 @@ public class DeckItem {
     
     /**
      * Initializes the cooldown of an item, use for game starts.
-     * Adds visual cooldown of c. If 0 then no cooldown added
+     * Adds visual cooldown of c. If 0 or existing cooldown then 
+     * no cooldown will be added added
      */
     public void initCooldown(int c) {
+        if (curCooldown > 0) {
+            return;
+        }
+        
         if (c == 0) {
             if (getActualAmount() < max) {
                 curCooldown = cooldown;
@@ -139,12 +146,27 @@ public class DeckItem {
     }
     
     /**
-     * @return a modifiable ItemStack object!
+     * @return a modifiable ItemStack object that represents the item
+     * in the player's inventory. Should not return null.
      */
     public ItemStack getItem() {
-        return item;
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (matches(i)) {
+                return i;
+            }
+        }
+        return null;
     }
     
+    /**
+     * A faster method that doesn't necessarily return an itemstack associated with a player
+     * 
+     * @return
+     */
+    public ItemStack getInstanceItem() {
+        return item;
+    }
+     
     /**
      * @return true if the item is unavailable, eg visible cooldown
      */
@@ -197,12 +219,18 @@ public class DeckItem {
     
     // Returns 0 if on visual cooldown
     private int getActualAmount() {
-        return unavailable ? 0 : item.getAmount();
+        return unavailable ? 0 : getItem().getAmount();
     }
 
     // Sets a visual cooldown, do 1 tick later to allow some items to be used
-    private void setVisualCooldown(double c) {
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
-        player.setCooldown(item.getType(), Math.max((int) (c * 20) - 1, 0)), 1);
+    // If the item is an arrow, set a cooldown for the bow/crossbow too
+    public void setVisualCooldown(double c) {
+        int cd = Math.max((int) (c * 20) - 1, 0);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            player.setCooldown(item.getType(), cd);
+            if (item.getType().toString().contains("ARROW")) {
+                player.setCooldown(Material.BOW, cd);
+            }
+        }, 1);
     }
 }

@@ -63,6 +63,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import net.kyori.adventure.text.Component;
@@ -221,6 +222,11 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Re-apply visual cooldowns
+        for (DeckItem di : playerArena.getPlayerInArena(player.getUniqueId()).getDeck().getItems()) {
+            di.setVisualCooldown(di.getCurrentCooldown());
+        }
+        
         // Re-give haste if player using architect with haste
         JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
         if (json.has("haste")) {
@@ -253,7 +259,7 @@ public class ArenaGameruleListener implements Listener {
     
     public static Map<Player, Location> bowShots = new HashMap<>();
     
-    // Handle sentinel longshot bow shoot event
+    // Handle sentinel longshot bow shoot event + bow cooldowns
     @EventHandler
     public void onBowShoot(EntityShootBowEvent event) {
         // Ensure we are handling a player in an arena
@@ -271,12 +277,14 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        ItemStack toConsume = event.getConsumable();
-        DeckItem di = arena.getPlayerInArena(player.getUniqueId()).getDeck().getDeckItem(toConsume);
-        if (di != null) {
-            CustomItemListener.consumeItem(player, arena, toConsume, false);
+        // Berserker user
+        if (event.getBow().getType() == Material.CROSSBOW) {
+            int cd = Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
+            player.setCooldown(Material.CROSSBOW, cd);
+            return;
         }
         
+        CustomItemListener.consumeItem(player, arena, event.getConsumable(), false);
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
@@ -284,6 +292,36 @@ public class ArenaGameruleListener implements Listener {
                 bowShots.remove(player);
             }, 100);
         }
+    }
+    
+    // Handle crossbow load cooldowns
+    @EventHandler
+    public void onCrossbowLoad(EntityLoadCrossbowEvent event) {
+        // Ensure we are handling a player in an arena
+        if (event.getEntityType() != EntityType.PLAYER) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if ((arena == null) || !arena.isRunning()) {
+            return;
+        }
+        
+        if (arena.getTeam(player.getUniqueId()) == "no team") {
+            return;
+        }
+        
+        // At this point, the player is 100% using berserker. Obtain the arrow item
+        ItemStack toConsume = null;
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (i.getType() == Material.ARROW || i.getType() == Material.TIPPED_ARROW) {
+                toConsume = i;
+                break;
+            }
+        }
+        
+        CustomItemListener.consumeItem(player, arena, toConsume, false);
     }
     
 

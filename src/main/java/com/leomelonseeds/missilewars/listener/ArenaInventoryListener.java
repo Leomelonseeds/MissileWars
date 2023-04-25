@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -194,13 +195,24 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        ItemStack hand = player.getInventory().getItemInMainHand();
-        if (dropped.getAmount() > 1) {
-            player.getInventory().getItemInMainHand().setAmount(1);
+        // Cancel if on cooldown
+        if (player.hasCooldown(dropped.getType())) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Give dropped item back to player if hand empty
+        ItemStack remaining = player.getInventory().getItem(EquipmentSlot.HAND);
+        if (remaining.getType() == Material.AIR) {
+            // Replace dropped item with a copy
+            ItemStack toDrop = new ItemStack(dropped);
+            event.getItemDrop().setItemStack(toDrop);
+            dropped.setAmount(1);
+            player.getInventory().setItem(EquipmentSlot.HAND, dropped);
             di.initCooldown(di.getCooldown());
             player.updateInventory();
         } else {
-            CustomItemListener.consumeItem(player, arena, hand, false);
+            CustomItemListener.consumeItem(player, arena, remaining, false);
         }
     }
 
@@ -234,9 +246,18 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
         }
-
+        
         // Cancel event if player cannot pick up item based on their given deck
         DeckItem di = deck.getDeckItem(item);
+        if (di == null && item.getType().toString().contains("ARROW") && (deck.getName().equals("Sentinel") || deck.getName().equals("Berserker"))) {
+            for (DeckItem temp : deck.getItems()) {
+                if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
+                    di = temp;
+                    break;
+                }
+            }
+        }
+        
         if (di != null) {
             int amount = item.getAmount();
             int toPickup = di.pickup(amount);
@@ -249,8 +270,11 @@ public class ArenaInventoryListener implements Listener {
                 ItemStack drop = new ItemStack(item);
                 drop.setAmount(amount - toPickup);
                 player.getWorld().dropItemNaturally(player.getLocation(), drop);
-                item.setAmount(toPickup);
             }
+            
+            ItemStack pick = new ItemStack(di.getInstanceItem());
+            pick.setAmount(di.unavailable() ? toPickup - 1 : toPickup);
+            event.getItem().setItemStack(pick);
         }
         
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
@@ -313,21 +337,20 @@ public class ArenaInventoryListener implements Listener {
         
         // At this point, we know that it is either sentinel or berserker picking up the arrow
         // We then convert the itemstack directly into the corresponding type of the player deck
-        ItemStack pickedUp = event.getItem().getItemStack();
         for (DeckItem di : deck.getItems()) {
             ItemStack i = di.getItem();
             if (!i.getType().toString().contains("ARROW")) {
                 continue;
             }
-            
-            if (i.getAmount() >= di.getMax()) {
+
+            if (di.pickup(1) == 0) {
                 event.setCancelled(true);
                 return;
             }
             
-            pickedUp = new ItemStack(i);
-            pickedUp.setAmount(1);
-            di.pickup(1);
+            ItemStack pick = new ItemStack(i);
+            pick.setAmount(1);
+            event.getItem().setItemStack(pick);
         }
     }
 
