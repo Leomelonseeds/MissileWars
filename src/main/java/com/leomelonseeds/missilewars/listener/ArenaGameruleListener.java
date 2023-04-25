@@ -273,7 +273,7 @@ public class ArenaGameruleListener implements Listener {
         ItemStack toConsume = event.getConsumable();
         DeckItem di = arena.getPlayerInArena(player.getUniqueId()).getDeck().getDeckItem(toConsume);
         if (di != null) {
-            di.consume();
+            CustomItemListener.consumeItem(player, arena, toConsume, false);
         }
         
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {

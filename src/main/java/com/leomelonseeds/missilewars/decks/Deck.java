@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /** A class representing a generic Deck. */
@@ -52,21 +51,6 @@ public class Deck {
             }
         }
         return result;
-    }
-
-    /**
-     * Give this Deck's gear to a given player.
-     *
-     * @param player the player to give the gear to
-     */
-    public void giveGear(Player player) {
-        for (ItemStack gearItem : gear) {
-            if (gearItem.getType().toString().contains("BOOTS")) {
-                player.getInventory().setBoots(gearItem);
-            } else {
-                player.getInventory().addItem(gearItem);
-            }
-        }
     }
     
     /**

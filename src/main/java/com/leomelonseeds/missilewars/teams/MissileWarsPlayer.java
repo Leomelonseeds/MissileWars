@@ -135,12 +135,21 @@ public class MissileWarsPlayer {
         this.deck = deck;
         Player player = getMCPlayer();
         if (deck == null || player == null) {
+            MissileWarsPlugin.getPlugin().log("GUGU");
             return;
         }
+
+        for (ItemStack gearItem : deck.getGear()) {
+            if (gearItem.getType().toString().contains("BOOTS")) {
+                player.getInventory().setBoots(gearItem);
+            } else {
+                player.getInventory().addItem(gearItem);
+            }
+        }
         
-        deck.giveGear(getMCPlayer());
         for (int i = 0; i < 8; i++) {
-            player.getInventory().setItem(i + 1, deck.getItems().get(i).getItem());
+            DeckItem di = deck.getItems().get(i);
+            player.getInventory().setItem(i + 1, di.getItem());
         }
     }
 
@@ -237,6 +246,7 @@ public class MissileWarsPlayer {
 
     /** Reset the stats of this {@link MissileWarsPlayer} back to 0 */
     public void resetPlayer() {
+        stopDeck();
         missiles = 0;
         utility = 0;
         kills = 0;
@@ -275,13 +285,6 @@ public class MissileWarsPlayer {
     @Override
     public int hashCode() {
         return Objects.hash(playerId);
-    }
-
-    /** Give the MC player their Deck gear. */
-    public void giveDeckGea() {
-        if (deck != null && getMCPlayer() != null) {
-            deck.giveGear(getMCPlayer());
-        }
     }
     
     public void stopDeck() {

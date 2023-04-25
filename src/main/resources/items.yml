@@ -1508,12 +1508,11 @@ text:
   actuallevel: " &7- &8%current%/%max%"
   missilestats:
   - ""
-  - "&aSpeed: %speed%m/s"
-  - "&cTNT: %tnt%"
+  - "&bSpeed: %speed%m/s"
+  - "&bTNT: %tnt%"
   itemstats:
-  - ""
   - "&bCooldown: %cooldown%&fs"
-  - "&bLimit: %limit% &fitems"
+  - "&bLimit: %max% &fitems"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   currentsp: "&aAvailable Skillpoints: &f%sp%"

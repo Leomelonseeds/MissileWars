@@ -210,21 +210,17 @@ public class MissileWarsTeam {
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
-        
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-
         members.add(player);
-        DeckManager dm = plugin.getDeckManager();
-        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId()));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         team.addPlayer(mcPlayer);
+        InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
-        InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         if (arena instanceof TrainingArena) {
@@ -232,8 +228,11 @@ public class MissileWarsTeam {
         } else {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
+
+        DeckManager dm = plugin.getDeckManager();
         player.setJoinTime(LocalDateTime.now());
         player.missilePreview(arena);
+        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId()));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

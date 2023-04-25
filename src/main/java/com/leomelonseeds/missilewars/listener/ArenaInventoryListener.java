@@ -94,7 +94,6 @@ public class ArenaInventoryListener implements Listener {
     /** Stop players from changing their armor/bow items. */
     @EventHandler
     public void stopItemMoving(InventoryClickEvent event) {
-        
         Player player = (Player) event.getWhoClicked();
         if (event.getCurrentItem() == null) {
             return;
@@ -122,16 +121,6 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        // Stop from moving deck items
-        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        ClickType click = event.getClick();
-        if (mwp.getDeck().getDeckItem(item) != null) {
-            if (click == ClickType.LEFT || click == ClickType.RIGHT || click.toString().contains("DROP")) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        
         // Stop crafting
         if (event.getClickedInventory() instanceof CraftingInventory) {
             event.setCancelled(true);
@@ -141,6 +130,16 @@ public class ArenaInventoryListener implements Listener {
         // Obtain player
         if (!(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
+        }
+        
+        // Stop from moving deck items
+        Deck deck = arena.getPlayerInArena(player.getUniqueId()).getDeck();
+        ClickType click = event.getClick();
+        if (deck != null && deck.getDeckItem(item) != null) {
+            if (click == ClickType.LEFT || click == ClickType.RIGHT || click.toString().contains("DROP")) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         // Stop armor removals and first slot changes
@@ -195,11 +194,12 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
+        ItemStack hand = player.getInventory().getItemInMainHand();
         if (dropped.getAmount() > 1) {
             player.getInventory().getItemInMainHand().setAmount(1);
             di.initCooldown(di.getCooldown());
         } else {
-            di.consume();
+            CustomItemListener.consumeItem(player, arena, hand, false);
         }
     }
 

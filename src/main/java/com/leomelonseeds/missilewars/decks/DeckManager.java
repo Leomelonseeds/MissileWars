@@ -67,7 +67,7 @@ public class DeckManager {
         String deck = basejson.getString("Deck");
         JSONObject json = plugin.getJSON().getPlayerPreset(uuid);
         
-        // TODO: Custom deck orderings: array of 8 numbers
+        // Custom deck orderings: array of 8 numbers
         // Index + 1 = slot, array[index] = index value defined in items.yml
         // Default: [0, 1, 2, 3, 4, 5, 6, 7]
         // If for example 0 is assigned to 7, then the item with index 7 will be placed in 0
@@ -105,7 +105,7 @@ public class DeckManager {
                 }
                 int max = (int) ConfigUtils.getItemValue(key, level, "max");
                 int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
-                pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, player));
+                pool.set(layout.indexOf(itemsConfig.getInt(key + ".index")), new DeckItem(i, cd, max, player));
             }
         }
         
@@ -322,11 +322,11 @@ public class DeckManager {
             @SuppressWarnings("unchecked")
             List<String> lore = new ArrayList<>((ArrayList<String>) templore);
             
-            // Add missile stats for missiles
+            // Add missile stats for missiles, and max + cooldown
             if (missile) {
-                List<String> stats = itemsConfig.getStringList("text.missilestats");
-                lore.addAll(stats);
+                lore.addAll(itemsConfig.getStringList("text.missilestats"));
             }
+            lore.addAll(itemsConfig.getStringList("text.itemstats"));
             
             // Compile lore into single line
             String line = "";
@@ -368,8 +368,7 @@ public class DeckManager {
                 JSONObject deckjson = playerjson.getJSONObject(deck);
                 // Add lore of unlocking possibility
                 if (((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
-                    (playerjson.has(realname) && !playerjson.getBoolean(realname))) &&
-                    !preset.equals("R")) {
+                    (playerjson.has(realname) && !playerjson.getBoolean(realname)))) {
                     int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
                     lore.add(itemsConfig.getString("text.locked1").replace("%cost%", cost + ""));
                     lore.add(itemsConfig.getString("text.locked2").replace("%cost%", cost + ""));

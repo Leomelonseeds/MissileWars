@@ -45,9 +45,8 @@ public class DeckItem {
     /**
      * Invoke after item is used or dropped, check matches()
      */
-    public void consume() {
-        if (item.getAmount() == 0) {
-            item.setAmount(1);
+    public void consume(boolean makeUnavailable) {
+        if (makeUnavailable) {
             unavailable = true;
             setVisualCooldown(curCooldown > 0 ? curCooldown : cooldown);
         }

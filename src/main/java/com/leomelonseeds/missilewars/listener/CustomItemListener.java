@@ -106,8 +106,9 @@ public class CustomItemListener implements Listener {
      * @param player
      * @param arena
      * @param item
+     * @param deplete should the item manually be depleted. If false, the item automatically depletes
      */
-    private void consumeItem(Player player, Arena arena, ItemStack item) {
+    public static void consumeItem(Player player, Arena arena, ItemStack item, boolean deplete) {
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
         if (mwp == null) {
             return;
@@ -123,7 +124,18 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        di.consume();
+        boolean makeUnavailable = false;
+        int amt = item.getAmount();
+        if (amt == 1) {
+            if (!deplete) {
+                item.setAmount(2);
+            }
+            makeUnavailable = true;
+        } else if (deplete) {
+            item.setAmount(amt - 1);
+        }
+        
+        di.consume(makeUnavailable);
     }
     
     /** Give architect pickaxes the haste effect */
@@ -245,6 +257,7 @@ public class CustomItemListener implements Listener {
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
             if (structureName.contains("shield-") || structureName.contains("platform-") || structureName.contains("torpedo-")) {
+                consumeItem(player, playerArena, hand, false);
                 return;
             }
             
@@ -294,8 +307,7 @@ public class CustomItemListener implements Listener {
             }
             
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
-                hand.setAmount(hand.getAmount() - 1);
-                consumeItem(player, playerArena, hand);
+                consumeItem(player, playerArena, hand, true);
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // 0.5s cooldown
@@ -312,7 +324,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Spawn a utility item
+        // Spawn a utility item. At this point we know the item MUST have a utility tag
         else {
             // Make sure we allow gear items to be used
             if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
@@ -339,8 +351,7 @@ public class CustomItemListener implements Listener {
                     }
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
-                    hand.setAmount(hand.getAmount() - 1);
-                    consumeItem(player, playerArena, hand);
+                    consumeItem(player, playerArena, hand, true);
                     return;
                 }
             }
@@ -363,13 +374,15 @@ public class CustomItemListener implements Listener {
                 fireball.setYield(yield);
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
-                hand.setAmount(hand.getAmount() - 1);
-                consumeItem(player, playerArena, hand);
+                consumeItem(player, playerArena, hand, true);
                 for (Player players : player.getWorld().getPlayers()) {
                      ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
                 }
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
             }
+            
+            // Otherwise another utility was used, tell deck item to consume as well
+            consumeItem(player, playerArena, hand, false);
         }
     }
 
@@ -437,7 +450,7 @@ public class CustomItemListener implements Listener {
             }
         }
 
-        consumeItem(player, playerArena, item);
+        consumeItem(player, playerArena, item, false);
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -514,8 +527,7 @@ public class CustomItemListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
         }
         
-        hand.setAmount(hand.getAmount() - 1);
-        consumeItem(player, playerArena, hand);
+        consumeItem(player, playerArena, hand, true);
         for (Player players : player.getWorld().getPlayers()) {
             ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
         }
@@ -594,7 +606,6 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a structure item
         ItemStack hand = thrown.getItem();
-        consumeItem(thrower, playerArena, hand);
         String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
@@ -747,7 +758,6 @@ public class CustomItemListener implements Listener {
         }
 
         // Check the duration here
-        consumeItem(thrower, playerArena, hand);
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));

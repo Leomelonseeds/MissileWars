@@ -233,11 +233,5 @@ public class PresetSelector implements MWInventory {
                 updateInventory();
             }
         }
-        
-        else if (item.getType() == Material.getMaterial(itemConfig.getString("ranked.item"))) {
-            if (type == ClickType.RIGHT) {
-                new RankedDeckCustomizer(player, deck);
-            }
-        }
     }
 }

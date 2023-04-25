@@ -39,7 +39,7 @@ public class JSONManager {
         this.plugin = plugin;
         playerCache = new HashMap<>();
         defaultPresets = new HashMap<>();
-        allPresets = new String[] {"A", "B", "C", "R"};
+        allPresets = new String[] {"A", "B", "C"};
         periodicSave();
         
         
