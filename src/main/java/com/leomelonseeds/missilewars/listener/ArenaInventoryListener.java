@@ -179,20 +179,27 @@ public class ArenaInventoryListener implements Listener {
             event.setCancelled(true);
             return;
         }
-
-        // Handle dropping of deck items
-        ItemStack dropped = event.getItemDrop().getItemStack();
-        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        DeckItem di = mwp.getDeck().getDeckItem(dropped);
-        if (di != null) {
-            di.consume();
-        }
        
         // Make sure we don't allow gear items to be dropped
+        ItemStack dropped = event.getItemDrop().getItemStack();
         String item = dropped.getType().toString();
         if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE")) {
             event.setCancelled(true);
             return;
+        }
+
+        // Handle dropping of deck items
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        DeckItem di = mwp.getDeck().getDeckItem(dropped);
+        if (di == null) {
+            return;
+        }
+        
+        if (dropped.getAmount() > 1) {
+            player.getInventory().getItemInMainHand().setAmount(1);
+            di.initCooldown(di.getCooldown());
+        } else {
+            di.consume();
         }
     }
 

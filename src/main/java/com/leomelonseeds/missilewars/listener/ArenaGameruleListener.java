@@ -56,6 +56,7 @@ import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
@@ -263,6 +264,16 @@ public class ArenaGameruleListener implements Listener {
         Arena arena = arenaManager.getArena(player.getUniqueId());
         if ((arena == null) || !arena.isRunning()) {
             return;
+        }
+        
+        if (arena.getTeam(player.getUniqueId()) == "no team") {
+            return;
+        }
+        
+        ItemStack toConsume = event.getConsumable();
+        DeckItem di = arena.getPlayerInArena(player.getUniqueId()).getDeck().getDeckItem(toConsume);
+        if (di != null) {
+            di.consume();
         }
         
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
@@ -591,9 +602,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Experimental poison 
         if (plugin.getConfig().getBoolean("experimental.poison")) {
-
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
-            
             if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (player.getLocation().getBlockY() >= toohigh) {

@@ -21,6 +21,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
@@ -47,8 +48,11 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
@@ -94,6 +98,32 @@ public class CustomItemListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         return arena;
+    }
+    
+    /**
+     * Tells the player deck that they consumed an item
+     * 
+     * @param player
+     * @param arena
+     * @param item
+     */
+    private void consumeItem(Player player, Arena arena, ItemStack item) {
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        if (mwp == null) {
+            return;
+        }
+        
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            return;
+        }
+        
+        DeckItem di = deck.getDeckItem(item);
+        if (di == null) {
+            return;
+        }
+        
+        di.consume();
     }
     
     /** Give architect pickaxes the haste effect */
@@ -265,6 +295,7 @@ public class CustomItemListener implements Listener {
             
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 hand.setAmount(hand.getAmount() - 1);
+                consumeItem(player, playerArena, hand);
                 playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // 0.5s cooldown
@@ -309,6 +340,7 @@ public class CustomItemListener implements Listener {
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
                     hand.setAmount(hand.getAmount() - 1);
+                    consumeItem(player, playerArena, hand);
                     return;
                 }
             }
@@ -332,6 +364,7 @@ public class CustomItemListener implements Listener {
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
                 hand.setAmount(hand.getAmount() - 1);
+                consumeItem(player, playerArena, hand);
                 for (Player players : player.getWorld().getPlayers()) {
                      ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
                 }
@@ -358,7 +391,8 @@ public class CustomItemListener implements Listener {
         }
 
         Arena playerArena = getPlayerArena(player);
-        if ((playerArena == null) || !event.getItemInHand().getType().toString().contains("LEAVES")) {
+        ItemStack item = event.getItemInHand();
+        if ((playerArena == null) || !item.getType().toString().contains("LEAVES")) {
             return;
         }
         
@@ -396,13 +430,14 @@ public class CustomItemListener implements Listener {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    ItemStack item = event.getItemInHand();
                     item.setAmount(item.getAmount());
                     EquipmentSlot slot = event.getHand();
                     player.getInventory().setItem(slot, item);
                 }
             }
         }
+
+        consumeItem(player, playerArena, item);
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -480,6 +515,7 @@ public class CustomItemListener implements Listener {
         }
         
         hand.setAmount(hand.getAmount() - 1);
+        consumeItem(player, playerArena, hand);
         for (Player players : player.getWorld().getPlayers()) {
             ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
         }
@@ -558,6 +594,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a structure item
         ItemStack hand = thrown.getItem();
+        consumeItem(thrower, playerArena, hand);
         String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
@@ -570,10 +607,7 @@ public class CustomItemListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!thrown.isDead()) {
-                    if (!thrower.isOnline()) {
-                        return;
-                    }
+                if (!thrown.isDead() && thrower.isOnline()) {
                     spawnUtility(structureName, thrower, thrown, playerArena);
                 }
             }
@@ -635,6 +669,11 @@ public class CustomItemListener implements Listener {
     public void spawnUtility(String structureName, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
         Location spawnLoc = thrown.getLocation();
         String mapName = "default-map";
+        ItemStack item = thrown.getItem();
+        if (playerArena.getTeam(thrower.getUniqueId()) == "no team") {
+            return;
+        }
+        
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
         }
@@ -666,14 +705,14 @@ public class CustomItemListener implements Listener {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    ItemStack item = thrown.getItem();
-                    thrower.getInventory().addItem(item);
+                    Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
+                    newitem.setPickupDelay(0);
                 }
             }
         } else {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
-            ItemStack item = thrown.getItem();
-            thrower.getInventory().addItem(item);
+            Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
+            newitem.setPickupDelay(0);
         }
         if (!thrown.isDead()) {
             thrown.remove();
@@ -708,6 +747,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Check the duration here
+        consumeItem(thrower, playerArena, hand);
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
@@ -728,9 +768,8 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        Block hitBlock = event.getHitBlock();
-
         // Spawn some water
+        Block hitBlock = event.getHitBlock();
         if (hitBlock == null) {
             return;
         }

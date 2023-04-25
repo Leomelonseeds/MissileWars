@@ -13,7 +13,7 @@ public class DeckItem {
     private ItemStack item;
     private int cooldown; // in seconds
     private int max;
-    private int curCooldown;
+    private double curCooldown;
     private Player player;
     BukkitTask cooldownTask;
     boolean unavailable;
@@ -62,12 +62,7 @@ public class DeckItem {
     private void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
-                curCooldown = cooldown;
-                if (unavailable) {
-                    setVisualCooldown(cooldown);
-                }
-            } else if (curCooldown == 0) {
+            if (curCooldown == 0) {
                 int amt = getActualAmount();
                 if (amt >= max) {
                     return;
@@ -80,28 +75,48 @@ public class DeckItem {
                     curCooldown = cooldown;
                     updateItem();
                 }
+            } else if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
+                if (unavailable) {
+                    setVisualCooldown(cooldown);
+                }
+                updateItem();
             } else {
-                curCooldown--;
+                curCooldown -= 0.5;
                 updateItem(); 
             }
-        }, 20L);
+        }, 10L);
     }
     
     /**
-     * Update this method every 2 ticks to be exactly accurate
+     * Accurate to 1/2 of second
      * 
      * @return
      */
-    public int getCurrentCooldown() {
+    public double getCurrentCooldown() {
         return curCooldown;
     }
     
     /**
-     * Set the cooldown of an item, use for game starts.
-     * Aadds visual cooldown of c. If 0 then no cooldown added
+     * If the item has a cooldown, it will be changed to c. If c is
+     * 0 in that case, then the item will be instantly given.
+     * Otherwise the method does nothing.
+     * 
+     * @param c
+     */
+    public void setCurrentCooldown(int c) {
+        curCooldown = c;
+    }
+    
+    /**
+     * Initializes the cooldown of an item, use for game starts.
+     * Adds visual cooldown of c. If 0 then no cooldown added
      */
     public void initCooldown(int c) {
         if (c == 0) {
+            if (getActualAmount() < max) {
+                curCooldown = cooldown;
+                updateItem();
+            }
             return;
         }
 
@@ -186,7 +201,7 @@ public class DeckItem {
     }
 
     // Sets a visual cooldown
-    private void setVisualCooldown(int c) {
-        player.setCooldown(item.getType(), c * 20);
+    private void setVisualCooldown(double c) {
+        player.setCooldown(item.getType(), (int) (c * 20));
     }
 }

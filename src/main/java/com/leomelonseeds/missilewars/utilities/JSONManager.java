@@ -130,7 +130,7 @@ public class JSONManager {
                         updateJson(currentpreset, defaultpreset);
                         int finalsp = getMaxSkillpoints(uuid);
                         // Anything not in this array is an enchantment
-                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints"});
+                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
                         
                         // Calculate sp spent on missiles and utility
                         // Also updates their jsons
