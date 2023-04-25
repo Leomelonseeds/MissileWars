@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.decks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -48,7 +49,6 @@ public class DeckItem {
      */
     public void consume(boolean makeUnavailable) {
         if (makeUnavailable) {
-            unavailable = true;
             setVisualCooldown(curCooldown > 0 ? curCooldown : cooldown);
         }
         
@@ -64,13 +64,14 @@ public class DeckItem {
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (curCooldown - 0.5 == 0) {
                 int amt = getActualAmount();
+                curCooldown = 0;
                 if (amt >= max) {
                     return;
                 }
                 
                 getItem().setAmount(++amt);
+                setVisualCooldown(0);
                 unavailable = false;
-                curCooldown = 0;
                 player.updateInventory();
                 
                 if (amt < max) {
@@ -129,7 +130,6 @@ public class DeckItem {
         }
 
         setVisualCooldown(c);
-        unavailable = true;
         curCooldown = c;
         updateItem();
     }
@@ -167,13 +167,6 @@ public class DeckItem {
     public ItemStack getInstanceItem() {
         return item;
     }
-     
-    /**
-     * @return true if the item is unavailable, eg visible cooldown
-     */
-    public boolean unavailable() {
-        return unavailable;
-    }
     
     /**
      * Effectively permanently stops the deck from running
@@ -191,23 +184,31 @@ public class DeckItem {
     
     /**
      * Assuming the item is already checked for matches(), instructs
-     * the item to pickup the specified amount (req >= 1). Cooldowns will continue
+     * the item to pickup the specified item entity. Cooldowns will continue
      * if there is still space left in the stack afterwards.
      * 
      * @param amount
-     * @return the amount of items that can be picked up, and 0 if unable to pickup
+     * @return if the item pickup was successful
      */
-    public int pickup(int amount) {
+    public boolean pickup(Item itemEntity) {
         int actamount = getActualAmount();
         if (actamount >= max) {
-            return 0;
-        }
-        
-        if (unavailable) {
-            setVisualCooldown(0);
+            return false;
         }
 
+        ItemStack item = itemEntity.getItemStack();
+        int amount = item.getAmount();
         int toPickup = Math.min(max - actamount, amount);
+        if (amount > toPickup) {
+            ItemStack drop = new ItemStack(item);
+            drop.setAmount(amount - toPickup);
+            player.getWorld().dropItem(itemEntity.getLocation(), drop);
+        }
+        
+        ItemStack pick = new ItemStack(item);
+        pick.setAmount(toPickup);
+        itemEntity.setItemStack(pick);
+        
         if (actamount + toPickup >= max) {
             if (cooldownTask != null) {
                 cooldownTask.cancel();
@@ -215,7 +216,17 @@ public class DeckItem {
             curCooldown = 0;
         }
         
-        return toPickup;
+        if (unavailable) {
+            setVisualCooldown(0);
+            ItemStack cur = getItem();
+            cur.setAmount(cur.getAmount() - 1);
+        }
+        
+        MissileWarsPlugin.getPlugin().log("toPickup: " + toPickup);
+        MissileWarsPlugin.getPlugin().log("amount: " + amount);
+        MissileWarsPlugin.getPlugin().log("actamount: " + actamount);
+        MissileWarsPlugin.getPlugin().log("max: " + max);
+        return true;
     }
     
     // Returns 0 if on visual cooldown
@@ -225,8 +236,10 @@ public class DeckItem {
 
     // Sets a visual cooldown, do 1 tick later to allow some items to be used
     // If the item is an arrow, set a cooldown for the bow/crossbow too
+    // Also sets unavailable to true
     public void setVisualCooldown(double c) {
         int cd = Math.max((int) (c * 20) - 1, 0);
+        unavailable = c != 0;
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             player.setCooldown(item.getType(), cd);
             

@@ -212,7 +212,9 @@ public class ArenaInventoryListener implements Listener {
             di.initCooldown(di.getCooldown());
             player.updateInventory();
         } else {
-            CustomItemListener.consumeItem(player, arena, remaining, false);
+            // Need to re-increase and manually decrease amount so consume doesn't screw over
+            remaining.setAmount(remaining.getAmount() + 1);
+            CustomItemListener.consumeItem(player, arena, remaining, true);
         }
     }
 
@@ -258,23 +260,9 @@ public class ArenaInventoryListener implements Listener {
             }
         }
         
-        if (di != null) {
-            int amount = item.getAmount();
-            int toPickup = di.pickup(amount);
-            if (toPickup == 0) {
-                event.setCancelled(true);
-                return;
-            }
-            
-            if (amount > toPickup) {
-                ItemStack drop = new ItemStack(item);
-                drop.setAmount(amount - toPickup);
-                player.getWorld().dropItemNaturally(player.getLocation(), drop);
-            }
-            
-            ItemStack pick = new ItemStack(di.getInstanceItem());
-            pick.setAmount(di.unavailable() ? toPickup - 1 : toPickup);
-            event.getItem().setItemStack(pick);
+        if (di != null && !di.pickup(event.getItem())) {
+            event.setCancelled(true);
+            return;
         }
         
         if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
@@ -343,14 +331,11 @@ public class ArenaInventoryListener implements Listener {
                 continue;
             }
 
-            if (di.pickup(1) == 0) {
+            event.getItem().setItemStack(i);
+            if (!di.pickup(event.getItem())) {
                 event.setCancelled(true);
                 return;
             }
-            
-            ItemStack pick = new ItemStack(i);
-            pick.setAmount(1);
-            event.getItem().setItemStack(pick);
         }
     }
 
