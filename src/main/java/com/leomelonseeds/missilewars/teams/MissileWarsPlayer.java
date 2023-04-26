@@ -221,6 +221,9 @@ public class MissileWarsPlayer {
                 di.initCooldown(di.getCooldown() - 25);
             } else {
                 di.updateItem();
+                if (di.getActualAmount() == 0) {
+                    di.setVisualCooldown(di.getCurrentCooldown());
+                }
             }
         }
     }

@@ -226,7 +226,7 @@ public class DeckItem {
     }
     
     // Returns 0 if on visual cooldown
-    private int getActualAmount() {
+    public int getActualAmount() {
         return unavailable ? 0 : getItem().getAmount();
     }
 

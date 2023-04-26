@@ -334,6 +334,7 @@ public class MissileWarsTeam {
             InventoryUtils.clearInventory(mcPlayer);
             arena.saveDeck(player);
             player.resetPlayer();
+            mcPlayer.setLevel(0);
             for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
                 mcPlayer.removePotionEffect(effect.getType());
             }
