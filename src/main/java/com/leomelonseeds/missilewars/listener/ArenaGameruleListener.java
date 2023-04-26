@@ -52,13 +52,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.json.JSONObject;
 
-import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
-import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
@@ -115,13 +112,13 @@ public class ArenaGameruleListener implements Listener {
     /** Handle all sorts of deaths. */
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent event) {
-        // Check if event cancelled by another plugin or some shit
-        if (event.isCancelled()) {
-            return;
-        }
-        
     	//Check if entity is player
     	if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+    	
+        // Check if event cancelled by another plugin or some shit
+        if (event.isCancelled()) {
             return;
         }
 
@@ -137,16 +134,14 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        // Stop fall damage on game start
-        if (event.getCause() == DamageCause.FALL) {
-            if (playerArena.getSecondsUntilStart() >= -1) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        
         // Don't handle players with no team
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        if (mwp.justSpawned()) {
+            event.setCancelled(true);
             return;
         }
         
@@ -176,15 +171,15 @@ public class ArenaGameruleListener implements Listener {
         // Clear negative potion effects (i think poison's the only one)
         event.setCancelled(true);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementDeaths();
-        player.setInvulnerable(true);
+        player.setHealth(20.0);
         player.teleport(spawn1);
         player.removePotionEffect(PotionEffectType.POISON);
         player.removePotionEffect(PotionEffectType.SLOW);
+        mwp.setJustSpawned();
         CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
         
         // Remove invulnerability and calculate/send killer and death messages
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            player.setInvulnerable(false);
             Player killer = player.getKiller();
             if (killer == null && event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
@@ -196,13 +191,13 @@ public class ArenaGameruleListener implements Listener {
                 String team1 = playerArena.getTeam(player.getUniqueId());
                 String team2 = playerArena.getTeam(killer.getUniqueId());
                 if (!(killer.equals(player) || team1.equals(team2))) {
-                    playerArena.getPlayerInArena(killer.getUniqueId()).incrementKills();
+                    mwp.incrementKills();
                     ConfigUtils.sendConfigSound("player-kill", killer);
                 }
             }
             
             // Send death message
-            Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer);
+            Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer, event);
             for (Player p : player.getWorld().getPlayers()) {
                 if (p.hasPermission("umw.vanilladeathmessages")) {
                     // No idea how to handle this tbh
@@ -227,56 +222,6 @@ public class ArenaGameruleListener implements Listener {
         }
         
         event.deathMessage(Component.text(""));
-    }
-
-    /** Handles haste giving on death */
-    @EventHandler
-    public void onRespawn(PlayerPostRespawnEvent event) {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Player player = event.getPlayer();
-        ArenaManager manager = plugin.getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
-            return;
-        }
-        
-        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
-            return;
-        }
-        
-        // Re-apply visual cooldowns
-        for (DeckItem di : playerArena.getPlayerInArena(player.getUniqueId()).getDeck().getItems()) {
-            di.setVisualCooldown(di.getCurrentCooldown());
-        }
-        
-        // Re-give haste if player using architect with haste
-        JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
-        if (json.has("haste")) {
-            ItemStack item = player.getInventory().getItemInMainHand();
-            if (item == null || item.getType() != Material.IRON_PICKAXE) {
-                return;
-            }
-            
-            int level = json.getInt("haste");
-            if (level <= 0) {
-                return;
-            }
-            
-            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
-        }
-        
-        // Regive vanguard passives
-        int bunny = plugin.getJSON().getAbility(player.getUniqueId(), "bunny");
-        if (bunny > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
-        }
-        
-        int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
-        if (adrenaline > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, level));
-        }
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();

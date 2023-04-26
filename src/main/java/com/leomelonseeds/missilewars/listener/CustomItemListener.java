@@ -14,7 +14,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
@@ -255,9 +254,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Disable if player just died
-        int sinceDeath = player.getStatistic(Statistic.TIME_SINCE_DEATH);
-        int respawnDisable = plugin.getConfig().getInt("respawn-disable");
-        if (sinceDeath <= respawnDisable) {
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        if (mwp.justSpawned()) {
             event.setCancelled(true);
             return;
         }
@@ -317,7 +315,7 @@ public class CustomItemListener implements Listener {
             
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 consumeItem(player, playerArena, hand, true);
-                playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+                mwp.incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // 0.5s cooldown
                 cooldown.add(player);
@@ -361,6 +359,7 @@ public class CustomItemListener implements Listener {
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
                     consumeItem(player, playerArena, hand, true);
+                    mwp.incrementUtility();
                     return;
                 }
             }
@@ -387,7 +386,7 @@ public class CustomItemListener implements Listener {
                 for (Player players : player.getWorld().getPlayers()) {
                      ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
                 }
-                playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+                mwp.incrementUtility();
                 return;
             }
             

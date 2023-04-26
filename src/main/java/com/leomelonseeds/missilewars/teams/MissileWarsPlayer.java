@@ -43,6 +43,8 @@ public class MissileWarsPlayer {
     private int missiles;
     /** The time that the player joined the game */
     private LocalDateTime joinTime;
+    /** Player should be invulnerable and not be able to spawn missiles if this is true */
+    private boolean justSpawned;
 
 
     /**
@@ -52,6 +54,26 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
+        justSpawned = false;
+    }
+    
+    /**
+     * Make player invulnerable and unable to interact
+     * for a short time
+     */
+    public void setJustSpawned() {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        justSpawned = true;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            justSpawned = false;
+        }, plugin.getConfig().getInt("respawn-disable"));
+    }
+    
+    /**
+     * @return should the player be invulnerable
+     */
+    public boolean justSpawned() {
+        return justSpawned;
     }
     
     /**
