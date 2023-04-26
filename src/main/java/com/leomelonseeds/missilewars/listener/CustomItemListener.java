@@ -117,14 +117,17 @@ public class CustomItemListener implements Listener {
         if (deck == null) {
             return;
         }
-        
+
+        int amt = item.getAmount();
         DeckItem di = deck.getDeckItem(item);
         if (di == null) {
+            if (deplete) {
+                item.setAmount(amt - 1);
+            }
             return;
         }
         
         boolean makeUnavailable = false;
-        int amt = item.getAmount();
         if (amt == 1) {
             if (!deplete) {
                 item.setAmount(2);
