@@ -79,6 +79,7 @@ public class DeckItem {
                     updateItem();
                 }
             } else if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
+                player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
                 if (unavailable) {
                     setVisualCooldown(curCooldown);
                 }
@@ -221,11 +222,6 @@ public class DeckItem {
             ItemStack cur = getItem();
             cur.setAmount(cur.getAmount() - 1);
         }
-        
-        MissileWarsPlugin.getPlugin().log("toPickup: " + toPickup);
-        MissileWarsPlugin.getPlugin().log("amount: " + amount);
-        MissileWarsPlugin.getPlugin().log("actamount: " + actamount);
-        MissileWarsPlugin.getPlugin().log("max: " + max);
         return true;
     }
     

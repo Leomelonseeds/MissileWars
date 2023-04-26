@@ -770,7 +770,7 @@ shield:
 
 platform:
   index: 6
-  item: SNOWBALL
+  item: EGG
   name: "&7★ Platform %level% ⚒"
   lore:
   - ""
@@ -909,6 +909,7 @@ creeper:
     - ""
     - "&7A creeper walks into a bar. I wasn't paid"
     - "&7enough to finish the joke"
+    - ""
   2:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper (Charged) &a&l☣"
@@ -918,6 +919,7 @@ creeper:
     - "&7creeper is. Seems like the specimen we have"
     - "&7here got struck by lightning. It has become"
     - "&7a lot more aggressive since and we concl-"
+    - ""
     spcost: 3
 
 fireball:
@@ -950,6 +952,7 @@ leaves:
   - ""
   - "&7Since when could you walk on leaves?"
   - "&7I thought they would just deca-"
+  - ""
   1:
     item: JUNGLE_LEAVES
     max: 8
@@ -998,6 +1001,7 @@ arrows:
   - "&7of arrows are, but I decided not to,"
   - "&7and instead wasted your time reading"
   - "&7this description."
+  - ""
   1:
     max: 2
     cooldown: 10

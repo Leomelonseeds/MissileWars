@@ -18,6 +18,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -291,11 +292,7 @@ public class DeckManager {
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial(material));
         if (deck != null) {
-            // Make item count reflect its level
-            item.setAmount(Math.max(level, 1));
-        } else if (name.equals("arrows")) {
-            // Don't bother anything with arrows
-            return item;
+            item.setAmount(Math.max(level, 1));  // Make item count reflect its level
         }
         
         // Find item name and lore
@@ -406,7 +403,7 @@ public class DeckManager {
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
                 PersistentDataType.STRING, name + "-" + level);
         
-        // Setup item meta for potions
+        // Setup extra item attributes for specific things
         if (name.equals("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
@@ -417,7 +414,10 @@ public class DeckManager {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
             pmeta.setColor(Color.PURPLE);
-        } 
+        } else if (name.equals("torpedo")) {
+            item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+            item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
         item.setItemMeta(itemMeta);
         return item;
     }

@@ -164,6 +164,15 @@ public class MissileWarsPlayer {
                 Player player = getMCPlayer();
                 ItemStack item = player.getInventory().getItemInMainHand();
                 DeckItem di = deck.getDeckItem(item);
+                if (di == null && item.getType().toString().contains("BOW")) {
+                    for (DeckItem temp : deck.getItems()) {
+                        if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
+                            di = temp;
+                            break;
+                        }
+                    }
+                }
+                
                 if (di == null) {
                     player.setLevel(0);
                     player.setExp(0F);

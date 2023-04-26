@@ -217,14 +217,14 @@ public class ConfigUtils {
     }
 
     /**
-     * Send a sound to the player, with location! Mainly
+     * Send a sound to a location! Mainly
      * useful for utility items.
      *
      * @param path the key of the sound in the sounds.yml file
      * @param player the player to send sound to
      * @param location the location to send the sound to
      */
-    public static void sendConfigSound(String path, Player player, Location location) {
+    public static void sendConfigSound(String path, Location location) {
         FileConfiguration soundConfig = getConfigFile("sounds.yml");
 
         if (!soundConfig.contains(path)) {
@@ -235,7 +235,7 @@ public class ConfigUtils {
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
-        player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
+        location.getWorld().playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
     
     /**

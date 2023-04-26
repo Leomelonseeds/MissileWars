@@ -64,8 +64,6 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.ess3.api.events.AfkStatusChangeEvent;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
@@ -170,21 +168,21 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Teleport player to spawnpoint with invulnerability to not take fall damage
-        // Clear negative potion effects (i think poison's the only one)
+        // Clear negative potion effects (i think poison/slow are the only ones)
         event.setCancelled(true);
+        ConfigUtils.sendConfigSound("player-death", player.getLocation());
         playerArena.getPlayerInArena(player.getUniqueId()).incrementDeaths();
         player.setHealth(20.0);
         player.teleport(spawn1);
         player.removePotionEffect(PotionEffectType.POISON);
         player.removePotionEffect(PotionEffectType.SLOW);
-        player.setFireTicks(0);
-        player.setSaturation(5F);
-        player.playSound(Sound.sound(Key.key("entity.player.death"), Sound.Source.MASTER, 1F, 1F));
         mwp.setJustSpawned();
         CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
         
         // Remove invulnerability and calculate/send killer and death messages
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            player.setFireTicks(0);
+            player.setSaturation(5F);
             Player killer = player.getKiller();
             if (killer == null && event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;

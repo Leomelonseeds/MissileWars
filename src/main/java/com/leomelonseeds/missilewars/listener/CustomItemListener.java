@@ -117,19 +117,21 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        int amt = item.getAmount();
         DeckItem di = deck.getDeckItem(item);
+        int amt = item.getAmount();
         if (di == null) {
             if (deplete) {
-                item.setAmount(amt - 1);
+                item.setAmount(item.getAmount() - 1);
             }
             return;
         }
         
+        // Use inv items, since sometimes actual item isn't used
         boolean makeUnavailable = false;
         if (amt == 1) {
             if (!deplete) {
                 item.setAmount(2);
+                player.updateInventory();
             }
             makeUnavailable = true;
         } else if (deplete) {
@@ -137,7 +139,6 @@ public class CustomItemListener implements Listener {
         }
         
         di.consume(makeUnavailable);
-        player.updateInventory();
     }
     
     /** Give architect pickaxes the haste effect */
@@ -284,7 +285,6 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
-            
             // Check if a block was clicked, including a moving block
             if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 for (int i = 1; i <= 4; i++) {
@@ -383,9 +383,7 @@ public class CustomItemListener implements Listener {
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
                 consumeItem(player, playerArena, hand, true);
-                for (Player players : player.getWorld().getPlayers()) {
-                     ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
-                }
+                ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
                 mwp.incrementUtility();
                 return;
             }
@@ -535,9 +533,7 @@ public class CustomItemListener implements Listener {
         }
         
         consumeItem(player, playerArena, hand, true);
-        for (Player players : player.getWorld().getPlayers()) {
-            ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
-        }
+        ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         despawnCanopy(spawnLoc, 5);
     }
@@ -714,9 +710,8 @@ public class CustomItemListener implements Listener {
                     }
                 }
             } 
-            for (Player players : thrower.getWorld().getPlayers()) {
-                ConfigUtils.sendConfigSound(sound, players, spawnLoc);
-            }
+
+            ConfigUtils.sendConfigSound(sound, spawnLoc);
             // Repairman
             int repairman = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "repairman");
             if (repairman > 0 && ConfigUtils.inShield(playerArena, spawnLoc, playerArena.getTeam(thrower.getUniqueId()), 5)) {
@@ -878,9 +873,7 @@ public class CustomItemListener implements Listener {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
                             SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
-                            for (Player player : location.getWorld().getPlayers()) {
-                                ConfigUtils.sendConfigSound("break-obsidian-shield", player, location);
-                            }
+                            ConfigUtils.sendConfigSound("break-obsidian-shield", location);
                         } else if (finalDuration % 2 == 0) {
                             SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
                         } else {
