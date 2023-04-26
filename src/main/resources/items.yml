@@ -10,6 +10,7 @@
 # Vanguard missiles
 lightning:
   index: 2
+  cooldown: 45
   1:
     file: 'lightning.nbt'
     item: OCELOT_SPAWN_EGG
@@ -42,6 +43,7 @@ lightning:
 
 supersonic:
   index: 3
+  cooldown: 60
   1:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
@@ -110,6 +112,7 @@ tomahawk:
 
 cronullifier:
   index: 4
+  cooldown: 60
   1:
     file: 'chronullifier.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
@@ -183,6 +186,7 @@ piranha:
 
 concorde:
   index: 3
+  cooldown: 60
   1:
     file: 'concorde.nbt'
     item: RAVAGER_SPAWN_EGG
@@ -217,6 +221,7 @@ concorde:
 
 supporter:
   index: 4
+  cooldown: 60
   1:
     file: 'supporter.nbt'
     item: BEE_SPAWN_EGG
@@ -283,6 +288,7 @@ guardian:
 
 gemini:
   index: 2
+  cooldown: 45
   1:
     file: 'gemini.nbt'
     item: SLIME_SPAWN_EGG
@@ -356,6 +362,7 @@ sword:
 
 cuboid:
   index: 3
+  cooldown: 60
   1:
     file: 'cuboid.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
@@ -390,6 +397,7 @@ cuboid:
 
 warhead: 
   index: 4
+  cooldown: 60
   1:
     file: 'warhead.nbt'
     item: CHICKEN_SPAWN_EGG
@@ -457,6 +465,7 @@ juggernaut:
 
 breaker:
   index: 2
+  cooldown: 45
   1:
     file: 'breaker.nbt'
     item: DOLPHIN_SPAWN_EGG
@@ -562,6 +571,7 @@ shipper:
 
 slingshot:
   index: 3
+  cooldown: 60
   1:
     file: 'slingshot.nbt'
     item: SHULKER_SPAWN_EGG
@@ -629,6 +639,7 @@ automaton:
 
 pisces:
   index: 4
+  cooldown: 60
   1:
     file: 'pisces.nbt'
     item: PARROT_SPAWN_EGG
@@ -661,6 +672,7 @@ pisces:
 
 lifter:
   index: 2
+  cooldown: 45
   1:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
@@ -700,6 +712,8 @@ lifter:
 
 splash:
   index: 5
+  cooldown: 20
+  max: 2
   item: SPLASH_POTION
   name: "&9★ Splash %level% ⚡"
   lore:
@@ -873,6 +887,8 @@ obsidianshieldclear:
 
 canopy:
   index: 7
+  cooldown: 45
+  max: 2
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"
@@ -947,6 +963,7 @@ fireball:
 
 leaves:
   index: 7
+  cooldown: 5
   name: "&2★ Leaves %level% ⚒"
   lore:
   - ""
@@ -956,20 +973,18 @@ leaves:
   1:
     item: JUNGLE_LEAVES
     max: 8
-    cooldown: 5
   2:
     item: AZALEA_LEAVES
-    max: 8
-    cooldown: 5
     spcost: 2
+    max: 12
   3:
     item: FLOWERING_AZALEA_LEAVES
-    max: 8
-    cooldown: 5
     spcost: 2
+    max: 16
   
 lingering_harming:
   index: 6
+  max: 2
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion %level% ⚡"
   lore:
@@ -990,8 +1005,10 @@ lingering_harming:
     amplifier: 2
     duration: 15
     spcost: 2
+    
 arrows:
   index: 7
+  cooldown: 16
   item: ARROW
   name: "&fArrows"
   lore:
@@ -1004,14 +1021,11 @@ arrows:
   - ""
   1:
     max: 2
-    cooldown: 10
   2:
     max: 3
-    cooldown: 10
     spcost: 1
   3:
     max: 4
-    cooldown: 10
     spcost: 3
     
 elytra:

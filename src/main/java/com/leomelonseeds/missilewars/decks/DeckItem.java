@@ -59,10 +59,10 @@ public class DeckItem {
     }
     
     // Item update task, handles giving items
-    private void updateItem() {
+    public void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (curCooldown - 0.5 == 0) {
+            if (curCooldown - 0.5 <= 0) {
                 int amt = getActualAmount();
                 curCooldown = 0;
                 if (amt >= max) {
@@ -117,6 +117,10 @@ public class DeckItem {
      * no cooldown will be added added
      */
     public void initCooldown(int c) {
+        if (c < 0) {
+            c = 0;
+        }
+        
         if (curCooldown > 0) {
             setVisualCooldown(c);
             return;
@@ -170,17 +174,13 @@ public class DeckItem {
     }
     
     /**
-     * Effectively permanently stops the deck from running
-     * Before calling this, make sure the player can no longer
-     * use any of their deck items (cancel interacts)
+     * Stops the item from running. The item can be stored away
+     * and re-used at a later state by calling updateItem()
      */
     public void stop() {
         if (cooldownTask != null) {
             cooldownTask.cancel();
         }
-        
-        curCooldown = 0;
-        setVisualCooldown(0);
     }
     
     /**

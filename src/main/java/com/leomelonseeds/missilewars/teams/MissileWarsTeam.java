@@ -207,6 +207,7 @@ public class MissileWarsTeam {
      * Add a player to the team.
      *
      * @param player the player to add
+     * @param if the game just started
      */
     public void addPlayer(MissileWarsPlayer player) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
@@ -232,7 +233,7 @@ public class MissileWarsTeam {
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId())));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(arena.fetchDeck(player)));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
@@ -331,6 +332,7 @@ public class MissileWarsTeam {
         	team.removePlayer(mcPlayer);
             members.remove(player);
             InventoryUtils.clearInventory(mcPlayer);
+            arena.saveDeck(player);
             player.resetPlayer();
             for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
                 mcPlayer.removePotionEffect(effect.getType());
