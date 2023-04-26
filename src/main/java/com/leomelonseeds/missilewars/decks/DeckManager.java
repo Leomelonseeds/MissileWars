@@ -329,7 +329,10 @@ public class DeckManager {
             if (missile) {
                 lore.addAll(itemsConfig.getStringList("text.missilestats"));
             }
-            lore.addAll(itemsConfig.getStringList("text.itemstats"));
+            
+            if (!intangible) {
+                lore.addAll(itemsConfig.getStringList("text.itemstats"));
+            }
             
             // Compile lore into single line
             String line = "";

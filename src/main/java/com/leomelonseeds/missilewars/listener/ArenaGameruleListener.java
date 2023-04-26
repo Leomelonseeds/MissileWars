@@ -25,7 +25,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonEvent;
@@ -110,15 +109,10 @@ public class ArenaGameruleListener implements Listener {
     }
 
     /** Handle all sorts of deaths. */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void onDamage(EntityDamageEvent event) {
     	//Check if entity is player
     	if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
-    	
-        // Check if event cancelled by another plugin or some shit
-        if (event.isCancelled()) {
             return;
         }
 
@@ -139,92 +133,84 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
-        if (mwp.justSpawned()) {
+        if (playerArena.getPlayerInArena(player.getUniqueId()).justSpawned()) {
             event.setCancelled(true);
             return;
         }
-        
-        // Only handle deaths
-        if (event.getFinalDamage() < player.getHealth()) {
-            return;
-        }
-        
-        // Un-obstruct spawns
-        Location spawn1 = playerArena.getPlayerSpawn(player);
-        Location spawn2 = spawn1.clone().add(0, 1, 0);
-        Location spawn3 = spawn1.clone().add(1, 0, 0);
-        Location spawn4 = spawn1.clone().add(-1, 0, 0);
-        Location spawn5 = spawn1.clone().add(0, 0, 1);
-        Location spawn6 = spawn1.clone().add(0, 0, -1);
-        for (Location l : new Location[] {spawn1, spawn2}) {
-            l.getBlock().setType(Material.AIR);
-        }
-        for (Location l : new Location[] {spawn3, spawn4, spawn5, spawn6}) {
-            Block b = l.getBlock();
-            if (b.getType() == Material.WATER || b.getType() == Material.LAVA) {
-                b.setType(Material.AIR);
-            }
-        }
-
-        // Teleport player to spawnpoint with invulnerability to not take fall damage
-        // Clear negative potion effects (i think poison/slow are the only ones)
-        event.setCancelled(true);
-        ConfigUtils.sendConfigSound("player-death", player.getLocation());
-        playerArena.getPlayerInArena(player.getUniqueId()).incrementDeaths();
-        player.setHealth(20.0);
-        player.teleport(spawn1);
-        player.removePotionEffect(PotionEffectType.POISON);
-        player.removePotionEffect(PotionEffectType.SLOW);
-        mwp.setJustSpawned();
-        CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
-        
-        // Remove invulnerability and calculate/send killer and death messages
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            player.setFireTicks(0);
-            player.setSaturation(5F);
-            Player killer = player.getKiller();
-            if (killer == null && event instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
-                killer = ConfigUtils.getAssociatedPlayer(damageEvent.getDamager(), playerArena);
-            }
-
-            // Find killer and increment kills
-            if (killer != null) {
-                String team1 = playerArena.getTeam(player.getUniqueId());
-                String team2 = playerArena.getTeam(killer.getUniqueId());
-                if (!(killer.equals(player) || team1.equals(team2))) {
-                    mwp.incrementKills();
-                    ConfigUtils.sendConfigSound("player-kill", killer);
-                }
-            }
-            
-            // Send death message
-            Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer, event);
-            for (Player p : player.getWorld().getPlayers()) {
-                if (p.hasPermission("umw.vanilladeathmessages")) {
-                    // No idea how to handle this tbh
-                    p.sendMessage(customDeathMessage);
-                } else {
-                    p.sendMessage(customDeathMessage);
-                }
-            }
-        }, 1);
     }
 
-    /** Handle player deaths in main and waiting lobbies. */
+    /** Handle player deaths. */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        event.setCancelled(true);
+        event.setShouldPlayDeathSound(true);
+        event.setReviveHealth(20);
+        
+        // Check if player was killed in an Arena
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getEntity();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager manager = plugin.getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
-        	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation(), true);
-        } else {
-            player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> player.teleport(ConfigUtils.getSpawnLocation()), 1);
+            return;
+        }
+
+        Location spawn = playerArena.getPlayerSpawn(player);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            player.teleport(spawn);
+            player.setFireTicks(0);
+            player.setSaturation(5F);
+            player.removePotionEffect(PotionEffectType.POISON);
+            player.removePotionEffect(PotionEffectType.SLOW);
+        }, 1);
+        Component deathMessage = event.deathMessage();
+        event.deathMessage(Component.text(""));
+        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+
+        // Count death if player is on a team
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        mwp.incrementDeaths();
+        
+        // Find the player's killer
+        Player killer = player.getKiller();
+        if (killer == null && player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) player.getLastDamageCause();
+            killer = ConfigUtils.getAssociatedPlayer(damageEvent.getDamager(), playerArena);
+        }
+
+        // Find killer and increment kills
+        if (killer != null) {
+            String team1 = playerArena.getTeam(player.getUniqueId());
+            String team2 = playerArena.getTeam(killer.getUniqueId());
+            if (!(killer.equals(player) || team1.equals(team2))) {
+                playerArena.getPlayerInArena(killer.getUniqueId()).incrementKills();
+                ConfigUtils.sendConfigSound("player-kill", killer);
+            }
         }
         
-        event.deathMessage(Component.text(""));
+        
+        // Send death message
+        Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer);
+        for (Player p : player.getWorld().getPlayers()) {
+            if (p.hasPermission("umw.vanilladeathmessages")) {
+                p.sendMessage(deathMessage);
+            } else {
+                p.sendMessage(customDeathMessage);
+            }
+        }
+        
+        // Remove canopy cooldown so canopy doesn't get used
+        CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
+        mwp.setJustSpawned();
+
+        // Un-obstruct spawns
+        Location spawn2 = spawn.clone().add(0, 1, 0);
+        for (Location l : new Location[] {spawn, spawn2}) {
+            l.getBlock().setType(Material.AIR);
+        }
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();

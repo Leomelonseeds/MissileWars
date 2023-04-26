@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -81,9 +80,9 @@ public class CosmeticUtils {
      * @param killer
      * @return
      */
-    public static Component getDeathMessage(Player dead, Player killer, EntityDamageEvent e) {
+    public static Component getDeathMessage(Player dead, Player killer) {
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
-        String damageCause = e.getCause().toString().toLowerCase();
+        String damageCause = dead.getLastDamageCause().getCause().toString().toLowerCase();
         String format;
         String result;
         if (killer == null || !killer.isOnline()) {
