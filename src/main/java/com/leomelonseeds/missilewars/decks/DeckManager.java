@@ -415,8 +415,8 @@ public class DeckManager {
             pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
             pmeta.setColor(Color.PURPLE);
         } else if (name.equals("torpedo")) {
-            item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
-            item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         item.setItemMeta(itemMeta);
         return item;

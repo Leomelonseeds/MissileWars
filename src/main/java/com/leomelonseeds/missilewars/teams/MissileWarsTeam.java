@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
-import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -229,12 +228,11 @@ public class MissileWarsTeam {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
 
-        DeckManager dm = plugin.getDeckManager();
         player.setJoinTime(LocalDateTime.now());
-        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId()));
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId())));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
