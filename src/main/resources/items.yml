@@ -9,7 +9,7 @@
 
 # Vanguard missiles
 lightning:
-  index: 1
+  index: 2
   1:
     file: 'lightning.nbt'
     item: OCELOT_SPAWN_EGG
@@ -41,7 +41,7 @@ lightning:
     spcost: 3
 
 supersonic:
-  index: 0
+  index: 3
   1:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
@@ -77,7 +77,7 @@ supersonic:
     spcost: 2
 
 tomahawk:
-  index: 4
+  index: 0
   1:
     file: 'tomahawk.nbt'
     item: ZOMBIE_SPAWN_EGG
@@ -109,7 +109,7 @@ tomahawk:
     spcost: 3
 
 cronullifier:
-  index: 2
+  index: 4
   1:
     file: 'chronullifier.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
@@ -144,12 +144,45 @@ cronullifier:
     tnt: 25
     spcost: 4
 
+piranha:
+  index: 1
+  1:
+    file: 'piranha.nbt'
+    item: COD_SPAWN_EGG
+    name: "&7☢ Piranha ✟"
+    lore:
+    - ""
+    - "&7Relatively simple, mostly reliable, and looks"
+    - "&7somewhat good. The Piranha has it all."
+    offset:
+      x: -2
+      y: -4
+      z: 4
+    speed: 1.7
+    tnt: 10
+  2:
+    file: 'anglerfish.nbt'
+    item: COD_SPAWN_EGG
+    name: "&7☢ &lAnglerfish &7✟"
+    lore:
+    - ""
+    - "&7The Piranha wishes it was this. Or maybe"
+    - "&7it doesn't. We don't know anyone who"
+    - "&7wants to look like an anglerfish."
+    offset:
+      x: -2
+      y: -5
+      z: 4
+    speed: 2.0
+    tnt: 23
+    spcost: 3
+
 
 # Sentinel missiles
 
 
 concorde:
-  index: 0
+  index: 3
   1:
     file: 'concorde.nbt'
     item: RAVAGER_SPAWN_EGG
@@ -183,7 +216,7 @@ concorde:
     spcost: 3
 
 supporter:
-  index: 2
+  index: 4
   1:
     file: 'supporter.nbt'
     item: BEE_SPAWN_EGG
@@ -216,7 +249,7 @@ supporter:
     spcost: 3
     
 guardian:
-  index: 4
+  index: 0
   1:
     file: 'guardian.nbt'
     item: GUARDIAN_SPAWN_EGG
@@ -249,7 +282,7 @@ guardian:
     spcost: 3
 
 gemini:
-  index: 1
+  index: 2
   1:
     file: 'gemini.nbt'
     item: SLIME_SPAWN_EGG
@@ -283,7 +316,7 @@ gemini:
     spcost: 3
 
 sword: 
-  index: 3
+  index: 1
   1:
     file: 'sword.nbt'
     item: SKELETON_SPAWN_EGG
@@ -317,45 +350,12 @@ sword:
     tnt: 15
     spcost: 3
 
-piranha:
-  index: 3
-  1:
-    file: 'piranha.nbt'
-    item: COD_SPAWN_EGG
-    name: "&7☢ Piranha ✟"
-    lore:
-    - ""
-    - "&7Relatively simple, mostly reliable, and looks"
-    - "&7somewhat good. The Piranha has it all."
-    offset:
-      x: -2
-      y: -4
-      z: 4
-    speed: 1.7
-    tnt: 10
-  2:
-    file: 'anglerfish.nbt'
-    item: COD_SPAWN_EGG
-    name: "&7☢ &lAnglerfish &7✟"
-    lore:
-    - ""
-    - "&7The Piranha wishes it was this. Or maybe"
-    - "&7it doesn't. We don't know anyone who"
-    - "&7wants to look like an anglerfish."
-    offset:
-      x: -2
-      y: -5
-      z: 4
-    speed: 2.0
-    tnt: 23
-    spcost: 3
-
 
 # Berserker missiles
 
 
 cuboid:
-  index: 0
+  index: 3
   1:
     file: 'cuboid.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
@@ -389,7 +389,7 @@ cuboid:
     spcost: 3
 
 warhead: 
-  index: 2
+  index: 4
   1:
     file: 'warhead.nbt'
     item: CHICKEN_SPAWN_EGG
@@ -423,7 +423,7 @@ warhead:
     spcost: 4
 
 juggernaut:
-  index: 3
+  index: 1
   1:
     file: 'juggernaut.nbt'
     item: GHAST_SPAWN_EGG
@@ -456,7 +456,7 @@ juggernaut:
     spcost: 3
 
 breaker:
-  index: 1
+  index: 2
   1:
     file: 'breaker.nbt'
     item: DOLPHIN_SPAWN_EGG
@@ -490,7 +490,7 @@ breaker:
     spcost: 4
 
 shieldbuster:
-  index: 4
+  index: 0
   1:
     file: 'shieldbuster.nbt'
     item: WITCH_SPAWN_EGG
@@ -527,7 +527,7 @@ shieldbuster:
 # Architect missiles
 
 shipper:
-  index: 1
+  index: 0
   1:
     file: 'shipper.nbt'
     item: HORSE_SPAWN_EGG
@@ -561,7 +561,7 @@ shipper:
     spcost: 2
 
 slingshot:
-  index: 0
+  index: 3
   1:
     file: 'slingshot.nbt'
     item: SHULKER_SPAWN_EGG
@@ -593,7 +593,7 @@ slingshot:
     spcost: 3
 
 automaton:
-  index: 4
+  index: 1
   1:
     file: 'automaton.nbt'
     item: STRAY_SPAWN_EGG
@@ -628,7 +628,7 @@ automaton:
     spcost: 3
 
 pisces:
-  index: 2
+  index: 4
   1:
     file: 'pisces.nbt'
     item: PARROT_SPAWN_EGG
@@ -660,7 +660,7 @@ pisces:
     spcost: 3
 
 lifter:
-  index: 3
+  index: 2
   1:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
@@ -699,7 +699,7 @@ lifter:
 # Utility items
 
 splash:
-  index: 6
+  index: 5
   item: SPLASH_POTION
   name: "&9★ Splash %level% ⚡"
   lore:
@@ -734,7 +734,7 @@ novarocket:
   - "&7from a trailer park in Florida."
 
 shield:
-  index: 7
+  index: 6
   item: SNOWBALL
   name: "&f★ Shield %level% ⚒"
   lore:
@@ -769,7 +769,7 @@ shield:
     spcost: 2
 
 platform:
-  index: 6
+  index: 5
   item: EGG
   name: "&7★ Platform %level% ⚒"
   lore:
@@ -872,7 +872,7 @@ obsidianshieldclear:
     z: 0
 
 canopy:
-  index: 5
+  index: 7
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"
@@ -901,7 +901,7 @@ canopy:
     spcost: 2
 
 creeper:
-  index: 6
+  index: 5
   1:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper &a&l☣"
@@ -923,7 +923,7 @@ creeper:
     spcost: 3
 
 fireball:
-  index: 5
+  index: 6
   item: FIRE_CHARGE
   name: "&4★ Fireball %level% &4&l☣"
   lore:
@@ -946,7 +946,7 @@ fireball:
     spcost: 3
 
 leaves:
-  index: 5
+  index: 7
   name: "&2★ Leaves %level% ⚒"
   lore:
   - ""
@@ -969,7 +969,7 @@ leaves:
     spcost: 2
   
 lingering_harming:
-  index: 7
+  index: 6
   item: LINGERING_POTION
   name: "&5★ Lingering Harming Potion %level% ⚡"
   lore:

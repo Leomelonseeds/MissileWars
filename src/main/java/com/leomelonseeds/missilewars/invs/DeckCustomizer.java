@@ -68,9 +68,6 @@ public class DeckCustomizer implements MWInventory {
         // Add panes and misc items
         for (int i = 0; i < 6; i++) {
             inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_NUGGET)));
-        }
-        
-        for (int i = 0; i < 6; i++) {
             inv.setItem(i * 9 + 7, blankName(new ItemStack(Material.IRON_BARS)));
         }
         
@@ -85,8 +82,11 @@ public class DeckCustomizer implements MWInventory {
             for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
                         s.equals("missiles"), init, deck, false, preset);
-                inv.setItem(index, item);
-                index++;
+                int add = itemConfig.getInt(u + ".index");
+                if (s.equals("utility")) {
+                    add -= 5;
+                }
+                inv.setItem(index + add, item);
             }
         }
         

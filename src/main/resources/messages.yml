@@ -48,9 +48,8 @@ messages:
   classic-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &a&lClassic"
-    - "&f- Recieve &cmissile&f/&9utility &fevery few seconds."
-    - "&f- &aRight click &fyour spawn eggs on &3blocks"
-    - "   &fto create missiles."
+    - "&f- Spawn your &cmissiles &fto attack the enemy."
+    - "&f- Use your &9utility &ffor defense and support."
     - "&f- &4Blow up &fyour opponents' &5nether portals &fto win."
     - "&f- &fRide your missiles to victory!"
     - "&b========================================"

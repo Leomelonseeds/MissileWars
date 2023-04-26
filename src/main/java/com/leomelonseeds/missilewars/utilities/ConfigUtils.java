@@ -75,8 +75,10 @@ public class ConfigUtils {
      * Does not reload the default.json
      */
     public static void reloadConfigs() {
-        MissileWarsPlugin.getPlugin().reloadConfig();
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         configCache.clear();
+        plugin.reloadConfig();
+        plugin.getDeckManager().reload();
     }
 
     /**

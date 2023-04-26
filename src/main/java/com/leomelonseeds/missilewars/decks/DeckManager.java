@@ -54,6 +54,12 @@ public class DeckManager {
         itemsConfig = ConfigUtils.getConfigFile("items.yml");
     }
     
+    /**
+     * Refresh item configs
+     */
+    public void reload() {
+        itemsConfig = ConfigUtils.getConfigFile("items.yml");
+    }
     
     /**
      * Gets a deck for a player

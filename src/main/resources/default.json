@@ -19,16 +19,16 @@
 			"sharpness": 2,
 			"fire_aspect": 0,
 			"utility": {
-				"canopy": 2,
 				"splash": 1,
-				"lingering_harming": 2
+				"lingering_harming": 2,
+				"canopy": 2
 			},
 			"missiles": {
-				"supersonic": 1,
-				"lightning": 1,
-				"cronullifier": 2,
+				"tomahawk": 2,
 				"piranha": 1,
-				"tomahawk": 2
+				"lightning": 1,
+				"supersonic": 1,
+				"cronullifier": 2
 			},
 			"ability": {
 				"selected": "None",
@@ -63,11 +63,11 @@
 				"arrows": 2
 			},
 			"missiles": {
-				"concorde": 1,
-				"gemini": 2,
-				"supporter": 1,
+				"guardian": 2,
 				"sword": 1,
-				"guardian": 2
+				"gemini": 2,
+				"concorde": 1,
+				"supporter": 1
 			},
 			"ability": {
 				"selected": "None",
@@ -98,16 +98,16 @@
 			"quick_charge": 0,
 			"sharpness": 2,
 			"utility": {
-				"fireball": 2,
 				"creeper": 1,
+				"fireball": 2,
 				"arrows": 2
 			},
 			"missiles": {
-				"cuboid": 2,
-				"breaker": 1,
-				"warhead": 2,
+				"shieldbuster": 1,
 				"juggernaut": 1,
-				"shieldbuster": 1
+				"breaker": 1,
+				"cuboid": 2,
+				"warhead": 2
 			},
 			"ability": {
 				"selected": "None",
@@ -139,16 +139,16 @@
 			"efficiency": 0,
 			"haste": 0,
 			"utility": {
-				"leaves": 2,
 				"platform": 2,
-				"shield": 2
+				"shield": 2,
+				"leaves": 2
 			},
 			"missiles": {
-				"slingshot": 2,
 				"shipper": 2,
-				"pisces": 1,
+				"automaton": 1,
 				"lifter": 1,
-				"automaton": 1
+				"slingshot": 2,
+				"pisces": 1
 			},
 			"ability": {
 				"selected": "None",
