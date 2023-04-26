@@ -193,14 +193,8 @@ public class MissileWarsPlayer {
      *
      * @param deck the deck to let this MissileWarsPlayer use
      */
-    public void setDeck(Deck deck) {
-        boolean newDeck = false;
-        if (deck == null) {
-            deck = MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId);
-            newDeck = true;
-        }
-        
-        this.deck = deck;
+    public void setDeck(boolean start) {
+        this.deck = MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId);
         Player player = getMCPlayer();
         if (deck == null || player == null) {
             return;
@@ -217,14 +211,7 @@ public class MissileWarsPlayer {
         for (int i = 0; i < 8; i++) {
             DeckItem di = deck.getItems().get(i);
             player.getInventory().setItem(i + 1, di.getInstanceItem());
-            if (newDeck) {
-                di.initCooldown(di.getCooldown() - 25);
-            } else {
-                di.updateItem();
-                if (di.getActualAmount() == 0) {
-                    di.setVisualCooldown(di.getCurrentCooldown());
-                }
-            }
+            di.initCooldown(di.getCooldown() - (start ? 25 : 0));
         }
     }
 

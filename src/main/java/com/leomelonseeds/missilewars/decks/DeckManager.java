@@ -330,7 +330,7 @@ public class DeckManager {
                 lore.addAll(itemsConfig.getStringList("text.missilestats"));
             }
             
-            if (!intangible) {
+            if (!intangible && level > 0) {
                 lore.addAll(itemsConfig.getStringList("text.itemstats"));
             }
             

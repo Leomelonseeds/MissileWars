@@ -15,7 +15,6 @@ public class Deck {
     private List<ItemStack> gear;
     /** Combined for ease of use */
     private List<DeckItem> pool;
-
     /**
      * Generate a deck from a given set of gear, utils, and missiles.
      *

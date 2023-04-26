@@ -36,7 +36,6 @@ import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -102,8 +101,6 @@ public class Arena implements ConfigurationSerializable {
     protected Tracker tracker;
     /** The vote manager for this arena */
     protected VoteManager voteManager;
-    /** Save decks to restore them later */
-    protected HashMap<UUID, Deck> leftPlayers;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -122,7 +119,6 @@ public class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
         tracker = new Tracker();
-        leftPlayers = new HashMap<>();
         voteManager = new VoteManager(this);
     }
 
@@ -165,7 +161,6 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         tracker = new Tracker();
-        leftPlayers = new HashMap<>();
         voteManager = new VoteManager(this);
     }
     
@@ -174,28 +169,6 @@ public class Arena implements ConfigurationSerializable {
             redTeam.unregisterTeam();
             blueTeam.unregisterTeam();
         }
-    }
-    
-    /**
-     * Check if player has an associated saved deck
-     */
-    public Deck fetchDeck(MissileWarsPlayer mwp) {
-        return leftPlayers.get(mwp.getMCPlayerId());
-    }
-    
-    /**
-     * Save a mwp's deck such that it can be fetched later
-     * if the game is still going.
-     * 
-     * @param mwp
-     */
-    public void saveDeck(MissileWarsPlayer mwp) {
-        if (mwp.getDeck() == null) {
-            return;
-        }
-        
-        leftPlayers.put(mwp.getMCPlayerId(), mwp.getDeck());
-        mwp.stopDeck();
     }
     
     /**
@@ -834,7 +807,7 @@ public class Arena implements ConfigurationSerializable {
                 } else {
                     removeSpectator(player);
                     otherTeam.removePlayer(player);
-                    joinTeam.addPlayer(player);
+                    joinTeam.addPlayer(player, false);
                     checkNotEmpty();
                     announceMessage("messages.queue-join-" + team, player);
                 }
@@ -1177,7 +1150,6 @@ public class Arena implements ConfigurationSerializable {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             player.stopDeck();
         }
-        leftPlayers.clear();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         // Remove all players after a short time, then reset the world a bit after

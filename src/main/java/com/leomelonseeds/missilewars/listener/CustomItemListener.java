@@ -334,7 +334,7 @@ public class CustomItemListener implements Listener {
         // Spawn a utility item. At this point we know the item MUST have a utility tag
         else {
             // Make sure we allow gear items to be used
-            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
+            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe") || utility.contains("arrow")) {
                 return;
             }
 
