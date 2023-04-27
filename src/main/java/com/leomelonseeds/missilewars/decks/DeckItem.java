@@ -88,6 +88,7 @@ public class DeckItem {
                 updateItem(); 
             }
         }, 20L);
+        plugin.log("COOLDOWN: " + curCooldown * 20 + ", VISUAL: " + player.getCooldown(item.getType()));
     }
     
     /**

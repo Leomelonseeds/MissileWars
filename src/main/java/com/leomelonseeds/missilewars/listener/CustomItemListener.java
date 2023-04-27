@@ -49,12 +49,11 @@ import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
-import com.leomelonseeds.missilewars.decks.Deck;
-import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -98,49 +97,6 @@ public class CustomItemListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         return arena;
-    }
-    
-    /**
-     * Tells the player deck that they consumed an item
-     * 
-     * @param player
-     * @param arena
-     * @param item
-     * @param deplete should the item manually be depleted. If false, the item automatically depletes
-     */
-    public static void consumeItem(Player player, Arena arena, ItemStack item, boolean deplete) {
-        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        if (mwp == null) {
-            return;
-        }
-        
-        Deck deck = mwp.getDeck();
-        if (deck == null) {
-            return;
-        }
-
-        DeckItem di = deck.getDeckItem(item);
-        int amt = item.getAmount();
-        if (di == null) {
-            if (deplete) {
-                item.setAmount(item.getAmount() - 1);
-            }
-            return;
-        }
-        
-        // Use inv items, since sometimes actual item isn't used
-        boolean makeUnavailable = false;
-        if (amt == 1) {
-            if (!deplete) {
-                item.setAmount(2);
-                player.updateInventory();
-            }
-            makeUnavailable = true;
-        } else if (deplete) {
-            item.setAmount(amt - 1);
-        }
-        
-        di.consume(makeUnavailable);
     }
     
     /** Give architect pickaxes the haste effect */
@@ -306,7 +262,7 @@ public class CustomItemListener implements Listener {
             }
             
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
-                consumeItem(player, playerArena, hand, true);
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 mwp.incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
@@ -344,17 +300,17 @@ public class CustomItemListener implements Listener {
                     }
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
-                    consumeItem(player, playerArena, hand, true);
+                    InventoryUtils.consumeItem(player, playerArena, hand, -1);
                     mwp.incrementUtility();
                 }
                 return;
             }
 
             // Spawn a fireball/dragon fireball
-            if (utility.contains("fireball")) {
+            if (utility.contains("fireball") || utility.contains("lingering")) {
                 event.setCancelled(true);
                 Fireball fireball;
-                if (utility.contains("dragon")) {
+                if (utility.contains("lingering")) {
                     fireball = (DragonFireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
                             player.getEyeLocation().getDirection()), EntityType.DRAGON_FIREBALL);
                     int amplifier = (int) getItemStat(utility, "amplifier");
@@ -379,7 +335,7 @@ public class CustomItemListener implements Listener {
                 
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
-                consumeItem(player, playerArena, hand, true);
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
                 mwp.incrementUtility();
                 return;
@@ -408,6 +364,8 @@ public class CustomItemListener implements Listener {
         int duration = Integer.parseInt(args[2]);
         AreaEffectCloud cloud = event.getAreaEffectCloud();
         cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
+        cloud.setDuration(duration * 20);
+        cloud.setDurationOnUse(0);
     }
 
     public static Set<UUID> canopy_cooldown = new HashSet<>();
@@ -433,19 +391,17 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Location loc = block.getLocation();
-        
         // no max height
+        Location loc = block.getLocation();
         if (loc.getBlockY() > plugin.getConfig().getInt("max-height")) {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
             event.setCancelled(true);
             return;
         }
         
+        // Stop spawngriefing
         Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
         Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
-        
-        // Stop spawngriefing
         if (loc.equals(s1) || loc.equals(s2)) {
             event.setCancelled(true);
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -472,7 +428,7 @@ public class CustomItemListener implements Listener {
             }
         }
 
-        consumeItem(player, playerArena, item, false);
+        InventoryUtils.consumeItem(player, playerArena, item, InventoryUtils.getInvSlot(item, player));
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -549,7 +505,7 @@ public class CustomItemListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
         }
         
-        consumeItem(player, playerArena, hand, true);
+        InventoryUtils.consumeItem(player, playerArena, hand, -1);
         ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         despawnCanopy(spawnLoc, 5);
@@ -600,19 +556,17 @@ public class CustomItemListener implements Listener {
     @EventHandler
     public void useProjectile(ProjectileLaunchEvent event) {
         // Ensure we are tracking a utility thrown by a player
-        if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
-              event.getEntity().getType() == EntityType.EGG ||
-              event.getEntity().getType() == EntityType.ENDER_PEARL)) {
+        EntityType type = event.getEntityType();
+        if (!(type == EntityType.SNOWBALL || type == EntityType.EGG || type == EntityType.ENDER_PEARL)) {
             return;
         }
-        ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         
+        ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         if (!(thrown.getShooter() instanceof Player)) {
             return;
         }
         
         Player thrower = (Player) thrown.getShooter();
-        
         if (canopy_freeze.contains(thrower)) {
             event.setCancelled(true);
             return;
@@ -632,7 +586,7 @@ public class CustomItemListener implements Listener {
 
         // Add meta for structure identification
         thrown.customName(Component.text(structureName));
-        consumeItem(thrower, playerArena, hand, false);
+        InventoryUtils.consumeItem(thrower, playerArena, hand, InventoryUtils.getInvSlot(hand, thrower));
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
@@ -752,7 +706,6 @@ public class CustomItemListener implements Listener {
     /** Handle projectile item utility creation */
     @EventHandler
     public void throwSplash(ProjectileLaunchEvent event) {
-
         if (event.getEntity().getType() != EntityType.SPLASH_POTION) {
             return;
         }
@@ -781,7 +734,7 @@ public class CustomItemListener implements Listener {
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
-        consumeItem(thrower, playerArena, hand, false);
+        InventoryUtils.consumeItem(thrower, playerArena, hand, InventoryUtils.getInvSlot(hand, thrower));
     }
 
     /** Handle spawning of splash waters */

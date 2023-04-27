@@ -214,7 +214,7 @@ public class ArenaInventoryListener implements Listener {
         } else {
             // Need to re-increase and manually decrease amount so consume doesn't screw over
             remaining.setAmount(remaining.getAmount() + 1);
-            CustomItemListener.consumeItem(player, arena, remaining, true);
+            InventoryUtils.consumeItem(player, arena, remaining, -1);
         }
     }
 

@@ -19,6 +19,10 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
 import io.github.a5h73y.parkour.Parkour;
 
@@ -160,5 +164,59 @@ public class InventoryUtils {
                 Bukkit.getLogger().log(Level.WARNING, "Failed to read inventory string of " + player.getName());
             }
         });
+    }
+    
+    // Given item from, return the slot of the item for the player. -1 if not found
+    public static int getInvSlot(ItemStack item, Player player) {
+        ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (item.isSimilar(contents[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * Tells the player deck that they consumed an item
+     * 
+     * @param player
+     * @param arena
+     * @param item
+     * @param slot the slot of the item. Provide -1 if the item can be manually depleted.
+     */
+    public static void consumeItem(Player player, Arena arena, ItemStack item, int slot) {
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        if (mwp == null) {
+            return;
+        }
+        
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            return;
+        }
+
+        DeckItem di = deck.getDeckItem(item);
+        int amt = item.getAmount();
+        boolean deplete = slot == -1;
+        if (di == null) {
+            if (deplete) {
+                item.setAmount(item.getAmount() - 1);
+            }
+            return;
+        }
+        
+        // Use inv items, since sometimes actual item isn't used
+        boolean makeUnavailable = false;
+        if (amt == 1) {
+            if (!deplete) {
+                player.getInventory().setItem(slot, item);
+            }
+            makeUnavailable = true;
+        } else if (deplete) {
+            item.setAmount(amt - 1);
+        }
+        
+        di.consume(makeUnavailable);
     }
 }

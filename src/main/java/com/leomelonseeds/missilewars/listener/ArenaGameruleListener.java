@@ -58,6 +58,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
@@ -240,7 +241,8 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        CustomItemListener.consumeItem(player, arena, event.getConsumable(), false);
+        ItemStack toConsume = event.getConsumable();
+        InventoryUtils.consumeItem(player, arena, toConsume, InventoryUtils.getInvSlot(toConsume, player));
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
@@ -270,14 +272,18 @@ public class ArenaGameruleListener implements Listener {
         
         // At this point, the player is 100% using berserker. Obtain the arrow item
         ItemStack toConsume = null;
-        for (ItemStack i : player.getInventory().getContents()) {
-            if (i.getType() == Material.ARROW || i.getType() == Material.TIPPED_ARROW) {
-                toConsume = i;
+        int slot = -1;
+        ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i];
+            if (item.getType() == Material.ARROW || item.getType() == Material.TIPPED_ARROW) {
+                toConsume = item;
+                slot = i;
                 break;
             }
         }
         
-        CustomItemListener.consumeItem(player, arena, toConsume, false);
+        InventoryUtils.consumeItem(player, arena, toConsume, slot);
     }
     
 

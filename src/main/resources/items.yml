@@ -1495,6 +1495,8 @@ indicators:
     - "&aSkillpoints&7. Check the item below"
     - "&7for your available skillpoints."
     - "&7You get one extra skillpoint per MW rank."
+    - ""
+    - "&aBalance: &f%mokens% Mokens"
     slot: 8
   skillpoints:
     item: EMERALD
@@ -1533,7 +1535,7 @@ text:
   - "&bLimit: %max% &fitems"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
-  currentsp: "&aAvailable Skillpoints: &f%sp%"
+  currentsp: "&cAvailable &7Skillpoints: &f%sp%"
 
 preset:
   info:
