@@ -202,15 +202,6 @@ public class MissileWarsTeam {
         }
         return false;
     }
-    
-    /**
-     * Assumes the game just started
-     * 
-     * @param player
-     */
-    public void addPlayer(MissileWarsPlayer player) {
-        addPlayer(player, true);
-    }
 
     /**
      * Add a player to the team.
@@ -218,7 +209,7 @@ public class MissileWarsTeam {
      * @param player the player to add
      * @param if the game just started
      */
-    public void addPlayer(MissileWarsPlayer player, boolean start) {
+    public void addPlayer(MissileWarsPlayer player) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         members.add(player);
 
@@ -242,7 +233,7 @@ public class MissileWarsTeam {
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(start));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(arena.getLeft(player.getMCPlayerId())));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
@@ -343,6 +334,7 @@ public class MissileWarsTeam {
             InventoryUtils.clearInventory(mcPlayer);
             player.stopDeck();
             player.resetPlayer();
+            arena.addLeft(player.getMCPlayerId());
             mcPlayer.setLevel(0);
             for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
                 mcPlayer.removePotionEffect(effect.getType());

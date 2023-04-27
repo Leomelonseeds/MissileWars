@@ -101,6 +101,8 @@ public class Arena implements ConfigurationSerializable {
     protected Tracker tracker;
     /** The vote manager for this arena */
     protected VoteManager voteManager;
+    /** Set of players who have played but have since left */
+    protected Set<UUID> leftPlayers;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -119,6 +121,7 @@ public class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
         tracker = new Tracker();
+        leftPlayers = new HashSet<>();
         voteManager = new VoteManager(this);
     }
 
@@ -161,6 +164,7 @@ public class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         tracker = new Tracker();
+        leftPlayers = new HashSet<>();
         voteManager = new VoteManager(this);
     }
     
@@ -169,6 +173,25 @@ public class Arena implements ConfigurationSerializable {
             redTeam.unregisterTeam();
             blueTeam.unregisterTeam();
         }
+    }
+    
+    /**
+     * Call when a player leaves the game/arena
+     * 
+     * @param uuid
+     */
+    public void addLeft(UUID uuid) {
+        leftPlayers.add(uuid);
+    }
+    
+    /**
+     * Check if the player has previously been in this game
+     * 
+     * @param uuid
+     * @return
+     */
+    public boolean getLeft(UUID uuid) {
+        return leftPlayers.contains(uuid);
     }
     
     /**
@@ -807,7 +830,7 @@ public class Arena implements ConfigurationSerializable {
                 } else {
                     removeSpectator(player);
                     otherTeam.removePlayer(player);
-                    joinTeam.addPlayer(player, false);
+                    joinTeam.addPlayer(player);
                     checkNotEmpty();
                     announceMessage("messages.queue-join-" + team, player);
                 }
@@ -1150,6 +1173,7 @@ public class Arena implements ConfigurationSerializable {
             player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             player.stopDeck();
         }
+        leftPlayers.clear();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         // Remove all players after a short time, then reset the world a bit after

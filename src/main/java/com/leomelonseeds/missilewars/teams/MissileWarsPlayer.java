@@ -84,6 +84,11 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!arena.isRunning()) {
+                    this.cancel();
+                    return;
+                }
+                
                 // If the player left, cancel task
                 String team = arena.getTeam(playerId);
                 if (team == "no team") {
@@ -95,6 +100,10 @@ public class MissileWarsPlayer {
                 Player player = getMCPlayer();
                 if (player.hasPermission("umw.disablepreview")) {
                     this.cancel();
+                    return;
+                }
+                
+                if (player.getLocation().getBlockY() < -64) {
                     return;
                 }
 
@@ -191,9 +200,9 @@ public class MissileWarsPlayer {
      * Call when player joins the game. Gives player
      * all deck items and such
      *
-     * @param deck the deck to let this MissileWarsPlayer use
+     * @param joinedBefore whether this player has previously been in the arena
      */
-    public void setDeck(boolean start) {
+    public void setDeck(boolean joinedBefore) {
         this.deck = MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId);
         Player player = getMCPlayer();
         if (deck == null || player == null) {
@@ -211,7 +220,7 @@ public class MissileWarsPlayer {
         for (int i = 0; i < 8; i++) {
             DeckItem di = deck.getItems().get(i);
             player.getInventory().setItem(i + 1, di.getInstanceItem());
-            di.initCooldown(di.getCooldown() - (start ? 25 : 0));
+            di.initCooldown(di.getCooldown() - (joinedBefore ? 0 : 25));
         }
     }
 
