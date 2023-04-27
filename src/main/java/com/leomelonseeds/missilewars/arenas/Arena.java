@@ -823,6 +823,10 @@ public class Arena implements ConfigurationSerializable {
             } else {
                 MissileWarsTeam joinTeam = team.equals("red") ? redTeam : blueTeam;
                 MissileWarsTeam otherTeam = team.equals("red") ? blueTeam : redTeam;
+                if (joinTeam.containsPlayer(uuid)) {
+                    return;
+                }
+                
                 if (!mcPlayer.isOp() && joinTeam.getSize() - otherTeam.getSize() >= 1) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
                 } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
@@ -835,7 +839,7 @@ public class Arena implements ConfigurationSerializable {
                     announceMessage("messages.queue-join-" + team, player);
                 }
             }
-            break;
+            return;
         }
     }
 
