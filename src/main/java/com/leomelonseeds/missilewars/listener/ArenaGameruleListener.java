@@ -242,7 +242,15 @@ public class ArenaGameruleListener implements Listener {
         }
         
         ItemStack toConsume = event.getConsumable();
-        InventoryUtils.consumeItem(player, arena, toConsume, InventoryUtils.getInvSlot(toConsume, player));
+        ItemStack[] contents = player.getInventory().getContents();
+        int slot = -1;
+        for (int i = 0; i < contents.length; i++) {
+            if (toConsume.isSimilar(contents[i])) {
+                slot = i;
+            }
+        }
+        InventoryUtils.consumeItem(player, arena, toConsume, slot);
+        
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight

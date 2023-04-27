@@ -37,6 +37,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -97,6 +98,11 @@ public class CustomItemListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         return arena;
+    }
+    
+    private int getSlotFromHand(Player player, EquipmentSlot hand) {
+        PlayerInventory inv = player.getInventory();
+        return hand == EquipmentSlot.HAND ? inv.getHeldItemSlot() : 40;
     }
     
     /** Give architect pickaxes the haste effect */
@@ -340,11 +346,6 @@ public class CustomItemListener implements Listener {
                 mwp.incrementUtility();
                 return;
             }
-            
-            // Make sure we allow gear items to be used
-            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe") || utility.contains("arrow")) {
-                return;
-            }
         }
     }
     
@@ -428,7 +429,7 @@ public class CustomItemListener implements Listener {
             }
         }
 
-        InventoryUtils.consumeItem(player, playerArena, item, InventoryUtils.getInvSlot(item, player));
+        InventoryUtils.consumeItem(player, playerArena, item, getSlotFromHand(player, event.getHand()));
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -586,7 +587,8 @@ public class CustomItemListener implements Listener {
 
         // Add meta for structure identification
         thrown.customName(Component.text(structureName));
-        InventoryUtils.consumeItem(thrower, playerArena, hand, InventoryUtils.getInvSlot(hand, thrower));
+        PlayerInventory inv = thrower.getInventory();
+        InventoryUtils.consumeItem(thrower, playerArena, hand, inv.getItemInMainHand().isSimilar(hand) ? inv.getHeldItemSlot() : 40);
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
@@ -734,13 +736,13 @@ public class CustomItemListener implements Listener {
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
-        InventoryUtils.consumeItem(thrower, playerArena, hand, InventoryUtils.getInvSlot(hand, thrower));
+        PlayerInventory inv = thrower.getInventory();
+        InventoryUtils.consumeItem(thrower, playerArena, hand, inv.getItemInMainHand().isSimilar(hand) ? inv.getHeldItemSlot() : 40);
     }
 
     /** Handle spawning of splash waters */
     @EventHandler
     public void handleSplash(ProjectileHitEvent event) {
-
         // Make sure we're getting the right potion here
         if ((event.getEntityType() != EntityType.SPLASH_POTION) || (event.getEntity().customName() == null)) {
             return;

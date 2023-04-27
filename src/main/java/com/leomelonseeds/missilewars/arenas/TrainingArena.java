@@ -38,6 +38,9 @@ public class TrainingArena extends Arena {
     public TrainingArena(Map<String, Object> serializedArena) {
         super(serializedArena);
     }
+    
+    @Override
+    public void addLeft(UUID uuid) {}
 
     @Override
     public void enqueue(UUID uuid, String team) {

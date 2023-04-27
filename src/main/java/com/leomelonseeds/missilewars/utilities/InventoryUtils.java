@@ -166,24 +166,13 @@ public class InventoryUtils {
         });
     }
     
-    // Given item from, return the slot of the item for the player. -1 if not found
-    public static int getInvSlot(ItemStack item, Player player) {
-        ItemStack[] contents = player.getInventory().getContents();
-        for (int i = 0; i < contents.length; i++) {
-            if (item.isSimilar(contents[i])) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
     /**
-     * Tells the player deck that they consumed an item
+     * Tell plugin that an item was consumed
      * 
      * @param player
      * @param arena
      * @param item
-     * @param slot the slot of the item. Provide -1 if the item can be manually depleted.
+     * @param slot -1 if should be manually depleted, provide slot otherwise
      */
     public static void consumeItem(Player player, Arena arena, ItemStack item, int slot) {
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
@@ -206,13 +195,18 @@ public class InventoryUtils {
             return;
         }
         
-        // Use inv items, since sometimes actual item isn't used
         boolean makeUnavailable = false;
         if (amt == 1) {
-            if (!deplete) {
-                player.getInventory().setItem(slot, item);
-            }
             makeUnavailable = true;
+            if (!deplete) {
+                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                    item.setAmount(1);
+                    player.getInventory().setItem(slot, item);
+                    if (item.getType() == Material.ENDER_PEARL) {
+                        player.setCooldown(Material.ENDER_PEARL, di.getCurrentCooldown() * 20 - 1);
+                    }
+                }, 1);
+            }
         } else if (deplete) {
             item.setAmount(amt - 1);
         }

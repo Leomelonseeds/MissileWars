@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.decks;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -70,8 +72,6 @@ public class DeckItem {
                 }
                 
                 getItem().setAmount(++amt);
-                setVisualCooldown(0);
-                player.updateInventory();
                 
                 if (amt < max) {
                     curCooldown = cooldown;
@@ -88,7 +88,10 @@ public class DeckItem {
                 updateItem(); 
             }
         }, 20L);
-        plugin.log("COOLDOWN: " + curCooldown * 20 + ", VISUAL: " + player.getCooldown(item.getType()));
+        int vis = player.getCooldown(item.getType());
+        if (unavailable && vis != curCooldown * 20) {
+            plugin.log("DIFFERENCE!! COOLDOWN: " + curCooldown * 20 + ", VISUAL: " + vis);
+        }
     }
     
     /**
@@ -161,7 +164,10 @@ public class DeckItem {
                 return i;
             }
         }
-        return null;
+        
+        player.getInventory().addItem(item);
+        Bukkit.getLogger().log(Level.WARNING, "A player is missing an item " + item.getType() + ", so it was re-added to their inventory.");
+        return getItem();
     }
     
     /**
