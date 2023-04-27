@@ -233,7 +233,7 @@ public class MissileWarsTeam {
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> player.setDeck(arena.getLeft(player.getMCPlayerId())));
+        player.setDeck(arena.getLeft(player.getMCPlayerId()));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

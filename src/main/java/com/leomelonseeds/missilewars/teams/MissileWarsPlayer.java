@@ -203,25 +203,27 @@ public class MissileWarsPlayer {
      * @param joinedBefore whether this player has previously been in the arena
      */
     public void setDeck(boolean joinedBefore) {
-        this.deck = MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId);
-        Player player = getMCPlayer();
-        if (deck == null || player == null) {
-            return;
-        }
-
-        for (ItemStack gearItem : deck.getGear()) {
-            if (gearItem.getType().toString().contains("BOOTS")) {
-                player.getInventory().setBoots(gearItem);
-            } else {
-                player.getInventory().addItem(gearItem);
+        MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId, (result) -> {
+            this.deck = (Deck) result;
+            Player player = getMCPlayer();
+            if (deck == null || player == null) {
+                return;
             }
-        }
-        
-        for (int i = 0; i < 8; i++) {
-            DeckItem di = deck.getItems().get(i);
-            player.getInventory().setItem(i + 1, di.getInstanceItem());
-            di.initCooldown(di.getCooldown() - (joinedBefore ? 0 : 25));
-        }
+
+            for (ItemStack gearItem : deck.getGear()) {
+                if (gearItem.getType().toString().contains("BOOTS")) {
+                    player.getInventory().setBoots(gearItem);
+                } else {
+                    player.getInventory().addItem(gearItem);
+                }
+            }
+            
+            for (int i = 0; i < 8; i++) {
+                DeckItem di = deck.getItems().get(i);
+                player.getInventory().setItem(i + 1, di.getInstanceItem());
+                di.initCooldown(di.getCooldown() - (joinedBefore ? 0 : 25));
+            }
+        });
     }
 
     /**

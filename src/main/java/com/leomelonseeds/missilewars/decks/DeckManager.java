@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.DBCallback;
 
 import net.kyori.adventure.text.Component;
 
@@ -68,7 +69,7 @@ public class DeckManager {
      * @param deck
      * @return
      */
-    public Deck getPlayerDeck(UUID uuid) {
+    public void getPlayerDeck(UUID uuid, DBCallback callback) {
         
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
@@ -175,7 +176,7 @@ public class DeckManager {
             item.setItemMeta(meta);
         }
         
-        return new Deck(deck, gear, pool);
+        callback.onQueryDone(new Deck(deck, gear, pool));
     }
     
     /**
