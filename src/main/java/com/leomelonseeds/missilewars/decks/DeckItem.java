@@ -229,23 +229,22 @@ public class DeckItem {
         return unavailable ? 0 : getItem().getAmount();
     }
 
-    // Sets a visual cooldown, do 1 tick later to allow some items to be used
+    // Sets a visual cooldown.
     // If the item is an arrow, set a cooldown for the bow/crossbow too
     // Also sets unavailable to true
     public void setVisualCooldown(int c) {
-        int cd = Math.max(c * 20 - 1, 0);
+        int cd = c * 20;
         unavailable = cd != 0;
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            player.setCooldown(item.getType(), cd);
+        player.setCooldown(item.getType(), cd);
             
-            // Due to the way crossbow loading and bow firing are handled,
-            // setting the item cooldowns for them differs slightly
-            if (item.getType().toString().contains("ARROW")) {
-                player.setCooldown(Material.BOW, cd);
-                if (cd == 0) {
-                    player.setCooldown(Material.CROSSBOW, 0);
-                }
+        // Due to the way crossbow loading and bow firing are handled,
+        // setting the item cooldowns for them differs slightly
+        if (item.getType().toString().contains("ARROW")) {
+            player.setCooldown(Material.BOW, cd);
+            if (cd == 0) {
+                player.setCooldown(Material.CROSSBOW, 0);
             }
-        }, 1);
+        }
+        
     }
 }

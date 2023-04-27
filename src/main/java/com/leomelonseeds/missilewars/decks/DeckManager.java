@@ -417,12 +417,6 @@ public class DeckManager {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
-        } else if (name.equals("lingering_harming")) {
-            int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
-            int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
-            PotionMeta pmeta = (PotionMeta) itemMeta;
-            pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
-            pmeta.setColor(Color.PURPLE);
         } else if (name.equals("torpedo")) {
             itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);

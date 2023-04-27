@@ -16,7 +16,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -43,6 +45,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
+import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
@@ -54,7 +57,6 @@ import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
@@ -192,7 +194,6 @@ public class CustomItemListener implements Listener {
         PlayerInventory inv = player.getInventory();
         ItemStack hand = inv.getItem(event.getHand());
         if (player.hasCooldown(hand.getType())) {
-            event.setCancelled(true);
             return;
         }
         
@@ -263,7 +264,6 @@ public class CustomItemListener implements Listener {
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
             if (structureName.contains("shield-") || structureName.contains("platform-") || structureName.contains("torpedo-")) {
-                consumeItem(player, playerArena, hand, false);
                 return;
             }
             
@@ -311,6 +311,7 @@ public class CustomItemListener implements Listener {
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
                 for (ItemStack i : player.getInventory().getContents()) {
+                    if (i == null) continue;
                     Material material = i.getType();
                     if (!player.hasCooldown(material) && material != hand.getType() && material.toString().contains("SPAWN_EGG")) {
                         player.setCooldown(material, plugin.getConfig().getInt("experimental.missile-cooldown"));
@@ -349,22 +350,33 @@ public class CustomItemListener implements Listener {
                 return;
             }
 
-            // Spawn a fireball
+            // Spawn a fireball/dragon fireball
             if (utility.contains("fireball")) {
                 event.setCancelled(true);
-                Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
-                        .getEyeLocation().getDirection()), EntityType.FIREBALL);
-                // Check for boosterball passive. Store passive by setting incendiary value
-                int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
-                if (boosterball > 0) {
-                    double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
-                    fireball.setIsIncendiary(false);
-                    fireball.customName(ConfigUtils.toComponent(multiplier + ""));
+                Fireball fireball;
+                if (utility.contains("dragon")) {
+                    fireball = (DragonFireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
+                            player.getEyeLocation().getDirection()), EntityType.DRAGON_FIREBALL);
+                    int amplifier = (int) getItemStat(utility, "amplifier");
+                    int duration = (int) getItemStat(utility, "duration");
+                    fireball.customName(Component.text("vdf:" + amplifier + ":" + duration));
+                    fireball.setCustomNameVisible(false);
                 } else {
-                    fireball.setIsIncendiary(true);
+                    fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
+                            player.getEyeLocation().getDirection()), EntityType.FIREBALL);
+                    // Check for boosterball passive. Store passive by setting incendiary value
+                    int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
+                    if (boosterball > 0) {
+                        double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
+                        fireball.setIsIncendiary(false);
+                        fireball.customName(ConfigUtils.toComponent(multiplier + ""));
+                    } else {
+                        fireball.setIsIncendiary(true);
+                    }
+                    float yield = (float) getItemStat(utility, "power");
+                    fireball.setYield(yield);
                 }
-                float yield = (float) getItemStat(utility, "power");
-                fireball.setYield(yield);
+                
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
                 consumeItem(player, playerArena, hand, true);
@@ -377,10 +389,25 @@ public class CustomItemListener implements Listener {
             if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe") || utility.contains("arrow")) {
                 return;
             }
-            
-            // Otherwise another utility was used, tell deck item to consume as well
-            consumeItem(player, playerArena, hand, false);
         }
+    }
+    
+    @EventHandler
+    public void dragonFireball(EnderDragonFireballHitEvent event) {
+        DragonFireball fb = event.getEntity();
+        if (fb.customName() == null) {
+            return;
+        }
+        
+        String[] args = ConfigUtils.toPlain(fb.customName()).split(":");
+        if (!args[0].equals("vdf")) {
+            return;
+        }
+        
+        int amplifier = Integer.parseInt(args[1]);
+        int duration = Integer.parseInt(args[2]);
+        AreaEffectCloud cloud = event.getAreaEffectCloud();
+        cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
     }
 
     public static Set<UUID> canopy_cooldown = new HashSet<>();
@@ -551,7 +578,6 @@ public class CustomItemListener implements Listener {
     /** Cancel canopy activation if player jumps falls or something */
     @EventHandler
     public void canopyCancel(PlayerMoveEvent e) {
-
         Player player = e.getPlayer();
         
         // Stop players from moving a second after canopy spawn
@@ -606,6 +632,7 @@ public class CustomItemListener implements Listener {
 
         // Add meta for structure identification
         thrown.customName(Component.text(structureName));
+        consumeItem(thrower, playerArena, hand, false);
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
@@ -754,6 +781,7 @@ public class CustomItemListener implements Listener {
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
+        consumeItem(thrower, playerArena, hand, false);
     }
 
     /** Handle spawning of splash waters */
@@ -765,7 +793,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        String customName = PlainTextComponentSerializer.plainText().serialize(event.getEntity().customName());
+        String customName = ConfigUtils.toPlain(event.getEntity().customName());
         if (!customName.contains("splash:")) {
             return;
         }

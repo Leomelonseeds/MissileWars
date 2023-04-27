@@ -985,8 +985,8 @@ leaves:
 lingering_harming:
   index: 6
   max: 2
-  item: LINGERING_POTION
-  name: "&5★ Lingering Harming Potion %level% ⚡"
+  item: DRAGON_HEAD
+  name: "&5★ Dragon Fireball %level% ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
