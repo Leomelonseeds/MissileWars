@@ -15,7 +15,7 @@ public class DeckItem {
     private ItemStack item;
     private int cooldown; // in seconds
     private int max;
-    private double curCooldown;
+    private int curCooldown;
     private Player player;
     BukkitTask cooldownTask;
     boolean unavailable;
@@ -62,7 +62,7 @@ public class DeckItem {
     public void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (curCooldown - 0.5 <= 0) {
+            if (curCooldown - 1 <= 0) {
                 int amt = getActualAmount();
                 curCooldown = 0;
                 if (amt >= max) {
@@ -71,7 +71,6 @@ public class DeckItem {
                 
                 getItem().setAmount(++amt);
                 setVisualCooldown(0);
-                unavailable = false;
                 player.updateInventory();
                 
                 if (amt < max) {
@@ -85,18 +84,18 @@ public class DeckItem {
                 }
                 updateItem();
             } else {
-                curCooldown -= 0.5;
+                curCooldown--;
                 updateItem(); 
             }
-        }, 10L);
+        }, 20L);
     }
     
     /**
-     * Accurate to 1/2 of second
+     * Accurate to the second
      * 
      * @return
      */
-    public double getCurrentCooldown() {
+    public int getCurrentCooldown() {
         return curCooldown;
     }
     
@@ -114,7 +113,7 @@ public class DeckItem {
     /**
      * Initializes the cooldown of an item, use for game starts.
      * Adds visual cooldown of c. If 0 or existing cooldown then 
-     * no cooldown will be added added
+     * no cooldown will be added
      */
     public void initCooldown(int c) {
         if (c < 0) {
@@ -233,9 +232,9 @@ public class DeckItem {
     // Sets a visual cooldown, do 1 tick later to allow some items to be used
     // If the item is an arrow, set a cooldown for the bow/crossbow too
     // Also sets unavailable to true
-    public void setVisualCooldown(double c) {
-        int cd = Math.max((int) (c * 20) - 1, 0);
-        unavailable = c != 0;
+    public void setVisualCooldown(int c) {
+        int cd = Math.max(c * 20 - 1, 0);
+        unavailable = cd != 0;
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             player.setCooldown(item.getType(), cd);
             

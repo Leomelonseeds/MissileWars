@@ -177,8 +177,6 @@ public class CustomItemListener implements Listener {
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
     }
-    
-    public static ArrayList<Player> cooldown = new ArrayList<>();
 
     /** Handle right clicking missiles and utility items */
     @EventHandler
@@ -307,24 +305,17 @@ public class CustomItemListener implements Listener {
                 mapName = playerArena.getMapName();
             }
             
-            // 0.5s cooldown
-            if (cooldown.contains(player)) {
-                ConfigUtils.sendConfigMessage("messages.missile-cooldown", player, null, null);
-                return;
-            }
-            
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 consumeItem(player, playerArena, hand, true);
                 mwp.incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
-                // 0.5s cooldown
-                cooldown.add(player);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        cooldown.remove(player);
+                // Missile cooldown
+                for (ItemStack i : player.getInventory().getContents()) {
+                    Material material = i.getType();
+                    if (!player.hasCooldown(material) && material != hand.getType() && material.toString().contains("SPAWN_EGG")) {
+                        player.setCooldown(material, plugin.getConfig().getInt("experimental.missile-cooldown"));
                     }
-                }.runTaskLater(plugin, plugin.getConfig().getInt("experimental.missile-cooldown"));
+                }
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }
@@ -333,15 +324,9 @@ public class CustomItemListener implements Listener {
         
         // Spawn a utility item. At this point we know the item MUST have a utility tag
         else {
-            // Make sure we allow gear items to be used
-            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe") || utility.contains("arrow")) {
-                return;
-            }
-
-            if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
-                if (utility.contains("creeper")) {
+            if (utility.contains("creeper")) {
+                if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
                     event.setCancelled(true);
-
                     // Can't place creepers on obsidian, otherwise broken game
                     List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                     for (String s : cancel) {
@@ -360,8 +345,8 @@ public class CustomItemListener implements Listener {
                     creeper.setCustomNameVisible(true);
                     consumeItem(player, playerArena, hand, true);
                     mwp.incrementUtility();
-                    return;
                 }
+                return;
             }
 
             // Spawn a fireball
@@ -385,6 +370,11 @@ public class CustomItemListener implements Listener {
                 consumeItem(player, playerArena, hand, true);
                 ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
                 mwp.incrementUtility();
+                return;
+            }
+            
+            // Make sure we allow gear items to be used
+            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe") || utility.contains("arrow")) {
                 return;
             }
             

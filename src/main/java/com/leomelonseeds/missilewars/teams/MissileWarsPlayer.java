@@ -188,9 +188,9 @@ public class MissileWarsPlayer {
                     return;
                 }
                 
-                double cd = di.getCurrentCooldown();
-                player.setLevel((int) Math.ceil(cd));
-                player.setExp((float) (cd - Math.floor(cd - 0.5)));
+                int cd = di.getCurrentCooldown();
+                player.setLevel(cd);
+                player.setExp(1F);
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }
