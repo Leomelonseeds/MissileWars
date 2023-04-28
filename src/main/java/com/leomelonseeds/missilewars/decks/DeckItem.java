@@ -65,17 +65,19 @@ public class DeckItem {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (curCooldown - 1 <= 0) {
-                int amt = getActualAmount();
                 curCooldown = 0;
+                int amt = getActualAmount();
                 if (amt >= max) {
                     return;
                 }
                 
                 getItem().setAmount(++amt);
-                unavailable = false;
-                String action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
-                action = action.replaceAll("%item%", ConfigUtils.toPlain(item.getItemMeta().displayName()));
-                player.sendActionBar(ConfigUtils.toComponent(action));
+                if (unavailable) {
+                    unavailable = false;
+                    String action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
+                    action = action.replaceAll("%item%", ConfigUtils.toPlain(item.getItemMeta().displayName()));
+                    player.sendActionBar(ConfigUtils.toComponent(action));
+                }
                 
                 if (amt < max) {
                     curCooldown = cooldown;

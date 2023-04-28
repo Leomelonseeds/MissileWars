@@ -1,7 +1,7 @@
 package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -221,8 +221,13 @@ public class MissileWarsPlayer {
                 }
             }
 
-            List<Integer> cooldowns = Arrays.asList(new Integer[] {0, 1, 2, 3, 4});
+            // Game start randomizer
             Random random = new Random();
+            List<Integer> cooldowns = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                cooldowns.add(i);
+            }
+            
             for (int i = 0; i < 8; i++) {
                 DeckItem di = deck.getItems().get(i);
                 ItemStack item = di.getInstanceItem();
