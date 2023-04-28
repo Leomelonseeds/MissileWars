@@ -72,6 +72,10 @@ public class DeckItem {
                 }
                 
                 getItem().setAmount(++amt);
+                unavailable = false;
+                String action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
+                action = action.replaceAll("%item%", ConfigUtils.toPlain(item.getItemMeta().displayName()));
+                player.sendActionBar(ConfigUtils.toComponent(action));
                 
                 if (amt < max) {
                     curCooldown = cooldown;
@@ -88,10 +92,6 @@ public class DeckItem {
                 updateItem(); 
             }
         }, 20L);
-        int vis = player.getCooldown(item.getType());
-        if (unavailable && vis != curCooldown * 20) {
-            plugin.log("DIFFERENCE!! COOLDOWN: " + curCooldown * 20 + ", VISUAL: " + vis);
-        }
     }
     
     /**

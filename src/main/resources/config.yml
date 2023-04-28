@@ -68,7 +68,7 @@ item-frequency:
 
 # Default max items/cooldown (in seconds) if not specified for each item
 default-max: 1
-default-cooldown: 30
+default-cooldown: 60
 
 # Amount of ticks items cannot be used after respawning
 respawn-disable: 10

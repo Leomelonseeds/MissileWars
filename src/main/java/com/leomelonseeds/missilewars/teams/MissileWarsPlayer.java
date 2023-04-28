@@ -1,7 +1,10 @@
 package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -204,12 +207,12 @@ public class MissileWarsPlayer {
      */
     public void setDeck(boolean joinedBefore) {
         MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId, (result) -> {
-            this.deck = (Deck) result;
             Player player = getMCPlayer();
-            if (deck == null || player == null) {
+            if (result == null || player == null) {
                 return;
             }
 
+            this.deck = (Deck) result;
             for (ItemStack gearItem : deck.getGear()) {
                 if (gearItem.getType().toString().contains("BOOTS")) {
                     player.getInventory().setBoots(gearItem);
@@ -217,12 +220,20 @@ public class MissileWarsPlayer {
                     player.getInventory().addItem(gearItem);
                 }
             }
-            
+
+            List<Integer> cooldowns = Arrays.asList(new Integer[] {0, 1, 2, 3, 4});
+            Random random = new Random();
             for (int i = 0; i < 8; i++) {
                 DeckItem di = deck.getItems().get(i);
-                player.getInventory().setItem(i + 1, di.getInstanceItem());
-                di.initCooldown(di.getCooldown() - (joinedBefore ? 0 : 25));
+                ItemStack item = di.getInstanceItem();
+                player.getInventory().setItem(i + 1, item);
+                if (item.getType().toString().contains("SPAWN_EGG")) {
+                    di.initCooldown((di.getCooldown() / 5) * cooldowns.remove(random.nextInt(cooldowns.size())) + 1);
+                } else {
+                    di.initCooldown(di.getCooldown());
+                }
             }
+            
         });
     }
 
