@@ -230,9 +230,16 @@ public class MissileWarsPlayer {
             
             for (int i = 0; i < 8; i++) {
                 DeckItem di = deck.getItems().get(i);
-                ItemStack item = di.getInstanceItem();
-                player.getInventory().setItem(i + 1, item);
-                if (item.getType().toString().contains("SPAWN_EGG")) {
+                String name = di.getInstanceItem().getType().toString();
+                player.getInventory().setItem(i + 1, di.getInstanceItem());
+                
+                // Add cooldown for crossbow, only at the start of the game
+                // since cooldown only applied after shooting crossbow otherwise
+                if (name.contains("ARROW")) {
+                    player.setCooldown(Material.CROSSBOW, di.getCooldown());
+                }
+                
+                if (name.contains("SPAWN_EGG")) {
                     di.initCooldown((di.getCooldown() / 5) * cooldowns.remove(random.nextInt(cooldowns.size())) + 1);
                 } else {
                     di.initCooldown(di.getCooldown());

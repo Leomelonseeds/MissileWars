@@ -105,6 +105,24 @@ public class CustomItemListener implements Listener {
         return hand == EquipmentSlot.HAND ? inv.getHeldItemSlot() : 40;
     }
     
+    /**
+     * Consume a projectile by finding its appropriate item in player inventory
+     * 
+     * @param item
+     * @param player
+     * @param arena
+     */
+    private void projectileConsume(ItemStack item, Player player, Arena arena) {
+        PlayerInventory inv = player.getInventory();
+        int slot = inv.getHeldItemSlot();
+        ItemStack main = inv.getItemInMainHand();
+        if (main.isSimilar(item)) {
+            InventoryUtils.consumeItem(player, arena, main, slot);
+        } else {
+            InventoryUtils.consumeItem(player, arena, inv.getItemInOffHand(), 40);
+        }
+    }
+    
     /** Give architect pickaxes the haste effect */
     @EventHandler
     public void giveHaste(PlayerItemHeldEvent event) {
@@ -587,8 +605,7 @@ public class CustomItemListener implements Listener {
 
         // Add meta for structure identification
         thrown.customName(Component.text(structureName));
-        PlayerInventory inv = thrower.getInventory();
-        InventoryUtils.consumeItem(thrower, playerArena, hand, inv.getItemInMainHand().isSimilar(hand) ? inv.getHeldItemSlot() : 40);
+        projectileConsume(hand, thrower, playerArena);
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
@@ -736,8 +753,7 @@ public class CustomItemListener implements Listener {
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
-        PlayerInventory inv = thrower.getInventory();
-        InventoryUtils.consumeItem(thrower, playerArena, hand, inv.getItemInMainHand().isSimilar(hand) ? inv.getHeldItemSlot() : 40);
+        projectileConsume(hand, thrower, playerArena);
     }
 
     /** Handle spawning of splash waters */
