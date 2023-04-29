@@ -193,7 +193,7 @@ public class MissileWarsPlayer {
                 
                 int cd = di.getCurrentCooldown();
                 player.setLevel(cd);
-                player.setExp(1F);
+                player.setExp((float) cd / di.getCooldown());
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }

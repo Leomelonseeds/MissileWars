@@ -238,11 +238,11 @@ public class DeckItem {
         return unavailable ? 0 : getItem().getAmount();
     }
 
-    // Sets a visual cooldown to 16/15 of the actual cooldown to account for desync
+    // Sets a visual cooldown
     // If the item is an arrow, set a cooldown for the bow/crossbow too
     // Also sets unavailable to true
     public void setVisualCooldown(int c) {
-        int cd = (int) Math.ceil(c * 20 * 16 / (double) 15);
+        int cd = c * 20;
         unavailable = cd != 0;
         player.setCooldown(item.getType(), cd);
             

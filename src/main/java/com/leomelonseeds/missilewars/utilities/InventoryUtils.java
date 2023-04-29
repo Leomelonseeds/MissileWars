@@ -202,7 +202,9 @@ public class InventoryUtils {
                 Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
                     item.setAmount(1);
                     player.getInventory().setItem(slot, item);
-                    di.setVisualCooldown(di.getCurrentCooldown());
+                    if (item.getType() == Material.ENDER_PEARL) {
+                        di.setVisualCooldown(di.getCurrentCooldown()); 
+                    }
                 }, 1);
             }
         } else if (deplete) {
