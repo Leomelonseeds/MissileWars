@@ -100,11 +100,6 @@ public class CustomItemListener implements Listener {
         return arena;
     }
     
-    private int getSlotFromHand(Player player, EquipmentSlot hand) {
-        PlayerInventory inv = player.getInventory();
-        return hand == EquipmentSlot.HAND ? inv.getHeldItemSlot() : 40;
-    }
-    
     /**
      * Consume a projectile by finding its appropriate item in player inventory
      * 
@@ -447,7 +442,7 @@ public class CustomItemListener implements Listener {
             }
         }
 
-        InventoryUtils.consumeItem(player, playerArena, item, getSlotFromHand(player, event.getHand()));
+        InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? player.getInventory().getHeldItemSlot() : 40);
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {

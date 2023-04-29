@@ -73,7 +73,7 @@ public class DeckItem {
                 
                 getItem().setAmount(++amt);
                 if (unavailable) {
-                    unavailable = false;
+                    setVisualCooldown(0);
                     String action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
                     action = action.replaceAll("%item%", ConfigUtils.toPlain(item.getItemMeta().displayName()));
                     player.sendActionBar(ConfigUtils.toComponent(action));
@@ -238,11 +238,11 @@ public class DeckItem {
         return unavailable ? 0 : getItem().getAmount();
     }
 
-    // Sets a visual cooldown.
+    // Sets a visual cooldown to 16/15 of the actual cooldown to account for desync
     // If the item is an arrow, set a cooldown for the bow/crossbow too
     // Also sets unavailable to true
     public void setVisualCooldown(int c) {
-        int cd = c * 20;
+        int cd = (int) Math.ceil(c * 20 * 16 / (double) 15);
         unavailable = cd != 0;
         player.setCooldown(item.getType(), cd);
             
