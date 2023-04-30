@@ -187,13 +187,13 @@ public class MissileWarsPlayer {
                 
                 if (di == null) {
                     player.setLevel(0);
-                    player.setExp(0F);
+                    player.setExp(1F);
                     return;
                 }
                 
                 int cd = di.getCurrentCooldown();
                 player.setLevel(cd);
-                player.setExp((float) cd / di.getCooldown());
+                player.setExp((di.getCooldown() - cd) / (float) di.getCooldown());
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }

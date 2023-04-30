@@ -907,6 +907,7 @@ canopy:
 
 creeper:
   index: 5
+  cooldown: 45
   1:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper &a&l☣"
