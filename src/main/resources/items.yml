@@ -1224,9 +1224,6 @@ Berserker:
         spcost: 1
       2: 
         level: 2
-        spcost: 1
-      3: 
-        level: 3
         spcost: 2
     blast_protection:
       cost: 1600

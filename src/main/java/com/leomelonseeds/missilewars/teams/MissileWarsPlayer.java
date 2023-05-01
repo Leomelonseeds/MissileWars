@@ -2,9 +2,9 @@ package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -222,11 +222,11 @@ public class MissileWarsPlayer {
             }
 
             // Game start randomizer
-            Random random = new Random();
             List<Integer> cooldowns = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 cooldowns.add(i);
             }
+            Collections.shuffle(cooldowns);
             
             for (int i = 0; i < 8; i++) {
                 DeckItem di = deck.getItems().get(i);
@@ -240,7 +240,7 @@ public class MissileWarsPlayer {
                 }
                 
                 if (name.contains("SPAWN_EGG")) {
-                    di.initCooldown((di.getCooldown() / 5) * cooldowns.remove(random.nextInt(cooldowns.size())) + 1);
+                    di.initCooldown((di.getCooldown() / 5) * cooldowns.remove(0) + 1);
                 } else {
                     di.initCooldown(di.getCooldown());
                 }
