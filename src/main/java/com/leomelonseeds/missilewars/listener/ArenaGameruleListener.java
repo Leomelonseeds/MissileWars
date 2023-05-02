@@ -567,8 +567,8 @@ public class ArenaGameruleListener implements Listener {
         double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
-            player.getInventory().addItem(item);
-            ConfigUtils.sendConfigSound("deconstructor-pickup", player);
+            Item newitem = player.getWorld().dropItem(player.getLocation(), item);
+            newitem.setPickupDelay(0);
         }
     }
 

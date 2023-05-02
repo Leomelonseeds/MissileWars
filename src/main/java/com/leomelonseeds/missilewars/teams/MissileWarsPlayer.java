@@ -223,7 +223,7 @@ public class MissileWarsPlayer {
 
             // Game start randomizer
             List<Integer> cooldowns = new ArrayList<>();
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i <= 4; i++) {
                 cooldowns.add(i);
             }
             Collections.shuffle(cooldowns);
@@ -240,7 +240,7 @@ public class MissileWarsPlayer {
                 }
                 
                 if (name.contains("SPAWN_EGG")) {
-                    di.initCooldown((di.getCooldown() / 5) * cooldowns.remove(0) + 1);
+                    di.initCooldown((di.getCooldown() / 4) * cooldowns.remove(0) + 1);
                 } else {
                     di.initCooldown(di.getCooldown());
                 }
