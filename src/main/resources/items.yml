@@ -878,6 +878,7 @@ obsidianshieldclear:
 
 canopy:
   index: 7
+  cooldown: 75
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"

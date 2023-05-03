@@ -25,6 +25,8 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -207,7 +209,6 @@ public class MissileWarsTeam {
      * Add a player to the team.
      *
      * @param player the player to add
-     * @param if the game just started
      */
     public void addPlayer(MissileWarsPlayer player) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
@@ -233,7 +234,20 @@ public class MissileWarsTeam {
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
-        player.setDeck(arena.getLeft(player.getMCPlayerId()));
+        
+        // TODO: Set player deck here instead of in the player class. After setting deck,
+        // notify arena that deck has been added. Once all queued players added to the game
+        // (arena needs some way of detecting that), the arena should then schedule cooldowns
+        // (due to team balancing/chaos mode needs). Otherwise, all cooldowns are infinite
+        plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId(), (result) -> {
+            Deck deck = (Deck) result;
+            player.setDeck(deck);
+            for (DeckItem di : deck.getItems()) {
+                mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
+            }
+            // TODO: Notify arena that deck successfully set
+            // This line should then be in the arena method: player.setDeck(arena.getLeft(player.getMCPlayerId()));
+        });
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

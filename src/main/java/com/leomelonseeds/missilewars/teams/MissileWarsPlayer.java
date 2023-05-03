@@ -1,9 +1,6 @@
 package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -200,12 +197,12 @@ public class MissileWarsPlayer {
 
     /**
      * Set the user's current {@link Deck}.
-     * Call when player joins the game. Gives player
-     * all deck items and such
      *
      * @param joinedBefore whether this player has previously been in the arena
      */
-    public void setDeck(boolean joinedBefore) {
+    public void setDeck(Deck deck) {
+        this.deck = deck;
+        /* ADD THIS SECTION TO ARENA METHOD
         MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId, (result) -> {
             Player player = getMCPlayer();
             if (result == null || player == null) {
@@ -246,7 +243,7 @@ public class MissileWarsPlayer {
                 }
             }
             
-        });
+        });*/
     }
 
     /**
