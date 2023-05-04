@@ -1,6 +1,9 @@
 package com.leomelonseeds.missilewars.teams;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -196,54 +199,58 @@ public class MissileWarsPlayer {
     }
 
     /**
-     * Set the user's current {@link Deck}.
+     * Set the user's current {@link Deck} and give gear items
      *
      * @param joinedBefore whether this player has previously been in the arena
      */
     public void setDeck(Deck deck) {
         this.deck = deck;
-        /* ADD THIS SECTION TO ARENA METHOD
-        MissileWarsPlugin.getPlugin().getDeckManager().getPlayerDeck(playerId, (result) -> {
-            Player player = getMCPlayer();
-            if (result == null || player == null) {
-                return;
+        Player player = getMCPlayer();
+        if (player == null) {
+            return;
+        }
+        
+        for (ItemStack gearItem : deck.getGear()) {
+            if (gearItem.getType().toString().contains("BOOTS")) {
+                player.getInventory().setBoots(gearItem);
+            } else {
+                player.getInventory().addItem(gearItem);
             }
+        }
+    }
+    
+    /**
+     * Initialize deck cooldowns
+     * 
+     * @param joinedBefore
+     */
+    public void initDeck(boolean joinedBefore) {
+        Player player = getMCPlayer(); // Not null due to check in arena
 
-            this.deck = (Deck) result;
-            for (ItemStack gearItem : deck.getGear()) {
-                if (gearItem.getType().toString().contains("BOOTS")) {
-                    player.getInventory().setBoots(gearItem);
-                } else {
-                    player.getInventory().addItem(gearItem);
-                }
-            }
-
-            // Game start randomizer
-            List<Integer> cooldowns = new ArrayList<>();
-            for (int i = 0; i <= 4; i++) {
-                cooldowns.add(i);
-            }
-            Collections.shuffle(cooldowns);
+        // Game start randomizer
+        List<Integer> cooldowns = new ArrayList<>();
+        for (int i = 0; i <= 4; i++) {
+            cooldowns.add(i);
+        }
+        Collections.shuffle(cooldowns);
+        
+        for (int i = 0; i < 8; i++) {
+            DeckItem di = deck.getItems().get(i);
+            String name = di.getInstanceItem().getType().toString();
+            player.getInventory().setItem(i + 1, di.getInstanceItem());
             
-            for (int i = 0; i < 8; i++) {
-                DeckItem di = deck.getItems().get(i);
-                String name = di.getInstanceItem().getType().toString();
-                player.getInventory().setItem(i + 1, di.getInstanceItem());
-                
-                // Add cooldown for crossbow, only at the start of the game
-                // since cooldown only applied after shooting crossbow otherwise
-                if (name.contains("ARROW")) {
-                    player.setCooldown(Material.CROSSBOW, di.getCooldown());
-                }
-                
-                if (name.contains("SPAWN_EGG")) {
-                    di.initCooldown((di.getCooldown() / 4) * cooldowns.remove(0) + 1);
-                } else {
-                    di.initCooldown(di.getCooldown());
-                }
+            // Add cooldown for crossbow, only at the start of the game
+            // since cooldown only applied after shooting crossbow otherwise
+            if (name.contains("ARROW")) {
+                player.setCooldown(Material.CROSSBOW, di.getCooldown());
             }
             
-        });*/
+            if (name.contains("SPAWN_EGG")) {
+                di.initCooldown((di.getCooldown() / 4) * cooldowns.remove(0) + 1);
+            } else {
+                di.initCooldown(di.getCooldown());
+            }
+        }
     }
 
     /**

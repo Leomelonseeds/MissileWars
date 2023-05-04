@@ -10,18 +10,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class DeckItem {
     
     private ItemStack item;
-    private int initCooldown; // An unmodifiable cooldown representing the cooldown the item started with
     private int cooldown; // The actual cooldown
     private int max;
     private int curCooldown;
     private Player player;
     BukkitTask cooldownTask;
     boolean unavailable;
+    MissileWarsTeam team; // Where to fetch the cooldown multiplier
     
     /**
      * @param item should correspond directly the player inventory's item (but its fine if it doesn't I guess)
@@ -30,12 +31,15 @@ public class DeckItem {
      */
     public DeckItem(ItemStack item, int cooldown, int max, Player player) {
         this.item = item;
-        this.initCooldown = cooldown;
         this.cooldown = cooldown;
         this.max = max;
         this.curCooldown = 0;
         this.player = player;
         this.unavailable = false;
+    }
+    
+    public void registerTeam(MissileWarsTeam team) {
+        this.team = team;
     }
     
     /**
@@ -53,11 +57,11 @@ public class DeckItem {
      */
     public void consume(boolean makeUnavailable) {
         if (makeUnavailable) {
-            setVisualCooldown(curCooldown > 0 ? curCooldown : cooldown);
+            setVisualCooldown(curCooldown > 0 ? curCooldown : getCooldown());
         }
         
         if (curCooldown == 0) {
-            curCooldown = cooldown;
+            curCooldown = getCooldown();
             updateItem();
         }
     }
@@ -82,7 +86,7 @@ public class DeckItem {
                 }
                 
                 if (amt < max) {
-                    curCooldown = cooldown;
+                    curCooldown = getCooldown();
                     updateItem();
                 }
             } else if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
@@ -135,7 +139,7 @@ public class DeckItem {
         
         if (c == 0) {
             if (getActualAmount() < max) {
-                curCooldown = cooldown;
+                curCooldown = getCooldown();
                 updateItem();
             }
             return;
@@ -146,21 +150,14 @@ public class DeckItem {
         updateItem();
     }
     
-    /**
-     * @return the cooldown the item started with
-     */
     public int getInitCooldown() {
-        return initCooldown;
-    }
-    
-    public int getCooldown() {
         return cooldown;
     }
     
-    public void setCooldown(int c) {
-        cooldown = c;
+    public int getCooldown() {
+        return (int) (cooldown * team.getMultiplier() / (team.isChaos() ? 2 : 1));
     }
-    
+     
     public int getMax() {
         return max;
     }

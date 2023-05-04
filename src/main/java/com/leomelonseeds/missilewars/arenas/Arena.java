@@ -187,16 +187,6 @@ public class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Check if the player has previously been in this game
-     * 
-     * @param uuid
-     * @return
-     */
-    public boolean getLeft(UUID uuid) {
-        return leftPlayers.contains(uuid);
-    }
-    
-    /**
      * Gets the arena's missile/utility tracker
      * 
      * @return
@@ -1123,11 +1113,10 @@ public class Arena implements ConfigurationSerializable {
     
     /**
      * Call after adding player to arena to schedule item distribution
-     * Requires that the player was added to the team
      * 
      * @param player 
      */
-    public void addPlayerCallback(MissileWarsPlayer player) {
+    public void addCallback(MissileWarsPlayer player) {
         // Return if player null, decrease queuecount to not hang game
         if (player.getMCPlayer() == null) {
             queueCount--;
@@ -1141,9 +1130,47 @@ public class Arena implements ConfigurationSerializable {
                 return;
             }
             
+            applyMultipliers();
+            for (MissileWarsPlayer mwp : redTeam.getMembers()) {
+                mwp.initDeck(false);
+            }
             
+            for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
+                mwp.initDeck(false);
+            }
             running = true;
+        } else {
+            applyMultipliers();
+            player.initDeck(leftPlayers.contains(player.getMCPlayerId()));
         }
+    }
+    
+    /**
+     * Apply multipliers for team balancing
+     */
+    public void applyMultipliers() {
+        MissileWarsTeam one = blueTeam; // Team with less players
+        MissileWarsTeam two = redTeam; // Team with more players
+        if (blueTeam.getSize() > redTeam.getSize()) {
+            one = redTeam;
+            two = blueTeam;
+        } else if (blueTeam.getSize() == redTeam.getSize() || blueTeam.getSize() == 0 || redTeam.getSize() == 0) {
+            one.setMultiplier(1);
+            two.setMultiplier(1);
+            return;
+        }
+        
+        // No need to balance if two / one > 3 / 2
+        double oneSize = one.getSize();
+        double twoSize = two.getSize();
+        if (oneSize * 3 / 2 > twoSize) {
+            one.setMultiplier(1);
+            two.setMultiplier(1);
+            return;
+        }
+        
+        one.setMultiplier(twoSize / oneSize);
+        two.setMultiplier(1);
     }
 
     /**

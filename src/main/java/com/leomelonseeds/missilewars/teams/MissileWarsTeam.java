@@ -57,6 +57,8 @@ public class MissileWarsTeam {
     private int shieldVolume;
     /** Register this team to a vanilla team */
     private Team team;
+    /** the multiplier for all cooldown items */
+    private double multiplier;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -72,6 +74,7 @@ public class MissileWarsTeam {
         this.spawn = spawn;
         this.arena = arena;
         this.shieldBlocksBroken = 0;
+        this.multiplier = 1;
         
         // Register team
         String teamName = arena.getName() + "." + name;
@@ -121,6 +124,14 @@ public class MissileWarsTeam {
         if (Bukkit.getScoreboardManager().getMainScoreboard().getTeams().contains(team)) {
             team.unregister();
         }
+    }
+    
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
+    }
+    
+    public double getMultiplier() {
+        return multiplier;
     }
     
     public String getName() {
@@ -189,7 +200,7 @@ public class MissileWarsTeam {
     public int getTotalPortals() {
         return portals.size();
     }
-
+ 
     /**
      * Check if a team contains a specific player based on their MC UUID.
      *
@@ -239,8 +250,9 @@ public class MissileWarsTeam {
             player.setDeck(deck);
             for (DeckItem di : deck.getItems()) {
                 mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
+                di.registerTeam(this);
             }
-            arena.addPlayerCallback(player);
+            arena.addCallback(player);
         });
      
         // Architect Haste
@@ -335,19 +347,22 @@ public class MissileWarsTeam {
      * @param player the player to remove
      */
     public void removePlayer(MissileWarsPlayer player) {
-        if (members.contains(player)) {
-        	Player mcPlayer = player.getMCPlayer();
-        	team.removePlayer(mcPlayer);
-            members.remove(player);
-            InventoryUtils.clearInventory(mcPlayer);
-            player.stopDeck();
-            player.resetPlayer();
-            arena.addLeft(player.getMCPlayerId());
-            mcPlayer.setLevel(0);
-            for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
-                mcPlayer.removePotionEffect(effect.getType());
-            }
+        if (!members.contains(player)) {
+            return;
         }
+        
+    	Player mcPlayer = player.getMCPlayer();
+    	team.removePlayer(mcPlayer);
+        members.remove(player);
+        InventoryUtils.clearInventory(mcPlayer);
+        player.stopDeck();
+        player.resetPlayer();
+        arena.addLeft(player.getMCPlayerId());
+        mcPlayer.setLevel(0);
+        for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
+            mcPlayer.removePotionEffect(effect.getType());
+        }
+        arena.applyMultipliers(); // Check for cooldowns
     }
 
     /**
