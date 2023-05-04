@@ -209,7 +209,7 @@ public class ArenaInventoryListener implements Listener {
             event.getItemDrop().setItemStack(toDrop);
             dropped.setAmount(1);
             player.getInventory().setItem(EquipmentSlot.HAND, dropped);
-            di.initCooldown(di.getCooldown());
+            di.initCooldown(di.getCurrentCooldown()); // Re-initialize cooldown, since item count set to 0
             player.updateInventory();
         } else {
             // Need to re-increase and manually decrease amount so consume doesn't screw over

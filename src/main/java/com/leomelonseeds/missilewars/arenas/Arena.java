@@ -103,6 +103,8 @@ public class Arena implements ConfigurationSerializable {
     protected VoteManager voteManager;
     /** Set of players who have played but have since left */
     protected Set<UUID> leftPlayers;
+    /** Helper variable to check when all queues are done */
+    protected int queueCount;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -975,13 +977,7 @@ public class Arena implements ConfigurationSerializable {
             }
             
             // Register teams and set running state to true
-            tasks.add(new BukkitRunnable() {
-                @Override
-                public void run() {
-                    startTeams();
-                    running = true;
-                }
-            }.runTaskLater(plugin, 5L));
+            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> startTeams(), 5L));
         });
     }
     
@@ -1069,6 +1065,7 @@ public class Arena implements ConfigurationSerializable {
                 toAssign.add(player);
             }
         }
+        queueCount = toAssign.size();
         Collections.shuffle(toAssign);
         double maxSize = getCapacity() / 2;
         double maxQueue = Math.ceil((double) (players.size() - spectators.size()) / 2);
@@ -1122,6 +1119,31 @@ public class Arena implements ConfigurationSerializable {
         blueTeam.sendSound("game-start");
         redTeam.sendTitle(gamemode + "-start");
         blueTeam.sendTitle(gamemode + "-start");
+    }
+    
+    /**
+     * Call after adding player to arena to schedule item distribution
+     * Requires that the player was added to the team
+     * 
+     * @param player 
+     */
+    public void addPlayerCallback(MissileWarsPlayer player) {
+        // Return if player null, decrease queuecount to not hang game
+        if (player.getMCPlayer() == null) {
+            queueCount--;
+            return;
+        }
+        
+        // Once redteam + blueteam = queuecount, running will be TRUE
+        // and therefore no race condition is possible
+        if (!running) {
+            if (blueTeam.getSize() + redTeam.getSize() < queueCount) {
+                return;
+            }
+            
+            
+            running = true;
+        }
     }
 
     /**

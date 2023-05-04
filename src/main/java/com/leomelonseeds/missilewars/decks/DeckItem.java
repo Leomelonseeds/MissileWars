@@ -15,7 +15,8 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DeckItem {
     
     private ItemStack item;
-    private int cooldown; // in seconds
+    private int initCooldown; // An unmodifiable cooldown representing the cooldown the item started with
+    private int cooldown; // The actual cooldown
     private int max;
     private int curCooldown;
     private Player player;
@@ -29,6 +30,7 @@ public class DeckItem {
      */
     public DeckItem(ItemStack item, int cooldown, int max, Player player) {
         this.item = item;
+        this.initCooldown = cooldown;
         this.cooldown = cooldown;
         this.max = max;
         this.curCooldown = 0;
@@ -142,6 +144,13 @@ public class DeckItem {
         setVisualCooldown(c);
         curCooldown = c;
         updateItem();
+    }
+    
+    /**
+     * @return the cooldown the item started with
+     */
+    public int getInitCooldown() {
+        return initCooldown;
     }
     
     public int getCooldown() {

@@ -234,19 +234,13 @@ public class MissileWarsTeam {
         player.missilePreview(arena);
         player.cooldownPreview(arena);
         player.setJustSpawned();
-        
-        // TODO: Set player deck here instead of in the player class. After setting deck,
-        // notify arena that deck has been added. Once all queued players added to the game
-        // (arena needs some way of detecting that), the arena should then schedule cooldowns
-        // (due to team balancing/chaos mode needs). Otherwise, all cooldowns are infinite
         plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId(), (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);
             for (DeckItem di : deck.getItems()) {
                 mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
             }
-            // TODO: Notify arena that deck successfully set
-            // This line should then be in the arena method: player.setDeck(arena.getLeft(player.getMCPlayerId()));
+            arena.addPlayerCallback(player);
         });
      
         // Architect Haste
