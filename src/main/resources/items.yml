@@ -1637,51 +1637,56 @@ gpassive:
     name: "&5Missile Specialist"
     lore:
     - ""
-    - "&7Your chance of recieving a missile increases"
-    - "&7and your chance of recieving a utility decreases"
-    - "&7by %percentage%%&7. At level 3, you will always"
-    - "&7recieve a missile when the game starts."
-    cost: 2000
+    - "&7Missile cooldowns are decreased by"
+    - "%mpercentage%%&7, and utility cooldowns are"
+    - "&7increased by %upercentage%%&7."
+    cost: 1500
     1:
-      percentage: 5
+      mpercentage: 5
+      upercentage: 15
       spcost: 1
     2:
-      percentage: 10
+      mpercentage: 10
+      upercentage: 30
       spcost: 2
     3: 
-      percentage: 15
+      mpercentage: 15
+      upercentage: 45
       spcost: 2
   utilityspec:
     name: "&5Utility Specialist"
     lore:
     - ""
-    - "&7Your chance of recieving a missile decreases"
-    - "&7and your chance of recieving a utility increases"
-    - "&7by %percentage%%&7. At level 3, you will always"
-    - "&7recieve a utility when the game starts." 
+    - "&Utility cooldowns are decreased by"
+    - "%upercentage%%&7, and missile cooldowns are"
+    - "&7increased by %mpercentage%%&7."
     cost: 1200   
     1:
-      percentage: 8
+      upercentage: 10
+      mpercentage: 5
       spcost: 1
     2:
-      percentage: 16
+      upercentage: 20
+      mpercentage: 10
       spcost: 2
     3: 
-      percentage: 24
+      upercentage: 30
+      mpercentage: 15
       spcost: 2
   hoarder:
     name: "&5Hoarder"
     lore:
     - ""
-    - "&7Your inventory limit is increased from"
-    - "&76 items to %limit%"
+    - "&7The maximum amount of each item is"
+    - "&7increased by %max%x&7 (rounded down),"
+    - "while cooldowns for all items are"
+    - "increased by %percentage%%&7."
     cost: 1600
     1:
-      limit: 7
+      max: 1.5
+      percentage: 10
       spcost: 1
     2:
-      limit: 8
-      spcost: 1
-    3:
-      limit: 9
-      spcost: 2
+      max: 2
+      percentage: 40
+      spcost: 3

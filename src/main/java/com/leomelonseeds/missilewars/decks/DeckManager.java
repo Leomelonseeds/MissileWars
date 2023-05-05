@@ -85,11 +85,32 @@ public class DeckManager {
         @SuppressWarnings("unchecked")
         List<Integer> layout = (List<Integer>)(Object) json.getJSONArray("layout").toList();
         
+        // Figure out utility and missile multipliers
+        String gpassive = json.getJSONObject("gpassive").getString("selected");
+        int glevel = json.getJSONObject("gpassive").getInt("level");
+        double mmult = 1;
+        double umult = 1;
+        double maxmult = 1;
+        if (glevel > 0) {
+            if (!gpassive.equals("hoarder")) {
+                double mperc = (double) ConfigUtils.getItemValue("gpassive." + gpassive, glevel, "mpercentage") / 100.0;
+                double uperc = (double) ConfigUtils.getItemValue("gpassive." + gpassive, glevel, "upercentage") / 100.0;
+                mmult = mperc + (gpassive.equals("missilespec") ? 0 : 1);
+                umult = uperc + (gpassive.equals("utilityspec") ? 0 : 1);
+            } else {
+                double perc = (double) ConfigUtils.getItemValue("gpassive.hoarder", glevel, "percentage") / 100.0;
+                mmult = perc + 1;
+                umult = perc + 1;
+                maxmult = (double) ConfigUtils.getItemValue("gpassive.hoarder", glevel, "max");
+            }
+        }
+        
         // Create pool items
         for (String s : new String[] {"missiles", "utility"}) {
             for (String key : json.getJSONObject(s).keySet()) {
                 int level = json.getJSONObject(s).getInt(key);
-                ItemStack i = createItem(key, level, s.equals("missiles"));
+                boolean isMissile = s.equals("missiles");
+                ItemStack i = createItem(key, level, isMissile);
                 // Change color of lava splash
                 if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
@@ -111,8 +132,8 @@ public class DeckManager {
                     pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
                     i.setItemMeta(pmeta);
                 }
-                int max = (int) ConfigUtils.getItemValue(key, level, "max");
-                int cd = (int) ConfigUtils.getItemValue(key, level, "cooldown");
+                int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
+                int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
                 pool.set(layout.indexOf(itemsConfig.getInt(key + ".index")), new DeckItem(i, cd, max, player));
             }
         }
