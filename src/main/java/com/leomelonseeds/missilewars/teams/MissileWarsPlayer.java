@@ -244,7 +244,7 @@ public class MissileWarsPlayer {
             }
             
             if (name.contains("SPAWN_EGG")) {
-                di.initCooldown((int) (maxcd * ((double) cooldowns.remove(0) / 4) + 1));
+                di.initCooldown((int) Math.min(maxcd * ((double) cooldowns.remove(0) / 4) + 1, maxcd));
             } else {
                 di.initCooldown(maxcd);
             }

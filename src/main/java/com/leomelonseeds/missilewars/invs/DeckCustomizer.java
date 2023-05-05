@@ -1,5 +1,8 @@
 package com.leomelonseeds.missilewars.invs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -63,7 +66,16 @@ public class DeckCustomizer implements MWInventory {
                 item.setItemMeta(meta);
             } else if (key.equals("info")) {
                 ItemMeta meta = item.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent(MissileWarsPlugin.getPlugin().getEconomy().getBalance(player) + ""));
+                List<String> newLore = new ArrayList<>();
+                for (Component c : item.lore()) {
+                    String info = ConfigUtils.toPlain(c);
+                    if (info.contains("Balance")) {
+                        double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
+                        info = info.replace("null", bal + "");
+                    }
+                    newLore.add(info);
+                }
+                meta.lore(ConfigUtils.toComponent(newLore));
                 item.setItemMeta(meta);
             }
             inv.setItem(itemConfig.getInt("indicators." + key + ".slot"), item);

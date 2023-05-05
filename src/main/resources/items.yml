@@ -740,7 +740,7 @@ novarocket:
 shield:
   index: 6
   item: SNOWBALL
-  cooldown: 45
+  max: 2
   name: "&f★ Shield %level% ⚒"
   lore:
   - ""
@@ -776,7 +776,7 @@ shield:
 platform:
   index: 5
   item: EGG
-  cooldown: 45
+  max: 2
   name: "&7★ Platform %level% ⚒"
   lore:
   - ""
