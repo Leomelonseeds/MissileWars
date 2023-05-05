@@ -33,7 +33,7 @@ messages:
   map-failed: "&cMap failed to generate! Please contact an admin."
   starting: "&7Starting now! Please wait for the map to generate..."
   cannot-place-structure: "&cYou cannot use that here!"
-  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster, and the game will no longer wait for ties."
+  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Cooldowns are now half as long, and the game will no longer wait for ties."
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   out-of-bounds: "&c&l[!] &cYou are out of bounds!"
   poison: "&c&l[!] &cYou start to feel the effects of being too high..."
@@ -226,7 +226,7 @@ titles:
     length: 100
   chaos-mode:
     title: "&0&o&lChaos mode"
-    subtitle: "2x the items, 4x the fun"
+    subtitle: "Half the cooldowns, 2x the fun!"
     length: 100
   video:
     title: "&aPlease,"

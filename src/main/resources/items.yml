@@ -725,6 +725,7 @@ splash:
   3:
     duration: 2
     extend: 20
+    max: 2
     spcost: 2
 
 novarocket:
