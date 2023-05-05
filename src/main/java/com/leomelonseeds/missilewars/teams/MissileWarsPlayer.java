@@ -250,6 +250,9 @@ public class MissileWarsPlayer {
             }
         }
         
+        if (joinedBefore) {
+            ConfigUtils.sendConfigMessage("messages.already-joined", player, null, null);
+        }
         cooldownPreview();
     }
  

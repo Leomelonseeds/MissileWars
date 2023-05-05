@@ -113,6 +113,7 @@ messages:
   joined-training: "&a&l[!] &7You are in the training arena. No stats will be affected here."
   nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
   item-ready: "&a&l[!] %item% &ais now available"
+  already-joined: "&c&l[!] &7You have already been in this game, so all your cooldowns have been maximized."
   training-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &d&lTraining"
