@@ -188,8 +188,9 @@ public class MissileWarsPlayer {
                 
                 int cd = di.getCurrentCooldown();
                 int maxcd = di.getCooldown();
+                float exp = (maxcd - cd) / (float) maxcd;
                 player.setLevel(cd);
-                player.setExp((maxcd - cd) / (float) maxcd);
+                player.setExp(Math.max(Math.min(exp, 1F), 0F)); // Make sure it's actually within 0 and 1
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }
@@ -244,7 +245,7 @@ public class MissileWarsPlayer {
             }
             
             if (name.contains("SPAWN_EGG") && !joinedBefore) {
-                di.initCooldown((int) Math.min(maxcd * ((double) cooldowns.remove(0) / 4) + 1, maxcd));
+                di.initCooldown((int) (maxcd * ((double) cooldowns.remove(0) / 4) + 1));
             } else {
                 di.initCooldown(maxcd);
             }
