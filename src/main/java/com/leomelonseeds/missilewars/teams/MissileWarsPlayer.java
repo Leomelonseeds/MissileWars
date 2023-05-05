@@ -243,7 +243,7 @@ public class MissileWarsPlayer {
                 player.setCooldown(Material.CROSSBOW, maxcd);
             }
             
-            if (name.contains("SPAWN_EGG")) {
+            if (name.contains("SPAWN_EGG") && !joinedBefore) {
                 di.initCooldown((int) Math.min(maxcd * ((double) cooldowns.remove(0) / 4) + 1, maxcd));
             } else {
                 di.initCooldown(maxcd);

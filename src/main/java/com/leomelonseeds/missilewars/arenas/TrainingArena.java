@@ -39,6 +39,7 @@ public class TrainingArena extends Arena {
         super(serializedArena);
     }
     
+    // No need to track who left the arena here
     @Override
     public void addLeft(UUID uuid) {}
 
