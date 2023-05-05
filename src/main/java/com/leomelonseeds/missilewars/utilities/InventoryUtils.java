@@ -37,6 +37,14 @@ public class InventoryUtils {
     public static void clearInventory(Player player) {
         clearInventory(player, false);
     }
+    
+    /**
+     * @param i
+     * @return if the item provided is not null and is a potion or milkbucket
+     */
+    private static boolean isPotion(ItemStack i) {
+        return i != null && (i.getType() == Material.POTION || i.getType() == Material.MILK_BUCKET);
+    }
 
     /**
      * Clears everything except for helmet of player
@@ -64,7 +72,7 @@ public class InventoryUtils {
             }
             
             // Don't clear alcohol (potions)
-            if (current.getType() == Material.POTION) {
+            if (isPotion(current)) {
                 continue;
             }
             
@@ -97,8 +105,7 @@ public class InventoryUtils {
             data.writeInt(inventory.getSize());
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack current = inventory.getItem(i);
-                boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
-                if (!isPotion) {
+                if (!isPotion(current)) {
                     data.writeObject(inventory.getItem(i));
                 } else {
                     data.writeObject(null);
@@ -136,8 +143,7 @@ public class InventoryUtils {
                     ItemStack invItem = (ItemStack) data.readObject();
                     boolean empty = invItem == null;
                     ItemStack current = inventory.getItem(i);
-                    boolean isPotion = current != null && current.getType() == Material.POTION ? true : false;
-                    if (!(i == 39 || (isPotion && empty))) {
+                    if (!(i == 39 || (isPotion(current) && empty))) {
                         inventory.setItem(i, invItem);
                     }
                 }

@@ -24,7 +24,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -343,18 +342,18 @@ public class ArenaInventoryListener implements Listener {
     @EventHandler
     public void onDrink(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
-        if (event.getItem().getType() == Material.POTION) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (player.getInventory().getItemInMainHand().getType() == Material.GLASS_BOTTLE) {
-                        player.getInventory().setItemInMainHand(null);
-                    } else if (player.getInventory().getItemInOffHand().getType() == Material.GLASS_BOTTLE) {
-                        player.getInventory().setItemInOffHand(null);
-                    }
-                }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), 1L);
+        Material type = event.getItem().getType();
+        if (!(type == Material.POTION || type == Material.MILK_BUCKET)) {
+            return;
         }
+        
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            PlayerInventory inv = player.getInventory();
+            Material mat = inv.getItem(event.getHand()).getType();
+            if (mat == Material.GLASS_BOTTLE || mat == Material.BUCKET) {
+                player.getInventory().setItem(event.getHand(), null);
+            }
+        }, 1L);
     }
     
     // Kill canopy cooldown if item switch
