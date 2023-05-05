@@ -19,6 +19,10 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
 import io.github.a5h73y.parkour.Parkour;
 
@@ -160,5 +164,53 @@ public class InventoryUtils {
                 Bukkit.getLogger().log(Level.WARNING, "Failed to read inventory string of " + player.getName());
             }
         });
+    }
+    
+    /**
+     * Tell plugin that an item was consumed
+     * 
+     * @param player
+     * @param arena
+     * @param item
+     * @param slot -1 if should be manually depleted, provide slot otherwise
+     */
+    public static void consumeItem(Player player, Arena arena, ItemStack item, int slot) {
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        if (mwp == null) {
+            return;
+        }
+        
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            return;
+        }
+
+        DeckItem di = deck.getDeckItem(item);
+        int amt = item.getAmount();
+        boolean deplete = slot == -1;
+        if (di == null) {
+            if (deplete) {
+                item.setAmount(item.getAmount() - 1);
+            }
+            return;
+        }
+        
+        boolean makeUnavailable = false;
+        if (amt == 1) {
+            makeUnavailable = true;
+            if (!deplete) {
+                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                    item.setAmount(1);
+                    player.getInventory().setItem(slot, item);
+                    if (item.getType() == Material.ENDER_PEARL) {
+                        di.setVisualCooldown(di.getCurrentCooldown()); 
+                    }
+                }, 1);
+            }
+        } else if (deplete) {
+            item.setAmount(amt - 1);
+        }
+        
+        di.consume(makeUnavailable);
     }
 }

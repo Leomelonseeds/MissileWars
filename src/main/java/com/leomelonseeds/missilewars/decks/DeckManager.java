@@ -10,12 +10,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -28,6 +31,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.DBCallback;
 
 import net.kyori.adventure.text.Component;
 
@@ -51,6 +55,12 @@ public class DeckManager {
         itemsConfig = ConfigUtils.getConfigFile("items.yml");
     }
     
+    /**
+     * Refresh item configs
+     */
+    public void reload() {
+        itemsConfig = ConfigUtils.getConfigFile("items.yml");
+    }
     
     /**
      * Gets a deck for a player
@@ -59,60 +69,78 @@ public class DeckManager {
      * @param deck
      * @return
      */
-    public Deck getPlayerDeck(UUID uuid, Boolean ranked) {
+    public void getPlayerDeck(UUID uuid, DBCallback callback) {
         
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
-        JSONObject json;
-        if (ranked) {
-            json = basejson.getJSONObject(deck).getJSONObject("R");
-        } else {
-            json = plugin.getJSON().getPlayerPreset(uuid);
-        }
+        JSONObject json = plugin.getJSON().getPlayerPreset(uuid);
         
-        // There are 12 utility items in the game
-        // Some items have their level determined on creation, while
-        // some have their level determined on use
-        // Items with level determined on creation:
-        // Shield, Platform, Leaves, Arrows (both sentinel + berserk), Torpedo, Lingering Harming
-        // Items with level determined on use:
-        // Fireball, Splash, Obsidian Shield, Canopy, Spawn Creeper
-        
-        List<ItemStack> missiles = Arrays.asList(new ItemStack[5]);
-        List<ItemStack> utility = Arrays.asList(new ItemStack[3]);
+        // Custom deck orderings: array of 8 numbers
+        // Index + 1 = slot, array[index] = index value defined in items.yml
+        // Default: [0, 1, 2, 3, 4, 5, 6, 7]
+        // If for example 0 is assigned to 7, then the item with index 7 will be placed in 0
+        List<DeckItem> pool = Arrays.asList(new DeckItem[8]);
         List<ItemStack> gear = new ArrayList<>();
+        Player player = Bukkit.getPlayer(uuid);
+        @SuppressWarnings("unchecked")
+        List<Integer> layout = (List<Integer>)(Object) json.getJSONArray("layout").toList();
         
-        // Create missiles
-        for (String key : json.getJSONObject("missiles").keySet()) {
-            ItemStack m = createItem(key, json.getJSONObject("missiles").getInt(key), true);
-            missiles.set(itemsConfig.getInt(key + ".index"), m);
+        // Figure out utility and missile multipliers
+        String gpassive = json.getJSONObject("gpassive").getString("selected");
+        int glevel = json.getJSONObject("gpassive").getInt("level");
+        double mmult = 1;
+        double umult = 1;
+        double maxmult = 1;
+        if (glevel > 0) {
+            if (!gpassive.equals("hoarder")) {
+                double mperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "mpercentage") / 100;
+                double uperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "upercentage") / 100;
+                if (gpassive.equals("missilespec")) {
+                    mmult = 1 - mperc;
+                    umult = uperc + 1;
+                } else {
+                    mmult = mperc + 1;
+                    umult = 1 - uperc;
+                }
+            } else {
+                double perc = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "percentage") / 100;
+                mmult = perc + 1;
+                umult = perc + 1;
+                maxmult = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "max");
+            }
         }
         
-        // Create utility
-        for (String key : json.getJSONObject("utility").keySet()) {
-            ItemStack u = createItem(key, json.getJSONObject("utility").getInt(key), false);
-            // Change color of lava splash
-            if (u.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
-                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
-                String name = ConfigUtils.toPlain(pmeta.displayName());
-                name = name.replaceFirst("9", "6");  // Make name orange
-                pmeta.displayName(ConfigUtils.toComponent(name));
-                pmeta.setColor(Color.ORANGE);
-                u.setItemMeta(pmeta);
+        // Create pool items
+        for (String s : new String[] {"missiles", "utility"}) {
+            for (String key : json.getJSONObject(s).keySet()) {
+                int level = json.getJSONObject(s).getInt(key);
+                boolean isMissile = s.equals("missiles");
+                ItemStack i = createItem(key, level, isMissile);
+                // Change color of lava splash
+                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
+                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
+                    String name = ConfigUtils.toPlain(pmeta.displayName());
+                    name = name.replaceFirst("9", "6");  // Make name orange
+                    pmeta.displayName(ConfigUtils.toComponent(name));
+                    pmeta.setColor(Color.ORANGE);
+                    i.setItemMeta(pmeta);
+                }
+                // Give slowness arrows in case of berserker
+                int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
+                if (i.getType() == Material.ARROW && slowarrow > 0) {
+                    int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
+                    int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
+                    i.setType(Material.TIPPED_ARROW);
+                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
+                    pmeta.setColor(Color.fromRGB(92, 110, 131));
+                    pmeta.displayName(ConfigUtils.toComponent("&fArrow of Slowness"));
+                    pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
+                    i.setItemMeta(pmeta);
+                }
+                int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
+                int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
+                pool.set(layout.indexOf(itemsConfig.getInt(key + ".index")), new DeckItem(i, cd, max, player));
             }
-            // Give slowness arrows in case of berserker
-            int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
-            if (u.getType() == Material.ARROW && slowarrow > 0) {
-                int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
-                int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
-                u.setType(Material.TIPPED_ARROW);
-                PotionMeta pmeta = (PotionMeta) u.getItemMeta();
-                pmeta.setColor(Color.fromRGB(92, 110, 131));
-                pmeta.displayName(ConfigUtils.toComponent("&fArrow of Slowness"));
-                pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
-                u.setItemMeta(pmeta);
-            }
-            utility.set(itemsConfig.getInt(key + ".index"), u);
         }
         
         // Create gear items
@@ -174,7 +202,7 @@ public class DeckManager {
             item.setItemMeta(meta);
         }
         
-        return new Deck(deck, gear, missiles, utility);
+        callback.onQueryDone(new Deck(deck, gear, pool));
     }
     
     /**
@@ -296,17 +324,8 @@ public class DeckManager {
         
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial(material));
-        if (deck == null) {
-            if (ConfigUtils.getItemValue(name, level, "amount") != null) {
-                item.setAmount((int) ConfigUtils.getItemValue(name, level, "amount"));
-            }
-            // Don't bother with arrows
-            if (name.equals("arrows")) {
-                return item;
-            }
-        } else {
-            // Make item count reflect its level
-            item.setAmount(Math.max(level, 1));
+        if (deck != null) {
+            item.setAmount(Math.max(level, 1));  // Make item count reflect its level
         }
         
         // Find item name and lore
@@ -333,10 +352,13 @@ public class DeckManager {
             @SuppressWarnings("unchecked")
             List<String> lore = new ArrayList<>((ArrayList<String>) templore);
             
-            // Add missile stats for missiles
+            // Add missile stats for missiles, and max + cooldown
             if (missile) {
-                List<String> stats = itemsConfig.getStringList("text.missilestats");
-                lore.addAll(stats);
+                lore.addAll(itemsConfig.getStringList("text.missilestats"));
+            }
+            
+            if (!intangible && level > 0) {
+                lore.addAll(itemsConfig.getStringList("text.itemstats"));
             }
             
             // Compile lore into single line
@@ -379,8 +401,7 @@ public class DeckManager {
                 JSONObject deckjson = playerjson.getJSONObject(deck);
                 // Add lore of unlocking possibility
                 if (((deckjson.has(realname) && !deckjson.getBoolean(realname)) ||
-                    (playerjson.has(realname) && !playerjson.getBoolean(realname))) &&
-                    !preset.equals("R")) {
+                    (playerjson.has(realname) && !playerjson.getBoolean(realname)))) {
                     int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
                     lore.add(itemsConfig.getString("text.locked1").replace("%cost%", cost + ""));
                     lore.add(itemsConfig.getString("text.locked2").replace("%cost%", cost + ""));
@@ -418,18 +439,15 @@ public class DeckManager {
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
                 PersistentDataType.STRING, name + "-" + level);
         
-        // Setup item meta for potions
+        // Setup extra item attributes for specific things
         if (name.equals("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
-        } else if (name.equals("lingering_harming")) {
-            int amplifier = (int) ConfigUtils.getItemValue(name, level, "amplifier");
-            int duration = (int) ConfigUtils.getItemValue(name, level, "duration");
-            PotionMeta pmeta = (PotionMeta) itemMeta;
-            pmeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
-            pmeta.setColor(Color.PURPLE);
-        } 
+        } else if (name.equals("torpedo")) {
+            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
         item.setItemMeta(itemMeta);
         return item;
     }

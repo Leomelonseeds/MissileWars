@@ -38,6 +38,10 @@ public class TrainingArena extends Arena {
     public TrainingArena(Map<String, Object> serializedArena) {
         super(serializedArena);
     }
+    
+    // No need to track who left the arena here
+    @Override
+    public void addLeft(UUID uuid) {}
 
     @Override
     public void enqueue(UUID uuid, String team) {
@@ -65,10 +69,13 @@ public class TrainingArena extends Arena {
                 ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
                 removeSpectator(player);
             } else {
+                if (blueTeam.containsPlayer(uuid)) {
+                    return;
+                }
+                
                 removeSpectator(player);
                 redTeam.removePlayer(player);
                 blueTeam.addPlayer(player);
-                player.giveDeckGear();
                 checkNotEmpty();
                 announceMessage("messages.queue-join-blue", player);
             }
@@ -164,17 +171,14 @@ public class TrainingArena extends Arena {
     @Override
     protected void startTeams() {
         // Literally place everyone on blue
+        queueCount = 0;
         for (MissileWarsPlayer player : players) {
-            if (!spectators.contains(player)) {
-                blueTeam.addPlayer(player);
+            if (spectators.contains(player)) {
+                continue;
             }
+            queueCount++;
+            blueTeam.addPlayer(player);
         }
-
-        // Send messages
-        redTeam.distributeGear();
-        blueTeam.distributeGear();
-        redTeam.scheduleDeckItems();
-        blueTeam.scheduleDeckItems();
     }
     
     @Override

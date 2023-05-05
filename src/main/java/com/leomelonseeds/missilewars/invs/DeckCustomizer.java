@@ -1,5 +1,8 @@
 package com.leomelonseeds.missilewars.invs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -61,6 +64,19 @@ public class DeckCustomizer implements MWInventory {
                 String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
                 meta.displayName(ConfigUtils.toComponent(name.replace("%sp%", presetjson.getInt("skillpoints") + "")));
                 item.setItemMeta(meta);
+            } else if (key.equals("info")) {
+                ItemMeta meta = item.getItemMeta();
+                List<String> newLore = new ArrayList<>();
+                for (Component c : item.lore()) {
+                    String info = ConfigUtils.toPlain(c);
+                    if (info.contains("Balance")) {
+                        double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
+                        info = info.replace("null", bal + "");
+                    }
+                    newLore.add(info);
+                }
+                meta.lore(ConfigUtils.toComponent(newLore));
+                item.setItemMeta(meta);
             }
             inv.setItem(itemConfig.getInt("indicators." + key + ".slot"), item);
         }
@@ -68,9 +84,6 @@ public class DeckCustomizer implements MWInventory {
         // Add panes and misc items
         for (int i = 0; i < 6; i++) {
             inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_NUGGET)));
-        }
-        
-        for (int i = 0; i < 6; i++) {
             inv.setItem(i * 9 + 7, blankName(new ItemStack(Material.IRON_BARS)));
         }
         
@@ -85,8 +98,11 @@ public class DeckCustomizer implements MWInventory {
             for (String u : presetjson.getJSONObject(s).keySet()) {
                 ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
                         s.equals("missiles"), init, deck, false, preset);
-                inv.setItem(index, item);
-                index++;
+                int add = itemConfig.getInt(u + ".index");
+                if (s.equals("utility")) {
+                    add -= 5;
+                }
+                inv.setItem(index + add, item);
             }
         }
         
@@ -141,42 +157,44 @@ public class DeckCustomizer implements MWInventory {
         // Reset to default config
         if (slot == itemConfig.getInt("indicators.reset.slot")) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
-                if (confirm) {
-                    JSONObject def = jsonManager.getDefaultPreset(deck);
-                    int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
-                    int level = RankUtils.getRankLevel(exp);
-                    def.put("skillpoints", def.getInt("skillpoints") + level);
-                    init.getJSONObject(deck).put(preset, def);
-                    updateInventory();
+                if (!confirm) {
+                    return;
                 }
-                return;
+                JSONObject def = jsonManager.getDefaultPreset(deck);
+                int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+                int level = RankUtils.getRankLevel(exp);
+                def.put("skillpoints", def.getInt("skillpoints") + level);
+                init.getJSONObject(deck).put(preset, def);
+                updateInventory();
             });
+            return;
         }
         
         // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
         if (slot == itemConfig.getInt("indicators.skillpoints.slot")) {
             new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
-                if (confirm) {
-                    for (String key : presetjson.keySet()) {
-                        if (presetjson.get(key) instanceof Integer) {
-                            presetjson.put(key, 0);
-                        }
-                    }
-                    for (String s : items) {
-                        for (String key : presetjson.getJSONObject(s).keySet()) {
-                            presetjson.getJSONObject(s).put(key, 1);
-                        }
-                    }
-                    for (String s : abilities) {
-                        JSONObject j = presetjson.getJSONObject(s);
-                        j.put("selected", "None");
-                        j.put("level", 0);
-                    }
-                    presetjson.put("skillpoints", jsonManager.getMaxSkillpoints(player.getUniqueId()));
-                    updateInventory();
+                if (!confirm) {
+                    return;
                 }
-                return;
+                for (String key : presetjson.keySet()) {
+                    if (presetjson.get(key) instanceof Integer) {
+                        presetjson.put(key, 0);
+                    }
+                }
+                for (String s : items) {
+                    for (String key : presetjson.getJSONObject(s).keySet()) {
+                        presetjson.getJSONObject(s).put(key, 1);
+                    }
+                }
+                for (String s : abilities) {
+                    JSONObject j = presetjson.getJSONObject(s);
+                    j.put("selected", "None");
+                    j.put("level", 0);
+                }
+                presetjson.put("skillpoints", jsonManager.getMaxSkillpoints(player.getUniqueId()));
+                updateInventory();
             });
+            return;
         }
         
         ItemStack item = inv.getItem(slot);
@@ -209,15 +227,16 @@ public class DeckCustomizer implements MWInventory {
             int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
             if (bal >= cost) {
                 new ConfirmAction("Purchase '" + realname + "'", player, this, (confirm) -> {
-                    if (confirm) {
-                        if (init.has(realname)) {
-                            init.put(realname, true);
-                        } else if (init.getJSONObject(deck).has(realname)) {
-                            init.getJSONObject(deck).put(realname, true);
-                        }
-                        MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
-                        updateInventory();
+                    if (!confirm) {
+                        return;
                     }
+                    if (init.has(realname)) {
+                        init.put(realname, true);
+                    } else if (init.getJSONObject(deck).has(realname)) {
+                        init.getJSONObject(deck).put(realname, true);
+                    }
+                    MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
+                    updateInventory();
                 });
             } else {
                 ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);

@@ -9,7 +9,7 @@
 
 # Vanguard missiles
 lightning:
-  index: 1
+  index: 2
   1:
     file: 'lightning.nbt'
     item: OCELOT_SPAWN_EGG
@@ -41,7 +41,7 @@ lightning:
     spcost: 3
 
 supersonic:
-  index: 0
+  index: 3
   1:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
@@ -75,9 +75,10 @@ supersonic:
     speed: 4.4
     tnt: 6
     spcost: 2
+    cooldown: 50
 
 tomahawk:
-  index: 4
+  index: 0
   1:
     file: 'tomahawk.nbt'
     item: ZOMBIE_SPAWN_EGG
@@ -109,7 +110,7 @@ tomahawk:
     spcost: 3
 
 cronullifier:
-  index: 2
+  index: 4
   1:
     file: 'chronullifier.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
@@ -144,12 +145,45 @@ cronullifier:
     tnt: 25
     spcost: 4
 
+piranha:
+  index: 1
+  1:
+    file: 'piranha.nbt'
+    item: COD_SPAWN_EGG
+    name: "&7☢ Piranha ✟"
+    lore:
+    - ""
+    - "&7Relatively simple, mostly reliable, and looks"
+    - "&7somewhat good. The Piranha has it all."
+    offset:
+      x: -2
+      y: -4
+      z: 4
+    speed: 1.7
+    tnt: 10
+  2:
+    file: 'anglerfish.nbt'
+    item: COD_SPAWN_EGG
+    name: "&7☢ &lAnglerfish &7✟"
+    lore:
+    - ""
+    - "&7The Piranha wishes it was this. Or maybe"
+    - "&7it doesn't. We don't know anyone who"
+    - "&7wants to look like an anglerfish."
+    offset:
+      x: -2
+      y: -5
+      z: 4
+    speed: 2.0
+    tnt: 23
+    spcost: 3
+
 
 # Sentinel missiles
 
 
 concorde:
-  index: 0
+  index: 3
   1:
     file: 'concorde.nbt'
     item: RAVAGER_SPAWN_EGG
@@ -183,7 +217,7 @@ concorde:
     spcost: 3
 
 supporter:
-  index: 2
+  index: 4
   1:
     file: 'supporter.nbt'
     item: BEE_SPAWN_EGG
@@ -216,7 +250,7 @@ supporter:
     spcost: 3
     
 guardian:
-  index: 4
+  index: 0
   1:
     file: 'guardian.nbt'
     item: GUARDIAN_SPAWN_EGG
@@ -249,7 +283,7 @@ guardian:
     spcost: 3
 
 gemini:
-  index: 1
+  index: 2
   1:
     file: 'gemini.nbt'
     item: SLIME_SPAWN_EGG
@@ -283,7 +317,7 @@ gemini:
     spcost: 3
 
 sword: 
-  index: 3
+  index: 1
   1:
     file: 'sword.nbt'
     item: SKELETON_SPAWN_EGG
@@ -317,45 +351,12 @@ sword:
     tnt: 15
     spcost: 3
 
-piranha:
-  index: 3
-  1:
-    file: 'piranha.nbt'
-    item: COD_SPAWN_EGG
-    name: "&7☢ Piranha ✟"
-    lore:
-    - ""
-    - "&7Relatively simple, mostly reliable, and looks"
-    - "&7somewhat good. The Piranha has it all."
-    offset:
-      x: -2
-      y: -4
-      z: 4
-    speed: 1.7
-    tnt: 10
-  2:
-    file: 'anglerfish.nbt'
-    item: COD_SPAWN_EGG
-    name: "&7☢ &lAnglerfish &7✟"
-    lore:
-    - ""
-    - "&7The Piranha wishes it was this. Or maybe"
-    - "&7it doesn't. We don't know anyone who"
-    - "&7wants to look like an anglerfish."
-    offset:
-      x: -2
-      y: -5
-      z: 4
-    speed: 2.0
-    tnt: 23
-    spcost: 3
-
 
 # Berserker missiles
 
 
 cuboid:
-  index: 0
+  index: 3
   1:
     file: 'cuboid.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
@@ -389,7 +390,7 @@ cuboid:
     spcost: 3
 
 warhead: 
-  index: 2
+  index: 4
   1:
     file: 'warhead.nbt'
     item: CHICKEN_SPAWN_EGG
@@ -423,7 +424,7 @@ warhead:
     spcost: 4
 
 juggernaut:
-  index: 3
+  index: 1
   1:
     file: 'juggernaut.nbt'
     item: GHAST_SPAWN_EGG
@@ -456,7 +457,7 @@ juggernaut:
     spcost: 3
 
 breaker:
-  index: 1
+  index: 2
   1:
     file: 'breaker.nbt'
     item: DOLPHIN_SPAWN_EGG
@@ -490,7 +491,7 @@ breaker:
     spcost: 4
 
 shieldbuster:
-  index: 4
+  index: 0
   1:
     file: 'shieldbuster.nbt'
     item: WITCH_SPAWN_EGG
@@ -527,7 +528,7 @@ shieldbuster:
 # Architect missiles
 
 shipper:
-  index: 1
+  index: 0
   1:
     file: 'shipper.nbt'
     item: HORSE_SPAWN_EGG
@@ -561,7 +562,7 @@ shipper:
     spcost: 2
 
 slingshot:
-  index: 0
+  index: 3
   1:
     file: 'slingshot.nbt'
     item: SHULKER_SPAWN_EGG
@@ -593,7 +594,7 @@ slingshot:
     spcost: 3
 
 automaton:
-  index: 4
+  index: 1
   1:
     file: 'automaton.nbt'
     item: STRAY_SPAWN_EGG
@@ -628,7 +629,7 @@ automaton:
     spcost: 3
 
 pisces:
-  index: 2
+  index: 4
   1:
     file: 'pisces.nbt'
     item: PARROT_SPAWN_EGG
@@ -660,7 +661,7 @@ pisces:
     spcost: 3
 
 lifter:
-  index: 3
+  index: 2
   1:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
@@ -699,7 +700,9 @@ lifter:
 # Utility items
 
 splash:
-  index: 1
+  index: 5
+  cooldown: 20
+  max: 1
   item: SPLASH_POTION
   name: "&9★ Splash %level% ⚡"
   lore:
@@ -722,6 +725,7 @@ splash:
   3:
     duration: 2
     extend: 20
+    max: 2
     spcost: 2
 
 novarocket:
@@ -734,8 +738,9 @@ novarocket:
   - "&7from a trailer park in Florida."
 
 shield:
-  index: 2
+  index: 6
   item: SNOWBALL
+  max: 2
   name: "&f★ Shield %level% ⚒"
   lore:
   - ""
@@ -769,8 +774,9 @@ shield:
     spcost: 2
 
 platform:
-  index: 1
-  item: SNOWBALL
+  index: 5
+  item: EGG
+  max: 2
   name: "&7★ Platform %level% ⚒"
   lore:
   - ""
@@ -806,7 +812,7 @@ platform:
     spcost: 2
 
 torpedo:
-  index: 0
+  index: 5
   item: EGG
   name: "&0★ Torpedo %level% ✟"
   lore:
@@ -834,7 +840,7 @@ torpedo:
     spcost: 3
 
 obsidianshield:
-  index: 1
+  index: 6
   file: 'obsidian_shield.nbt'
   item: ENDER_PEARL
   name: "&5★ Obsidian Shield %level% ✟"
@@ -872,7 +878,8 @@ obsidianshieldclear:
     z: 0
 
 canopy:
-  index: 0
+  index: 7
+  cooldown: 75
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"
@@ -901,7 +908,9 @@ canopy:
     spcost: 2
 
 creeper:
-  index: 1
+  index: 5
+  cooldown: 45
+  max: 2
   1:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper &a&l☣"
@@ -909,6 +918,7 @@ creeper:
     - ""
     - "&7A creeper walks into a bar. I wasn't paid"
     - "&7enough to finish the joke"
+    - ""
   2:
     item: CREEPER_HEAD
     name: "&a★ Spawn Creeper (Charged) &a&l☣"
@@ -918,10 +928,11 @@ creeper:
     - "&7creeper is. Seems like the specimen we have"
     - "&7here got struck by lightning. It has become"
     - "&7a lot more aggressive since and we concl-"
+    - ""
     spcost: 3
 
 fireball:
-  index: 0
+  index: 6
   item: FIRE_CHARGE
   name: "&4★ Fireball %level% &4&l☣"
   lore:
@@ -944,30 +955,32 @@ fireball:
     spcost: 3
 
 leaves:
-  index: 0
+  index: 7
+  cooldown: 5
   name: "&2★ Leaves %level% ⚒"
   lore:
   - ""
   - "&7Since when could you walk on leaves?"
   - "&7I thought they would just deca-"
   - ""
-  - "&bAmount: %amount%"
   1:
     item: JUNGLE_LEAVES
-    amount: 8
+    max: 8
   2:
     item: AZALEA_LEAVES
-    amount: 12
     spcost: 2
+    max: 16
   3:
     item: FLOWERING_AZALEA_LEAVES
-    amount: 16
     spcost: 2
+    max: 32
   
 lingering_harming:
-  index: 2
-  item: LINGERING_POTION
-  name: "&5★ Lingering Harming Potion %level% ⚡"
+  index: 6
+  cooldown: 45
+  max: 2
+  item: DRAGON_HEAD
+  name: "&5★ Dragon Fireball %level% ⚡"
   lore:
   - ""
   - "&7How it feels to chew 5 gum"
@@ -976,18 +989,20 @@ lingering_harming:
   - "&bDuration: %duration%"
   1:
     # 0 = lvl 1
-    amplifier: 1
+    amplifier: 0
     duration: 5
   2:
     amplifier: 1
     duration: 10
     spcost: 1
   3:
-    amplifier: 2
+    amplifier: 1
     duration: 15
-    spcost: 2
+    spcost: 1
+    
 arrows:
-  index: 2
+  index: 7
+  cooldown: 16
   item: ARROW
   name: "&fArrows"
   lore:
@@ -998,14 +1013,13 @@ arrows:
   - "&7and instead wasted your time reading"
   - "&7this description."
   - ""
-  - "&bAmount: %amount%"
   1:
-    amount: 2
+    max: 2
   2:
-    amount: 3
+    max: 3
     spcost: 1
   3:
-    amount: 4
+    max: 4
     spcost: 3
     
 elytra:
@@ -1215,9 +1229,6 @@ Berserker:
         spcost: 1
       2: 
         level: 2
-        spcost: 1
-      3: 
-        level: 3
         spcost: 2
     blast_protection:
       cost: 1600
@@ -1418,7 +1429,6 @@ held:
 
 # Stuff relating to Deck GUI
 default-skillpoints: 18
-default-skillpoints-ranked: 16
 
 intangibles:
   locked: RED_STAINED_GLASS_PANE
@@ -1436,21 +1446,18 @@ indicators:
     lore:
       - "&7Make your missiles stronger and faster"
     slot: 0
-    rankedslot: 0
   utility:
     item: COMPARATOR
     name: "&9&lUtility"
     lore:
       - "&7Improve the effectiveness of utilities"
     slot: 9
-    rankedslot: 9
   enchants:
     item: ENCHANTED_BOOK
     name: "&3&lGear Enchantments"
     lore:
       - "&7Enhance your weapons and armor"
     slot: 18
-    rankedslot: 18
   passive:
     item: YELLOW_DYE
     name: "&e&lPassive"
@@ -1479,8 +1486,9 @@ indicators:
     - "&aSkillpoints&7. Check the item below"
     - "&7for your available skillpoints."
     - "&7You get one extra skillpoint per MW rank."
+    - ""
+    - "&aBalance: &f%mokens% Mokens"
     slot: 8
-    rankedslot: 8
   skillpoints:
     item: EMERALD
     name: "&aAvailable Skillpoints: &f%sp%"
@@ -1489,7 +1497,6 @@ indicators:
     - "&cClick to downgrade all items"
     - "&cand return all skillpoints."
     slot: 17
-    rankedslot: 17
   reset:
     item: BARRIER
     name: "&cReset Preset"
@@ -1503,21 +1510,23 @@ indicators:
     item: RED_STAINED_GLASS_PANE
     name: "&cBack"
     slot: 53
-    rankedslot: 26
   
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
   locked2: "&cLeft-click &7to purchase"
-  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
-  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   level: "&f%1%"
   nextlevel: " &7(-> &e%2%&7)&f"
   actuallevel: " &7- &8%current%/%max%"
-  currentsp: "&aAvailable Skillpoints: &f%sp%"
   missilestats:
   - ""
-  - "&aSpeed: %speed%m/s"
-  - "&cTNT: %tnt%"
+  - "&bSpeed: %speed%m/s"
+  - "&bTNT: %tnt%"
+  itemstats:
+  - "&bCooldown: %cooldown%&fs"
+  - "&bLimit: %max% &fitems"
+  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
+  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
+  currentsp: "&cAvailable &7Skillpoints: &f%sp%"
 
 preset:
   info:
@@ -1617,18 +1626,6 @@ preset:
     - "&7and purchase passives and abilities."
     - ""
     - "&cClick &7to edit this preset"
-  ranked:
-    item: ENCHANTED_BOOK
-    name: "&3&lRanked Preset"
-    lore:
-    - ""
-    - "&7This is the &3ranked &7preset for this"
-    - "&7deck. This preset is only used in &3ranked"
-    - "&7games, and is automatically selected based"
-    - "&7on your deck. &eAbilities &7and &6passives"
-    - "&7are &cdisabled &7in this deck."
-    - ""
-    - "&cRight-click &7to edit this preset"
   
 enchants:
   name: "&b%enchant%"
@@ -1641,51 +1638,56 @@ gpassive:
     name: "&5Missile Specialist"
     lore:
     - ""
-    - "&7Your chance of recieving a missile increases"
-    - "&7and your chance of recieving a utility decreases"
-    - "&7by %percentage%%&7. At level 3, you will always"
-    - "&7recieve a missile when the game starts."
-    cost: 2000
+    - "&7Missile cooldowns are decreased by"
+    - "%mpercentage%%&7, and utility cooldowns are"
+    - "&7increased by %upercentage%%&7."
+    cost: 1500
     1:
-      percentage: 5
+      mpercentage: 5
+      upercentage: 15
       spcost: 1
     2:
-      percentage: 10
-      spcost: 2
+      mpercentage: 10
+      upercentage: 30
+      spcost: 1
     3: 
-      percentage: 15
+      mpercentage: 15
+      upercentage: 45
       spcost: 2
   utilityspec:
     name: "&5Utility Specialist"
     lore:
     - ""
-    - "&7Your chance of recieving a missile decreases"
-    - "&7and your chance of recieving a utility increases"
-    - "&7by %percentage%%&7. At level 3, you will always"
-    - "&7recieve a utility when the game starts." 
+    - "&7Utility cooldowns are decreased by"
+    - "%upercentage%%&7, and missile cooldowns are"
+    - "&7increased by %mpercentage%%&7."
     cost: 1200   
     1:
-      percentage: 8
+      upercentage: 10
+      mpercentage: 5
       spcost: 1
     2:
-      percentage: 16
-      spcost: 2
+      upercentage: 20
+      mpercentage: 10
+      spcost: 1
     3: 
-      percentage: 24
+      upercentage: 30
+      mpercentage: 15
       spcost: 2
   hoarder:
     name: "&5Hoarder"
     lore:
     - ""
-    - "&7Your inventory limit is increased from"
-    - "&76 items to %limit%"
+    - "&7The maximum amount of each item is"
+    - "&7increased by %max%x&7 (rounded down),"
+    - "&7while cooldowns for all items are"
+    - "&7increased by %percentage%%&7."
     cost: 1600
     1:
-      limit: 7
+      max: 1.5
+      percentage: 10
       spcost: 1
     2:
-      limit: 8
-      spcost: 1
-    3:
-      limit: 9
-      spcost: 2
+      max: 2
+      percentage: 40
+      spcost: 3

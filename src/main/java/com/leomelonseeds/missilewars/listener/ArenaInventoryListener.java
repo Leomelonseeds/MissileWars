@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -29,6 +30,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -93,7 +95,6 @@ public class ArenaInventoryListener implements Listener {
     /** Stop players from changing their armor/bow items. */
     @EventHandler
     public void stopItemMoving(InventoryClickEvent event) {
-        
         Player player = (Player) event.getWhoClicked();
         if (event.getCurrentItem() == null) {
             return;
@@ -130,6 +131,16 @@ public class ArenaInventoryListener implements Listener {
         // Obtain player
         if (!(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
+        }
+        
+        // Stop from moving deck items
+        Deck deck = arena.getPlayerInArena(player.getUniqueId()).getDeck();
+        ClickType click = event.getClick();
+        if (deck != null && deck.getDeckItem(item) != null) {
+            if (click == ClickType.LEFT || click == ClickType.RIGHT || click.toString().contains("DROP")) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         // Stop armor removals and first slot changes
@@ -168,12 +179,42 @@ public class ArenaInventoryListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
-        String item = event.getItemDrop().getItemStack().toString();
-        
-        // Make sure we allow gear items to be used
+       
+        // Make sure we don't allow gear items to be dropped
+        ItemStack dropped = event.getItemDrop().getItemStack();
+        String item = dropped.getType().toString();
         if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE")) {
             event.setCancelled(true);
+            return;
+        }
+
+        // Handle dropping of deck items
+        MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
+        DeckItem di = mwp.getDeck().getDeckItem(dropped);
+        if (di == null) {
+            return;
+        }
+        
+        // Cancel if on cooldown
+        if (player.hasCooldown(dropped.getType())) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Give dropped item back to player if hand empty
+        ItemStack remaining = player.getInventory().getItem(EquipmentSlot.HAND);
+        if (remaining.getType() == Material.AIR) {
+            // Replace dropped item with a copy
+            ItemStack toDrop = new ItemStack(dropped);
+            event.getItemDrop().setItemStack(toDrop);
+            dropped.setAmount(1);
+            player.getInventory().setItem(EquipmentSlot.HAND, dropped);
+            di.initCooldown(di.getCurrentCooldown()); // Re-initialize cooldown, since item count set to 0
+            player.updateInventory();
+        } else {
+            // Need to re-increase and manually decrease amount so consume doesn't screw over
+            remaining.setAmount(remaining.getAmount() + 1);
+            InventoryUtils.consumeItem(player, arena, remaining, -1);
         }
     }
 
@@ -191,10 +232,9 @@ public class ArenaInventoryListener implements Listener {
         if (arena == null) {
             return;
         }
+        
         MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
-        
         Deck deck = mwPlayer.getDeck();
-        
         if (deck == null) {
             return;
         }
@@ -208,9 +248,19 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
         }
-
+        
         // Cancel event if player cannot pick up item based on their given deck
-        if (!deck.hasInventorySpace(mwPlayer.getMCPlayer(), false)) {
+        DeckItem di = deck.getDeckItem(item);
+        if (di == null && item.getType().toString().contains("ARROW") && (deck.getName().equals("Sentinel") || deck.getName().equals("Berserker"))) {
+            for (DeckItem temp : deck.getItems()) {
+                if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
+                    di = temp;
+                    break;
+                }
+            }
+        }
+        
+        if (di != null && !di.pickup(event.getItem())) {
             event.setCancelled(true);
             return;
         }
@@ -273,14 +323,19 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        // Check slowness arrow pickups
-        ItemStack pickedUp = event.getItem().getItemStack();
-        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "slownessarrows") > 0 &&
-                pickedUp.getType() == Material.TIPPED_ARROW) {
-            int index = ConfigUtils.getConfigFile("items.yml").getInt("arrows.index");
-            ItemStack tippedArrow = new ItemStack(deck.getUtility().get(index));
-            tippedArrow.setAmount(pickedUp.getAmount());
-            event.getItem().setItemStack(tippedArrow);
+        // At this point, we know that it is either sentinel or berserker picking up the arrow
+        // We then convert the itemstack directly into the corresponding type of the player deck
+        for (DeckItem di : deck.getItems()) {
+            ItemStack i = di.getInstanceItem();
+            if (!i.getType().toString().contains("ARROW")) {
+                continue;
+            }
+
+            event.getItem().setItemStack(i);
+            if (!di.pickup(event.getItem())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

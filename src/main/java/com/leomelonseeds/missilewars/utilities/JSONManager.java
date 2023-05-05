@@ -39,7 +39,7 @@ public class JSONManager {
         this.plugin = plugin;
         playerCache = new HashMap<>();
         defaultPresets = new HashMap<>();
-        allPresets = new String[] {"A", "B", "C", "R"};
+        allPresets = new String[] {"A", "B", "C"};
         periodicSave();
         
         
@@ -101,7 +101,7 @@ public class JSONManager {
                             }
                         }
                     }
-                    JSONObject defaultpreset = defaultPresets.get(deck);
+                    JSONObject defaultpreset = getDefaultPreset(deck);
                     for (String preset : plugin.getDeckManager().getPresets()) {
                         // Only load presets player has permissions for to save on storage
                         boolean hasPreset = Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase());
@@ -130,7 +130,7 @@ public class JSONManager {
                         updateJson(currentpreset, defaultpreset);
                         int finalsp = getMaxSkillpoints(uuid);
                         // Anything not in this array is an enchantment
-                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints"});
+                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
                         
                         // Calculate sp spent on missiles and utility
                         // Also updates their jsons
@@ -198,18 +198,20 @@ public class JSONManager {
                         
                         // Calculate sp spent on enchantments
                         for (String k : currentpreset.keySet()) {
-                            if (!all.contains(k)) {
-                                int level = currentpreset.getInt(k);
-                                int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
-                                if (level > maxLevel) {
-                                    currentpreset.put(k, maxLevel);
-                                    level = maxLevel;
-                                }
-                                while (level > 0) {
-                                    int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
-                                    finalsp -= cost;
-                                    level--;
-                                }
+                            if (all.contains(k)) {
+                                continue;
+                            }
+                            
+                            int level = currentpreset.getInt(k);
+                            int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
+                            if (level > maxLevel) {
+                                currentpreset.put(k, maxLevel);
+                                level = maxLevel;
+                            }
+                            while (level > 0) {
+                                int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
+                                finalsp -= cost;
+                                level--;
                             }
                         }
                         
@@ -224,11 +226,6 @@ public class JSONManager {
                             currentpreset.put("skillpoints", finalsp);
                         }
                     }
-                    
-                    // Create ranked preset if not exist
-                    // if (!deckjson.has("R")) {
-                    //    deckjson.put("R", createRankedPreset(deck));
-                    // }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -238,31 +235,6 @@ public class JSONManager {
             
             playerCache.put(uuid, newJson);
         });
-    }
-    
-    /**
-     * Creates a ranked preset from a default preset
-     * 
-     * @param json
-     * @return
-     */
-    private JSONObject createRankedPreset(String deck) {
-        JSONObject json = getDefaultPreset(deck);
-        for (String key : json.keySet()) {
-            if (json.get(key) instanceof Integer) {
-                json.put(key, 0);
-            }
-        }
-        for (String s : new String[] {"missiles", "utility"}) {
-            for (String key : json.getJSONObject(s).keySet()) {
-                json.getJSONObject(s).put(key, 1);
-            }
-        }
-        json.remove("ability");
-        json.remove("passive");
-        json.remove("gpassive");
-        json.put("skillpoints", ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints-ranked"));
-        return json;
     }
     
     /**

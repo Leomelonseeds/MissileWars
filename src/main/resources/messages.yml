@@ -33,10 +33,9 @@ messages:
   map-failed: "&cMap failed to generate! Please contact an admin."
   starting: "&7Starting now! Please wait for the map to generate..."
   cannot-place-structure: "&cYou cannot use that here!"
-  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Items will now be given 2x faster, and the game will no longer wait for ties."
+  chaos-mode: "&a&l[!] &7There are &c%umw_chaos_time% &7minutes until the game ends. Cooldowns are now half as long, and the game will no longer wait for ties."
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
-  inventory-limit: "&c&l[!] &7You did not recieve %umw_item% &7because your inventory limit was reached."
-  out-of-bounds: "&c&l[!] &7You did not recieve %umw_item% &7because you are out of bounds."
+  out-of-bounds: "&c&l[!] &cYou are out of bounds!"
   poison: "&c&l[!] &cYou start to feel the effects of being too high..."
   game-end-reminder: "&c&l[!] &7The game will end in &c%umw_time_remaining%&7!"
   red-team-empty: "&cRed team &7is empty. &9Blue team &7will automatically win in 60 seconds."
@@ -49,9 +48,8 @@ messages:
   classic-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &a&lClassic"
-    - "&f- Recieve &cmissile&f/&9utility &fevery few seconds."
-    - "&f- &aRight click &fyour spawn eggs on &3blocks"
-    - "   &fto create missiles."
+    - "&f- Spawn your &cmissiles &fto attack the enemy."
+    - "&f- Use your &9utility &ffor defense and support."
     - "&f- &4Blow up &fyour opponents' &5nether portals &fto win."
     - "&f- &fRide your missiles to victory!"
     - "&b========================================"
@@ -114,6 +112,8 @@ messages:
   training-blue-only: "&c&l[!] &7You can only be on &9blue &7in the training arena."
   joined-training: "&a&l[!] &7You are in the training arena. No stats will be affected here."
   nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
+  item-ready: "&a&l[!] %item% &ais now available"
+  already-joined: "&c&l[!] &7You have already been in this game, so all your cooldowns have been maximized."
   training-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &d&lTraining"
@@ -227,7 +227,7 @@ titles:
     length: 100
   chaos-mode:
     title: "&0&o&lChaos mode"
-    subtitle: "2x the items, 4x the fun"
+    subtitle: "Half the cooldowns, 2x the fun!"
     length: 100
   video:
     title: "&aPlease,"

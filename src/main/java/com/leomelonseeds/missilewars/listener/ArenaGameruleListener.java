@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -50,17 +51,17 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.json.JSONObject;
 
-import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import net.kyori.adventure.text.Component;
@@ -108,7 +109,7 @@ public class ArenaGameruleListener implements Listener {
         }
     }
 
-    /** Handle void death. Works outside arenas too. */
+    /** Handle all sorts of deaths. */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
     	//Check if entity is player
@@ -117,43 +118,62 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Cause instant death so player can respawn faster
+    	Player player = (Player) event.getEntity();
         if (event.getCause() == DamageCause.VOID) {
             event.setDamage(40.0);
         }
         
-        // Stop fall damage on game start
-        if (event.getCause() == DamageCause.FALL) {
-            Player player = (Player) event.getEntity();
-            ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-            Arena playerArena = manager.getArena(player.getUniqueId());
-            if (playerArena != null && playerArena.getSecondsUntilStart() >= -1) {
-                event.setCancelled(true);
-            }
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena playerArena = manager.getArena(player.getUniqueId());
+        if (playerArena == null) {
+            return;
+        }
+        
+        // Don't handle players with no team
+        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+            return;
+        }
+        
+        if (playerArena.getPlayerInArena(player.getUniqueId()).justSpawned()) {
+            event.setCancelled(true);
+            return;
         }
     }
 
     /** Handle player deaths. */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        event.setCancelled(true);
+        event.setShouldPlayDeathSound(true);
+        event.setReviveHealth(20);
+        
         // Check if player was killed in an Arena
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getEntity();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager manager = plugin.getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
-        	player.setBedSpawnLocation(ConfigUtils.getSpawnLocation(), true);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> player.teleport(ConfigUtils.getSpawnLocation()), 1);
             return;
         }
-        
-        player.setBedSpawnLocation(playerArena.getPlayerSpawn(player), true);
+
+        Location spawn = playerArena.getPlayerSpawn(player);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            player.teleport(spawn);
+            player.setFireTicks(0);
+            player.setSaturation(5F);
+            player.removePotionEffect(PotionEffectType.POISON);
+            player.removePotionEffect(PotionEffectType.SLOW);
+        }, 1);
         Component deathMessage = event.deathMessage();
         event.deathMessage(Component.text(""));
-        
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }
 
         // Count death if player is on a team
-        playerArena.getPlayerInArena(player.getUniqueId()).incrementDeaths();
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        mwp.incrementDeaths();
         
         // Find the player's killer
         Player killer = player.getKiller();
@@ -185,73 +205,18 @@ public class ArenaGameruleListener implements Listener {
         
         // Remove canopy cooldown so canopy doesn't get used
         CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
+        mwp.setJustSpawned();
 
         // Un-obstruct spawns
-        Location spawn1 = playerArena.getPlayerSpawn(player);
-        Location spawn2 = spawn1.clone().add(0, 1, 0);
-        Location spawn3 = spawn1.clone().add(1, 0, 0);
-        Location spawn4 = spawn1.clone().add(-1, 0, 0);
-        Location spawn5 = spawn1.clone().add(0, 0, 1);
-        Location spawn6 = spawn1.clone().add(0, 0, -1);
-        for (Location l : new Location[] {spawn1, spawn2}) {
+        Location spawn2 = spawn.clone().add(0, 1, 0);
+        for (Location l : new Location[] {spawn, spawn2}) {
             l.getBlock().setType(Material.AIR);
-        }
-        for (Location l : new Location[] {spawn3, spawn4, spawn5, spawn6}) {
-            Block b = l.getBlock();
-            if (b.getType() == Material.WATER || b.getType() == Material.LAVA) {
-                b.setType(Material.AIR);
-            }
-        }
-    }
-
-    /** Handles haste giving on death */
-    @EventHandler
-    public void onRespawn(PlayerPostRespawnEvent event) {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Player player = event.getPlayer();
-        ArenaManager manager = plugin.getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
-        if (playerArena == null) {
-            return;
-        }
-        
-        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
-            return;
-        }
-        
-        // Re-give haste if player using architect with haste
-        JSONObject json = plugin.getJSON().getPlayerPreset(player.getUniqueId());
-        if (json.has("haste")) {
-            ItemStack item = player.getInventory().getItemInMainHand();
-            if (item == null || item.getType() != Material.IRON_PICKAXE) {
-                return;
-            }
-            
-            int level = json.getInt("haste");
-            if (level <= 0) {
-                return;
-            }
-            
-            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
-        }
-        
-        // Regive vanguard passives
-        int bunny = plugin.getJSON().getAbility(player.getUniqueId(), "bunny");
-        if (bunny > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", bunny, "amplifier");
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, level));
-        }
-        
-        int adrenaline = plugin.getJSON().getAbility(player.getUniqueId(), "adrenaline");
-        if (adrenaline > 0) {
-            int level = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", adrenaline, "amplifier");
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, level));
         }
     }
     
     public static Map<Player, Location> bowShots = new HashMap<>();
     
-    // Handle sentinel longshot bow shoot event
+    // Handle sentinel longshot bow shoot event + bow cooldowns
     @EventHandler
     public void onBowShoot(EntityShootBowEvent event) {
         // Ensure we are handling a player in an arena
@@ -265,6 +230,27 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        if (arena.getTeam(player.getUniqueId()) == "no team") {
+            return;
+        }
+        
+        // Berserker user
+        if (event.getBow().getType() == Material.CROSSBOW) {
+            int cd = Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
+            player.setCooldown(Material.CROSSBOW, cd);
+            return;
+        }
+        
+        ItemStack toConsume = event.getConsumable();
+        ItemStack[] contents = player.getInventory().getContents();
+        int slot = -1;
+        for (int i = 0; i < contents.length; i++) {
+            if (toConsume.isSimilar(contents[i])) {
+                slot = i;
+            }
+        }
+        InventoryUtils.consumeItem(player, arena, toConsume, slot);
+        
         if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
@@ -272,6 +258,40 @@ public class ArenaGameruleListener implements Listener {
                 bowShots.remove(player);
             }, 100);
         }
+    }
+    
+    // Handle crossbow load cooldowns
+    @EventHandler
+    public void onCrossbowLoad(EntityLoadCrossbowEvent event) {
+        // Ensure we are handling a player in an arena
+        if (event.getEntityType() != EntityType.PLAYER) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = arenaManager.getArena(player.getUniqueId());
+        if ((arena == null) || !arena.isRunning()) {
+            return;
+        }
+        
+        if (arena.getTeam(player.getUniqueId()) == "no team") {
+            return;
+        }
+        
+        // At this point, the player is 100% using berserker. Obtain the arrow item
+        ItemStack toConsume = null;
+        int slot = -1;
+        ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i];
+            if (item.getType() == Material.ARROW || item.getType() == Material.TIPPED_ARROW) {
+                toConsume = item;
+                slot = i;
+                break;
+            }
+        }
+        
+        InventoryUtils.consumeItem(player, arena, toConsume, slot);
     }
     
 
@@ -289,7 +309,7 @@ public class ArenaGameruleListener implements Listener {
         if ((arena == null) || !arena.isRunning()) {
             return;
         }
-
+        
         // Check if player is damaged by a player
         Player damager = null;
         Boolean isProjectile = false;;
@@ -418,7 +438,8 @@ public class ArenaGameruleListener implements Listener {
                     }, 1);
                     
                     // Give item back on successful hit
-                    damager.getInventory().addItem(item);
+                    Item newitem = damager.getWorld().dropItem(damager.getLocation(), item);
+                    newitem.setPickupDelay(0);
                 }
             }
         }
@@ -546,7 +567,8 @@ public class ArenaGameruleListener implements Listener {
         double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
-            possibleArena.getWorld().dropItemNaturally(block.getLocation(), item);
+            Item newitem = player.getWorld().dropItem(player.getLocation(), item);
+            newitem.setPickupDelay(0);
         }
     }
 
@@ -591,9 +613,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Experimental poison 
         if (plugin.getConfig().getBoolean("experimental.poison")) {
-
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
-            
             if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (player.getLocation().getBlockY() >= toohigh) {

@@ -75,8 +75,10 @@ public class ConfigUtils {
      * Does not reload the default.json
      */
     public static void reloadConfigs() {
-        MissileWarsPlugin.getPlugin().reloadConfig();
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         configCache.clear();
+        plugin.reloadConfig();
+        plugin.getDeckManager().reload();
     }
 
     /**
@@ -217,14 +219,14 @@ public class ConfigUtils {
     }
 
     /**
-     * Send a sound to the player, with location! Mainly
+     * Send a sound to a location! Mainly
      * useful for utility items.
      *
      * @param path the key of the sound in the sounds.yml file
      * @param player the player to send sound to
      * @param location the location to send the sound to
      */
-    public static void sendConfigSound(String path, Player player, Location location) {
+    public static void sendConfigSound(String path, Location location) {
         FileConfiguration soundConfig = getConfigFile("sounds.yml");
 
         if (!soundConfig.contains(path)) {
@@ -235,7 +237,7 @@ public class ConfigUtils {
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
-        player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
+        location.getWorld().playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
     
     /**
@@ -373,12 +375,12 @@ public class ConfigUtils {
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        int x1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y2");
-        int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z1");
-        int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z2");
+        int x1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x1");
+        int x2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.x2");
+        int y1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y1");
+        int y2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.y2");
+        int z1 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z1");
+        int z2 = (int) getMapNumber(arena.getGamemode(), arena.getMapName(), team + "-shield.z2");
         if (x1 - bias <= x && x <= x2 + bias && 
             y1 - bias <= y && y <= y2 + bias &&
             z1 - bias <= z && z <= z2 + bias) {
@@ -399,11 +401,17 @@ public class ConfigUtils {
         
         if (itemsConfig.contains(item + "." + level + "." + get)) {
             return itemsConfig.get(item + "." + level + "." + get);
-        } else if (itemsConfig.contains(item + "." + get)) {
-            return itemsConfig.get(item + "." + get);
-        } else {
-            return null;
         }
+        
+        if (itemsConfig.contains(item + "." + get)) {
+            return itemsConfig.get(item + "." + get);
+        }
+        
+        if (get.equals("max") || get.equals("cooldown")) {
+            return MissileWarsPlugin.getPlugin().getConfig().getInt("default-" + get);
+        }
+        
+        return null;
     }
     
     /**
@@ -417,9 +425,9 @@ public class ConfigUtils {
         Object o = getItemValue(abilityPath, level, stat);
         if (o == null) {
             return 0;
-        } else {
-            return Double.valueOf(o + "");
         }
+        
+        return Double.valueOf(o + "");
     }
     
     /**
@@ -499,5 +507,16 @@ public class ConfigUtils {
         }
         return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
                 id), PersistentDataType.STRING);
+    }
+    
+    // Determine if a player is out of bounds
+    public static boolean outOfBounds(Player player, Arena arena) {
+        if (arena == null) {
+            return false;
+        }
+        double toohigh = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
+        double toofar = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
+        Location loc = player.getLocation();
+        return loc.getBlockY() > toohigh || loc.getBlockX() < toofar;
     }
 }

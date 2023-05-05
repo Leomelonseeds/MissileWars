@@ -13,21 +13,20 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
-import com.leomelonseeds.missilewars.decks.DeckManager;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -48,8 +47,6 @@ public class MissileWarsTeam {
     private Set<MissileWarsPlayer> members;
     /** The spawn location for the team. */
     private Location spawn;
-    /** The current task for Deck pool item distribution. */
-    private BukkitTask poolItemRunnable;
     /** Whether the team's decks should be distributing items in chaos-mode. */
     private boolean chaosMode;
     /** Map containing locations and statuses of all portals */
@@ -60,6 +57,8 @@ public class MissileWarsTeam {
     private int shieldVolume;
     /** Register this team to a vanilla team */
     private Team team;
+    /** the multiplier for all cooldown items */
+    private double multiplier;
 
     /**
      * Create a {@link MissileWarsTeam} with a given name
@@ -75,6 +74,7 @@ public class MissileWarsTeam {
         this.spawn = spawn;
         this.arena = arena;
         this.shieldBlocksBroken = 0;
+        this.multiplier = 1;
         
         // Register team
         String teamName = arena.getName() + "." + name;
@@ -124,6 +124,14 @@ public class MissileWarsTeam {
         if (Bukkit.getScoreboardManager().getMainScoreboard().getTeams().contains(team)) {
             team.unregister();
         }
+    }
+    
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
+    }
+    
+    public double getMultiplier() {
+        return multiplier;
     }
     
     public String getName() {
@@ -192,7 +200,7 @@ public class MissileWarsTeam {
     public int getTotalPortals() {
         return portals.size();
     }
-
+ 
     /**
      * Check if a team contains a specific player based on their MC UUID.
      *
@@ -207,37 +215,24 @@ public class MissileWarsTeam {
         }
         return false;
     }
-    
+
     /**
      * Add a player to the team.
      *
      * @param player the player to add
      */
     public void addPlayer(MissileWarsPlayer player) {
-        addPlayer(player, false);
-    }
-
-    /**
-     * Add a player to the team.
-     *
-     * @param player the player to add
-     */
-    public void addPlayer(MissileWarsPlayer player, Boolean ranked) {
-        
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-
         members.add(player);
-        DeckManager dm = plugin.getDeckManager();
-        player.setDeck(dm.getPlayerDeck(player.getMCPlayerId(), ranked));
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         team.addPlayer(mcPlayer);
+        InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
-        InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         if (arena instanceof TrainingArena) {
@@ -245,8 +240,19 @@ public class MissileWarsTeam {
         } else {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
+
         player.setJoinTime(LocalDateTime.now());
-        player.missilePreview(arena);
+        player.setJustSpawned();
+        plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId(), (result) -> {
+            Deck deck = (Deck) result;
+            player.setDeck(deck);
+            player.missilePreview(arena);
+            for (DeckItem di : deck.getItems()) {
+                mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
+                di.registerTeam(this);
+            }
+            arena.addCallback(player);
+        });
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
@@ -334,73 +340,29 @@ public class MissileWarsTeam {
         return item;
     }
 
-    /** Give each {@link MissileWarsPlayer} their gear. */
-    public void distributeGear() {
-        for (MissileWarsPlayer player : members) {
-            player.giveDeckGear();
-            player.givePoolItem(true);
-        }
-    }
-
-    /** Schedule the distribution of in-game Deck items. */
-    public void scheduleDeckItems() {
-        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        double timeBetween = settings.getInt("item-frequency." + Math.max(1, Math.min(members.size(), 3)));
-        if (chaosMode) {
-            timeBetween /= settings.getInt("chaos-mode.multiplier");
-        }
-
-        int secsBetween = (int) Math.floor(timeBetween);
-
-        // Setup level countdown till distribution
-        for (int secInCd = secsBetween; secInCd > 0; secInCd--) {
-            int finalSecInCd = secInCd;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (MissileWarsPlayer player : members) {
-                        player.getMCPlayer().setLevel(finalSecInCd);
-                    }
-                }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), (secsBetween - secInCd) * 20);
-        }
-
-        poolItemRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Distribute items
-                for (MissileWarsPlayer player : members) {
-                    player.givePoolItem(false);
-                }
-                // Enqueue next distribution
-                scheduleDeckItems();
-            }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(),  secsBetween * 20L);
-    }
-
-    /** Stop the distribution of in-game Deck items. */
-    public void stopDeckItems() {
-        if (poolItemRunnable != null) {
-            poolItemRunnable.cancel();
-        }
-    }
-
     /**
      * Remove a given player from the team.
      *
      * @param player the player to remove
      */
     public void removePlayer(MissileWarsPlayer player) {
-        if (members.contains(player)) {
-        	Player mcPlayer = player.getMCPlayer();
-        	team.removePlayer(mcPlayer);
-            members.remove(player);
-            InventoryUtils.clearInventory(mcPlayer);
-            player.resetPlayer();
-            for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
-                mcPlayer.removePotionEffect(effect.getType());
-            }
+        if (!members.contains(player)) {
+            return;
         }
+        
+    	Player mcPlayer = player.getMCPlayer();
+    	team.removePlayer(mcPlayer);
+        members.remove(player);
+        InventoryUtils.clearInventory(mcPlayer);
+        player.stopDeck();
+        player.resetPlayer();
+        arena.addLeft(player.getMCPlayerId());
+        mcPlayer.setLevel(0);
+        mcPlayer.setExp(0F);
+        for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
+            mcPlayer.removePotionEffect(effect.getType());
+        }
+        arena.applyMultipliers(); // Check for cooldowns
     }
 
     /**

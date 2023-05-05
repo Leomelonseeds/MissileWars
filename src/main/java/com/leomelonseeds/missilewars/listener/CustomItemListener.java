@@ -14,13 +14,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
@@ -44,15 +46,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
+import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
@@ -96,6 +100,24 @@ public class CustomItemListener implements Listener {
         return arena;
     }
     
+    /**
+     * Consume a projectile by finding its appropriate item in player inventory
+     * 
+     * @param item
+     * @param player
+     * @param arena
+     */
+    private void projectileConsume(ItemStack item, Player player, Arena arena) {
+        PlayerInventory inv = player.getInventory();
+        int slot = inv.getHeldItemSlot();
+        ItemStack main = inv.getItemInMainHand();
+        if (main.isSimilar(item)) {
+            InventoryUtils.consumeItem(player, arena, main, slot);
+        } else {
+            InventoryUtils.consumeItem(player, arena, inv.getItemInOffHand(), 40);
+        }
+    }
+    
     /** Give architect pickaxes the haste effect */
     @EventHandler
     public void giveHaste(PlayerItemHeldEvent event) {
@@ -132,8 +154,6 @@ public class CustomItemListener implements Listener {
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
     }
-    
-    public static ArrayList<Player> cooldown = new ArrayList<>();
 
     /** Handle right clicking missiles and utility items */
     @EventHandler
@@ -148,6 +168,11 @@ public class CustomItemListener implements Listener {
         Player player = event.getPlayer();
         PlayerInventory inv = player.getInventory();
         ItemStack hand = inv.getItem(event.getHand());
+        if (player.hasCooldown(hand.getType())) {
+            return;
+        }
+        
+        // Check arena
         Arena playerArena = getPlayerArena(player);
         String held = ConfigUtils.getStringFromItem(hand, "held");
         if (playerArena == null) {
@@ -204,9 +229,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Disable if player just died
-        int sinceDeath = player.getStatistic(Statistic.TIME_SINCE_DEATH);
-        int respawnDisable = plugin.getConfig().getInt("respawn-disable");
-        if (sinceDeath <= respawnDisable) {
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        if (mwp.justSpawned()) {
             event.setCancelled(true);
             return;
         }
@@ -234,7 +258,6 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
-            
             // Check if a block was clicked, including a moving block
             if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 for (int i = 1; i <= 4; i++) {
@@ -257,41 +280,29 @@ public class CustomItemListener implements Listener {
                 mapName = playerArena.getMapName();
             }
             
-            // 0.5s cooldown
-            if (cooldown.contains(player)) {
-                ConfigUtils.sendConfigMessage("messages.missile-cooldown", player, null, null);
-                return;
-            }
-            
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
-                hand.setAmount(hand.getAmount() - 1);
-                playerArena.getPlayerInArena(player.getUniqueId()).incrementMissiles();
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                mwp.incrementMissiles();
                 ConfigUtils.sendConfigSound("spawn-missile", player);
-                // 0.5s cooldown
-                cooldown.add(player);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        cooldown.remove(player);
+                // Missile cooldown
+                for (ItemStack i : player.getInventory().getContents()) {
+                    if (i == null) continue;
+                    Material material = i.getType();
+                    if (!player.hasCooldown(material) && material != hand.getType() && material.toString().contains("SPAWN_EGG")) {
+                        player.setCooldown(material, plugin.getConfig().getInt("experimental.missile-cooldown"));
                     }
-                }.runTaskLater(plugin, plugin.getConfig().getInt("experimental.missile-cooldown"));
+                }
             } else {
                 ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }
             return;
         }
         
-        // Spawn a utility item
+        // Spawn a utility item. At this point we know the item MUST have a utility tag
         else {
-            // Make sure we allow gear items to be used
-            if (utility.contains("bow") || utility.contains("sword") || utility.contains("pickaxe")) {
-                return;
-            }
-
-            if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
-                if (utility.contains("creeper")) {
+            if (utility.contains("creeper")) {
+                if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
                     event.setCancelled(true);
-
                     // Can't place creepers on obsidian, otherwise broken game
                     List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                     for (String s : cancel) {
@@ -308,36 +319,67 @@ public class CustomItemListener implements Listener {
                     }
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
-                    hand.setAmount(hand.getAmount() - 1);
-                    return;
+                    InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                    mwp.incrementUtility();
                 }
+                return;
             }
 
-            // Spawn a fireball
-            if (utility.contains("fireball")) {
+            // Spawn a fireball/dragon fireball
+            if (utility.contains("fireball") || utility.contains("lingering")) {
                 event.setCancelled(true);
-                Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(player
-                        .getEyeLocation().getDirection()), EntityType.FIREBALL);
-                // Check for boosterball passive. Store passive by setting incendiary value
-                int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
-                if (boosterball > 0) {
-                    double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
-                    fireball.setIsIncendiary(false);
-                    fireball.customName(ConfigUtils.toComponent(multiplier + ""));
+                Fireball fireball;
+                if (utility.contains("lingering")) {
+                    fireball = (DragonFireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
+                            player.getEyeLocation().getDirection()), EntityType.DRAGON_FIREBALL);
+                    int amplifier = (int) getItemStat(utility, "amplifier");
+                    int duration = (int) getItemStat(utility, "duration");
+                    fireball.customName(Component.text("vdf:" + amplifier + ":" + duration));
+                    fireball.setCustomNameVisible(false);
                 } else {
-                    fireball.setIsIncendiary(true);
+                    fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
+                            player.getEyeLocation().getDirection()), EntityType.FIREBALL);
+                    // Check for boosterball passive. Store passive by setting incendiary value
+                    int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
+                    if (boosterball > 0) {
+                        double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
+                        fireball.setIsIncendiary(false);
+                        fireball.customName(ConfigUtils.toComponent(multiplier + ""));
+                    } else {
+                        fireball.setIsIncendiary(true);
+                    }
+                    float yield = (float) getItemStat(utility, "power");
+                    fireball.setYield(yield);
                 }
-                float yield = (float) getItemStat(utility, "power");
-                fireball.setYield(yield);
+                
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
-                hand.setAmount(hand.getAmount() - 1);
-                for (Player players : player.getWorld().getPlayers()) {
-                     ConfigUtils.sendConfigSound("spawn-fireball", players, player.getLocation());
-                }
-                playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
+                mwp.incrementUtility();
+                return;
             }
         }
+    }
+    
+    @EventHandler
+    public void dragonFireball(EnderDragonFireballHitEvent event) {
+        DragonFireball fb = event.getEntity();
+        if (fb.customName() == null) {
+            return;
+        }
+        
+        String[] args = ConfigUtils.toPlain(fb.customName()).split(":");
+        if (!args[0].equals("vdf")) {
+            return;
+        }
+        
+        int amplifier = Integer.parseInt(args[1]);
+        int duration = Integer.parseInt(args[2]);
+        AreaEffectCloud cloud = event.getAreaEffectCloud();
+        cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
+        cloud.setDuration(duration * 20);
+        cloud.setDurationOnUse(0);
     }
 
     public static Set<UUID> canopy_cooldown = new HashSet<>();
@@ -358,23 +400,22 @@ public class CustomItemListener implements Listener {
         }
 
         Arena playerArena = getPlayerArena(player);
-        if ((playerArena == null) || !event.getItemInHand().getType().toString().contains("LEAVES")) {
+        ItemStack item = event.getItemInHand();
+        if ((playerArena == null) || !item.getType().toString().contains("LEAVES")) {
             return;
         }
         
-        Location loc = block.getLocation();
-        
         // no max height
+        Location loc = block.getLocation();
         if (loc.getBlockY() > plugin.getConfig().getInt("max-height")) {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
             event.setCancelled(true);
             return;
         }
         
+        // Stop spawngriefing
         Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
         Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
-        
-        // Stop spawngriefing
         if (loc.equals(s1) || loc.equals(s2)) {
             event.setCancelled(true);
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -396,13 +437,12 @@ public class CustomItemListener implements Listener {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    ItemStack item = event.getItemInHand();
-                    item.setAmount(item.getAmount());
-                    EquipmentSlot slot = event.getHand();
-                    player.getInventory().setItem(slot, item);
+                    item.setAmount(item.getAmount() + 1);
                 }
             }
         }
+
+        InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? player.getInventory().getHeldItemSlot() : 40);
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -479,10 +519,8 @@ public class CustomItemListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
         }
         
-        hand.setAmount(hand.getAmount() - 1);
-        for (Player players : player.getWorld().getPlayers()) {
-            ConfigUtils.sendConfigSound("spawn-canopy", players, spawnLoc);
-        }
+        InventoryUtils.consumeItem(player, playerArena, hand, -1);
+        ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         despawnCanopy(spawnLoc, 5);
     }
@@ -510,7 +548,6 @@ public class CustomItemListener implements Listener {
     /** Cancel canopy activation if player jumps falls or something */
     @EventHandler
     public void canopyCancel(PlayerMoveEvent e) {
-
         Player player = e.getPlayer();
         
         // Stop players from moving a second after canopy spawn
@@ -533,19 +570,17 @@ public class CustomItemListener implements Listener {
     @EventHandler
     public void useProjectile(ProjectileLaunchEvent event) {
         // Ensure we are tracking a utility thrown by a player
-        if (!(event.getEntity().getType() == EntityType.SNOWBALL ||
-              event.getEntity().getType() == EntityType.EGG ||
-              event.getEntity().getType() == EntityType.ENDER_PEARL)) {
+        EntityType type = event.getEntityType();
+        if (!(type == EntityType.SNOWBALL || type == EntityType.EGG || type == EntityType.ENDER_PEARL)) {
             return;
         }
-        ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         
+        ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         if (!(thrown.getShooter() instanceof Player)) {
             return;
         }
         
         Player thrower = (Player) thrown.getShooter();
-        
         if (canopy_freeze.contains(thrower)) {
             event.setCancelled(true);
             return;
@@ -565,15 +600,13 @@ public class CustomItemListener implements Listener {
 
         // Add meta for structure identification
         thrown.customName(Component.text(structureName));
+        projectileConsume(hand, thrower, playerArena);
 
         // Schedule structure spawn after 1 second if snowball is still alive
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!thrown.isDead()) {
-                    if (!thrower.isOnline()) {
-                        return;
-                    }
+                if (!thrown.isDead() && thrower.isOnline()) {
                     spawnUtility(structureName, thrower, thrown, playerArena);
                 }
             }
@@ -635,6 +668,11 @@ public class CustomItemListener implements Listener {
     public void spawnUtility(String structureName, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
         Location spawnLoc = thrown.getLocation();
         String mapName = "default-map";
+        ItemStack item = thrown.getItem();
+        if (playerArena.getTeam(thrower.getUniqueId()) == "no team") {
+            return;
+        }
+        
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
         }
@@ -657,23 +695,22 @@ public class CustomItemListener implements Listener {
                     }
                 }
             } 
-            for (Player players : thrower.getWorld().getPlayers()) {
-                ConfigUtils.sendConfigSound(sound, players, spawnLoc);
-            }
+
+            ConfigUtils.sendConfigSound(sound, spawnLoc);
             // Repairman
             int repairman = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "repairman");
             if (repairman > 0 && ConfigUtils.inShield(playerArena, spawnLoc, playerArena.getTeam(thrower.getUniqueId()), 5)) {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    ItemStack item = thrown.getItem();
-                    thrower.getInventory().addItem(item);
+                    Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
+                    newitem.setPickupDelay(0);
                 }
             }
         } else {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
-            ItemStack item = thrown.getItem();
-            thrower.getInventory().addItem(item);
+            Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
+            newitem.setPickupDelay(0);
         }
         if (!thrown.isDead()) {
             thrown.remove();
@@ -683,7 +720,6 @@ public class CustomItemListener implements Listener {
     /** Handle projectile item utility creation */
     @EventHandler
     public void throwSplash(ProjectileLaunchEvent event) {
-
         if (event.getEntity().getType() != EntityType.SPLASH_POTION) {
             return;
         }
@@ -712,25 +748,24 @@ public class CustomItemListener implements Listener {
         int extend = (int) getItemStat(utility, "extend");
         thrown.customName(Component.text("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
+        projectileConsume(hand, thrower, playerArena);
     }
 
     /** Handle spawning of splash waters */
     @EventHandler
     public void handleSplash(ProjectileHitEvent event) {
-
         // Make sure we're getting the right potion here
         if ((event.getEntityType() != EntityType.SPLASH_POTION) || (event.getEntity().customName() == null)) {
             return;
         }
         
-        String customName = PlainTextComponentSerializer.plainText().serialize(event.getEntity().customName());
+        String customName = ConfigUtils.toPlain(event.getEntity().customName());
         if (!customName.contains("splash:")) {
             return;
         }
 
-        Block hitBlock = event.getHitBlock();
-
         // Spawn some water
+        Block hitBlock = event.getHitBlock();
         if (hitBlock == null) {
             return;
         }
@@ -822,9 +857,7 @@ public class CustomItemListener implements Listener {
                     if (playerArena.isRunning()) {
                         if (finalDuration == duration) {
                             SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
-                            for (Player player : location.getWorld().getPlayers()) {
-                                ConfigUtils.sendConfigSound("break-obsidian-shield", player, location);
-                            }
+                            ConfigUtils.sendConfigSound("break-obsidian-shield", location);
                         } else if (finalDuration % 2 == 0) {
                             SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
                         } else {

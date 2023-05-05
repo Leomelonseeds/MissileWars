@@ -46,6 +46,10 @@ public class JoinLeaveListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
     	Player player = event.getPlayer();
     	player.teleport(ConfigUtils.getSpawnLocation());
+    	if (player.isInvulnerable()) {
+    	    player.setInvulnerable(false);
+    	}
+    	
         for (PotionEffect effect : player.getActivePotionEffects()){
             if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE) {
                 continue;
