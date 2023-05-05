@@ -242,12 +242,11 @@ public class MissileWarsTeam {
         }
 
         player.setJoinTime(LocalDateTime.now());
-        player.missilePreview(arena);
-        player.cooldownPreview(arena);
         player.setJustSpawned();
         plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId(), (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);
+            player.missilePreview(arena);
             for (DeckItem di : deck.getItems()) {
                 mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
                 di.registerTeam(this);
@@ -359,6 +358,7 @@ public class MissileWarsTeam {
         player.resetPlayer();
         arena.addLeft(player.getMCPlayerId());
         mcPlayer.setLevel(0);
+        mcPlayer.setExp(0F);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
             mcPlayer.removePotionEffect(effect.getType());
         }

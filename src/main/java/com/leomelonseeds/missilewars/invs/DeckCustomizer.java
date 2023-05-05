@@ -66,7 +66,7 @@ public class DeckCustomizer implements MWInventory {
             } else if (key.equals("info")) {
                 ItemMeta meta = item.getItemMeta();
                 String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
-                DecimalFormat df = new DecimalFormat("0.00");
+                DecimalFormat df = new DecimalFormat("###,###,##0.##");
                 double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
                 meta.displayName(ConfigUtils.toComponent(name.replace("%mokens%", df.format(bal))));
                 item.setItemMeta(meta);
@@ -150,42 +150,44 @@ public class DeckCustomizer implements MWInventory {
         // Reset to default config
         if (slot == itemConfig.getInt("indicators.reset.slot")) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
-                if (confirm) {
-                    JSONObject def = jsonManager.getDefaultPreset(deck);
-                    int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
-                    int level = RankUtils.getRankLevel(exp);
-                    def.put("skillpoints", def.getInt("skillpoints") + level);
-                    init.getJSONObject(deck).put(preset, def);
-                    updateInventory();
+                if (!confirm) {
+                    return;
                 }
-                return;
+                JSONObject def = jsonManager.getDefaultPreset(deck);
+                int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+                int level = RankUtils.getRankLevel(exp);
+                def.put("skillpoints", def.getInt("skillpoints") + level);
+                init.getJSONObject(deck).put(preset, def);
+                updateInventory();
             });
+            return;
         }
         
         // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
         if (slot == itemConfig.getInt("indicators.skillpoints.slot")) {
             new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
-                if (confirm) {
-                    for (String key : presetjson.keySet()) {
-                        if (presetjson.get(key) instanceof Integer) {
-                            presetjson.put(key, 0);
-                        }
-                    }
-                    for (String s : items) {
-                        for (String key : presetjson.getJSONObject(s).keySet()) {
-                            presetjson.getJSONObject(s).put(key, 1);
-                        }
-                    }
-                    for (String s : abilities) {
-                        JSONObject j = presetjson.getJSONObject(s);
-                        j.put("selected", "None");
-                        j.put("level", 0);
-                    }
-                    presetjson.put("skillpoints", jsonManager.getMaxSkillpoints(player.getUniqueId()));
-                    updateInventory();
+                if (!confirm) {
+                    return;
                 }
-                return;
+                for (String key : presetjson.keySet()) {
+                    if (presetjson.get(key) instanceof Integer) {
+                        presetjson.put(key, 0);
+                    }
+                }
+                for (String s : items) {
+                    for (String key : presetjson.getJSONObject(s).keySet()) {
+                        presetjson.getJSONObject(s).put(key, 1);
+                    }
+                }
+                for (String s : abilities) {
+                    JSONObject j = presetjson.getJSONObject(s);
+                    j.put("selected", "None");
+                    j.put("level", 0);
+                }
+                presetjson.put("skillpoints", jsonManager.getMaxSkillpoints(player.getUniqueId()));
+                updateInventory();
             });
+            return;
         }
         
         ItemStack item = inv.getItem(slot);
@@ -218,15 +220,16 @@ public class DeckCustomizer implements MWInventory {
             int cost = (int) ConfigUtils.getItemValue(name, level, "cost");
             if (bal >= cost) {
                 new ConfirmAction("Purchase '" + realname + "'", player, this, (confirm) -> {
-                    if (confirm) {
-                        if (init.has(realname)) {
-                            init.put(realname, true);
-                        } else if (init.getJSONObject(deck).has(realname)) {
-                            init.getJSONObject(deck).put(realname, true);
-                        }
-                        MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
-                        updateInventory();
+                    if (!confirm) {
+                        return;
                     }
+                    if (init.has(realname)) {
+                        init.put(realname, true);
+                    } else if (init.getJSONObject(deck).has(realname)) {
+                        init.getJSONObject(deck).put(realname, true);
+                    }
+                    MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
+                    updateInventory();
                 });
             } else {
                 ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);

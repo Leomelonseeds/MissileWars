@@ -93,15 +93,20 @@ public class DeckManager {
         double maxmult = 1;
         if (glevel > 0) {
             if (!gpassive.equals("hoarder")) {
-                double mperc = (double) ConfigUtils.getItemValue("gpassive." + gpassive, glevel, "mpercentage") / 100.0;
-                double uperc = (double) ConfigUtils.getItemValue("gpassive." + gpassive, glevel, "upercentage") / 100.0;
-                mmult = mperc + (gpassive.equals("missilespec") ? 0 : 1);
-                umult = uperc + (gpassive.equals("utilityspec") ? 0 : 1);
+                double mperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "mpercentage") / 100;
+                double uperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "upercentage") / 100;
+                if (gpassive.equals("missilespec")) {
+                    mmult = 1 - mperc;
+                    umult = uperc + 1;
+                } else {
+                    mmult = mperc + 1;
+                    umult = 1 - uperc;
+                }
             } else {
-                double perc = (double) ConfigUtils.getItemValue("gpassive.hoarder", glevel, "percentage") / 100.0;
+                double perc = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "percentage") / 100;
                 mmult = perc + 1;
                 umult = perc + 1;
-                maxmult = (double) ConfigUtils.getItemValue("gpassive.hoarder", glevel, "max");
+                maxmult = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "max");
             }
         }
         

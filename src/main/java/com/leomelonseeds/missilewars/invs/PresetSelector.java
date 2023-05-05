@@ -215,22 +215,16 @@ public class PresetSelector implements MWInventory {
             }
             
             // Check item types
-            if (itemType == edit) {
-                if (player.hasPermission("umw.autoselect")) {
-                    // Choose preset
-                    playerJson.put("Deck", deck);
-                    playerJson.put("Preset", p);
-                    ConfigUtils.sendConfigSound("change-preset", player);
-                    updateInventory();
-                }
-                // Open deck customizer
-                new DeckCustomizer(player, deck, p);
-            } else if (itemType == selection) {
+            if (itemType == edit || itemType == selection) {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
                 ConfigUtils.sendConfigSound("change-preset", player);
                 updateInventory();
+                if (itemType == edit) {
+                    // Open deck customizer
+                    new DeckCustomizer(player, deck, p);
+                }
             }
         }
     }

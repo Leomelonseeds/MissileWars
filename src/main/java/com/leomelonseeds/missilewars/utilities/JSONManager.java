@@ -101,7 +101,7 @@ public class JSONManager {
                             }
                         }
                     }
-                    JSONObject defaultpreset = defaultPresets.get(deck);
+                    JSONObject defaultpreset = getDefaultPreset(deck);
                     for (String preset : plugin.getDeckManager().getPresets()) {
                         // Only load presets player has permissions for to save on storage
                         boolean hasPreset = Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase());
@@ -198,18 +198,20 @@ public class JSONManager {
                         
                         // Calculate sp spent on enchantments
                         for (String k : currentpreset.keySet()) {
-                            if (!all.contains(k)) {
-                                int level = currentpreset.getInt(k);
-                                int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
-                                if (level > maxLevel) {
-                                    currentpreset.put(k, maxLevel);
-                                    level = maxLevel;
-                                }
-                                while (level > 0) {
-                                    int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
-                                    finalsp -= cost;
-                                    level--;
-                                }
+                            if (all.contains(k)) {
+                                continue;
+                            }
+                            
+                            int level = currentpreset.getInt(k);
+                            int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
+                            if (level > maxLevel) {
+                                currentpreset.put(k, maxLevel);
+                                level = maxLevel;
+                            }
+                            while (level > 0) {
+                                int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
+                                finalsp -= cost;
+                                level--;
                             }
                         }
                         

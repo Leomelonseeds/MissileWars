@@ -121,7 +121,7 @@ public class MissileWarsPlayer {
                 ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
                 ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
                 ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
-                if (hand == null) {
+                if (hand == null || player.hasCooldown(hand.getType())) {
                     return;
                 }
 
@@ -157,18 +157,13 @@ public class MissileWarsPlayer {
             }
         }.runTaskTimerAsynchronously(plugin, 20, 10);
     }
-    
-    /**
-     * Similar to missile preview, but for item specific cooldowns
-     * Sets player exp bar level
-     */
-    public void cooldownPreview(Arena arena) {
+
+    // EXP bar cooldown preview
+    private void cooldownPreview() {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // If the player left, cancel task
-                String team = arena.getTeam(playerId);
-                if (team == "no team") {
+                if (deck == null) {
                     this.cancel();
                     return;
                 }
@@ -192,14 +187,16 @@ public class MissileWarsPlayer {
                 }
                 
                 int cd = di.getCurrentCooldown();
+                int maxcd = di.getCooldown();
                 player.setLevel(cd);
-                player.setExp((di.getCooldown() - cd) / (float) di.getCooldown());
+                player.setExp((maxcd - cd) / (float) maxcd);
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }
 
     /**
      * Set the user's current {@link Deck} and give gear items
+     * The actual deck items are given later when initDeck is called by the Arena
      *
      * @param joinedBefore whether this player has previously been in the arena
      */
@@ -220,7 +217,7 @@ public class MissileWarsPlayer {
     }
     
     /**
-     * Initialize deck cooldowns
+     * Initialize deck cooldowns and exp cooldown
      * 
      * @param joinedBefore
      */
@@ -241,18 +238,21 @@ public class MissileWarsPlayer {
             
             // Add cooldown for crossbow, only at the start of the game
             // since cooldown only applied after shooting crossbow otherwise
+            int maxcd = di.getCooldown();
             if (name.contains("ARROW")) {
-                player.setCooldown(Material.CROSSBOW, di.getCooldown());
+                player.setCooldown(Material.CROSSBOW, maxcd);
             }
             
             if (name.contains("SPAWN_EGG")) {
-                di.initCooldown((di.getCooldown() / 4) * cooldowns.remove(0) + 1);
+                di.initCooldown((int) (maxcd * ((double) cooldowns.remove(0) / 4) + 1));
             } else {
-                di.initCooldown(di.getCooldown());
+                di.initCooldown(maxcd);
             }
         }
+        
+        cooldownPreview();
     }
-
+ 
     /**
      * Get the user's currently selected {@link Deck}.
      *

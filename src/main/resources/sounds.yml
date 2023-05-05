@@ -114,7 +114,3 @@ watch-the-fucking-video:
   sound: BLOCK_NOTE_BLOCK_BASS
   volume: 1.0
   pitch: 0.0
-deconstructor-pickup:
-  sound: ENTITY_ITEM_PICKUP
-  volume: 1.0
-  pitch: 1.0
