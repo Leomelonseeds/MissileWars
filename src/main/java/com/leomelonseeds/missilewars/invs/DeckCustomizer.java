@@ -1,7 +1,5 @@
 package com.leomelonseeds.missilewars.invs;
 
-import java.text.DecimalFormat;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -65,10 +63,7 @@ public class DeckCustomizer implements MWInventory {
                 item.setItemMeta(meta);
             } else if (key.equals("info")) {
                 ItemMeta meta = item.getItemMeta();
-                String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
-                DecimalFormat df = new DecimalFormat("###,###,##0.##");
-                double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
-                meta.displayName(ConfigUtils.toComponent(name.replace("%mokens%", df.format(bal))));
+                meta.displayName(ConfigUtils.toComponent(MissileWarsPlugin.getPlugin().getEconomy().getBalance(player) + ""));
                 item.setItemMeta(meta);
             }
             inv.setItem(itemConfig.getInt("indicators." + key + ".slot"), item);
