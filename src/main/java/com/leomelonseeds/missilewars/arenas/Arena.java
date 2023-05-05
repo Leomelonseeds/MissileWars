@@ -1169,7 +1169,7 @@ public class Arena implements ConfigurationSerializable {
             return;
         }
         
-        one.setMultiplier(twoSize / oneSize);
+        one.setMultiplier(oneSize / twoSize);
         two.setMultiplier(1);
     }
 
