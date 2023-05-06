@@ -283,11 +283,12 @@ public class CustomItemListener implements Listener {
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
+                int cooldown = plugin.getConfig().getInt("experimental.missile-cooldown");
                 for (ItemStack i : player.getInventory().getContents()) {
                     if (i == null) continue;
                     Material material = i.getType();
                     if (!player.hasCooldown(material) && material.toString().contains("SPAWN_EGG")) {
-                        player.setCooldown(material, plugin.getConfig().getInt("experimental.missile-cooldown"));
+                        player.setCooldown(material, cooldown);
                     }
                 }
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
