@@ -430,6 +430,7 @@ public class CustomItemListener implements Listener {
         int repairman = plugin.getJSON().getAbility(player.getUniqueId(), "repairman");
         int durationMultiplier = 1;
         String team = playerArena.getTeam(player.getUniqueId());
+        boolean consume = true;
         if (naturesblessing > 0) {
             durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
         } else if (repairman > 0) {
@@ -438,11 +439,16 @@ public class CustomItemListener implements Listener {
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
                     item.setAmount(item.getAmount());
+                    player.getInventory().setItem(event.getHand(), item);
+                    consume = false;
                 }
             }
         }
 
-        InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? player.getInventory().getHeldItemSlot() : 40);
+        if (consume) {
+            InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? 
+                    player.getInventory().getHeldItemSlot() : 40);
+        }
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
