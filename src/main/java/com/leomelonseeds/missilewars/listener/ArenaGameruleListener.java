@@ -364,83 +364,85 @@ public class ArenaGameruleListener implements Listener {
         if (isProjectile) {
             // Do sentinel longshot checks
             Projectile projectile = (Projectile) event.getDamager();
-            if (projectile.getShooter() instanceof Player) {
-                // Longshot calculations
-                if (projectile.getType() == EntityType.ARROW) {
-                    if (bowShots.containsKey(damager) && bowShots.get(damager).getWorld().equals(damager.getWorld())) {
-                        int longshot = plugin.getJSON().getAbility(damager.getUniqueId(), "longshot");
-                        double plus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
-                        double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
-                        double dmg = event.getDamage();
-                        double distance = bowShots.get(damager).distance(player.getLocation());
-                        double cutoff = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "cutoff");
-                        
-                        // Calculate damage
-                        if (distance >= cutoff) {
-                            double extradistance = distance - cutoff;
-                            double extradmg = Math.min(extradistance * plus, max);
-                            event.setDamage(dmg + extradmg);
-                        }
-                        
-                        bowShots.remove(damager);
-                    }
-
-                    // Arrowhealth message
-                    if (player.getHealth() - event.getFinalDamage() > 0 && !player.equals(damager)) {
-                        DecimalFormat df = new DecimalFormat("0.0");
-                        df.setRoundingMode(RoundingMode.UP);
-                        String health = df.format(player.getHealth() - event.getFinalDamage());
-                        String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
-                        msg = msg.replace("%health%", health);
-                        damager.sendMessage(msg);
-                    }
-                } 
-                // Check for prickly projectiles
-                else if (projectile.getType() == EntityType.EGG || 
-                         projectile.getType() == EntityType.SNOWBALL || 
-                         projectile.getType() == EntityType.ENDER_PEARL) {
+            if (!(projectile.getShooter() instanceof Player)) {
+                return;
+            }
+            
+            // Longshot calculations
+            if (projectile.getType() == EntityType.ARROW) {
+                if (bowShots.containsKey(damager) && bowShots.get(damager).getWorld().equals(damager.getWorld())) {
+                    int longshot = plugin.getJSON().getAbility(damager.getUniqueId(), "longshot");
+                    double plus = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "plus");
+                    double max = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "max");
+                    double dmg = event.getDamage();
+                    double distance = bowShots.get(damager).distance(player.getLocation());
+                    double cutoff = ConfigUtils.getAbilityStat("Sentinel.passive.longshot", longshot, "cutoff");
                     
-                    // Cancel ender pearl damage (or something, idk oldcombatmechanics did this so)
-                    if (event.getDamage() != 0.0) {
-                        return;
+                    // Calculate damage
+                    if (distance >= cutoff) {
+                        double extradistance = distance - cutoff;
+                        double extradmg = Math.min(extradistance * plus, max);
+                        event.setDamage(dmg + extradmg);
                     }
                     
-                    // Check for the passive
-                    int prickly = plugin.getJSON().getAbility(damager.getUniqueId(), "prickly");
-                    if (prickly == 0) {
-                        return;
-                    }
-
-                    ThrowableProjectile proj = (ThrowableProjectile) projectile;
-                    ItemStack item = proj.getItem();
-                    int maxmultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.prickly", prickly, "multiplier");
-                    
-                    // Make sure its custom item
-                    if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
-                            new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
-                        return;
-                    }
-                    
-                    // Get level of the item
-                    String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
-                            "item-structure"), PersistentDataType.STRING);
-                    String[] args = itemString.split("-");
-                    int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
-                    
-                    // Set custom damage and knockback
-                    event.setDamage(0.0001);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        Vector velocity = player.getVelocity();
-                        double velx = velocity.getX() * multiplier;
-                        double velz = velocity.getZ() * multiplier;
-                        double vely = velocity.getY();
-                        player.setVelocity(new Vector(velx, vely, velz));
-                    }, 1);
-                    
-                    // Give item back on successful hit
-                    Item newitem = damager.getWorld().dropItem(damager.getLocation(), item);
-                    newitem.setPickupDelay(0);
+                    bowShots.remove(damager);
                 }
+
+                // Arrowhealth message
+                if (player.getHealth() - event.getFinalDamage() > 0 && !player.equals(damager)) {
+                    DecimalFormat df = new DecimalFormat("0.0");
+                    df.setRoundingMode(RoundingMode.UP);
+                    String health = df.format(player.getHealth() - event.getFinalDamage());
+                    String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
+                    msg = msg.replace("%health%", health);
+                    damager.sendMessage(msg);
+                }
+            } 
+            // Check for prickly projectiles
+            else if (projectile.getType() == EntityType.EGG || 
+                     projectile.getType() == EntityType.SNOWBALL || 
+                     projectile.getType() == EntityType.ENDER_PEARL) {
+                
+                // Cancel ender pearl damage (or something, idk oldcombatmechanics did this so)
+                if (event.getDamage() != 0.0) {
+                    return;
+                }
+                
+                // Check for the passive
+                int prickly = plugin.getJSON().getAbility(damager.getUniqueId(), "prickly");
+                if (prickly == 0) {
+                    return;
+                }
+
+                ThrowableProjectile proj = (ThrowableProjectile) projectile;
+                ItemStack item = proj.getItem();
+                int maxmultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.prickly", prickly, "multiplier");
+                
+                // Make sure its custom item
+                if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
+                        new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
+                    return;
+                }
+                
+                // Get level of the item
+                String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
+                        "item-structure"), PersistentDataType.STRING);
+                String[] args = itemString.split("-");
+                int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
+                
+                // Set custom damage and knockback
+                event.setDamage(0.0001);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    Vector velocity = player.getVelocity();
+                    double velx = velocity.getX() * multiplier;
+                    double velz = velocity.getZ() * multiplier;
+                    double vely = velocity.getY();
+                    player.setVelocity(new Vector(velx, vely, velz));
+                }, 1);
+                
+                // Give item back on successful hit
+                Item newitem = damager.getWorld().dropItem(damager.getLocation(), item);
+                newitem.setPickupDelay(0);
             }
         }
     }
