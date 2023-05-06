@@ -130,7 +130,7 @@ public class JSONManager {
                         updateJson(currentpreset, defaultpreset);
                         int finalsp = getMaxSkillpoints(uuid);
                         // Anything not in this array is an enchantment
-                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
+                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "skillpoints", "layout"});
                         
                         // Calculate sp spent on missiles and utility
                         // Also updates their jsons
@@ -172,11 +172,11 @@ public class JSONManager {
                             }
                         }
                         
-                        // Calculate sp spent on abilities and passives, and delete if not exist
-                        for (String s : new String[] {"passive", "ability"}) {
+                        // Calculate sp spent on passives, and delete if not exist (RIP abilities)
+                        for (String s : new String[] {"passive"}) {
                             int level = currentpreset.getJSONObject(s).getInt("level");
                             String ability = currentpreset.getJSONObject(s).getString("selected");
-                            // Change ".passive" to "." + s when abilities come out
+                            // Change ".passive" to "." + s when abilities come out :sob:
                             Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
                             if (!abilities.contains(ability)) {
                                 currentpreset.getJSONObject(s).put("selected", "None");
@@ -189,7 +189,7 @@ public class JSONManager {
                                     level = maxLevel;
                                 }
                                 while (level > 0) {
-                                    int cost = itemConfig.getInt(deck + "." + s + "." + ability + "." + level + ".spcost");
+                                    int cost = itemConfig.getInt(deck + ".passive." + ability + "." + level + ".spcost");
                                     finalsp -= cost;
                                     level--;
                                 }
@@ -350,7 +350,7 @@ public class JSONManager {
      */
     public int getAbility(UUID uuid, String ability) {
         JSONObject json = getPlayerPreset(uuid);
-        for (String s : new String[] {"gpassive", "passive", "ability"}) {
+        for (String s : new String[] {"gpassive", "passive"}) {
             if (json.has(s) && json.getJSONObject(s).getString("selected").equals(ability)) {
                 return json.getJSONObject(s).getInt("level");
             }

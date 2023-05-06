@@ -43,13 +43,13 @@ public class DeckCustomizer implements MWInventory {
         itemConfig = ConfigUtils.getConfigFile("items.yml");
         init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         items = new String[] {"missiles", "utility"};
-        abilities = new String[] {"gpassive", "passive", "ability"};
+        abilities = new String[] {"gpassive", "passive"};
         this.player = player;
         this.deck = deck;
         this.preset = preset;
         
         String title = itemConfig.getString("title.deck").replace("%deck%", deck).replace("%preset%", preset);
-        inv = Bukkit.createInventory(null, 54, ConfigUtils.toComponent(title));
+        inv = Bukkit.createInventory(null, 45, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this);
     }
 
@@ -82,15 +82,11 @@ public class DeckCustomizer implements MWInventory {
         }
         
         // Add panes and misc items
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 5; i++) {
             inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_NUGGET)));
             inv.setItem(i * 9 + 7, blankName(new ItemStack(Material.IRON_BARS)));
         }
-        
-        // Too lazy to come up with formula
-        for (int i : new int[]{35, 44}) {
-            inv.setItem(i, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
-        }
+        inv.setItem(35, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         
         // Missile + Utility items
         for (String s : items) {

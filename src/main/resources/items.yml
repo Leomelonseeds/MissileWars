@@ -1168,7 +1168,7 @@ Sentinel:
       - "&7an additional %plus% &7damage per block, up"
       - "&7to a maximum of %max% &7extra damage."
       cost: 1500
-      cutoff: 20
+      cutoff: 24
       1:
         spcost: 1
         plus: 0.10
@@ -1471,10 +1471,6 @@ indicators:
       - "&7Perks available to all decks"
       - "&7that are always active"
     slot: 36
-  ability:
-    item: ORANGE_DYE
-    name: "&6&lAbility &d(Coming Soon)"
-    slot: 45
   info:
     item: COMPASS
     name: "&fMenu Information"
@@ -1509,7 +1505,7 @@ indicators:
   back:
     item: RED_STAINED_GLASS_PANE
     name: "&cBack"
-    slot: 53
+    slot: 44
   
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"

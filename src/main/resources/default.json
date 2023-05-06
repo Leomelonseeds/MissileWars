@@ -29,10 +29,6 @@
 				"supersonic": 1,
 				"cronullifier": 2
 			},
-			"ability": {
-				"selected": "None",
-				"level": 0
-			},
 			"passive": {
 				"selected": "adrenaline",
 				"level": 2
@@ -66,10 +62,6 @@
 				"gemini": 2,
 				"concorde": 1,
 				"supporter": 1
-			},
-			"ability": {
-				"selected": "None",
-				"level": 0
 			},
 			"passive": {
 				"selected": "punch",
@@ -106,10 +98,6 @@
 				"cuboid": 2,
 				"warhead": 2
 			},
-			"ability": {
-				"selected": "None",
-				"level": 0
-			},
 			"passive": {
 				"selected": "slownessarrows",
 				"level": 2
@@ -145,10 +133,6 @@
 				"lifter": 1,
 				"slingshot": 2,
 				"pisces": 1
-			},
-			"ability": {
-				"selected": "None",
-				"level": 0
 			},
 			"passive": {
 				"selected": "prickly",
