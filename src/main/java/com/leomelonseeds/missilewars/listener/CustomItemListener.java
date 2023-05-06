@@ -437,7 +437,7 @@ public class CustomItemListener implements Listener {
                 double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
                 Random random = new Random();
                 if (random.nextDouble() < percentage) {
-                    item.setAmount(item.getAmount() + 1);
+                    item.setAmount(item.getAmount());
                 }
             }
         }

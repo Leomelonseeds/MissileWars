@@ -74,16 +74,9 @@ public class DeckManager {
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
         JSONObject json = plugin.getJSON().getPlayerPreset(uuid);
-        
-        // Custom deck orderings: array of 8 numbers
-        // Index + 1 = slot, array[index] = index value defined in items.yml
-        // Default: [0, 1, 2, 3, 4, 5, 6, 7]
-        // If for example 0 is assigned to 7, then the item with index 7 will be placed in 0
         List<DeckItem> pool = Arrays.asList(new DeckItem[8]);
         List<ItemStack> gear = new ArrayList<>();
         Player player = Bukkit.getPlayer(uuid);
-        @SuppressWarnings("unchecked")
-        List<Integer> layout = (List<Integer>)(Object) json.getJSONArray("layout").toList();
         
         // Figure out utility and missile multipliers
         String gpassive = json.getJSONObject("gpassive").getString("selected");
@@ -139,7 +132,7 @@ public class DeckManager {
                 }
                 int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
-                pool.set(layout.indexOf(itemsConfig.getInt(key + ".index")), new DeckItem(i, cd, max, player));
+                pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, player));
             }
         }
         

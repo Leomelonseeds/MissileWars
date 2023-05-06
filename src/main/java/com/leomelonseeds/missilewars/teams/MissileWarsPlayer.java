@@ -212,7 +212,7 @@ public class MissileWarsPlayer {
             if (gearItem.getType().toString().contains("BOOTS")) {
                 player.getInventory().setBoots(gearItem);
             } else {
-                player.getInventory().addItem(gearItem);
+                player.getInventory().setItem(0, gearItem);
             }
         }
     }
