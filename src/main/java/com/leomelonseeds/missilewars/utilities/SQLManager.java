@@ -410,7 +410,7 @@ public class SQLManager {
                     stmt.setString(1, uuid.toString());
                     ResultSet resultSet = stmt.executeQuery();
                     if (resultSet.next()) {
-                        result = resultSet.getInt("rank");
+                        result = resultSet.getInt("ranknum");
                     }
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Failed to get " + stat + " rank for " + Bukkit.getPlayer(uuid).getName());
@@ -444,7 +444,7 @@ public class SQLManager {
                  stmt.setString(1, uuid.toString());
                  ResultSet resultSet = stmt.executeQuery();
                  if (resultSet.next()) {
-                     result = resultSet.getInt("rank");
+                     result = resultSet.getInt("ranknum");
                  }
              } catch (SQLException e) {
                  logger.log(Level.SEVERE, "Failed to get overall stat rank " + stat + " for " +
