@@ -398,8 +398,11 @@ public class SQLManager {
                 int result = 0;
                 String query =
                         """
-                        SELECT count($1) + 1 rank FROM umw_players
-                        WHERE $1 > (SELECT $1 FROM umw_players WHERE uuid = ?);
+                        SELECT ranknum FROM (
+                            SELECT uuid, (rank() over (ORDER BY $1 DESC)) ranknum
+                            FROM umw_players
+                        ) temp
+                        WHERE uuid = ?;
                         """.replace("$1", stat);
                 try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                         query
@@ -417,34 +420,22 @@ public class SQLManager {
 
             // Overall gamemode stat
             String query = """
-                    SELECT count(
-                    (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) +
-                    (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) +
-                    (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END)) + 1 AS rank
-                    FROM umw_players players
-                    LEFT JOIN umw_stats_classic a
-                    ON players.uuid = a.uuid
-                    LEFT JOIN umw_stats_ctf b
-                    ON a.uuid = b.uuid
-                    LEFT JOIN umw_stats_domination c
-                    ON b.uuid = c.uuid
-                    WHERE
-                    (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) +
-                    (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) +
-                    (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END)
-                    >
-                    (SELECT
-                    (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) +
-                    (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) +
-                    (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END)
-                    FROM umw_players players
-                    LEFT JOIN umw_stats_classic a
-                    ON players.uuid = a.uuid
-                    LEFT JOIN umw_stats_ctf b
-                    ON a.uuid = b.uuid
-                    LEFT JOIN umw_stats_domination c
-                    ON b.uuid = c.uuid
-                    WHERE players.uuid = ?);
+                    SELECT ranknum FROM (
+                        SELECT uuid, (rank() over (ORDER BY $1 DESC)) ranknum FROM (
+                            SELECT players.uuid,
+                            (CASE WHEN a.$1 is NULL THEN 0 ELSE a.$1 END) +
+                            (CASE WHEN b.$1 is NULL THEN 0 ELSE b.$1 END) +
+                            (CASE WHEN c.$1 is NULL THEN 0 ELSE c.$1 END) AS $1
+                            FROM umw_players players
+                            LEFT JOIN umw_stats_classic a
+                            ON players.uuid = a.uuid
+                            LEFT JOIN umw_stats_ctf b
+                            ON a.uuid = b.uuid
+                            LEFT JOIN umw_stats_domination c
+                            ON b.uuid = c.uuid
+                        ) temp1
+                    ) temp2
+                    WHERE uuid = ?;
                     """.replace("$1", stat);
              int result = 0;
              try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
