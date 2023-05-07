@@ -114,3 +114,7 @@ watch-the-fucking-video:
   sound: BLOCK_NOTE_BLOCK_BASS
   volume: 1.0
   pitch: 0.0
+creepershot:
+  sound: ENTITY_CREEPER_DEATH
+  volume: 2.0
+  pitch: 2.0

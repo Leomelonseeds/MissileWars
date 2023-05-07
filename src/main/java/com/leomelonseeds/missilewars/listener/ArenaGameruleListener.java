@@ -273,8 +273,10 @@ public class ArenaGameruleListener implements Listener {
             }
             creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
             creeper.setCustomNameVisible(true);
-            creeper.setVelocity(proj.getVelocity().multiply(2));
+            creeper.setVelocity(proj.getVelocity().multiply(2.5));
             proj.remove();
+            
+            ConfigUtils.sendConfigSound("creepershot", player);
             return;
         }
         
