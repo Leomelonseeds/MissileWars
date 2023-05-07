@@ -1277,13 +1277,13 @@ Berserker:
       3:
         spcost: 2
         multiplier: 2.5
-    missilesmith:
-      name: "&eMissilesmith"
+    creepershot:
+      name: "&eCreepershot"
       lore:
       - ""
-      - "&7Any non-berserker missiles given to you" 
-      - "&7by other players will automatically be"
-      - "&7upgraded to their highest level."
+      - "&7Holding your creeper on the offhand will"
+      - "&7load it as a shootable projectile from"
+      - "&7your crossbow."
       cost: 1200
       1:
         spcost: 5

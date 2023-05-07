@@ -241,7 +241,7 @@ public class MissileWarsPlayer {
             // since cooldown only applied after shooting crossbow otherwise
             int maxcd = di.getCooldown();
             if (name.contains("ARROW")) {
-                player.setCooldown(Material.CROSSBOW, maxcd);
+                player.setCooldown(Material.CROSSBOW, maxcd * 20);
             }
             
             if (name.contains("SPAWN_EGG") && !joinedBefore) {

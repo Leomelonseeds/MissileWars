@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.listener;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Item;
@@ -47,6 +50,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -223,8 +229,9 @@ public class ArenaGameruleListener implements Listener {
         if (event.getEntityType() != EntityType.PLAYER) {
             return;
         }
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = (Player) event.getEntity();
-        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager arenaManager = plugin.getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
         if ((arena == null) || !arena.isRunning()) {
             return;
@@ -238,6 +245,36 @@ public class ArenaGameruleListener implements Listener {
         if (event.getBow().getType() == Material.CROSSBOW) {
             int cd = Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
             player.setCooldown(Material.CROSSBOW, cd);
+            
+            // Check for creepershot
+            ItemStack crossbow = event.getBow();
+            CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
+            boolean charged = false;
+            boolean creepershot = false;
+            for (ItemStack proj : cmeta.getChargedProjectiles()) {
+                if (proj.getType() == Material.FIREWORK_ROCKET) {
+                    creepershot = true;
+                    if (ConfigUtils.toPlain(proj.displayName()).contains("Charged")) {
+                        charged = true;
+                    }
+                    break;
+                }
+            }
+            
+            if (!creepershot) {
+                return;
+            }
+            
+            Entity proj = event.getProjectile();
+            Location spawnLoc = proj.getLocation();
+            Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
+            if (charged) {
+                creeper.setPowered(true);
+            }
+            creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
+            creeper.setCustomNameVisible(true);
+            creeper.setVelocity(proj.getVelocity().multiply(2));
+            proj.remove();
             return;
         }
         
@@ -251,10 +288,10 @@ public class ArenaGameruleListener implements Listener {
         }
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
-        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
+        if (plugin.getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 bowShots.remove(player);
             }, 100);
         }
@@ -268,7 +305,8 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         Player player = (Player) event.getEntity();
-        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        ArenaManager arenaManager = plugin.getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
         if ((arena == null) || !arena.isRunning()) {
             return;
@@ -279,11 +317,13 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // At this point, the player is 100% using berserker. Obtain the arrow item
+        PlayerInventory inv = player.getInventory();
         ItemStack toConsume = null;
         int slot = -1;
-        ItemStack[] contents = player.getInventory().getContents();
+        ItemStack[] contents = inv.getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
+            if (item == null) continue;
             if (item.getType() == Material.ARROW || item.getType() == Material.TIPPED_ARROW) {
                 toConsume = item;
                 slot = i;
@@ -292,6 +332,32 @@ public class ArenaGameruleListener implements Listener {
         }
         
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
+        
+        // Creepershot
+        if (plugin.getJSON().getAbility(player.getUniqueId(), "creepershot") > 0) {
+            ItemStack offhand = inv.getItemInOffHand();
+            if (offhand.getType() == Material.CREEPER_HEAD && !player.hasCooldown(offhand.getType())) {
+                // Prepare fake creeper item
+                boolean charged = ConfigUtils.toPlain(offhand.displayName()).contains("Charged");
+                ItemStack creeper = new ItemStack(Material.FIREWORK_ROCKET);
+                ItemMeta meta = creeper.getItemMeta();
+                meta.displayName(ConfigUtils.toComponent(charged ? "&fCharged Creeper" : "&fCreeper"));
+                creeper.setItemMeta(meta);
+                
+                // Load "creeper" into crossbow
+                InventoryUtils.consumeItem(player, arena, offhand, -1);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    ItemStack crossbow = event.getCrossbow();
+                    CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
+                    List<ItemStack> newProjs = new ArrayList<>();
+                    for (int i = 0; i < cmeta.getChargedProjectiles().size(); i++) {
+                        newProjs.add(new ItemStack(creeper));
+                    }
+                    cmeta.setChargedProjectiles(newProjs);
+                    crossbow.setItemMeta(cmeta);
+                }, 1);
+            }
+        }
     }
     
 

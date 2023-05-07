@@ -8,8 +8,6 @@
 	"Vanguard": {
 		"feather_falling": false,
 		"fire_aspect": false,
-		"endercanopy": false,
-		"dragonsblessing": false,
 		"bunny": false,
 		"lavasplash": false,
 		"defaultpreset": {
@@ -42,8 +40,6 @@
 	"Sentinel": {
 		"fire_protection": false,
 		"sharpness": false,
-		"forksmash": false,
-		"fissionarrow": false,
 		"longshot": false,
 		"warden": false,
 		"defaultpreset": {
@@ -77,9 +73,8 @@
 		"blast_protection": false,
 		"multishot": false,
 		"quick_charge": false,
-		"missilesmith": false,
-		"hurl": false,
 		"boosterball": false,
+		"creepershot": false,
 		"defaultpreset": {
 			"skillpoints": 3,
 			"blast_protection": 0,
@@ -112,7 +107,6 @@
 		"haste": false,
 		"efficiency": false,
 		"projectile_protection": false,
-		"utilitymaster": false,
 		"naturesblessing": false,
 		"repairman": false,
 		"deconstructor": false,

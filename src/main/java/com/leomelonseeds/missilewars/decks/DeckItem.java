@@ -195,6 +195,10 @@ public class DeckItem {
         if (cooldownTask != null) {
             cooldownTask.cancel();
         }
+        
+        if (player.isOnline()) {
+            setVisualCooldown(0);
+        }
     }
     
     /**

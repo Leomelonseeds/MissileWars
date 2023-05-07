@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +22,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.persistence.PersistentDataType;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -261,39 +259,6 @@ public class ArenaInventoryListener implements Listener {
         
         if (di != null && !di.pickup(event.getItem())) {
             event.setCancelled(true);
-            return;
-        }
-        
-        if (plugin.getJSON().getAbility(player.getUniqueId(), "missilesmith") > 0) {
-            // Can't be same player
-            if (event.getItem().getThrower() == player.getUniqueId()) {
-                return;
-            }
-            // Must be a missile
-            if (!item.getType().toString().contains("SPAWN_EGG")) {
-                return;
-            }
-            // Must have item structure data
-            if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
-                    new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
-                return;
-            }
-            // Must not be a Berserker missile
-            for (ItemStack i : mwPlayer.getDeck().getMissiles()) {
-                if (i.isSimilar(item)) {
-                    return;
-                }
-            }
-            
-            String[] args = item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(plugin,
-                    "item-structure"), PersistentDataType.STRING).split("-");
-            String name = args[0];
-            int level = Integer.parseInt(args[1]);
-            int maxlevel = plugin.getDeckManager().getMaxLevel(name);
-            
-            if (level < plugin.getDeckManager().getMaxLevel(name)) {
-                event.getItem().setItemStack(plugin.getDeckManager().createItem(name, maxlevel, true));
-            }
         }
     }
    
