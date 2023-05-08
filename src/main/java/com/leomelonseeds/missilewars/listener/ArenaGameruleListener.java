@@ -691,7 +691,7 @@ public class ArenaGameruleListener implements Listener {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
                     }
-                }, 10);
+                }, 20);
                 return;
             }
             
