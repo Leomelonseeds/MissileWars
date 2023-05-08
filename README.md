@@ -36,7 +36,7 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 * **Spawn Creeper**
 
 ## New Maps
-20+ new maps, each changing the gameplay in fun and inventive ways, have been added. Up to 8 maps are available at one time and rotate weekly, while new maps are constantly being worked on. Most of the maps are made by Lizzem, huge props to her!
+25+ new maps, each changing the gameplay in fun and inventive ways, have been added. Up to 8 maps are available at one time and rotate weekly, while new maps are constantly being worked on. Most of the maps are made by Lizzem, huge props to her!
 * **Double Layer** - by M310N
 ![](https://i.imgur.com/ZXzhell.jpg)
 * **Middle Ground** - by M310N
