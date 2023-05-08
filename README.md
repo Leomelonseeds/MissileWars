@@ -16,7 +16,7 @@ There are now 4 different Decks (kits), each with 5 different missiles, 3 unique
 Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless.
 
 Hours have been spent balancing each item and passive. Any build you can come up with may be just as viable as the next. Counter strong builds with ones of your own, and find strategies to master the use of each deck.
-![image](https://user-images.githubusercontent.com/17891302/172035160-7b004f57-35cc-4ee4-a233-d24430ca11f5.png)
+![2023-05-07_20 23 02](https://user-images.githubusercontent.com/17891302/236727713-197cd2d7-1b1c-44b0-bb11-0f36668cf168.png)
 
 ## Items
 The decks include over 35 new unique missiles (most credited to the Rocket Riders team!) and utility items, making gameplay more fun and interesting, offering many new strategies and possibilities for team collaboration. Below are some new utility items:
@@ -31,23 +31,33 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 
 ## New Maps
 20+ new maps, each changing the gameplay in fun and inventive ways, have been added. Up to 8 maps are available at one time and rotate weekly, while new maps are constantly being worked on.
-* **Double Layer** - The classic map, but with thicker bases. What could go wrong?
+* **Double Layer** - by M310N
 ![](https://i.imgur.com/ZXzhell.jpg)
-* **Middle Ground** - An extra base, smack in the middle of the map.
+* **Middle Ground** - by M310N
 ![](https://i.imgur.com/KeWo1el.jpg)
-* **Minefield** - A menacing map with explosive chain reactions
-![](https://i.imgur.com/PnHOhla.jpg)
-* **Cube Crowd** - The dumbest map name represents our coolest idea, a skygrid style field of blocks to chill on.
-![](https://i.imgur.com/zKrGraC.jpg)
+* **Mountains** - by Lizzem
+![2023-05-07_20 25 55](https://user-images.githubusercontent.com/17891302/236727863-b77c3970-a256-49b3-b18c-c81176734149.png)
+* **Cube Crowd** - by Lizzem & M310N
+![2023-05-07_20 27 21](https://user-images.githubusercontent.com/17891302/236727894-2251ee49-09e4-491c-8ecc-d7e4db607a5e.png)
+* **23andTNT** - by M310N
+![2023-05-07_20 27 56](https://user-images.githubusercontent.com/17891302/236727922-6af5759d-53e2-4592-9b44-4a64f683f739.png)
+* **Light Smog** - by Lizzem
+![2023-05-07_20 28 29](https://user-images.githubusercontent.com/17891302/236727947-3b6b0d38-fd58-4bb6-8090-fc3d7c9861a8.png)
+* **Swept** - by Chronos22
+![2023-05-07_20 26 45](https://user-images.githubusercontent.com/17891302/236727974-b7efaa25-1a96-4d06-82c7-7c20328085c2.png)
+* **Darkness Fortress** - by Lizzem
+![2023-05-07_20 29 03](https://user-images.githubusercontent.com/17891302/236728000-7e9d4134-46bc-4a49-b3ea-026610548b3d.png)
 
 ## Gameplay & QOL
 Here are just a few of the most important features that you might not have seen before.
+* Per-item cooldowns - each item has its own cooldown and max items, removing almost all RNG associated with the game.
+![image](https://user-images.githubusercontent.com/17891302/236728106-6d1055b5-4e29-49d3-841c-e84e4ec02ef4.png)
 * You now need to blow up *all* enemy portals to win (and there can be many :).
 * A tracker system associates portal breaks and kills from TNT to yourself. Blocked a missile with a shield or your own missile? That's your kill. Sniped someone with a Slingshot missile? That's your kill.
 * A rankup and stats system has been added. Gain more skillpoints with each rankup to use in your decks, and climb the leaderboards.
-* A 30 minute game timer, after which the team with the most portals remaining wins. Chaos mode starts when there are 10 minutes remaining, with 2x item speed.
-* Item spawn timer adjusts to team size to balance unfair teams: 1 player = 12 seconds, 2 players = 14 seconds, 3+ players = 16 seconds.
-* Receive multiple of one item, with a cap at 6 items (unless you upgrade the Hoarder passive).
+* A 30 minute game timer, after which the team with the most portals remaining wins. Chaos mode starts when there are 10 minutes remaining, with halved item cooldowns.
+* Cooldowns in 1v2s and 2v3s adjust to 1/2 and 2/3 of their normal times respectively to balance unfair teams.
+* A particle preview of the location of a spawnable missile.
 * A cooldown of 0.4 seconds between each missile spawn.
 * Auto-queue into the next game after the current game ends.
 * Use /votemap to pick your favorite map.
@@ -55,8 +65,6 @@ Here are just a few of the most important features that you might not have seen 
 
 ## Roadmap
 Why stop here? Missile Wars is in active development. Here are the features I have planned out:
-* A training arena with no time limit
-* Passives that require team interaction
 * New gamemode: Capture the Flag
 * New gamemode: Domination
 * Private games with custom settings (creatable by ROYAL rank players only)
