@@ -801,25 +801,35 @@ public class CustomItemListener implements Listener {
             }
             return;
         }
-
-        BlockFace face = event.getHitBlockFace();
-        Location location = event.getHitBlock().getRelative(face).getLocation();
-
-        double duration = Double.parseDouble(args[1]);
-        int lavasplash = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
-        if (lavasplash <= 0) {
-            if (location.getBlock().getType() != Material.AIR) {
+        
+        // Check for splashes going through moving pistons
+        Location location = hitBlock.getRelative(event.getHitBlockFace()).getLocation();
+        Block spawnBlock = location.getBlock();
+        if (spawnBlock.getType() != Material.AIR) {
+            if (spawnBlock.getType() != Material.MOVING_PISTON) {
                 return;
             }
-            location.getBlock().setType(Material.WATER);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (location.getBlock().getType() == Material.WATER) {
-                        location.getBlock().setType(Material.AIR);
-                    }
+            
+            Block upper = hitBlock.getRelative(BlockFace.UP);
+            if (upper.getType() != Material.AIR) {
+                return;
+            }
+            
+            location = upper.getLocation();
+        }
+
+        // Normal splash manager
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        double duration = Double.parseDouble(args[1]);
+        int lavasplash = plugin.getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
+        if (lavasplash <= 0) {
+            Block actualBlock = location.getBlock();
+            actualBlock.setType(Material.WATER);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (actualBlock.getType() == Material.WATER) {
+                    actualBlock.setType(Material.AIR);
                 }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20));
+            }, (long) (duration * 20));
             return;
         }
         
@@ -841,14 +851,11 @@ public class CustomItemListener implements Listener {
                 continue;
             }
             l.getBlock().setType(Material.LAVA);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (l.getBlock().getType() == Material.LAVA) {
-                        l.getBlock().setType(Material.AIR);
-                    }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (l.getBlock().getType() == Material.LAVA) {
+                    l.getBlock().setType(Material.AIR);
                 }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), (long) (duration * 20 * durationmultiplier));
+            }, (long) (duration * 20 * durationmultiplier));
         }
     }
 
