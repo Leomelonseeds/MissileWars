@@ -13,7 +13,13 @@ There are now 4 different Decks (kits), each with 5 different missiles, 3 unique
 * **Sentinel** - A defense specialist, with sturdy missiles and utility items like the sky-mine torpedo and obsidian shield. Includes a flame bow that can be enchanted with sharpness and punch.
 * **Architect** - If constructing infrastructure is your thing, the special missiles, shields, platforms, and leaves offered by this deck will suit your playstyle. Has an iron pickaxe that can be upgraded with sharpness, efficiency, and a custom haste enchantment.
 
-Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless.
+Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless. Here's some examples of available passives:
+* **Adrenaline** (Vanguard) - Permanent Speed effect. Another passive called **Bunny** gives permanent jump boost.
+* **Longshot** (Sentinel) - Increases bow damage the further the shot.
+* **Warden** (Sentinel) - Gives Strength and Resistance when on your own base.
+* **Creepershot** (Berserker) - Allows you to load creepers as projectiles into your crossbow and fire them at enemies.
+* **Prickly Projectiles** (Architect) - Thrown eggs and snowballs do knockback to enemies, and are given back on a successful hit.
+* **Deconstructor** (Architect) - Random chance for mined missile-related blocks to be picked up in your inventory.
 
 Hours have been spent balancing each item and passive. Any build you can come up with may be just as viable as the next. Counter strong builds with ones of your own, and find strategies to master the use of each deck.
 ![2023-05-07_20 23 02](https://user-images.githubusercontent.com/17891302/236727713-197cd2d7-1b1c-44b0-bb11-0f36668cf168.png)
@@ -51,6 +57,7 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 ## Gameplay & QOL
 Here are just a few of the most important features that you might not have seen before.
 * Per-item cooldowns - each item has its own cooldown and max items, removing almost all RNG associated with the game.
+
 ![image](https://user-images.githubusercontent.com/17891302/236728106-6d1055b5-4e29-49d3-841c-e84e4ec02ef4.png)
 * You now need to blow up *all* enemy portals to win (and there can be many :).
 * A tracker system associates portal breaks and kills from TNT to yourself. Blocked a missile with a shield or your own missile? That's your kill. Sniped someone with a Slingshot missile? That's your kill.
