@@ -1212,7 +1212,8 @@ public class Arena implements ConfigurationSerializable {
             discordMessage = ":pencil: A game was tied in arena " + this.getName();
         } else {
             // Send titles
-            MissileWarsTeam losingTeam = winningTeam == redTeam ? blueTeam : redTeam;
+            boolean isRed = winningTeam == redTeam;
+            MissileWarsTeam losingTeam = isRed ? blueTeam : redTeam;
             winningTeam.sendTitle("victory");
             losingTeam.sendTitle("defeat");
 
@@ -1223,6 +1224,9 @@ public class Arena implements ConfigurationSerializable {
             }
             String winners = String.join(", ", winList);
             discordMessage = ":tada: Team **" + winningTeam.getName() + "** (" + winners + ") has won a game in arena " + this.getName();
+            
+            // Spawn victory pegasus
+            SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, mapName, false, false);
         }
         discordChannel.sendMessage(discordMessage).queue();
         

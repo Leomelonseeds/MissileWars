@@ -212,6 +212,7 @@ public class ArenaGameruleListener implements Listener {
         // Remove canopy cooldown so canopy doesn't get used
         CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
         mwp.setJustSpawned();
+        player.setKiller(null);
 
         // Un-obstruct spawns
         Location spawn2 = spawn.clone().add(0, 1, 0);

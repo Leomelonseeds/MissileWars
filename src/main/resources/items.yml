@@ -7,7 +7,15 @@
 # The "index" in each item defines the order that the items are loaded into their arrays,
 # determining, which item from other decks they will be paired with.
 
-# Vanguard missiles
+# PEGASUS - The victory structure that spawns when a team wins
+pegasus:
+  file: 'pegasus.nbt'
+  offset: 
+    x: -15
+    y: 12
+    z: 15
+
+# Vanguard missilestha
 lightning:
   index: 2
   1:
