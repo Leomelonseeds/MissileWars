@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -63,7 +64,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             if (args.length < 3) {
-                sendErrorMsg(sender, "Usage: /umw rotation [gamemode] list/add/remove");
+                sendErrorMsg(sender, "Usage: /umw rotation [gamemode] list/add/remove/listall/default");
                 return true;
             }
             
@@ -103,6 +104,13 @@ public class MissileWarsCommand implements CommandExecutor {
                     cur.remove(map);
                     sendSuccessMsg(sender, "Removed " + map + " from the rotation.");
                 }
+            case "default":
+                // Because add/remove runs this code too, we must verify that it is default
+                if (args[2].equals("default")) {
+                    cur.clear();
+                    cur.add("default-map");
+                    cur.add("double-layer");
+                }
                 
                 maps.set(args[1] + ".rotation", cur);
                 File file = new File(plugin.getDataFolder().toString(), "maps.yml");
@@ -118,8 +126,17 @@ public class MissileWarsCommand implements CommandExecutor {
             case "list":
                 sendSuccessMsg(sender, "Current " + args[1] + " maps: " + String.join(", ", cur));
                 return true;
+            case "listall":
+                List<String> all = new ArrayList<>();
+                for (String m : maps.getConfigurationSection(args[1]).getKeys(false)) {
+                    if (!m.equals("rotation")) {
+                        all.add(m);
+                    }
+                }
+                
+                sendSuccessMsg(sender, "All " + args[1] + " maps: " + String.join(", ", all));
+                return true;
             }
-            
         }
         
         if (action.equalsIgnoreCase("votemap")) {

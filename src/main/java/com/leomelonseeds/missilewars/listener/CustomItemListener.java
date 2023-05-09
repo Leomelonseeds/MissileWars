@@ -865,21 +865,20 @@ public class CustomItemListener implements Listener {
         int duration = t * 2;
         for (int i = duration; i > duration - 10; i--) {
             int finalDuration = i;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (playerArena.isRunning()) {
-                        if (finalDuration == duration) {
-                            SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
-                            ConfigUtils.sendConfigSound("break-obsidian-shield", location);
-                        } else if (finalDuration % 2 == 0) {
-                            SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
-                        } else {
-                            SchematicManager.spawnNBTStructure(null, "obsidianshield-1", location, red, mapName, false, false);
-                        }
-                    }
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                if (!playerArena.isRunning()) {
+                    return;
                 }
-            }.runTaskLater(MissileWarsPlugin.getPlugin(), i * 10L);
+                
+                if (finalDuration == duration) {
+                    SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
+                    ConfigUtils.sendConfigSound("break-obsidian-shield", location);
+                } else if (finalDuration % 2 == 0) {
+                    SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
+                } else {
+                    SchematicManager.spawnNBTStructure(null, "obsidianshield-1", location, red, mapName, false, false);
+                }
+            }, i * 10L);
         }
     }
 }
