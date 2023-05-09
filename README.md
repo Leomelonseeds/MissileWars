@@ -1,8 +1,8 @@
 # Ultima Missile Wars
 ![](https://cdn.discordapp.com/attachments/358673756836855810/958149582120968262/2022-03-28_16.36.03.png)
-A new, fresh installment of the classic gamemode made by Cubehamster and Sethbling, where slimeblock TNT flying machines are used to bust through enemy shields and blow up their nether portals. Join with your friends now at play.ultimamc.net
+A new, fresh installment of the classic gamemode made by Cubehamster and Sethbling, where slimeblock TNT flying machines are used to bust through enemy shields and blow up their nether portals. Join with your friends now at **play.ultimamc.net**
 
-All the original, best features of Missile Wars are here - but with 4 customizable classes or decks, 40+ different missiles, 20+ new maps, and a whole host of gameplay additions and improvements, you won't be forgetting this version any time soon.
+All the original, best features of Missile Wars are here - but with 4 customizable classes or decks, 40+ different missiles, 25+ new maps, and a whole host of gameplay additions and improvements, you won't be forgetting this version any time soon.
 
 *Do not try to compile and use this plugin on your own server. It will not work.*
 
@@ -45,7 +45,7 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 ![2023-05-07_20 25 55](https://user-images.githubusercontent.com/17891302/236727863-b77c3970-a256-49b3-b18c-c81176734149.png)
 * **Cube Crowd** - by Lizzem & M310N
 ![2023-05-07_20 27 21](https://user-images.githubusercontent.com/17891302/236727894-2251ee49-09e4-491c-8ecc-d7e4db607a5e.png)
-* **23andTNT** - by M310N
+* **23andTNT** - by M310N (yes, you have to destroy all 23 portals to win)
 ![2023-05-07_20 27 56](https://user-images.githubusercontent.com/17891302/236727922-6af5759d-53e2-4592-9b44-4a64f683f739.png)
 * **Light Smog** - by Lizzem
 ![2023-05-07_20 28 29](https://user-images.githubusercontent.com/17891302/236727947-3b6b0d38-fd58-4bb6-8090-fc3d7c9861a8.png)
