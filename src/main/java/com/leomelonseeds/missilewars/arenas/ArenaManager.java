@@ -445,9 +445,9 @@ public class ArenaManager {
             vanguard.addTrait(vCommand);
             vanguard.addTrait(gravity);
             Equipment vequip = new Equipment();
+            vanguard.addTrait(vequip);
             vequip.set(EquipmentSlot.HAND, new ItemStack(Material.GOLDEN_SWORD));
             vequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.GOLDEN_BOOTS));
-            vanguard.addTrait(vequip);
 
             arenaWorld.loadChunk(vLoc.getChunk());
             vanguard.spawn(vLoc);
@@ -468,9 +468,9 @@ public class ArenaManager {
             sentinel.addTrait(sCommand);
             sentinel.addTrait(gravity);
             Equipment sequip = new Equipment();
+            sentinel.addTrait(sequip);
             sequip.set(EquipmentSlot.HAND, new ItemStack(Material.BOW));
             sequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.IRON_BOOTS));
-            sentinel.addTrait(sequip);
 
             arenaWorld.loadChunk(sLoc.getChunk());
             sentinel.spawn(sLoc);
@@ -491,9 +491,9 @@ public class ArenaManager {
             berserker.addTrait(bCommand);
             berserker.addTrait(gravity);
             Equipment bequip = new Equipment();
+            berserker.addTrait(bequip);
             bequip.set(EquipmentSlot.HAND, new ItemStack(Material.CROSSBOW));
             bequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.DIAMOND_BOOTS));
-            berserker.addTrait(bequip);
 
             arenaWorld.loadChunk(bLoc.getChunk());
             berserker.spawn(bLoc);
@@ -514,9 +514,9 @@ public class ArenaManager {
             architect.addTrait(aCommand);
             architect.addTrait(gravity);
             Equipment aequip = new Equipment();
+            architect.addTrait(aequip);
             aequip.set(EquipmentSlot.HAND, new ItemStack(Material.IRON_PICKAXE));
             aequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.CHAINMAIL_BOOTS));
-            architect.addTrait(aequip);
 
             arenaWorld.loadChunk(aLoc.getChunk());
             architect.spawn(aLoc);
