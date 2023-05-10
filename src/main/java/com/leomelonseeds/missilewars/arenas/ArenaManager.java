@@ -31,6 +31,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -53,6 +54,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.trait.Equipment;
+import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
 import net.citizensnpcs.trait.CommandTrait;
 import net.citizensnpcs.trait.Gravity;
 import net.citizensnpcs.trait.LookClose;
@@ -340,6 +343,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_TILE_DROPS, false);
+        arenaWorld.setGameRule(GameRule.DO_MOB_LOOT, false);
         arenaWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         arenaWorld.setGameRule(GameRule.KEEP_INVENTORY, true);
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
@@ -440,6 +444,10 @@ public class ArenaManager {
                     CommandTrait.Hand.BOTH).player(true));
             vanguard.addTrait(vCommand);
             vanguard.addTrait(gravity);
+            Equipment vequip = new Equipment();
+            vequip.set(EquipmentSlot.HAND, new ItemStack(Material.GOLDEN_SWORD));
+            vequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.GOLDEN_BOOTS));
+            vanguard.addTrait(vequip);
 
             arenaWorld.loadChunk(vLoc.getChunk());
             vanguard.spawn(vLoc);
@@ -459,6 +467,10 @@ public class ArenaManager {
                     CommandTrait.Hand.BOTH).player(true));
             sentinel.addTrait(sCommand);
             sentinel.addTrait(gravity);
+            Equipment sequip = new Equipment();
+            sequip.set(EquipmentSlot.HAND, new ItemStack(Material.BOW));
+            sequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.IRON_BOOTS));
+            sentinel.addTrait(sequip);
 
             arenaWorld.loadChunk(sLoc.getChunk());
             sentinel.spawn(sLoc);
@@ -478,6 +490,10 @@ public class ArenaManager {
                     CommandTrait.Hand.BOTH).player(true));
             berserker.addTrait(bCommand);
             berserker.addTrait(gravity);
+            Equipment bequip = new Equipment();
+            bequip.set(EquipmentSlot.HAND, new ItemStack(Material.CROSSBOW));
+            bequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.DIAMOND_BOOTS));
+            berserker.addTrait(bequip);
 
             arenaWorld.loadChunk(bLoc.getChunk());
             berserker.spawn(bLoc);
@@ -497,6 +513,10 @@ public class ArenaManager {
                     CommandTrait.Hand.BOTH).player(true));
             architect.addTrait(aCommand);
             architect.addTrait(gravity);
+            Equipment aequip = new Equipment();
+            aequip.set(EquipmentSlot.HAND, new ItemStack(Material.IRON_PICKAXE));
+            aequip.set(EquipmentSlot.BOOTS, new ItemStack(Material.CHAINMAIL_BOOTS));
+            architect.addTrait(aequip);
 
             arenaWorld.loadChunk(aLoc.getChunk());
             architect.spawn(aLoc);
