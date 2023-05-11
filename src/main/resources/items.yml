@@ -7,15 +7,7 @@
 # The "index" in each item defines the order that the items are loaded into their arrays,
 # determining, which item from other decks they will be paired with.
 
-# PEGASUS - The victory structure that spawns when a team wins
-pegasus:
-  file: 'pegasus.nbt'
-  offset: 
-    x: -15
-    y: 12
-    z: 15
-
-# Vanguard missilestha
+# Vanguard missiles
 lightning:
   index: 2
   1:
@@ -1030,6 +1022,8 @@ arrows:
     max: 4
     spcost: 3
     
+# MISC ITEMS / SCHEMATICS
+    
 elytra:
   item: ELYTRA
   name: "&dArcanic Wings"
@@ -1037,6 +1031,43 @@ elytra:
   - "&7An extra-dimensional artifact of"
   - "&7bygone days, now imbued to the brim"
   - "&7with preservative arcana."
+
+# The victory structure that spawns when a team wins
+pegasus:
+  file: 'pegasus.nbt'
+  offset: 
+    x: -15
+    y: 12
+    z: 15
+    
+# training arena turrets (red by default)
+fireball_turret:
+  file: 'fireball_turret.nbt'
+  offset:
+    x: -3
+    y: 0
+    z: 0
+    
+fireball_turret_clear:
+  file: 'fireball_turret_clear.nbt'
+  offset:
+    x: -3
+    y: 0
+    z: 0
+    
+turret:
+  file: 'turret.nbt'
+  offset:
+    x: -2
+    y: 0
+    z: 0
+    
+turret_clear:
+  file: 'turret_clear.nbt'
+  offset:
+    x: -2
+    y: 0
+    z: 0
 
 
 # Per-deck items/abilities
