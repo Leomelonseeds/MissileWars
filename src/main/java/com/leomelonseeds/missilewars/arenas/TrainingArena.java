@@ -238,12 +238,8 @@ public class TrainingArena extends Arena {
         }
         
         // Just a code block that I can break out of :)
+        boolean turret = false;
         do {
-            // Don't torture new players
-            if (maxLevel < 1) {
-                break;
-            }
-            
             // Find closest missile to red base
             Tracked toDefend = null; 
             int maxtz = 0; // Larger z = closer to red base
@@ -271,11 +267,17 @@ public class TrainingArena extends Arena {
             if (max == 0) {
                 break;
             }
+            
+            // If maxpz close to base and within trajectory of an arrow turret, spawn one.
+            // Otherwise, random chance for training arena to spawn a fireball turret.
+            // Trajectory of arrow turret: -(z-49)^2 / 50 within certain offset of player y, where
+            // player x is within bounds of x1 + 3 and x2 - 3
+            
 
             // Determine theoretical best location to spawn missile then adjust to actual limits
             // Add a small bias onto player detection so defending against riders are prioritized
-            int spawnx = 0;
-            int spawny = 0;
+            int spawnx;
+            int spawny;
             if (maxpz + 8 >= maxtz && closestPlayer != null) {
                 spawnx = closestPlayer.getBlockX();
                 spawny = closestPlayer.getBlockY() + 6;
@@ -297,30 +299,32 @@ public class TrainingArena extends Arena {
         } while (false);
         
         // If all else fails, we just pick a random location
-        if (loc == null) {
-            // If portals destroyed, target the other portal
-            FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
-            Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(getWorld());
-            Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(getWorld());
-            if (p1.getBlock().getType() != Material.NETHER_PORTAL) {
-                x1 += 15; // p1 is negative x portal, so target positive X by increasing X
-            } else if (p2.getBlock().getType() != Material.NETHER_PORTAL) {
-                x2 -= 15; // and vice versa
+        if (!turret) {
+            if (loc == null) {
+                // If portals destroyed, target the other portal
+                FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
+                Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(getWorld());
+                Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(getWorld());
+                if (p1.getBlock().getType() != Material.NETHER_PORTAL) {
+                    x1 += 15; // p1 is negative x portal, so target positive X by increasing X
+                } else if (p2.getBlock().getType() != Material.NETHER_PORTAL) {
+                    x2 -= 15; // and vice versa
+                }
+                
+                // Try at most a constant number of times to increase performance
+                int count = 0;
+                do {
+                    int x = random.nextInt(x1, x2 + 1);
+                    int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
+                    loc = new Location(getWorld(), x, y, z);
+                    count++;
+                } while (wouldCollide(loc, redMissiles, 0, 2) && count < 5);
             }
             
-            // Try at most a constant number of times to increase performance
-            int count = 0;
-            do {
-                int x = random.nextInt(x1, x2 + 1);
-                int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
-                loc = new Location(getWorld(), x, y, z);
-                count++;
-            } while (wouldCollide(loc, redMissiles, 0, 2) && count < 5);
+            // Spawn missile
+            Location floc = loc;
+            Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));    
         }
-        
-        // Spawn missile
-        Location floc = loc;
-        Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));
         
         // Take an average time to spawn next random missile
         FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
