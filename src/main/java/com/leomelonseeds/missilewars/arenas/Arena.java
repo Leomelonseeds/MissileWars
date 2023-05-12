@@ -720,7 +720,7 @@ public class Arena implements ConfigurationSerializable {
     /**
      * Checks if the game is empty, and ends game/cancels tasks if so
      */
-    public void checkEmpty() {
+    private void checkEmpty() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();   
         if (!plugin.isEnabled()) {
             return;
@@ -738,6 +738,11 @@ public class Arena implements ConfigurationSerializable {
             return;
         }
         
+        autoEnd();
+    }
+    
+    protected void autoEnd() {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();   
         if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
             endGame(null);
         } else if (redTeam.getSize() <= 0) {
@@ -762,7 +767,7 @@ public class Arena implements ConfigurationSerializable {
             }.runTaskLater(plugin, 60 * 20L);
         }
     }
-
+ 
     /**
      * Check if a player is spectating.
      *

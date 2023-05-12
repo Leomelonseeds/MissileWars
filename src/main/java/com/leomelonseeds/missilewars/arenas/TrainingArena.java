@@ -17,8 +17,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
@@ -31,12 +34,16 @@ import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
 
 public class TrainingArena extends Arena {
     
+    boolean hasTurret;
+    
     public TrainingArena() {
         super("training", 100);
+        hasTurret = false;
     }
 
     public TrainingArena(Map<String, Object> serializedArena) {
         super(serializedArena);
+        hasTurret = false;
     }
     
     // No need to track who left the arena here
@@ -107,15 +114,7 @@ public class TrainingArena extends Arena {
     
     // Reset training arena after 30 min
     @Override
-    public void checkEmpty() {
-        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
-            return;
-        }
-
-        if (!running || redTeam == null || blueTeam == null) {
-            return;
-        }
-        
+    protected void autoEnd() {
         if (blueTeam.getSize() <= 0) {
             autoEnd = new BukkitRunnable() {
                 @Override
@@ -219,6 +218,7 @@ public class TrainingArena extends Arena {
         List<String> m = new ArrayList<>(missiles.keySet());
         String missile = m.get(random.nextInt(m.size()));
         int level = random.nextInt(missiles.get(missile)) + 1;
+        World world = getWorld();
         Location loc = null;
         
         // Setup various collections
@@ -238,7 +238,7 @@ public class TrainingArena extends Arena {
         }
         
         // Just a code block that I can break out of :)
-        boolean turret = false;
+        boolean spawnedTurret = false;
         do {
             // Find closest missile to red base
             Tracked toDefend = null; 
@@ -272,6 +272,50 @@ public class TrainingArena extends Arena {
             // Otherwise, random chance for training arena to spawn a fireball turret.
             // Trajectory of arrow turret: -(z-49)^2 / 50 within certain offset of player y, where
             // player x is within bounds of x1 + 3 and x2 - 3
+            if (!hasTurret && maxpz > 0) {
+                double cpz = closestPlayer.getZ();
+                double cpy = closestPlayer.getY();
+                int spawnx = Math.max(Math.min(closestPlayer.getBlockX(), x2), x1);
+                double esty = -1 * Math.pow(cpz - 49, 2) / 50;
+                if (Math.abs(esty - cpy) <= 5) {
+                    // Spawn arrow turret if player is within range of a spawner, despawn 10 sec later
+                    Location tloc = new Location(world, spawnx, y2, z);
+                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "turret-0", tloc, false, mapName, false, false));
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        SchematicManager.spawnNBTStructure(null, "turret_clear-0", tloc, false, mapName, false, false);
+                        hasTurret = false;
+                    }, 20 * 10L);
+                } else if (random.nextDouble() < 0.33) {
+                    // Otherwise, 33% chance to spawn a fireball turret at -3, 16, 51, with fire location at 0, 22, 51 
+                    Location tloc = new Location(world, -3, 16, 51);
+                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "fireball_turret-0", tloc, false, mapName, false, false));
+
+                    // Fireball 3 sec after loading turret
+                    int flevel = Math.min(maxLevel, 3);
+                    Location pfloc = closestPlayer.add(0, -2, 5);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        Location floc = new Location(world, 0, 22, 51);
+                        Vector fvec = pfloc.toVector().subtract(floc.toVector());
+                        Fireball fireball = (Fireball) world.spawnEntity(floc, EntityType.FIREBALL);
+                        fireball.setIsIncendiary(true);
+                        fireball.setYield(flevel);
+                        fireball.setDirection(fvec);
+                        ConfigUtils.sendConfigSound("spawn-fireball", floc);
+                    }, 20 * 3L);
+                    
+                    // Despawn turret
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        SchematicManager.spawnNBTStructure(null, "fireball_turret_clear-0", tloc, false, mapName, false, false);
+                        hasTurret = false;
+                    }, 20 * 6L);
+                } else {
+                    break;
+                }
+                
+                hasTurret = true;
+                spawnedTurret = true;
+                break;
+            }
             
 
             // Determine theoretical best location to spawn missile then adjust to actual limits
@@ -288,7 +332,7 @@ public class TrainingArena extends Arena {
             
             spawnx = Math.max(Math.min(spawnx, x2), x1);
             spawny = Math.max(Math.min(spawny, y2), y1);
-            Location defloc = new Location(getWorld(), spawnx, spawny, z);
+            Location defloc = new Location(world, spawnx, spawny, z);
             
             // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
             if (wouldCollide(defloc, redMissiles, max, 1) && (level < 3 || maxtz < z - 20)) {
@@ -299,12 +343,12 @@ public class TrainingArena extends Arena {
         } while (false);
         
         // If all else fails, we just pick a random location
-        if (!turret) {
+        if (!spawnedTurret) {
             if (loc == null) {
                 // If portals destroyed, target the other portal
                 FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
-                Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(getWorld());
-                Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(getWorld());
+                Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(world);
+                Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(world);
                 if (p1.getBlock().getType() != Material.NETHER_PORTAL) {
                     x1 += 15; // p1 is negative x portal, so target positive X by increasing X
                 } else if (p2.getBlock().getType() != Material.NETHER_PORTAL) {
@@ -316,7 +360,7 @@ public class TrainingArena extends Arena {
                 do {
                     int x = random.nextInt(x1, x2 + 1);
                     int y = random.nextDouble() > 0.5 ? y2 : random.nextInt(y1 + 4, y2 + 1);
-                    loc = new Location(getWorld(), x, y, z);
+                    loc = new Location(world, x, y, z);
                     count++;
                 } while (wouldCollide(loc, redMissiles, 0, 2) && count < 5);
             }
