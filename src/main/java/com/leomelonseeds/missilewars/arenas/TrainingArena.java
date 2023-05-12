@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,16 +35,19 @@ import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
 
 public class TrainingArena extends Arena {
     
-    boolean hasTurret;
+    private boolean hasTurret;
+    private int missiles;
     
     public TrainingArena() {
         super("training", 100);
         hasTurret = false;
+        missiles = 0;
     }
 
     public TrainingArena(Map<String, Object> serializedArena) {
         super(serializedArena);
         hasTurret = false;
+        missiles = 0;
     }
     
     // No need to track who left the arena here
@@ -181,7 +185,29 @@ public class TrainingArena extends Arena {
     }
     
     @Override
-    protected void calculateStats(MissileWarsTeam winningTeam) {}
+    protected void calculateStats(MissileWarsTeam winningTeam) {
+        // Reward for breaking portals (10 per break, max 20, avg 20)
+        // Reward for reducing their shield health (2 per 10%, max 20, avg 5-10)
+        // Equation: training missiles * shield health
+        String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
+        int portal_reward = 20;
+        int shield_health_reward = ((int) ((100 - redTeam.getShieldHealth())) / 10) * 2;
+        int defense_reward = (int) (missiles * redTeam.getShieldHealth() / 100);
+        this.missiles = 0;
+        
+        for (MissileWarsPlayer player : players) {
+            if (getTeam(player.getMCPlayerId()).equals("no team")) {
+                continue;
+            }
+            
+            int amountEarned = portal_reward * player.getMVP() + shield_health_reward + defense_reward;
+            RankUtils.addExp(player.getMCPlayer(), amountEarned);
+            
+            String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
+            player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
+            MissileWarsPlugin.getPlugin().getEconomy().depositPlayer(player.getMCPlayer(), amountEarned);
+        }
+    }
     
     // Spawn a missile based on a few conditions at the red base
     private void spawnMissile(Map<String, Integer> missiles) {
@@ -368,6 +394,7 @@ public class TrainingArena extends Arena {
             }
             
             // Spawn missile
+            this.missiles++;
             Location floc = loc;
             Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));    
         }
