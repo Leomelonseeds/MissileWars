@@ -625,6 +625,15 @@ public class ArenaManager {
      */
     public int getPlayers(String gamemode) {
         int count = 0;
+        if (gamemode.equals("training")) {
+            for (Arena arena : loadedArenas) {
+                if (arena instanceof TrainingArena) {
+                    return arena.getTotalPlayers();
+                }
+            }
+            return 0;
+        }
+        
         for (Arena a : getLoadedArenas(gamemode)) {
             count += a.getTotalPlayers();
         }
