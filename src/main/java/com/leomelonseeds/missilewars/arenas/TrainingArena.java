@@ -187,12 +187,12 @@ public class TrainingArena extends Arena {
     @Override
     protected void calculateStats(MissileWarsTeam winningTeam) {
         // Reward for breaking portals (10 per break, max 20, avg 20)
-        // Reward for reducing their shield health (2 per 10%, max 20, avg 5-10)
-        // Equation: training missiles * shield health
+        // Reward for reducing red shield health (2 per 10%, max 20, avg 5-10)
+        // Equation: training missiles * blue shield health
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
         int portal_reward = 20;
         int shield_health_reward = ((int) ((100 - redTeam.getShieldHealth())) / 10) * 2;
-        int defense_reward = (int) (missiles * redTeam.getShieldHealth() / 100);
+        int defense_reward = (int) (missiles * blueTeam.getShieldHealth() / 100);
         this.missiles = 0;
         
         for (MissileWarsPlayer player : players) {
