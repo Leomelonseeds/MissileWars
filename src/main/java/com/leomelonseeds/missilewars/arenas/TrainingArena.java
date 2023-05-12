@@ -275,26 +275,27 @@ public class TrainingArena extends Arena {
             if (!hasTurret && maxpz > 0) {
                 double cpz = closestPlayer.getZ();
                 double cpy = closestPlayer.getY();
+                double cpx = closestPlayer.getX();
                 int spawnx = Math.max(Math.min(closestPlayer.getBlockX(), x2), x1);
-                double esty = -1 * Math.pow(cpz - 49, 2) / 50;
+                double esty = -1 * Math.pow(cpz - 45, 2) / 50 + 30;
                 if (Math.abs(esty - cpy) <= 5) {
                     // Spawn arrow turret if player is within range of a spawner, despawn 10 sec later
-                    Location tloc = new Location(world, spawnx, y2, z);
+                    Location tloc = new Location(world, spawnx, y2 + 1, z);
                     Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "turret-0", tloc, false, mapName, false, false));
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         SchematicManager.spawnNBTStructure(null, "turret_clear-0", tloc, false, mapName, false, false);
                         hasTurret = false;
                     }, 20 * 10L);
-                } else if (random.nextDouble() < 0.33) {
-                    // Otherwise, 33% chance to spawn a fireball turret at -3, 16, 51, with fire location at 0, 22, 51 
-                    Location tloc = new Location(world, -3, 16, 51);
+                } else if (cpz < z - 10 && (random.nextDouble() < 0.33 || cpy < y1-5 || cpy > y2+2 || cpx < x1-5 || cpx > x2+5)) {
+                    // Otherwise, if 33% chance or if player cannot be nuked by missile, spawn a fireball turret at 0, 17, 51, with fire location at 0, 22, 51 
+                    Location tloc = new Location(world, 0, y2 + 1, z);
                     Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "fireball_turret-0", tloc, false, mapName, false, false));
 
                     // Fireball 3 sec after loading turret
                     int flevel = Math.min(maxLevel, 3);
                     Location pfloc = closestPlayer.add(0, -2, 5);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        Location floc = new Location(world, 0, 22, 51);
+                        Location floc = new Location(world, 0, 22, z);
                         Vector fvec = pfloc.toVector().subtract(floc.toVector());
                         Fireball fireball = (Fireball) world.spawnEntity(floc, EntityType.FIREBALL);
                         fireball.setIsIncendiary(true);
@@ -334,16 +335,17 @@ public class TrainingArena extends Arena {
             spawny = Math.max(Math.min(spawny, y2), y1);
             Location defloc = new Location(world, spawnx, spawny, z);
             
-            // Make sure it doesn't collide with an existing missile, if player not skilled enough to handle
-            if (wouldCollide(defloc, redMissiles, max, 1) && (level < 3 || maxtz < z - 20)) {
+            // Make sure it doesn't collide with an existing missile if player not within nuking range
+            if (wouldCollide(defloc, redMissiles, max, 1) && maxpz < z - 20) {
                 break;
             }
             
             loc = defloc;
         } while (false);
         
-        // If all else fails, we just pick a random location
+        // If a turret was not spawned, spawn a missile
         if (!spawnedTurret) {
+            // If all else fails, we just pick a random location
             if (loc == null) {
                 // If portals destroyed, target the other portal
                 FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
@@ -370,15 +372,13 @@ public class TrainingArena extends Arena {
             Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));    
         }
         
-        // Take an average time to spawn next random missile
-        FileConfiguration settings = MissileWarsPlugin.getPlugin().getConfig();
-        int time = settings.getInt("item-frequency." + Math.max(1, Math.min(playercount, 3)));
-        
+        // Take an average time to spawn next random missile and spawn
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
         // Subtract one second for each level of the highest levelled player
+        int time = plugin.getConfig().getInt("default-cooldown") / 5;
         int interval = Math.max(2, (time / Math.max(playercount, 1)) - maxLevel);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), () -> spawnMissile(missiles), interval * 20L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> spawnMissile(missiles), interval * 20L);
     }
     
     // Algorithm to check if at a certain location, there already is a missile heading towards enemy base

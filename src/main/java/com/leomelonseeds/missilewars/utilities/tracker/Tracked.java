@@ -41,6 +41,11 @@ public abstract class Tracked {
         removalTasks.add(new BukkitRunnable() {
             @Override
             public void run() {
+                // Extra check just to make sure
+                if (!arena.isRunning() || !MissileWarsPlugin.getPlugin().isEnabled()) {
+                    this.cancel();
+                }
+                
                 if (testForRemoval()) {
                     remove();
                 }
