@@ -197,9 +197,13 @@ public class TrainingArena extends Arena {
             return;
         }
         
-        // Get maximum ranked and distanced player
+        // Get maximum ranked and distanced player, and determine if doublespeed
+        boolean doublespeed = true;
         int maxLevel = 0;
         for (MissileWarsPlayer player : blueTeam.getMembers()) {
+            if (!player.getMCPlayer().hasPermission("umw.trainingdifficulty")) {
+                doublespeed = false;
+            }
             int level = RankUtils.getRankLevel(plugin.getSQL().getExpSync(player.getMCPlayerId()));
             if (level > maxLevel) {
                 maxLevel = level;
@@ -376,8 +380,9 @@ public class TrainingArena extends Arena {
         // Adjust for tick, divide by num players to simulate equal teams.
         // Do not simulate missile randomness because that's boring
         // Subtract one second for each level of the highest levelled player
+        // Divide by 2 if all members of blue team have doublespeed enabled
         int time = plugin.getConfig().getInt("default-cooldown") / 5;
-        int interval = Math.max(2, (time / Math.max(playercount, 1)) - maxLevel);
+        int interval = Math.max(2, ((time / Math.max(playercount, 1)) - maxLevel) / (doublespeed ? 2 : 1));
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> spawnMissile(missiles), interval * 20L);
     }
     
