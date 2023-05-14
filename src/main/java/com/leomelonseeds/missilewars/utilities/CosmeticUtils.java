@@ -159,7 +159,7 @@ public class CosmeticUtils {
      * @return
      */
     public static Component getPortalMessage(Player killer, String brokeTeam) {
-        if (killer == null) {
+        if (killer == null || !killer.isOnline()) {
             return ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.portal-broke", null, null, null)
                     .replace("%team%", (brokeTeam.equals("red") ? ChatColor.RED : ChatColor.BLUE) + brokeTeam));
         }
