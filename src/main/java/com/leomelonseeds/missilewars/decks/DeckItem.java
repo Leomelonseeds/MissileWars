@@ -123,9 +123,11 @@ public class DeckItem {
     }
     
     /**
-     * Initializes the cooldown of an item, use for game starts.
-     * Adds visual cooldown of c. If 0 or existing cooldown then 
-     * no cooldown will be added
+     * Initializes the cooldown of an item, use for game starts/item drops.
+     * Adds visual cooldown of c. If there is existing cooldown
+     * no cooldown will be added. Otherwise if c == 0 then max cooldown
+     * will be applied, since this method only called after dropping the
+     * last item.
      */
     public void initCooldown(int c) {
         if (c < 0) {
@@ -138,11 +140,7 @@ public class DeckItem {
         }
         
         if (c == 0) {
-            if (getActualAmount() < max) {
-                curCooldown = getCooldown();
-                updateItem();
-            }
-            return;
+            c = getCooldown();
         }
 
         setVisualCooldown(c);
