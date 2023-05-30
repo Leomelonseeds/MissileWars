@@ -22,10 +22,8 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -41,10 +39,8 @@ import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
-import com.leomelonseeds.missilewars.utilities.SQLManager;
 import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 import github.scarsz.discordsrv.DiscordSRV;
@@ -54,10 +50,9 @@ import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
 import net.kyori.adventure.text.Component;
-import net.milkbowl.vault.economy.Economy;
 
 /** Represents a MissileWarsArena where the game will be played. */
-public class Arena implements ConfigurationSerializable {
+public abstract class Arena implements ConfigurationSerializable {
 
     /** Comparator to sort by capacity */
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
@@ -1028,26 +1023,7 @@ public class Arena implements ConfigurationSerializable {
     /**
      * Gamemode-specific setups
      */
-    protected void performGamemodeSetup() {
-        // Setup portals
-        for (MissileWarsTeam team : new MissileWarsTeam[] {blueTeam, redTeam}) {
-            FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
-            ConfigurationSection config = maps.getConfigurationSection(gamemode + "." + mapName + "." + "portals");
-            if (config == null) {
-                config = maps.getConfigurationSection(gamemode + ".default-map.portals");
-            }
-            for (String s : config.getKeys(false)) {
-                double x = config.getDouble(s + ".x");
-                double y = config.getDouble(s + ".y");
-                double z = config.getDouble(s + ".z");
-                if (team == redTeam) {
-                    z = z * -1;
-                }
-                Location portalLoc = new Location(getWorld(), x, y, z);
-                team.getPortals().put(portalLoc, true);
-            }
-        }
-    }
+    protected abstract void performGamemodeSetup();
     
     /**
      * Assigns players and starts the teams
@@ -1255,152 +1231,7 @@ public class Arena implements ConfigurationSerializable {
     }
     
     // Calculate and store all player stats from the game
-    protected void calculateStats(MissileWarsTeam winningTeam) {
-        // Setup player variables
-        List<String> winningMessages = ConfigUtils.getConfigTextList("messages." + gamemode + "-end", null, null, null);
-        String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
-        FileConfiguration ranksConfig = ConfigUtils.getConfigFile("ranks.yml");
-        int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
-        int use_utility = ranksConfig.getInt("experience.use_utility");
-        int kill = ranksConfig.getInt("experience.kill");
-        double portal_broken = (double) ranksConfig.getInt("experience.portal_broken") / blueTeam.getTotalPortals();
-        int shield_health = ranksConfig.getInt("experience.shield_health");
-        int win = ranksConfig.getInt("experience.win");
-
-        int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
-        int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
-
-        // Find players with mvp, most deaths, and kills
-        List<MissileWarsPlayer> mvp = new ArrayList<>();
-        List<MissileWarsPlayer> mostKills = new ArrayList<>();
-        List<MissileWarsPlayer> mostDeaths = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
-            if (getTeam(player.getMCPlayerId()).equals("no team")) {
-                continue;
-            }
-            
-            // Top MVPs
-            if (mvp.isEmpty() || mvp.get(0).getMVP() < player.getMVP()) {
-                mvp.clear();
-                mvp.add(player);
-            } else if (mvp.get(0).getMVP() == player.getMVP()) {
-                mvp.add(player);
-            }
-            // Top kills
-            if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
-                mostKills.clear();
-                mostKills.add(player);
-            } else if (mostKills.get(0).getKills() == player.getKills()) {
-                mostKills.add(player);
-            }
-            // Top deaths
-            if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
-                mostDeaths.clear();
-                mostDeaths.add(player);
-            } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
-                mostDeaths.add(player);
-            }
-        }
-
-        // Produce most mvp/kills/deaths list
-        List<String> mostMVPList = new ArrayList<>();
-        for (MissileWarsPlayer player : mvp) {
-            mostMVPList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_mvp = String.join(", ", mostMVPList);
-        
-        List<String> mostKillsList = new ArrayList<>();
-        for (MissileWarsPlayer player : mostKills) {
-            mostKillsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_kills = String.join(", ", mostKillsList);
-
-        List<String> mostDeathsList = new ArrayList<>();
-        for (MissileWarsPlayer player : mostDeaths) {
-            mostDeathsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_deaths = String.join(", ", mostDeathsList);
-
-        int most_mvp_amount = mvp.isEmpty() ? 0 : mvp.get(0).getMVP();
-        int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
-        int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getDeaths();
-
-        Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
-        LocalDateTime endTime = LocalDateTime.now();
-        long gameTime = Duration.between(startTime, endTime).toSeconds();
-        
-        // Calculate win message
-        List<String> actualWinMessages = new ArrayList<>();
-        String winner = winningTeam == null ? "&e&lNONE" : winningTeam == blueTeam ? "&9&lBLUE" : "&c&lRED";
-        for (String s : winningMessages) {
-            s = s.replaceAll("%umw_winning_team%", winner);
-            s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
-            s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
-            s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
-            s = s.replaceAll("%umw_most_mvp%", most_mvp);
-            s = s.replaceAll("%umw_most_kills%", most_kills);
-            s = s.replaceAll("%umw_most_deaths%", most_deaths);
-            actualWinMessages.add(ChatColor.translateAlternateColorCodes('&', s));
-        }
-
-        // Update stats for each player
-        for (MissileWarsPlayer player : players) {
-            // Send win message
-            for (String s : actualWinMessages) {
-                player.getMCPlayer().sendMessage(s);
-            }
-
-            // -1 = TIE, 0 = LOST, 1 = WIN
-            int won = winningTeam == null ? -1 : 0;
-
-            // Calculate currency gain per-game
-            UUID uuid = player.getMCPlayerId();
-            if (getTeam(uuid).equals("no team")) {
-                continue;
-            }
-
-            int amountEarned = 0;
-            int playerAmount = 0;
-            int teamAmount = 0;
-            long playTime = Duration.between(player.getJoinTime(), endTime).toSeconds();
-            if (playTime <= 40) {
-                ConfigUtils.sendConfigMessage("messages.earn-none-time", player.getMCPlayer(), null, null);
-                continue;
-            }
-            
-            playerAmount = spawn_missile * player.getMissiles() +
-                           use_utility * player.getUtility() +
-                           kill * player.getKills() +
-                           (int) (portal_broken * player.getMVP());
-            if (blueTeam.containsPlayer(uuid)) {
-                teamAmount = blue_shield_health_amount;
-                if (winningTeam == blueTeam) {
-                    teamAmount += win;
-                    won = 1;
-                }
-            } else {
-                teamAmount = red_shield_health_amount;
-                if (winningTeam == redTeam) {
-                    teamAmount += win;
-                    won = 1;
-                }
-            }
-            
-            double percentPlayed = (double) playTime / gameTime;
-            amountEarned = playerAmount + (int) (percentPlayed * teamAmount);
-
-            // Update player stats
-            SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
-
-            sql.updateClassicStats(uuid, player.getMVP(), won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
-            sql.updateWinstreak(uuid, gamemode, won);
-            RankUtils.addExp(player.getMCPlayer(), amountEarned);
-
-            String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-            player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
-            econ.depositPlayer(player.getMCPlayer(), amountEarned);
-        }
-    }
+    protected abstract void calculateStats(MissileWarsTeam winningTeam);
     
     /** Remove Players from the map */
     public void removePlayers() {
@@ -1497,100 +1328,6 @@ public class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
             if (player.getMCPlayer() != null) {
                 player.getMCPlayer().setLevel(level);
-            }
-        }
-    }
-
-    /**
-     * Register the breaking of a portal at a location in this Arena.
-     *
-     * @param location the location
-     */
-    public void registerPortalBreak(Location location, Entity entity) {
-        // Ignore if game not running
-        if (!running) {
-            return;
-        }
-
-        // Check if portal broke at blue or red z
-        MissileWarsTeam broketeam = blueTeam;
-        MissileWarsTeam enemy = redTeam;
-        int z = location.getBlockZ();
-        if (z > 0) {
-            broketeam = redTeam;
-            enemy = blueTeam;
-        }
-        
-        // Check if portal break was registered
-        if (!broketeam.registerPortalBreak(location)) {
-            return;
-        }
-        
-        // Check if team still has living portals
-        if (broketeam.hasLivingPortal()) {
-            broketeam.sendTitle("own-portal-destroyed");
-            enemy.sendTitle("enemy-portal-destroyed");
-        }
-        
-        // Check if has associated player
-        Player player = ConfigUtils.getAssociatedPlayer(entity, this);
-        
-        // Send messages if player found
-        if (player != null && !getTeam(player.getUniqueId()).equals("no team")) {
-            // Only add to stats if on opposite team
-            if (enemy.containsPlayer(player.getUniqueId())) {
-                getPlayerInArena(player.getUniqueId()).addToMVP(1);
-            }
-        }
-        Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());
-        for (MissileWarsPlayer mwPlayer : players) {
-            mwPlayer.getMCPlayer().sendMessage(msg);
-        }
-        
-        // Waiting for a tie in this case
-        if (!redTeam.hasLivingPortal() && !blueTeam.hasLivingPortal()) {
-            endGame(null);
-            return;
-        }
-        
-        if (waitingForTie) {
-            return;
-        }
-
-        // Check if either team's last portal has been broken
-        int wait = MissileWarsPlugin.getPlugin().getConfig().getInt("tie-wait-time");
-        
-        if (!redTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= getChaosTime()) {
-                endGame(blueTeam);
-            } else {
-                blueTeam.sendTitle("enemy-portals-destroyed");
-                redTeam.sendTitle("own-portals-destroyed");
-                waitingForTie = true;
-                tasks.add(new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (blueTeam.hasLivingPortal()) {
-                            endGame(blueTeam);
-                        }
-                    }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
-            }
-        } else if (!blueTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= getChaosTime()) {
-                endGame(redTeam);
-            } else {
-                blueTeam.sendTitle("own-portals-destroyed");
-                redTeam.sendTitle("enemy-portals-destroyed");
-                waitingForTie = true;
-                tasks.add(new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (redTeam.hasLivingPortal()) {
-                            endGame(redTeam);
-                        }
-                    }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
             }
         }
     }

@@ -61,6 +61,7 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
@@ -574,12 +575,12 @@ public class ArenaGameruleListener implements Listener {
             }
         }
         // Check for TNT explosions of portals
-        else if (entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
-                 entity == EntityType.CREEPER) {
+        else if ((entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
+                 entity == EntityType.CREEPER) && possibleArena instanceof ClassicArena) {
             event.blockList().forEach(block -> {
                 // Register portal brake if block was broken
                 if (block.getType() == Material.NETHER_PORTAL) {
-                    possibleArena.registerPortalBreak(block.getLocation(), event.getEntity());
+                    ((ClassicArena) possibleArena).registerPortalBreak(block.getLocation(), event.getEntity());
                 }
             });
         }

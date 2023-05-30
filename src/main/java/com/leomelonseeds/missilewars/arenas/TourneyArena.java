@@ -18,7 +18,7 @@ import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
  * @author LEGEND
  *
  */
-public class TourneyArena extends Arena {
+public class TourneyArena extends ClassicArena {
 
     public TourneyArena(String name, int capacity) {
         super(name, capacity);

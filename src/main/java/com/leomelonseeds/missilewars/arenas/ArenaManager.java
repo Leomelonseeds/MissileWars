@@ -317,7 +317,7 @@ public class ArenaManager {
         Arena arena;
         switch (gamemode) {
         case "classic":
-            arena = new Arena(name, capacity);
+            arena = new ClassicArena(name, capacity);
             break;
         case "tourney":
             arena = new TourneyArena(name, capacity);

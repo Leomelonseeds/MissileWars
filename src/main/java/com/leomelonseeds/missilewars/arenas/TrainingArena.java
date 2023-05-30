@@ -33,7 +33,7 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.tracker.Tracked;
 import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
 
-public class TrainingArena extends Arena {
+public class TrainingArena extends ClassicArena {
     
     private boolean hasTurret;
     private int missiles;
