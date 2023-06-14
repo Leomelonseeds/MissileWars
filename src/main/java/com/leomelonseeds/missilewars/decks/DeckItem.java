@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.decks;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -249,7 +250,12 @@ public class DeckItem {
     // Sets a visual cooldown
     // If the item is an arrow, set a cooldown for the bow/crossbow too
     // Also sets unavailable to true
+    // No workie if player in creative mode
     public void setVisualCooldown(int c) {
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            return;
+        }
+        
         int cd = c * 20;
         unavailable = cd != 0;
         player.setCooldown(item.getType(), cd);
