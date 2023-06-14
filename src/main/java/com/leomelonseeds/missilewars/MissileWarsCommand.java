@@ -55,6 +55,18 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // Reset coldowns
+        if (action.equalsIgnoreCase("resetCooldowns")) {
+            Player player = getCommandTarget(args, sender);
+            if (player == null) {
+                return true;
+            }
+            
+            for (ItemStack i : player.getInventory().getContents()) {
+                player.setCooldown(i.getType(), 0);
+            }
+        }
+        
         // Make changes to map rotation
         if (action.equalsIgnoreCase("rotation")) {
             // Ensure player is allowed
