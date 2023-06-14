@@ -63,6 +63,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             for (ItemStack i : player.getInventory().getContents()) {
+                if (i == null) continue;
                 player.setCooldown(i.getType(), 0);
             }
         }
