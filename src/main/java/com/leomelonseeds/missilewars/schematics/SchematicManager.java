@@ -27,6 +27,7 @@ import org.bukkit.structure.StructureManager;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
 import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
@@ -88,11 +89,13 @@ public class SchematicManager {
 
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
+            sendError(player, "How the hell did you get that here?");
             return false;
         }
         
         // Don't be too high
         if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
+            sendError(player, "Structures cannot be spawned this high!");
             return false;
         }
 
@@ -104,10 +107,12 @@ public class SchematicManager {
 
         // Attempt to get structure file
         if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
+            sendError(player, "The file for this structure is missing! Please contact an admin.");
             return false;
         }
         String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
         if (fileName == null) {
+            sendError(player, "The file for this structure is missing! Please contact an admin.");
             return false;
         }
         if (redMissile) {
@@ -122,6 +127,7 @@ public class SchematicManager {
         try {
             structure = manager.loadStructure(structureFile);
         } catch (IOException e) {
+            sendError(player, "The file for this structure is missing! Please contact an admin.");
             return false;
         }
 
@@ -154,6 +160,20 @@ public class SchematicManager {
         int sizey = structure.getSize().getBlockY();
         int sizez = structure.getSize().getBlockZ();
         
+        // If its a missile, then check teamgrief
+        if (isMissile) {
+            Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
+            // SAME Z PLANE, GO XY 
+            if (ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue")) {
+                // TODOTODO
+                if (redMissile) {
+                    int z = spawnz - 1;
+                } else {
+                    int z = spawnz + 1;
+                }
+            }
+        }
+        
         // Checks if the missile intersects with an obsidian/barrier structure
         if (checkCollision) {
             if (redMissile) {
@@ -170,6 +190,7 @@ public class SchematicManager {
                             // Check all other cancellable blocks
                             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                             if (cancel.contains(b.toString())) {
+                                sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
                             }
                         }
@@ -186,6 +207,7 @@ public class SchematicManager {
                             }
                             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                             if (cancel.contains(b.toString())) {
+                                sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
                             }
                         }
@@ -247,6 +269,10 @@ public class SchematicManager {
             block.getState().update(true);
         }*/
         return true;
+    }
+    
+    private static void sendError(Player player, String message) {
+        player.sendMessage(ConfigUtils.toComponent(message));
     }
     
     /**

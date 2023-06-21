@@ -295,8 +295,6 @@ public class CustomItemListener implements Listener {
                 }
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 mwp.incrementMissiles();
-            } else {
-                ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             }
             return;
         }
@@ -505,7 +503,6 @@ public class CustomItemListener implements Listener {
         Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
         Location spawnLoc = player.getEyeLocation().clone().add(distance);
         if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
-            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
             return;
         }
             
@@ -717,7 +714,6 @@ public class CustomItemListener implements Listener {
                 }
             }
         } else {
-            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", thrower, null, null);
             Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
             newitem.setPickupDelay(0);
         }
