@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.arenas;
+package com.leomelonseeds.missilewars.arenas.votes;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,6 +11,9 @@ import java.util.TreeMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.TrainingArena;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class VoteManager {
@@ -29,7 +32,7 @@ public class VoteManager {
         }
         
         // Troll for training arena
-        if (arena instanceof TrainingArena) {
+        if (arena instanceof TrainingArena || arena instanceof TutorialArena) {
             allVotes.put("default-map", 64);
         }
     }

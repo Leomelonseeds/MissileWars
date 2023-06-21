@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.arenas;
+package com.leomelonseeds.missilewars.arenas.votes;
 
 public class Vote {
     

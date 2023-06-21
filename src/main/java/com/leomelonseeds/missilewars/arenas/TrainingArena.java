@@ -85,7 +85,6 @@ public class TrainingArena extends ClassicArena {
                 }
                 
                 removeSpectator(player);
-                redTeam.removePlayer(player);
                 blueTeam.addPlayer(player);
                 checkNotEmpty();
                 announceMessage("messages.queue-join-blue", player);

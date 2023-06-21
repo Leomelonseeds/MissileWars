@@ -100,6 +100,12 @@ public class ArenaManager {
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
             arena.loadWorldFromDisk();
+            if (arena instanceof TutorialArena) {
+                Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Starting tutorial arena in 10 seconds...");
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    arena.start();
+                }, 10 * 20);
+            }
         }
     }
 
