@@ -160,22 +160,11 @@ public class SchematicManager {
         int sizey = structure.getSize().getBlockY();
         int sizez = structure.getSize().getBlockZ();
         
-        // If its a missile, then check teamgrief
-        if (isMissile) {
-            Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
-            // SAME Z PLANE, GO XY 
-            if (ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue")) {
-                // TODOTODO
-                if (redMissile) {
-                    int z = spawnz - 1;
-                } else {
-                    int z = spawnz + 1;
-                }
-            }
-        }
-        
         // Checks if the missile intersects with an obsidian/barrier structure
         if (checkCollision) {
+            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+            Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
+            boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
             if (redMissile) {
                 for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
                     for (int y = spawny; y < spawny + sizey; y++) {
@@ -187,8 +176,13 @@ public class SchematicManager {
                                 continue;
                             }
                             
+                            // Check for teamgrief
+                            if (missileInBase && z == spawnz - 1) {
+                                sendError(player, "You cannot spawn missiles inside your base!");
+                                return false;
+                            }
+                            
                             // Check all other cancellable blocks
-                            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
                             if (cancel.contains(b.toString())) {
                                 sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
@@ -205,7 +199,12 @@ public class SchematicManager {
                             if (b == Material.AIR) {
                                 continue;
                             }
-                            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+                            
+                            if (missileInBase && z == spawnz + 1) {
+                                sendError(player, "You cannot spawn missiles inside your base!");
+                                return false;
+                            }
+                            
                             if (cancel.contains(b.toString())) {
                                 sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
@@ -272,7 +271,7 @@ public class SchematicManager {
     }
     
     private static void sendError(Player player, String message) {
-        player.sendMessage(ConfigUtils.toComponent(message));
+        player.sendMessage(ConfigUtils.toComponent("&c" + message));
     }
     
     /**
