@@ -188,7 +188,7 @@ public class PresetSelector implements MWInventory {
         if (slot == 4) {
             playerJson.put("Deck", deck);
             playerJson.put("Preset", "A");
-            ConfigUtils.sendConfigSound("change-preset", player);
+            presetMessage("A");
             updateInventory();
         }
         
@@ -219,7 +219,7 @@ public class PresetSelector implements MWInventory {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
-                ConfigUtils.sendConfigSound("change-preset", player);
+                presetMessage(p);
                 updateInventory();
                 if (itemType == edit) {
                     // Open deck customizer
@@ -227,5 +227,13 @@ public class PresetSelector implements MWInventory {
                 }
             }
         }
+    }
+    
+    private void presetMessage(String preset) {
+        String msg = ConfigUtils.getConfigText("messages.change-preset", player, null, null);
+        msg = msg.replace("%deck%", deck);
+        msg = msg.replace("%preset%", preset);
+        player.sendMessage(msg);
+        ConfigUtils.sendConfigSound("change-preset", player);
     }
 }

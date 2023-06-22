@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.arenas;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -9,8 +10,11 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class TutorialArena extends ClassicArena {
     
+    private Map<UUID, Integer> stage;
+    
     public TutorialArena() {
         super("tutorial", 100);
+        this.stage = new HashMap<>();
     }
 
     public TutorialArena(Map<String, Object> serializedArena) {

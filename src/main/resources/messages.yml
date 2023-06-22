@@ -116,6 +116,7 @@ messages:
   already-joined: "&c&l[!] &7You have already been in this game, so all your cooldowns have been maximized."
   tutorial-not-available: "&c&l[!] &cPlease wait for this arena to start..."
   team-balancing: "&a&l[!] &7Your cooldowns are &afaster &7because the teams are unbalanced."
+  change-preset: "&a&l[!] &7You are now using %deck% - Preset %preset%!"
   training-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &d&lTraining"
