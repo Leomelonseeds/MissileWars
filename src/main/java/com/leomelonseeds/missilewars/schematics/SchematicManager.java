@@ -133,7 +133,6 @@ public class SchematicManager {
 
         // Apply offset
         Location spawnLoc = loc.clone();
-
         Vector offset;
         if (structureConfig.contains(args[0] + ".offset")) {
             offset = getVector(structureConfig, args[0] + ".offset", null, null);

@@ -601,7 +601,8 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Fix dumb bug. No break obsidian
-        if (block.getType().toString().contains("OBSIDIAN")) {
+        String type = block.getType().toString();
+        if (type.contains("OBSIDIAN") || type.equals("NETHER_PORTAL")) {
             event.setCancelled(true);
             return;
         }
@@ -620,7 +621,6 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Check if deconstructor can break block
-        String type = block.getType().toString();
         List<String> whitelist = plugin.getConfig().getStringList("deconstructor-blocks");
         boolean proceed = false;
         for (String b : whitelist) {
