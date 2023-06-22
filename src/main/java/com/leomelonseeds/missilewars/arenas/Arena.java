@@ -1152,6 +1152,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         one.setMultiplier(oneSize / twoSize);
+        one.broadcastConfigMsg("messages.team-balancing", null);
         two.setMultiplier(1);
     }
 

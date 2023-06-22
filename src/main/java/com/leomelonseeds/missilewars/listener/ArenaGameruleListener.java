@@ -245,8 +245,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Berserker user
         if (event.getBow().getType() == Material.CROSSBOW) {
-            int cd = Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
-            player.setCooldown(Material.CROSSBOW, cd);
+            player.setCooldown(Material.CROSSBOW, Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW)));
             
             // Check for creepershot
             ItemStack crossbow = event.getBow();

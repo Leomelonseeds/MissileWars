@@ -22,6 +22,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CrossbowMeta;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -205,9 +206,22 @@ public class ArenaInventoryListener implements Listener {
             ItemStack toDrop = new ItemStack(dropped);
             event.getItemDrop().setItemStack(toDrop);
             dropped.setAmount(1);
-            player.getInventory().setItem(EquipmentSlot.HAND, dropped);
+            PlayerInventory pinv = player.getInventory();
+            pinv.setItem(EquipmentSlot.HAND, dropped);
             di.initCooldown(di.getCurrentCooldown()); // Re-initialize cooldown, since item count set to 0
             player.updateInventory();
+            
+            // Update crossbow cooldown
+            for (ItemStack i : pinv.getContents()) {
+                if (i == null || i.getType() != Material.CROSSBOW) {
+                    continue;
+                }
+                
+                CrossbowMeta cmeta = (CrossbowMeta) i.getItemMeta();
+                if (cmeta.getChargedProjectiles().isEmpty()) {
+                    player.setCooldown(Material.CROSSBOW, Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW)));
+                }
+            }
         } else {
             // Need to re-increase and manually decrease amount so consume doesn't screw over
             remaining.setAmount(remaining.getAmount() + 1);

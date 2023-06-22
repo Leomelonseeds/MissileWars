@@ -230,7 +230,7 @@ public class CustomItemListener implements Listener {
         
         // Disable if player just died
         MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
-        if (mwp.justSpawned()) {
+        if (mwp.justSpawned() && !hand.getType().toString().contains("BOW")) {
             event.setCancelled(true);
             return;
         }

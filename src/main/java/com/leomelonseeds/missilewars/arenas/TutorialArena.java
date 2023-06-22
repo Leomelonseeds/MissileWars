@@ -28,6 +28,11 @@ public class TutorialArena extends ClassicArena {
                 continue;
             }
             
+            if (!running) {
+                ConfigUtils.sendConfigMessage("messages.tutorial-not-available", player.getMCPlayer(), this, null); 
+                return; 
+            }
+            
             if (team.equals("red")) {
                 ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
                 return;
