@@ -125,6 +125,56 @@ messages:
     - "&f- &fThere is no time limit."
     - "&f- &fUse &a/leave &fto change your deck."
     - "&b========================================"
+  stage0: "&a&l[!] &7If you already know how to play Ultima Missile Wars, you can use &f/lobby &7to skip the introduction."
+  stage1:
+    - "&b========================================"
+    - "&f&aRight-click &fnear the edge of the base"
+    - "&fto place a missile. Missiles will &cignite"
+    - "&fand &4explode &fif they encouter obstacles."
+    - "&b========================================"
+  stage2:
+    - "&b========================================"
+    - "&fPlace a missile &a2-4 blocks &fbehind the edge of"
+    - "&fthe base, then run and jump on it to ride it."
+    - "&b========================================"
+  stage3:
+    - "&b========================================"
+    - "&7&oThis part is optional - type &f/skip &7to skip it"
+    - "&fThe &8Concorde &fis a fast missile. To ride it:"
+    - "&f- Stand on the &nedge &fof the base and turn around"
+    - "&f- Aim &a3 blocks &fin front and place the missile"
+    - "&f- &nQuickly &fturn around and jump to ride"
+    - "&b========================================"
+  stage4:
+    - "&b========================================"
+    - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
+    - "&fcan be thrown to defend against oncoming missiles."
+    - "&fThey spawn after &a1 second &f and will &cbreak &fif"
+    - "&fthey hit a block before then."
+    - "&b========================================"
+  stage5:
+    - "&b========================================"
+    - "&7&oThis part is optional - type &f/skip &7to skip it"
+    - "&fBehind the enemy base are &5nether portals &fthat"
+    - "&fmust be blown up to win the game. Ride a missile"
+    - "&fto the enemy and spawn a bunch of missiles inside"
+    - "&ftheir base to blow it up!"
+    - "&b========================================"
+  stage6:
+    - "&b========================================"
+    - "&fThere are 4 decks &7(kits) &favailable to play."
+    - "&fEach contains 5 unique missiles and 3 utility."
+    - "&fYou are using &b&lSentinel&f. Use &a/leave&f, and"
+    - "&finteract with the NPCs to select &c&lBerserker&f."
+    - "&b========================================"
+  stage7:
+    - "&b========================================"
+    - "&fEach deck has many options available to customize."
+    - "&fUpgrading them costs &askillpoints, &fand each preset"
+    - "&fhas a limited amount. Use 2 skillpoints to upgrade the"
+    - "&6sharpness enchantment &ffor &c&lBerserker &ffrom 2 to 3."
+    - "&b========================================"
+  tutorial-complete: "&a&l[!] &7You successfully completed the introduction. Have fun!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -162,11 +212,13 @@ titles:
       - "top 10 anime battles"
       - "me when never felt a woman's touch"
       - "also try Minecraft!"
+      - "holy freaking crap"
+      - "pogchamp"
     length: 120
   defeat:
     title: "&c&lDefeat"
     subtitle:
-      - "get good"
+      - "have you tried getting good"
       - "L + ratio"
       - "gg"
       - "Unfortunate"
@@ -195,13 +247,14 @@ titles:
       - "Disclaimer: Ultima does not condone recreational drug use"
       - "You must train for another 100 years"
       - "also try Minecraft!"
+      - "i'm not mad, just disappointed"
+      - "back to the drawing board..."
     length: 120
   tie:
     title: "&e&lTie"
     subtitle:
       - "¯\_(ツ)_/¯"
-      - "do something"
-      - "looks like time ran out"
+      - "*poke* do something"
       - "epic &f&mfail"
       - "close enough"
       - "time for a rematch"
@@ -211,6 +264,7 @@ titles:
       - "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too"
       - "All that work, just for a tie"
       - "also try Minecraft!"
+      - "The missile knows where it is at all times. It knows this because it knows where it isn't. By subtracting where it is from where it isn't"
     length: 120
   enemy-portal-destroyed:
     title: "&5Enemy Portal Destroyed"
@@ -236,6 +290,39 @@ titles:
     title: "&aPlease,"
     subtitle: "&b↓ &fWatch the video in chat &b↓"
     length: 200
+  stage0:
+    title: "&a&lWelcome!"
+    subtitle: "&fPlease complete this short intro"
+    length: 120
+  stage1:
+    title: "&bPart 1"
+    subtitle: "&fPlacing missiles"
+    length: 60
+  stage2:
+    title: "&bPart 2"
+    subtitle: "&fRiding missiles"
+    length: 60
+  stage3:
+    title: "&bPart 3 (Optional)"
+    subtitle: "&fRiding fast missiles"
+    length: 60
+  stage4:
+    title: "&bPart 4"
+    subtitle: "&fDefending"
+    length: 60
+  stage5:
+    title: "&bPart 5 (Optional)"
+    subtitle: "&fAttacking"
+    length: 60
+  stage6:
+    title: "&bPart 6"
+    subtitle: "&fDecks"
+    length: 60
+  stage7:
+    title: "&bPart 7"
+    subtitle: "&fDeck customization"
+    length: 60
+  
   
 # For customizing placeholderAPI placeholders
 # All placeholders prefixed with umw_  
@@ -245,6 +332,9 @@ placeholders:
     active: "&eIn-game"
     full: "&cFull - spectators only"
     finished: "&9Resetting..."
+    
+bossbar:
+  
 
 # For GUI inventory customization
 inventories:
