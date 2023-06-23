@@ -172,7 +172,7 @@ messages:
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
     - "&fhas a limited amount. Use 2 skillpoints to upgrade the"
-    - "&6sharpness enchantment &ffor &c&lBerserker &ffrom 2 to 3."
+    - "&6Sharpness enchantment &ffor &c&lBerserker &ffrom 2 to 3."
     - "&b========================================"
   tutorial-complete: "&a&l[!] &7You successfully completed the introduction. Have fun!"
     
@@ -333,7 +333,16 @@ placeholders:
     full: "&cFull - spectators only"
     finished: "&9Resetting..."
     
+# Bossbar goals
 bossbar:
+  stage0: "&aWelcome!"
+  stage1: "&bGoal: &fRight-click to place a missile"
+  stage2: "&bGoal: &fJump on and ride a missile"
+  stage3: "&bGoal: &fRide the &8Concorde"
+  stage4: "&bGoal: &fUse &5Obsidian Shield &for &0Torpedo &fto stop the oncoming missile"
+  stage5: "&bGoal: &fDestroy any of the enemy portals"
+  stage6: "&bGoal: &fUse &a/leave &fand change your deck to &c&lBerserker"
+  stage7: "&bGoal: &fUpgrade &6Sharpness &ffor &c&lBerserker &fto level 3"
   
 
 # For GUI inventory customization
