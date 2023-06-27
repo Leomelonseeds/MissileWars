@@ -383,10 +383,6 @@ public class JSONManager {
      * @return
      */
     public int getMaxSkillpoints(UUID uuid) {
-        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
-        int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(uuid);
-        int level = RankUtils.getRankLevel(exp);
-        int sp = itemConfig.getInt("default-skillpoints") + level;
-        return sp;
+        return ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints");
     }
 }

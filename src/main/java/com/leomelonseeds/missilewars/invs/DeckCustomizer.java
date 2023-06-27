@@ -19,7 +19,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
-import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -157,9 +156,6 @@ public class DeckCustomizer implements MWInventory {
                     return;
                 }
                 JSONObject def = jsonManager.getDefaultPreset(deck);
-                int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
-                int level = RankUtils.getRankLevel(exp);
-                def.put("skillpoints", def.getInt("skillpoints") + level);
                 init.getJSONObject(deck).put(preset, def);
                 updateInventory();
             });

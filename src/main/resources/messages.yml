@@ -68,9 +68,8 @@ messages:
   rankup: 
     - "&b========================================"
     - "&6&lRANK UP &7- %previous% &f-> %current%"
-    - "&aCongratulations! &fYou now have &b%sp%"
-    - "&ftotal Skillpoints available to spend"
-    - "&ffor each preset."
+    - "&aCongratulations! &fYou unlocked new cosmetics"
+    - "&aviewable through the main menu or /cosmetics"
     - "&b========================================"
   rankup-others: "&b%umw_focus% &franked up from %previous% &fto %current%&f!"
   canopy-cancel: "&cYour canopy teleportation was cancelled!"

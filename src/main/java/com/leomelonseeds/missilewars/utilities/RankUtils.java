@@ -189,7 +189,6 @@ public class RankUtils {
             for (String s : ConfigUtils.getConfigTextList("messages.rankup", null, null, null)) {
                 s = s.replaceAll("%previous%", getRankName(current));
                 s = s.replaceAll("%current%", getRankName(newexp));
-                s = s.replaceAll("%sp%", ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints") + newlevel + "");
                 
                 player.sendMessage(s);
             }
