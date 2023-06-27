@@ -38,7 +38,7 @@ lightning:
       z: 5
     speed: 3.3
     tnt: 18
-    spcost: 3
+    spcost: 2
 
 supersonic:
   index: 3
@@ -65,16 +65,15 @@ supersonic:
     name: "&b☢ &lHypersonic &b⚡"
     lore:
     - ""
-    - "&7This missile is the older, preferred, and"
-    - "&7spoiled brother of the socially anxious"
-    - "&7Supersonic."
+    - "&7This missile is the older, spoiled brother"
+    - "&7of the socially anxious Supersonic."
     offset:
       x: -1
       y: -5
       z: 5
     speed: 4.4
     tnt: 6
-    spcost: 2
+    spcost: 1
     cooldown: 50
 
 tomahawk:
@@ -107,7 +106,7 @@ tomahawk:
       z: 4
     speed: 2.0
     tnt: 17
-    spcost: 3
+    spcost: 2
 
 cronullifier:
   index: 4
@@ -143,7 +142,7 @@ cronullifier:
       z: 4
     speed: 2.2
     tnt: 25
-    spcost: 4
+    spcost: 3
 
 piranha:
   index: 1
@@ -176,7 +175,7 @@ piranha:
       z: 4
     speed: 2.0
     tnt: 23
-    spcost: 3
+    spcost: 2
 
 
 # Sentinel missiles
@@ -214,7 +213,7 @@ concorde:
       z: 5
     speed: 3.3
     tnt: 15
-    spcost: 3
+    spcost: 2
 
 supporter:
   index: 4
@@ -247,7 +246,7 @@ supporter:
       z: 4
     speed: 1.7
     tnt: 25
-    spcost: 3
+    spcost: 2
     
 guardian:
   index: 0
@@ -280,7 +279,7 @@ guardian:
       z: 4
     speed: 1.7
     tnt: 9
-    spcost: 3
+    spcost: 2
 
 gemini:
   index: 2
@@ -314,7 +313,7 @@ gemini:
       z: 4
     speed: 2.0
     tnt: 12
-    spcost: 3
+    spcost: 2
 
 sword: 
   index: 1
@@ -349,7 +348,7 @@ sword:
       z: 4
     speed: 1.7
     tnt: 15
-    spcost: 3
+    spcost: 2
 
 
 # Berserker missiles
@@ -387,7 +386,7 @@ cuboid:
       z: 4
     speed: 2.2
     tnt: 26
-    spcost: 3
+    spcost: 2
 
 warhead: 
   index: 4
@@ -421,7 +420,7 @@ warhead:
       z: 4
     speed: 2.0
     tnt: 33
-    spcost: 4
+    spcost: 3
 
 juggernaut:
   index: 1
@@ -454,7 +453,7 @@ juggernaut:
       z: 4
     speed: 1.7
     tnt: 32
-    spcost: 3
+    spcost: 2
 
 breaker:
   index: 2
@@ -488,7 +487,7 @@ breaker:
       z: 4
     speed: 2.0
     tnt: 34
-    spcost: 4
+    spcost: 3
 
 shieldbuster:
   index: 0
@@ -522,7 +521,7 @@ shieldbuster:
       z: 4
     speed: 1.7
     tnt: 21
-    spcost: 3
+    spcost: 2
 
 
 # Architect missiles
@@ -559,7 +558,7 @@ shipper:
       z: 4
     speed: 2.0
     tnt: 6
-    spcost: 2
+    spcost: 1
 
 slingshot:
   index: 3
@@ -591,7 +590,7 @@ slingshot:
       z: 4
     speed: 2.2
     tnt: 14
-    spcost: 3
+    spcost: 2
 
 automaton:
   index: 1
@@ -626,7 +625,7 @@ automaton:
       z: 4
     speed: 2.0
     tnt: 17
-    spcost: 3
+    spcost: 2
 
 pisces:
   index: 4
@@ -658,7 +657,7 @@ pisces:
       z: 4
     speed: 1.7
     tnt: 24
-    spcost: 3
+    spcost: 2
 
 lifter:
   index: 2
@@ -694,7 +693,7 @@ lifter:
       z: 4
     speed: 2.0
     tnt: 8
-    spcost: 3
+    spcost: 2
 
 
 # Utility items
@@ -726,7 +725,7 @@ splash:
     duration: 2
     extend: 20
     max: 2
-    spcost: 2
+    spcost: 1
 
 novarocket:
   name: "&1⚠ &lNova Rocket ☣"
@@ -771,7 +770,7 @@ shield:
       y: -4
       z: 0
     size: "9x9"
-    spcost: 2
+    spcost: 1
 
 platform:
   index: 5
@@ -809,7 +808,7 @@ platform:
       y: 0
       z: -4
     size: "9x9"
-    spcost: 2
+    spcost: 1
 
 torpedo:
   index: 5
@@ -837,7 +836,7 @@ torpedo:
       y: -7
       z: -2
     size: "Large"
-    spcost: 3
+    spcost: 2
 
 obsidianshield:
   index: 6
@@ -862,7 +861,7 @@ obsidianshield:
     spcost: 1
   3:
     duration: 20
-    spcost: 2
+    spcost: 1
   
 obsidianshielddeplete:
   file: 'obsidian_shield_deplete.nbt'
@@ -902,10 +901,10 @@ canopy:
     distance: 6
   2: 
     distance: 9
-    spcost: 2
+    spcost: 1
   3: 
     distance: 12
-    spcost: 2
+    spcost: 1
 
 creeper:
   index: 5
@@ -929,7 +928,7 @@ creeper:
     - "&7here got struck by lightning. It has become"
     - "&7a lot more aggressive since and we concl-"
     - ""
-    spcost: 3
+    spcost: 2
 
 fireball:
   index: 6
@@ -949,10 +948,10 @@ fireball:
     power: 1
   2:
     power: 2
-    spcost: 2
+    spcost: 1
   3:
     power: 3
-    spcost: 3
+    spcost: 1
 
 leaves:
   index: 7
@@ -968,11 +967,11 @@ leaves:
     max: 8
   2:
     item: AZALEA_LEAVES
-    spcost: 2
+    spcost: 1
     max: 16
   3:
     item: FLOWERING_AZALEA_LEAVES
-    spcost: 2
+    spcost: 1
     max: 32
   
 lingering_harming:
@@ -1017,10 +1016,10 @@ arrows:
     max: 2
   2:
     max: 3
-    spcost: 2
+    spcost: 1
   3:
     max: 4
-    spcost: 2
+    spcost: 1
     
 # MISC ITEMS / SCHEMATICS
     
@@ -1088,15 +1087,15 @@ Vanguard:
         spcost: 1
       2: 
         level: 3
-        spcost: 2
+        spcost: 1
       3:
         level: 5
-        spcost: 2
+        spcost: 1
     fire_aspect:
       cost: 1200
       1: 
         level: 1
-        spcost: 2
+        spcost: 1
     feather_falling:
       cost: 800
       1: 
@@ -1104,7 +1103,7 @@ Vanguard:
         spcost: 1
       2: 
         level: 2
-        spcost: 2
+        spcost: 1
   passive:
     adrenaline:
       name: "&eAdrenaline"
@@ -1116,10 +1115,10 @@ Vanguard:
         spcost: 1
         amplifier: 0
       2:
-        spcost: 2
+        spcost: 1
         amplifier: 1
       3:
-        spcost: 3
+        spcost: 1
         amplifier: 2
     bunny:
       name: "&eBunny"
@@ -1132,10 +1131,10 @@ Vanguard:
         spcost: 1
         amplifier: 0
       2:
-        spcost: 2
+        spcost: 1
         amplifier: 1
       3:
-        spcost: 3
+        spcost: 1
         amplifier: 2
     lavasplash:
       name: "&eLava Splash"
@@ -1154,7 +1153,7 @@ Vanguard:
         radius: 0
         multiplier: 2
       3:
-        spcost: 2
+        spcost: 1
         radius: 1
         multiplier: 2
 Sentinel:
@@ -1181,7 +1180,7 @@ Sentinel:
         spcost: 1
       3:
         level: 6
-        spcost: 2
+        spcost: 1
     fire_protection:
       cost: 600
       1:
@@ -1197,7 +1196,7 @@ Sentinel:
       - ""
       - "&7Adds Punch I to your bow."
       1:
-        spcost: 4
+        spcost: 3
     longshot:
       name: "&eLongshot"
       lore:
@@ -1213,11 +1212,11 @@ Sentinel:
         plus: 0.10
         max: 4
       2:
-        spcost: 2
+        spcost: 1
         plus: 0.15
         max: 6
       3:
-        spcost: 2
+        spcost: 1
         plus: 0.20
         max: 8
     warden:
@@ -1231,10 +1230,10 @@ Sentinel:
         spcost: 1
         amplifier: 0
       2:
-        spcost: 2
+        spcost: 1
         amplifier: 1
       3:
-        spcost: 2
+        spcost: 1
         amplifier: 2
 Berserker:
   weapon:
@@ -1255,12 +1254,12 @@ Berserker:
         spcost: 1
       3: 
         level: 9
-        spcost: 2
+        spcost: 1
     multishot:
       cost: 800
       1: 
         level: 1
-        spcost: 2
+        spcost: 1
     quick_charge:
       cost: 1200
       1: 
@@ -1268,7 +1267,7 @@ Berserker:
         spcost: 1
       2: 
         level: 2
-        spcost: 2
+        spcost: 1
     blast_protection:
       cost: 1600
       1: 
@@ -1276,7 +1275,7 @@ Berserker:
         spcost: 1
       2: 
         level: 6
-        spcost: 2
+        spcost: 1
   passive:
     slownessarrows:
       name: "&eSlowness Arrows"
@@ -1286,15 +1285,15 @@ Berserker:
       - "&7of slowness with amplifier of %amplifier%"
       - "&7and duration of %duration% &7seconds."
       1:
-        spcost: 2
+        spcost: 1
         amplifier: 1
         duration: 2
       2:
-        spcost: 2
+        spcost: 1
         amplifier: 1
         duration: 3
       3:
-        spcost: 2
+        spcost: 1
         amplifier: 2
         duration: 3
     boosterball:
@@ -1308,13 +1307,13 @@ Berserker:
       - "&7is multiplied by %multiplier%&7."
       cost: 2000
       1:
-        spcost: 2
+        spcost: 1
         multiplier: 1.5
       2:
         spcost: 1
         multiplier: 2
       3:
-        spcost: 2
+        spcost: 1
         multiplier: 2.5
     creepershot:
       name: "&eCreepershot"
@@ -1325,7 +1324,7 @@ Berserker:
       - "&7your crossbow."
       cost: 1200
       1:
-        spcost: 5
+        spcost: 3
 Architect:
   weapon:
     item: IRON_PICKAXE
@@ -1346,7 +1345,7 @@ Architect:
         spcost: 1
       3: 
         level: 3
-        spcost: 2
+        spcost: 1
     efficiency:
       cost: 600
       1: 
@@ -1357,7 +1356,7 @@ Architect:
         spcost: 1
       3: 
         level: 3
-        spcost: 2
+        spcost: 1
     haste:
       cost: 1400
       1: 
@@ -1365,7 +1364,7 @@ Architect:
         spcost: 1
       2: 
         level: 4
-        spcost: 2
+        spcost: 1
     projectile_protection:
       cost: 1200
       1: 
@@ -1373,7 +1372,7 @@ Architect:
         spcost: 1
       2: 
         level: 6
-        spcost: 2
+        spcost: 1
   passive:
     prickly:
       name: "&ePrickly Projectiles"
@@ -1389,10 +1388,10 @@ Architect:
         spcost: 1
         multiplier: 1
       2:
-        spcost: 2
+        spcost: 1
         multiplier: 2
       3:
-        spcost: 2
+        spcost: 1
         multiplier: 3
     naturesblessing:
       name: "&eNature's Blessing"
@@ -1405,10 +1404,10 @@ Architect:
         spcost: 1
       2: 
         multiplier: 3
-        spcost: 2
+        spcost: 1
       3: 
         multiplier: 4
-        spcost: 2
+        spcost: 1
     repairman:
       name: "&eRepairman"
       lore:
@@ -1424,10 +1423,10 @@ Architect:
         spcost: 1
       2: 
         percentage: 75
-        spcost: 2
+        spcost: 1
       3:
         percentage: 85
-        spcost: 2
+        spcost: 1
     deconstructor:
       name: "&eDeconstructor"
       lore:
@@ -1441,13 +1440,13 @@ Architect:
       cost: 2200
       1: 
         percentage: 15
-        spcost: 2
+        spcost: 1
       2: 
         percentage: 20
         spcost: 1
       3:
         percentage: 25
-        spcost: 2
+        spcost: 1
         
 # Held items 
 held:
@@ -1467,7 +1466,7 @@ held:
    
 
 # Stuff relating to Deck GUI
-default-skillpoints: 18
+default-skillpoints: 16
 
 intangibles:
   locked: RED_STAINED_GLASS_PANE
@@ -1685,7 +1684,7 @@ gpassive:
     2:
       max: 2
       percentage: 40
-      spcost: 3
+      spcost: 2
   missilespec:
     name: "&5Missile Specialist"
     lore:
@@ -1705,7 +1704,7 @@ gpassive:
     3: 
       mpercentage: 15
       upercentage: 45
-      spcost: 2
+      spcost: 1
   utilityspec:
     name: "&5Utility Specialist"
     lore:
@@ -1725,4 +1724,4 @@ gpassive:
     3: 
       upercentage: 30
       mpercentage: 15
-      spcost: 2
+      spcost: 1
