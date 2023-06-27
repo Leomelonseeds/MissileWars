@@ -1017,10 +1017,10 @@ arrows:
     max: 2
   2:
     max: 3
-    spcost: 1
+    spcost: 2
   3:
     max: 4
-    spcost: 3
+    spcost: 2
     
 # MISC ITEMS / SCHEMATICS
     
@@ -1669,6 +1669,23 @@ enchants:
   - "&bEnchantment Level: %level%"
   
 gpassive:
+  hoarder:
+    name: "&5Hoarder"
+    lore:
+    - ""
+    - "&7The maximum amount of each item is"
+    - "&7increased by %max%x&7 (rounded down),"
+    - "&7while cooldowns for all items are"
+    - "&7increased by %percentage%%&7."
+    cost: 1600
+    1:
+      max: 1.5
+      percentage: 10
+      spcost: 1
+    2:
+      max: 2
+      percentage: 40
+      spcost: 3
   missilespec:
     name: "&5Missile Specialist"
     lore:
@@ -1709,20 +1726,3 @@ gpassive:
       upercentage: 30
       mpercentage: 15
       spcost: 2
-  hoarder:
-    name: "&5Hoarder"
-    lore:
-    - ""
-    - "&7The maximum amount of each item is"
-    - "&7increased by %max%x&7 (rounded down),"
-    - "&7while cooldowns for all items are"
-    - "&7increased by %percentage%%&7."
-    cost: 1600
-    1:
-      max: 1.5
-      percentage: 10
-      spcost: 1
-    2:
-      max: 2
-      percentage: 40
-      spcost: 3

@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -98,7 +99,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /** The vote manager for this arena */
     protected VoteManager voteManager;
     /** Set of players who have played but have since left */
-    protected Set<UUID> leftPlayers;
+    protected HashMap<UUID, Integer> leftPlayers;
     /** Helper variable to check when all queues are done */
     protected int queueCount;
 
@@ -119,7 +120,7 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         npcs = new ArrayList<>();
         tracker = new Tracker();
-        leftPlayers = new HashSet<>();
+        leftPlayers = new HashMap<>();
         voteManager = new VoteManager(this);
     }
 
@@ -162,7 +163,7 @@ public abstract class Arena implements ConfigurationSerializable {
         blueQueue = new LinkedList<>();
         tasks = new LinkedList<>();
         tracker = new Tracker();
-        leftPlayers = new HashSet<>();
+        leftPlayers = new HashMap<>();
         voteManager = new VoteManager(this);
     }
     
@@ -179,7 +180,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid
      */
     public void addLeft(UUID uuid) {
-        leftPlayers.add(uuid);
+        if (leftPlayers.containsKey(uuid)) {
+            leftPlayers.put(uuid, leftPlayers.get(uuid) + 1);
+        } else {
+            leftPlayers.put(uuid, 1);
+        }
     }
     
     /**
@@ -271,15 +276,6 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public boolean isWaitingForTie() {
         return waitingForTie;
-    }
-
-    /**
-     * Get the number of seconds remaining when chaos time activates.
-     *
-     * @return the number of seconds remaining when chaos time activates
-     */
-    public static int getChaosTime() {
-        return MissileWarsPlugin.getPlugin().getConfig().getInt("chaos-mode.time-left") * 60;
     }
 
     /**
@@ -428,7 +424,23 @@ public abstract class Arena implements ConfigurationSerializable {
     public String getTimeRemaining() {
         // Adjust for correct timings
         int seconds = Math.max((int) getSecondsRemaining() - 1, 0);
-        return String.format("%02d:%02d", (seconds / 60) % 60, seconds % 60);
+        int untilNextStage;
+        String status;
+        if (seconds > 1200) {
+            status = "75% Cooldown: ";
+            untilNextStage = seconds - 1200;
+        } else if (seconds > 600) {
+            status = "50% Cooldown: ";
+            untilNextStage = seconds - 600;
+        } else if (seconds > 300) {
+            status = "No tie wait: ";
+            untilNextStage = seconds - 300;
+        } else {
+            status = "Game end: ";
+            untilNextStage = seconds;
+        }
+        return ChatColor.GRAY + status + ChatColor.GREEN + 
+                String.format("%02d:%02d", (untilNextStage / 60) % 60, untilNextStage % 60);
     }
 
     /**
@@ -977,48 +989,43 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     protected void performTimeSetup() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        BukkitScheduler scheduler = Bukkit.getScheduler();
         
-        // Chaos time start
-        long gameLength = getSecondsRemaining();
-        int chaosStart = getChaosTime();
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                blueTeam.setChaosMode(true);
-                redTeam.setChaosMode(true);
-                blueTeam.sendTitle("chaos-mode");
-                redTeam.sendTitle("chaos-mode");
-                announceMessage("messages.chaos-mode", null);
-            }
-        }.runTaskLater(plugin, (gameLength - chaosStart) * 20));
+        // Stage 1 chaos
+        tasks.add(scheduler.runTaskLater(plugin, () -> {
+            blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
+            redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
+            announceMessage("messages.chaos1", null);
+        }, 600 * 20));
+        
+        // Stage 2 chaos
+        tasks.add(scheduler.runTaskLater(plugin, () -> {
+            blueTeam.setMultiplier(blueTeam.getMultiplier() * 2 / 3);
+            redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
+            announceMessage("messages.chaos2", null);
+        }, 600 * 20));
+        
+        // Stage 3 chaos
+        tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 600 * 20));
 
-        // Game is 1800 seconds long.
-        int[] reminderTimes = {600, 1500, 1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
-
+        // Reminders 1 minute before the game ends
+        int[] reminderTimes = {1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
         for (int i : reminderTimes) {
-            tasks.add(new BukkitRunnable() {
-                @Override
-                public void run() {
-                    announceMessage("messages.game-end-reminder", null);
-                }
-            }.runTaskLater(plugin, i * 20));
+            tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.game-end-reminder", null), i * 20));
         }
         
         // Setup a tie
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                int blue = blueTeam.getRemainingPortals();
-                int red = redTeam.getRemainingPortals();
-                if (blue > red) {
-                    endGame(blueTeam);
-                } else if (red > blue) {
-                    endGame(redTeam);
-                } else {
-                    endGame(null);
-                }
+        tasks.add(scheduler.runTaskLater(plugin, () -> {
+            int blue = blueTeam.getRemainingPortals();
+            int red = redTeam.getRemainingPortals();
+            if (blue > red) {
+                endGame(blueTeam);
+            } else if (red > blue) {
+                endGame(redTeam);
+            } else {
+                endGame(null);
             }
-        }.runTaskLater(plugin, getSecondsRemaining() * 20));
+        }, getSecondsRemaining() * 20));
     }
     
     /**
@@ -1123,7 +1130,7 @@ public abstract class Arena implements ConfigurationSerializable {
             running = true;
         } else {
             applyMultipliers();
-            player.initDeck(leftPlayers.contains(player.getMCPlayerId()));
+            player.initDeck(leftPlayers.get(player.getMCPlayerId()) >= 2);
         }
     }
     

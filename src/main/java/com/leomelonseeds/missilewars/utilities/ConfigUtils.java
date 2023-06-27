@@ -119,7 +119,6 @@ public class ConfigUtils {
         }
 
         // Set umw arena-less placeholders
-        msg = msg.replaceAll("%umw_chaos_time%", "" + Arena.getChaosTime() / 60);
         FileConfiguration messageConfig = getConfigFile("messages.yml");
         msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
         msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));

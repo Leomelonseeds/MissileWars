@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -264,39 +264,33 @@ public class ClassicArena extends Arena {
         }
 
         // Check if either team's last portal has been broken
-        int wait = MissileWarsPlugin.getPlugin().getConfig().getInt("tie-wait-time");
-        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        int wait = plugin.getConfig().getInt("tie-wait-time");
         if (!redTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= getChaosTime()) {
+            if (getSecondsRemaining() <= 300) {
                 endGame(blueTeam);
             } else {
                 blueTeam.sendTitle("enemy-portals-destroyed");
                 redTeam.sendTitle("own-portals-destroyed");
                 waitingForTie = true;
-                tasks.add(new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (blueTeam.hasLivingPortal()) {
-                            endGame(blueTeam);
-                        }
+                tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (blueTeam.hasLivingPortal()) {
+                        endGame(blueTeam);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
+                }, wait * 20L));
             }
         } else if (!blueTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= getChaosTime()) {
+            if (getSecondsRemaining() <= 300) {
                 endGame(redTeam);
             } else {
                 blueTeam.sendTitle("own-portals-destroyed");
                 redTeam.sendTitle("enemy-portals-destroyed");
                 waitingForTie = true;
-                tasks.add(new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (redTeam.hasLivingPortal()) {
-                            endGame(redTeam);
-                        }
+                tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (redTeam.hasLivingPortal()) {
+                        endGame(redTeam);
                     }
-                }.runTaskLater(MissileWarsPlugin.getPlugin(), wait * 20L));
+                }, wait * 20L));
             }
         }
     }

@@ -3,7 +3,6 @@
     "Preset": "A",
 	"missilespec": false,
 	"utilityspec": false,
-	"hoarder": false,
 	"death-messages": "default",
 	"Vanguard": {
 		"feather_falling": false,
@@ -11,19 +10,19 @@
 		"bunny": false,
 		"lavasplash": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 4,
 			"feather_falling": 0,
 			"sharpness": 2,
 			"fire_aspect": 0,
 			"utility": {
-				"splash": 1,
+				"splash": 2,
 				"lingering_harming": 2,
-				"canopy": 2
+				"canopy": 3
 			},
 			"missiles": {
 				"tomahawk": 2,
-				"piranha": 1,
-				"lightning": 1,
+				"piranha": 2,
+				"lightning": 2,
 				"supersonic": 1,
 				"cronullifier": 2
 			},
@@ -39,14 +38,13 @@
 	},
 	"Sentinel": {
 		"fire_protection": false,
-		"sharpness": false,
 		"longshot": false,
 		"warden": false,
 		"defaultpreset": {
-			"skillpoints": 2,
+			"skillpoints": 6,
 			"fire_protection": 0,
 			"flame": 1,
-			"sharpness": 0,
+			"sharpness": 2,
 			"utility": {
 				"torpedo": 2,
 				"obsidianshield": 2,
@@ -57,7 +55,7 @@
 				"sword": 1,
 				"gemini": 2,
 				"concorde": 1,
-				"supporter": 1
+				"supporter": 2
 			},
 			"passive": {
 				"selected": "punch",
@@ -76,7 +74,7 @@
 		"boosterball": false,
 		"creepershot": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 6,
 			"blast_protection": 0,
 			"multishot": 0,
 			"quick_charge": 0,
@@ -84,12 +82,12 @@
 			"utility": {
 				"creeper": 1,
 				"fireball": 2,
-				"arrows": 2
+				"arrows": 3
 			},
 			"missiles": {
 				"shieldbuster": 1,
 				"juggernaut": 1,
-				"breaker": 1,
+				"breaker": 2,
 				"cuboid": 2,
 				"warhead": 2
 			},
@@ -111,26 +109,26 @@
 		"repairman": false,
 		"deconstructor": false,
 		"defaultpreset": {
-			"skillpoints": 4,
+			"skillpoints": 5,
 			"projectile_protection": 0,
-			"sharpness": 2,
+			"sharpness": 3,
 			"efficiency": 0,
 			"haste": 0,
 			"utility": {
 				"platform": 2,
 				"shield": 2,
-				"leaves": 2
+				"leaves": 3
 			},
 			"missiles": {
 				"shipper": 2,
 				"automaton": 1,
 				"lifter": 1,
 				"slingshot": 2,
-				"pisces": 1
+				"pisces": 3
 			},
 			"passive": {
 				"selected": "prickly",
-				"level": 2
+				"level": 3
 			},
 			"gpassive": {
 				"selected": "None",

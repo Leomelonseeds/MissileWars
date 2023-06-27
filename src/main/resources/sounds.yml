@@ -54,10 +54,18 @@ spawn-fireball:
   sound: ENTITY_GHAST_SHOOT
   volume: 1.0
   pitch: 1.0
-chaos-mode:
+chaos1:
   sound: ENTITY_GHAST_SCREAM
   volume: 1.0
   pitch: 0.5
+chaos2:
+  sound: ENTITY_GHAST_SCREAM
+  volume: 1.0
+  pitch: 0.7
+chaos3:
+  sound: ENTITY_GHAST_SCREAM
+  volume: 1.0
+  pitch: 1.0
 game-end-reminder:
   sound: BLOCK_NOTE_BLOCK_HAT
   volume: 1.0
