@@ -1003,10 +1003,10 @@ public abstract class Arena implements ConfigurationSerializable {
             blueTeam.setMultiplier(blueTeam.getMultiplier() * 2 / 3);
             redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
             announceMessage("messages.chaos2", null);
-        }, 600 * 20));
+        }, 1200 * 20));
         
         // Stage 3 chaos
-        tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 600 * 20));
+        tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 1500 * 20));
 
         // Reminders 1 minute before the game ends
         int[] reminderTimes = {1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};

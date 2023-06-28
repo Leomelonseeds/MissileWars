@@ -1259,7 +1259,7 @@ Berserker:
       cost: 800
       1: 
         level: 1
-        spcost: 1
+        spcost: 2
     quick_charge:
       cost: 1200
       1: 
