@@ -785,7 +785,7 @@ public class CustomItemListener implements Listener {
             if (hitEntity.getType() == EntityType.PRIMED_TNT) {
                 Location loc = hitEntity.getLocation();
                 hitEntity.remove();
-                loc.getBlock().setType(Material.TNT);
+                loc.getBlock().setType(Material.TNT, false);
             }
             return;
         }
