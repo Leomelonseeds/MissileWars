@@ -707,9 +707,9 @@ splash:
   lore:
   - ""
   - "&7Make it rain (but not snow) with the Splash!"
-  - "&7This handy utility allows its user to fall"
-  - "&7from great heights, climb walls, put out"
-  - "&7fires, increase canopy duration, and flood"
+  - "&7This handy utility allows its user to defuse"
+  - "&7TNT,fall from great heights, climb walls, put"
+  - "&7out fires, increase canopy duration, and flood"
   - "&7the Nile river every August."
   - ""
   - "&bDuration: %duration%s"

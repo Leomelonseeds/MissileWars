@@ -1130,7 +1130,8 @@ public abstract class Arena implements ConfigurationSerializable {
             running = true;
         } else {
             applyMultipliers();
-            player.initDeck(leftPlayers.get(player.getMCPlayerId()) >= 2);
+            player.initDeck(leftPlayers.containsKey(player.getMCPlayerId()) && 
+                    leftPlayers.get(player.getMCPlayerId()) >= 2);
         }
     }
     

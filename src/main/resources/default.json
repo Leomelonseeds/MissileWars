@@ -17,11 +17,11 @@
 			"utility": {
 				"splash": 2,
 				"lingering_harming": 2,
-				"canopy": 3
+				"canopy": 2
 			},
 			"missiles": {
 				"tomahawk": 2,
-				"piranha": 2,
+				"piranha": 1,
 				"lightning": 2,
 				"supersonic": 1,
 				"cronullifier": 2
@@ -55,7 +55,7 @@
 				"sword": 1,
 				"gemini": 2,
 				"concorde": 1,
-				"supporter": 2
+				"supporter": 1
 			},
 			"passive": {
 				"selected": "punch",
@@ -87,7 +87,7 @@
 			"missiles": {
 				"shieldbuster": 1,
 				"juggernaut": 1,
-				"breaker": 2,
+				"breaker": 1,
 				"cuboid": 2,
 				"warhead": 2
 			},
@@ -124,11 +124,11 @@
 				"automaton": 1,
 				"lifter": 1,
 				"slingshot": 2,
-				"pisces": 3
+				"pisces": 2
 			},
 			"passive": {
 				"selected": "prickly",
-				"level": 3
+				"level": 2
 			},
 			"gpassive": {
 				"selected": "None",
