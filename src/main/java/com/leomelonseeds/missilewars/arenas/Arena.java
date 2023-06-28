@@ -436,7 +436,7 @@ public abstract class Arena implements ConfigurationSerializable {
             status = "No tie wait: ";
             untilNextStage = seconds - 300;
         } else {
-            status = "Game end: ";
+            status = "Game ends in: ";
             untilNextStage = seconds;
         }
         return ChatColor.GRAY + status + ChatColor.GREEN + 

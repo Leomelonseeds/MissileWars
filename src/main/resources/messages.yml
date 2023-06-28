@@ -39,7 +39,7 @@ messages:
   drop-item: "&c&l[!] &7Dropped items will despawn in &c10 seconds&7!"
   out-of-bounds: "&c&l[!] &cYou are out of bounds!"
   poison: "&c&l[!] &cYou start to feel the effects of being too high..."
-  game-end-reminder: "&c&l[!] &7The game will end in &c%umw_time_remaining%&7!"
+  game-end-reminder: "&c&l[!] &7%umw_time_remaining%"
   red-team-empty: "&cRed team &7is empty. &9Blue team &7will automatically win in 60 seconds."
   blue-team-empty: "&9Blue team &7is empty. &cRed team &7will automatically win in 60 seconds."
   # When a player on your team leaves and changes the arena item-frequency
