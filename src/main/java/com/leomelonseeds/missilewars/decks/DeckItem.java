@@ -67,16 +67,6 @@ public class DeckItem {
         }
     }
     
-    /**
-     * If player has deck item in main hand and the item is unavailable (visual cooldown)
-     * display action bar cooldown (async due to possible switch item lag)
-     */
-    public void actionBarCd() {
-        if (matches(player.getInventory().getItemInMainHand())) {
-            
-        }
-    }
-    
     // Item update task, handles giving items
     public void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
@@ -91,9 +81,6 @@ public class DeckItem {
                 getItem().setAmount(++amt);
                 if (unavailable) {
                     setVisualCooldown(0);
-                    String action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
-                    action = action.replaceAll("%item%", ConfigUtils.toPlain(item.getItemMeta().displayName()));
-                    player.sendActionBar(ConfigUtils.toComponent(action));
                 }
                 
                 if (amt < max) {

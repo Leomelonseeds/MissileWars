@@ -19,7 +19,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -49,8 +48,6 @@ public class MissileWarsPlayer {
     private LocalDateTime joinTime;
     /** Player should be invulnerable and not be able to spawn missiles if this is true */
     private boolean justSpawned;
-    /** A bukkit task representing the cooldown for action bar */
-    private BukkitTask cdAction;
 
 
     /**
@@ -163,11 +160,7 @@ public class MissileWarsPlayer {
 
     // EXP bar cooldown preview
     private void cooldownPreview() {
-        if (cdAction != null) {
-            cdAction.cancel();
-        }
-        
-        cdAction = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 if (deck == null) {
@@ -199,6 +192,16 @@ public class MissileWarsPlayer {
                 float exp = (maxcd - cd) / (float) maxcd;
                 player.setLevel(cd);
                 player.setExp(Math.max(Math.min(exp, 1F), 0F)); // Make sure it's actually within 0 and 1
+                
+                // Actionbar stuff  
+                String action;
+                if (player.hasCooldown(item.getType())) {
+                    action = ConfigUtils.getConfigText("messages.item-cooldown", player, null, null);
+                    action = action.replace("%cd%", cd + "");
+                } else {
+                    action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
+                }
+                player.sendActionBar(ConfigUtils.toComponent(action));
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }

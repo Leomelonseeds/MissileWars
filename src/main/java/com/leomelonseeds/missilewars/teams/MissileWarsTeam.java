@@ -356,13 +356,16 @@ public class MissileWarsTeam {
         InventoryUtils.clearInventory(mcPlayer);
         player.stopDeck();
         player.resetPlayer();
-        arena.addLeft(player.getMCPlayerId());
         mcPlayer.setLevel(0);
         mcPlayer.setExp(0F);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
             mcPlayer.removePotionEffect(effect.getType());
         }
-        arena.applyMultipliers(); // Check for cooldowns
+        
+        if (arena.isRunning()) {
+            arena.addLeft(player.getMCPlayerId());
+            arena.applyMultipliers(); // Check for cooldowns
+        }
     }
 
     /**
