@@ -114,6 +114,7 @@ messages:
   joined-training: "&a&l[!] &7No stats are affected in this arena."
   nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
   item-ready: "&a&l[!] %item% &ais now available"
+  item-cooldown: "&c&l[!] %item% &cis on cooldown for %cd%s"
   already-joined: "&c&l[!] &7You have rejoined this game too many times, so all your cooldowns have been maximized."
   tutorial-not-available: "&c&l[!] &cPlease wait for this arena to start..."
   team-balancing: "&a&l[!] &7Your cooldowns are &afaster &7because the teams are unbalanced."

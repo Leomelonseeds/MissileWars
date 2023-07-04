@@ -19,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -48,6 +49,8 @@ public class MissileWarsPlayer {
     private LocalDateTime joinTime;
     /** Player should be invulnerable and not be able to spawn missiles if this is true */
     private boolean justSpawned;
+    /** A bukkit task representing the cooldown for action bar */
+    private BukkitTask cdAction;
 
 
     /**
@@ -160,7 +163,11 @@ public class MissileWarsPlayer {
 
     // EXP bar cooldown preview
     private void cooldownPreview() {
-        new BukkitRunnable() {
+        if (cdAction != null) {
+            cdAction.cancel();
+        }
+        
+        cdAction = new BukkitRunnable() {
             @Override
             public void run() {
                 if (deck == null) {
@@ -169,21 +176,22 @@ public class MissileWarsPlayer {
                 }
                 
                 Player player = getMCPlayer();
-                ItemStack item = player.getInventory().getItemInMainHand();
+                PlayerInventory inv = player.getInventory();
+                ItemStack item = inv.getItemInMainHand();
                 DeckItem di = deck.getDeckItem(item);
-                if (di == null && item.getType().toString().contains("BOW")) {
-                    for (DeckItem temp : deck.getItems()) {
-                        if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
-                            di = temp;
-                            break;
-                        }
-                    }
-                }
-                
                 if (di == null) {
-                    player.setLevel(0);
-                    player.setExp(1F);
-                    return;
+                    if (item.getType().toString().contains("BOW")) {
+                        for (DeckItem temp : deck.getItems()) {
+                            if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
+                                di = temp;
+                                break;
+                            }
+                        }
+                    } else {
+                        player.setLevel(0);
+                        player.setExp(1F);
+                        return; 
+                    }
                 }
                 
                 int cd = di.getCurrentCooldown();

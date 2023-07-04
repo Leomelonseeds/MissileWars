@@ -67,6 +67,14 @@ public class DeckItem {
         }
     }
     
+    /**
+     * If player has deck item in main hand and the item is unavailable (visual cooldown)
+     * display action bar cooldown (async due to possible switch item lag)
+     */
+    public void actionBarCd() {
+        
+    }
+    
     // Item update task, handles giving items
     public void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
