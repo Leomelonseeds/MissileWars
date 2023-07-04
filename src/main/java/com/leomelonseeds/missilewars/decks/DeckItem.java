@@ -72,7 +72,9 @@ public class DeckItem {
      * display action bar cooldown (async due to possible switch item lag)
      */
     public void actionBarCd() {
-        
+        if (matches(player.getInventory().getItemInMainHand())) {
+            
+        }
     }
     
     // Item update task, handles giving items
