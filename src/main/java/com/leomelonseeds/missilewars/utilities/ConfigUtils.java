@@ -36,7 +36,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 
 /** Utility Class for acquiring data from config files, and other useful functions. */
@@ -472,13 +471,13 @@ public class ConfigUtils {
     }
 
     /**
-     * Component to plain text!
+     * Component to plain text, keeping section color codes!
      * 
      * @param component
      * @return
      */
     public static String toPlain(Component component) {
-        return PlainTextComponentSerializer.plainText().serialize(component);
+        return LegacyComponentSerializer.legacySection().serialize(component);
     }
     
     /**
@@ -494,7 +493,7 @@ public class ConfigUtils {
         if (killerEntity.getType() == EntityType.CREEPER) {
             Creeper creeper = (Creeper) killerEntity;
             if (creeper.isCustomNameVisible()) {
-                String name = toPlain(creeper.customName());
+                String name = removeColors(toPlain(creeper.customName()));
                 String[] args = name.split("'");
                 player = Bukkit.getPlayer(args[0]);
             }
