@@ -16,7 +16,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -439,7 +438,7 @@ public abstract class Arena implements ConfigurationSerializable {
             status = "Game ends in: ";
             untilNextStage = seconds;
         }
-        return ChatColor.GRAY + status + ChatColor.GREEN + 
+        return "§7" + status + "§a" + 
                 String.format("%02d:%02d", (untilNextStage / 60) % 60, untilNextStage % 60);
     }
 
@@ -882,8 +881,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 mcPlayer.sendActionBar(Component.text("Type /spectate to stop spectating"));
                 checkEmpty();
             } else {
-                player.getMCPlayer().sendMessage(ConfigUtils.getConfigText("messages.spectate-join-fail",
-                        player.getMCPlayer(), null, null));
+                ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
             }
             break;
         }
@@ -1346,13 +1344,13 @@ public abstract class Arena implements ConfigurationSerializable {
      * Get the team color of a given player.
      *
      * @param id the player's UUID
-     * @return the team color of the given player
+     * @return the team color of the given player, in the form of a readily available chatcolor string
      */
-    public ChatColor getTeamColor(UUID id) {
+    public String getTeamColor(UUID id) {
         if (blueTeam != null && blueTeam.containsPlayer(id)) {
-            return ChatColor.BLUE;
+            return "§9";
         } else if (redTeam != null && redTeam.containsPlayer(id)) {
-            return ChatColor.RED;
+            return "§c";
         } else {
             return null;
         }

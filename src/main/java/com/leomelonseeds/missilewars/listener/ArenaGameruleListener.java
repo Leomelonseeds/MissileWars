@@ -466,7 +466,7 @@ public class ArenaGameruleListener implements Listener {
                     String health = df.format(player.getHealth() - event.getFinalDamage());
                     String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
                     msg = msg.replace("%health%", health);
-                    damager.sendMessage(msg);
+                    damager.sendMessage(ConfigUtils.toComponent(msg));
                 }
             } 
             // Check for prickly projectiles

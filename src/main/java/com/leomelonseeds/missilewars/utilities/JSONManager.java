@@ -219,7 +219,7 @@ public class JSONManager {
                             String msg = ConfigUtils.getConfigText("messages.sp-negative", null, null, null);
                             msg = msg.replace("%deck%", deck);
                             msg = msg.replace("%preset%", preset);
-                            player.sendMessage(msg);
+                            player.sendMessage(ConfigUtils.toComponent(msg));
                             newJson.getJSONObject(deck).put(preset, defaultpreset);
                         } else {
                             currentpreset.put("skillpoints", finalsp);

@@ -320,16 +320,6 @@ titles:
     title: "&bPart 7"
     subtitle: "&fDeck customization"
     length: 60
-  
-  
-# For customizing placeholderAPI placeholders
-# All placeholders prefixed with umw_  
-placeholders:
-  status:
-    waiting: "&aWaiting for players..."
-    active: "&eIn-game"
-    full: "&cFull - spectators only"
-    finished: "&9Resetting..."
     
 # Bossbar goals
 bossbar:

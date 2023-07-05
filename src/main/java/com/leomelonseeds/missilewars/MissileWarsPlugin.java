@@ -149,7 +149,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Testing MySQL connection...");
         if (!sqlManager.testConnection()) {
             log("The plugin cannot function without the database. Shutting down now...");
-            this.getPluginLoader().disablePlugin(this);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
         }
         log("MySQL connection test complete.");
 

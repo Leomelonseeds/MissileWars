@@ -8,7 +8,6 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -719,7 +718,7 @@ public class MissileWarsCommand implements CommandExecutor {
      * @param msg the error message
      */
     protected void sendErrorMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.RED + "Error: " + ChatColor.GRAY + msg);
+        target.sendMessage(ConfigUtils.toComponent("§cError: §7" + msg));
     }
 
     /**
@@ -729,7 +728,7 @@ public class MissileWarsCommand implements CommandExecutor {
      * @param msg the error message
      */
     protected void sendSuccessMsg(CommandSender target, String msg) {
-        target.sendMessage(ChatColor.GREEN + "Success! " + ChatColor.GRAY + msg);
+        target.sendMessage(ConfigUtils.toComponent("§aSuccess! §7" + msg));
     }
 
     /**

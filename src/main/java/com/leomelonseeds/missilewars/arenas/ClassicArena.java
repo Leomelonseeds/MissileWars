@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -146,14 +145,14 @@ public class ClassicArena extends Arena {
             s = s.replaceAll("%umw_most_mvp%", most_mvp);
             s = s.replaceAll("%umw_most_kills%", most_kills);
             s = s.replaceAll("%umw_most_deaths%", most_deaths);
-            actualWinMessages.add(ChatColor.translateAlternateColorCodes('&', s));
+            actualWinMessages.add(s);
         }
 
         // Update stats for each player
         for (MissileWarsPlayer player : players) {
             // Send win message
             for (String s : actualWinMessages) {
-                player.getMCPlayer().sendMessage(s);
+                player.getMCPlayer().sendMessage(ConfigUtils.toComponent(s));
             }
 
             // -1 = TIE, 0 = LOST, 1 = WIN
@@ -203,7 +202,7 @@ public class ClassicArena extends Arena {
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
 
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-            player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
+            player.getMCPlayer().sendMessage(ConfigUtils.toComponent(earnMessagePlayer));
             econ.depositPlayer(player.getMCPlayer(), amountEarned);
         }
     }

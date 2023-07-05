@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -203,7 +202,7 @@ public class TrainingArena extends ClassicArena {
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
             
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-            player.getMCPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', earnMessagePlayer));
+            player.getMCPlayer().sendMessage(ConfigUtils.toComponent(earnMessagePlayer));
             MissileWarsPlugin.getPlugin().getEconomy().depositPlayer(player.getMCPlayer(), amountEarned);
         }
     }

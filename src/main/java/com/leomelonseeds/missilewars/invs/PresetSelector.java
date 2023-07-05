@@ -233,7 +233,7 @@ public class PresetSelector implements MWInventory {
         String msg = ConfigUtils.getConfigText("messages.change-preset", player, null, null);
         msg = msg.replace("%deck%", deck);
         msg = msg.replace("%preset%", preset);
-        player.sendMessage(msg);
+        player.sendMessage(ConfigUtils.toComponent(msg));
         ConfigUtils.sendConfigSound("change-preset", player);
     }
 }

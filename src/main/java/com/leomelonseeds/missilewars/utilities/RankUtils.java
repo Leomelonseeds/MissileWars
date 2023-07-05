@@ -189,8 +189,7 @@ public class RankUtils {
             for (String s : ConfigUtils.getConfigTextList("messages.rankup", null, null, null)) {
                 s = s.replaceAll("%previous%", getRankName(current));
                 s = s.replaceAll("%current%", getRankName(newexp));
-                
-                player.sendMessage(s);
+                player.sendMessage(ConfigUtils.toComponent(s));
             }
             String othermessage = ConfigUtils.getConfigText("messages.rankup-others", null, null, player);
             othermessage = othermessage.replaceAll("%previous%", getRankName(current));
@@ -198,7 +197,7 @@ public class RankUtils {
             
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (!p.getName().equals(player.getName())) {
-                    p.sendMessage(othermessage);
+                    p.sendMessage(ConfigUtils.toComponent(othermessage));
                 }
             }
             plugin.log(othermessage + " (added " + exp + " exp)");

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -799,8 +798,7 @@ public class CustomItemListener implements Listener {
                 // we therefore know that the structure was placed successfully and do not need
                 // to perform validity checks based on the map
                 SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), "default-map", false, false);
-                thrower.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7This canopy will now last &a" +
-                            extraduration + " &7seconds longer."));
+                thrower.sendMessage(ConfigUtils.toComponent("&7This canopy will now last &a" + extraduration + " &7seconds longer."));
             }
             return;
         }

@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -233,7 +232,7 @@ public class DeckManager {
             ItemMeta meta = item.getItemMeta();
             List<Component> loreLines = meta.lore();
             List<Component> newLore = new ArrayList<>();
-            newLore.add(Component.text(ChatColor.GRAY + "Haste " + roman(lvl)));
+            newLore.add(ConfigUtils.toComponent("§7Haste " + roman(lvl)));
             for (Component c : loreLines) {
                 newLore.add(c);
             }

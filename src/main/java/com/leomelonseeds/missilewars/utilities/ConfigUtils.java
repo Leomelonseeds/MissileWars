@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -34,6 +34,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 
@@ -98,32 +99,27 @@ public class ConfigUtils {
             msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
             msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
             msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getTimeRemaining());
-            String status = ChatColor.GOLD + "In Lobby";
+            String status = "§6In Lobby";
             if (arena.isRunning()) {
-                status = ChatColor.GREEN + "In Game";
+                status = "§aIn Game";
             } else if (arena.isResetting()) {
-                status = ChatColor.RED + "Resetting";
+                status = "§cResetting";
             }
             msg = msg.replaceAll("%umw_arena_status%", status);
             if (player != null) {
                 msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
                 if (msg.contains("%umw_team%")) {
-                    String team = arena.getTeam(player.getUniqueId()) + ChatColor.RESET;
+                    String team = arena.getTeam(player.getUniqueId()) + "§r";
                     if (team.equals("red")) {
-                        msg = msg.replaceAll("%umw_team%", ChatColor.RED + team);
+                        msg = msg.replaceAll("%umw_team%", "§c" + team);
                     } else if (team.equals("blue")) {
-                        msg = msg.replaceAll("%umw_team%", ChatColor.BLUE + team);
+                        msg = msg.replaceAll("%umw_team%", "§9" + team);
                     }
                 }
             }
         }
 
         // Set umw arena-less placeholders
-        FileConfiguration messageConfig = getConfigFile("messages.yml");
-        msg = msg.replaceAll("umw_waiting", messageConfig.getString("placeholders.status.waiting"));
-        msg = msg.replaceAll("umw_active", messageConfig.getString("placeholders.status.active"));
-        msg = msg.replaceAll("umw_full", messageConfig.getString("placeholders.status.full"));
-        msg = msg.replaceAll("umw_finished", messageConfig.getString("placeholders.status.finished"));
         if (focus != null) {
             msg = msg.replaceAll("%umw_focus%", getFocusName(focus));
         }
@@ -132,7 +128,7 @@ public class ConfigUtils {
         if (player != null) {
             msg = PlaceholderAPI.setPlaceholders(player, msg);
         }
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return msg;
     }
 
     /**
@@ -182,14 +178,14 @@ public class ConfigUtils {
         // Check for multi line message
         if (!messagesConfig.getStringList(path).isEmpty()) {
             for (String msg : messagesConfig.getStringList(path)) {
-                player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
+                player.sendMessage(toComponent(setPlaceholders(prefix + msg, player, arena, focus)));
             }
         }
 
         // Send single line message
         else {
             String msg = messagesConfig.getString(path);
-            player.sendMessage(setPlaceholders(prefix + msg, player, arena, focus));
+            player.sendMessage(toComponent(setPlaceholders(prefix + msg, player, arena, focus)));
         }
 
         // Check for associated sound
@@ -306,9 +302,9 @@ public class ConfigUtils {
         Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
         String displayName = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
         if (playerArena != null) {
-            ChatColor teamColor = playerArena.getTeamColor(player.getUniqueId());
+            String teamColor = playerArena.getTeamColor(player.getUniqueId());
             if (teamColor != null) {
-                return teamColor + ChatColor.stripColor(displayName);
+                return teamColor + removeColors(displayName);
             }
         }
         return displayName;
@@ -340,11 +336,9 @@ public class ConfigUtils {
     public static String getMapText(String mapType, String mapName, String path) {
         FileConfiguration mapsConfig = ConfigUtils.getConfigFile("maps.yml");
         if (mapsConfig.contains(mapType + "." + mapName + "." + path)) {
-            return ChatColor.translateAlternateColorCodes('&',
-                    mapsConfig.getString(mapType + "." + mapName + "." + path));
+            return convertAmps(mapsConfig.getString(mapType + "." + mapName + "." + path));
         } else {
-            return ChatColor.translateAlternateColorCodes('&',
-                    mapsConfig.getString(mapType + ".default-map." + path));
+            return convertAmps(mapsConfig.getString(mapType + ".default-map." + path));
         }
     }
     
@@ -432,13 +426,34 @@ public class ConfigUtils {
     }
     
     /**
+     * Remove color codes from a string (stolen from md5 chatcolor class)
+     * 
+     * @param s
+     * @return
+     */
+    public static String removeColors(String s) {
+        Pattern strip = Pattern.compile("(?i)§[0-9A-FK-ORX]");
+        return strip.matcher(s).replaceAll("");
+    }
+    
+    /**
+     *  Converted all ampersands in string the chatcolor character
+     * 
+     * @param s
+     * @return
+     */
+    public static String convertAmps(String s) {
+        return s.replaceAll("&", "§");
+    }
+    
+    /**
      * Get a line, translate it to a component.
      * 
      * @param line
      * @return
      */
     public static Component toComponent(String line) {
-        return Component.text(ChatColor.translateAlternateColorCodes('&', line));
+        return LegacyComponentSerializer.legacySection().deserialize(convertAmps(line));
     }
     
     /**
@@ -478,7 +493,7 @@ public class ConfigUtils {
         if (killerEntity.getType() == EntityType.CREEPER) {
             Creeper creeper = (Creeper) killerEntity;
             if (creeper.isCustomNameVisible()) {
-                String name = ChatColor.stripColor(toPlain(creeper.customName()));
+                String name = toPlain(creeper.customName());
                 String[] args = name.split("'");
                 player = Bukkit.getPlayer(args[0]);
             }

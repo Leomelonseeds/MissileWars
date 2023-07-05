@@ -61,7 +61,6 @@ import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.SkinTrait;
 import net.citizensnpcs.trait.VillagerProfession;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -98,13 +97,11 @@ public class ArenaManager {
         // Load worlds for arenas
         if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
-            Bukkit.getConsoleSender().sendMessage(NamedTextColor.GREEN + "Loading arena: " + arena.getName() + "...");
+            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
             arena.loadWorldFromDisk();
             if (arena instanceof TutorialArena) {
-                Bukkit.getConsoleSender().sendMessage(NamedTextColor.GREEN + "Starting tutorial arena in 10 seconds...");
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    arena.start();
-                }, 10 * 20);
+                Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aStarting tutorial arena in 10 seconds..."));
+                Bukkit.getScheduler().runTaskLater(plugin, () -> arena.start(), 10 * 20);
             }
         }
     }

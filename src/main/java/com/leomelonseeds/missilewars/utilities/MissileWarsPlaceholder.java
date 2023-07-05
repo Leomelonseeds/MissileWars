@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.json.JSONObject;
 
@@ -57,25 +56,25 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equalsIgnoreCase("team")) {
-            return playerArena == null ? "no team" : ChatColor.stripColor(playerArena.getTeam(player.getUniqueId()));
+            return playerArena == null ? "no team" : ConfigUtils.removeColors(playerArena.getTeam(player.getUniqueId()));
         }
 
         if (params.equalsIgnoreCase("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");
             String preset = json.getString("Preset");
-            ChatColor chatcolor = ChatColor.DARK_GREEN;
+            String chatcolor = "§2";
             switch (deck) {
                 case "Vanguard":
-                    chatcolor = ChatColor.GOLD;
+                    chatcolor = "§6";
                     break;
                 case "Sentinel":
-                    chatcolor = ChatColor.AQUA;
+                    chatcolor = "§b";
                     break;
                 case "Berserker":
-                    chatcolor = ChatColor.RED;
+                    chatcolor = "§c";
             }
-            return chatcolor + json.getString("Deck") + ChatColor.GRAY + " [" + preset + "]";
+            return chatcolor + json.getString("Deck") + "§7 [" + preset + "]";
         }
 
         // Rank placeholders
@@ -130,7 +129,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                     for (int i = 0; i < size; i++) {
                         result = result + "|";
                     }
-                    return ChatColor.GRAY + result;
+                    return "§7" + result;
                 }
                 return RankUtils.getProgressBar(exp, size);
             }
@@ -160,7 +159,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 int index = Integer.parseInt(args[4]) - 1;
                 String playerName = RankUtils.getLeaderboardPlayer((OfflinePlayer) list.get(index).get(0));
                 String playerStat = Integer.toString((int) list.get(index).get(1));
-                return ChatColor.translateAlternateColorCodes('&', playerName + " &7- &f" + playerStat);
+                return ConfigUtils.convertAmps(playerName + " &7- &f" + playerStat);
             }
 
             // stats_[gamemode/overall]_[stat]_rank
@@ -187,7 +186,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         // Arena specific placeholders
 
         if (params.equalsIgnoreCase("gamemode")) {
-            return ChatColor.GREEN + "Classic";
+            return "§a" + "Classic";
         }
 
         boolean inGame = playerArena.isRunning() || playerArena.isResetting();
@@ -222,38 +221,38 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("red_shield_health")) {
             double health = Math.max(0, redTeam.getShieldHealth());
-            ChatColor chatcolor;
+            String chatcolor;
             if (health >= 90) {
-                chatcolor = ChatColor.DARK_GREEN;
+                chatcolor = "§2";
             } else if (health >= 80) {
-                chatcolor = ChatColor.GREEN;
+                chatcolor = "§a";
             } else if (health >= 70) {
-                chatcolor = ChatColor.YELLOW;
+                chatcolor = "§e";
             } else if (health >= 60) {
-                chatcolor = ChatColor.GOLD;
+                chatcolor = "§6";
             } else if (health >= 50) {
-                chatcolor = ChatColor.RED;
+                chatcolor = "§c";
             } else {
-                chatcolor = ChatColor.DARK_RED;
+                chatcolor = "§4";
             }
             return chatcolor + df.format(health)+ "%";
         }
 
         if (params.equalsIgnoreCase("blue_shield_health")) {
             double health = Math.max(0, blueTeam.getShieldHealth());
-            ChatColor chatcolor;
+            String chatcolor;
             if (health >= 90) {
-                chatcolor = ChatColor.DARK_GREEN;
+                chatcolor = "§2";
             } else if (health >= 80) {
-                chatcolor = ChatColor.GREEN;
+                chatcolor = "§a";
             } else if (health >= 70) {
-                chatcolor = ChatColor.YELLOW;
+                chatcolor = "§e";
             } else if (health >= 60) {
-                chatcolor = ChatColor.GOLD;
+                chatcolor = "§6";
             } else if (health >= 50) {
-                chatcolor = ChatColor.RED;
+                chatcolor = "§c";
             } else {
-                chatcolor = ChatColor.DARK_RED;
+                chatcolor = "§4";
             }
             return chatcolor + df.format(health)+ "%";
         }
