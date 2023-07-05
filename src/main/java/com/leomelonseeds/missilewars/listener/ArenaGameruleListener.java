@@ -29,6 +29,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
@@ -45,6 +46,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -851,5 +853,33 @@ public class ArenaGameruleListener implements Listener {
         Location spawnLoc = tnt.remove(loc).subtract(0, 0.5, 0);
         TNTPrimed primed = (TNTPrimed) b.getWorld().spawnEntity(spawnLoc, EntityType.PRIMED_TNT);
         primed.setFuseTicks(80);
+    }
+    
+    // ------------------------------------------------
+    // The next section handles jump pads
+    // ------------------------------------------------
+    
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.PHYSICAL) {
+            return;
+        }
+        
+        if (event.getClickedBlock().getType() != Material.LIGHT_WEIGHTED_PRESSURE_PLATE) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        if (!player.getWorld().getName().equals("world")) {
+            return;
+        }
+
+        double radians = Math.toRadians(player.getLocation().getYaw());
+        double x = -Math.sin(radians) * 1.5;
+        double y = 1.0;
+        double z = Math.cos(radians) * 1.5;
+        player.setVelocity(new Vector(x, y, z));
+        ConfigUtils.sendConfigSound("lobby-plate", player);
+        event.setCancelled(true);
     }
 }

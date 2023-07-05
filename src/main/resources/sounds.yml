@@ -126,3 +126,7 @@ creepershot:
   sound: ENTITY_CREEPER_DEATH
   volume: 2.0
   pitch: 2.0
+lobby-plate:
+  sound: ENTITY_BAT_TAKEOFF
+  volume: 1.0
+  pitch: 1.0
