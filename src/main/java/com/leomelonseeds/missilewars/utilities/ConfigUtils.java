@@ -34,6 +34,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -453,7 +454,7 @@ public class ConfigUtils {
      * @return
      */
     public static Component toComponent(String line) {
-        return LegacyComponentSerializer.legacySection().deserialize("§r" + convertAmps(line));
+        return LegacyComponentSerializer.legacySection().deserialize(convertAmps(line)).decoration(TextDecoration.ITALIC, false);
     }
     
     /**
