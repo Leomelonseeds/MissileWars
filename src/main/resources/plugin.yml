@@ -1,7 +1,7 @@
 name: MissileWars
 version: 1.0.0
 main: com.leomelonseeds.missilewars.MissileWarsPlugin
-api-version: 1.19
+api-version: 1.20
 authors: [ M310N, Vhbob ]
 description: A MissileWars plugin for UltimaMC
 commands:
