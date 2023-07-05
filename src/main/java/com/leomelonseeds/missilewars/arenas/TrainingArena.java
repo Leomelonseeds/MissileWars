@@ -153,7 +153,7 @@ public class TrainingArena extends ClassicArena {
     
     @Override
     public String getTimeRemaining() {
-        return "∞";
+        return "§7Game ends in: §a∞";
     }
     
     @Override

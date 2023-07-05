@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -51,7 +52,6 @@ import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -439,7 +439,7 @@ public abstract class Arena implements ConfigurationSerializable {
             status = "Game ends in: ";
             untilNextStage = seconds;
         }
-        return NamedTextColor.GRAY + status + NamedTextColor.GREEN + 
+        return ChatColor.GRAY + status + ChatColor.GREEN + 
                 String.format("%02d:%02d", (untilNextStage / 60) % 60, untilNextStage % 60);
     }
 
@@ -1348,11 +1348,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param id the player's UUID
      * @return the team color of the given player
      */
-    public NamedTextColor getTeamColor(UUID id) {
+    public ChatColor getTeamColor(UUID id) {
         if (blueTeam != null && blueTeam.containsPlayer(id)) {
-            return NamedTextColor.BLUE;
+            return ChatColor.BLUE;
         } else if (redTeam != null && redTeam.containsPlayer(id)) {
-            return NamedTextColor.RED;
+            return ChatColor.RED;
         } else {
             return null;
         }
