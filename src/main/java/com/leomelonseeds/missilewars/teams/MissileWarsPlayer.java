@@ -104,12 +104,6 @@ public class MissileWarsPlayer {
                 if (player == null) {
                     return;
                 }
-
-                // If player disabled preview, cancel task
-                if (player.hasPermission("umw.disablepreview")) {
-                    this.cancel();
-                    return;
-                }
                 
                 if (player.getLocation().getBlockY() < -64) {
                     return;
@@ -117,7 +111,7 @@ public class MissileWarsPlayer {
 
                 // Make sure player is aiming for a block
                 Block target = player.getTargetBlockExact(4);
-                if (target.getType() == Material.AIR) {
+                if (target == null || target.getType() == Material.AIR) {
                     return;
                 }
 
