@@ -55,8 +55,6 @@ import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
-import net.kyori.adventure.text.Component;
-
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
     
@@ -328,7 +326,7 @@ public class CustomItemListener implements Listener {
                             player.getEyeLocation().getDirection()), EntityType.DRAGON_FIREBALL);
                     int amplifier = (int) getItemStat(utility, "amplifier");
                     int duration = (int) getItemStat(utility, "duration");
-                    fireball.customName(Component.text("vdf:" + amplifier + ":" + duration));
+                    fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
                     fireball.setCustomNameVisible(false);
                 } else {
                     fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
@@ -598,7 +596,7 @@ public class CustomItemListener implements Listener {
         }
 
         // Add meta for structure identification
-        thrown.customName(Component.text(structureName));
+        thrown.customName(ConfigUtils.toComponent(structureName));
         projectileConsume(hand, thrower, playerArena);
 
         // Schedule structure spawn after 1 second if snowball is still alive
@@ -744,7 +742,7 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
-        thrown.customName(Component.text("splash:" + duration + ":" + extend));
+        thrown.customName(ConfigUtils.toComponent("splash:" + duration + ":" + extend));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
         projectileConsume(hand, thrower, playerArena);
     }

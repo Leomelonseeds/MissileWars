@@ -276,7 +276,7 @@ public class DeckCustomizer implements MWInventory {
     // Return an item with a blank name
     private ItemStack blankName(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text(""));
+        meta.displayName(ConfigUtils.toComponent(""));
         item.setItemMeta(meta);
         return item;
     }

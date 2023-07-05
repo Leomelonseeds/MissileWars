@@ -269,7 +269,7 @@ public class ConfigUtils {
         int length = Integer.parseInt(getConfigText("titles." + path + ".length", null, null, null));
         
         Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(length * 50), Duration.ofMillis(1000));
-        Title finalTitle = Title.title(Component.text(title), Component.text(subtitle), times);
+        Title finalTitle = Title.title(toComponent(title), toComponent(subtitle), times);
 
         player.showTitle(finalTitle);
         sendConfigSound(path, player);
@@ -432,7 +432,7 @@ public class ConfigUtils {
      * @return
      */
     public static String removeColors(String s) {
-        Pattern strip = Pattern.compile("(?i)§[0-9A-FK-ORX]");
+        Pattern strip = Pattern.compile("(?i)(§|&)[0-9A-FK-ORX]");
         return strip.matcher(s).replaceAll("");
     }
     

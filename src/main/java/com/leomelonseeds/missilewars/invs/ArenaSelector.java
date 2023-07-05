@@ -30,7 +30,7 @@ public class ArenaSelector implements MWInventory {
         this.gamemode = gamemode;
         
         String title = ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null);
-        inv = Bukkit.createInventory(null, 27, Component.text(title));
+        inv = Bukkit.createInventory(null, 27, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this);
         
         // Refresh inventory once in a while
@@ -57,9 +57,9 @@ public class ArenaSelector implements MWInventory {
             String display = ConfigUtils.getConfigText("inventories.game-selector.game-item.name", player, arena, null);
             List<Component> lore = new ArrayList<>();
             for (String s : ConfigUtils.getConfigTextList("inventories.game-selector.game-item.lore", player, arena, null)) {
-                lore.add(Component.text(s));
+                lore.add(ConfigUtils.toComponent(s));
             }
-            arenaItemMeta.displayName(Component.text(display));
+            arenaItemMeta.displayName(ConfigUtils.toComponent(display));
             arenaItemMeta.lore(lore);
             arenaItem.setItemMeta(arenaItemMeta);
             inv.addItem(arenaItem);

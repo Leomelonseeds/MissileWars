@@ -31,7 +31,7 @@ public class MapVoting implements MWInventory {
         
         String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
         int size = getPlayerArena(player).getVoteManager().getVotes().size();
-        inv = Bukkit.createInventory(null, (int) Math.ceil((double) size / 9) * 9, Component.text(title));
+        inv = Bukkit.createInventory(null, (int) Math.ceil((double) size / 9) * 9, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this);
         
         // Refresh inventory once in a while
@@ -61,13 +61,13 @@ public class MapVoting implements MWInventory {
             // Set display name to map name
             ItemMeta mapItemMeta = mapItem.getItemMeta();
             String display = ConfigUtils.getMapText(arena.getGamemode(), mapName, "name");
-            mapItemMeta.displayName(Component.text(display));
+            mapItemMeta.displayName(ConfigUtils.toComponent(display));
             
             // Add lore
             List<Component> lore = new ArrayList<>();
             for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {
                 String sn = s.replaceAll("%umw_map_votes%", "" + votes);
-                lore.add(Component.text(sn));
+                lore.add(ConfigUtils.toComponent(sn));
             }
             mapItemMeta.lore(lore);
             

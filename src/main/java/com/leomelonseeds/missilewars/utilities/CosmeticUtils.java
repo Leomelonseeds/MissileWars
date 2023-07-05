@@ -189,8 +189,7 @@ public class CosmeticUtils {
         
         // Add rainbow if rainbow
         if (format.equals("rainbow")) {
-            return Component.text(ChatColor.translateAlternateColorCodes('&', prefix))
-                    .append(toRainbow(ChatColor.translateAlternateColorCodes('&', result)));
+            return ConfigUtils.toComponent(prefix).append(toRainbow(result));
         }
         result = prefix + result;
         return ConfigUtils.toComponent(result);
@@ -229,7 +228,7 @@ public class CosmeticUtils {
     
     // Makes a text rainbow.
     private static TextComponent toRainbow(String input) {
-        String stripped = ChatColor.stripColor(input);
+        String stripped = ConfigUtils.removeColors(input);
         Builder result = Component.text();
         String[] characters = stripped.split("");
         int charsBeforeFlip = 21;

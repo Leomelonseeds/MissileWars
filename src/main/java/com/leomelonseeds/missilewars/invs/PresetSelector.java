@@ -21,8 +21,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
-import net.kyori.adventure.text.Component;
-
 public class PresetSelector implements MWInventory {
     
     private Inventory inv;
@@ -141,7 +139,7 @@ public class PresetSelector implements MWInventory {
             }
             ItemStack item = new ItemStack(color);
             ItemMeta meta = item.getItemMeta();
-            meta.displayName(Component.text(""));
+            meta.displayName(ConfigUtils.toComponent(""));
             item.setItemMeta(meta);
             inv.setItem(i, item);
         }
@@ -152,7 +150,7 @@ public class PresetSelector implements MWInventory {
             if (i != 49) {
                 item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
                 ItemMeta meta = item.getItemMeta();
-                meta.displayName(Component.text(""));
+                meta.displayName(ConfigUtils.toComponent(""));
                 item.setItemMeta(meta);
             } else {
                 item = new ItemStack(Material.RED_STAINED_GLASS_PANE);

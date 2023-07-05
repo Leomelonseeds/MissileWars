@@ -175,7 +175,7 @@ public class ArenaGameruleListener implements Listener {
             player.removePotionEffect(PotionEffectType.SLOW);
         }, 1);
         Component deathMessage = event.deathMessage();
-        event.deathMessage(Component.text(""));
+        event.deathMessage(ConfigUtils.toComponent(""));
         if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }

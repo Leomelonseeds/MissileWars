@@ -50,7 +50,6 @@ import io.github.a5h73y.parkour.Parkour;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
-import net.kyori.adventure.text.Component;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -878,7 +877,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
-                mcPlayer.sendActionBar(Component.text("Type /spectate to stop spectating"));
+                mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
                 checkEmpty();
             } else {
                 ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);

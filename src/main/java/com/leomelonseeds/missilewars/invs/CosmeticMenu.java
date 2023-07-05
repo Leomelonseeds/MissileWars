@@ -15,8 +15,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 
-import net.kyori.adventure.text.Component;
-
 public class CosmeticMenu implements MWInventory {
     
     private Inventory inv;
@@ -28,7 +26,7 @@ public class CosmeticMenu implements MWInventory {
         this.cosmetic = cosmetic;
         
         String title = ConfigUtils.getConfigText("inventories.cosmetics." + cosmetic + ".title", null, null, null);
-        inv = Bukkit.createInventory(null, 36, Component.text(title));
+        inv = Bukkit.createInventory(null, 36, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this); 
     }
 
@@ -45,7 +43,7 @@ public class CosmeticMenu implements MWInventory {
             if (i != 31) {
                 item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
                 ItemMeta meta = item.getItemMeta();
-                meta.displayName(Component.text(""));
+                meta.displayName(ConfigUtils.toComponent(""));
                 item.setItemMeta(meta);
             } else {
                 item = new ItemStack(Material.RED_STAINED_GLASS_PANE);

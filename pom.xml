@@ -156,7 +156,7 @@
         <dependency>
 		    <groupId>com.github.A5H73Y</groupId>
 		    <artifactId>Parkour</artifactId>
-		    <version>7.0.5</version>
+		    <version>Parkour-7.2.0-RELEASE.92</version>
 		    <type>jar</type>
 		    <scope>provided</scope>
 		</dependency>
