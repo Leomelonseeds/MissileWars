@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -219,12 +220,15 @@ public class ClassicArena extends Arena {
         }
 
         // Check if portal broke at blue or red z
-        MissileWarsTeam broketeam = blueTeam;
-        MissileWarsTeam enemy = redTeam;
+        MissileWarsTeam broketeam;
+        MissileWarsTeam enemy;
         int z = location.getBlockZ();
         if (z > 0) {
             broketeam = redTeam;
             enemy = blueTeam;
+        } else {
+            broketeam = blueTeam;
+            enemy = redTeam;
         }
         
         // Check if portal break was registered
@@ -253,45 +257,48 @@ public class ClassicArena extends Arena {
             mwPlayer.getMCPlayer().sendMessage(msg);
         }
         
-        // Waiting for a tie in this case
-        if (!redTeam.hasLivingPortal() && !blueTeam.hasLivingPortal()) {
+        // End game if both do not have living portal (only possible when waiting for tie)
+        if (!(redTeam.hasLivingPortal() || blueTeam.hasLivingPortal())) {
             endGame(null);
             return;
         }
         
+        // Otherwise don't do anything if tie is waiting
         if (waitingForTie) {
+            return;
+        }
+        
+        // And also don't do anything if both teams are alive
+        if (redTeam.hasLivingPortal() && blueTeam.hasLivingPortal()) {
             return;
         }
 
         // Check if either team's last portal has been broken
+        // We know from the above conditions that only one team has a living portal in this case
+        // and furthermore, the team that is ALIVE is enemy since break was registered for broketeam
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         int wait = plugin.getConfig().getInt("tie-wait-time");
-        if (!redTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= 300) {
-                endGame(blueTeam);
-            } else {
-                blueTeam.sendTitle("enemy-portals-destroyed");
-                redTeam.sendTitle("own-portals-destroyed");
-                waitingForTie = true;
-                tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (blueTeam.hasLivingPortal()) {
-                        endGame(blueTeam);
-                    }
-                }, wait * 20L));
+        if (getSecondsRemaining() <= 300) {
+            endGame(enemy);
+        } else {
+            enemy.sendTitle("enemy-portals-destroyed");
+            broketeam.sendTitle("own-portals-destroyed");
+            waitingForTie = true;
+            
+            // Set all to spectator to prevent further action
+            for (MissileWarsPlayer mwp : broketeam.getMembers()) {
+                mwp.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             }
-        } else if (!blueTeam.hasLivingPortal()) {
-            if (getSecondsRemaining() <= 300) {
-                endGame(redTeam);
-            } else {
-                blueTeam.sendTitle("own-portals-destroyed");
-                redTeam.sendTitle("enemy-portals-destroyed");
-                waitingForTie = true;
-                tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (redTeam.hasLivingPortal()) {
-                        endGame(redTeam);
-                    }
-                }, wait * 20L));
+            for (MissileWarsPlayer mwp : enemy.getMembers()) {
+                mwp.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             }
+            
+            // Setup tie for tie wait time
+            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (enemy.hasLivingPortal()) {
+                    endGame(enemy);
+                }
+            }, wait * 20L));
         }
     }
 }

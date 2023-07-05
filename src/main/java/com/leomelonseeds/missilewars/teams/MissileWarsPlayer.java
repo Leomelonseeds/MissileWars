@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -169,6 +170,10 @@ public class MissileWarsPlayer {
                 }
                 
                 Player player = getMCPlayer();
+                if (player.getGameMode() == GameMode.SPECTATOR) {
+                    return;
+                }
+                
                 PlayerInventory inv = player.getInventory();
                 ItemStack item = inv.getItemInMainHand();
                 DeckItem di = deck.getDeckItem(item);

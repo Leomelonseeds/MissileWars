@@ -222,12 +222,6 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Check if game is waiting for tie
-        if (playerArena.isWaitingForTie()) {
-            event.setCancelled(true);
-            return;
-        }
-        
         // Disable if player just died
         MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
         if (mwp.justSpawned() && !hand.getType().toString().contains("BOW")) {
