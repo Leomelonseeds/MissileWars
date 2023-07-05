@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -62,6 +61,7 @@ import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.trait.SheepTrait;
 import net.citizensnpcs.trait.SkinTrait;
 import net.citizensnpcs.trait.VillagerProfession;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -98,10 +98,10 @@ public class ArenaManager {
         // Load worlds for arenas
         if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Loading arena: " + arena.getName() + "...");
+            Bukkit.getConsoleSender().sendMessage(NamedTextColor.GREEN + "Loading arena: " + arena.getName() + "...");
             arena.loadWorldFromDisk();
             if (arena instanceof TutorialArena) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Starting tutorial arena in 10 seconds...");
+                Bukkit.getConsoleSender().sendMessage(NamedTextColor.GREEN + "Starting tutorial arena in 10 seconds...");
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     arena.start();
                 }, 10 * 20);
@@ -378,8 +378,7 @@ public class ArenaManager {
             Vector redVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.red", null, null);
             Location redLoc = new Location(arenaWorld, redVec.getX(), redVec.getY(), redVec.getZ());
             redLoc.setYaw(90);
-            NPC redNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
-                    ChatColor.RED + "" + ChatColor.BOLD + "Red Team");
+            NPC redNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, "§cRed Team");
             CommandTrait enqueueRed = new CommandTrait();
             enqueueRed.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueuered",
                     CommandTrait.Hand.BOTH).player(true));
@@ -397,8 +396,7 @@ public class ArenaManager {
             Vector blueVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.blue", null, null);
             Location blueLoc = new Location(arenaWorld, blueVec.getX(), blueVec.getY(), blueVec.getZ());
             blueLoc.setYaw(90);
-            NPC blueNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP,
-                    ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team");
+            NPC blueNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, "§9§lBlue Team");
             CommandTrait enqueueBlue = new CommandTrait();
             enqueueBlue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueueblue",
                     CommandTrait.Hand.BOTH).player(true));
@@ -416,8 +414,7 @@ public class ArenaManager {
             Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar", null, null);
             Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ());
             barLoc.setYaw(-90);
-            NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER,
-                    ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Bartender");
+            NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "§2§lBartender");
             // Add command
             CommandTrait openBar = new CommandTrait();
             openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
@@ -440,8 +437,7 @@ public class ArenaManager {
             Vector vVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.vanguard", null, null);
             Location vLoc = new Location(arenaWorld, vVec.getX(), vVec.getY(), vVec.getZ());
             vLoc.setYaw(-90);
-            NPC vanguard = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
-                    ChatColor.GOLD + "" + ChatColor.BOLD + "Vanguard");
+            NPC vanguard = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§6§lVanguard");
             SkinTrait vSkin = vanguard.getOrAddTrait(SkinTrait.class);
             vSkin.setSkinPersistent("vanguard", schematicConfig.getString("lobby.npc-pos.vanguard.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.vanguard.value"));
@@ -463,8 +459,7 @@ public class ArenaManager {
             Vector sVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.sentinel", null, null);
             Location sLoc = new Location(arenaWorld, sVec.getX(), sVec.getY(), sVec.getZ());
             sLoc.setYaw(-90);
-            NPC sentinel = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
-                    ChatColor.AQUA + "" + ChatColor.BOLD + "Sentinel");
+            NPC sentinel = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§b§lSentinel");
             SkinTrait sSkin = sentinel.getOrAddTrait(SkinTrait.class);
             sSkin.setSkinPersistent("sentinel", schematicConfig.getString("lobby.npc-pos.sentinel.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.sentinel.value"));
@@ -486,8 +481,7 @@ public class ArenaManager {
             Vector bVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
             Location bLoc = new Location(arenaWorld, bVec.getX(), bVec.getY(), bVec.getZ());
             bLoc.setYaw(-90);
-            NPC berserker = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
-                    ChatColor.RED + "" + ChatColor.BOLD + "Berserker");
+            NPC berserker = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§c§lBerserker");
             SkinTrait bSkin = berserker.getOrAddTrait(SkinTrait.class);
             bSkin.setSkinPersistent("berserker", schematicConfig.getString("lobby.npc-pos.berserker.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.berserker.value"));
@@ -509,8 +503,7 @@ public class ArenaManager {
             Vector aVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.architect", null, null);
             Location aLoc = new Location(arenaWorld, aVec.getX(), aVec.getY(), aVec.getZ());
             aLoc.setYaw(-90);
-            NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER,
-                    ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Architect");
+            NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§2§lArchitect");
             SkinTrait aSkin = architect.getOrAddTrait(SkinTrait.class);
             aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.architect.value"));

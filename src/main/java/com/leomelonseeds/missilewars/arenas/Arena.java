@@ -16,7 +16,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -46,12 +45,13 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.a5h73y.parkour.Parkour;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -439,7 +439,7 @@ public abstract class Arena implements ConfigurationSerializable {
             status = "Game ends in: ";
             untilNextStage = seconds;
         }
-        return ChatColor.GRAY + status + ChatColor.GREEN + 
+        return NamedTextColor.GRAY + status + NamedTextColor.GREEN + 
                 String.format("%02d:%02d", (untilNextStage / 60) % 60, untilNextStage % 60);
     }
 
@@ -1348,11 +1348,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param id the player's UUID
      * @return the team color of the given player
      */
-    public ChatColor getTeamColor(UUID id) {
+    public NamedTextColor getTeamColor(UUID id) {
         if (blueTeam != null && blueTeam.containsPlayer(id)) {
-            return ChatColor.BLUE;
+            return NamedTextColor.BLUE;
         } else if (redTeam != null && redTeam.containsPlayer(id)) {
-            return ChatColor.RED;
+            return NamedTextColor.RED;
         } else {
             return null;
         }

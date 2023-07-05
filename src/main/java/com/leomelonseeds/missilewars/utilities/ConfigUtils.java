@@ -34,6 +34,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 
@@ -306,7 +307,7 @@ public class ConfigUtils {
         Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
         String displayName = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
         if (playerArena != null) {
-            ChatColor teamColor = playerArena.getTeamColor(player.getUniqueId());
+            NamedTextColor teamColor = playerArena.getTeamColor(player.getUniqueId());
             if (teamColor != null) {
                 return teamColor + ChatColor.stripColor(displayName);
             }

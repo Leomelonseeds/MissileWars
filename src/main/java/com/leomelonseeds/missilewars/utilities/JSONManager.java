@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -22,8 +23,6 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckManager;
-
-import github.scarsz.discordsrv.dependencies.commons.io.IOUtils;
 
 public class JSONManager {
 
