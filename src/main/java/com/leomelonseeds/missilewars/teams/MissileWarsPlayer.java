@@ -100,8 +100,12 @@ public class MissileWarsPlayer {
                     return;
                 }
 
-                // If player disabled preview, cancel task
                 Player player = getMCPlayer();
+                if (player == null) {
+                    return;
+                }
+
+                // If player disabled preview, cancel task
                 if (player.hasPermission("umw.disablepreview")) {
                     this.cancel();
                     return;
@@ -112,7 +116,7 @@ public class MissileWarsPlayer {
                 }
 
                 // Make sure player is aiming for a block
-                Block target = player.getTargetBlock(null, 4);
+                Block target = player.getTargetBlockExact(4);
                 if (target.getType() == Material.AIR) {
                     return;
                 }
@@ -164,7 +168,13 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
+                // Player left the server
                 Player player = getMCPlayer();
+                if (player == null) {
+                    this.cancel();
+                    return;
+                }
+                
                 if (deck == null) {
                     player.sendActionBar(ConfigUtils.toComponent(""));
                     this.cancel();
