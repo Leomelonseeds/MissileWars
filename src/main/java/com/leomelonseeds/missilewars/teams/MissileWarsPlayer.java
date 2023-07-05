@@ -49,6 +49,10 @@ public class MissileWarsPlayer {
     private LocalDateTime joinTime;
     /** Player should be invulnerable and not be able to spawn missiles if this is true */
     private boolean justSpawned;
+    /** Stores the last item previewed so it knows when to stop showing ready sign */
+    private ItemStack lastItem;
+    /** If the last item stored was available or not */
+    private boolean lastAvailable;
 
 
     /**
@@ -58,7 +62,9 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
+        lastItem = null;
         justSpawned = false;
+        lastAvailable = false;
     }
     
     /**
@@ -194,6 +200,8 @@ public class MissileWarsPlayer {
                         player.setLevel(0);
                         player.setExp(1F);
                         player.sendActionBar(ConfigUtils.toComponent(""));
+                        lastItem = null;
+                        lastAvailable = false;
                         return; 
                     }
                 }
@@ -204,13 +212,21 @@ public class MissileWarsPlayer {
                 player.setLevel(cd);
                 player.setExp(Math.max(Math.min(exp, 1F), 0F)); // Make sure it's actually within 0 and 1
                 
-                // Actionbar stuff  
+                // Don't show actionbar if last item was already available
+                if (di.matches(lastItem) && lastAvailable) {
+                    return;
+                }
+
+                // Actionbar stuff
+                lastItem = di.getInstanceItem();
                 String action;
                 if (player.hasCooldown(item.getType())) {
                     action = ConfigUtils.getConfigText("messages.item-cooldown", player, null, null);
                     action = action.replace("%cd%", cd + "");
+                    lastAvailable = false;
                 } else {
                     action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
+                    lastAvailable = true;
                 }
                 player.sendActionBar(ConfigUtils.toComponent(action));
             }
