@@ -255,8 +255,8 @@ public class CustomItemListener implements Listener {
             // Check if a block was clicked, including a moving block
             if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 for (int i = 1; i <= 4; i++) {
-                    Block temp = player.getTargetBlock(i);
-                    if (temp.getType() == Material.MOVING_PISTON) {
+                    Block temp = player.getTargetBlockExact(i);
+                    if (temp != null && temp.getType() == Material.MOVING_PISTON) {
                         clicked = temp;
                         break;
                     }
