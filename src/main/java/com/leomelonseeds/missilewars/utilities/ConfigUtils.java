@@ -453,7 +453,7 @@ public class ConfigUtils {
      * @return
      */
     public static Component toComponent(String line) {
-        return LegacyComponentSerializer.legacySection().deserialize(convertAmps(line));
+        return LegacyComponentSerializer.legacySection().deserialize("§r" + convertAmps(line));
     }
     
     /**

@@ -164,12 +164,13 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
+                Player player = getMCPlayer();
                 if (deck == null) {
+                    player.sendActionBar(ConfigUtils.toComponent(""));
                     this.cancel();
                     return;
                 }
                 
-                Player player = getMCPlayer();
                 if (player.getGameMode() == GameMode.SPECTATOR) {
                     return;
                 }
@@ -188,6 +189,7 @@ public class MissileWarsPlayer {
                     } else {
                         player.setLevel(0);
                         player.setExp(1F);
+                        player.sendActionBar(ConfigUtils.toComponent(""));
                         return; 
                     }
                 }
