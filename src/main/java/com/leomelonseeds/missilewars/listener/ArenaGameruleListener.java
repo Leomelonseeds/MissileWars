@@ -856,7 +856,7 @@ public class ArenaGameruleListener implements Listener {
     }
     
     // ------------------------------------------------
-    // The next section handles jump pads
+    // The next section handles jump pads (code stolen from HubBasics)
     // ------------------------------------------------
     
     @EventHandler

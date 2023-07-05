@@ -17,10 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.TNTPrimeEvent;
+import org.bukkit.event.block.TNTPrimeEvent.PrimeCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-import com.destroystokyo.paper.event.block.TNTPrimeEvent;
-import com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -149,8 +149,8 @@ public class Tracker {
      */
     public void assignPrimeSource(TNTPrimeEvent event) {
         // Check if explosion or redstone related event
-        PrimeReason reason = event.getReason();
-        if (!(reason == PrimeReason.REDSTONE || reason == PrimeReason.EXPLOSION)) {
+        PrimeCause reason = event.getCause();
+        if (!(reason == PrimeCause.REDSTONE || reason == PrimeCause.EXPLOSION)) {
             return;
         }
         Location l = event.getBlock().getLocation();
@@ -177,7 +177,7 @@ public class Tracker {
             }
             
             // Otherwise if it gets ignited by another tnt ignore
-            if (reason == PrimeReason.EXPLOSION) {
+            if (reason == PrimeCause.EXPLOSION) {
                 continue;
             }
             
