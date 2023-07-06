@@ -116,7 +116,7 @@ public class MissileWarsPlayer {
                 }
 
                 // Make sure player is aiming for a block
-                Block target = player.getTargetBlockExact(4);
+                Block target = player.getTargetBlock(null, 4);
                 if (target == null || target.getType() == Material.AIR) {
                     return;
                 }

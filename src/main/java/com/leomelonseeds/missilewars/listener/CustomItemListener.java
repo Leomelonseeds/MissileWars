@@ -233,6 +233,8 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
+            event.setCancelled(true);
+            
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
                 event.setCancelled(true);
@@ -252,7 +254,7 @@ public class CustomItemListener implements Listener {
             // Check if a block was clicked, including a moving block
             if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 for (int i = 1; i <= 4; i++) {
-                    Block temp = player.getTargetBlockExact(i);
+                    Block temp = player.getTargetBlock(null, i);
                     if (temp != null && temp.getType() == Material.MOVING_PISTON) {
                         clicked = temp;
                         break;
@@ -262,8 +264,6 @@ public class CustomItemListener implements Listener {
             if (clicked == null) {
                 return;
             }
-            
-            event.setCancelled(true);
 
             // Place structure
             String mapName = "default-map";
