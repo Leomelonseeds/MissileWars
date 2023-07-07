@@ -707,7 +707,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         String oppositeTeam = team.equals("red") ? "blue" : "red";
-        if (ConfigUtils.inShield(arena, loc, oppositeTeam, 1)) {
+        if (ConfigUtils.inShield(arena, loc, oppositeTeam, 3)) {
             player.setGlowing(true);
         } else {
             player.setGlowing(false);
