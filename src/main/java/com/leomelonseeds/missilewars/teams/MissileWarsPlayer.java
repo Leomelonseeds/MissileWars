@@ -211,24 +211,21 @@ public class MissileWarsPlayer {
                 float exp = (maxcd - cd) / (float) maxcd;
                 player.setLevel(cd);
                 player.setExp(Math.max(Math.min(exp, 1F), 0F)); // Make sure it's actually within 0 and 1
-                
-                // Don't show actionbar if last item was already available
-                if (di.matches(lastItem) && lastAvailable) {
-                    return;
-                }
 
                 // Actionbar stuff
-                lastItem = di.getInstanceItem();
                 String action;
                 if (player.hasCooldown(item.getType())) {
                     action = ConfigUtils.getConfigText("messages.item-cooldown", player, null, null);
                     action = action.replace("%cd%", cd + "");
                     lastAvailable = false;
+                } else if (di.matches(lastItem) && lastAvailable) {
+                    return;
                 } else {
                     action = ConfigUtils.getConfigText("messages.item-ready", player, null, null);
                     lastAvailable = true;
                 }
                 player.sendActionBar(ConfigUtils.toComponent(action));
+                lastItem = di.getInstanceItem();
             }
         }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
     }
