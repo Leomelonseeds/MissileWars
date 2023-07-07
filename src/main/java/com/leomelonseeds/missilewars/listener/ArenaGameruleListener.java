@@ -171,9 +171,9 @@ public class ArenaGameruleListener implements Listener {
             player.teleport(spawn);
             player.setFireTicks(0);
             player.setSaturation(5F);
+            player.setGlowing(false);
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.SLOW);
-            player.removePotionEffect(PotionEffectType.GLOWING);
         }, 1);
         Component deathMessage = event.deathMessage();
         event.deathMessage(ConfigUtils.toComponent(""));
@@ -707,10 +707,10 @@ public class ArenaGameruleListener implements Listener {
         }
         
         String oppositeTeam = team.equals("red") ? "blue" : "red";
-        if (ConfigUtils.inShield(arena, loc, oppositeTeam, 2)) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 60 * 30, 0, true));
+        if (ConfigUtils.inShield(arena, loc, oppositeTeam, 1)) {
+            player.setGlowing(true);
         } else {
-            player.removePotionEffect(PotionEffectType.GLOWING);
+            player.setGlowing(false);
         }
     }
     

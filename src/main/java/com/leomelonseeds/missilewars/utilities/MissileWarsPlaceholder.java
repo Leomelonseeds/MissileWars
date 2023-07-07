@@ -55,8 +55,14 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return ConfigUtils.getFocusName(player);
         }
 
-        if (params.equalsIgnoreCase("team")) {
-            return playerArena == null ? "no team" : ConfigUtils.removeColors(playerArena.getTeam(player.getUniqueId()));
+        if (params.contains("team")) {
+            String team = playerArena == null ? "no team" : playerArena.getTeam(player.getUniqueId());
+            if (params.equalsIgnoreCase("team")) {
+                return team;
+            }
+            if (params.equalsIgnoreCase("team_color")) {
+                return playerArena == null ? "&f" : team.equals("red") ? "&c" : "&9";
+            }
         }
 
         if (params.equalsIgnoreCase("deck")) {

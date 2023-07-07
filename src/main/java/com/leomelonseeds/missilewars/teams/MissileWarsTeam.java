@@ -358,6 +358,7 @@ public class MissileWarsTeam {
         player.resetPlayer();
         mcPlayer.setLevel(0);
         mcPlayer.setExp(0F);
+        mcPlayer.setGlowing(false);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
             mcPlayer.removePotionEffect(effect.getType());
         }
