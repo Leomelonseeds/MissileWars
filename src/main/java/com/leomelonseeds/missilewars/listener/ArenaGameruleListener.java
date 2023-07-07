@@ -173,6 +173,7 @@ public class ArenaGameruleListener implements Listener {
             player.setSaturation(5F);
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.SLOW);
+            player.removePotionEffect(PotionEffectType.GLOWING);
         }, 1);
         Component deathMessage = event.deathMessage();
         event.deathMessage(ConfigUtils.toComponent(""));
@@ -654,7 +655,7 @@ public class ArenaGameruleListener implements Listener {
     }
     
     /** Experimental setting to give players poison if they go too high.
-     *  Also handle priest passive
+     *  Also handles glow effect in opponent base
      */
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
@@ -671,7 +672,8 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
+        String team = arena.getTeam(player.getUniqueId());
+        if (team.equals("no team")) {
             return;
         }
         
@@ -685,11 +687,12 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Experimental poison 
+        Location loc = player.getLocation();
         if (plugin.getConfig().getBoolean("experimental.poison")) {
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
             if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (player.getLocation().getBlockY() >= toohigh) {
+                    if (loc.getBlockY() >= toohigh) {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
                     }
@@ -701,6 +704,13 @@ public class ArenaGameruleListener implements Listener {
                 player.removePotionEffect(PotionEffectType.POISON);
                 return;
             }
+        }
+        
+        String oppositeTeam = team.equals("red") ? "blue" : "red";
+        if (ConfigUtils.inShield(arena, loc, oppositeTeam, 2)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 60 * 30, 0, true));
+        } else {
+            player.removePotionEffect(PotionEffectType.GLOWING);
         }
     }
     
