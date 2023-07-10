@@ -46,7 +46,6 @@ public class JoinLeaveListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
     	Player player = event.getPlayer();
     	player.teleport(ConfigUtils.getSpawnLocation());
-    	player.setGlowing(false);
     	if (player.isInvulnerable()) {
     	    player.setInvulnerable(false);
     	}

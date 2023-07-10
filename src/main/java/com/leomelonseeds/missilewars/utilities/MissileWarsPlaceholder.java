@@ -61,7 +61,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return team;
             }
             if (params.equalsIgnoreCase("team_color")) {
-                return playerArena == null ? "&f" : team.equals("red") ? "&c" : "&9";
+                return team.equals("no team") ? "&f" : team.equals("red") ? "&c" : "&9";
             }
         }
 
