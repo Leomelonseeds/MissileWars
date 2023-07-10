@@ -1147,12 +1147,8 @@ Vanguard:
       1:
         spcost: 1
         radius: 0
-        multiplier: 1
+        multiplier: 1.5
       2:
-        spcost: 1
-        radius: 0
-        multiplier: 2
-      3:
         spcost: 1
         radius: 1
         multiplier: 2

@@ -242,7 +242,12 @@ public class ClassicArena extends Arena {
         }
         
         // Check if has associated player
-        Player player = ConfigUtils.getAssociatedPlayer(entity, this);
+        Player player;
+        if (entity instanceof Player) {
+            player = (Player) entity;
+        } else {
+            player = ConfigUtils.getAssociatedPlayer(entity, this);
+        }
         
         // Send messages if player found
         if (player != null && !getTeam(player.getUniqueId()).equals("no team")) {

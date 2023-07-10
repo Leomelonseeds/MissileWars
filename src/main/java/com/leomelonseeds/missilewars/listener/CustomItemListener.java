@@ -49,6 +49,7 @@ import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -773,48 +774,53 @@ public class CustomItemListener implements Listener {
         
         // Defuse primed TNT
         if (hitEntity != null) {
-            if (hitEntity.getType() == EntityType.PRIMED_TNT) {
-                Location loc = hitEntity.getLocation();
+            if (hitEntity.getType() != EntityType.PRIMED_TNT) {
+                return;
+            }
+            Location loc = hitEntity.getLocation();
+            if (loc.getBlock().getType() != Material.NETHER_PORTAL) {
                 hitEntity.remove();
                 loc.getBlock().setType(Material.TNT, false);
+                return; 
             }
-            return;
         }
 
         // Handle hitting oak_wood to fully repair canopies
         if (hitBlock.getType() == Material.OAK_WOOD) {
-            if (event.getEntity().getShooter() instanceof Player) {
-                int extraduration = Integer.parseInt(args[2]);
-                Location key = hitBlock.getLocation();
-                if (canopy_extensions.containsKey(key)) {
-                    canopy_extensions.put(key, canopy_extensions.get(key) + extraduration);
-                } else {
-                    canopy_extensions.put(key, extraduration);
-                }
-                Location newSpawn = hitBlock.getLocation().add(0, 1, 0);
-                // map name doesn't matter here because the canopy has already been spawned,
-                // we therefore know that the structure was placed successfully and do not need
-                // to perform validity checks based on the map
-                SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), "default-map", false, false);
-                thrower.sendMessage(ConfigUtils.toComponent("&7This canopy will now last &a" + extraduration + " &7seconds longer."));
+            int extraduration = Integer.parseInt(args[2]);
+            Location key = hitBlock.getLocation();
+            if (canopy_extensions.containsKey(key)) {
+                canopy_extensions.put(key, canopy_extensions.get(key) + extraduration);
+            } else {
+                canopy_extensions.put(key, extraduration);
             }
+            Location newSpawn = hitBlock.getLocation().add(0, 1, 0);
+            // map name doesn't matter here because the canopy has already been spawned,
+            // we therefore know that the structure was placed successfully and do not need
+            // to perform validity checks based on the map
+            SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), "default-map", false, false);
+            thrower.sendMessage(ConfigUtils.toComponent("&7This canopy will now last &a" + extraduration + " &7seconds longer."));
             return;
         }
         
-        // Check for splashes going through moving pistons
+        // Check for portal breaks / moving pistons
         Location location = hitBlock.getRelative(event.getHitBlockFace()).getLocation();
-        Block spawnBlock = location.getBlock();
+        Block spawnBlock = location.getBlock();// Check for splashes going through moving pistons
         if (spawnBlock.getType() != Material.AIR) {
-            if (spawnBlock.getType() != Material.MOVING_PISTON) {
+            if (spawnBlock.getType() == Material.NETHER_PORTAL) {
+                Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(thrower.getWorld());
+                if (arena instanceof ClassicArena) {
+                    ((ClassicArena) arena).registerPortalBreak(location, thrower);
+                }
+            } else if (spawnBlock.getType() != Material.MOVING_PISTON) {
                 return;
+            } else {
+                Block upper = hitBlock.getRelative(BlockFace.UP);
+                if (upper.getType() != Material.AIR) {
+                    return;
+                }
+                location = upper.getLocation();
             }
-            
-            Block upper = hitBlock.getRelative(BlockFace.UP);
-            if (upper.getType() != Material.AIR) {
-                return;
-            }
-            
-            location = upper.getLocation();
         }
 
         // Normal splash manager
@@ -845,8 +851,9 @@ public class CustomItemListener implements Listener {
         }
         
         // Spawn and then remove lavasplash after a while
-        for (Location l : locations) {
-            if (l.getBlock().getType() != Material.AIR) {
+        for (int i = 0; i < locations.size(); i++) {
+            Location l = locations.get(i);
+            if (i > 0 && l.getBlock().getType() != Material.AIR) {
                 continue;
             }
             l.getBlock().setType(Material.LAVA);
