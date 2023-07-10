@@ -108,6 +108,7 @@ public class DeckManager {
                 int level = json.getJSONObject(s).getInt(key);
                 boolean isMissile = s.equals("missiles");
                 ItemStack i = createItem(key, level, isMissile);
+                
                 // Change color of lava splash
                 if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
@@ -117,6 +118,7 @@ public class DeckManager {
                     pmeta.setColor(Color.ORANGE);
                     i.setItemMeta(pmeta);
                 }
+                
                 // Give slowness arrows in case of berserker
                 int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
                 if (i.getType() == Material.ARROW && slowarrow > 0) {
@@ -129,6 +131,14 @@ public class DeckManager {
                     pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
                     i.setItemMeta(pmeta);
                 }
+                
+                // Give spectral arrows in case of sentinel
+                int spectral = plugin.getJSON().getAbility(uuid, "spectral");
+                if (i.getType() == Material.ARROW && spectral > 0) {
+                    i.setType(Material.SPECTRAL_ARROW);
+                }
+                
+                // Finalize item
                 int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
                 pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, player));

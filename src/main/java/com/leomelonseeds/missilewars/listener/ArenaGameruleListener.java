@@ -25,6 +25,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
@@ -293,12 +294,21 @@ public class ArenaGameruleListener implements Listener {
         }
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
+        // Longshot
         if (plugin.getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 bowShots.remove(player);
             }, 100);
+        }
+        
+        // Spectral arrows
+        int spectral = plugin.getJSON().getAbility(player.getUniqueId(), "spectral");
+        if (spectral > 0 && event.getProjectile() instanceof SpectralArrow) {
+            SpectralArrow arrow = (SpectralArrow) event.getProjectile();
+            int duration = (int) ConfigUtils.getAbilityStat("Sentinel.passive.spectral", spectral, "duration");
+            arrow.setGlowingTicks(duration * 20);
         }
     }
     

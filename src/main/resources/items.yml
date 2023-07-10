@@ -1235,6 +1235,23 @@ Sentinel:
       3:
         spcost: 1
         amplifier: 2
+    spectral:
+      name: "&eSpectral Arrows"
+      lore:
+      - ""
+      - "&7Instead of normal arrows, recieve spectral"
+      - "&7arrows that make players glow through walls"
+      - "&7for %duration% &7seconds on hit."
+      cost: 600
+      1:
+        spcost: 1
+        duration: 15
+      2:
+        spcost: 1
+        duration: 30
+      3:
+        spcost: 1
+        duration: 60
 Berserker:
   weapon:
     item: CROSSBOW
