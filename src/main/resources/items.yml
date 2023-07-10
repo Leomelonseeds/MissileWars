@@ -43,38 +43,39 @@ lightning:
 supersonic:
   index: 3
   1:
-    file: 'supersonic.nbt'
+    file: 'hypersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ Supersonic ⚡"
+    name: "&b☢ &lHypersonic &b⚡"
     lore:
     - ""
     - "&74.4 meters per second is not, in technical"
     - "&7terms, supersonic. However, this thing is"
     - "&7still fast. Blazing fast. Don't even try to ride"
-    - "&7it. Really, dont. We can't afford another"
+    - "&7it. Really, don't. We can't afford another"
     - "&7lawsuit."
     offset:
       x: -1
       y: -5
       z: 5
     speed: 4.4
-    tnt: 4
+    tnt: 6
   2:
-    file: 'hypersonic.nbt'
+    file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ &lHypersonic &b⚡"
+    name: "&b☢ Supersonic ⚡"
     lore:
     - ""
-    - "&7This missile is the older, spoiled brother"
-    - "&7of the socially anxious Supersonic."
+    - "&7Although this missile sounds like a downgrade"
+    - "&7from the Hypersonic, it in fact has much less"
+    - "&7social anxiety, in addition to being a lot"
+    - "&7easier and smoother to ride."
     offset:
       x: -1
       y: -5
       z: 5
     speed: 4.4
-    tnt: 6
+    tnt: 4
     spcost: 1
-    cooldown: 50
 
 tomahawk:
   index: 0
@@ -708,9 +709,9 @@ splash:
   - ""
   - "&7Make it rain (but not snow) with the Splash!"
   - "&7This handy utility allows its user to defuse"
-  - "&7TNT,fall from great heights, climb walls, put"
-  - "&7out fires, increase canopy duration, and flood"
-  - "&7the Nile river every August."
+  - "&7TNT, fall from great heights, climb walls, put"
+  - "&7out fires, increase canopy duration, and even"
+  - "&7break portals."
   - ""
   - "&bDuration: %duration%s"
   - "&bCanopy Extend: %extend%s"

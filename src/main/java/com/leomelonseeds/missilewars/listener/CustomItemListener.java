@@ -10,9 +10,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AreaEffectCloud;
@@ -601,14 +604,31 @@ public class CustomItemListener implements Listener {
         projectileConsume(hand, thrower, playerArena);
 
         // Schedule structure spawn after 1 second if snowball is still alive
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!thrown.isDead() && thrower.isOnline()) {
+                spawnUtility(structureName, thrower, thrown, playerArena);
+            }
+        }, 20);
+        
+        // Add particle effects for prickly/poke
+        UUID uuid = thrower.getUniqueId();
+        int prickly = plugin.getJSON().getAbility(uuid, "prickly");
+        int poke = plugin.getJSON().getAbility(uuid, "poke");
+        if (prickly <= 0 && poke <= 0) {
+            return;
+        }
+        
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!thrown.isDead() && thrower.isOnline()) {
-                    spawnUtility(structureName, thrower, thrown, playerArena);
+                if (thrown.isDead()) {
+                    this.cancel();
                 }
+                DustOptions dustOptions = new DustOptions(prickly > 0 ? Color.MAROON : Color.LIME, 1.0F);
+                playerArena.getWorld().spawnParticle(Particle.REDSTONE, thrown.getLocation(), poke, dustOptions);
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), 20);
+        }.runTaskTimer(plugin, 1, 1);
     }
 
     /** Utility should go through players */
@@ -810,7 +830,7 @@ public class CustomItemListener implements Listener {
             if (spawnBlock.getType() == Material.NETHER_PORTAL) {
                 Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(thrower.getWorld());
                 if (arena instanceof ClassicArena) {
-                    ((ClassicArena) arena).registerPortalBreak(location, thrower);
+                    ((ClassicArena) arena).registerPortalBreak(location.clone(), thrower);
                 }
             } else if (spawnBlock.getType() != Material.MOVING_PISTON) {
                 return;
