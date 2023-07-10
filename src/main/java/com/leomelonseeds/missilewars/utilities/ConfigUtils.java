@@ -527,7 +527,7 @@ public class ConfigUtils {
     
     // Determine if a player is out of bounds
     public static boolean outOfBounds(Player player, Arena arena) {
-        if (arena == null) {
+        if (arena == null || !arena.isRunning() || arena.isWaitingForTie()) {
             return false;
         }
         double toohigh = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");

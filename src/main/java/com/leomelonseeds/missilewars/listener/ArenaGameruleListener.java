@@ -173,6 +173,7 @@ public class ArenaGameruleListener implements Listener {
             player.setFireTicks(0);
             player.setSaturation(5F);
             player.removePotionEffect(PotionEffectType.POISON);
+            player.removePotionEffect(PotionEffectType.GLOWING);
             player.removePotionEffect(PotionEffectType.SLOW);
         }, 1);
         Component deathMessage = event.deathMessage();

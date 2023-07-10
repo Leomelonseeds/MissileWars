@@ -648,7 +648,7 @@ public class CustomItemListener implements Listener {
         
         // Here, players must be on different teams
         // Allow collisions if arrow or fireball
-        if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.FIREBALL) {
+        if (event.getEntityType().toString().contains("ARROW") || event.getEntityType() == EntityType.FIREBALL) {
             return;
         }
         

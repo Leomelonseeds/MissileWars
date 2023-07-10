@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
@@ -1219,8 +1220,10 @@ public abstract class Arena implements ConfigurationSerializable {
         discordChannel.sendMessage(discordMessage).queue();
         
         for (MissileWarsPlayer player : players) {
-            player.getMCPlayer().setGameMode(GameMode.SPECTATOR);
             player.stopDeck();
+            Player p = player.getMCPlayer();
+            p.setGameMode(GameMode.SPECTATOR);
+            p.removePotionEffect(PotionEffectType.GLOWING);
         }
         leftPlayers.clear();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
