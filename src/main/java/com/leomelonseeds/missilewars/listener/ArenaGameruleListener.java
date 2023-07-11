@@ -794,7 +794,7 @@ public class ArenaGameruleListener implements Listener {
     }
     
     // ---------------------------------------------------------
-    // The next section ignites tnt if b36 hit with flame arrow
+    // This section ignites tnt if b36 hit with flame arrow
     // ---------------------------------------------------------
     
     public static Map<Location, Location> tnt = new HashMap<>();
@@ -869,7 +869,7 @@ public class ArenaGameruleListener implements Listener {
     }
     
     // ------------------------------------------------
-    // The next section handles jump pads (code stolen from HubBasics)
+    // This section handles jump pads (code stolen from HubBasics)
     // ------------------------------------------------
     
     @EventHandler
@@ -895,4 +895,8 @@ public class ArenaGameruleListener implements Listener {
         ConfigUtils.sendConfigSound("lobby-plate", player);
         event.setCancelled(true);
     }
+    
+    // ------------------------------------------------
+    // This section handles dragon fireball deflection
+    // ------------------------------------------------
 }

@@ -903,32 +903,33 @@ public abstract class Arena implements ConfigurationSerializable {
             Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
         }
 
+        // Schedule start
         startTime = LocalDateTime.now().plusSeconds(secCountdown);
-        String startMsg = "messages.lobby-countdown-start";
-        announceMessage(startMsg, null);
-        tasks.add(new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!start()) {
-                    announceMessage("messages.start-failed", null);
-                }
+        announceMessage("messages.lobby-countdown-start", null);
+        tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (running) {
+                return;
             }
-        }.runTaskLater(plugin, secCountdown * 20));
+            
+            if (!start()) {
+                announceMessage("messages.start-failed", null);
+            }
+        }, secCountdown * 20));
 
         // Schedule 30-second countdown
         int cdNear = plugin.getConfig().getInt("lobby-countdown-near");
         for (int secInCd = secCountdown; secInCd > 0; secInCd--) {
             int finalSecInCd = secInCd;
-            tasks.add(new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (finalSecInCd <= cdNear) {
-                        String startMsg = "messages.lobby-countdown-near";
-                        announceMessage(startMsg, null);
-                    }
-                    setXpLevel(finalSecInCd);
+            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (running) {
+                    return;
                 }
-            }.runTaskLater(plugin, (secCountdown - secInCd) * 20));
+                
+                if (finalSecInCd <= cdNear) {
+                    announceMessage("messages.lobby-countdown-near", null);
+                }
+                setXpLevel(finalSecInCd);  
+            }, (secCountdown - secInCd) * 20));
         }
     }
 

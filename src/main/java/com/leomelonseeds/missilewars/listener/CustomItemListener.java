@@ -645,6 +645,8 @@ public class CustomItemListener implements Listener {
         if (event.getHitEntity() == null) {
             return;
         }
+        
+        MissileWarsPlugin.getPlugin().log("Entity " + thrown.getType() + " just collided with " + event.getHitEntity().getType());
 
         // Make sure it's in an arena
         Player thrower = (Player) thrown.getShooter();
