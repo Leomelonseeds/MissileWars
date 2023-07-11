@@ -17,9 +17,7 @@ import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
-import com.leomelonseeds.missilewars.listener.JoinLeaveListener;
-import com.leomelonseeds.missilewars.listener.TrackerListener;
-import com.leomelonseeds.missilewars.listener.WorldCreationListener;
+import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
@@ -73,10 +71,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
-        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
-        Bukkit.getPluginManager().registerEvents(new WorldCreationListener(), this);
-        Bukkit.getPluginManager().registerEvents(new TrackerListener(), this);
         log("Commands and events loaded.");
 
         // Load decks

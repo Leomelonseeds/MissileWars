@@ -1,13 +1,17 @@
 package com.leomelonseeds.missilewars.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,9 +22,44 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
-/** Class for managing arena leaving and joining. */
-public class JoinLeaveListener implements Listener {
-
+public class MiscListener implements Listener {
+    
+    // WORLD CREATION LISTENER
+    
+    @EventHandler
+    public void worldInit(WorldInitEvent e) {
+        e.getWorld().setKeepSpawnInMemory(false);
+    }
+    
+    // TRACKER LISTENER
+    
+    @EventHandler
+    public void tntPrimed(TNTPrimeEvent e) {
+        // Get arena
+        World world = e.getBlock().getWorld();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(world);
+        if (arena == null) {
+            return;
+        }
+        
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
+                () -> arena.getTracker().assignPrimeSource(e));
+    }
+    
+    @EventHandler
+    public void pistonExtend(BlockPistonExtendEvent e) {
+        // Get arena
+        World world = e.getBlock().getWorld();
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(world);
+        if (arena == null) {
+            return;
+        }
+        
+        arena.getTracker().registerPistonEvent(e);
+    }
+    
     /** Remove player from Arena if they DC. */
     @EventHandler(priority = EventPriority.LOW)
     public void onQuit(PlayerQuitEvent event) {
@@ -33,7 +72,7 @@ public class JoinLeaveListener implements Listener {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
-        	InventoryUtils.saveInventory(player, true);
+            InventoryUtils.saveInventory(player, true);
             return;
         }
 
@@ -44,12 +83,12 @@ public class JoinLeaveListener implements Listener {
     /** Handle inventory loading on join */
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
-    	Player player = event.getPlayer();
-    	player.teleport(ConfigUtils.getSpawnLocation());
-    	if (player.isInvulnerable()) {
-    	    player.setInvulnerable(false);
-    	}
-    	
+        Player player = event.getPlayer();
+        player.teleport(ConfigUtils.getSpawnLocation());
+        if (player.isInvulnerable()) {
+            player.setInvulnerable(false);
+        }
+        
         for (PotionEffect effect : player.getActivePotionEffects()){
             if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE) {
                 continue;
@@ -57,21 +96,23 @@ public class JoinLeaveListener implements Listener {
             player.removePotionEffect(effect.getType());
         }
 
-    	// Load player data, making sure for new players that it happens after an entry for them is created.
-    	MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
+        // Load player data, making sure for new players that it happens after an entry for them is created.
+        MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
             MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
             InventoryUtils.loadInventory(player);
             RankUtils.setPlayerExpBar(player);
-    	});
+        });
     }
+    
+    // JOIN/LEAVE LISTENERS
 
     /** Remove player from Arena if they leave the world. */
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
 
-    	Player player = event.getPlayer();
-    	World from = event.getFrom();
-    	World to = player.getWorld();
+        Player player = event.getPlayer();
+        World from = event.getFrom();
+        World to = player.getWorld();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         
         // Idk why this check is here but whatever
@@ -87,19 +128,19 @@ public class JoinLeaveListener implements Listener {
             
             // Arena to arena transfers
             if (to.getName().contains("mwarena")) {
-    	        Arena toArena = manager.getArena(player.getUniqueId());
-    	        if (toArena == null) {
-    	            return;
-    	        }
-    	        
-    	        if (fromArena.getPlayers().contains(player)) {
-    	            fromArena.removePlayer(player.getUniqueId(), false);
-    	        }
-    	        
-    	        if (!toArena.getPlayers().contains(player)) {
-    	            toArena.joinPlayer(player);
-    	        }
-    	        return;
+                Arena toArena = manager.getArena(player.getUniqueId());
+                if (toArena == null) {
+                    return;
+                }
+                
+                if (fromArena.getPlayers().contains(player)) {
+                    fromArena.removePlayer(player.getUniqueId(), false);
+                }
+                
+                if (!toArena.getPlayers().contains(player)) {
+                    toArena.joinPlayer(player);
+                }
+                return;
             }
             
             // Arena to world transfer
@@ -124,4 +165,5 @@ public class JoinLeaveListener implements Listener {
             }
         }
     }
+
 }

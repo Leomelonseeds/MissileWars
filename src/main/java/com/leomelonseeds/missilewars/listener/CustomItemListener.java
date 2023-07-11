@@ -18,7 +18,6 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
@@ -48,7 +47,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
-import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
@@ -332,24 +330,7 @@ public class CustomItemListener implements Listener {
                     int duration = (int) getItemStat(utility, "duration");
                     fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
                     fireball.setCustomNameVisible(false);
-                    
-                    /*
-                    // Spawn armorstand following the fireball so it can be deflected
-                    Slime slime = (Slime) player.getWorld().spawnEntity(spawnLoc, EntityType.SLIME);
-                    slime.setSize(2);
-                    // slime.setInvisible(true);
-                    slime.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 30 * 60, 4, true, true));
-                    slime.setAI(false);
-                    slime.setSilent(true);
-                    slime.setCollidable(false);
-                    slime.getCollidableExemptions().add(fireball.getUniqueId());
-                    Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                        if (fireball.isDead()) {
-                            slime.remove();
-                        }
-                        slime.teleport(fireball.getLocation().clone().add(fireball.getVelocity().multiply(3)));
-                    }, 0, 1);
-                    */
+                    Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
                 } else {
                     fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
                             player.getEyeLocation().getDirection()), EntityType.FIREBALL);
@@ -374,26 +355,6 @@ public class CustomItemListener implements Listener {
                 return;
             }
         }
-    }
-    
-    @EventHandler
-    public void dragonFireball(EnderDragonFireballHitEvent event) {
-        DragonFireball fb = event.getEntity();
-        if (fb.customName() == null) {
-            return;
-        }
-        
-        String[] args = ConfigUtils.toPlain(fb.customName()).split(":");
-        if (!args[0].equals("vdf")) {
-            return;
-        }
-        
-        int amplifier = Integer.parseInt(args[1]);
-        int duration = Integer.parseInt(args[2]);
-        AreaEffectCloud cloud = event.getAreaEffectCloud();
-        cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, duration, amplifier), true);
-        cloud.setDuration(duration * 20);
-        cloud.setDurationOnUse(0);
     }
 
     public static Set<UUID> canopy_cooldown = new HashSet<>();
