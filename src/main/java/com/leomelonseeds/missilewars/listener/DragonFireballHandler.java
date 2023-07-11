@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -20,6 +21,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DragonFireballHandler implements Listener {
 
     private static final double VELMULT = 3;
+    private BukkitTask updateTask;
     private Slime slime;
     private DragonFireball fireball;
     private boolean hitDetected;
@@ -36,7 +38,7 @@ public class DragonFireballHandler implements Listener {
         slime.setSilent(true);
         slime.setCollidable(false);
         slime.getCollidableExemptions().add(fireball.getUniqueId());
-        Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1);
+        updateTask = (Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1));
     }
     
     // Teleports the slime to in front of the fireball
@@ -45,10 +47,6 @@ public class DragonFireballHandler implements Listener {
             return;
         }
         
-        if (fireball.isDead()) {
-            slime.remove();
-            HandlerList.unregisterAll(this);
-        }
         slime.teleport(fireball.getLocation().clone().add(fireball.getVelocity().multiply(VELMULT)));
     }
     
@@ -85,5 +83,10 @@ public class DragonFireballHandler implements Listener {
         cloud.setDuration(duration * 20);
         cloud.setDurationOnUse(0);
         cloud.setRadiusPerTick(0);
+        
+        // Mark slime for removal
+        updateTask.cancel();
+        slime.remove();
+        HandlerList.unregisterAll(this);
     }
 }
