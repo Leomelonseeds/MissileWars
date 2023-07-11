@@ -45,7 +45,7 @@ supersonic:
   1:
     file: 'hypersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ &lHypersonic &b⚡"
+    name: "&b☢ Hypersonic ⚡"
     lore:
     - ""
     - "&74.4 meters per second is not, in technical"
@@ -62,7 +62,7 @@ supersonic:
   2:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ Supersonic ⚡"
+    name: "&b☢ &lSupersonic &b⚡"
     lore:
     - ""
     - "&7Although this missile sounds like a downgrade"

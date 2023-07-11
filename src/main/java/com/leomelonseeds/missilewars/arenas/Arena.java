@@ -1119,17 +1119,17 @@ public abstract class Arena implements ConfigurationSerializable {
             
             applyMultipliers();
             for (MissileWarsPlayer mwp : redTeam.getMembers()) {
-                mwp.initDeck(false);
+                mwp.initDeck(false, this);
             }
             
             for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
-                mwp.initDeck(false);
+                mwp.initDeck(false, this);
             }
             running = true;
         } else {
             applyMultipliers();
             player.initDeck(leftPlayers.containsKey(player.getMCPlayerId()) && 
-                    leftPlayers.get(player.getMCPlayerId()) >= 2);
+                    leftPlayers.get(player.getMCPlayerId()) >= 2, this);
         }
     }
     

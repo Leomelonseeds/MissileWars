@@ -702,7 +702,7 @@ public class ArenaGameruleListener implements Listener {
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
             if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (loc.getBlockY() >= toohigh) {
+                    if (player.getLocation().getBlockY() >= toohigh) {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
                     }

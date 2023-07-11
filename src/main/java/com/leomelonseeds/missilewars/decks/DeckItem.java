@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class DeckItem {
     
@@ -20,7 +20,7 @@ public class DeckItem {
     private int cooldown; // The actual cooldown
     private int max;
     private int curCooldown;
-    private Player player;
+    private MissileWarsPlayer mwp;
     BukkitTask cooldownTask;
     boolean unavailable;
     MissileWarsTeam team; // Where to fetch the cooldown multiplier
@@ -30,12 +30,12 @@ public class DeckItem {
      * @param cooldown is in seconds
      * @param max
      */
-    public DeckItem(ItemStack item, int cooldown, int max, Player player) {
+    public DeckItem(ItemStack item, int cooldown, int max, MissileWarsPlayer mwp) {
         this.item = item;
         this.cooldown = cooldown;
         this.max = max;
         this.curCooldown = 0;
-        this.player = player;
+        this.mwp = mwp;
         this.unavailable = false;
     }
     
@@ -87,8 +87,7 @@ public class DeckItem {
                     curCooldown = getCooldown();
                     updateItem();
                 }
-            } else if (ConfigUtils.outOfBounds(player, plugin.getArenaManager().getArena(player.getUniqueId()))) {
-                player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
+            } else if (mwp.outOfBounds()) {
                 if (unavailable) {
                     setVisualCooldown(curCooldown);
                 }
@@ -163,6 +162,7 @@ public class DeckItem {
      * in the player's inventory. Should not return null.
      */
     public ItemStack getItem() {
+        Player player = mwp.getMCPlayer();
         for (ItemStack i : player.getInventory().getContents()) {
             if (matches(i)) {
                 return i;
@@ -191,8 +191,9 @@ public class DeckItem {
         if (cooldownTask != null) {
             cooldownTask.cancel();
         }
-        
-        if (player.isOnline()) {
+
+        Player player = mwp.getMCPlayer();
+        if (player != null && player.isOnline()) {
             setVisualCooldown(0);
         }
     }
@@ -206,6 +207,7 @@ public class DeckItem {
      * @return if the item pickup was successful
      */
     public boolean pickup(Item itemEntity) {
+        Player player = mwp.getMCPlayer();
         int actamount = getActualAmount();
         if (actamount >= max) {
             return false;
@@ -249,6 +251,7 @@ public class DeckItem {
     // Also sets unavailable to true
     // No workie if player in creative mode
     public void setVisualCooldown(int c) {
+        Player player = mwp.getMCPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) {
             return;
         }

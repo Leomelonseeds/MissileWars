@@ -243,7 +243,7 @@ public class MissileWarsTeam {
 
         player.setJoinTime(LocalDateTime.now());
         player.setJustSpawned();
-        plugin.getDeckManager().getPlayerDeck(player.getMCPlayerId(), (result) -> {
+        plugin.getDeckManager().getPlayerDeck(player, (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);
             player.missilePreview(arena);

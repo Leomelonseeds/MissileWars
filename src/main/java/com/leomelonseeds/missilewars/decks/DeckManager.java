@@ -10,13 +10,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +27,7 @@ import org.bukkit.potion.PotionType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
 
@@ -68,14 +67,13 @@ public class DeckManager {
      * @param deck
      * @return
      */
-    public void getPlayerDeck(UUID uuid, DBCallback callback) {
-        
+    public void getPlayerDeck(MissileWarsPlayer mwp, DBCallback callback) {
+        UUID uuid = mwp.getMCPlayerId();
         JSONObject basejson = plugin.getJSON().getPlayer(uuid);
         String deck = basejson.getString("Deck");
         JSONObject json = plugin.getJSON().getPlayerPreset(uuid);
         List<DeckItem> pool = Arrays.asList(new DeckItem[8]);
         List<ItemStack> gear = new ArrayList<>();
-        Player player = Bukkit.getPlayer(uuid);
         
         // Figure out utility and missile multipliers
         String gpassive = json.getJSONObject("gpassive").getString("selected");
@@ -141,7 +139,7 @@ public class DeckManager {
                 // Finalize item
                 int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
-                pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, player));
+                pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, mwp));
             }
         }
         

@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -53,6 +52,8 @@ public class MissileWarsPlayer {
     private ItemStack lastItem;
     /** If the last item stored was available or not */
     private boolean lastAvailable;
+    /** If the player is out of bounds */
+    private boolean outOfBounds;
 
 
     /**
@@ -65,6 +66,7 @@ public class MissileWarsPlayer {
         lastItem = null;
         justSpawned = false;
         lastAvailable = false;
+        outOfBounds = false;
     }
     
     /**
@@ -87,6 +89,13 @@ public class MissileWarsPlayer {
     }
     
     /**
+     * @return is the player currently out of bounds
+     */
+    public boolean outOfBounds() {
+        return outOfBounds;
+    }
+        
+    /**
      * Missile preview feature
      */
     public void missilePreview(Arena arena) {
@@ -94,7 +103,7 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!arena.isRunning()) {
+                if (!arena.isRunning() || arena.isWaitingForTie()) {
                     this.cancel();
                     return;
                 }
@@ -163,25 +172,20 @@ public class MissileWarsPlayer {
         }.runTaskTimerAsynchronously(plugin, 20, 10);
     }
 
-    // EXP bar cooldown preview
-    private void cooldownPreview() {
+    // EXP bar cooldown preview + out of bounds handling
+    private void cooldownPreview(Arena arena) {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!arena.isRunning() || arena.isWaitingForTie() || deck == null) {
+                    this.cancel();
+                    return;
+                }
+                
                 // Player left the server
                 Player player = getMCPlayer();
                 if (player == null) {
                     this.cancel();
-                    return;
-                }
-                
-                if (deck == null) {
-                    player.sendActionBar(ConfigUtils.toComponent(""));
-                    this.cancel();
-                    return;
-                }
-                
-                if (player.getGameMode() == GameMode.SPECTATOR) {
                     return;
                 }
                 
@@ -204,6 +208,16 @@ public class MissileWarsPlayer {
                         lastAvailable = false;
                         return; 
                     }
+                }
+                
+                if (ConfigUtils.outOfBounds(player, arena)) {
+                    player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
+                    outOfBounds = true;
+                    lastAvailable = false;
+                    return;
+                } else {
+                    player.sendActionBar(ConfigUtils.toComponent(""));
+                    outOfBounds = false;
                 }
                 
                 int cd = di.getCurrentCooldown();
@@ -257,7 +271,7 @@ public class MissileWarsPlayer {
      * 
      * @param joinedBefore
      */
-    public void initDeck(boolean joinedBefore) {
+    public void initDeck(boolean joinedBefore, Arena arena) {
         Player player = getMCPlayer(); // Not null due to check in arena
 
         // Game start randomizer
@@ -289,7 +303,8 @@ public class MissileWarsPlayer {
         if (joinedBefore) {
             ConfigUtils.sendConfigMessage("messages.already-joined", player, null, null);
         }
-        cooldownPreview();
+        
+        cooldownPreview(arena);
     }
  
     /**
@@ -390,6 +405,10 @@ public class MissileWarsPlayer {
         kills = 0;
         deaths = 0;
         deck = null;
+        lastItem = null;
+        justSpawned = false;
+        lastAvailable = false;
+        outOfBounds = false;
     }
 
     /** Set the join time of this {@link MissileWarsPlayer} */
