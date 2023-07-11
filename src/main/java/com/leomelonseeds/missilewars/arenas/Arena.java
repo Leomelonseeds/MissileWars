@@ -35,6 +35,7 @@ import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
@@ -43,7 +44,6 @@ import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
-import com.leomelonseeds.missilewars.utilities.tracker.Tracker;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;

@@ -216,7 +216,6 @@ public class MissileWarsPlayer {
                     lastAvailable = false;
                     return;
                 } else {
-                    player.sendActionBar(ConfigUtils.toComponent(""));
                     outOfBounds = false;
                 }
                 

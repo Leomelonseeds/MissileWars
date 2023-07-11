@@ -896,7 +896,7 @@ public class ArenaGameruleListener implements Listener {
         event.setCancelled(true);
     }
     
-    // ------------------------------------------------
+    // --------------------------------------------------
     // This section handles dragon fireball deflection
-    // ------------------------------------------------
+    // --------------------------------------------------
 }

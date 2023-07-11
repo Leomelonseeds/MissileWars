@@ -28,10 +28,10 @@ import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
+import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.DBCallback;
-import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
-import com.leomelonseeds.missilewars.utilities.tracker.TrackedUtility;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;

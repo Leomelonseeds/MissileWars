@@ -326,12 +326,30 @@ public class CustomItemListener implements Listener {
                 event.setCancelled(true);
                 Fireball fireball;
                 if (utility.contains("lingering")) {
-                    fireball = (DragonFireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
-                            player.getEyeLocation().getDirection()), EntityType.DRAGON_FIREBALL);
+                    Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
+                    fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
                     int amplifier = (int) getItemStat(utility, "amplifier");
                     int duration = (int) getItemStat(utility, "duration");
                     fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
                     fireball.setCustomNameVisible(false);
+                    
+                    /*
+                    // Spawn armorstand following the fireball so it can be deflected
+                    Slime slime = (Slime) player.getWorld().spawnEntity(spawnLoc, EntityType.SLIME);
+                    slime.setSize(2);
+                    // slime.setInvisible(true);
+                    slime.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 30 * 60, 4, true, true));
+                    slime.setAI(false);
+                    slime.setSilent(true);
+                    slime.setCollidable(false);
+                    slime.getCollidableExemptions().add(fireball.getUniqueId());
+                    Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                        if (fireball.isDead()) {
+                            slime.remove();
+                        }
+                        slime.teleport(fireball.getLocation().clone().add(fireball.getVelocity().multiply(3)));
+                    }, 0, 1);
+                    */
                 } else {
                     fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
                             player.getEyeLocation().getDirection()), EntityType.FIREBALL);
@@ -347,7 +365,7 @@ public class CustomItemListener implements Listener {
                     float yield = (float) getItemStat(utility, "power");
                     fireball.setYield(yield);
                 }
-                
+
                 fireball.setDirection(player.getEyeLocation().getDirection());
                 fireball.setShooter(player);
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
@@ -384,12 +402,9 @@ public class CustomItemListener implements Listener {
     // Check for architect leaves to despawn them after a while
     @EventHandler
     public void architectLeaves(BlockPlaceEvent event) {
-        
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        
         if (canopy_freeze.contains(player)) {
             event.setCancelled(true);
             return;
@@ -645,8 +660,6 @@ public class CustomItemListener implements Listener {
         if (event.getHitEntity() == null) {
             return;
         }
-        
-        MissileWarsPlugin.getPlugin().log("Entity " + thrown.getType() + " just collided with " + event.getHitEntity().getType());
 
         // Make sure it's in an arena
         Player thrower = (Player) thrown.getShooter();

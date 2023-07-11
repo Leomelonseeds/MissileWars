@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.utilities.tracker;
+package com.leomelonseeds.missilewars.arenas.tracker;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

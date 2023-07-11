@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
@@ -23,7 +24,6 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
 import com.leomelonseeds.missilewars.utilities.SQLManager;
-import com.leomelonseeds.missilewars.utilities.tracker.TrackedMissile;
 
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;

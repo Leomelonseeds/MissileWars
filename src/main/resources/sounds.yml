@@ -18,6 +18,14 @@ own-portal-destroyed:
   sound: ENTITY_LIGHTNING_BOLT_THUNDER
   volume: 1.0
   pitch: 1.0
+enemy-portals-destroyed:
+  sound: ENTITY_ZOMBIE_VILLAGER_CURE
+  volume: 0.8
+  pitch: 0.8
+own-portals-destroyed:
+  sound: ENTITY_LIGHTNING_BOLT_THUNDER
+  volume: 1.0
+  pitch: 1.0
 spawn-missile:
   sound: ITEM_FLINTANDSTEEL_USE
   volume: 1.0
