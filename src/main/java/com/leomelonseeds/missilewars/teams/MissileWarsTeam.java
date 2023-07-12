@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -232,8 +233,6 @@ public class MissileWarsTeam {
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
-        mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         player.setJoinTime(LocalDateTime.now());
         player.setJustSpawned();
         if (arena instanceof TrainingArena) {
@@ -242,11 +241,11 @@ public class MissileWarsTeam {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
         
-        // Drop any alcohol items and clear inventory
-        ItemStack[] inv = mcPlayer.getInventory().getContents();
+        // Drop any alcohol items and clear inventory, then add armor
+        PlayerInventory inv = mcPlayer.getInventory();
         boolean dropped = false;
         for (int i = 0; i <= 8; i++) {
-            ItemStack ci = inv[i];
+            ItemStack ci = inv.getContents()[i];
             if (InventoryUtils.isPotion(ci)) {
                 arena.getWorld().dropItem(spawn, ci);
                 dropped = true;
@@ -256,6 +255,8 @@ public class MissileWarsTeam {
             ConfigUtils.sendConfigMessage("messages.dropped-alcohol", mcPlayer, null, null);
         }
         InventoryUtils.clearInventory(mcPlayer, true);
+        inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+        inv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         
         // Create and register deck
         plugin.getDeckManager().getPlayerDeck(player, (result) -> {
