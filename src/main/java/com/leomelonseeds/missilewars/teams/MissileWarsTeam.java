@@ -228,7 +228,6 @@ public class MissileWarsTeam {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         team.addPlayer(mcPlayer);
-        InventoryUtils.clearInventory(mcPlayer, true);
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
@@ -243,6 +242,7 @@ public class MissileWarsTeam {
 
         player.setJoinTime(LocalDateTime.now());
         player.setJustSpawned();
+        InventoryUtils.clearInventory(mcPlayer, true);
         plugin.getDeckManager().getPlayerDeck(player, (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);

@@ -213,16 +213,19 @@ public class PresetSelector implements MWInventory {
             }
             
             // Check item types
-            if (itemType == edit || itemType == selection) {
+            if (itemType == edit) {
+                // Open deck customizer
+                new DeckCustomizer(player, deck, p);
+                return;
+            }
+            
+            // Check item types
+            if (itemType == selection) {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
                 presetMessage(p);
                 updateInventory();
-                if (itemType == edit) {
-                    // Open deck customizer
-                    new DeckCustomizer(player, deck, p);
-                }
             }
         }
     }
