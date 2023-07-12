@@ -177,16 +177,26 @@ public class MissileWarsPlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!arena.isRunning() || arena.isWaitingForTie() || deck == null) {
-                    this.cancel();
-                    return;
-                }
-                
                 // Player left the server
                 Player player = getMCPlayer();
                 if (player == null) {
                     this.cancel();
                     return;
+                }
+
+                if (!arena.isRunning() || arena.isWaitingForTie() || deck == null) {
+                    player.sendActionBar(ConfigUtils.toComponent(""));
+                    this.cancel();
+                    return;
+                }
+                
+                if (ConfigUtils.outOfBounds(player, arena)) {
+                    player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
+                    outOfBounds = true;
+                    lastAvailable = false;
+                    return;
+                } else {
+                    outOfBounds = false;
                 }
                 
                 PlayerInventory inv = player.getInventory();
@@ -212,15 +222,6 @@ public class MissileWarsPlayer {
                         lastAvailable = false;
                         return; 
                     }
-                }
-                
-                if (ConfigUtils.outOfBounds(player, arena)) {
-                    player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
-                    outOfBounds = true;
-                    lastAvailable = false;
-                    return;
-                } else {
-                    outOfBounds = false;
                 }
                 
                 int cd = di.getCurrentCooldown();

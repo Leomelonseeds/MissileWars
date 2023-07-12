@@ -42,7 +42,7 @@ public class InventoryUtils {
      * @param i
      * @return if the item provided is not null and is a potion or milkbucket
      */
-    private static boolean isPotion(ItemStack i) {
+    public static boolean isPotion(ItemStack i) {
         return i != null && (i.getType() == Material.POTION || i.getType() == Material.MILK_BUCKET);
     }
 

@@ -234,15 +234,30 @@ public class MissileWarsTeam {
         mcPlayer.setFireTicks(0);
         mcPlayer.getInventory().setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         mcPlayer.getInventory().setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        player.setJoinTime(LocalDateTime.now());
+        player.setJustSpawned();
         if (arena instanceof TrainingArena) {
             ConfigUtils.sendConfigMessage("messages.training-start", mcPlayer, null, null);
         } else {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
-
-        player.setJoinTime(LocalDateTime.now());
-        player.setJustSpawned();
+        
+        // Drop any alcohol items and clear inventory
+        ItemStack[] inv = mcPlayer.getInventory().getContents();
+        boolean dropped = false;
+        for (int i = 0; i <= 8; i++) {
+            ItemStack ci = inv[i];
+            if (InventoryUtils.isPotion(ci)) {
+                arena.getWorld().dropItem(spawn, ci);
+                dropped = true;
+            }
+        }
+        if (dropped) {
+            ConfigUtils.sendConfigMessage("messages.dropped-alcohol", mcPlayer, null, null);
+        }
         InventoryUtils.clearInventory(mcPlayer, true);
+        
+        // Create and register deck
         plugin.getDeckManager().getPlayerDeck(player, (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);
