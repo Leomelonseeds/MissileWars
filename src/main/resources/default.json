@@ -106,8 +106,7 @@
 		"haste": false,
 		"efficiency": false,
 		"projectile_protection": false,
-		"naturesblessing": false,
-		"repairman": false,
+		"poke": false,
 		"deconstructor": false,
 		"defaultpreset": {
 			"skillpoints": 2,

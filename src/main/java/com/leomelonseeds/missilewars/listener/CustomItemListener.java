@@ -396,31 +396,8 @@ public class CustomItemListener implements Listener {
 
         // Register block place
         playerArena.registerShieldBlockEdit(block.getLocation(), true);
-        
-        // Check passives
-        int naturesblessing = plugin.getJSON().getAbility(player.getUniqueId(), "naturesblessing");
-        int repairman = plugin.getJSON().getAbility(player.getUniqueId(), "repairman");
-        int durationMultiplier = 1;
-        String team = playerArena.getTeam(player.getUniqueId());
-        boolean consume = true;
-        if (naturesblessing > 0) {
-            durationMultiplier = (int) ConfigUtils.getAbilityStat("Architect.passive.naturesblessing", naturesblessing, "multiplier");
-        } else if (repairman > 0) {
-            if (ConfigUtils.inShield(playerArena, loc, team, 6)) {
-                double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
-                Random random = new Random();
-                if (random.nextDouble() < percentage) {
-                    item.setAmount(item.getAmount());
-                    player.getInventory().setItem(event.getHand(), item);
-                    consume = false;
-                }
-            }
-        }
-
-        if (consume) {
-            InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? 
+        InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? 
                     player.getInventory().getHeldItemSlot() : 40);
-        }
         
         // Remove leaves after 30 sec
         new BukkitRunnable() {
@@ -431,17 +408,9 @@ public class CustomItemListener implements Listener {
                     return;
                 }
                 
-                // No repairman/outside base = remove leaves
-                if (repairman == 0 || !ConfigUtils.inShield(playerArena, loc, team, 6)) {
-                    loc.getBlock().setType(Material.AIR);
-                    return;
-                }
-                
-                // Replace blocks with endstone if repairman
-                loc.getBlock().setType(Material.END_STONE);
-                
+                loc.getBlock().setType(Material.AIR);
             }
-        }.runTaskLater(plugin, 30 * 20 * durationMultiplier);
+        }.runTaskLater(plugin, 30 * 20);
     }
 
     private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
