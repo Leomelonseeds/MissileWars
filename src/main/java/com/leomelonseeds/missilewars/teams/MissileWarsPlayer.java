@@ -200,6 +200,10 @@ public class MissileWarsPlayer {
                                 break;
                             }
                         }
+                        
+                        if (di == null) {
+                            return;
+                        }
                     } else {
                         player.setLevel(0);
                         player.setExp(1F);

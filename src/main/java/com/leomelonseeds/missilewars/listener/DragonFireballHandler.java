@@ -3,16 +3,23 @@ package com.leomelonseeds.missilewars.listener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.DragonFireball;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -21,23 +28,25 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DragonFireballHandler implements Listener {
 
     private static final double VELMULT = 3;
+    private static final int LIFETIME = 30 * 20;
     private BukkitTask updateTask;
     private Slime slime;
     private DragonFireball fireball;
     private boolean hitDetected;
+    private int timer;
     
     public DragonFireballHandler(Fireball fireball) {
         this.fireball = (DragonFireball) fireball;
         this.hitDetected = false;
+        this.timer = 0;
         
-        // Spawn armorstand following the fireball so it can be deflected
+        // Spawn slime following the fireball so it can be deflected
         slime = (Slime) fireball.getWorld().spawnEntity(fireball.getLocation(), EntityType.SLIME);
         slime.setSize(2);
-        // slime.setInvisible(true);
-        slime.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 30 * 60, 4, true, true));
+        slime.setInvisible(true);
+        slime.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, LIFETIME, 4, true, true));
         slime.setSilent(true);
-        slime.setCollidable(false);
-        slime.getCollidableExemptions().add(fireball.getUniqueId());
+        slime.setAI(false);
         updateTask = (Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1));
     }
     
@@ -47,20 +56,57 @@ public class DragonFireballHandler implements Listener {
             return;
         }
         
+        if (timer >= LIFETIME) {
+            remove();
+        }
+        
         slime.teleport(fireball.getLocation().clone().add(fireball.getVelocity().multiply(VELMULT)));
+        timer++;
     }
     
     @EventHandler
-    private void onHit(EntityDamageByEntityEvent e) {
+    private void onEntityHit(ProjectileHitEvent e) {
+        if (!e.getEntity().getUniqueId().equals(fireball.getUniqueId())) {
+            return;
+        }
+        
+        if (e.getHitEntity() == null) {
+            return;
+        }
+        
+        if (e.getHitEntity().getUniqueId().equals(slime.getUniqueId())) {
+            e.setCancelled(true);;
+        }
+    }
+    
+    @EventHandler
+    private void onDeflect(EntityDamageByEntityEvent e) {
         // Check if the slime got hit
         if (!e.getEntity().getUniqueId().equals(slime.getUniqueId())) {
             return;
         }
 
+        Entity damager = e.getDamager();
+        Vector direction;
+        if (damager instanceof Projectile) {
+            direction = damager.getVelocity();
+        } else if (damager instanceof Explosive) {
+            direction = e.getEntity().getLocation().toVector().subtract(damager.getLocation().toVector());
+        } else if (damager instanceof Player) {
+            direction = ((Player) damager).getEyeLocation().getDirection();
+            fireball.setShooter((ProjectileSource) damager);
+        } else {
+            return;
+        }
+
         hitDetected = true;
-        e.setDamage(0.0001);
+        fireball.setVelocity(new Vector(0, 0, 0));
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            fireball.setDirection(slime.getVelocity());
+            slime.setFireTicks(0);
+            for (PotionEffect pe : slime.getActivePotionEffects()) {
+                slime.removePotionEffect(pe.getType());
+            }
+            fireball.setDirection(direction);
             hitDetected = false;
         }, 1);
     }
@@ -83,10 +129,13 @@ public class DragonFireballHandler implements Listener {
         cloud.setDuration(duration * 20);
         cloud.setDurationOnUse(0);
         cloud.setRadiusPerTick(0);
-        
-        // Mark slime for removal
+        remove();
+    }
+    
+    private void remove() {
         updateTask.cancel();
         slime.remove();
+        fireball.remove();
         HandlerList.unregisterAll(this);
     }
 }
