@@ -188,6 +188,7 @@ public class TrainingArena extends ClassicArena {
         // Reward for reducing red shield health (2 per 10%, max 20, avg 5-10)
         // Equation: training missiles * blue shield health
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
+        String timeMessage = ConfigUtils.getConfigText("messages.training-time", null, null, null);
         int portal_reward = 20;
         int shield_health_reward = ((int) ((100 - redTeam.getShieldHealth())) / 10) * 2;
         int defense_reward = (int) (missiles * blueTeam.getShieldHealth() / 100);
@@ -198,12 +199,18 @@ public class TrainingArena extends ClassicArena {
                 continue;
             }
             
+            // Exp calculation
+            Player mcplayer = player.getMCPlayer();
             int amountEarned = portal_reward * player.getMVP() + shield_health_reward + defense_reward;
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
-            
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
-            player.getMCPlayer().sendMessage(ConfigUtils.toComponent(earnMessagePlayer));
+            mcplayer.sendMessage(ConfigUtils.toComponent(earnMessagePlayer));
             MissileWarsPlugin.getPlugin().getEconomy().depositPlayer(player.getMCPlayer(), amountEarned);
+            
+            // Time calculation
+            long secsTaken = Duration.between(player.getJoinTime(), LocalDateTime.now()).toSeconds();
+            String curTimeMessage = timeMessage.replaceAll("%time%", String.format("%02d:%02d", (secsTaken / 60) % 60, secsTaken % 60));
+            mcplayer.sendMessage(ConfigUtils.toComponent(curTimeMessage));
         }
     }
     

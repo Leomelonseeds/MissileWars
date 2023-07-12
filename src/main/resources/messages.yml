@@ -128,6 +128,7 @@ messages:
     - "&f- &fThere is no time limit."
     - "&f- &fUse &a/leave &fto change your deck."
     - "&b========================================"
+  training-time: "&7You spent &3%time% &7in this game."
   stage0: "&a&l[!] &7If you already know how to play Ultima Missile Wars, you can use &f/lobby &7to skip the introduction."
   stage1:
     - "&b========================================"
