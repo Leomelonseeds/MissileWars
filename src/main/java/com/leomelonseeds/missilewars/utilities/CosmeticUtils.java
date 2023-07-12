@@ -25,7 +25,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.util.HSVLike;
-import net.md_5.bungee.api.ChatColor;
 
 /** Various statistic and cosmetic related methods */
 public class CosmeticUtils {
@@ -146,7 +145,7 @@ public class CosmeticUtils {
         
         // Rainbow if rainbow
         if (format.equals("rainbow")) {
-            return toRainbow(ChatColor.translateAlternateColorCodes('&', result));
+            return toRainbow(ConfigUtils.convertAmps(result));
         }
         return ConfigUtils.toComponent(result);
     }
@@ -159,12 +158,13 @@ public class CosmeticUtils {
      * @return
      */
     public static Component getPortalMessage(Player killer, String brokeTeam) {
+        String teamcode = brokeTeam.equals("red") ? "&c" : "&9";
         if (killer == null || !killer.isOnline()) {
             return ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.portal-broke", null, null, null)
-                    .replace("%team%", (brokeTeam.equals("red") ? ChatColor.RED : ChatColor.BLUE) + brokeTeam));
+                    .replace("%team%", teamcode + brokeTeam));
         }
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
-        String prefix = "&5&l[!] ";
+        String prefix = "&5&l[!] &r";
         String format = getFormat("death-messages", killer);
         String result = getFromConfig(messages, format, "portal");
 
@@ -185,7 +185,7 @@ public class CosmeticUtils {
         }
         
         result = result.replace("%killer%", ConfigUtils.getFocusName(killer));
-        result = result.replace("%team%", (brokeTeam.equals("red") ? ChatColor.RED : ChatColor.BLUE) + brokeTeam);
+        result = result.replace("%team%", teamcode + brokeTeam);
         
         // Add rainbow if rainbow
         if (format.equals("rainbow")) {
