@@ -983,7 +983,9 @@ lingering_harming:
   name: "&5★ Dragon Fireball %level% ⚡"
   lore:
   - ""
-  - "&7How it feels to chew 5 gum"
+  - "&7How it feels to chew 5 gum. Note that"
+  - "&7contrary to vanilla Minecraft, these"
+  - "&7can be deflected too."
   - ""
   - "&bAmplifier: %amplifier%"
   - "&bDuration: %duration%"
