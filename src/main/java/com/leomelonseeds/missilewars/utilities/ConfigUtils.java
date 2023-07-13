@@ -517,6 +517,10 @@ public class ConfigUtils {
      * @return
      */
     public static String getStringFromItem(ItemStack item, String id) {
+        if (item == null) {
+            return null;
+        }
+        
         if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
                 PersistentDataType.STRING)) {
             return null;

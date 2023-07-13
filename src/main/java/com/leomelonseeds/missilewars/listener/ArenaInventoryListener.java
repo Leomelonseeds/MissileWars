@@ -271,8 +271,9 @@ public class ArenaInventoryListener implements Listener {
             }
         }
         
-        if (di != null && !di.pickup(event.getItem())) {
+        if (di != null) {
             event.setCancelled(true);
+            di.pickup(event.getItem());
         }
     }
    
@@ -310,10 +311,8 @@ public class ArenaInventoryListener implements Listener {
             }
 
             event.getItem().setItemStack(i);
-            if (!di.pickup(event.getItem())) {
-                event.setCancelled(true);
-                return;
-            }
+            event.setCancelled(true);
+            di.pickup(event.getItem());
         }
     }
 

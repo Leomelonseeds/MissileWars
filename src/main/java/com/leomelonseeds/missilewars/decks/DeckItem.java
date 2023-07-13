@@ -204,13 +204,12 @@ public class DeckItem {
      * if there is still space left in the stack afterwards.
      * 
      * @param amount
-     * @return if the item pickup was successful
      */
-    public boolean pickup(Item itemEntity) {
+    public void pickup(Item itemEntity) {
         Player player = mwp.getMCPlayer();
         int actamount = getActualAmount();
         if (actamount >= max) {
-            return false;
+            return;
         }
 
         ItemStack item = itemEntity.getItemStack();
@@ -222,10 +221,6 @@ public class DeckItem {
             player.getWorld().dropItem(itemEntity.getLocation(), drop);
         }
         
-        ItemStack pick = new ItemStack(item);
-        pick.setAmount(toPickup);
-        itemEntity.setItemStack(pick);
-        
         if (actamount + toPickup >= max) {
             if (cooldownTask != null) {
                 cooldownTask.cancel();
@@ -235,10 +230,12 @@ public class DeckItem {
         
         if (unavailable) {
             setVisualCooldown(0);
-            ItemStack cur = getItem();
-            cur.setAmount(cur.getAmount() - 1);
         }
-        return true;
+        
+        ItemStack cur = getItem();
+        player.playPickupItemAnimation(itemEntity);
+        cur.setAmount(actamount + toPickup);
+        itemEntity.remove();
     }
     
     // Returns 0 if on visual cooldown

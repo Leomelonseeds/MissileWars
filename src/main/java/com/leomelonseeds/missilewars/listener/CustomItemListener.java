@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,6 +58,12 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
+    
+    public static Set<UUID> canopy_cooldown = new HashSet<>();
+    public static Set<Player> canopy_freeze = new HashSet<>();
+    Map<Location, Integer> canopy_extensions = new HashMap<>();
+    public static Map<Location, Integer> leaves = new HashMap<>();
+
     
     /**
      * Simply get level from name
@@ -357,9 +362,6 @@ public class CustomItemListener implements Listener {
         }
     }
 
-    public static Set<UUID> canopy_cooldown = new HashSet<>();
-    public static Map<Location, Integer> leaves = new HashMap<>();
-
     // Check for architect leaves to despawn them after a while
     @EventHandler
     public void architectLeaves(BlockPlaceEvent event) {
@@ -470,10 +472,7 @@ public class CustomItemListener implements Listener {
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         despawnCanopy(spawnLoc, 5);
     }
-
-    public static Set<Player> canopy_freeze = new HashSet<>();
-    Map<Location, Integer> canopy_extensions = new HashMap<>();
-
+    
     private void despawnCanopy(Location loc, int duration) {
         new BukkitRunnable() {
             @Override
@@ -544,22 +543,96 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        // Add meta for structure identification
-        thrown.customName(ConfigUtils.toComponent(structureName));
+        // Add meta for structure identification + pokemissiles
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        ItemStack offhand = thrower.getInventory().getItemInOffHand();
+        UUID uuid = thrower.getUniqueId();
+        int poke = plugin.getJSON().getAbility(uuid, "poke");
+        if (poke > 0) {
+            String offName = ConfigUtils.getStringFromItem(offhand, "item-structure");
+            if (offName != null && !thrower.hasCooldown(offhand.getType()) && offhand.getType().toString().contains("SPAWN_EGG")) {
+                structureName = offName + "-p"; // Add extra dash to represent a pokemissile
+                InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
+            } else {
+                // Set poke to 0 so the particles won't activate
+                poke = 0;
+            }
+        }
         projectileConsume(hand, thrower, playerArena);
 
         // Schedule structure spawn after 1 second if snowball is still alive
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        boolean pokeActive = poke > 0;
+        String structure = structureName;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!thrown.isDead() && thrower.isOnline()) {
-                spawnUtility(structureName, thrower, thrown, playerArena);
+            if (thrown.isDead() || !thrower.isOnline()) {
+                return;
+            }
+
+            Location spawnLoc = thrown.getLocation();
+            String mapName = playerArena.getMapName();
+            ItemStack item = thrown.getItem();
+            if (playerArena.getTeam(uuid) == "no team") {
+                return;
+            }
+            
+            boolean red = isRedTeam(thrower);
+            if (SchematicManager.spawnNBTStructure(thrower, structure, spawnLoc, red, mapName, false, true)) {
+                playerArena.getPlayerInArena(uuid).incrementUtility();
+                String sound;
+                if (structure.contains("obsidianshield")) {
+                    sound = "spawn-obsidian-shield";
+                    // Detect obsidian shield duration in seconds here
+                    // Also clear obsidian shield after a while
+                    int duration = (int) getItemStat(structure, "duration") * 2;
+                    for (int i = duration; i > duration - 10; i--) {
+                        int finalDuration = i;
+                        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                            if (!playerArena.isRunning()) {
+                                return;
+                            }
+                            
+                            if (finalDuration == duration) {
+                                SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, mapName, false, false);
+                                ConfigUtils.sendConfigSound("break-obsidian-shield", spawnLoc);
+                            } else if (finalDuration % 2 == 0) {
+                                SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", spawnLoc, red, mapName, false, false);
+                            } else {
+                                SchematicManager.spawnNBTStructure(null, "obsidianshield-1", spawnLoc, red, mapName, false, false);
+                            }
+                        }, i * 10L);
+                    }
+                } else if (structure.contains("shield-") || structure.contains("platform")) {
+                    sound = "spawn-shield";
+                } else if (structure.contains("torpedo")) {
+                    sound = "spawn-torpedo";
+                    // Register all spawned TNT minecarts into the tracker
+                    for (Entity e : spawnLoc.getNearbyEntities(2, 3, 2)) {
+                        if (e.getType() == EntityType.MINECART_TNT) {
+                            playerArena.getTracker().registerTNTMinecart((ExplosiveMinecart) e, thrower);
+                        }
+                    }
+                } else {
+                    sound = "spawn-missile";
+                }
+
+                ConfigUtils.sendConfigSound(sound, spawnLoc);
+            } else {
+                Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
+                newitem.setPickupDelay(0);
+                
+                if (pokeActive) {
+                    Item mitem = thrower.getWorld().dropItem(thrower.getLocation(), offhand);
+                    mitem.setPickupDelay(0);
+                }
+            }
+            
+            if (!thrown.isDead()) {
+                thrown.remove();
             }
         }, 20);
         
         // Add particle effects for prickly/poke
-        UUID uuid = thrower.getUniqueId();
         int prickly = plugin.getJSON().getAbility(uuid, "prickly");
-        int poke = plugin.getJSON().getAbility(uuid, "poke");
         if (prickly <= 0 && poke <= 0) {
             return;
         }
@@ -571,7 +644,7 @@ public class CustomItemListener implements Listener {
                     this.cancel();
                 }
                 DustOptions dustOptions = new DustOptions(prickly > 0 ? Color.MAROON : Color.LIME, 1.0F);
-                playerArena.getWorld().spawnParticle(Particle.REDSTONE, thrown.getLocation(), poke, dustOptions);
+                playerArena.getWorld().spawnParticle(Particle.REDSTONE, thrown.getLocation(), 1, dustOptions);
             }
         }.runTaskTimer(plugin, 1, 1);
     }
@@ -625,58 +698,6 @@ public class CustomItemListener implements Listener {
 
         // Otherwise, also cancel all collisions
         event.setCancelled(true);
-    }
-
-    /** Handle spawning of utility structures */
-    public void spawnUtility(String structureName, Player thrower, ThrowableProjectile thrown, Arena playerArena) {
-        Location spawnLoc = thrown.getLocation();
-        String mapName = "default-map";
-        ItemStack item = thrown.getItem();
-        if (playerArena.getTeam(thrower.getUniqueId()) == "no team") {
-            return;
-        }
-        
-        if (playerArena.getMapName() != null) {
-            mapName = playerArena.getMapName();
-        }
-        if (SchematicManager.spawnNBTStructure(thrower, structureName, spawnLoc, isRedTeam(thrower), mapName, false, true)) {
-            playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
-            String sound = "none";
-            if (structureName.contains("obsidianshield")) {
-                sound = "spawn-obsidian-shield";
-                // Detect obsidian shield duration in seconds here!
-                int duration = (int) getItemStat(structureName, "duration");
-                clearObsidianShield(duration, spawnLoc, isRedTeam(thrower), mapName, playerArena);
-            } else if (structureName.contains("shield-") || structureName.contains("platform")) {
-                sound = "spawn-shield";
-            } else if (structureName.contains("torpedo")) {
-                sound = "spawn-torpedo";
-                // Register all spawned TNT minecarts into the tracker
-                for (Entity e : spawnLoc.getNearbyEntities(2, 2, 2)) {
-                    if (e.getType() == EntityType.MINECART_TNT) {
-                        playerArena.getTracker().registerTNTMinecart((ExplosiveMinecart) e, thrower);
-                    }
-                }
-            } 
-
-            ConfigUtils.sendConfigSound(sound, spawnLoc);
-            // Repairman
-            int repairman = MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "repairman");
-            if (repairman > 0 && ConfigUtils.inShield(playerArena, spawnLoc, playerArena.getTeam(thrower.getUniqueId()), 5)) {
-                double percentage = ConfigUtils.getAbilityStat("Architect.passive.repairman", repairman, "percentage") / 100;
-                Random random = new Random();
-                if (random.nextDouble() < percentage) {
-                    Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
-                    newitem.setPickupDelay(0);
-                }
-            }
-        } else {
-            Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
-            newitem.setPickupDelay(0);
-        }
-        if (!thrown.isDead()) {
-            thrown.remove();
-        }
     }
 
     /** Handle projectile item utility creation */
@@ -827,29 +848,6 @@ public class CustomItemListener implements Listener {
                     l.getBlock().setType(Material.AIR);
                 }
             }, (long) (duration * 20 * durationmultiplier));
-        }
-    }
-
-    /** Clears obsidian shield after a certain amount of time */
-    private void clearObsidianShield(int t, Location location, Boolean red, String mapName, Arena playerArena) {
-
-        int duration = t * 2;
-        for (int i = duration; i > duration - 10; i--) {
-            int finalDuration = i;
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                if (!playerArena.isRunning()) {
-                    return;
-                }
-                
-                if (finalDuration == duration) {
-                    SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", location, red, mapName, false, false);
-                    ConfigUtils.sendConfigSound("break-obsidian-shield", location);
-                } else if (finalDuration % 2 == 0) {
-                    SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", location, red, mapName, false, false);
-                } else {
-                    SchematicManager.spawnNBTStructure(null, "obsidianshield-1", location, red, mapName, false, false);
-                }
-            }, i * 10L);
         }
     }
 }

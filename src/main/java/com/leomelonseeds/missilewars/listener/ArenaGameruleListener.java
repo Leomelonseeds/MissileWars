@@ -78,6 +78,9 @@ import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleListener implements Listener {
+    
+    public static Map<Player, Location> bowShots = new HashMap<>();
+    public static Set<Player> saidGG = new HashSet<>();
 
     /** Event to ignore hunger. */
     @EventHandler
@@ -225,8 +228,6 @@ public class ArenaGameruleListener implements Listener {
             l.getBlock().setType(Material.AIR);
         }
     }
-    
-    public static Map<Player, Location> bowShots = new HashMap<>();
     
     // Handle sentinel longshot bow shoot event + bow cooldowns
     @EventHandler
@@ -752,8 +753,6 @@ public class ArenaGameruleListener implements Listener {
         arena.announceMessage("messages.afk-removal", mwPlayer);
         arena.removePlayer(player.getUniqueId(), true);
     }
-    
-    Set<Player> saidGG = new HashSet<>();
     
     // Add exp if GG
     @EventHandler

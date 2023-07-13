@@ -139,27 +139,29 @@ public class SchematicManager {
         } else {
             offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
         }
-        // Flip z if on red team
-        StructureRotation rotation = StructureRotation.NONE;
         
-        // Normal red missile offset adjustment
+        // Check for pokemissile
+        int sizex = structure.getSize().getBlockX();
+        int sizey = structure.getSize().getBlockY();
+        int sizez = structure.getSize().getBlockZ();
+        if (args.length == 3 && args[2].equals("p")) {
+            isMissile = true;
+            offset.setZ(-1 * sizez / 2);
+            offset.setY(-1 * sizey / 2);
+        }
+        
+        StructureRotation rotation = StructureRotation.NONE;
         if (redMissile) {
             offset.setZ(offset.getZ() * -1);
             offset.setX(offset.getX() * -1);
             rotation = StructureRotation.CLOCKWISE_180;
         }
         spawnLoc = spawnLoc.add(offset);
-
-        // Time to perform no place checks
+        
+        // Checks if the missile intersects with an obsidian/barrier structure
         int spawnx = spawnLoc.getBlockX();
         int spawny = spawnLoc.getBlockY();
         int spawnz = spawnLoc.getBlockZ();
-
-        int sizex = structure.getSize().getBlockX();
-        int sizey = structure.getSize().getBlockY();
-        int sizez = structure.getSize().getBlockZ();
-        
-        // Checks if the missile intersects with an obsidian/barrier structure
         if (checkCollision) {
             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
