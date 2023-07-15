@@ -878,7 +878,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
-                mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
+                mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /sp to stop spectating"));
                 checkEmpty();
             } else {
                 ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);

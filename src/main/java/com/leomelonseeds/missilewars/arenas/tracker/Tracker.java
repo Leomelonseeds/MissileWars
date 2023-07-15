@@ -103,7 +103,7 @@ public class Tracker {
         // Register tnt around
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             // Set source
-            for (Entity entity : exploded.getNearbyEntities(3, 3, 3)) {
+            for (Entity entity : exploded.getNearbyEntities(6, 6, 6)) {
                 if (entity.getType() == EntityType.PRIMED_TNT) {
                     TNTPrimed tnt = (TNTPrimed) entity;
                     Entity actualSource = tnt.getSource();
