@@ -22,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.decks.DeckManager;
 
 public class JSONManager {
 
@@ -355,24 +354,6 @@ public class JSONManager {
             }
         }
         return 0;
-    }
-    
-    /**
-     * Adds 1 extra skillpoint onto each deck
-     * 
-     * @param uuid
-     */
-    public void rankUp(UUID uuid) {
-        JSONObject json = getPlayer(uuid);
-        DeckManager deckmanager = MissileWarsPlugin.getPlugin().getDeckManager();
-        for (String d : deckmanager.getDecks()) {
-            for (String p : deckmanager.getPresets()) {
-                if (json.getJSONObject(d).has(p)) {
-                    JSONObject pjson = json.getJSONObject(d).getJSONObject(p);
-                    pjson.put("skillpoints", pjson.getInt("skillpoints") + 1); 
-                }  
-            }
-        }
     }
     
     /**

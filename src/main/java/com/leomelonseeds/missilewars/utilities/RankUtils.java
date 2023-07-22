@@ -201,8 +201,6 @@ public class RankUtils {
                 }
             }
             plugin.log(othermessage + " (added " + exp + " exp)");
-            
-            plugin.getJSON().rankUp(player.getUniqueId());
         }
 
         plugin.getSQL().updateExp(player.getUniqueId(), exp);
