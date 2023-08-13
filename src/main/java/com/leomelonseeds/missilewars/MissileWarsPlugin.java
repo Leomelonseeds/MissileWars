@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
@@ -17,6 +18,7 @@ import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
+import com.leomelonseeds.missilewars.listener.DefuseHelper;
 import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -68,11 +70,14 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Load commands and events
         log("Loading commands and events...");
+        DefuseHelper dfh = new DefuseHelper(this);
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
+        Bukkit.getPluginManager().registerEvents(dfh, this);
+        ProtocolLibrary.getProtocolManager().addPacketListener(dfh);
         log("Commands and events loaded.");
 
         // Load decks

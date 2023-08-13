@@ -100,12 +100,14 @@ public class DragonFireballHandler implements Listener {
         }
 
         hitDetected = true;
+        Vector curVelocity = fireball.getVelocity();
         fireball.setVelocity(new Vector(0, 0, 0));
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             slime.setFireTicks(0);
             for (PotionEffect pe : slime.getActivePotionEffects()) {
                 slime.removePotionEffect(pe.getType());
             }
+            fireball.setVelocity(direction.multiply(curVelocity.length()));
             fireball.setDirection(direction);
             hitDetected = false;
         }, 1);

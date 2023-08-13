@@ -96,22 +96,28 @@
 	        <id>essentials-releases</id>
 	        <url>https://repo.essentialsx.net/releases/</url>
 	    </repository>
+		<!-- ProtocolLib -->
+	    <repository>
+		    <id>dmulloy2-repo</id>
+		    <url>https://repo.dmulloy2.net/repository/public/</url>
+		</repository>
     </repositories>
     
     <dependencies>
-        <!-- Hikari -->
-    	<dependency>
-   			<groupId>com.zaxxer</groupId>
-		    <artifactId>HikariCP</artifactId>
-		    <version>5.0.1</version>
-		</dependency>
+        <!-- PaperMC (Obviously) -->
         <dependency>
     		<groupId>io.papermc.paper</groupId>
     		<artifactId>paper-api</artifactId>
     		<version>1.20.1-R0.1-SNAPSHOT</version>
     		<scope>provided</scope>
 		</dependency>
-        <!-- FAWE API -->
+        <!-- Hikari (MySQL) -->
+    	<dependency>
+   			<groupId>com.zaxxer</groupId>
+		    <artifactId>HikariCP</artifactId>
+		    <version>5.0.1</version>
+		</dependency>
+        <!-- FAWE API (Maps) -->
         <dependency>
             <groupId>com.fastasyncworldedit</groupId>
             <artifactId>FastAsyncWorldEdit-Core</artifactId>
@@ -131,14 +137,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- PAPI API  -->
+        <!-- PAPI API (Placeholder) -->
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.9.2</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Citizens API  -->
+        <!-- Citizens API (NPC) -->
         <dependency>
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizens-main</artifactId>
@@ -152,7 +158,7 @@
 	            </exclusion>
 	        </exclusions>
         </dependency>
-        <!-- Parkour -->
+        <!-- Parkour (No join on parkour) -->
         <dependency>
 		    <groupId>com.github.A5H73Y</groupId>
 		    <artifactId>Parkour</artifactId>
@@ -160,14 +166,14 @@
 		    <type>jar</type>
 		    <scope>provided</scope>
 		</dependency>
-        <!-- WorldGuard -->
+        <!-- WorldGuard (Create regions) -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.0.4</version>
             <scope>provided</scope>
         </dependency>
-        <!-- WorldGuardExtraFlags -->
+        <!-- WorldGuardExtraFlags (Commands/effect flags) -->
         <dependency>
             <groupId>net.goldtreeservers.worldguardextraflags</groupId>
             <artifactId>worldguardextraflags</artifactId>
@@ -175,31 +181,41 @@
             <scope>system</scope>
             <systemPath>${basedir}/WorldGuardExtraFlags.jar</systemPath>
         </dependency>
+        <!-- DiscordSRV -->
         <dependency>
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
             <version>1.26.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Vault (Eco rewards) -->
         <dependency>
         	<groupId>com.github.MilkBowl</groupId>
         	<artifactId>VaultAPI</artifactId>
         	<version>1.7</version>
         	<scope>provided</scope>
     	</dependency>
+        <!-- Essentials (AFK detection) -->
     	<dependency>
 	        <groupId>net.essentialsx</groupId>
 	        <artifactId>EssentialsX</artifactId>
 	        <version>2.20.0</version>
 	        <scope>provided</scope>
     	</dependency>
-    	<!-- https://mvnrepository.com/artifact/org.json/json -->
+        <!-- ProtocolLib (Packet Manipulation) -->
+		<dependency>
+		    <groupId>com.comphenix.protocol</groupId>
+		    <artifactId>ProtocolLib</artifactId>
+		    <version>5.1.0</version>
+		    <scope>provided</scope>
+		</dependency>
+    	<!-- https://mvnrepository.com/artifact/org.json/json (JSON) -->
 		<dependency>
 		    <groupId>org.json</groupId>
 		    <artifactId>json</artifactId>
 		    <version>20230618</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io (StringUtils etc) -->
 		<dependency>
 		    <groupId>commons-io</groupId>
 		    <artifactId>commons-io</artifactId>
