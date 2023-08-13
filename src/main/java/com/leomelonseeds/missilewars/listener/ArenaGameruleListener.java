@@ -914,38 +914,13 @@ public class ArenaGameruleListener implements Listener {
         // In other words, the player will only see the effect of their
         // click after ping milliseconds.
         
-        // To alleviate this issue for high-ping users, we increase the
-        // reach of the player (for fb deflection only) in order for fireballs
-        // to appear normal to the player. Fireballs start at around 1m/tick
-        // and gradually accelerate to about 1.9m/tick, but from my testing
-        // being less generous feels more natural to high-ping players. I'll
-        // show below that for every 2 ticks of latency, the player's reach
-        // must be increased by 1 block.
-        
-        // For example, for a player with 200ms of ping, their click takes
-        // 100ms to register on the server and in the meantime, they have to
-        // wait for the fireball to come within reach for the correct packet
-        // to be sent. If the fireball is travelling at 1m/s and the reach is
-        // 3m away, when the fireball comes within reach it will actually be 
-        // 1m away from the player on the server. The player clicks, but the
-        // packet takes 100ms to reach the server, and by that time the fireball
-        // has already collided with the player and thus deflection is impossible.
-        
-        // If the player wants to have the server-side deflection register at
-        // 3m or closer away, we must extend the reach of the player to 5 blocks -
-        // this way when the player clicks, it will register on the server when
-        // the fireball travels to 3 blocks away. 100ms = 1 block extra reach.
-        // Maximum for now (australian player) would be 3 blocks. Round ping
-        // up by 20 for players around the border.
+        // To alleviate this issue for high-ping users, we simply perform
+        // fireball hit-detection on the server side, preventing the need
+        // for the hit packet to be sent in order for fb deflection.
          
        
         Player player = event.getPlayer();
-        int toCheck = Math.min((player.getPing() + 20) / 100, 3);
-        if (toCheck <= 0) {
-            return;
-        }
-        
-        Entity target = player.getTargetEntity(3 + toCheck);
+        Entity target = player.getTargetEntity(3);
         if (target == null) {
             return;
         }

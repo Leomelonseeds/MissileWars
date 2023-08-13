@@ -20,6 +20,7 @@ import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
 import com.leomelonseeds.missilewars.listener.DefuseHelper;
 import com.leomelonseeds.missilewars.listener.MiscListener;
+import com.leomelonseeds.missilewars.listener.RotationHelper;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
@@ -78,6 +79,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
         Bukkit.getPluginManager().registerEvents(dfh, this);
         ProtocolLibrary.getProtocolManager().addPacketListener(dfh);
+        ProtocolLibrary.getProtocolManager().addPacketListener(new RotationHelper(this));
         log("Commands and events loaded.");
 
         // Load decks
