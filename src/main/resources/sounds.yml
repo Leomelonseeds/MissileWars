@@ -138,3 +138,7 @@ lobby-plate:
   sound: ENTITY_BAT_TAKEOFF
   volume: 1.0
   pitch: 1.0
+fireball-deflect:
+  sound: ENTITY_PLAYER_ATTACK_WEAK
+  volume: 1.0
+  pitch: 1.0

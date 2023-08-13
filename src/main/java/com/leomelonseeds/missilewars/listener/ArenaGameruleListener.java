@@ -964,6 +964,8 @@ public class ArenaGameruleListener implements Listener {
             Vector curVelocity = fireball.getVelocity();
             Vector direction = player.getEyeLocation().getDirection();
             fireball.setVelocity(new Vector(0, 0, 0));
+            fireball.setShooter(player);
+            ConfigUtils.sendConfigSound("fireball-deflect", player);
             Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
                 fireball.setVelocity(direction.multiply(curVelocity.length()));
                 fireball.setDirection(direction);
