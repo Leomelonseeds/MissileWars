@@ -117,7 +117,6 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             return;
         }
         
-
         // In the rare cases where a CME may occur, simply quit
         if (cmeLock) {
             return;
@@ -201,7 +200,9 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 addQueue.add(new DefuseBlock(block, dir));
             }
         }
-        
+
+        cmeLock = true;
         blocks.addAll(addQueue);
+        cmeLock = false;
     }
 }
