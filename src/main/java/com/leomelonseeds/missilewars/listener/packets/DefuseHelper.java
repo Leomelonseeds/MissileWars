@@ -1,11 +1,11 @@
-package com.leomelonseeds.missilewars.listener;
+package com.leomelonseeds.missilewars.listener.packets;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -72,7 +72,6 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     // through the list of blocks looking for a block that was moved less than player ping ago
     // that also has the same X and Y and has Z in the opposite direction of when it was last moved.
     
-    private static final int TICKS_BEFORE_REMOVAL = 12;
     private MissileWarsPlugin plugin;
     private Set<DefuseBlock> blocks;
     private boolean cmeLock;
@@ -82,24 +81,6 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         this.plugin = plugin;
         this.blocks = new HashSet<>();
         this.cmeLock = false;
-        
-        // Removal task
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            Set<DefuseBlock> toRemove = new HashSet<>();
-            for (DefuseBlock db : blocks) {
-                // Minimum speed is 12gt engine, so ignore if exceeds
-                if (db.getTicks() > TICKS_BEFORE_REMOVAL) {
-                    toRemove.add(db);
-                    break;
-                }
-                
-                db.increaseTime();
-            }
-            
-            cmeLock = true;
-            blocks.removeAll(toRemove);
-            cmeLock = false;
-        }, 100, 1);
     }
      
     @Override
@@ -126,7 +107,9 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         int ping = player.getPing();
-        for (DefuseBlock db : new HashSet<>(blocks)) {
+        Iterator<DefuseBlock> it = blocks.iterator();
+        while (it.hasNext()) {
+            DefuseBlock db = it.next();
             if (!db.checkEquality(bp, world)) {
                 continue;
             }
@@ -166,43 +149,24 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     private void addToList(List<Block> affectedBlocks, BlockPistonEvent e) {
         // Only consider if piston is pushing north or south
         BlockFace dir = e.getDirection();
-        int toAdd;
-        if (dir == BlockFace.SOUTH) {
-            toAdd = 1;
-        } else if (dir == BlockFace.NORTH) {
-            toAdd = -1;
-        } else {
+        if (!(dir == BlockFace.SOUTH || dir == BlockFace.NORTH)) {
             return;
         }
         
-        Set<DefuseBlock> addQueue = new HashSet<>();
+        // Add all non-instabreak blocks to defuseblock list
         for (Block block : affectedBlocks) {
-            // Make sure the block is an instabreak
             Material type = block.getType();
-            if (!(type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK)) {
-                continue;
-            }
-
-            Location loc = block.getLocation();
-            boolean added = false;
-            for (DefuseBlock db : blocks) {
-                // Check if it already exists in the blocklist
-                if (!db.checkEquality(loc, type)) {
-                    continue;
-                }
-
-                db.setZ(loc.getBlockZ() + toAdd);
-                added = true;
-                break;
-            }
-            
-            if (!added) {
-                addQueue.add(new DefuseBlock(block, dir));
+            if (type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK) {
+                new DefuseBlock(block.getLocation(), dir, this);
             }
         }
-
-        cmeLock = true;
-        blocks.addAll(addQueue);
-        cmeLock = false;
+    }
+    
+    public void setCMELock(boolean yes) {
+        cmeLock = yes;
+    }
+    
+    public Set<DefuseBlock> getList(){
+        return blocks;
     }
 }

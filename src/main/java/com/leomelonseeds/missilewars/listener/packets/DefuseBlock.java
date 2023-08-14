@@ -1,35 +1,54 @@
-package com.leomelonseeds.missilewars.listener;
+package com.leomelonseeds.missilewars.listener.packets;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.comphenix.protocol.wrappers.BlockPosition;
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
 /**
  * Represents a slime, honey, or TNT block which can be instantly mined and defuse a missile
  */
 public class DefuseBlock {
-    
+
+    // Max ping to account for is 350, so 6 ticks before removal
+    private static final int TICKS_BEFORE_REMOVAL = 7;
     private World world;
     private int x;
     private int y;
     private int z;
     private int lastZ;
     private int ticks;
-    private Material type;
     
-    public DefuseBlock(Block block, BlockFace direction) {
-        Location loc = block.getLocation();
+    public DefuseBlock(Location loc, BlockFace direction, DefuseHelper dfh) {
         world = loc.getWorld();
         x = loc.getBlockX();
         y = loc.getBlockY();
         lastZ = loc.getBlockZ();
         z = direction == BlockFace.SOUTH ? lastZ + 1 : lastZ - 1;
         ticks = 0;
-        type = block.getType();
+        
+        // Add/Removal task
+        dfh.setCMELock(true);
+        dfh.getList().add(this);
+        dfh.setCMELock(false);
+        DefuseBlock block = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (ticks > TICKS_BEFORE_REMOVAL) {
+                    dfh.setCMELock(true);
+                    dfh.getList().remove(block);
+                    dfh.setCMELock(false);
+                    this.cancel();
+                    return;
+                }
+                
+                ticks++;
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
     
     /**
@@ -47,24 +66,8 @@ public class DefuseBlock {
         return z;
     }
     
-    /**
-     * Increases the ticks since the block has been there
-     */
-    public void increaseTime() {
-        ticks++;
-    }
-    
     public int getTicks() {
         return ticks;
-    }
-    
-    /**
-     * @param location
-     * @return If this block is the same as the param, used for piston block checks
-     */
-    public boolean checkEquality(Location l, Material curType) {
-        return l.getWorld().toString().equals(world.toString()) && 
-                l.getBlockX() == x && l.getBlockY() == y && l.getBlockZ() == z && curType == type;
     }
     
     /**

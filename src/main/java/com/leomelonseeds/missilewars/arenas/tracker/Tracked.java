@@ -69,16 +69,28 @@ public abstract class Tracked {
      * @return
      */
     public boolean contains(Location l) {
+        return contains(l, 0);
+    }
+
+    
+    /**
+     * Checks if the given location is contained within the tracked object
+     * 
+     * @param l
+     * @param bias the bias to apply
+     * @return
+     */
+    public boolean contains(Location l, double bias) {
         double x = l.getX();
         double y = l.getY();
         double z = l.getZ();
         
-        double x1 = Math.min(pos1.getX(), pos2.getX());
-        double x2 = Math.max(pos1.getX(), pos2.getX());
-        double y1 = Math.min(pos1.getY(), pos2.getY());
-        double y2 = Math.max(pos1.getY(), pos2.getY());
-        double z1 = Math.min(pos1.getZ(), pos2.getZ());
-        double z2 = Math.max(pos1.getZ(), pos2.getZ());
+        double x1 = Math.min(pos1.getX(), pos2.getX()) - bias;
+        double x2 = Math.max(pos1.getX(), pos2.getX()) + bias;
+        double y1 = Math.min(pos1.getY(), pos2.getY()) - bias;
+        double y2 = Math.max(pos1.getY(), pos2.getY()) + bias;
+        double z1 = Math.min(pos1.getZ(), pos2.getZ()) - bias;
+        double z2 = Math.max(pos1.getZ(), pos2.getZ()) + bias;
         
         if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
             return true;

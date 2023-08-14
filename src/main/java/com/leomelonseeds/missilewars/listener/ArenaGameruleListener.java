@@ -61,6 +61,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -920,10 +921,17 @@ public class ArenaGameruleListener implements Listener {
          
        
         Player player = event.getPlayer();
+        RayTraceResult rtr = player.rayTraceEntities(3);
+        if (rtr == null) {
+            return;
+        }
+        
         Entity target = player.getTargetEntity(3);
         if (target == null) {
             return;
         }
+        
+        MissileWarsPlugin.getPlugin().log("Fireball deflect attempt detected");
 
         // Handle dragon fireballs by registering an EDBEE for the handler
         if (target instanceof Slime) {
