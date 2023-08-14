@@ -2,7 +2,9 @@ package com.leomelonseeds.missilewars.listener.packets;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -43,6 +45,7 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
     private static final Class<?> RELATIVE_MOVEMENT_CLASS = MinecraftReflection.getMinecraftClass("world.entity.RelativeMovement");
     private static final EquivalentConverter<RelativeMovement> RELATIVE_MOVEMENT_CONVERTER = new EnumWrappers.IndexedEnumConverter<>(RelativeMovement.class, RELATIVE_MOVEMENT_CLASS);
     private MissileWarsPlugin plugin;
+    public static Set<UUID> teleportQueue = new HashSet<>();
     
     public RubberbandHelper(MissileWarsPlugin plugin) {
         super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.POSITION);
@@ -90,30 +93,37 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         }
         
         // EXTREMELY EXPERIMENTAL RUBBERBAND FIXER
+        // Sync server location with client by teleporting them
+        UUID uuid = player.getUniqueId();
+        if (!teleportQueue.contains(uuid)) {
+            PacketContainer clientPacket = PositionListener.clientPosition.get(uuid);
+            StructureModifier<Double> lcsmd = clientPacket.getDoubles(); // 0 x 1 y 2 z
+            StructureModifier<Float> lcsmf = clientPacket.getFloat(); // 0 yaw 1 pitch
+            float yaw = lcsmf.read(0) == 0 ? smf.read(0) : lcsmf.read(0);
+            float pitch = lcsmf.read(1) == 0 ? smf.read(1) : lcsmf.read(1);
+            teleportQueue.add(uuid);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
+                player.teleport(teleportTo);
+            });
+        } else {
+            teleportQueue.remove(uuid);
+        }
         
         // Rewrite to relative teleport. Prevent rubberbanding entirely if server
-        // location is close enough to clients. Otherwise, send a packet to teleport
-        // the client to the server position.
+        // location is close enough to clients. Otherwise, don't modify the final
+        // location of the packet.
         Set<RelativeMovement> flags = new HashSet<>();
-        Location server = player.getLocation();
-        Location client = PositionListener.clientPosition.get(player.getUniqueId());
-        if (server.distance(client) > 2) {
-            // flags.add(RelativeMovement.X);
-            // flags.add(RelativeMovement.Y);
-            // flags.add(RelativeMovement.Z);
-            smd.write(0, client.getX());
-            smd.write(1, client.getY());
-            smd.write(2, client.getZ());
-        }
+        flags.add(RelativeMovement.X);
+        flags.add(RelativeMovement.Y);
+        flags.add(RelativeMovement.Z);
         flags.add(RelativeMovement.X_ROT);
         flags.add(RelativeMovement.Y_ROT);
         packet.getSets(RELATIVE_MOVEMENT_CONVERTER).write(0, flags);
         smf.write(0, 0.0F);
         smf.write(1, 0.0F);
-        
-        plugin.log("Server position: " + server);
-        plugin.log("Client position: " + client);
-        plugin.log("Difference: " + server.clone().subtract(client));
-        plugin.log("Distance: " + server.distance(client));
+        smd.write(0, 0.0);
+        smd.write(1, 0.0);
+        smd.write(2, 0.0);
     }
 }
