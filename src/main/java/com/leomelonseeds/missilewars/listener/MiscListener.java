@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -77,6 +78,7 @@ public class MiscListener implements Listener {
         }
 
         playerArena.removePlayer(player.getUniqueId(), false);
+        PositionListener.clientPosition.remove(player.getUniqueId());
         player.teleport(ConfigUtils.getSpawnLocation());
     }
 

@@ -1,7 +1,7 @@
 package com.leomelonseeds.missilewars.listener.packets;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -107,32 +107,35 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         int ping = player.getPing();
-        Iterator<DefuseBlock> it = blocks.iterator();
-        while (it.hasNext()) {
-            DefuseBlock db = it.next();
-            if (!db.checkEquality(bp, world)) {
-                continue;
-            }
-            
-            // As mentioned above, only continue if piston was pushed less than player ping time ago
-            // Add 10 to the ping for players hovering around the border of ticks
-            int since = db.getTicks();
-            if (since * 50 > ping + 10) {
+        try {
+            for (DefuseBlock db : blocks) {
+                if (!db.checkEquality(bp, world)) {
+                    continue;
+                }
+                
+                // As mentioned above, only continue if piston was pushed less than player ping time ago
+                // Add 10 to the ping for players hovering around the border of ticks
+                int since = db.getTicks();
+                if (since * 50 > ping + 10) {
+                    break;
+                }
+                
+                // If ticks <= 1 then we are handling a moving piston
+                // 1 -> send 1 tick later, 0 -> send 2 ticks later
+                BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
+                sm.write(0, newbp); 
+                if (since <= 1) {
+                    event.setCancelled(true);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet);
+                    }, since * - 1 + 2);
+                }
+                
                 break;
-            }
-            
-            // If ticks <= 1 then we are handling a moving piston
-            // 1 -> send 1 tick later, 0 -> send 2 ticks later
-            BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
-            sm.write(0, newbp); 
-            if (since <= 1) {
-                event.setCancelled(true);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet);
-                }, since * - 1 + 2);
-            }
-            
-            break;
+            }  
+        } catch (ConcurrentModificationException e) {
+            plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
+            return;
         }
     }
     

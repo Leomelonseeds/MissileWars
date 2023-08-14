@@ -91,20 +91,29 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         
         // EXTREMELY EXPERIMENTAL RUBBERBAND FIXER
         
-        // Rewrite to relative teleport
+        // Rewrite to relative teleport. Prevent rubberbanding entirely if server
+        // location is close enough to clients. Otherwise, send a packet to teleport
+        // the client to the server position.
         Set<RelativeMovement> flags = new HashSet<>();
-        // flags.add(RelativeMovement.X);
-        // flags.add(RelativeMovement.Y);
-        // flags.add(RelativeMovement.Z);
+        Location server = player.getLocation();
+        Location client = PositionListener.clientPosition.get(player.getUniqueId());
+        if (server.distance(client) > 2) {
+            // flags.add(RelativeMovement.X);
+            // flags.add(RelativeMovement.Y);
+            // flags.add(RelativeMovement.Z);
+            smd.write(0, client.getX());
+            smd.write(1, client.getY());
+            smd.write(2, client.getZ());
+        }
         flags.add(RelativeMovement.X_ROT);
         flags.add(RelativeMovement.Y_ROT);
         packet.getSets(RELATIVE_MOVEMENT_CONVERTER).write(0, flags);
         smf.write(0, 0.0F);
         smf.write(1, 0.0F);
-        // smd.write(0, 0.0);
-        // smd.write(1, 0.0);
-        // smd.write(2, 0.0);
         
-        plugin.log("Packet modified. Player position: " + player.getLocation());
+        plugin.log("Server position: " + server);
+        plugin.log("Client position: " + client);
+        plugin.log("Difference: " + server.clone().subtract(client));
+        plugin.log("Distance: " + server.distance(client));
     }
 }
