@@ -110,9 +110,7 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
             teleportQueue.remove(uuid);
         }
         
-        // Rewrite to relative teleport. Prevent rubberbanding entirely if server
-        // location is close enough to clients. Otherwise, don't modify the final
-        // location of the packet.
+        // Rewrite to relative teleport
         Set<RelativeMovement> flags = new HashSet<>();
         flags.add(RelativeMovement.X);
         flags.add(RelativeMovement.Y);

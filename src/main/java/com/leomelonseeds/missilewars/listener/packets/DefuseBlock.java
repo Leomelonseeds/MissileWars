@@ -13,13 +13,14 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
  */
 public class DefuseBlock {
 
-    // Max ping to account for is 350, so 6 ticks before removal
+    // Max ping to account for is 350, so 7 ticks before removal
     private static final int TICKS_BEFORE_REMOVAL = 7;
     private World world;
     private int x;
     private int y;
     private int z;
     private int lastZ;
+    private int nextZ;
     private int ticks;
     
     public DefuseBlock(Location loc, BlockFace direction, DefuseHelper dfh) {
@@ -27,7 +28,9 @@ public class DefuseBlock {
         x = loc.getBlockX();
         y = loc.getBlockY();
         lastZ = loc.getBlockZ();
-        z = direction == BlockFace.SOUTH ? lastZ + 1 : lastZ - 1;
+        int toAdd = direction == BlockFace.SOUTH ? 1 : -1;
+        z = lastZ + toAdd;
+        nextZ = z + toAdd;
         ticks = 0;
         
         // Add/Removal task
@@ -51,19 +54,12 @@ public class DefuseBlock {
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
     
-    /**
-     * @param newZ
-     * 
-     * Updates the Z location of the defuse block, also resetting the tick counter
-     */
-    public void setZ(int newZ) {
-        lastZ = z;
-        z = newZ;
-        ticks = 0;
-    }
-    
     public int getZ() {
         return z;
+    }
+    
+    public int getNextZ() {
+        return nextZ;
     }
     
     public int getTicks() {

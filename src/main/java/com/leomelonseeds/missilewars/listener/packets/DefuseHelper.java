@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -18,7 +19,6 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -117,21 +117,42 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 // Add 10 to the ping for players hovering around the border of ticks
                 int since = db.getTicks();
                 if (since * 50 > ping + 10) {
-                    break;
+                    return;
                 }
                 
-                // If ticks <= 1 then we are handling a moving piston
-                // 1 -> send 1 tick later, 0 -> send 2 ticks later
+                // If we're handling a moving piston, use spigot's setType to remove the block.
+                // Otherwise do packet rewriting for the smoothest experience (no ghost blocks).
+                // If the location already contains air, then move the packet forward another block.
+                // Then do the same checks again. If the checks happen to fail, then do nothing.
+                // I'm sure there's a way to write this with less lines but this is much easier to
+                // understand for me.
                 BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
-                sm.write(0, newbp); 
-                if (since <= 1) {
+                Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
+                Block block = world.getBlockAt(bploc);
+                if (block.getType() == Material.MOVING_PISTON) {
                     event.setCancelled(true);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet);
-                    }, since * - 1 + 2);
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        world.getBlockAt(bploc).setType(Material.AIR);
+                    });
+                    return;
+                } else if (block.getType() == Material.AIR) {
+                    bploc.setZ(db.getNextZ());
+                    block = world.getBlockAt(bploc);
+                    if (block.getType() == Material.MOVING_PISTON) {
+                        event.setCancelled(true);
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            world.getBlockAt(bploc).setType(Material.AIR);
+                        });
+                        return;
+                    } else if (block.getType() == Material.AIR) {
+                        return;
+                    }
+                    
+                    newbp = new BlockPosition(bp.getX(), bp.getY(), db.getNextZ());
                 }
                 
-                break;
+                sm.write(0, newbp);  
+                return;
             }  
         } catch (ConcurrentModificationException e) {
             plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
