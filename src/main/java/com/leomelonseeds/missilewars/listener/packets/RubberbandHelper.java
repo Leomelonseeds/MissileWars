@@ -14,7 +14,6 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.EquivalentConverter;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -23,8 +22,6 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
-
-import net.minecraft.world.entity.RelativeMovement;
 
 public class RubberbandHelper extends PacketAdapter implements Listener {
     
@@ -43,13 +40,16 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
     // by hooking into NMS. This was absolutely insane to figure out.
     
     private static final Class<?> RELATIVE_MOVEMENT_CLASS = MinecraftReflection.getMinecraftClass("world.entity.RelativeMovement");
-    private static final EquivalentConverter<RelativeMovement> RELATIVE_MOVEMENT_CONVERTER = new EnumWrappers.IndexedEnumConverter<>(RelativeMovement.class, RELATIVE_MOVEMENT_CLASS);
     private MissileWarsPlugin plugin;
     public static Set<UUID> teleportQueue = new HashSet<>();
     
     public RubberbandHelper(MissileWarsPlugin plugin) {
         super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.POSITION);
         this.plugin = plugin;
+    }
+    
+    public enum PlayerTeleportFlag {
+        X, Y, Z, Y_ROT, X_ROT
     }
 
     @Override
@@ -111,13 +111,13 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         }
         
         // Rewrite to relative teleport
-        Set<RelativeMovement> flags = new HashSet<>();
-        flags.add(RelativeMovement.X);
-        flags.add(RelativeMovement.Y);
-        flags.add(RelativeMovement.Z);
-        flags.add(RelativeMovement.X_ROT);
-        flags.add(RelativeMovement.Y_ROT);
-        packet.getSets(RELATIVE_MOVEMENT_CONVERTER).write(0, flags);
+        Set<PlayerTeleportFlag> flags = new HashSet<>();
+        flags.add(PlayerTeleportFlag.X);
+        flags.add(PlayerTeleportFlag.Y);
+        flags.add(PlayerTeleportFlag.Z);
+        flags.add(PlayerTeleportFlag.X_ROT);
+        flags.add(PlayerTeleportFlag.Y_ROT);
+        packet.getSets(EnumWrappers.getGenericConverter(RELATIVE_MOVEMENT_CLASS, PlayerTeleportFlag.class)).write(0, flags);
         smf.write(0, 0.0F);
         smf.write(1, 0.0F);
         smd.write(0, 0.0);
