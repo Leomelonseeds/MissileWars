@@ -141,7 +141,7 @@ public class SchematicManager {
         }
         
         // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
-        if (player.hasPermission("umw.oldoffsets")) {
+        if (player != null && player.hasPermission("umw.oldoffsets")) {
             offset.setZ(offset.getZ() + (Double.valueOf(ConfigUtils.getItemValue(args[0], level, "speed") + "") > 3 ? 2 : 1));
         }
         
