@@ -1687,15 +1687,15 @@ gpassive:
     - "&7increased by %upercentage%%&7."
     cost: 1500
     1:
-      mpercentage: 5
+      mpercentage: 7
       upercentage: 15
       spcost: 1
     2:
-      mpercentage: 10
+      mpercentage: 14
       upercentage: 30
       spcost: 1
     3: 
-      mpercentage: 15
+      mpercentage: 21
       upercentage: 45
       spcost: 1
   utilityspec:
@@ -1708,13 +1708,13 @@ gpassive:
     cost: 1200   
     1:
       upercentage: 10
-      mpercentage: 5
+      mpercentage: 10
       spcost: 1
     2:
       upercentage: 20
-      mpercentage: 10
+      mpercentage: 20
       spcost: 1
     3: 
       upercentage: 30
-      mpercentage: 15
+      mpercentage: 30
       spcost: 1
