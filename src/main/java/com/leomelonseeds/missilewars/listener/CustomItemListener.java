@@ -191,18 +191,30 @@ public class CustomItemListener implements Listener {
             }
             
             event.setCancelled(true);
-            String command = "bossshop open menu " + player.getName();
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "bossshop open menu " + player.getName());
             return;
         }
         
         // Player is using a held item inside an arena
         if (held != null) {
             event.setCancelled(true);
-            if (held.equals("leave")) {
-                playerArena.removePlayer(player.getUniqueId(), true);
-            } else if (held.equals("votemap")) {
+            UUID uuid = player.getUniqueId();
+            switch(held) {
+            case "votemap":
                 new MapVoting(player);
+                break;
+            case "leave":
+                playerArena.removePlayer(uuid, true);
+                break;
+            case "red":
+            case "blue":
+                playerArena.enqueue(uuid, held);
+                break;
+            case "spectate":
+                playerArena.addSpectator(uuid);
+                break;
+            case "deck":
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "bossshop open decks " + player.getName());
             }
             return;
         }

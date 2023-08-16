@@ -37,6 +37,7 @@ import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
+import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -522,7 +523,6 @@ public abstract class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
         }
 
-        ConfigUtils.sendConfigMessage("messages.joined-arena", player, this, null);
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
 
@@ -537,12 +537,15 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Give player items
-        ItemStack leave = MissileWarsPlugin.getPlugin().getDeckManager().createItem("held.to-lobby", 0, false);
-        addHeldMeta(leave, "leave");
-        player.getInventory().setItem(8, leave);
-        ItemStack votemap = MissileWarsPlugin.getPlugin().getDeckManager().createItem("held.votemap", 0, false);
-        addHeldMeta(votemap, "votemap");
-        player.getInventory().setItem(4, votemap);
+        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
+        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+        for (String i : items) {
+            String path = "held." + i;
+            ItemStack item = dm.createItem(path, 0, false);
+            addHeldMeta(item, i);
+            player.getInventory().setItem(itemConfig.getInt(path), item);
+        }
 
         // Check for game start
         postJoin(player, asSpectator);

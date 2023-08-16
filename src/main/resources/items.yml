@@ -1453,15 +1453,27 @@ held:
   votemap:
     item: MAP
     name: "&aMap Voting"
+    slot: 4
   to-lobby:
     item: BARRIER
     name: "&bReturn to Lobby"
+    slot: 8
   blue:
     item: BLUE_DYE
     name: "&9Queue Blue"
+    slot: 5
   red:
     item: RED_DYE
     name: "&cQueue Red"
+    slot: 3
+  deck:
+    item: BOOK
+    name: "&3Select Deck"
+    slot: 0
+  spectate:
+    item: ENDER_EYE
+    name: "&8Spectate"
+    slot: 7
    
 
 # Stuff relating to Deck GUI
