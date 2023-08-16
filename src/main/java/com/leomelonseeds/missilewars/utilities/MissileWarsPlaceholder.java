@@ -65,6 +65,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             }
         }
 
+        if (params.equalsIgnoreCase("deck_plain")) {
+            return MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId()).getString("Deck");
+        }
+
         if (params.equalsIgnoreCase("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");

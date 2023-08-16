@@ -1456,6 +1456,12 @@ held:
   to-lobby:
     item: BARRIER
     name: "&bReturn to Lobby"
+  blue:
+    item: BLUE_DYE
+    name: "&9Queue Blue"
+  red:
+    item: RED_DYE
+    name: "&cQueue Red"
    
 
 # Stuff relating to Deck GUI
@@ -1558,7 +1564,7 @@ text:
 preset:
   info:
     Architect:
-      item: NETHER_STAR
+      item: IRON_PICKAXE
       name: "&2&lArchitect"
       lore:
       - ""
@@ -1576,7 +1582,7 @@ preset:
       - ""
       - "&cClick &7to use this deck."
     Vanguard:
-      item: NETHER_STAR
+      item: GOLDEN_SWORD
       name: "&6&lVanguard"
       lore:
       - ""
@@ -1595,7 +1601,7 @@ preset:
       - ""
       - "&cClick &7to use this deck."
     Sentinel:
-      item: NETHER_STAR
+      item: BOW
       name: "&b&lSentinel"
       lore:
       - ""
@@ -1615,7 +1621,7 @@ preset:
       - ""
       - "&cClick &7to use this deck."
     Berserker:
-      item: NETHER_STAR
+      item: CROSSBOW
       name: "&c&lBerserker"
       lore:
       - ""
