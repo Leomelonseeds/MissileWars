@@ -21,6 +21,8 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
+import net.kyori.adventure.text.Component;
+
 public class PresetSelector implements MWInventory {
     
     private Inventory inv;
@@ -121,6 +123,14 @@ public class PresetSelector implements MWInventory {
         
         // Add top info
         ItemStack info = dm.createItem("preset.info." + deck, 0, false);
+        ItemMeta infoMeta = info.getItemMeta();
+        infoMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
+        if (playerJson.getString("Deck").equals(deck)) {
+            List<Component> lore = infoMeta.lore();
+            lore.set(lore.size() - 1, ConfigUtils.toComponent("&aSelected"));
+            infoMeta.lore(lore);
+        }
+        info.setItemMeta(infoMeta);
         inv.setItem(4, info);
         for (int i = 0; i < 9; i++) {
             if (i == 4) {
