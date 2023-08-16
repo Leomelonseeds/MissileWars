@@ -280,8 +280,15 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equalsIgnoreCase("blue_portals")) {
-
             return blueTeam.getRemainingPortals() + "";
+        }
+
+        if (params.equalsIgnoreCase("red_portals_total")) {
+            return redTeam.getTotalPortals() + "";
+        }
+
+        if (params.equalsIgnoreCase("blue_portals_total")) {
+            return blueTeam.getTotalPortals() + "";
         }
 
         return null; // Placeholder is unknown by the Expansion
