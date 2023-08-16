@@ -72,6 +72,10 @@ public class SchematicManager {
         }
         return vector;
     }
+    
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision) {
+        return spawnNBTStructure(player, structureName, loc, redMissile, mapName, isMissile, checkCollision, 0);
+    }
 
     /**
      * Spawn a structure at a given location with a given rotation.
@@ -85,7 +89,7 @@ public class SchematicManager {
      * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision) {
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
 
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
@@ -171,6 +175,7 @@ public class SchematicManager {
             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
             boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
+            boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red");
             if (redMissile) {
                 for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
                     for (int y = spawny; y < spawny + sizey; y++) {
@@ -190,6 +195,11 @@ public class SchematicManager {
                             
                             // Check all other cancellable blocks
                             if (cancel.contains(b.toString())) {
+                                // Move missile backwards if it would spawn in another base (it has definitely collided with the portal)
+                                if (missileInOtherBase) {
+                                    Location testAgain = loc.clone().add(0, 0, 1);
+                                    return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
+                                }
                                 sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
                             }
@@ -212,6 +222,10 @@ public class SchematicManager {
                             }
                             
                             if (cancel.contains(b.toString())) {
+                                if (missileInOtherBase) {
+                                    Location testAgain = loc.clone().add(0, 0, -1);
+                                    return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
+                                }
                                 sendError(player, "You cannot spawn structures inside unbreakable blocks!");
                                 return false;
                             }
@@ -223,6 +237,9 @@ public class SchematicManager {
 
         // Place structure
         structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
+        if (player != null && attempt > 0) {
+            ConfigUtils.sendConfigMessage("messages.missile-moved", player, null, null);
+        }
         
         // Add structure to tracker list
         World world = loc.getWorld();
@@ -277,6 +294,10 @@ public class SchematicManager {
     }
     
     private static void sendError(Player player, String message) {
+        if (player == null) {
+            return;
+        }
+        
         player.sendMessage(ConfigUtils.toComponent("&c" + message));
     }
     

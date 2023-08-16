@@ -120,6 +120,7 @@ messages:
   team-balancing: "&a&l[!] &7Your cooldowns are &afaster &7because the teams are unbalanced."
   change-preset: "&a&l[!] &7You are now using %deck% - Preset %preset%!"
   dropped-alcohol: "&c&l[!] &7You had alcohol in your hotbar, so it was dropped."
+  missile-moved: "&a&l[!] &7Your missile was moved backward, since you tried to spawn it in an enemy portal."
   training-start:
     - "&b========================================"
     - "&d&lMissile &5&lWars &7- &d&lTraining"
