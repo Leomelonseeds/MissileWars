@@ -536,16 +536,7 @@ public abstract class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
         }
         
-        // Give player items
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
-        String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
-        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
-        for (String i : items) {
-            String path = "held." + i;
-            ItemStack item = dm.createItem(path, 0, false);
-            addHeldMeta(item, i);
-            player.getInventory().setItem(itemConfig.getInt(path + ".slot"), item);
-        }
+        giveHeldItems(player);
 
         // Check for game start
         postJoin(player, asSpectator);
@@ -574,6 +565,19 @@ public abstract class Arena implements ConfigurationSerializable {
             } else {
                 enqueue(player.getUniqueId(), "blue");
             }
+        }
+    }
+    
+    // Give player necessary items
+    protected void giveHeldItems(Player player) {
+        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
+        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+        for (String i : items) {
+            String path = "held." + i;
+            ItemStack item = dm.createItem(path, 0, false);
+            addHeldMeta(item, i);
+            player.getInventory().setItem(itemConfig.getInt(path + ".slot"), item);
         }
     }
     
@@ -700,6 +704,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
         player.teleport(getPlayerSpawn(player));
         player.setGameMode(GameMode.ADVENTURE);
+        giveHeldItems(player);
 
         return true;
     }
