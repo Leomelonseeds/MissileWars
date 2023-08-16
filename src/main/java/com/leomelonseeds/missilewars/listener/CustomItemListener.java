@@ -203,7 +203,7 @@ public class CustomItemListener implements Listener {
             case "votemap":
                 new MapVoting(player);
                 break;
-            case "leave":
+            case "to-lobby":
                 playerArena.removePlayer(uuid, true);
                 break;
             case "red":

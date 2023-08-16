@@ -129,6 +129,7 @@ public class PresetSelector implements MWInventory {
             List<Component> lore = infoMeta.lore();
             lore.set(lore.size() - 1, ConfigUtils.toComponent("&aSelected"));
             infoMeta.lore(lore);
+            infoMeta.addEnchant(Enchantment.DURABILITY, 1, true);
         }
         info.setItemMeta(infoMeta);
         inv.setItem(4, info);
