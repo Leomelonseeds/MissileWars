@@ -140,6 +140,11 @@ public class SchematicManager {
             offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
         }
         
+        // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
+        if (player.hasPermission("umw.oldoffsets")) {
+            offset.setZ(offset.getZ() + Double.valueOf(ConfigUtils.getItemValue(args[0], level, "offset.z") + "") > 3 ? 2 : 1);
+        }
+        
         // Check for pokemissile
         int sizex = structure.getSize().getBlockX();
         int sizey = structure.getSize().getBlockY();

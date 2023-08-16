@@ -43,9 +43,9 @@ lightning:
 supersonic:
   index: 3
   1:
-    file: 'hypersonic.nbt'
+    file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ Hypersonic ⚡"
+    name: "&b☢ Supersonic ⚡"
     lore:
     - ""
     - "&74.4 meters per second is not, in technical"
@@ -58,23 +58,22 @@ supersonic:
       y: -5
       z: 3
     speed: 4.4
-    tnt: 6
+    tnt: 4
   2:
-    file: 'supersonic.nbt'
+    file: 'hypersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ &lSupersonic &b⚡"
+    name: "&b☢ &lHypersonic &b⚡"
     lore:
     - ""
-    - "&7Although this missile sounds like a downgrade"
-    - "&7from the Hypersonic, it in fact has much less"
-    - "&7social anxiety, in addition to being a lot"
-    - "&7easier and smoother to ride."
+    - "&7This missile is the older, spoiled brother"
+    - "&7of the socially anxious Supersonic."
+    - ""
     offset:
       x: -1
       y: -5
       z: 3
     speed: 4.4
-    tnt: 4
+    tnt: 6
     spcost: 1
 
 tomahawk:
