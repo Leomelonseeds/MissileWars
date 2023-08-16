@@ -1704,11 +1704,11 @@ gpassive:
     - "&7increased by %upercentage%%&7."
     cost: 1500
     1:
-      mpercentage: 6
+      mpercentage: 10
       upercentage: 15
       spcost: 1
     2:
-      mpercentage: 13
+      mpercentage: 15
       upercentage: 30
       spcost: 1
     3: 
