@@ -92,36 +92,38 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
             return;
         }
         
-        // EXTREMELY EXPERIMENTAL RUBBERBAND FIXER
-        // Sync server location with client by teleporting them
-        UUID uuid = player.getUniqueId();
-        if (!teleportQueue.contains(uuid)) {
-            PacketContainer clientPacket = PositionListener.clientPosition.get(uuid);
-            StructureModifier<Double> lcsmd = clientPacket.getDoubles(); // 0 x 1 y 2 z
-            StructureModifier<Float> lcsmf = clientPacket.getFloat(); // 0 yaw 1 pitch
-            float yaw = lcsmf.read(0) == 0 ? smf.read(0) : lcsmf.read(0);
-            float pitch = lcsmf.read(1) == 0 ? smf.read(1) : lcsmf.read(1);
-            teleportQueue.add(uuid);
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
-                player.teleport(teleportTo);
-            });
-        } else {
-            teleportQueue.remove(uuid);
-        }
-        
         // Rewrite to relative teleport
         Set<PlayerTeleportFlag> flags = new HashSet<>();
-        flags.add(PlayerTeleportFlag.X);
-        flags.add(PlayerTeleportFlag.Y);
-        flags.add(PlayerTeleportFlag.Z);
+        if (!player.hasPermission("umw.disablepositionrubberbandfix")) {
+            flags.add(PlayerTeleportFlag.X);
+            flags.add(PlayerTeleportFlag.Y);
+            flags.add(PlayerTeleportFlag.Z);
+            smd.write(0, 0.0);
+            smd.write(1, 0.0);
+            smd.write(2, 0.0);
+            
+            // Sync server location with client by teleporting them
+            UUID uuid = player.getUniqueId();
+            if (!teleportQueue.contains(uuid)) {
+                PacketContainer clientPacket = PositionListener.clientPosition.get(uuid);
+                StructureModifier<Double> lcsmd = clientPacket.getDoubles(); // 0 x 1 y 2 z
+                StructureModifier<Float> lcsmf = clientPacket.getFloat(); // 0 yaw 1 pitch
+                float yaw = lcsmf.read(0) == 0 ? smf.read(0) : lcsmf.read(0);
+                float pitch = lcsmf.read(1) == 0 ? smf.read(1) : lcsmf.read(1);
+                teleportQueue.add(uuid);
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
+                    player.teleport(teleportTo);
+                });
+            } else {
+                teleportQueue.remove(uuid);
+            }
+        }
+        
         flags.add(PlayerTeleportFlag.X_ROT);
         flags.add(PlayerTeleportFlag.Y_ROT);
         packet.getSets(EnumWrappers.getGenericConverter(RELATIVE_MOVEMENT_CLASS, PlayerTeleportFlag.class)).write(0, flags);
         smf.write(0, 0.0F);
         smf.write(1, 0.0F);
-        smd.write(0, 0.0);
-        smd.write(1, 0.0);
-        smd.write(2, 0.0);
     }
 }
