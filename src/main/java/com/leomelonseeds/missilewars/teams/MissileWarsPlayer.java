@@ -148,7 +148,7 @@ public class MissileWarsPlayer {
 
                 // At this point, we know the player is holding a missile item facing a block
                 Location loc = target.getLocation();
-                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == "red");
+                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == "red", player.hasPermission("umw.oldoffsets"));
                 double x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
                 double x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
                 double y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
