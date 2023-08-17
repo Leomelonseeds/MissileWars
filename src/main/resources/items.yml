@@ -1508,13 +1508,13 @@ indicators:
     slot: 18
   passive:
     item: YELLOW_DYE
-    name: "&e&lPassive"
+    name: "&e&lPassive &8(1 only)"
     lore:
       - "&7Perks that are always active"
     slot: 27
   gpassive:
     item: PURPLE_DYE
-    name: "&5&lGlobal Passive"
+    name: "&5&lGlobal Passive &8(1 only)"
     lore:
       - "&7Perks available to all decks"
       - "&7that are always active"
