@@ -211,7 +211,12 @@ public class CustomItemListener implements Listener {
                 playerArena.enqueue(uuid, held);
                 break;
             case "spectate":
-                playerArena.addSpectator(uuid);
+                MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
+                if (playerArena.isSpectating(mwp)) {
+                    playerArena.removeSpectator(mwp);
+                } else {
+                    playerArena.addSpectator(uuid); 
+                }
                 break;
             case "deck":
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "bossshop open decks " + player.getName());
