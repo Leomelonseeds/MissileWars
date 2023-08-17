@@ -207,7 +207,7 @@ public class ArenaManager {
             int capacity = arena.getCapacity();
             String gamemode = arena.getGamemode();
             removeArena(arena);
-            createArena(rawname, gamemode, capacity);
+            createArena(rawname, rawname.equals("training") ? rawname : gamemode, capacity);
         }
     }
 

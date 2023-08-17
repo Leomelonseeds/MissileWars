@@ -296,19 +296,19 @@ titles:
     subtitle: "&fRiding missiles"
     length: 60
   stage3:
-    title: "&bPart 4"
+    title: "&bPart 3"
     subtitle: "&fDefending"
     length: 60
   stage4:
-    title: "&bPart 5 (Optional)"
+    title: "&bPart 4 (Optional)"
     subtitle: "&fAttacking"
     length: 60
   stage5:
-    title: "&bPart 6"
+    title: "&bPart 5"
     subtitle: "&fDecks"
     length: 60
   stage6:
-    title: "&bPart 7"
+    title: "&bPart 6"
     subtitle: "&fDeck customization"
     length: 60
     
