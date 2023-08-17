@@ -291,6 +291,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return blueTeam.getTotalPortals() + "";
         }
 
+        if (params.equalsIgnoreCase("kills")) {
+            return playerArena.getPlayerInArena(player.getUniqueId()).getKills() + "";
+        }
+
         return null; // Placeholder is unknown by the Expansion
     }
 

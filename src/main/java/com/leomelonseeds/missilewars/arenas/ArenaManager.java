@@ -355,7 +355,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
-        arenaWorld.setDifficulty(Difficulty.NORMAL);
+        arenaWorld.setDifficulty(Difficulty.EASY);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
@@ -434,7 +434,7 @@ public class ArenaManager {
             Vector vVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.vanguard", null, null);
             Location vLoc = new Location(arenaWorld, vVec.getX(), vVec.getY(), vVec.getZ());
             vLoc.setYaw(-90);
-            NPC vanguard = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§6§lVanguard");
+            NPC vanguard = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§6§lVanguard §6⚡§f");
             SkinTrait vSkin = vanguard.getOrAddTrait(SkinTrait.class);
             vSkin.setSkinPersistent("vanguard", schematicConfig.getString("lobby.npc-pos.vanguard.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.vanguard.value"));
@@ -456,7 +456,7 @@ public class ArenaManager {
             Vector sVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.sentinel", null, null);
             Location sLoc = new Location(arenaWorld, sVec.getX(), sVec.getY(), sVec.getZ());
             sLoc.setYaw(-90);
-            NPC sentinel = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§b§lSentinel");
+            NPC sentinel = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§b§lSentinel §b✟§f");
             SkinTrait sSkin = sentinel.getOrAddTrait(SkinTrait.class);
             sSkin.setSkinPersistent("sentinel", schematicConfig.getString("lobby.npc-pos.sentinel.signature"),
                                                 schematicConfig.getString("lobby.npc-pos.sentinel.value"));
@@ -478,7 +478,7 @@ public class ArenaManager {
             Vector bVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
             Location bLoc = new Location(arenaWorld, bVec.getX(), bVec.getY(), bVec.getZ());
             bLoc.setYaw(-90);
-            NPC berserker = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§c§lBerserker");
+            NPC berserker = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§c§lBerserker ☣§f");
             SkinTrait bSkin = berserker.getOrAddTrait(SkinTrait.class);
             bSkin.setSkinPersistent("berserker", schematicConfig.getString("lobby.npc-pos.berserker.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.berserker.value"));
@@ -500,7 +500,7 @@ public class ArenaManager {
             Vector aVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.architect", null, null);
             Location aLoc = new Location(arenaWorld, aVec.getX(), aVec.getY(), aVec.getZ());
             aLoc.setYaw(-90);
-            NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§2§lArchitect");
+            NPC architect = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, "§2§lArchitect §2⚒§f");
             SkinTrait aSkin = architect.getOrAddTrait(SkinTrait.class);
             aSkin.setSkinPersistent("architect", schematicConfig.getString("lobby.npc-pos.architect.signature"),
                                                  schematicConfig.getString("lobby.npc-pos.architect.value"));

@@ -139,25 +139,17 @@ messages:
     - "&b========================================"
   stage2:
     - "&b========================================"
-    - "&fPlace a missile &a2-4 blocks &fbehind the edge of"
-    - "&fthe base, then run and jump on it to ride it."
+    - "&fPlace a missile on the the edge of the base,"
+    - "&fthen run and jump on it to ride it."
     - "&b========================================"
   stage3:
-    - "&b========================================"
-    - "&7&oThis part is optional - type &f/skip &7to skip it"
-    - "&fThe &8Concorde &fis a fast missile. To ride it:"
-    - "&f- Stand on the &nedge &fof the base and turn around"
-    - "&f- Aim &a3 blocks &fin front and place the missile"
-    - "&f- &nQuickly &fturn around and jump to ride"
-    - "&b========================================"
-  stage4:
     - "&b========================================"
     - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
     - "&fcan be thrown to defend against oncoming missiles."
     - "&fThey spawn after &a1 second &f and will &cbreak &fif"
     - "&fthey hit a block before then."
     - "&b========================================"
-  stage5:
+  stage4:
     - "&b========================================"
     - "&7&oThis part is optional - type &f/skip &7to skip it"
     - "&fBehind the enemy base are &5nether portals &fthat"
@@ -165,14 +157,14 @@ messages:
     - "&fto the enemy and spawn a bunch of missiles inside"
     - "&ftheir base to blow it up!"
     - "&b========================================"
-  stage6:
+  stage5:
     - "&b========================================"
     - "&fThere are 4 decks &7(kits) &favailable to play."
     - "&fEach contains 5 unique missiles and 3 utility."
     - "&fYou are using &b&lSentinel&f. Use &a/leave&f, and"
     - "&finteract with the NPCs to select &c&lBerserker&f."
     - "&b========================================"
-  stage7:
+  stage6:
     - "&b========================================"
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
@@ -304,22 +296,18 @@ titles:
     subtitle: "&fRiding missiles"
     length: 60
   stage3:
-    title: "&bPart 3 (Optional)"
-    subtitle: "&fRiding fast missiles"
-    length: 60
-  stage4:
     title: "&bPart 4"
     subtitle: "&fDefending"
     length: 60
-  stage5:
+  stage4:
     title: "&bPart 5 (Optional)"
     subtitle: "&fAttacking"
     length: 60
-  stage6:
+  stage5:
     title: "&bPart 6"
     subtitle: "&fDecks"
     length: 60
-  stage7:
+  stage6:
     title: "&bPart 7"
     subtitle: "&fDeck customization"
     length: 60
@@ -329,11 +317,10 @@ bossbar:
   stage0: "&aWelcome!"
   stage1: "&bGoal: &fRight-click to place a missile"
   stage2: "&bGoal: &fJump on and ride a missile"
-  stage3: "&bGoal: &fRide the &8Concorde"
-  stage4: "&bGoal: &fUse &5Obsidian Shield &for &0Torpedo &fto stop the oncoming missile"
-  stage5: "&bGoal: &fDestroy any of the enemy portals"
-  stage6: "&bGoal: &fUse &a/leave &fand change your deck to &c&lBerserker"
-  stage7: "&bGoal: &fUpgrade &6Sharpness &ffor &c&lBerserker &fto level 3"
+  stage3: "&bGoal: &fThrow an &5Obsidian Shield &for &0Torpedo &fto the &xX/"
+  stage4: "&bGoal: &fDestroy any of the enemy portals"
+  stage5: "&bGoal: &fUse &a/leave &fand change your deck to &c&lBerserker"
+  stage6: "&bGoal: &fUpgrade &6Sharpness &ffor &c&lBerserker &fto level 3"
   
 
 # For GUI inventory customization
