@@ -94,7 +94,7 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         
         // Rewrite to relative teleport
         Set<PlayerTeleportFlag> flags = new HashSet<>();
-        if (!player.hasPermission("umw.disablepositionrubberbandfix")) {
+        if (player.hasPermission("umw.positionrubberbandfix")) {
             flags.add(PlayerTeleportFlag.X);
             flags.add(PlayerTeleportFlag.Y);
             flags.add(PlayerTeleportFlag.Z);
@@ -110,11 +110,9 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
                 StructureModifier<Float> lcsmf = clientPacket.getFloat(); // 0 yaw 1 pitch
                 float yaw = lcsmf.read(0) == 0 ? smf.read(0) : lcsmf.read(0);
                 float pitch = lcsmf.read(1) == 0 ? smf.read(1) : lcsmf.read(1);
+                Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
                 teleportQueue.add(uuid);
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
-                    player.teleport(teleportTo);
-                });
+                Bukkit.getScheduler().runTask(plugin, () -> player.teleport(teleportTo));
             } else {
                 teleportQueue.remove(uuid);
             }
