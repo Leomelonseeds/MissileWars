@@ -158,6 +158,12 @@ public class ArenaInventoryListener implements Listener {
     /** Manage item dropping. */
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
+        // Make sure this action can't deflect a fireball
+        Player player = event.getPlayer();
+        ArenaGameruleListener.notLeftClick.add(player.getUniqueId());
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
+        ArenaGameruleListener.notLeftClick.remove(player.getUniqueId()), 1);
+        
         // Cancel if dropping custom item
         if (InventoryUtils.isHeldItem(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
@@ -165,7 +171,6 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Check if player is in Arena
-        Player player = event.getPlayer();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
         if (arena == null) {

@@ -44,7 +44,6 @@ public class DragonFireballHandler implements Listener {
         slime = (Slime) fireball.getWorld().spawnEntity(fireball.getLocation(), EntityType.SLIME);
         slime.setSize(2);
         slime.setInvisible(true);
-        slime.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, LIFETIME, 4, true, true));
         slime.setSilent(true);
         slime.setAI(false);
         updateTask = (Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1));
@@ -85,16 +84,24 @@ public class DragonFireballHandler implements Listener {
         if (!e.getEntity().getUniqueId().equals(slime.getUniqueId())) {
             return;
         }
-
+        
+        // Don't want anything to happen to slime
+        e.setDamage(0.001);
+        slime.setFireTicks(0);
+        for (PotionEffect pe : slime.getActivePotionEffects()) {
+            slime.removePotionEffect(pe.getType());
+        }
+        
         Entity damager = e.getDamager();
         Vector direction;
         if (damager instanceof Projectile) {
-            direction = damager.getVelocity();
+            direction = damager.getVelocity().normalize();
         } else if (damager instanceof Explosive) {
             direction = e.getEntity().getLocation().toVector().subtract(damager.getLocation().toVector());
         } else if (damager instanceof Player) {
             direction = ((Player) damager).getEyeLocation().getDirection();
             fireball.setShooter((ProjectileSource) damager);
+            ConfigUtils.sendConfigSound("fireball-deflect", (Player) damager);
         } else {
             return;
         }
@@ -103,11 +110,9 @@ public class DragonFireballHandler implements Listener {
         Vector curVelocity = fireball.getVelocity();
         fireball.setVelocity(new Vector(0, 0, 0));
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            slime.setFireTicks(0);
-            for (PotionEffect pe : slime.getActivePotionEffects()) {
-                slime.removePotionEffect(pe.getType());
+            if (!(damager instanceof Explosive)) {
+                fireball.setVelocity(direction.multiply(curVelocity.length()));  
             }
-            fireball.setVelocity(direction.multiply(curVelocity.length()));
             fireball.setDirection(direction);
             hitDetected = false;
         }, 1);

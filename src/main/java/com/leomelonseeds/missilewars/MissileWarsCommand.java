@@ -61,10 +61,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
-            for (ItemStack i : player.getInventory().getContents()) {
-                if (i == null) continue;
-                player.setCooldown(i.getType(), 0);
-            }
+            InventoryUtils.resetCooldowns(player);
         }
         
         // Make changes to map rotation

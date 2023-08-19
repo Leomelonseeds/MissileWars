@@ -1529,7 +1529,6 @@ indicators:
     - "&7purchase and upgrade it using"
     - "&aSkillpoints&7. Check the item below"
     - "&7for your available skillpoints."
-    - "&7You get one extra skillpoint per MW rank."
     - ""
     - "&aBalance: &f%mokens% Mokens"
     slot: 8

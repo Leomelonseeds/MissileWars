@@ -196,9 +196,9 @@ public class CustomItemListener implements Listener {
         }
         
         // Player is using a held item inside an arena
+        UUID uuid = player.getUniqueId();
         if (held != null) {
             event.setCancelled(true);
-            UUID uuid = player.getUniqueId();
             switch(held) {
             case "votemap":
                 new MapVoting(player);
@@ -229,6 +229,10 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        // Make sure this action can't deflect a fireball
+        ArenaGameruleListener.notLeftClick.add(uuid);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> ArenaGameruleListener.notLeftClick.remove(uuid), 1);
+        
         // Check if player is frozen by a canopy
         if (canopy_freeze.contains(player)) {
             event.setCancelled(true);
@@ -244,7 +248,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Disable if player just died
-        MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
         if (mwp.justSpawned() && !hand.getType().toString().contains("BOW")) {
             event.setCancelled(true);
             return;
@@ -262,7 +266,7 @@ public class CustomItemListener implements Listener {
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
                 event.setCancelled(true);
-                if (canopy_cooldown.contains(player.getUniqueId())) {
+                if (canopy_cooldown.contains(uuid)) {
                     return;
                 }
                 if (!player.isOnGround()) {
@@ -270,7 +274,7 @@ public class CustomItemListener implements Listener {
                     return;
                 }
                 ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
-                canopy_cooldown.add(player.getUniqueId());
+                canopy_cooldown.add(uuid);
                 Bukkit.getScheduler().runTaskLater(plugin, () -> spawnCanopy(player, playerArena, structureName, hand), 20L); 
                 return;
             }
@@ -357,7 +361,7 @@ public class CustomItemListener implements Listener {
                     fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
                             player.getEyeLocation().getDirection()), EntityType.FIREBALL);
                     // Check for boosterball passive. Store passive by setting incendiary value
-                    int boosterball = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
+                    int boosterball = plugin.getJSON().getAbility(uuid, "boosterball");
                     if (boosterball > 0) {
                         double multiplier = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", boosterball, "multiplier");
                         fireball.setIsIncendiary(false);

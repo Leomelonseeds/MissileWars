@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -19,7 +20,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -49,6 +49,9 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -61,7 +64,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -793,6 +795,14 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
+    // Reset cooldowns if player goes in creative
+    @EventHandler
+    public void onGamemode(PlayerGameModeChangeEvent event) {
+        if (event.getNewGameMode() == GameMode.CREATIVE) {
+            InventoryUtils.resetCooldowns(event.getPlayer());
+        }
+    }
+    
     // ---------------------------------------------------------
     // This section ignites tnt if b36 hit with flame arrow
     // ---------------------------------------------------------
@@ -900,39 +910,25 @@ public class ArenaGameruleListener implements Listener {
     // This section helps high-ping users with fireball deflections
     // --------------------------------------------------
     
+    public static Set<UUID> notLeftClick = new HashSet<>();
+    
     @EventHandler
-    public void onLeftClick(PlayerInteractEvent event) {
-        if (event.getAction() != Action.LEFT_CLICK_AIR) {
+    public void onPlayerAnimation(PlayerAnimationEvent event) {
+        if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) {
             return;
         }
-        
-        // Player ping / 2 is the latency from client to server.
-        // Therefore the click takes ping / 2 to register, and the
-        // fireball also appears ping / 2 milliseconds further away
-        // than it should. This means that by the time the click
-        // registers on the server, the fireball will already be ping
-        // milliseconds further along than it appears to the client.
-        // In other words, the player will only see the effect of their
-        // click after ping milliseconds.
-        
-        // To alleviate this issue for high-ping users, we simply perform
-        // fireball hit-detection on the server side, preventing the need
-        // for the hit packet to be sent in order for fb deflection.
-         
-       
+
+        // Cancel if a left click was recently detected
         Player player = event.getPlayer();
-        RayTraceResult rtr = player.rayTraceEntities(3);
-        if (rtr == null) {
+        if (notLeftClick.contains(player.getUniqueId())) {
             return;
         }
-        
-        Entity target = player.getTargetEntity(3);
+
+        Entity target = player.getTargetEntity(2); // 2 is enough for 3 block reach (for some reason)
         if (target == null) {
             return;
         }
         
-        MissileWarsPlugin.getPlugin().log("Fireball deflect attempt detected");
-
         // Handle dragon fireballs by registering an EDBEE for the handler
         if (target instanceof Slime) {
             @SuppressWarnings("deprecation")
@@ -942,19 +938,15 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Custom handle for normal fireballs (pretty much same code as dragon fireball hit detection)
-        if (target instanceof Fireball && !(target instanceof DragonFireball)) {
+        if (target instanceof Fireball) {
             Fireball fireball = (Fireball) target;
             Vector curVelocity = fireball.getVelocity();
             Vector direction = player.getEyeLocation().getDirection();
-            fireball.setVelocity(new Vector(0, 0, 0));
             fireball.setShooter(player);
+            fireball.setVelocity(direction.multiply(curVelocity.length()));
+            fireball.setDirection(direction);
             ConfigUtils.sendConfigSound("fireball-deflect", player);
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                fireball.setVelocity(direction.multiply(curVelocity.length()));
-                fireball.setDirection(direction);
-            }, 1);
             return;
         }
-        
     }
 }

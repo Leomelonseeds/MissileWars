@@ -219,4 +219,16 @@ public class InventoryUtils {
         
         di.consume(makeUnavailable);
     }
+    
+    /**
+     * Reset the player's visual cooldowns for all items
+     * 
+     * @param player
+     */
+    public static void resetCooldowns(Player player) {
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (i == null) continue;
+            player.setCooldown(i.getType(), 0);
+        }
+    }
 }
