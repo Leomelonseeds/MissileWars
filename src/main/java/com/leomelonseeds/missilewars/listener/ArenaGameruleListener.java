@@ -31,6 +31,7 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -908,11 +909,12 @@ public class ArenaGameruleListener implements Listener {
     
     // --------------------------------------------------
     // This section helps high-ping users with fireball deflections
+    // event is high priority to execute after player drop/interact
     // --------------------------------------------------
     
     public static Set<UUID> notLeftClick = new HashSet<>();
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerAnimation(PlayerAnimationEvent event) {
         if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) {
             return;
@@ -937,7 +939,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        // Custom handle for normal fireballs (pretty much same code as dragon fireball hit detection)
+        // Thank you so much mister CAG2 for suggesting Player#attack, absolute genius if you ask me
         if (target instanceof Fireball) {
             player.attack(target);
         }
