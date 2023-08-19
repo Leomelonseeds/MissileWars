@@ -939,14 +939,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Custom handle for normal fireballs (pretty much same code as dragon fireball hit detection)
         if (target instanceof Fireball) {
-            Fireball fireball = (Fireball) target;
-            Vector curVelocity = fireball.getVelocity();
-            Vector direction = player.getEyeLocation().getDirection();
-            fireball.setShooter(player);
-            fireball.setVelocity(direction.multiply(curVelocity.length()));
-            fireball.setDirection(direction);
-            ConfigUtils.sendConfigSound("fireball-deflect", player);
-            return;
+            player.attack(target);
         }
     }
 }
