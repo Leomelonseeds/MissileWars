@@ -136,6 +136,9 @@ public class DeckManager {
                     i.setType(Material.SPECTRAL_ARROW);
                 }
                 
+                // Hide enchants (for cooldown completion)
+                i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                
                 // Finalize item
                 int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
@@ -444,9 +447,6 @@ public class DeckManager {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             PotionData pdata = new PotionData(PotionType.WATER);
             pmeta.setBasePotionData(pdata);
-        } else if (name.equals("torpedo")) {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         item.setItemMeta(itemMeta);
         return item;

@@ -99,7 +99,6 @@ public class ArenaGameruleListener implements Listener {
     // Stop players from regen health in opponent base
     @EventHandler
     public void onRegen(EntityRegainHealthEvent event) {
-
         if (event.getRegainReason() != RegainReason.SATIATED) { 
             return; 
         }
@@ -165,10 +164,13 @@ public class ArenaGameruleListener implements Listener {
         event.setCancelled(true);
         event.setShouldPlayDeathSound(true);
         event.setReviveHealth(20);
+        Player player = event.getEntity();
+        
+        // Make player undrunk
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "brew " + player.getName() + " 0 10");
         
         // Check if player was killed in an Arena
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Player player = event.getEntity();
         ArenaManager manager = plugin.getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
@@ -212,7 +214,6 @@ public class ArenaGameruleListener implements Listener {
             }
         }
         
-        
         // Send death message
         Component customDeathMessage = CosmeticUtils.getDeathMessage(player, killer);
         for (Player p : player.getWorld().getPlayers()) {
@@ -250,7 +251,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (arena.getTeam(player.getUniqueId()) == "no team") {
+        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }
         
@@ -335,7 +336,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (arena.getTeam(player.getUniqueId()) == "no team") {
+        if (arena.getTeam(player.getUniqueId()).equals("no team")) {
             return;
         }
         

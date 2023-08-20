@@ -91,6 +91,10 @@ public class MiscListener implements Listener {
             player.setInvulnerable(false);
         }
         
+        // Make player undrunk
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "brew " + player.getName() + " 0 10");
+        
+        // Remove potion effects
         for (PotionEffect effect : player.getActivePotionEffects()){
             if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE) {
                 continue;

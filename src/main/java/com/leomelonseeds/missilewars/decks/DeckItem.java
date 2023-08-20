@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -50,7 +51,13 @@ public class DeckItem {
      * @return
      */
     public boolean matches(ItemStack i) {
-        return item.isSimilar(i);
+        if (i == null) {
+            return false;
+        }
+        
+        ItemStack toMatch = i.clone();
+        toMatch.removeEnchantment(Enchantment.DURABILITY);
+        return item.isSimilar(toMatch);
     }
     
     /**
@@ -162,6 +169,10 @@ public class DeckItem {
      * in the player's inventory. Should not return null.
      */
     public ItemStack getItem() {
+        return getItem(true);
+    }
+    
+    public ItemStack getItem(boolean reAdd) {
         Player player = mwp.getMCPlayer();
         for (ItemStack i : player.getInventory().getContents()) {
             if (matches(i)) {
@@ -169,9 +180,13 @@ public class DeckItem {
             }
         }
         
-        player.getInventory().addItem(item);
-        Bukkit.getLogger().log(Level.WARNING, "A player is missing an item " + item.getType() + ", so it was re-added to their inventory.");
-        return getItem();
+        if (reAdd) {
+            player.getInventory().addItem(item);
+            Bukkit.getLogger().log(Level.WARNING, "A player is missing an item " + item.getType() + ", so it was re-added to their inventory.");
+            return getItem(true);
+        }
+        
+        return null;
     }
     
     /**
@@ -256,6 +271,16 @@ public class DeckItem {
         int cd = c * 20;
         unavailable = cd != 0;
         player.setCooldown(item.getType(), cd);
+        
+        // Give item enchantment if 0 reached
+        ItemStack actual = getItem(false);
+        if (actual != null) {
+            if (c == 0) {
+                actual.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+            } else {
+                actual.removeEnchantment(Enchantment.DURABILITY);
+            } 
+        }
             
         // Due to the way crossbow loading and bow firing are handled,
         // setting the item cooldowns for them differs slightly
