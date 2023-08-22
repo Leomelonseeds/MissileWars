@@ -153,7 +153,10 @@ public class TutorialArena extends ClassicArena {
             return;
         }
 
-        // Give player location to throw shield at if stage 3
+        // Give player location to throw shield at if stage 4
+        if (!ConfigUtils.inShield(this, player.getLocation(), "blue", 2)) {
+            player.teleport(getPlayerSpawn(player));
+        }
         Random random = new Random();
         final double X = random.nextInt(-15, 16) + 0.5;
         final double Y = 13.5;
@@ -194,6 +197,7 @@ public class TutorialArena extends ClassicArena {
             player.showBossBar(bossbars.get(7));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
+                stage.remove(uuid);
                 removePlayer(uuid, true);
             }, 60);
             return;
