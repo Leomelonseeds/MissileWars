@@ -238,7 +238,7 @@ public class MissileWarsTeam {
         player.setJustSpawned();
         if (arena instanceof TrainingArena) {
             ConfigUtils.sendConfigMessage("messages.training-start", mcPlayer, null, null);
-        } else {
+        } else if (!(arena instanceof TutorialArena)) {
             ConfigUtils.sendConfigMessage("messages." + arena.getGamemode() + "-start", mcPlayer, null, null);
         }
         

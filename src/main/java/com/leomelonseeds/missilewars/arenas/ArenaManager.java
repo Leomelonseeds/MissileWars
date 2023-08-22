@@ -103,8 +103,8 @@ public class ArenaManager {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
             arena.loadWorldFromDisk();
             if (arena instanceof TutorialArena) {
-                Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aStarting tutorial arena in 10 seconds..."));
-                Bukkit.getScheduler().runTaskLater(plugin, () -> arena.start(), 10 * 20);
+                Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aStarting tutorial arena..."));
+                arena.start();
             }
         }
     }
@@ -644,13 +644,13 @@ public class ArenaManager {
 
 
     /**
-     * Gets a list of the loaded arenas, sorted by highest capacity
+     * Gets a list of the loaded arenas, sorted by highest capacity then by name
      *
      * @return The list of loaded arenas
      */
     public List<Arena> getLoadedArenas() {
         List<Arena> sortedArenas = loadedArenas;
-        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity));
+        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity).thenComparing(Arena.byName));
         return sortedArenas;
     }
 }

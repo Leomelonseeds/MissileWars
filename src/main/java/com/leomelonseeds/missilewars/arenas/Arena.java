@@ -56,9 +56,9 @@ import net.citizensnpcs.api.exception.NPCLoadException;
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
 
-    /** Comparator to sort by capacity */
+    /** Comparator for sorting arenas */
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
-    /** Comparator to sort by capacity */
+    public static Comparator<Arena> byName = Comparator.comparing(a -> a.getName());
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
     /** The arena name. */
     protected String name;
@@ -576,16 +576,12 @@ public abstract class Arena implements ConfigurationSerializable {
         for (String i : items) {
             String path = "held." + i;
             ItemStack item = dm.createItem(path, 0, false);
-            addHeldMeta(item, i);
+            ItemMeta meta = item.getItemMeta();
+            meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
+                    PersistentDataType.STRING, i);
+            item.setItemMeta(meta);
             player.getInventory().setItem(itemConfig.getInt(path + ".slot"), item);
         }
-    }
-    
-    private void addHeldMeta(ItemStack item, String s) {
-        ItemMeta meta = item.getItemMeta();
-        meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
-                PersistentDataType.STRING, s);
-        item.setItemMeta(meta);
     }
     
     /**
@@ -987,7 +983,13 @@ public abstract class Arena implements ConfigurationSerializable {
             }
             
             // Register teams and set running state to true
-            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> startTeams(), 5L));
+            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (players.isEmpty()) {
+                    running = true;
+                    return;
+                }
+                startTeams();
+            }, 5L));
         });
     }
     
@@ -1051,13 +1053,13 @@ public abstract class Arena implements ConfigurationSerializable {
                 toAssign.add(player);
             }
         }
+        
+        // Assign queued players. If a queue is larger than a team size put remaining
+        // players into the front of the queue to be assigned first into random teams
         queueCount = toAssign.size();
         Collections.shuffle(toAssign);
         double maxSize = getCapacity() / 2;
         double maxQueue = Math.ceil((double) (players.size() - spectators.size()) / 2);
-        
-        // Assign queued players. If a queue is larger than a team size put remaining
-        // players into the front of the queue to be assigned first into random teams
         while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
             if (!redQueue.isEmpty()) {
                 MissileWarsPlayer toAdd = redQueue.remove();

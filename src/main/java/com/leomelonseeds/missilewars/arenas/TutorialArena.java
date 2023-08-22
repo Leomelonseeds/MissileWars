@@ -1,12 +1,15 @@
 package com.leomelonseeds.missilewars.arenas;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -23,19 +26,26 @@ public class TutorialArena extends ClassicArena {
     
     public TutorialArena() {
         super("tutorial", 100);
+        init();
+        start();
+    }
+
+    public TutorialArena(Map<String, Object> serializedArena) {
+        super(serializedArena);
+        init();
+    }
+    
+    private void init() {
         this.stage = new HashMap<>();
+        this.bossbars = new ArrayList<>();
         
         // Initialize boss bars
         FileConfiguration messages = ConfigUtils.getConfigFile("messages.yml");
         for (int i = 0; i <= 6; i++) {
             String line = messages.getString("bossbar.stage" + i);
             BossBar bar = BossBar.bossBar(ConfigUtils.toComponent(line), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
-            bossbars.set(i, bar);
+            bossbars.add(bar);
         }
-    }
-
-    public TutorialArena(Map<String, Object> serializedArena) {
-        super(serializedArena);
     }
 
     @Override
@@ -79,7 +89,7 @@ public class TutorialArena extends ClassicArena {
     
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
-        player.showBossBar(bossbars.get(s));
+        stage.put(player.getUniqueId(), s);
         ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null);
         ConfigUtils.sendTitle("stage" + s, player);
         if (s == 0) {
@@ -89,7 +99,8 @@ public class TutorialArena extends ClassicArena {
             }, 120);
             return;
         } 
-        
+
+        player.showBossBar(bossbars.get(s));
         ConfigUtils.sendConfigSound("stage", player);
     }
     
@@ -107,15 +118,16 @@ public class TutorialArena extends ClassicArena {
             return;
         }
 
+        // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
         if (s == 6) {
             ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
             removePlayer(uuid, true);
         }
         
-        stage.put(uuid, actualStage + 1);
+        player.hideBossBar(bossbars.get(s));
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            initiateStage(player, actualStage + 1);
+            initiateStage(player, s + 1);
         }, 60);
     }
     
@@ -131,16 +143,13 @@ public class TutorialArena extends ClassicArena {
     }
     
     @Override
-    protected void giveHeldItems(Player player) {}
+    public void registerPortalBreak(Location location, Entity entity) {
+        
+    }
     
     // No need to track who left the arena here
     @Override
     public void addLeft(UUID uuid) {}
-    
-    @Override
-    public String getTimeRemaining() {
-        return "∞";
-    }
     
     @Override
     public void performTimeSetup() {}

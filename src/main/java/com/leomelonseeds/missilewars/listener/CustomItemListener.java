@@ -50,6 +50,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -314,6 +315,11 @@ public class CustomItemListener implements Listener {
                 }
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 mwp.incrementMissiles();
+                
+                // Training arena things
+                if (playerArena instanceof TutorialArena) {
+                    ((TutorialArena) playerArena).registerStageCompletion(player, 1);
+                }
             }
             return;
         }

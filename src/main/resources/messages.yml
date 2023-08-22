@@ -318,8 +318,8 @@ titles:
     
 # Bossbar goals
 bossbar:
-  stage0: "&aWelcome!"
-  stage1: "&bGoal: &fRight-click to place a missile"
+  stage0: "&aWelcome" # unused
+  stage1: "&bGoal: &fRight-click a spawn egg to place a missile"
   stage2: "&bGoal: &fJump on and ride a missile"
   stage3: "&bGoal: &fThrow an &5Obsidian Shield &for &0Torpedo &fto the &xX/"
   stage4: "&bGoal: &fDestroy any of the enemy portals"
