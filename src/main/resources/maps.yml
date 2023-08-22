@@ -78,13 +78,13 @@ lobby:
 classic:
   rotation:
   - default-map
-  - umbrella-beach
   - double-layer
+  - formal
+  - book
   - cubecrowd
-  - towers
+  - divider
+  - light-smog
   - 23andtnt
-  - coppercastle
-  - traffic-light-cake
   default-map:
     name: '&fStandoff'
     file: DefaultMap.schem
@@ -606,7 +606,7 @@ classic:
   formal:
     name: '&fFormal'
     file: Formal.schem
-    too-high: 37
+    too-high: 38
     blue-shield:
       y2: 34
     red-shield:
@@ -732,7 +732,7 @@ classic:
       x2: 28
       y2: 19
       z2: 74
-    too-high: 28
+    too-high: 29
   towers:
     name: '&fTowers'
     file: Towers.schem

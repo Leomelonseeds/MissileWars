@@ -176,59 +176,50 @@ public class SchematicManager {
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
             boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
             boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red");
+            int x1, x2, z1, z2;
             if (redMissile) {
-                for (int z = spawnz - sizez + 1; z <= spawnz; z++) {
-                    for (int y = spawny; y < spawny + sizey; y++) {
-                        for (int x = spawnx; x > spawnx - sizex; x--) {
-                            // Only check non-air blocks for missile collision
-                            Location l = new Location(loc.getWorld(), x, y, z);
-                            Material b = l.getBlock().getType();
-                            if (b == Material.AIR) {
-                                continue;
-                            }
-                            
-                            // Check for teamgrief
-                            if (missileInBase && z == spawnz - 1) {
-                                sendError(player, "You cannot spawn missiles inside your base!");
-                                return false;
-                            }
-                            
-                            // Check all other cancellable blocks
-                            if (cancel.contains(b.toString())) {
-                                // Move missile backwards if it would spawn in another base (it has definitely collided with the portal)
-                                if (missileInOtherBase) {
-                                    Location testAgain = loc.clone().add(0, 0, 1);
-                                    return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
-                                }
-                                sendError(player, "You cannot spawn structures inside unbreakable blocks!");
-                                return false;
-                            }
-                        }
-                    }
-                }
+                z1 = spawnz - sizez + 1;
+                z2 = spawnz;
+                x1 = spawnx - sizex + 1;
+                x2 = spawnx;
             } else {
-                for (int z = spawnz + sizez - 1; z >= spawnz; z--) {
-                    for (int y = spawny; y < spawny + sizey; y++) {
-                        for (int x = spawnx; x < spawnx + sizex; x++) {
-                            Location l = new Location(loc.getWorld(), x, y, z);
-                            Material b = l.getBlock().getType();
-                            if (b == Material.AIR) {
-                                continue;
+                z1 = spawnz;
+                z2 = spawnz + sizez - 1;
+                x1 = spawnx;
+                x2 = spawnx + sizex - 1;
+            }
+            
+            for (int z = z1; z <= z2; z++) {
+                for (int y = spawny; y < spawny + sizey; y++) {
+                    for (int x = x1; x <= x2; x++) {
+                        // Only check non-air blocks for missile collision
+                        Location l = new Location(loc.getWorld(), x, y, z);
+                        Material b = l.getBlock().getType();
+                        if (b == Material.AIR) {
+                            continue;
+                        }
+                        
+                        // Check for tutorial arena
+                        if (loc.getWorld().getName().contains("tutorial")) {
+                            sendError(player, "Missiles spawned in this arena must be clear of obstacles!");
+                            return false;
+                        }
+                        
+                        // Check for teamgrief
+                        if (missileInBase && z == spawnz - 1) {
+                            sendError(player, "You cannot spawn missiles inside your base!");
+                            return false;
+                        }
+                        
+                        // Check all other cancellable blocks
+                        if (cancel.contains(b.toString())) {
+                            // Move missile backwards if it would spawn in another base (it has definitely collided with the portal)
+                            if (missileInOtherBase) {
+                                Location testAgain = loc.clone().add(0, 0, 1);
+                                return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
                             }
-                            
-                            if (missileInBase && z == spawnz + 1) {
-                                sendError(player, "You cannot spawn missiles inside your base!");
-                                return false;
-                            }
-                            
-                            if (cancel.contains(b.toString())) {
-                                if (missileInOtherBase) {
-                                    Location testAgain = loc.clone().add(0, 0, -1);
-                                    return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
-                                }
-                                sendError(player, "You cannot spawn structures inside unbreakable blocks!");
-                                return false;
-                            }
+                            sendError(player, "You cannot spawn structures inside unbreakable blocks!");
+                            return false;
                         }
                     }
                 }

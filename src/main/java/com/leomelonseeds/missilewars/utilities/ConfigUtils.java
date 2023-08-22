@@ -165,6 +165,7 @@ public class ConfigUtils {
 
     /**
      * Send a configurable message with placeholders set for player.
+     * The path should include "messages."
      *
      * @param path the path to the message in the messages.yml file
      * @param player the player to send the message to and set placeholder using
@@ -236,7 +237,7 @@ public class ConfigUtils {
     }
     
     /**
-     * Send the team a title at a given path.
+     * Send the team a title at a given path. Path should not include "messages." or "titles."
      *
      * @param path the path
      */

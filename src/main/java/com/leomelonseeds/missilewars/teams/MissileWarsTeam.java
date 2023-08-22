@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -382,6 +383,10 @@ public class MissileWarsTeam {
         if (arena.isRunning()) {
             arena.addLeft(player.getMCPlayerId());
             arena.applyMultipliers(); // Check for cooldowns
+        }
+        
+        if (arena instanceof TutorialArena) {
+            ((TutorialArena) arena).removeBossBars(mcPlayer);
         }
     }
 

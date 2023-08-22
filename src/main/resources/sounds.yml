@@ -142,3 +142,11 @@ fireball-deflect:
   sound: ENTITY_PLAYER_ATTACK_WEAK
   volume: 1.0
   pitch: 1.0
+stagecomplete:
+  sound: ENTITY_PLAYER_LEVELUP
+  volume: 1.0
+  pitch: 1.0
+stage:
+  sound: BLOCK_NOTE_BLOCK_PLING
+  volume: 1.0
+  pitch: 1.1

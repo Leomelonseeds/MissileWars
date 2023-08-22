@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.arenas;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -64,6 +65,8 @@ import net.citizensnpcs.trait.VillagerProfession;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
+    
+    private final static List<String> specialArenas = new ArrayList<>(Arrays.asList(new String[] {"tutorial", "training"}));
 
     private final MissileWarsPlugin plugin;
 
@@ -207,7 +210,7 @@ public class ArenaManager {
             int capacity = arena.getCapacity();
             String gamemode = arena.getGamemode();
             removeArena(arena);
-            createArena(rawname, rawname.equals("training") ? rawname : gamemode, capacity);
+            createArena(rawname, specialArenas.contains(rawname) ? rawname : gamemode, capacity);
         }
     }
 
@@ -305,8 +308,8 @@ public class ArenaManager {
     	Logger logger = Bukkit.getLogger();
     	
     	String n = gamemode + "-" + tempname;
-    	if (gamemode.equals("training")) {
-    	    n = "training";
+    	if (specialArenas.contains(gamemode)) {
+    	    n = gamemode;
     	}
     	String name = n;
 
@@ -327,6 +330,9 @@ public class ArenaManager {
             break;
         case "training":
             arena = new TrainingArena();
+            break;
+        case "tutorial":
+            arena = new TutorialArena();
             break;
         default:
             logger.log(Level.WARNING, "Invalid arena type!");

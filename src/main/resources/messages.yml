@@ -311,6 +311,10 @@ titles:
     title: "&bPart 6"
     subtitle: "&fDeck customization"
     length: 60
+  stagecomplete:
+    title: "&f"
+    subtitle: "&aWell done!"
+    length: 60
     
 # Bossbar goals
 bossbar:
