@@ -4,30 +4,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
 
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 
 public class TutorialArena extends ClassicArena {
     
     private Map<UUID, Integer> stage;
+    private Map<UUID, Location> xs;
+    private Map<UUID, BukkitTask> particles;
     private List<BossBar> bossbars;
+    private boolean justReset;
     
     public TutorialArena() {
         super("tutorial", 100);
         init();
-        start();
     }
 
     public TutorialArena(Map<String, Object> serializedArena) {
@@ -36,16 +52,44 @@ public class TutorialArena extends ClassicArena {
     }
     
     private void init() {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         this.stage = new HashMap<>();
         this.bossbars = new ArrayList<>();
+        this.xs = new HashMap<>();
+        this.particles = new HashMap<>();
+        this.justReset = true;
         
         // Initialize boss bars
         FileConfiguration messages = ConfigUtils.getConfigFile("messages.yml");
-        for (int i = 0; i <= 6; i++) {
+        for (int i = 0; i <= 7; i++) {
             String line = messages.getString("bossbar.stage" + i);
             BossBar bar = BossBar.bossBar(ConfigUtils.toComponent(line), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+            bar.progress(i / 7F);
             bossbars.add(bar);
         }
+        
+        // Start 1 tick later to make sure it doesn't interfere with other things
+        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
+        
+        // World reset task
+        int minute = 20 * 60;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (justReset) {
+                    return;
+                }
+                
+                if (!players.isEmpty()) {
+                    return;
+                }
+                
+                plugin.log("Resetting tutorial arena...");
+                resetWorld();
+                init();
+                this.cancel();
+            }
+        }.runTaskTimer(plugin, minute, minute);
     }
 
     @Override
@@ -56,6 +100,7 @@ public class TutorialArena extends ClassicArena {
         }
         enqueue(uuid, "blue");
         initiateStage(player, stage.get(uuid));
+        justReset = false;
     }
     
     @Override
@@ -89,19 +134,42 @@ public class TutorialArena extends ClassicArena {
     
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
-        stage.put(player.getUniqueId(), s);
-        ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null);
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        UUID uuid = player.getUniqueId();
+
         ConfigUtils.sendTitle("stage" + s, player);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 40);
         if (s == 0) {
             ConfigUtils.sendConfigSound("stagecomplete", player);
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                initiateStage(player, 1);
-            }, 120);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> initiateStage(player, 1), 160);
+            stage.put(uuid, 1);
             return;
         } 
 
         player.showBossBar(bossbars.get(s));
         ConfigUtils.sendConfigSound("stage", player);
+        
+        if (s != 4) {
+            return;
+        }
+
+        // Give player location to throw shield at if stage 3
+        Random random = new Random();
+        final double X = random.nextInt(-15, 16) + 0.5;
+        final double Y = 13.5;
+        final double Z = -24.5;
+        xs.put(uuid, new Location(getWorld(), X, Y, Z));
+        DustOptions dustOptions = new DustOptions(Color.FUCHSIA, 1.5F);
+        particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            double yneg = Y - 1;
+            double ypos = Y + 1;
+            for (double x = X - 1; x <= X + 1; x += 0.25) {
+                player.spawnParticle(Particle.REDSTONE, x, yneg, Z, 2, dustOptions);
+                player.spawnParticle(Particle.REDSTONE, x, ypos, Z, 2, dustOptions);
+                yneg += 0.25;
+                ypos -= 0.25;
+            }
+        }, 10, 5));
     }
     
     /**
@@ -112,6 +180,7 @@ public class TutorialArena extends ClassicArena {
      * @param s
      */
     public void registerStageCompletion(Player player, int s) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         UUID uuid = player.getUniqueId();
         int actualStage = stage.get(uuid);
         if (s != actualStage) {
@@ -121,31 +190,157 @@ public class TutorialArena extends ClassicArena {
         // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
         if (s == 6) {
-            ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
-            removePlayer(uuid, true);
+            player.hideBossBar(bossbars.get(s));
+            player.showBossBar(bossbars.get(7));
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
+                removePlayer(uuid, true);
+            }, 60);
+            return;
         }
-        
-        player.hideBossBar(bossbars.get(s));
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+
+        stage.put(uuid, s + 1);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            player.hideBossBar(bossbars.get(s));
             initiateStage(player, s + 1);
         }, 60);
     }
     
     /**
-     * Hides all tutorial bossbars for the player
+     * Skip the current stage
      * 
      * @param player
      */
-    public void removeBossBars(Player player) {
-        for (BossBar b : bossbars) {
-            player.hideBossBar(b);
+    public void registerStageSkip(Player player) {
+        UUID uuid = player.getUniqueId();
+        int s = stage.get(uuid);
+        if (s != 3) {
+            ConfigUtils.sendConfigMessage("messages.stage-skip-fail", player, null, null);
+            return;
         }
+        
+        stage.put(uuid, s + 1);
+        player.hideBossBar(bossbars.get(s));
+        initiateStage(player, s + 1);
+    }
+    
+    // Remove the Xs for obsidian shield throw
+    private void removeXs(UUID uuid) {
+        if (!xs.containsKey(uuid)) {
+            return;
+        }
+        
+        xs.remove(uuid);
+        particles.get(uuid).cancel();
+        particles.remove(uuid);
+    }
+    
+    /**
+     * Register placing a throwable projectile 
+     * 
+     * @param location
+     * @param player
+     */
+    public void registerProjectilePlacement(Location location, Player player) {
+        UUID uuid = player.getUniqueId();
+        if (stage.get(uuid) != 4) {
+            return;
+        }
+        
+        Location loc = xs.get(uuid);
+        if (loc.distance(location) > 3) {
+            return;
+        }
+        
+        registerStageCompletion(player, 4);
+        removeXs(player.getUniqueId());
     }
     
     @Override
     public void registerPortalBreak(Location location, Entity entity) {
+        // Check if portal broke at blue or red z
+        MissileWarsTeam broketeam = location.getBlockZ() > 0 ? redTeam : blueTeam;
         
+        // Check if portal break was registered
+        if (!broketeam.registerPortalBreak(location, false)) {
+            return;
+        }
+        
+        // Reset map after 5 sec
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null);
+        }, 100);
+        
+        // Check if has associated player
+        Player player;
+        if (entity instanceof Player) {
+            player = (Player) entity;
+        } else {
+            player = ConfigUtils.getAssociatedPlayer(entity, this);
+        }
+        
+        Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());
+        for (MissileWarsPlayer mwPlayer : players) {
+            mwPlayer.getMCPlayer().sendMessage(msg);
+        }
+        
+        // Check if team still has living portals
+        if (player == null || broketeam == blueTeam) {
+            return;
+        }
+        
+        ConfigUtils.sendConfigSound("enemy-portal-destroyed", player);
+        registerStageCompletion(player, 3);
     }
+    
+    /**
+     * Remove a player with a given UUID from the arena.
+     *
+     * @param uuid the UUID of the player
+     */
+    @Override
+    public void removePlayer(UUID uuid, Boolean tolobby) {
+        // Remove player from all teams and queues
+        MissileWarsPlayer toRemove = getPlayerInArena(uuid);
+        players.remove(toRemove);
+        voteManager.removePlayer(toRemove.getMCPlayer());
+        spectators.remove(toRemove);
+        blueTeam.removePlayer(toRemove);
+
+        // Run proper clearing commands on the player
+        if (tolobby) {
+            Arena arena = this;
+            Player mcPlayer = toRemove.getMCPlayer();
+            mcPlayer.teleport(ConfigUtils.getSpawnLocation());
+            mcPlayer.setGameMode(GameMode.ADVENTURE);
+            mcPlayer.setHealth(20);
+            InventoryUtils.loadInventory(mcPlayer);
+            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
+            RankUtils.setPlayerExpBar(mcPlayer);
+
+            // Notify discord
+            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+            discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + arena.getName()).queue();
+
+            for (Player player : Bukkit.getWorld("world").getPlayers()) {
+                ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
+            }
+            
+            // Remove tutorial stuff
+            removeXs(uuid);
+            for (BossBar b : bossbars) {
+                mcPlayer.hideBossBar(b);
+            }
+        }
+    }
+    
+    @Override
+    public void applyMultipliers() {
+        blueTeam.setMultiplier(1 / 12.0);
+    }
+    
+    @Override
+    protected void startTeams() {}
     
     // No need to track who left the arena here
     @Override
@@ -153,9 +348,6 @@ public class TutorialArena extends ClassicArena {
     
     @Override
     public void performTimeSetup() {}
-    
-    @Override
-    protected void startTeams() {}
     
     @Override
     protected void calculateStats(MissileWarsTeam winningTeam) {}

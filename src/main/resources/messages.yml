@@ -132,46 +132,47 @@ messages:
   training-time: "&7You spent &3%time% &7in this game."
   stage0: "&a&l[!] &7If you already know how to play Ultima Missile Wars, you can use &f/lobby &7to skip the introduction."
   stage1:
-    - "&b========================================"
-    - "&f&aRight-click &fnear the edge of the base"
-    - "&fto place a missile. Missiles will &cignite"
-    - "&fand &4explode &fif they encouter obstacles."
+    - "&b============== Stage 1 =================="
+    - "&f&aRight-click &fa spawn egg at the edge of the base"
+    - "&fbase to place a missile. Missiles will &cignite &fand"
+    - "&4explode &fif they encouter obstacles."
     - "&b========================================"
   stage2:
-    - "&b========================================"
+    - "&b============== Stage 2 =================="
     - "&fPlace a missile on the the edge of the base,"
     - "&fthen run and jump on it to ride it."
     - "&b========================================"
   stage3:
-    - "&b========================================"
-    - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
-    - "&fcan be thrown to defend against oncoming missiles."
-    - "&fThey spawn after &a1 second &f and will &cbreak &fif"
-    - "&fthey hit a block before then."
-    - "&b========================================"
-  stage4:
-    - "&b========================================"
+    - "&b============== Stage 3 =================="
     - "&7&oThis part is optional - type &f/skip &7to skip it"
     - "&fBehind the enemy base are &5nether portals &fthat"
     - "&fmust be blown up to win the game. Ride a missile"
     - "&fto the enemy and spawn a bunch of missiles inside"
     - "&ftheir base to blow it up!"
     - "&b========================================"
-  stage5:
+  stage4:
+    - "&b============== Stage 4 =================="
+    - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
+    - "&fcan be thrown to defend against oncoming missiles."
+    - "&fThey spawn after &a1 second &fand will &cbreak &fif"
+    - "&fthey hit a block before then. Throw one at the &dX&f!"
     - "&b========================================"
+  stage5:
+    - "&b============== Stage 5 =================="
     - "&fThere are 4 decks &7(kits) &favailable to play."
     - "&fEach contains 5 unique missiles and 3 utility."
     - "&fYou are using &b&lSentinel&f. Use &a/leave&f, and"
     - "&finteract with the NPCs to select &c&lBerserker&f."
     - "&b========================================"
   stage6:
-    - "&b========================================"
+    - "&b============== Stage 6 =================="
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
     - "&fhas a limited amount. Use 2 skillpoints to upgrade the"
     - "&6Sharpness enchantment &ffor &c&lBerserker &ffrom 2 to 3."
     - "&b========================================"
   tutorial-complete: "&a&l[!] &7You successfully completed the introduction. Have fun!"
+  stage-skip-fail: "&c&l[!] &7You cannot skip this stage."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -284,31 +285,31 @@ titles:
     subtitle: "&b↓ &fWatch the video in chat &b↓"
     length: 200
   stage0:
-    title: "&a&lWelcome!"
+    title: "&aWelcome!"
     subtitle: "&fPlease complete this short intro"
     length: 120
   stage1:
-    title: "&bPart 1"
+    title: "&bStage 1"
     subtitle: "&fPlacing missiles"
     length: 60
   stage2:
-    title: "&bPart 2"
+    title: "&bStage 2"
     subtitle: "&fRiding missiles"
     length: 60
   stage3:
-    title: "&bPart 3"
-    subtitle: "&fDefending"
-    length: 60
-  stage4:
-    title: "&bPart 4 (Optional)"
+    title: "&bStage 3 (Optional)"
     subtitle: "&fAttacking"
     length: 60
+  stage4:
+    title: "&bStage 4"
+    subtitle: "&fDefending"
+    length: 60
   stage5:
-    title: "&bPart 5"
+    title: "&bStage 5"
     subtitle: "&fDecks"
     length: 60
   stage6:
-    title: "&bPart 6"
+    title: "&bStage 6"
     subtitle: "&fDeck customization"
     length: 60
   stagecomplete:
@@ -321,10 +322,11 @@ bossbar:
   stage0: "&aWelcome" # unused
   stage1: "&bGoal: &fRight-click a spawn egg to place a missile"
   stage2: "&bGoal: &fJump on and ride a missile"
-  stage3: "&bGoal: &fThrow an &5Obsidian Shield &for &0Torpedo &fto the &xX/"
-  stage4: "&bGoal: &fDestroy any of the enemy portals"
+  stage3: "&bGoal: &fDestroy any of the enemy portals"
+  stage4: "&bGoal: &fThrow an &5Obsidian Shield &for &0Torpedo &fto the &dX"
   stage5: "&bGoal: &fUse &a/leave &fand change your deck to &c&lBerserker"
   stage6: "&bGoal: &fUpgrade &6Sharpness &ffor &c&lBerserker &fto level 3"
+  stage7: "&bYou finished the tutorial!"
   
 
 # For GUI inventory customization

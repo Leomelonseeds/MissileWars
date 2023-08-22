@@ -18,6 +18,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
@@ -44,10 +47,16 @@ public class PresetSelector implements MWInventory {
 
     @Override
     public void updateInventory() {
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
-        List<String> presets = MissileWarsPlugin.getPlugin().getDeckManager().getPresets();
+        // Register stage completion if player uses berserker
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena instanceof TutorialArena && playerJson.getString("Deck").equals("Berserker")) {
+            ((TutorialArena) arena).registerStageCompletion(player, 5);
+        }
         
         // Add preset items
+        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        List<String> presets = MissileWarsPlugin.getPlugin().getDeckManager().getPresets();
         for (int i = 0; i < presets.size(); i++) {
             String p = presets.get(i);
             

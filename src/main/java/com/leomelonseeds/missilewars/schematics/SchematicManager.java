@@ -21,7 +21,6 @@ import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.Vector;
@@ -176,6 +175,7 @@ public class SchematicManager {
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
             boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
             boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red");
+            boolean isTutorial = loc.getWorld().getName().contains("tutorial");
             int x1, x2, z1, z2;
             if (redMissile) {
                 z1 = spawnz - sizez + 1;
@@ -200,8 +200,8 @@ public class SchematicManager {
                         }
                         
                         // Check for tutorial arena
-                        if (loc.getWorld().getName().contains("tutorial")) {
-                            sendError(player, "Missiles spawned in this arena must be clear of obstacles!");
+                        if (isMissile && z < 0 && isTutorial) {
+                            sendError(player, "Missiles spawned on your side of this arena must be clear of obstacles!");
                             return false;
                         }
                         
@@ -417,11 +417,9 @@ public class SchematicManager {
             e.printStackTrace();
             return false;
         }
-        
 
         // Paste WE clipboard
         Vector spawnPos;
-
         if (mapType == null) {
             spawnPos = getVector(schematicConfig, schematicName + ".pos", null, null);
         } else {
@@ -439,47 +437,46 @@ public class SchematicManager {
                         .ignoreAirBlocks(true)
                         .build();
                 Operations.complete(operation);
-                if (callback != null) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            // LightSmog epic random TNT
-                            if (schematicName.equals("light-smog")) {
-                                Region region = new CuboidRegion(weWorld, BlockVector3.at(34, -16, -21), BlockVector3.at(-34, 32, 21));
-                                BlockState tnt = BukkitAdapter.adapt(Material.TNT.createBlockData());
-                                BlockState blackStainedGlass = BukkitAdapter.adapt(Material.BLACK_STAINED_GLASS.createBlockData());
-                                RandomPattern pattern = new RandomPattern();
-                                pattern.add(tnt, 0.5);
-                                pattern.add(blackStainedGlass, 99.5);
-                                editSession.setBlocks(region, pattern);
-                            }
-                            
-                            // Trinitrotoluene random tnt
-                            else if (schematicName.equals("trinitrotoluene")) {
-                                Region region1 = new CuboidRegion(weWorld, BlockVector3.at(-32, -15, -65), BlockVector3.at(32, 16, -34));
-                                Region region2 = new CuboidRegion(weWorld, BlockVector3.at(-32, -15, 34), BlockVector3.at(32, 16, 65));
-                                BlockState tnt = BukkitAdapter.adapt(Material.TNT.createBlockData());
-                                BlockState cyanStainedGlass = BukkitAdapter.adapt(Material.CYAN_STAINED_GLASS.createBlockData());
-                                BlockState redStainedGlass = BukkitAdapter.adapt(Material.RED_STAINED_GLASS.createBlockData());
-                                Set<BaseBlock> cyanSet = new HashSet<>();
-                                cyanSet.add(new BaseBlock(cyanStainedGlass));
-                                Set<BaseBlock> redSet = new HashSet<>();
-                                redSet.add(new BaseBlock(redStainedGlass));
-                                RandomPattern pattern1 = new RandomPattern();
-                                RandomPattern pattern2 = new RandomPattern();
-                                pattern1.add(tnt, 1);
-                                pattern1.add(cyanStainedGlass, 99);
-                                pattern2.add(tnt, 1);
-                                pattern2.add(redStainedGlass, 99);
-                                editSession.replaceBlocks(region1, cyanSet, pattern1);
-                                editSession.replaceBlocks(region2, redSet, pattern2);
-                            }
-                            
-                            // Start doing everything else
-                            callback.onQueryDone(null);
-                        }
-                    }.runTask(MissileWarsPlugin.getPlugin());
+                if (callback == null) {
+                    return;
                 }
+                
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
+                    // LightSmog epic random TNT
+                    if (schematicName.equals("light-smog")) {
+                        Region region = new CuboidRegion(weWorld, BlockVector3.at(34, -16, -21), BlockVector3.at(-34, 32, 21));
+                        BlockState tnt = BukkitAdapter.adapt(Material.TNT.createBlockData());
+                        BlockState blackStainedGlass = BukkitAdapter.adapt(Material.BLACK_STAINED_GLASS.createBlockData());
+                        RandomPattern pattern = new RandomPattern();
+                        pattern.add(tnt, 0.5);
+                        pattern.add(blackStainedGlass, 99.5);
+                        editSession.setBlocks(region, pattern);
+                    }
+                    
+                    // Trinitrotoluene random tnt
+                    else if (schematicName.equals("trinitrotoluene")) {
+                        Region region1 = new CuboidRegion(weWorld, BlockVector3.at(-32, -15, -65), BlockVector3.at(32, 16, -34));
+                        Region region2 = new CuboidRegion(weWorld, BlockVector3.at(-32, -15, 34), BlockVector3.at(32, 16, 65));
+                        BlockState tnt = BukkitAdapter.adapt(Material.TNT.createBlockData());
+                        BlockState cyanStainedGlass = BukkitAdapter.adapt(Material.CYAN_STAINED_GLASS.createBlockData());
+                        BlockState redStainedGlass = BukkitAdapter.adapt(Material.RED_STAINED_GLASS.createBlockData());
+                        Set<BaseBlock> cyanSet = new HashSet<>();
+                        cyanSet.add(new BaseBlock(cyanStainedGlass));
+                        Set<BaseBlock> redSet = new HashSet<>();
+                        redSet.add(new BaseBlock(redStainedGlass));
+                        RandomPattern pattern1 = new RandomPattern();
+                        RandomPattern pattern2 = new RandomPattern();
+                        pattern1.add(tnt, 1);
+                        pattern1.add(cyanStainedGlass, 99);
+                        pattern2.add(tnt, 1);
+                        pattern2.add(redStainedGlass, 99);
+                        editSession.replaceBlocks(region1, cyanSet, pattern1);
+                        editSession.replaceBlocks(region2, redSet, pattern2);
+                    }
+                    
+                    // Start doing everything else
+                    callback.onQueryDone(null);
+                });
             }
         });
         return true;

@@ -16,6 +16,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -238,7 +241,7 @@ public class DeckCustomizer implements MWInventory {
         
         int sp = presetjson.getInt("skillpoints");
         
-        // Upgrade/downgade missiles/utility/enchants
+        // Upgrade/downgade missiles/utility
         for (String s : items) {
             JSONObject cjson = presetjson.getJSONObject(s);
             if (cjson.has(realname)) {
@@ -318,6 +321,15 @@ public class DeckCustomizer implements MWInventory {
             json.put(realname, json.getInt(realname) + 1);
             presetjson.put("skillpoints", sp - spcost);
             ConfigUtils.sendConfigSound("use-skillpoint", player);
+            
+            // Register stage completion if player upgrades sharp to 3
+            ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+            Arena arena = manager.getArena(player.getUniqueId());
+            if (arena instanceof TutorialArena && deck.equals("Berserker") &&  
+                    realname.equals("sharpness") && json.getInt("sharpness") == 3) {
+                ((TutorialArena) arena).registerStageCompletion(player, 6);
+            }
+            
             updateInventory();
             return;
         }

@@ -611,7 +611,7 @@ public class ArenaManager {
     public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
         List<Arena> sortedArenas = new ArrayList<>();
         for (Arena a : loadedArenas) {
-            if (a.getGamemode().equals(gamemode) && !(a instanceof TrainingArena)) {
+            if (a.getGamemode().equals(gamemode) && !specialArenas.contains(a.getName())) {
                 sortedArenas.add(a);
             }
         }

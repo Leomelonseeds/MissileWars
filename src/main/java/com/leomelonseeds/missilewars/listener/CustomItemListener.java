@@ -51,6 +51,8 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
+import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -318,7 +320,24 @@ public class CustomItemListener implements Listener {
                 
                 // Training arena things
                 if (playerArena instanceof TutorialArena) {
-                    ((TutorialArena) playerArena).registerStageCompletion(player, 1);
+                    TutorialArena tutorialArena = (TutorialArena) playerArena;
+                    tutorialArena.registerStageCompletion(player, 1);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        if (!player.isOnline()) {
+                            return;
+                        }
+                        
+                        for (Tracked t : tutorialArena.getTracker().getMissiles()) {
+                            if (!(t instanceof TrackedMissile)) {
+                                continue;
+                            }
+                            
+                            if (t.contains(player.getLocation(), 2)) {
+                                tutorialArena.registerStageCompletion(player, 2);
+                                return;
+                            }
+                        }
+                    }, 100);
                 }
             }
             return;
@@ -643,6 +662,11 @@ public class CustomItemListener implements Listener {
                 }
 
                 ConfigUtils.sendConfigSound(sound, spawnLoc);
+                
+                // Register tutorial arena stage
+                if (playerArena instanceof TutorialArena) {
+                    ((TutorialArena) playerArena).registerProjectilePlacement(spawnLoc, thrower);
+                }
             } else {
                 Item newitem = thrower.getWorld().dropItem(thrower.getLocation(), item);
                 newitem.setPickupDelay(0);

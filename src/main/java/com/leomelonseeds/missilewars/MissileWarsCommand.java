@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
@@ -52,6 +53,22 @@ public class MissileWarsCommand implements CommandExecutor {
             
             ConfigUtils.reloadConfigs();
             sendSuccessMsg(sender, "Files reloaded.");
+        }
+        
+        // Skip a tutorial stage
+        if (action.equalsIgnoreCase("skip")) {
+            if (!(sender instanceof Player)) {
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            if (arena == null || !(arena instanceof TutorialArena)) {
+                sendErrorMsg(player, "This command can only be used in the tutorial arena");
+                return true;
+            }
+            
+            ((TutorialArena) arena).registerStageSkip(player);
         }
         
         // Reset coldowns

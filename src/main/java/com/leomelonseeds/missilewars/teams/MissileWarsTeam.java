@@ -259,7 +259,7 @@ public class MissileWarsTeam {
         inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         inv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         
-        // Create and register deck
+        // Create and register deck. Initdeck is in arena code!
         plugin.getDeckManager().getPlayerDeck(player, (result) -> {
             Deck deck = (Deck) result;
             player.setDeck(deck);
@@ -384,10 +384,6 @@ public class MissileWarsTeam {
             arena.addLeft(player.getMCPlayerId());
             arena.applyMultipliers(); // Check for cooldowns
         }
-        
-        if (arena instanceof TutorialArena) {
-            ((TutorialArena) arena).removeBossBars(mcPlayer);
-        }
     }
 
     /**
@@ -397,20 +393,39 @@ public class MissileWarsTeam {
      * @return true if a portal's broken status was changed
      */
     public boolean registerPortalBreak(Location loc) {
+        return registerPortalBreak(loc, true);
+    }
+    
+    /**
+     * @param loc
+     * @param count set to false to not count the portal as broken
+     * @return
+     */
+    public boolean registerPortalBreak(Location loc, boolean count) {
         // Trace portal block to the most positive x and y positions
         while (loc.clone().add(1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
             loc.add(1, 0, 0);
         }
+        
         while (loc.clone().add(0, 1, 0).getBlock().getType() != Material.OBSIDIAN) {
             loc.add(0, 1, 0);
         }
+        
+        // Return if no registered portal at location
         if (portals.get(loc) == null) {
             return false;
         }
+        
+        // If portal still exists there
         if (portals.get(loc)) {
             portals.put(loc, false);
+            // Reset this to true after 5 sec if don't count
+            if (!count) {
+                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portals.put(loc, true), 100);
+            }
             return true;
         }
+        
         return false;
     }
 
