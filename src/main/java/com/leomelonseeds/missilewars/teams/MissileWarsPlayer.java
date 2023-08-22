@@ -226,7 +226,7 @@ public class MissileWarsPlayer {
                 
                 int cd = di.getCurrentCooldown();
                 int maxcd = di.getCooldown();
-                float exp = (maxcd - cd) / (float) maxcd;
+                float exp = maxcd == 0 ? 1F : (maxcd - cd) / (float) maxcd;
                 player.setLevel(cd);
                 player.setExp(Math.max(Math.min(exp, 1F), 0F)); // Make sure it's actually within 0 and 1
 
