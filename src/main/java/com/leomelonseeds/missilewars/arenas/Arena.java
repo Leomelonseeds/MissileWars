@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -1283,6 +1284,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /** Load this Arena's world from the disk. */
     public void loadWorldFromDisk() {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        arenaCreator.type(WorldType.FLAT);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> ConfigUtils.reloadCitizens(), 10);
     }
