@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,9 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.citizensnpcs.Citizens;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.exception.NPCLoadException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -80,6 +84,17 @@ public class ConfigUtils {
         configCache.clear();
         plugin.reloadConfig();
         plugin.getDeckManager().reload();
+    }
+    
+    /**
+     * Reload all NPCs to make them appear again
+     */
+    public static void reloadCitizens() {
+        try {
+            ((Citizens) CitizensAPI.getPlugin()).reload();
+        } catch (NPCLoadException e) {
+            Bukkit.getLogger().log(Level.WARNING, "Citizens couldn't be reloaded.");
+        }
     }
 
     /**

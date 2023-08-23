@@ -85,6 +85,9 @@ public class TutorialArena extends ClassicArena {
                 }
                 
                 plugin.log("Resetting tutorial arena...");
+                running = false;
+                resetting = true;
+                stopTrackers();
                 resetWorld();
                 init();
                 this.cancel();
@@ -134,15 +137,21 @@ public class TutorialArena extends ClassicArena {
     
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
+        // Cancel if player not on correct stage
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         UUID uuid = player.getUniqueId();
+        if (stage.get(uuid) != s) {
+            return;
+        }
 
         ConfigUtils.sendTitle("stage" + s, player);
         Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 40);
         if (s == 0) {
             ConfigUtils.sendConfigSound("stagecomplete", player);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> initiateStage(player, 1), 160);
-            stage.put(uuid, 1);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                stage.put(uuid, 1);
+                initiateStage(player, 1);
+            }, 160);
             return;
         } 
 
@@ -206,7 +215,9 @@ public class TutorialArena extends ClassicArena {
         stage.put(uuid, s + 1);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.hideBossBar(bossbars.get(s));
-            initiateStage(player, s + 1);
+            if (player.getWorld().getName().equals(getWorld().getName())) {
+                initiateStage(player, s + 1);
+            }
         }, 60);
     }
     

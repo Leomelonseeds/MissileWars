@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -49,9 +48,6 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.a5h73y.parkour.Parkour;
-import net.citizensnpcs.Citizens;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.exception.NPCLoadException;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -899,13 +895,6 @@ public abstract class Arena implements ConfigurationSerializable {
         if (startTime != null) {
             return;
         }
-        
-        // Respawns citizens
-        try {
-            ((Citizens) CitizensAPI.getPlugin()).reload();
-        } catch (NPCLoadException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Citizens in " + getWorld().getName() + " couldn't be reloaded.");
-        }
 
         // Schedule start
         startTime = LocalDateTime.now().plusSeconds(secCountdown);
@@ -1295,6 +1284,7 @@ public abstract class Arena implements ConfigurationSerializable {
     public void loadWorldFromDisk() {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> ConfigUtils.reloadCitizens(), 10);
     }
     
     /** Reset the arena world. */
