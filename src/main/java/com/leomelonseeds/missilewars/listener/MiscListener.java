@@ -107,6 +107,8 @@ public class MiscListener implements Listener {
             MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
             InventoryUtils.loadInventory(player);
             RankUtils.setPlayerExpBar(player);
+            
+            // Teleport new players to join arena
         });
     }
     

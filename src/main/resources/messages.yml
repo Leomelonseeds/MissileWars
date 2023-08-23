@@ -147,8 +147,8 @@ messages:
     - "&7&oThis part is optional - type &f/skip &7to skip it"
     - "&fBehind the enemy base are &5nether portals &fthat"
     - "&fmust be blown up to win the game. Ride a missile"
-    - "&fto the enemy and spawn a bunch of missiles inside"
-    - "&ftheir base to blow it up!"
+    - "&fto &cred team &fand &espawn a bunch of missiles &linside"
+    - "&e&ltheir base &fto blow up their portal!"
     - "&b========================================"
   stage4:
     - "&b============== Stage 4 =================="
@@ -160,18 +160,25 @@ messages:
   stage5:
     - "&b============== Stage 5 =================="
     - "&fThere are 4 decks &7(kits) &favailable to play."
-    - "&fEach contains 5 unique missiles and 3 utility."
-    - "&fYou are using &b&lSentinel&f. Use &a/leave&f, and"
-    - "&finteract with the NPCs to select &c&lBerserker&f."
+    - "&fEach contains its own unique &cmissiles&f, &9utilities&f,"
+    - "&6weapon&f, &3enchantments&f, and &epassive abilities."
+    - "&fBy default, you are using &b&lSentinel&f. Use"
+    - "&a/leave&f, and interact with the NPCs to select"
+    - "&fanother deck of your choice."
     - "&b========================================"
   stage6:
     - "&b============== Stage 6 =================="
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
-    - "&fhas a limited amount. Use 2 skillpoints to upgrade the"
-    - "&6Sharpness enchantment &ffor &c&lBerserker &ffrom 2 to 3."
+    - "&fhas &a16 &fin total. Use skillpoints to upgrade or"
+    - "&fdowngrade any &3Gear Enchantment &fin your deck."
     - "&b========================================"
-  tutorial-complete: "&a&l[!] &7You successfully completed the introduction. Have fun!"
+  tutorial-complete:
+    - "&b=========== Tutorial Complete ============="
+    - "&fYou have successfully completed the tutorial. If"
+    - "&fyou want more practice attacking or defending, try"
+    - "&fout the &dTraining &farena. Otherwise, have fun!"
+    - "&b========================================"
   stage-skip-fail: "&c&l[!] &7You cannot skip this stage."
     
 titles:
@@ -323,9 +330,9 @@ bossbar:
   stage1: "&bGoal: &fRight-click a spawn egg to place a missile"
   stage2: "&bGoal: &fJump on and ride a missile"
   stage3: "&bGoal: &fDestroy any of the enemy portals"
-  stage4: "&bGoal: &fThrow an &5Obsidian Shield &for &0Torpedo &fto the &dX"
-  stage5: "&bGoal: &fUse &a/leave &fand change your deck to &c&lBerserker"
-  stage6: "&bGoal: &fUpgrade &6Sharpness &ffor &c&lBerserker &fto level 3"
+  stage4: "&bGoal: &fUse a defensive item to blow up the oncoming missile."
+  stage5: "&bGoal: &fUse &a/leave &fand change your deck."
+  stage6: "&bGoal: &fUpgrade any &3&lGear Enchantment &ffor your deck."
   stage7: "&bYou finished the tutorial!"
   
 

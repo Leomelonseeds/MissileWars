@@ -481,5 +481,28 @@ public class SchematicManager {
         });
         return true;
     }
+    
+    
+    /**
+     * Clears a 5x5 area centered around X and y = 12 from z = 50 to z = -49
+     * Function is currently unused, since problems exist where malicious
+     * players can still prevent new players from completing the tutorial
+     * 
+     * @param x
+     * @param world
+     */
+    public static void clearTutorialLane(final int x, World world, DBCallback callback) {
+        final int y = 12;
+        final int zneg = -50;
+        final int zpos = 50;
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+            com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                Region region = new CuboidRegion(weWorld, BlockVector3.at(x - 2, y - 1, zneg), BlockVector3.at(x + 2, y + 1, zpos));
+                editSession.setBlocks(region, new BaseBlock(BukkitAdapter.adapt(Material.AIR.createBlockData())));
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.onQueryDone(null));
+            } 
+        });
+    }
 
 }

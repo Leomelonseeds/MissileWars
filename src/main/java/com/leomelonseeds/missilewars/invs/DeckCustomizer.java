@@ -322,14 +322,7 @@ public class DeckCustomizer implements MWInventory {
             presetjson.put("skillpoints", sp - spcost);
             ConfigUtils.sendConfigSound("use-skillpoint", player);
             
-            // Register stage completion if player upgrades sharp to 3
-            ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-            Arena arena = manager.getArena(player.getUniqueId());
-            if (arena instanceof TutorialArena && deck.equals("Berserker") &&  
-                    realname.equals("sharpness") && json.getInt("sharpness") == 3) {
-                ((TutorialArena) arena).registerStageCompletion(player, 6);
-            }
-            
+            checkTutorial(json);
             updateInventory();
             return;
         }
@@ -346,8 +339,19 @@ public class DeckCustomizer implements MWInventory {
             json.put(realname, json.getInt(realname) - 1);
             presetjson.put("skillpoints", sp + spgain);
             ConfigUtils.sendConfigSound("use-skillpoint", player);
+            
+            checkTutorial(json);
             updateInventory();
             return;
+        }
+    }
+
+    // Register stage completion if player upgrades or downgrades and enchant
+    private void checkTutorial(JSONObject json) {
+        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        Arena arena = manager.getArena(player.getUniqueId());
+        if (arena instanceof TutorialArena && json.equals(presetjson)) {
+            ((TutorialArena) arena).registerStageCompletion(player, 6);
         }
     }
     

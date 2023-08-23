@@ -162,10 +162,11 @@ public class TutorialArena extends ClassicArena {
             return;
         }
 
-        // Give player location to throw shield at if stage 4
         if (!ConfigUtils.inShield(this, player.getLocation(), "blue", 2)) {
             player.teleport(getPlayerSpawn(player));
         }
+        
+        // Give player location to throw shield at if stage 4
         Random random = new Random();
         final double X = random.nextInt(-15, 16) + 0.5;
         final double Y = 13.5;
@@ -194,8 +195,8 @@ public class TutorialArena extends ClassicArena {
     public void registerStageCompletion(Player player, int s) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         UUID uuid = player.getUniqueId();
-        int actualStage = stage.get(uuid);
-        if (s != actualStage) {
+        Integer actualStage = stage.get(uuid);
+        if (actualStage == null || s != actualStage) {
             return;
         }
 
@@ -204,9 +205,9 @@ public class TutorialArena extends ClassicArena {
         if (s == 6) {
             player.hideBossBar(bossbars.get(s));
             player.showBossBar(bossbars.get(7));
+            stage.remove(uuid);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
-                stage.remove(uuid);
                 removePlayer(uuid, true);
             }, 60);
             return;
