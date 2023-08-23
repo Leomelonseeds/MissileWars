@@ -31,16 +31,16 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.schematics.SchematicManager;
-import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.SchematicManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -345,7 +345,7 @@ public class ArenaManager {
         logger.log(Level.INFO, "Generating arena world for " + name);
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
-        arenaCreator.generator(new VoidChunkGenerator());
+        arenaCreator.generator(new ChunkGenerator() {});
         World arenaWorld = arenaCreator.createWorld();
         assert arenaWorld != null;
         arenaWorld.setAutoSave(false);

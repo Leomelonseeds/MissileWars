@@ -26,11 +26,11 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
-import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
+import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 public class TrainingArena extends ClassicArena {
     

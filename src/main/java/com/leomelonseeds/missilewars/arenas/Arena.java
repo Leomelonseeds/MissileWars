@@ -24,6 +24,7 @@ import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -38,13 +39,12 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckManager;
-import com.leomelonseeds.missilewars.schematics.SchematicManager;
-import com.leomelonseeds.missilewars.schematics.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
+import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -1285,7 +1285,7 @@ public abstract class Arena implements ConfigurationSerializable {
     public void loadWorldFromDisk() {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
-        arenaCreator.generator(new VoidChunkGenerator()).createWorld().setAutoSave(false);
+        arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> ConfigUtils.reloadCitizens(), 10);
     }
     

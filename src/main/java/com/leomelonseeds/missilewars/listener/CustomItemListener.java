@@ -54,10 +54,10 @@ import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.invs.MapVoting;
-import com.leomelonseeds.missilewars.schematics.SchematicManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
