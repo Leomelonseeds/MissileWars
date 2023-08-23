@@ -55,6 +55,21 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // Go to lobby
+        if (action.equalsIgnoreCase("lobby")) {
+            if (!(sender instanceof Player)) {
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            if (arena == null) {
+                player.teleport(ConfigUtils.getSpawnLocation());
+            } else {
+                arena.removePlayer(player.getUniqueId(), true);
+            }
+        }
+        
         // Skip a tutorial stage
         if (action.equalsIgnoreCase("skip")) {
             if (!(sender instanceof Player)) {

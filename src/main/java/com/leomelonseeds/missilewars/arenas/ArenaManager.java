@@ -635,6 +635,15 @@ public class ArenaManager {
             }
             return 0;
         }
+
+        if (gamemode.equals("tutorial")) {
+            for (Arena arena : loadedArenas) {
+                if (arena instanceof TutorialArena) {
+                    return arena.getTotalPlayers();
+                }
+            }
+            return 0;
+        }
         
         for (Arena a : getLoadedArenas(gamemode)) {
             count += a.getTotalPlayers();

@@ -103,13 +103,26 @@ public class MiscListener implements Listener {
         }
 
         // Load player data, making sure for new players that it happens after an entry for them is created.
-        MissileWarsPlugin.getPlugin().getSQL().createPlayer(player.getUniqueId(), result -> {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        plugin.getSQL().createPlayer(player.getUniqueId(), result -> {
             MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
             InventoryUtils.loadInventory(player);
             RankUtils.setPlayerExpBar(player);
-            
-            // Teleport new players to join arena
         });
+        
+        // Teleport new players to join arena
+        if (player.hasPlayedBefore()) {
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Arena arena = plugin.getArenaManager().getArena("tutorial");
+            if (arena.isResetting()) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> arena.joinPlayer(player), 20);
+            } else {
+                arena.joinPlayer(player);
+            }
+        }, 20);
     }
     
     // JOIN/LEAVE LISTENERS
