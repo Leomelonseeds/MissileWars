@@ -137,6 +137,11 @@ public class TutorialArena extends ClassicArena {
     
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
+        // Cancel if player isn't in the arena anymore
+        if (!player.getWorld().getName().equals(getWorld().getName())) {
+            return;
+        }
+        
         // Cancel if player not on correct stage
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         UUID uuid = player.getUniqueId();
@@ -216,9 +221,7 @@ public class TutorialArena extends ClassicArena {
         stage.put(uuid, s + 1);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.hideBossBar(bossbars.get(s));
-            if (player.getWorld().getName().equals(getWorld().getName())) {
-                initiateStage(player, s + 1);
-            }
+            initiateStage(player, s + 1);
         }, 60);
     }
     
