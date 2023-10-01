@@ -170,8 +170,8 @@ messages:
     - "&b============== Stage 6 =================="
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
-    - "&fhas &a16 &fin total. Use skillpoints to upgrade or"
-    - "&fdowngrade any &3Gear Enchantment &fin your deck."
+    - "&fhas &a16 &fin total. Select '&7&lEdit Preset&f' and"
+    - "&fupgrade or downgrade any &cMissile &for &9Utility&f."
     - "&b========================================"
   tutorial-complete:
     - "&b=========== Tutorial Complete ============="
@@ -293,7 +293,7 @@ titles:
     length: 200
   stage0:
     title: "&aWelcome!"
-    subtitle: "&fPlease complete this short intro"
+    subtitle: "&fPlease complete a short tutorial"
     length: 120
   stage1:
     title: "&bStage 1"
@@ -327,13 +327,13 @@ titles:
 # Bossbar goals
 bossbar:
   stage0: "&aWelcome" # unused
-  stage1: "&bGoal: &fRight-click a spawn egg to place a missile"
-  stage2: "&bGoal: &fJump on and ride a missile"
-  stage3: "&bGoal: &fDestroy any of the enemy portals"
-  stage4: "&bGoal: &fUse a defensive item to blow up the oncoming missile."
-  stage5: "&bGoal: &fUse &a/leave &fand change your deck."
-  stage6: "&bGoal: &fUpgrade any &3&lGear Enchantment &ffor your deck."
-  stage7: "&bYou finished the tutorial!"
+  stage1: "&b&lGoal: &f&lRight-click a spawn egg to place a missile"
+  stage2: "&b&lGoal: &f&lJump on and ride a missile"
+  stage3: "&b&lGoal: &f&lDestroy any enemy portal &7(&f/skip &7to skip)"
+  stage4: "&b&lGoal: &f&lThrow a projectile at the &d&lX"
+  stage5: "&b&lGoal: &f&lType &a&l/leave &f&land use NPCs to change your deck"
+  stage6: "&b&lGoal: &f&lUpgrade/downgrade any &c&lMissile &f&lor &9&lUtility"
+  stage7: "&b&lYou finished the tutorial!"
   
 
 # For GUI inventory customization

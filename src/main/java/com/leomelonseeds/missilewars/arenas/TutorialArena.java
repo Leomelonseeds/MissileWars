@@ -63,7 +63,7 @@ public class TutorialArena extends ClassicArena {
         FileConfiguration messages = ConfigUtils.getConfigFile("messages.yml");
         for (int i = 0; i <= 7; i++) {
             String line = messages.getString("bossbar.stage" + i);
-            BossBar bar = BossBar.bossBar(ConfigUtils.toComponent(line), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+            BossBar bar = BossBar.bossBar(ConfigUtils.toComponent(line), 1, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
             bar.progress(i / 7F);
             bossbars.add(bar);
         }
