@@ -180,6 +180,7 @@ messages:
     - "&fout the &dTraining &farena. Otherwise, have fun!"
     - "&b========================================"
   stage-skip-fail: "&c&l[!] &7You cannot skip this stage."
+  wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -296,29 +297,29 @@ titles:
     subtitle: "&fPlease complete a short tutorial"
     length: 120
   stage1:
-    title: "&bStage 1"
-    subtitle: "&fPlacing missiles"
-    length: 60
+    title: "&bPlacing Missiles"
+    subtitle: "&fRight-click any spawn egg"
+    length: 100
   stage2:
-    title: "&bStage 2"
-    subtitle: "&fRiding missiles"
-    length: 60
+    title: "&bRiding Missiles"
+    subtitle: "&fRun and jump on a missile"
+    length: 100
   stage3:
-    title: "&bStage 3 (Optional)"
-    subtitle: "&fAttacking"
-    length: 60
+    title: "&bAttacking (Optional)"
+    subtitle: "&fDestroy any enemy portal"
+    length: 100
   stage4:
-    title: "&bStage 4"
-    subtitle: "&fDefending"
-    length: 60
+    title: "&bDefending"
+    subtitle: "&fThrow a projectile at the &d&lX"
+    length: 100
   stage5:
-    title: "&bStage 5"
-    subtitle: "&fDecks"
-    length: 60
+    title: "&bDecks"
+    subtitle: "&fUse &a/leave &fand change your deck"
+    length: 100
   stage6:
-    title: "&bStage 6"
-    subtitle: "&fDeck customization"
-    length: 60
+    title: "&bCustomization"
+    subtitle: "&fUpgrade/downgrade any missile/utility"
+    length: 100
   stagecomplete:
     title: "&f"
     subtitle: "&aWell done!"

@@ -150,7 +150,7 @@ public class TutorialArena extends ClassicArena {
         }
 
         ConfigUtils.sendTitle("stage" + s, player);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 40);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 100);
         if (s == 0) {
             ConfigUtils.sendConfigSound("stagecomplete", player);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -163,6 +163,7 @@ public class TutorialArena extends ClassicArena {
         player.showBossBar(bossbars.get(s));
         ConfigUtils.sendConfigSound("stage", player);
         
+        // Do some additional work if stage 4 is present
         if (s != 4) {
             return;
         }
@@ -188,6 +189,11 @@ public class TutorialArena extends ClassicArena {
                 ypos -= 0.25;
             }
         }, 10, 5));
+        
+        String deck = getPlayerInArena(player.getUniqueId()).getDeck().getName();
+        if (deck.equals("Berserker") || deck.equals("Vanguard")) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
+        }
     }
     
     /**
