@@ -557,10 +557,12 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Auto-join team if setting turned on
         else if (!player.hasPermission("umw.disableautoteam") && running) {
-            if (getRedTeam().getSize() < getBlueTeam().getSize()) {
-                enqueue(player.getUniqueId(), "red");
+            int redSize = getRedTeam().getSize();
+            int blueSize = getBlueTeam().getSize();
+            if (redSize == blueSize) {
+                enqueue(player.getUniqueId(), Math.random() > 0.5 ? "red" : "blue");
             } else {
-                enqueue(player.getUniqueId(), "blue");
+                enqueue(player.getUniqueId(), blueSize > redSize ? "red" : "blue");
             }
         }
     }
