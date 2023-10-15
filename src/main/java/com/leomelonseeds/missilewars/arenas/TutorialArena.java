@@ -107,7 +107,7 @@ public class TutorialArena extends ClassicArena {
     }
     
     @Override
-    public void enqueue(UUID uuid, String team) {
+    public void enqueue(UUID uuid, String team, boolean force) {
         for (MissileWarsPlayer player : players) {
             if (!player.getMCPlayerId().equals(uuid)) {
                 continue;

@@ -789,11 +789,11 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Force-enqueue a player with a given UUID to a team
+     * Enqueue a player with a given UUID to a team
      *
      * @param uuid the Player's UUID
      * @param team use "red" or "blue"
-     * @param force whether to force enqueue
+     * @param force whether to allow uneven team sizes
      */
     public void enqueue(UUID uuid, String team, boolean force) {
         for (MissileWarsPlayer player : players) {
@@ -852,6 +852,8 @@ public abstract class Arena implements ConfigurationSerializable {
     
     /**
      * Enqueue a player with a given UUID to a team
+     * Do not override this function! Override the
+     * 3 parameter one instead.
      *
      * @param uuid the Player's UUID
      * @param team use "red" or "blue"
