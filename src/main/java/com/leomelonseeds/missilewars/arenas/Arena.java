@@ -789,12 +789,13 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Enqueue a player with a given UUID to a team
+     * Force-enqueue a player with a given UUID to a team
      *
      * @param uuid the Player's UUID
      * @param team use "red" or "blue"
+     * @param force whether to force enqueue
      */
-    public void enqueue(UUID uuid, String team) {
+    public void enqueue(UUID uuid, String team, boolean force) {
         for (MissileWarsPlayer player : players) {
             if (!player.getMCPlayerId().equals(uuid)) {
                 continue;
@@ -833,7 +834,7 @@ public abstract class Arena implements ConfigurationSerializable {
                     return;
                 }
                 
-                if (!mcPlayer.isOp() && joinTeam.getSize() - otherTeam.getSize() >= 1) {
+                if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !force) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
                 } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
@@ -847,6 +848,16 @@ public abstract class Arena implements ConfigurationSerializable {
             }
             return;
         }
+    }
+    
+    /**
+     * Enqueue a player with a given UUID to a team
+     *
+     * @param uuid the Player's UUID
+     * @param team use "red" or "blue"
+     */
+    public void enqueue(UUID uuid, String team) {
+        enqueue(uuid, team, false);
     }
 
     /**

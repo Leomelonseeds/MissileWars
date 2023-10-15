@@ -589,7 +589,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
 
-            arena.enqueue(target.getUniqueId(), team);
+            arena.enqueue(target.getUniqueId(), team, true);
             return true;
         }
 
