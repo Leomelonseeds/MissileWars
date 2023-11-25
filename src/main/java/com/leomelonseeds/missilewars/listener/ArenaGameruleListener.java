@@ -22,6 +22,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -403,34 +404,39 @@ public class ArenaGameruleListener implements Listener {
         // Check if player is damaged by a player
         Player damager = null;
         Boolean isProjectile = false;;
-        if (event.getDamager().getType() == EntityType.PLAYER) {
+        Entity eventDamager = event.getDamager();
+        if (eventDamager.getType() == EntityType.PLAYER) {
             damager = (Player) event.getDamager();
         } else if (event.getDamager() instanceof Projectile) {
             // Do sentinel longshot checks
             Projectile projectile = (Projectile) event.getDamager();
-            // Allow players to damage anyone with fireballs
-            if (projectile.getType() == EntityType.FIREBALL) {
-                // Check for boosterball (non-incendiary fireball) and multiply knockback
-                // If not boosterball, deal no damage to entities
-                Fireball fb = (Fireball) projectile;
-                if (!fb.isIncendiary()) {
-                    double multiplier = Double.parseDouble(ConfigUtils.toPlain(fb.customName()));
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        Vector velocity = player.getVelocity();
-                        double velx = velocity.getX() * multiplier;
-                        double velz = velocity.getZ() * multiplier;
-                        double vely = velocity.getY();
-                        player.setVelocity(new Vector(velx, vely, velz));
-                    }, 1);
-                } else {
-                    event.setDamage(0.0001);
-                }
-                // Allow fb friendly fire
-                return;
-            }
             if (projectile.getShooter() instanceof Player) {
                 damager = (Player) projectile.getShooter();
                 isProjectile = true;
+            }
+        } else if (eventDamager instanceof Explosive) {
+            /*
+            // Check bers rocketeer
+            int blastprot = player.getInventory().getBoots().getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
+            int rocketeer = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
+            if (blastprot > 0 && rocketeer > 0) {
+                // blastprot = 15% kb reduction per level. To get to the original, divide current velocity by 
+                // 1 - 15% per level of blastprot
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    double bmult = 1 / (1 - 0.15 * blastprot);
+                    double rmult = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", rocketeer, "multiplier");
+                    Vector velocity = player.getVelocity();
+                    double velx = velocity.getX() * bmult * rmult;
+                    double velz = velocity.getZ() * bmult * rmult;
+                    double vely = velocity.getY() * bmult * rmult;
+                    player.setVelocity(new Vector(velx, vely, velz));
+                }, 1);
+            }
+            */
+            
+            // Fireballs should not do dmg to players
+            if (eventDamager instanceof Fireball) {
+                event.setDamage(0.0001);
             }
         }
         

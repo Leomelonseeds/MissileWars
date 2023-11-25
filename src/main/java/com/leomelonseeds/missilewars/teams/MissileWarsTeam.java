@@ -260,16 +260,14 @@ public class MissileWarsTeam {
         inv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
         
         // Create and register deck. Initdeck is in arena code!
-        plugin.getDeckManager().getPlayerDeck(player, (result) -> {
-            Deck deck = (Deck) result;
-            player.setDeck(deck);
-            player.missilePreview(arena);
-            for (DeckItem di : deck.getItems()) {
-                mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
-                di.registerTeam(this);
-            }
-            arena.addCallback(player);
-        });
+        Deck deck = plugin.getDeckManager().getPlayerDeck(player);
+        player.setDeck(deck);
+        player.missilePreview(arena);
+        for (DeckItem di : deck.getItems()) {
+            mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
+            di.registerTeam(this);
+        }
+        arena.addCallback(player);
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

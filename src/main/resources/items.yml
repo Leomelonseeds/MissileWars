@@ -940,8 +940,9 @@ fireball:
   - "&7making of this utility. Technically."
   - "&7They died instantly and painlessly."
   - ""
-  - "&dNote that non-boosterball fireballs"
-  - "&ddo no explosion damage to players."
+  - "&dNote that fireballs do no explosion"
+  - "&ddamage to players and cannot break"
+  - "&dportals."
   - ""
   - "&bPower: %power%"
   1:
@@ -1312,24 +1313,23 @@ Berserker:
         amplifier: 2
         duration: 3
     boosterball:
-      name: "&eBoosterball"
+      name: "&eRocketeer"
       lore:
       - ""
-      - "&7Fireballs no longer do damage to blocks."
-      - "&7Instead, they now do full explosion damage"
-      - "&7to players. Additionally, the horizontal"
-      - "&7knockback players receieve from fireballs"
-      - "&7is multiplied by %multiplier%&7."
+      - "&7Blast protection no longer reduces knockback"
+      - "&7received from explosions. In addition, the"
+      - "&7knockback you receive from explosions is"
+      - "&7multiplied by %multiplier%&7."
       cost: 2000
       1:
         spcost: 1
-        multiplier: 1.5
+        multiplier: 1
       2:
         spcost: 1
-        multiplier: 2
+        multiplier: 1.25
       3:
         spcost: 1
-        multiplier: 2.5
+        multiplier: 1.5
     creepershot:
       name: "&eCreepershot"
       lore:

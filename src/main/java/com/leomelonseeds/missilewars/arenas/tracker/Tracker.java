@@ -60,6 +60,10 @@ public class Tracker {
      */
     public void stopAll() {
         for (Tracked t : tracked) {
+            // Honestly no clue how any tracked can be null but it happened once
+            if (t == null) {
+                continue;
+            }
             t.cancelTasks();
         }
         tracked.clear();

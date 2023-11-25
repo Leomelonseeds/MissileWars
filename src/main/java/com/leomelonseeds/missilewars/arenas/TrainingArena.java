@@ -67,7 +67,7 @@ public class TrainingArena extends ClassicArena {
             
             // Make sure people can't break the game
             if (startTime != null) {
-                int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                long time = getSecondsUntilStart();
                 if (time <= 1 && time >= -1) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                     return;

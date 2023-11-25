@@ -132,18 +132,18 @@ messages:
   training-time: "&7You spent &3%time% &7in this game."
   stage0: "&a&l[!] &7If you already know how to play Ultima Missile Wars, you can use &f/lobby &7to skip the introduction."
   stage1:
-    - "&b============== Stage 1 =================="
+    - "&b============ Placing Missiles ==============="
     - "&f&aRight-click &fa spawn egg at the edge of the base"
     - "&fbase to place a missile. Missiles will &cignite &fand"
     - "&4explode &fif they encouter obstacles."
     - "&b========================================"
   stage2:
-    - "&b============== Stage 2 =================="
+    - "&b============ Riding Missiles ================"
     - "&fPlace a missile on the the edge of the base,"
     - "&fthen run and jump on it to ride it."
     - "&b========================================"
   stage3:
-    - "&b============== Stage 3 =================="
+    - "&b============== Attacking =================="
     - "&7&oThis part is optional - type &f/skip &7to skip it"
     - "&fBehind the enemy base are &5nether portals &fthat"
     - "&fmust be blown up to win the game. Ride a missile"
@@ -151,14 +151,14 @@ messages:
     - "&e&ltheir base &fto blow up their portal!"
     - "&b========================================"
   stage4:
-    - "&b============== Stage 4 =================="
+    - "&b============= Defending ================="
     - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
     - "&fcan be thrown to defend against oncoming missiles."
     - "&fThey spawn after &a1 second &fand will &cbreak &fif"
     - "&fthey hit a block before then. Throw one at the &dX&f!"
     - "&b========================================"
   stage5:
-    - "&b============== Stage 5 =================="
+    - "&b=============== Decks ==================="
     - "&fThere are 4 decks &7(kits) &favailable to play."
     - "&fEach contains its own unique &cmissiles&f, &9utilities&f,"
     - "&6weapon&f, &3enchantments&f, and &epassive abilities."
@@ -167,7 +167,7 @@ messages:
     - "&fanother deck of your choice."
     - "&b========================================"
   stage6:
-    - "&b============== Stage 6 =================="
+    - "&b============ Customization ================"
     - "&fEach deck has many options available to customize."
     - "&fUpgrading them costs &askillpoints, &fand each preset"
     - "&fhas &a16 &fin total. Select '&7&lEdit Preset&f' and"
@@ -180,6 +180,7 @@ messages:
     - "&fout the &dTraining &farena. Otherwise, have fun!"
     - "&b========================================"
   stage-skip-fail: "&c&l[!] &7You cannot skip this stage."
+  stage-skip-fail-game: "&c&l[!] &7You must be in-game to skip this stage."
   wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
     
 titles:
@@ -318,7 +319,7 @@ titles:
     length: 100
   stage6:
     title: "&bCustomization"
-    subtitle: "&fUpgrade/downgrade any missile/utility"
+    subtitle: "&fUpgrade or downgrade any missile/utility"
     length: 100
   stagecomplete:
     title: "&f"
@@ -333,7 +334,7 @@ bossbar:
   stage3: "&b&lGoal: &f&lDestroy any enemy portal &7(&f/skip &7to skip)"
   stage4: "&b&lGoal: &f&lThrow a projectile at the &d&lX"
   stage5: "&b&lGoal: &f&lType &a&l/leave &f&land use NPCs to change your deck"
-  stage6: "&b&lGoal: &f&lUpgrade/downgrade any &c&lMissile &f&lor &9&lUtility"
+  stage6: "&b&lGoal: &f&lUse NPCs to up/downgrade any &c&lMissile &f&lor &9&lUtility"
   stage7: "&b&lYou finished the tutorial!"
   
 

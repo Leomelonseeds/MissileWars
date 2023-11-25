@@ -244,6 +244,11 @@ public class TutorialArena extends ClassicArena {
             return;
         }
         
+        if (!blueTeam.containsPlayer(uuid)) {
+            ConfigUtils.sendConfigMessage("messages.stage-skip-fail-game", player, null, null);
+            return;
+        }
+        
         stage.put(uuid, s + 1);
         player.hideBossBar(bossbars.get(s));
         initiateStage(player, s + 1);

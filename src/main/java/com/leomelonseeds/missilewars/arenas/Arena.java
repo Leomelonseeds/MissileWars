@@ -736,7 +736,10 @@ public abstract class Arena implements ConfigurationSerializable {
             return;
         }
         
-        if (!running && startTime != null && getNumPlayers() < plugin.getConfig().getInt("minimum-players")) {
+        // Cancel if not running and there's enough time left
+        // Don't cancel game if its in the process of starting
+        if (!running && startTime != null && getSecondsUntilStart() >= 0 && 
+                getNumPlayers() < plugin.getConfig().getInt("minimum-players")) {
             for (BukkitTask task : tasks) {
                 task.cancel();
             }
@@ -803,7 +806,7 @@ public abstract class Arena implements ConfigurationSerializable {
             
             // Make sure people can't break the game
             if (startTime != null) {
-                int time = (int) Duration.between(LocalDateTime.now(), startTime).toSeconds();
+                long time = getSecondsUntilStart();
                 if (time <= 1 && time >= -1) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
                     return;
@@ -989,7 +992,8 @@ public abstract class Arena implements ConfigurationSerializable {
             
             // Register teams and set running state to true
             tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (players.isEmpty()) {
+                // Checks if all players are spectating (and if there are no players)
+                if (spectators.size() == players.size()) {
                     running = true;
                     return;
                 }
@@ -1088,10 +1092,6 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Assign remaining players
         for (MissileWarsPlayer player : toAssign) {
-            // Ignore if player is a spectator
-            if (spectators.contains(player)) {
-                continue;
-            }
             if (blueTeam.getSize() <= redTeam.getSize()) {
                 if (blueTeam.getSize() >= maxSize) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
@@ -1120,33 +1120,33 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param player 
      */
     public void addCallback(MissileWarsPlayer player) {
-        // Return if player null, decrease queuecount to not hang game
-        if (player.getMCPlayer() == null) {
-            queueCount--;
+        // If game is running, no null/queuecount checks are needed
+        if (running) {
+            applyMultipliers();
+            player.initDeck(leftPlayers.containsKey(player.getMCPlayerId()) && 
+                    leftPlayers.get(player.getMCPlayerId()) >= 3, this);
             return;
         }
         
-        // Once redteam + blueteam = queuecount, running will be TRUE
-        // and therefore no race condition is possible
-        if (!running) {
-            if (blueTeam.getSize() + redTeam.getSize() < queueCount) {
-                return;
-            }
-            
-            applyMultipliers();
-            for (MissileWarsPlayer mwp : redTeam.getMembers()) {
-                mwp.initDeck(false, this);
-            }
-            
-            for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
-                mwp.initDeck(false, this);
-            }
-            running = true;
-        } else {
-            applyMultipliers();
-            player.initDeck(leftPlayers.containsKey(player.getMCPlayerId()) && 
-                    leftPlayers.get(player.getMCPlayerId()) >= 2, this);
+        // Return if player is not in game, decrease queuecount to not hang game
+        if (!players.contains(player) || spectators.contains(player)) {
+            queueCount--;
         }
+
+        // Once redteam + blueteam = queuecount, running will be TRUE
+        if (blueTeam.getSize() + redTeam.getSize() < queueCount) {
+            return;
+        }
+        
+        applyMultipliers();
+        for (MissileWarsPlayer mwp : redTeam.getMembers()) {
+            mwp.initDeck(false, this);
+        }
+        
+        for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
+            mwp.initDeck(false, this);
+        }
+        running = true;
     }
     
     /**
