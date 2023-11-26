@@ -430,7 +430,9 @@ public class ArenaGameruleListener implements Listener {
                 int blastprot = boots.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
                 if (blastprot > 0) {
                     boots.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
-                    event.setDamage(event.getDamage() * (1 - 0.15 * blastprot));
+                    // This line isn't needed for some reason, as the game takes it into account
+                    // even though the enchantment has been removed in the same tick
+                    // event.setDamage(event.getDamage() * (1 - 0.15 * blastprot));
                 }
                 
                 // Apply extra velocity from rocketeer if available and restore enchantment
@@ -441,7 +443,9 @@ public class ArenaGameruleListener implements Listener {
                     double velz = velocity.getZ() * rmult;
                     double vely = velocity.getY() * rmult;
                     player.setVelocity(new Vector(velx, vely, velz));
-                    boots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, blastprot);
+                    if (blastprot > 0) {
+                        boots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, blastprot);
+                    }
                 }, 1);
             }
             
