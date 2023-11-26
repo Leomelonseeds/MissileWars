@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -31,6 +32,7 @@ import org.bukkit.entity.Slime;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -414,29 +416,40 @@ public class ArenaGameruleListener implements Listener {
                 damager = (Player) projectile.getShooter();
                 isProjectile = true;
             }
-        } else if (eventDamager instanceof Explosive) {
-            /*
+        }
+        
+        // Berserker explosion checks
+        if (eventDamager instanceof Explosive || 
+            eventDamager instanceof ExplosiveMinecart ||
+            eventDamager instanceof Creeper) {
             // Check bers rocketeer
-            int blastprot = player.getInventory().getBoots().getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
             int rocketeer = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
-            if (blastprot > 0 && rocketeer > 0) {
-                // blastprot = 15% kb reduction per level. To get to the original, divide current velocity by 
-                // 1 - 15% per level of blastprot
+            if (rocketeer > 0) {
+                // Temporarily remove blastprot to allow normal explosion
+                ItemStack boots = player.getInventory().getBoots();
+                int blastprot = boots.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
+                if (blastprot > 0) {
+                    boots.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
+                    event.setDamage(event.getDamage() * (1 - 0.15 * blastprot));
+                }
+                
+                // Apply extra velocity from rocketeer if available and restore enchantment
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    double bmult = 1 / (1 - 0.15 * blastprot);
                     double rmult = ConfigUtils.getAbilityStat("Berserker.passive.boosterball", rocketeer, "multiplier");
                     Vector velocity = player.getVelocity();
-                    double velx = velocity.getX() * bmult * rmult;
-                    double velz = velocity.getZ() * bmult * rmult;
-                    double vely = velocity.getY() * bmult * rmult;
+                    double velx = velocity.getX() * rmult;
+                    double velz = velocity.getZ() * rmult;
+                    double vely = velocity.getY() * rmult;
                     player.setVelocity(new Vector(velx, vely, velz));
+                    boots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, blastprot);
                 }, 1);
             }
-            */
             
             // Fireballs should not do dmg to players
+            // return to allow friendly fire
             if (eventDamager instanceof Fireball) {
                 event.setDamage(0.0001);
+                return;
             }
         }
         
@@ -494,6 +507,7 @@ public class ArenaGameruleListener implements Listener {
                     damager.sendMessage(ConfigUtils.toComponent(msg));
                 }
             } 
+            
             // Check for prickly projectiles
             else if (projectile.getType() == EntityType.EGG || 
                      projectile.getType() == EntityType.SNOWBALL || 

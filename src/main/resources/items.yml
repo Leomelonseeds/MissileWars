@@ -1287,10 +1287,10 @@ Berserker:
     blast_protection:
       cost: 1600
       1: 
-        level: 3
+        level: 2
         spcost: 1
       2: 
-        level: 6
+        level: 4
         spcost: 1
   passive:
     slownessarrows:
