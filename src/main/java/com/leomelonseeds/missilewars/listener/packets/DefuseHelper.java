@@ -132,7 +132,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 if (block.getType() == Material.MOVING_PISTON) {
                     event.setCancelled(true);
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        world.getBlockAt(bploc).setType(Material.AIR);
+                        player.breakBlock(world.getBlockAt(bploc));
                     });
                     return;
                 } else if (block.getType() == Material.AIR) {
@@ -141,7 +141,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                     if (block.getType() == Material.MOVING_PISTON) {
                         event.setCancelled(true);
                         Bukkit.getScheduler().runTask(plugin, () -> {
-                            world.getBlockAt(bploc).setType(Material.AIR);
+                            player.breakBlock(world.getBlockAt(bploc));
                         });
                         return;
                     } else if (block.getType() == Material.AIR) {

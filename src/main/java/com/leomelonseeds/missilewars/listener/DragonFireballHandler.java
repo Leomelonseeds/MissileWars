@@ -107,15 +107,9 @@ public class DragonFireballHandler implements Listener {
         }
 
         hitDetected = true;
-        Vector curVelocity = fireball.getVelocity();
-        fireball.setVelocity(new Vector(0, 0, 0));
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            if (!(damager instanceof Explosive)) {
-                fireball.setVelocity(direction.multiply(curVelocity.length()));  
-            }
-            fireball.setDirection(direction);
-            hitDetected = false;
-        }, 1);
+        fireball.teleport(fireball.getLocation());
+        fireball.setDirection(direction);
+        hitDetected = false;
     }
     
     @EventHandler
