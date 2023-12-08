@@ -326,16 +326,36 @@ titles:
     subtitle: "&aWell done!"
     length: 60
     
-# Bossbar goals
-bossbar:
-  stage0: "&aWelcome" # unused
-  stage1: "&b&lGoal: &f&lRight-click a spawn egg to place a missile"
-  stage2: "&b&lGoal: &f&lJump on and ride a missile"
-  stage3: "&b&lGoal: &f&lDestroy any enemy portal &7(&f/skip &7to skip)"
-  stage4: "&b&lGoal: &f&lThrow a projectile at the &d&lX"
-  stage5: "&b&lGoal: &f&lType &a&l/leave &f&land use NPCs to change your deck"
-  stage6: "&b&lGoal: &f&lUse NPCs to up/downgrade any &c&lMissile &f&lor &9&lUtility"
-  stage7: "&b&lYou finished the tutorial!"
+# Scoreboard goals (use with PAPI %umw_tutorial_#%)
+scoreboard:
+  stage0: 
+    - "&fWelcome to Missile Wars!"
+  stage1: 
+    - "&f&lRight-click &fa spawn egg"
+    - "&fon the edge of the base"
+    - "&fto place a missile"
+  stage2: 
+    - "&fRide a missile"
+  stage3: 
+    - "&fDestroy any enemy portal"
+    - "&fby riding over and placing"
+    - "&fmissiles inside their base"
+    - "&7(Type &8/skip &7to skip)"
+  stage4: 
+    - "&fProjectiles spawn after"
+    - "&a1 second &fand &cbreak &fif"
+    - "&fthey hit a block. Throw"
+    - "one at the &d&lX&f!"
+  stage5: 
+    - "&fType &a/leave &fand use the"
+    - "&fNPCs to change your deck"
+  stage6: 
+    - "&fSelect &7&lEdit Preset &fin"
+    - "&fthe NPCs, and upgrade"
+    - "&for downgrade any"
+    - "&c&lMissile &for &9&lUtility&f"
+  stage7: 
+    - "&fFinished the tutorial!"
   
 
 # For GUI inventory customization

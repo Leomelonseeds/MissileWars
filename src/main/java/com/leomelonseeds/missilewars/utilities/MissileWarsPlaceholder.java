@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -194,6 +195,24 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         // Arena specific placeholders
+        
+        if (params.contains("tutorial")) {
+            if (!(playerArena instanceof TutorialArena)) {
+                return null;
+            }
+            
+            int line = Integer.parseInt(params.split("_")[1]);
+            Integer stage = ((TutorialArena) playerArena).getStage(player.getUniqueId());
+            if (stage == null) {
+                return "";
+            }
+            
+            List<String> lines = ConfigUtils.getConfigTextList("scoreboard.stage" + stage, null, null, null);
+            if (line >= lines.size()) {
+                return "";
+            }
+            return lines.get(line);
+        }
 
         if (params.equalsIgnoreCase("gamemode")) {
             return "§a" + "Classic";

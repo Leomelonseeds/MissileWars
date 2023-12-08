@@ -1,8 +1,6 @@
 package com.leomelonseeds.missilewars.arenas;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -13,7 +11,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,7 +27,6 @@ import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 
 public class TutorialArena extends ClassicArena {
@@ -38,7 +34,6 @@ public class TutorialArena extends ClassicArena {
     private Map<UUID, Integer> stage;
     private Map<UUID, Location> xs;
     private Map<UUID, BukkitTask> particles;
-    private List<BossBar> bossbars;
     private boolean justReset;
     
     public TutorialArena() {
@@ -54,19 +49,9 @@ public class TutorialArena extends ClassicArena {
     private void init() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         this.stage = new HashMap<>();
-        this.bossbars = new ArrayList<>();
         this.xs = new HashMap<>();
         this.particles = new HashMap<>();
         this.justReset = true;
-        
-        // Initialize boss bars
-        FileConfiguration messages = ConfigUtils.getConfigFile("messages.yml");
-        for (int i = 0; i <= 7; i++) {
-            String line = messages.getString("bossbar.stage" + i);
-            BossBar bar = BossBar.bossBar(ConfigUtils.toComponent(line), 1, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
-            bar.progress(i / 7F);
-            bossbars.add(bar);
-        }
         
         // Start 1 tick later to make sure it doesn't interfere with other things
         Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
@@ -93,6 +78,10 @@ public class TutorialArena extends ClassicArena {
                 this.cancel();
             }
         }.runTaskTimer(plugin, minute, minute);
+    }
+    
+    public Integer getStage(UUID uuid) {
+        return stage.get(uuid);
     }
 
     @Override
@@ -160,7 +149,6 @@ public class TutorialArena extends ClassicArena {
             return;
         } 
 
-        player.showBossBar(bossbars.get(s));
         ConfigUtils.sendConfigSound("stage", player);
         
         // Do some additional work if stage 4 is present
@@ -214,11 +202,10 @@ public class TutorialArena extends ClassicArena {
         // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
         if (s == 6) {
-            player.hideBossBar(bossbars.get(s));
-            player.showBossBar(bossbars.get(7));
-            stage.remove(uuid);
+            stage.put(uuid, 7);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
+                stage.remove(uuid);
                 removePlayer(uuid, true);
             }, 60);
             return;
@@ -226,7 +213,6 @@ public class TutorialArena extends ClassicArena {
 
         stage.put(uuid, s + 1);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            player.hideBossBar(bossbars.get(s));
             initiateStage(player, s + 1);
         }, 60);
     }
@@ -250,7 +236,6 @@ public class TutorialArena extends ClassicArena {
         }
         
         stage.put(uuid, s + 1);
-        player.hideBossBar(bossbars.get(s));
         initiateStage(player, s + 1);
     }
     
@@ -358,9 +343,6 @@ public class TutorialArena extends ClassicArena {
             
             // Remove tutorial stuff
             removeXs(uuid);
-            for (BossBar b : bossbars) {
-                mcPlayer.hideBossBar(b);
-            }
         }
     }
     
