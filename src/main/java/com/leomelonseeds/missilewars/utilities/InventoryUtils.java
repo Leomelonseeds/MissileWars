@@ -69,7 +69,7 @@ public class InventoryUtils {
             // If it's not an illegal item, don't clear
             if (i == 39) {
                 String cur = current.getType().toString();
-                if (!cur.contains("HELMET") && !cur.contains("CREEPER") || !cur.contains("DRAGON")) {
+                if (!cur.contains("HELMET") && !cur.contains("CREEPER") && !cur.contains("DRAGON")) {
                     continue;
                 }
             }
@@ -77,7 +77,7 @@ public class InventoryUtils {
             // Don't clear alcohol (potions)
             if (isPotion(current)) {
                 continue;
-            }
+            }   
             
             inventory.clear(i);
         }
