@@ -15,8 +15,9 @@ import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.clip.placeholderapi.expansion.Relational;
 
-public class MissileWarsPlaceholder extends PlaceholderExpansion {
+public class MissileWarsPlaceholder extends PlaceholderExpansion implements Relational {
 
 
     @Override
@@ -52,25 +53,25 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         DecimalFormat df = new DecimalFormat("##.##");
 
         // General purpose placeholders
-        if (params.equalsIgnoreCase("focus")) {
+        if (params.equals("focus")) {
             return ConfigUtils.getFocusName(player);
         }
 
         if (params.contains("team")) {
             String team = playerArena == null ? "no team" : playerArena.getTeam(player.getUniqueId());
-            if (params.equalsIgnoreCase("team")) {
+            if (params.equals("team")) {
                 return team;
             }
-            if (params.equalsIgnoreCase("team_color")) {
+            if (params.equals("team_color")) {
                 return team.equals("no team") ? "&f" : team.equals("red") ? "&c" : "&9";
             }
         }
 
-        if (params.equalsIgnoreCase("deck_plain")) {
+        if (params.equals("deck_plain")) {
             return MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId()).getString("Deck");
         }
 
-        if (params.equalsIgnoreCase("deck")) {
+        if (params.equals("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");
             String preset = json.getString("Preset");
@@ -95,37 +96,37 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             int level = RankUtils.getRankLevel(exp);
             int max = 10;
 
-            if (params.equalsIgnoreCase("rank_level")) {
+            if (params.equals("rank_level")) {
                 return Integer.toString(level);
             }
             
-            if (params.equalsIgnoreCase("rank_exp_total")) {
+            if (params.equals("rank_exp_total")) {
                 return Integer.toString(exp);
             }
 
-            if (params.equalsIgnoreCase("rank_name")) {
+            if (params.equals("rank_name")) {
                 return RankUtils.getRankName(exp);
             }
 
-            if (params.equalsIgnoreCase("rank_symbol")) {
+            if (params.equals("rank_symbol")) {
                 return RankUtils.getRankSymbol(exp);
             }
 
-            if (params.equalsIgnoreCase("rank_exp")) {
+            if (params.equals("rank_exp")) {
                 if (level >= max) {
                     return "0";
                 }
                 return Integer.toString(RankUtils.getCurrentExp(exp));
             }
 
-            if (params.equalsIgnoreCase("rank_exp_next")) {
+            if (params.equals("rank_exp_next")) {
                 if (level >= max) {
                     return "N/A";
                 }
                 return Integer.toString(RankUtils.getNextExp(exp));
             }
 
-            if (params.equalsIgnoreCase("rank_progress_percentage")) {
+            if (params.equals("rank_progress_percentage")) {
                 if (level >= max) {
                     return "0%";
                 }
@@ -186,7 +187,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return Integer.toString(manager.getPlayers(params.split("_")[1]));
         }
 
-        if (params.equalsIgnoreCase("arena")) {
+        if (params.equals("arena")) {
             return playerArena == null ? "Lobby" : StringUtils.capitalize(playerArena.getName());
         }
 
@@ -214,21 +215,21 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return lines.get(line);
         }
 
-        if (params.equalsIgnoreCase("gamemode")) {
+        if (params.equals("gamemode")) {
             return "§a" + "Classic";
         }
 
         boolean inGame = playerArena.isRunning() || playerArena.isResetting();
 
-        if (params.equalsIgnoreCase("ingame")) {
+        if (params.equals("ingame")) {
             return inGame ? "true" : "false";
         }
 
-        if (params.equalsIgnoreCase("red_queue")) {
+        if (params.equals("red_queue")) {
             return Integer.toString(playerArena.getRedQueue());
         }
 
-        if (params.equalsIgnoreCase("blue_queue")) {
+        if (params.equals("blue_queue")) {
             return Integer.toString(playerArena.getBlueQueue());
         }
 
@@ -240,15 +241,15 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         MissileWarsTeam redTeam = playerArena.getRedTeam();
         MissileWarsTeam blueTeam = playerArena.getBlueTeam();
 
-        if (params.equalsIgnoreCase("map")) {
+        if (params.equals("map")) {
             return ConfigUtils.getMapText(playerArena.getGamemode(), playerArena.getMapName(), "name");
         }
 
-        if (params.equalsIgnoreCase("time_remaining")) {
+        if (params.equals("time_remaining")) {
             return playerArena.getTimeRemaining();
         }
 
-        if (params.equalsIgnoreCase("red_shield_health")) {
+        if (params.equals("red_shield_health")) {
             double health = Math.max(0, redTeam.getShieldHealth());
             String chatcolor;
             if (health >= 90) {
@@ -267,7 +268,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return chatcolor + df.format(health)+ "%";
         }
 
-        if (params.equalsIgnoreCase("blue_shield_health")) {
+        if (params.equals("blue_shield_health")) {
             double health = Math.max(0, blueTeam.getShieldHealth());
             String chatcolor;
             if (health >= 90) {
@@ -286,35 +287,40 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return chatcolor + df.format(health)+ "%";
         }
 
-        if (params.equalsIgnoreCase("red_team")) {
+        if (params.equals("red_team")) {
+            if (redTeam == null) {
+                return "0";
+            }
             return Integer.toString(redTeam.getSize());
         }
 
-        if (params.equalsIgnoreCase("blue_team")) {
+        if (params.equals("blue_team")) {
+            if (blueTeam == null) {
+                return "0";
+            }
             return Integer.toString(blueTeam.getSize());
         }
 
-        if (params.equalsIgnoreCase("red_portals")) {
+        if (params.equals("red_portals")) {
             return redTeam.getRemainingPortals() + "";
         }
 
-        if (params.equalsIgnoreCase("blue_portals")) {
+        if (params.equals("blue_portals")) {
             return blueTeam.getRemainingPortals() + "";
         }
 
-        if (params.equalsIgnoreCase("red_portals_total")) {
+        if (params.equals("red_portals_total")) {
             return redTeam.getTotalPortals() + "";
         }
 
-        if (params.equalsIgnoreCase("blue_portals_total")) {
+        if (params.equals("blue_portals_total")) {
             return blueTeam.getTotalPortals() + "";
         }
 
-        if (params.equalsIgnoreCase("kills")) {
+        if (params.equals("kills")) {
             return playerArena.getPlayerInArena(player.getUniqueId()).getKills() + "";
         }
 
         return null; // Placeholder is unknown by the Expansion
     }
-
 }
