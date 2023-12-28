@@ -15,9 +15,8 @@ import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import me.clip.placeholderapi.expansion.Relational;
 
-public class MissileWarsPlaceholder extends PlaceholderExpansion implements Relational {
+public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
 
     @Override
