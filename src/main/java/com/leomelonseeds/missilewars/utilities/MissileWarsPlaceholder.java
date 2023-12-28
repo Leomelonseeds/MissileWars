@@ -232,13 +232,27 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return Integer.toString(playerArena.getBlueQueue());
         }
 
-        if (!inGame) {
-            return null;
-        }
-
         // In-Game placeholders
         MissileWarsTeam redTeam = playerArena.getRedTeam();
         MissileWarsTeam blueTeam = playerArena.getBlueTeam();
+
+        if (params.equals("red_team")) {
+            if (redTeam == null) {
+                return "0";
+            }
+            return Integer.toString(redTeam.getSize());
+        }
+
+        if (params.equals("blue_team")) {
+            if (blueTeam == null) {
+                return "0";
+            }
+            return Integer.toString(blueTeam.getSize());
+        }
+
+        if (!inGame) {
+            return null;
+        }
 
         if (params.equals("map")) {
             return ConfigUtils.getMapText(playerArena.getGamemode(), playerArena.getMapName(), "name");
@@ -284,20 +298,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 chatcolor = "§4";
             }
             return chatcolor + df.format(health)+ "%";
-        }
-
-        if (params.equals("red_team")) {
-            if (redTeam == null) {
-                return "0";
-            }
-            return Integer.toString(redTeam.getSize());
-        }
-
-        if (params.equals("blue_team")) {
-            if (blueTeam == null) {
-                return "0";
-            }
-            return Integer.toString(blueTeam.getSize());
         }
 
         if (params.equals("red_portals")) {
