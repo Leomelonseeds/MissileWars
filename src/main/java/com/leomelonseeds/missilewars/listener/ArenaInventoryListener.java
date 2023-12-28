@@ -317,7 +317,9 @@ public class ArenaInventoryListener implements Listener {
 
             event.getItem().setItemStack(i);
             event.setCancelled(true);
-            di.pickup(event.getItem());
+            if (di.pickup(event.getItem())) {
+                event.getArrow().remove();
+            }
         }
     }
 

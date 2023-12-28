@@ -220,11 +220,11 @@ public class DeckItem {
      * 
      * @param amount
      */
-    public void pickup(Item itemEntity) {
+    public boolean pickup(Item itemEntity) {
         Player player = mwp.getMCPlayer();
         int actamount = getActualAmount();
         if (actamount >= max) {
-            return;
+            return false;
         }
 
         ItemStack item = itemEntity.getItemStack();
@@ -251,6 +251,7 @@ public class DeckItem {
         player.playPickupItemAnimation(itemEntity);
         cur.setAmount(actamount + toPickup);
         itemEntity.remove();
+        return true;
     }
     
     // Returns 0 if on visual cooldown
