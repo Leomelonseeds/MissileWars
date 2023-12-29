@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -315,8 +316,9 @@ public class ConfigUtils {
      * @return player name stripped of color and applied of team
      */
     public static String getFocusName(OfflinePlayer player) {
-        Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
-        String displayName = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
+        Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(uuid);
+        String displayName = player.isOnline() ? ConfigUtils.toPlain(Bukkit.getPlayer(uuid).displayName()) : player.getName();
         if (playerArena != null) {
             String teamColor = playerArena.getTeamColor(player.getUniqueId());
             if (teamColor != null) {

@@ -166,6 +166,9 @@ public class RankUtils {
         }
 
         String nick = MissileWarsPlugin.getPlugin().getSQL().getPlayerNick(player.getUniqueId());
+        if (nick == null) {
+            nick = player.getName();
+        }
         int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
 
         return prefix + nick + " " + getRankSymbol(exp);
