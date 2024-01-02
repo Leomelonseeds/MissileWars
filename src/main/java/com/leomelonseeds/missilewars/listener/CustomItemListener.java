@@ -233,8 +233,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Make sure this action can't deflect a fireball
-        ArenaGameruleListener.notLeftClick.add(uuid);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> ArenaGameruleListener.notLeftClick.remove(uuid), 1);
+        MiscListener.notLeftClick.add(uuid);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> MiscListener.notLeftClick.remove(uuid), 1);
         
         // Check if player is frozen by a canopy
         if (canopy_freeze.contains(player)) {

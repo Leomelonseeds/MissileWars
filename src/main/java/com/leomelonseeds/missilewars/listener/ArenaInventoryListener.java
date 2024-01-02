@@ -160,9 +160,9 @@ public class ArenaInventoryListener implements Listener {
     public void onItemDrop(PlayerDropItemEvent event) {
         // Make sure this action can't deflect a fireball
         Player player = event.getPlayer();
-        ArenaGameruleListener.notLeftClick.add(player.getUniqueId());
+        MiscListener.notLeftClick.add(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
-        ArenaGameruleListener.notLeftClick.remove(player.getUniqueId()), 1);
+        MiscListener.notLeftClick.remove(player.getUniqueId()), 1);
         
         // Cancel if dropping custom item
         if (InventoryUtils.isHeldItem(event.getItemDrop().getItemStack())) {

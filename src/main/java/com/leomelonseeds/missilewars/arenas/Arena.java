@@ -1306,7 +1306,7 @@ public abstract class Arena implements ConfigurationSerializable {
     
     /** Reset the arena world. */
     public void resetWorld() {
-        Bukkit.unloadWorld(getWorld(), false);
+        MissileWarsPlugin.getPlugin().log("Unloading world... success? " + Bukkit.unloadWorld(getWorld(), false));
         unregisterTeams();
         loadWorldFromDisk();
         resetting = false;
