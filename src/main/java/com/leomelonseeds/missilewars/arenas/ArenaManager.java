@@ -101,12 +101,14 @@ public class ArenaManager {
         if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
-            arena.loadWorldFromDisk();
+            arena.loadWorldFromDisk(false);
             if (arena instanceof TutorialArena) {
                 Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aStarting tutorial arena..."));
                 arena.start();
             }
         }
+        
+        ConfigUtils.reloadCitizens();
     }
 
     /** Clean up and save arenas on server shutdown */
@@ -174,6 +176,7 @@ public class ArenaManager {
         }
         CitizensAPI.getNPCRegistry().saveToStore();
         Bukkit.unloadWorld(arenaWorld, false);
+        Bukkit.getWorlds().remove(arenaWorld);
         File worldFolder = new File("mwarena_" + arena.getName());
         try {
             FileUtils.deleteDirectory(worldFolder);

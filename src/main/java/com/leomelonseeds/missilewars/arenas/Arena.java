@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -1253,7 +1254,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             resetWorld();
-        }, waitTime + 100L);
+        }, waitTime + 60L);
     }
     
     // Calculate and store all player stats from the game
@@ -1265,10 +1266,11 @@ public abstract class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             // Also only requeue if capacity is 20
+            List<Arena> togo = MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode);
             Player player = mwPlayer.getMCPlayer();
             if (!player.hasPermission("umw.disablerequeue") && capacity == cap) {
                 Boolean success = false;
-                for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
+                for (Arena arena : togo) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
                             (!arena.isRunning() && !arena.isResetting())) {
                         // Switch player arenas
@@ -1297,21 +1299,34 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /** Load this Arena's world from the disk. */
-    public void loadWorldFromDisk() {
+    public void loadWorldFromDisk(boolean reloadCitizens) {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
         arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> ConfigUtils.reloadCitizens(), 10);
+        if (reloadCitizens) {
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
+                    () -> ConfigUtils.reloadCitizens(), 10);
+        }
     }
     
     /** Reset the arena world. */
     public void resetWorld() {
-        MissileWarsPlugin.getPlugin().log("Unloading world... success? " + Bukkit.unloadWorld(getWorld(), false));
+        World world = getWorld();
+        MissileWarsPlugin.getPlugin().log("Unloading " + world.getLoadedChunks().length + " chunks and resetting world...");
+        for (Chunk chunk : world.getLoadedChunks()) {
+            chunk.unload(false);
+        }
         unregisterTeams();
-        loadWorldFromDisk();
-        resetting = false;
         startTime = null;
         voteManager = new VoteManager(this);
+        Bukkit.unloadWorld(world, false);
+        Bukkit.getWorlds().remove(world);
+        
+        // Wait 1 sec to make sure world unloads properly
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            loadWorldFromDisk(true);
+            resetting = false;
+        }, 60);
     }
 
     /**
