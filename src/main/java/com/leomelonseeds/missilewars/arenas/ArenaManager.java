@@ -107,8 +107,9 @@ public class ArenaManager {
                 arena.start();
             }
         }
-        
-        ConfigUtils.reloadCitizens();
+
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
+                () -> ConfigUtils.reloadCitizens(), 10);
     }
 
     /** Clean up and save arenas on server shutdown */
