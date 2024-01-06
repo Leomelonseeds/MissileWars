@@ -53,8 +53,8 @@ public class TutorialArena extends ClassicArena {
         this.particles = new HashMap<>();
         this.justReset = true;
         
-        // Start 1 tick later to make sure it doesn't interfere with other things
-        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
+        // Wait 4 seconds for the world to load. then start
+        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 80);
         
         // World reset task
         int minute = 20 * 60;
@@ -352,7 +352,17 @@ public class TutorialArena extends ClassicArena {
     }
     
     @Override
-    protected void startTeams() {}
+    protected void startTeams() {
+        // Literally place everyone on blue
+        queueCount = 0;
+        for (MissileWarsPlayer player : players) {
+            if (spectators.contains(player)) {
+                continue;
+            }
+            queueCount++;
+            blueTeam.addPlayer(player);
+        }
+    }
     
     // No need to track who left the arena here
     @Override
