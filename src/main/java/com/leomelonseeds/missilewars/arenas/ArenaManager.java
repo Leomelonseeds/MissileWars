@@ -255,6 +255,10 @@ public class ArenaManager {
      */
     public Arena getArena(World world) {
         for (Arena arena : loadedArenas) {
+            if (arena.getWorld() == null) {
+                continue;
+            }
+            
             if (arena.getWorld().equals(world)) {
                 return arena;
             }
