@@ -1254,7 +1254,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             resetWorld();
-        }, waitTime + 60L);
+        }, waitTime + 40L);
     }
     
     // Calculate and store all player stats from the game
@@ -1320,12 +1320,13 @@ public abstract class Arena implements ConfigurationSerializable {
         startTime = null;
         voteManager = new VoteManager(this);
         Bukkit.unloadWorld(world, false);
+        Bukkit.getWorlds().remove(world);
         
-        // Wait 3 sec to make sure world unloads properly
+        // Wait 4 sec to make sure world unloads properly
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             loadWorldFromDisk(true);
             resetting = false;
-        }, 60);
+        }, 80);
     }
 
     /**

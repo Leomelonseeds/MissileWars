@@ -318,7 +318,7 @@ public class ConfigUtils {
     public static String getFocusName(OfflinePlayer player) {
         UUID uuid = player.getUniqueId();
         Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(uuid);
-        String displayName = player.isOnline() ? ConfigUtils.toPlain(Bukkit.getPlayer(uuid).displayName()) : player.getName();
+        String displayName = player.isOnline() ? toPlain(Bukkit.getPlayer(uuid).displayName()) : player.getName();
         if (playerArena != null) {
             String teamColor = playerArena.getTeamColor(player.getUniqueId());
             if (teamColor != null) {
