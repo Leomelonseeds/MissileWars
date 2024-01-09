@@ -104,14 +104,22 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             return;
         }
 
-        // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
         Player player = event.getPlayer();
         World world = player.getWorld();
         int ping = player.getPing();
-        try {
-            for (DefuseBlock db : blocks) {
-                if (!db.checkEquality(bp, world)) {
-                    continue;
+        Location checkLoc = new Location(world, bp.getX(), bp.getY(), bp.getZ());
+        for (int i = 0; i <= 1; i++) {
+            try {
+                DefuseBlock db = null;
+                for (DefuseBlock cdb : blocks) {
+                    if (cdb.getLastLoc().equals(checkLoc)) {
+                        db = cdb;
+                        break;
+                    }
+                }  
+                
+                if (db == null) {
+                    return;
                 }
                 
                 // As mentioned above, only continue if piston was pushed less than player ping time ago
@@ -124,8 +132,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 // If we're handling a moving piston, rewrite packet for the smoothest experience.
                 // If the location already contains air, then move the packet forward another block.
                 // Then do the same checks again. If the checks happen to fail, then do nothing.
-                // I'm sure there's a way to write this with less lines but this is much easier to
-                // understand for me.
+                // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
                 BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
                 Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
                 Block block = world.getBlockAt(bploc);
@@ -133,28 +140,28 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 if (block.getType() == Material.MOVING_PISTON) {
                     moving = true;
                 } else if (block.getType() == Material.AIR) {
-                    newbp = new BlockPosition(bp.getX(), bp.getY(), db.getNextZ());
-                    bploc.setZ(db.getNextZ());
-                    block = world.getBlockAt(bploc);
-                    if (block.getType() == Material.MOVING_PISTON) {
-                        moving = true;
-                    } else if (block.getType() == Material.AIR) {
+                    if (i == 1) {
                         return;
                     }
+                    
+                    // If AIR, do the loop again to check if
+                    // any block have moved 2 forward
+                    checkLoc.setZ(db.getZ());
+                    continue;
                 }
 
                 sm.write(0, newbp);
                 if (moving) {
                     event.setCancelled(true);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet);
+                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
                     }, 2);
                 }
                 return;
-            }  
-        } catch (ConcurrentModificationException e) {
-            plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
-            return;
+            } catch (ConcurrentModificationException e) {
+                plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
+                return;
+            } 
         }
     }
     
