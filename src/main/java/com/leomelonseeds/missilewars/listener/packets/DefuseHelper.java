@@ -180,7 +180,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         // Add all non-instabreak blocks to defuseblock list
         for (Block block : affectedBlocks) {
             Material type = block.getType();
-            if (type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK) {
+            if (type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK || type == Material.END_ROD) {
                 new DefuseBlock(block.getLocation(), dir, this);
             }
         }

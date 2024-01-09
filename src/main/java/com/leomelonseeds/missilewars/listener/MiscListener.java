@@ -264,7 +264,8 @@ public class MiscListener implements Listener {
             return;
         }
         
-        if (((Arrow) e.getEntity()).getFireTicks() <= 0) {
+        Arrow arrow = (Arrow) e.getEntity();
+        if (arrow.getFireTicks() <= 0) {
             return;
         }
         
@@ -286,6 +287,11 @@ public class MiscListener implements Listener {
         Location spawnLoc = tnt.remove(loc).subtract(0, 0.5, 0);
         TNTPrimed primed = (TNTPrimed) b.getWorld().spawnEntity(spawnLoc, EntityType.PRIMED_TNT);
         primed.setFuseTicks(80);
+        
+        // Get source
+        if (arrow.getShooter() instanceof Player) {
+            primed.setSource((Player) arrow.getShooter());
+        }
     }
     
     // ------------------------------------------------
