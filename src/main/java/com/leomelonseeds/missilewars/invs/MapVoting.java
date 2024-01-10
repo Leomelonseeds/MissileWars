@@ -94,6 +94,9 @@ public class MapVoting implements MWInventory {
     public void registerClick(int slot, ClickType type) {
         Arena arena = getPlayerArena(player);
         ItemStack clicked = inv.getItem(slot);
+        if (clicked == null) {
+            return;
+        }
         
         // Get meta
         ItemMeta meta = clicked.getItemMeta();
