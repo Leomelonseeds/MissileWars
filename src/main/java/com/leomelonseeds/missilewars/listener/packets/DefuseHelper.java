@@ -136,9 +136,17 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
                 Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
                 Block block = world.getBlockAt(bploc);
-                boolean moving = false;
                 if (block.getType() == Material.MOVING_PISTON) {
-                    moving = true;
+                    // Since must be 0 or 1 if its a moving piston
+                    // 0 = 2t delay, 1 = 1t delay
+                    event.setCancelled(true);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        if (world.getBlockAt(bploc).getType() != Material.AIR) {
+                            sm.write(0, newbp);
+                        }
+                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
+                    }, since * -1 + 2);
+                    return;
                 } else if (block.getType() == Material.AIR) {
                     if (i == 1) {
                         return;
@@ -151,12 +159,6 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 }
 
                 sm.write(0, newbp);
-                if (moving) {
-                    event.setCancelled(true);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
-                    }, 2);
-                }
                 return;
             } catch (ConcurrentModificationException e) {
                 plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
