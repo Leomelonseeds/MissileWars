@@ -141,7 +141,9 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                     // 0 = 2t delay, 1 = 1t delay
                     event.setCancelled(true);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        if (world.getBlockAt(bploc).getType() != Material.AIR) {
+                        Block cur = world.getBlockAt(bploc);
+                        if (cur.getType() != Material.AIR) {
+                            player.breakBlock(cur);
                             sm.write(0, newbp);
                         }
                         ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
