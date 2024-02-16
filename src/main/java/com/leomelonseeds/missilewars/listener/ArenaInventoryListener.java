@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -315,11 +316,17 @@ public class ArenaInventoryListener implements Listener {
                 continue;
             }
 
-            event.getItem().setItemStack(i);
+            Item ei = event.getItem();
+            ei.setItemStack(i);
             event.setCancelled(true);
-            if (di.pickup(event.getItem())) {
-                event.getArrow().remove();
+            if (!di.pickup(ei)) {
+                return;
             }
+
+            player.playPickupItemAnimation(ei);
+            event.getArrow().remove();
+            ConfigUtils.sendConfigSound("pickup", player);
+            return;
         }
     }
 

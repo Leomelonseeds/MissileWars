@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -348,8 +351,15 @@ public class MiscListener implements Listener {
         
         // Handle dragon fireballs by registering an EDBEE for the handler
         if (target instanceof Slime) {
-            @SuppressWarnings("deprecation")
-            EntityDamageByEntityEvent extraEvent = new EntityDamageByEntityEvent(player, target, DamageCause.ENTITY_ATTACK, 0.001);
+            EntityDamageByEntityEvent extraEvent = new EntityDamageByEntityEvent(
+                    player, 
+                    target, 
+                    DamageCause.ENTITY_ATTACK, 
+                    DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).build(), 
+                    null, 
+                    Collections.emptyMap(), 
+                    false);
+            extraEvent.setDamage(0.001);
             Bukkit.getPluginManager().callEvent(extraEvent);
             return;
         }

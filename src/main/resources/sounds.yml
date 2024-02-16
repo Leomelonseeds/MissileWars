@@ -150,3 +150,7 @@ stage:
   sound: BLOCK_NOTE_BLOCK_PLING
   volume: 1.0
   pitch: 1.1
+pickup:
+  sound: ENTITY_ITEM_PICKUP
+  volume: 1.0
+  pitch: 1.0
