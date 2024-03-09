@@ -52,9 +52,7 @@ public class TutorialArena extends ClassicArena {
         this.xs = new HashMap<>();
         this.particles = new HashMap<>();
         this.justReset = true;
-        
-        // Wait 5 seconds for the world to load. then start
-        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 100);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
         
         // World reset task
         int minute = 20 * 60;

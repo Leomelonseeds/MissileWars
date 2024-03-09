@@ -39,7 +39,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -368,11 +367,5 @@ public class MiscListener implements Listener {
         if (target instanceof Fireball) {
             player.attack(target);
         }
-    }
-    
-    // Debug world saving
-    @EventHandler
-    public void onWorldSave(WorldSaveEvent e) {
-        MissileWarsPlugin.getPlugin().log("World save detected... world: " + e.getWorld().getName());
     }
 }

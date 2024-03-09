@@ -1,9 +1,8 @@
 package com.leomelonseeds.missilewars.listener.packets;
 
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -74,14 +73,12 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     // that also has the same X and Y and has Z in the opposite direction of when it was last moved.
     
     private MissileWarsPlugin plugin;
-    private Set<DefuseBlock> blocks;
-    private boolean cmeLock;
+    private Map<Location, DefuseBlock> blocks;
 
     public DefuseHelper(MissileWarsPlugin plugin) {
         super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG);
         this.plugin = plugin;
-        this.blocks = new HashSet<>();
-        this.cmeLock = false;
+        this.blocks = new HashMap<>();
     }
      
     @Override
@@ -98,74 +95,57 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         if (bp.getY() == 0) {
             return;
         }
-        
-        // In the rare cases where a CME may occur, simply quit
-        if (cmeLock) {
-            return;
-        }
 
         Player player = event.getPlayer();
         World world = player.getWorld();
         int ping = player.getPing();
         Location checkLoc = new Location(world, bp.getX(), bp.getY(), bp.getZ());
         for (int i = 0; i <= 1; i++) {
-            try {
-                DefuseBlock db = null;
-                for (DefuseBlock cdb : blocks) {
-                    if (cdb.getLastLoc().equals(checkLoc)) {
-                        db = cdb;
-                        break;
+            DefuseBlock db = blocks.get(checkLoc);
+            if (db == null) {
+                return;
+            }
+                
+            // As mentioned above, only continue if piston was pushed less than player ping time ago
+            // Add 10 to the ping for players hovering around the border of ticks
+            int since = db.getTicks();
+            if (since * 50 > ping + 10) {
+                return;
+            }
+            
+            // If we're handling a moving piston, rewrite packet for the smoothest experience.
+            // If the location already contains air, then move the packet forward another block.
+            // Then do the same checks again. If the checks happen to fail, then do nothing.
+            // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
+            BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
+            Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
+            Block block = world.getBlockAt(bploc);
+            if (block.getType() == Material.MOVING_PISTON) {
+                // Since must be 0 or 1 if its a moving piston
+                // 0 = 2t delay, 1 = 1t delay
+                event.setCancelled(true);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    Block cur = world.getBlockAt(bploc);
+                    if (cur.getType() != Material.AIR) {
+                        player.breakBlock(cur);
+                        sm.write(0, newbp);
                     }
-                }  
-                
-                if (db == null) {
+                    ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
+                }, since * -1 + 2);
+                return;
+            } else if (block.getType() == Material.AIR) {
+                if (i == 1) {
                     return;
                 }
                 
-                // As mentioned above, only continue if piston was pushed less than player ping time ago
-                // Add 10 to the ping for players hovering around the border of ticks
-                int since = db.getTicks();
-                if (since * 50 > ping + 10) {
-                    return;
-                }
-                
-                // If we're handling a moving piston, rewrite packet for the smoothest experience.
-                // If the location already contains air, then move the packet forward another block.
-                // Then do the same checks again. If the checks happen to fail, then do nothing.
-                // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
-                BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
-                Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
-                Block block = world.getBlockAt(bploc);
-                if (block.getType() == Material.MOVING_PISTON) {
-                    // Since must be 0 or 1 if its a moving piston
-                    // 0 = 2t delay, 1 = 1t delay
-                    event.setCancelled(true);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        Block cur = world.getBlockAt(bploc);
-                        if (cur.getType() != Material.AIR) {
-                            player.breakBlock(cur);
-                            sm.write(0, newbp);
-                        }
-                        ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
-                    }, since * -1 + 2);
-                    return;
-                } else if (block.getType() == Material.AIR) {
-                    if (i == 1) {
-                        return;
-                    }
-                    
-                    // If AIR, do the loop again to check if
-                    // any block have moved 2 forward
-                    checkLoc.setZ(db.getZ());
-                    continue;
-                }
+                // If AIR, do the loop again to check if
+                // any block have moved 2 forward
+                checkLoc.setZ(db.getZ());
+                continue;
+            }
 
-                sm.write(0, newbp);
-                return;
-            } catch (ConcurrentModificationException e) {
-                plugin.log("Concurrent modification detected, cancelling DefuseHelper...");
-                return;
-            } 
+            sm.write(0, newbp);
+            return;
         }
     }
     
@@ -189,17 +169,23 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         // Add all non-instabreak blocks to defuseblock list
         for (Block block : affectedBlocks) {
             Material type = block.getType();
-            if (type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK || type == Material.END_ROD) {
-                new DefuseBlock(block.getLocation(), dir, this);
+            if (!(type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK || type == Material.END_ROD)) {
+                continue;
+            }
+            
+            Location loc = block.getLocation();
+            DefuseBlock db = blocks.get(loc);
+            if (db == null) {
+                db = new DefuseBlock(loc, dir, this);
+                blocks.put(loc, db);
+            } else {
+                db.resetTicks();
+                db.setZ(loc, dir);
             }
         }
     }
     
-    public void setCMELock(boolean yes) {
-        cmeLock = yes;
-    }
-    
-    public Set<DefuseBlock> getList(){
-        return blocks;
+    public void removeDefuseBlock(Location loc) {
+        blocks.remove(loc);
     }
 }

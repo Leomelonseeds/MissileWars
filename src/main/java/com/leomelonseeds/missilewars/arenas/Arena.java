@@ -1322,11 +1322,8 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.unloadWorld(world, false);
         Bukkit.getWorlds().remove(world);
         
-        // Wait 4 sec to make sure world unloads properly
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            loadWorldFromDisk(true);
-            resetting = false;
-        }, 80);
+        loadWorldFromDisk(true);
+        resetting = false;
     }
 
     /**
