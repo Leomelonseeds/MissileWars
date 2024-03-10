@@ -11,10 +11,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
@@ -137,7 +139,7 @@ public class TutorialArena extends ClassicArena {
         }
 
         ConfigUtils.sendTitle("stage" + s, player);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 100);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 50);
         if (s == 0) {
             ConfigUtils.sendConfigSound("stagecomplete", player);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -149,37 +151,55 @@ public class TutorialArena extends ClassicArena {
 
         ConfigUtils.sendConfigSound("stage", player);
         
-        // Do some additional work if stage 4 is present
-        if (s != 4) {
+        // Spawn particles for stage 4 (defense)
+        if (s == 4) {
+            if (!ConfigUtils.inShield(this, player.getLocation(), "blue", 2)) {
+                player.teleport(getPlayerSpawn(player));
+            }
+            
+            // Give player location to throw shield at if stage 4
+            Random random = new Random();
+            final double X = random.nextInt(-15, 16) + 0.5;
+            final double Y = 13.5;
+            final double Z = -24.5;
+            xs.put(uuid, new Location(getWorld(), X, Y, Z));
+            DustOptions dustOptions = new DustOptions(Color.FUCHSIA, 1.5F);
+            particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                double yneg = Y - 1;
+                double ypos = Y + 1;
+                for (double x = X - 1; x <= X + 1; x += 0.25) {
+                    player.spawnParticle(Particle.REDSTONE, x, yneg, Z, 2, dustOptions);
+                    player.spawnParticle(Particle.REDSTONE, x, ypos, Z, 2, dustOptions);
+                    yneg += 0.25;
+                    ypos -= 0.25;
+                }
+            }, 10, 5));
+            
+            String deck = getPlayerInArena(player.getUniqueId()).getDeck().getName();
+            if (deck.equals("Berserker") || deck.equals("Vanguard")) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
+            }
             return;
         }
-
-        if (!ConfigUtils.inShield(this, player.getLocation(), "blue", 2)) {
-            player.teleport(getPlayerSpawn(player));
-        }
         
-        // Give player location to throw shield at if stage 4
-        Random random = new Random();
-        final double X = random.nextInt(-15, 16) + 0.5;
-        final double Y = 13.5;
-        final double Z = -24.5;
-        xs.put(uuid, new Location(getWorld(), X, Y, Z));
-        DustOptions dustOptions = new DustOptions(Color.FUCHSIA, 1.5F);
-        particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            double yneg = Y - 1;
-            double ypos = Y + 1;
-            for (double x = X - 1; x <= X + 1; x += 0.25) {
-                player.spawnParticle(Particle.REDSTONE, x, yneg, Z, 2, dustOptions);
-                player.spawnParticle(Particle.REDSTONE, x, ypos, Z, 2, dustOptions);
-                yneg += 0.25;
-                ypos -= 0.25;
+        // Spawn particles above NPCs
+        if (s == 5 || s == 6) {
+            FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
+            for (String npc : new String[] {"berserker", "architect", "vanguard", "sentinel"}) { 
+                Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + npc, null, null);
+                Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
+                particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                    player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 10, 0.4, 0.4, 0.4);
+                }, 0, 20));
             }
-        }, 10, 5));
-        
-        String deck = getPlayerInArena(player.getUniqueId()).getDeck().getName();
-        if (deck.equals("Berserker") || deck.equals("Vanguard")) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
         }
+
+        // Close inventory for stage 6 so people can see the instructions
+        if (s == 6) {
+            player.closeInventory();
+            return;
+        }
+        
     }
     
     /**
