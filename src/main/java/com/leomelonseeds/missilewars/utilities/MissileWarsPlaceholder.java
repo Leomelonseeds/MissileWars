@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -65,27 +66,40 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return team.equals("no team") ? "&f" : team.equals("red") ? "&c" : "&9";
             }
         }
-
-        if (params.equals("deck_plain")) {
-            return MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId()).getString("Deck");
-        }
-
-        if (params.equals("deck")) {
+        
+        if (params.contains("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
             String deck = json.getString("Deck");
-            String preset = json.getString("Preset");
-            String chatcolor = "§2";
-            switch (deck) {
-                case "Vanguard":
-                    chatcolor = "§6";
-                    break;
-                case "Sentinel":
-                    chatcolor = "§b";
-                    break;
-                case "Berserker":
-                    chatcolor = "§c";
+            if (params.equals("deck_plain")) {
+                return json.getString("Deck");
             }
-            return chatcolor + json.getString("Deck") + "§7 [" + preset + "]";
+
+            String preset = json.getString("Preset");
+            if (params.equals("deck")) {
+                String chatcolor = "§2";
+                switch (deck) {
+                    case "Vanguard":
+                        chatcolor = "§6";
+                        break;
+                    case "Sentinel":
+                        chatcolor = "§b";
+                        break;
+                    case "Berserker":
+                        chatcolor = "§c";
+                }
+                return chatcolor + json.getString("Deck") + "§7 [" + preset + "]";
+            }
+            
+            FileConfiguration sec = ConfigUtils.getConfigFile("items.yml");
+            String type = params.split("_")[1];
+            String passive = json.getJSONObject(deck).getJSONObject(preset).getJSONObject(type).getString("selected");
+            if (passive.equals("None")) {
+                return "None";
+            }
+
+            String path = type.equals("gpassive") ? "gpassive." + passive + ".name" :
+                deck + "." + type + "." + passive + ".name";
+            return sec.getString(path);
         }
 
         // Rank placeholders

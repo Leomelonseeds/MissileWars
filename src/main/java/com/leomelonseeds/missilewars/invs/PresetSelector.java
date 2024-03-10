@@ -83,18 +83,16 @@ public class PresetSelector implements MWInventory {
                     l = l.replaceAll("%gpassive%", "None");
                     l = l.replaceAll("%passive%", "None");
                 } else {
-                    String gpassive = current.getJSONObject("gpassive").getString("selected");
-                    if (!gpassive.equals("None")) {
-                        l = l.replaceAll("%gpassive%", itemConfig.getString("gpassive." + gpassive + ".name"));
-                    } else {
-                        l = l.replaceAll("%gpassive%", "None");
-                    }
-
-                    String passive = current.getJSONObject("passive").getString("selected");
-                    if (!passive.equals("None")) {
-                        l = l.replaceAll("%passive%", itemConfig.getString(deck + ".passive." + passive + ".name"));
-                    } else {
-                        l = l.replaceAll("%passive%", "None");
+                    for (String type : new String[] {"passive", "gpassive"}) {
+                        String passive = current.getJSONObject(type).getString("selected");
+                        String placeholder = "%" + type + "%";
+                        String path = type.equals("gpassive") ? "gpassive." + passive + ".name" :
+                            deck + "." + type + "." + passive + ".name";
+                        if (!passive.equals("None")) {
+                            l = l.replaceAll(placeholder, itemConfig.getString(path));
+                        } else {
+                            l = l.replaceAll(placeholder, "None");
+                        }
                     }
                 }
                 lore.add(l);
