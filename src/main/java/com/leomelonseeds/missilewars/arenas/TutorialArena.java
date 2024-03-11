@@ -182,6 +182,21 @@ public class TutorialArena extends ClassicArena {
             return;
         }
         
+        // Keep title if player has not left in stage 5
+        if (s == 5) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (getTeam(uuid).equals("no team")) {
+                        this.cancel();
+                        return;
+                    }
+                    
+                    ConfigUtils.sendTitle("stage5hold", player);
+                }
+            }.runTaskTimer(plugin, 20, 20);
+        }
+        
         // Spawn particles above NPCs
         if (s == 5 || s == 6) {
             FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
@@ -197,7 +212,6 @@ public class TutorialArena extends ClassicArena {
         // Close inventory for stage 6 so people can see the instructions
         if (s == 6) {
             player.closeInventory();
-            return;
         }
         
     }

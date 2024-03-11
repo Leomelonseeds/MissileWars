@@ -19,6 +19,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -283,9 +284,17 @@ public class ConfigUtils {
             subtitle = PlaceholderAPI.setPlaceholders(player, subtitle);
         }
 
-        int length = Integer.parseInt(getConfigText("titles." + path + ".length", null, null, null));
+        ConfigurationSection sec = getConfigFile("messages.yml").getConfigurationSection("titles." + path);
+        int[] durs = {500, 1000, 1000}; // In milliseconds
+        String[] sdurs = {"fadein", "length", "fadeout"};
+        for (int i = 0; i < 3; i++) {
+            if (sec.contains(sdurs[i])) {
+                durs[i] = sec.getInt(sdurs[i]) * 50;
+            }
+        }
         
-        Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(length * 50), Duration.ofMillis(1000));
+        
+        Title.Times times = Title.Times.times(Duration.ofMillis(durs[0]), Duration.ofMillis(durs[1]), Duration.ofMillis(durs[2]));
         Title finalTitle = Title.title(toComponent(title), toComponent(subtitle), times);
 
         player.showTitle(finalTitle);
