@@ -86,7 +86,7 @@ public class SchematicManager {
      * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
+    private static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
 
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
@@ -172,7 +172,7 @@ public class SchematicManager {
             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
             boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
-            boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red");
+            boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red", 4);
             boolean isTutorial = loc.getWorld().getName().contains("tutorial");
             int x1, x2, z1, z2;
             if (redMissile) {
@@ -213,7 +213,7 @@ public class SchematicManager {
                         if (cancel.contains(b.toString())) {
                             // Move missile backwards if it would spawn in another base (it has definitely collided with the portal)
                             if (missileInOtherBase) {
-                                Location testAgain = loc.clone().add(0, 0, 1);
+                                Location testAgain = loc.clone().add(0, 0, redMissile ? 1 : -1);
                                 return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
                             }
                             sendError(player, "You cannot spawn structures inside unbreakable blocks!");
