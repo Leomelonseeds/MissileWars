@@ -210,6 +210,32 @@ public class MissileWarsCommand implements CommandExecutor {
             return true;
         }
         
+        if (action.equalsIgnoreCase("map")) {
+            if (!(sender instanceof Player)) {
+                sendErrorMsg(sender, "You must be a player");
+                return true;
+            }
+            Player player = (Player) sender;
+
+            // Try to find Arena
+            Arena arena = arenaManager.getArena(player.getUniqueId());
+            if (arena == null) {
+                sendErrorMsg(player, "You are not in an arena!");
+                return true;
+            }
+            
+            // Arena must have started
+            if (!arena.isRunning() && !arena.isResetting()) {
+                sendErrorMsg(player, "No map generated yet! Vote for one using &a/votemap");
+                return true;
+            }
+
+            String ret = ConfigUtils.getConfigText("messages.map", player, arena, null);
+            ret = ret.replaceAll("%map%", ConfigUtils.getMapText(arena.getGamemode(), arena.getMapName(), "name"));
+            player.sendMessage(ConfigUtils.toComponent(ret));
+            return true;
+        }
+        
         if (action.equalsIgnoreCase("spectate")) {
             if (!(sender instanceof Player)) {
                 sendErrorMsg(sender, "You must be a player");

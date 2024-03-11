@@ -182,6 +182,7 @@ messages:
   stage-skip-fail: "&c&l[!] &7You cannot skip this stage."
   stage-skip-fail-game: "&c&l[!] &7You must be in-game to skip this stage."
   wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
+  map: "&7Current map: %map%"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
