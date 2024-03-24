@@ -127,7 +127,7 @@ public class TutorialArena extends ClassicArena {
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
         // Cancel if player isn't in the arena anymore
-        if (!player.getWorld().getName().equals(getWorld().getName())) {
+        if (!isInArena(player.getUniqueId())) {
             return;
         }
         
@@ -138,7 +138,19 @@ public class TutorialArena extends ClassicArena {
             return;
         }
 
-        ConfigUtils.sendTitle("stage" + s, player);
+        // Title task: Send titles once every 20 seconds to make sure players on right track
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (isInArena(player.getUniqueId()) && stage.get(uuid) == s) {
+                    ConfigUtils.sendTitle("stage" + s, player);;
+                } else {
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0, 500);
+        
+        
         Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 50);
         if (s == 0) {
             ConfigUtils.sendConfigSound("stagecomplete", player);
@@ -180,21 +192,6 @@ public class TutorialArena extends ClassicArena {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
             }
             return;
-        }
-        
-        // Keep title if player has not left in stage 5
-        if (s == 5) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (getTeam(uuid).equals("no team")) {
-                        this.cancel();
-                        return;
-                    }
-                    
-                    ConfigUtils.sendTitle("stage5hold", player);
-                }
-            }.runTaskTimer(plugin, 20, 20);
         }
         
         // Spawn particles above NPCs

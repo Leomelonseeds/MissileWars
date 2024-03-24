@@ -318,11 +318,6 @@ titles:
     title: "&bDecks"
     subtitle: "&fUse &a/leave &fand change your deck"
     length: 100
-  stage5hold:
-    title: "&bDecks"
-    subtitle: "&fUse &a/leave &fand change your deck"
-    length: 20
-    fadein: 0
   stage6:
     title: "&bCustomization"
     subtitle: "&fUpgrade or downgrade any missile/utility"

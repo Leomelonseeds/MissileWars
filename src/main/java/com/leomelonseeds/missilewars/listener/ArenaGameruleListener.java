@@ -173,9 +173,9 @@ public class ArenaGameruleListener implements Listener {
             player.teleport(spawn);
             player.setFireTicks(0);
             player.setSaturation(5F);
-            player.removePotionEffect(PotionEffectType.POISON);
-            player.removePotionEffect(PotionEffectType.GLOWING);
-            player.removePotionEffect(PotionEffectType.SLOW);
+            for (PotionEffect effect : player.getActivePotionEffects()) {
+                player.removePotionEffect(effect.getType());
+            }
         }, 1);
         Component deathMessage = event.deathMessage();
         event.deathMessage(ConfigUtils.toComponent(""));
