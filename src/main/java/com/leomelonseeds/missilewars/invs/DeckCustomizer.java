@@ -61,12 +61,7 @@ public class DeckCustomizer implements MWInventory {
         // Add indicators
         for (String key : itemConfig.getConfigurationSection("indicators").getKeys(false)) {
             ItemStack item = deckManager.createItem("indicators." + key, 0, false);
-            if (key.equals("skillpoints")) {
-                ItemMeta meta = item.getItemMeta();
-                String name = ConfigUtils.toPlain(item.getItemMeta().displayName());
-                meta.displayName(ConfigUtils.toComponent(name.replace("%sp%", presetjson.getInt("skillpoints") + "")));
-                item.setItemMeta(meta);
-            } else if (key.equals("info")) {
+            if (key.equals("info")) {
                 ItemMeta meta = item.getItemMeta();
                 List<String> newLore = new ArrayList<>();
                 for (Component c : item.lore()) {
@@ -74,6 +69,8 @@ public class DeckCustomizer implements MWInventory {
                     if (info.contains("Balance")) {
                         double bal = MissileWarsPlugin.getPlugin().getEconomy().getBalance(player);
                         info = info.replace("null", bal + "");
+                    } else if (info.contains("Available Skillpoints")) {
+                        info = info.replace("null", presetjson.getInt("skillpoints") + "");
                     }
                     newLore.add(info);
                 }
@@ -279,7 +276,8 @@ public class DeckCustomizer implements MWInventory {
     // Return an item with a blank name
     private ItemStack blankName(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(""));
+        String name = item.getType() == Material.IRON_NUGGET ? "&f→" : "";
+        meta.displayName(ConfigUtils.toComponent(name));
         item.setItemMeta(meta);
         return item;
     }

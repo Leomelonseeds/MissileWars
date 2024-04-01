@@ -348,6 +348,9 @@ public class TutorialArena extends ClassicArena {
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         players.remove(toRemove);
         voteManager.removePlayer(toRemove.getMCPlayer());
+        for (MissileWarsPlayer mwPlayer : players) {
+            ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+        }
         spectators.remove(toRemove);
         blueTeam.removePlayer(toRemove);
 

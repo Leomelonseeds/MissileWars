@@ -1479,9 +1479,9 @@ held:
 default-skillpoints: 16
 
 intangibles:
-  locked: RED_STAINED_GLASS_PANE
-  unlocked: ORANGE_STAINED_GLASS_PANE
-  selected: GREEN_STAINED_GLASS_PANE
+  locked: RED_WOOL
+  unlocked: ORANGE_WOOL
+  selected: LIME_WOOL
 
 title:
   preset: "%deck% - Preset Selection"
@@ -1524,17 +1524,18 @@ indicators:
     name: "&fMenu Information"
     lore:
     - ""
-    - "&7Use this menu to customize your deck."
-    - "&7After unlocking an ability/passive,"
-    - "&7purchase and upgrade it using"
-    - "&aSkillpoints&7. Check the item below"
-    - "&7for your available skillpoints."
+    - "&7- Each row is a different category."
+    - "&7- Left click an item to upgrade it."
+    - "&7- Right click items to downgrade."
+    - "&7- Presets have &f16 &7skillpoints."
+    - "&7- Earn &fMokens &7by playing games."
     - ""
+    - "&aAvailable Skillpoints: &f%sp%"
     - "&aBalance: &f%mokens% Mokens"
     slot: 8
   skillpoints:
     item: EMERALD
-    name: "&aAvailable Skillpoints: &f%sp%"
+    name: "&aReturn Skillpoints"
     lore:
     - ""
     - "&cClick to downgrade all items"
@@ -1650,21 +1651,20 @@ preset:
       - ""
       - "&cClick &7to use this deck."
   normal:
-    item: BOOK
+    item: LIGHT_GRAY_CONCRETE
+    itemselect: LIME_CONCRETE
+    itemnotselect: LIGHT_GRAY_CONCRETE
+    nameselect: "&aSelected"
+    namenotselect: "&cClick &7to select this preset"
+  edit:
+    item: WRITABLE_BOOK
     name: "&f&lPreset %preset%"
     lore:
     - ""
-    - "&7Passive: %passive%"
-    - "&7Global Passive: %gpassive%"
+    - "&fPassive: &8%passive%"
+    - "&fGlobal Passive: &8%gpassive%"
     - ""
-    loreselect: "&aSelected"
-    lorenotselect: "&cClick &7to select this preset"
-  edit:
-    item: REPEATER
-    name: "&7&lEdit Preset"
-    lore:
-    - ""
-    - "&7Edit this preset to change the levels of"
+    - "&7Edit this preset to upgrade/downgrade"
     - "&7your missiles, utility, and enchantments,"
     - "&7and purchase passives and abilities."
     - ""

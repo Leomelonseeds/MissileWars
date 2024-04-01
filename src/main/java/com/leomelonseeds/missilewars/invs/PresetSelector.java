@@ -60,9 +60,10 @@ public class PresetSelector implements MWInventory {
         for (int i = 0; i < presets.size(); i++) {
             String p = presets.get(i);
             
-            ItemStack item = new ItemStack(Material.getMaterial(itemConfig.getString("preset.normal.item")));
+            // Create deck edit item
+            ItemStack item = new ItemStack(Material.getMaterial(itemConfig.getString("preset.edit.item")));
             ItemMeta meta = item.getItemMeta();
-            String name = itemConfig.getString("preset.normal.name").replace("%preset%", p);
+            String name = itemConfig.getString("preset.edit.name").replace("%preset%", p);
             if (p.equals("B")) {
                 name += " &8(requires &e&lESQUIRE&8)";
             } else if (p.equals("C")) {
@@ -78,7 +79,7 @@ public class PresetSelector implements MWInventory {
             }
 
             // Use null if player doesn't have the json, otherwise do manual replacements
-            for (String l : itemConfig.getStringList("preset.normal.lore")) {
+            for (String l : itemConfig.getStringList("preset.edit.lore")) {
                 if (current == null) {
                     l = l.replaceAll("%gpassive%", "None");
                     l = l.replaceAll("%passive%", "None");
@@ -98,15 +99,6 @@ public class PresetSelector implements MWInventory {
                 lore.add(l);
             }
             
-            // Make item glow if selected
-            if (deck.equals(playerJson.getString("Deck")) && p.equals(playerJson.getString("Preset"))) {
-                meta.addEnchant(Enchantment.DURABILITY, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                lore.add(itemConfig.getString("preset.normal.loreselect"));
-            } else {
-                lore.add(itemConfig.getString("preset.normal.lorenotselect"));
-            }
-            
             // Add data for slot registration identification
             meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING, p);
@@ -116,13 +108,23 @@ public class PresetSelector implements MWInventory {
             // NO RANKED PRESET AT THE MOMENT, PUT 19 INSTEAD OF 20 IF ADDED BACK
             inv.setItem(i * 2 + 20, item);
             
-            // Create deck edit item
-            ItemStack edit = dm.createItem("preset.edit", 0, false);
-            ItemMeta editMeta = edit.getItemMeta();
-            editMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
+            
+            // Create deck selection item
+            ItemStack sel = dm.createItem("preset.normal", 0, false);
+            ItemMeta selMeta = sel.getItemMeta();
+            
+            // Different material and name if selected
+            String select = "notselect";
+            if (deck.equals(playerJson.getString("Deck")) && p.equals(playerJson.getString("Preset"))) {
+                select = "select";
+            }
+            
+            sel.setType(Material.valueOf(itemConfig.getString("preset.normal.item" + select)));
+            selMeta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.normal.name" + select)));
+            selMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING, p);
-            edit.setItemMeta(editMeta);
-            inv.setItem(i * 2 + 29, edit);
+            sel.setItemMeta(selMeta);
+            inv.setItem(i * 2 + 29, sel);
         }
         
         // ItemStack ranked = MissileWarsPlugin.getPlugin().getDeckManager().createItem("ranked", 0, false);
