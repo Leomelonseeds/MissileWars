@@ -173,9 +173,7 @@ public class DeckManager {
         {
             addEnch(weapon, "sharpness", deck, json);
             addEnch(weapon, "flame", deck, json);
-            if (plugin.getJSON().getAbility(uuid, "punch") > 0) {
-                weapon.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-            }
+            addEnch(weapon, "punch", deck, json);
             ItemStack boots = new ItemStack(Material.IRON_BOOTS);
             addEnch(boots, "fire_protection", deck, json);
             gear.add(boots);

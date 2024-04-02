@@ -39,12 +39,12 @@
 	"Sentinel": {
 		"fire_protection": false,
 		"longshot": false,
-		"warden": false,
 		"spectral": false,
 		"defaultpreset": {
 			"skillpoints": 2,
 			"fire_protection": 0,
 			"flame": 1,
+			"punch": 1,
 			"sharpness": 2,
 			"utility": {
 				"torpedo": 2,
@@ -59,7 +59,7 @@
 				"supporter": 2
 			},
 			"passive": {
-				"selected": "punch",
+				"selected": "warden",
 				"level": 1
 			},
 			"gpassive": {

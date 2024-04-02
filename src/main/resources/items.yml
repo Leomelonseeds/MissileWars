@@ -1169,6 +1169,10 @@ Sentinel:
       1:
         level: 1
         spcost: 1
+    punch:
+      1:
+        level: 1
+        spcost: 2
     sharpness:
       cost: 400
       1: 
@@ -1189,13 +1193,22 @@ Sentinel:
         level: 4
         spcost: 1
   passive:
-    punch:
-      name: "&ePunch"
+    warden:
+      name: "&eWarden"
       lore:
       - ""
-      - "&7Adds Punch I to your bow."
+      - "&7Receive Strength and Resistance with"
+      - "&7amplifier %amplifier% &7while in your base."
+      cost: 1000
       1:
-        spcost: 3
+        spcost: 1
+        amplifier: 0
+      2:
+        spcost: 1
+        amplifier: 1
+      3:
+        spcost: 1
+        amplifier: 2
     longshot:
       name: "&eLongshot"
       lore:
@@ -1218,22 +1231,6 @@ Sentinel:
         spcost: 1
         plus: 0.20
         max: 8
-    warden:
-      name: "&eWarden"
-      lore:
-      - ""
-      - "&7Receive Strength and Resistance with"
-      - "&7amplifier %amplifier% &7while in your base."
-      cost: 1000
-      1:
-        spcost: 1
-        amplifier: 0
-      2:
-        spcost: 1
-        amplifier: 1
-      3:
-        spcost: 1
-        amplifier: 2
     spectral:
       name: "&eSpectral Arrows"
       lore:
