@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.DragonFireball;
+import org.bukkit.entity.EnderSignal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -62,8 +63,8 @@ import com.leomelonseeds.missilewars.utilities.SchematicManager;
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
     
-    public static Set<UUID> canopy_cooldown = new HashSet<>();
     public static Set<Player> canopy_freeze = new HashSet<>();
+    public static Map<Player, ItemStack> canopy_cooldown = new HashMap<>();
     Map<Location, Integer> canopy_extensions = new HashMap<>();
     public static Map<Location, Integer> leaves = new HashMap<>();
 
@@ -269,16 +270,29 @@ public class CustomItemListener implements Listener {
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
                 event.setCancelled(true);
-                if (canopy_cooldown.contains(uuid)) {
-                    return;
-                }
-                if (!player.isOnGround()) {
-                    ConfigUtils.sendConfigMessage("messages.canopy-fail", player, null, null);
-                    return;
-                }
-                ConfigUtils.sendConfigMessage("messages.canopy-activate", player, null, null);
-                canopy_cooldown.add(uuid);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> spawnCanopy(player, playerArena, structureName, hand), 20L); 
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                
+                // Spawn ender eye
+                Location eyeLoc = player.getEyeLocation();
+                EnderSignal signal = (EnderSignal) playerArena.getWorld().spawnEntity(eyeLoc, EntityType.ENDER_SIGNAL);
+                
+                // Set target location
+                int canopy_distance = (int) getItemStat(structureName, "distance");
+                Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
+                signal.setTargetLocation(eyeLoc.clone().add(distance).toCenterLocation());
+                ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
+                signal.setDropItem(false);
+                
+                // Add player to canopy cooldown list to give item back on death
+                canopy_cooldown.put(player, hand);
+                
+                // Send sound 2 seconds later
+                Bukkit.getScheduler().runTaskLater(plugin, () ->
+                    ConfigUtils.sendConfigSound("canopy-activate", player), 40L);
+                
+                // Teleport 3 seconds later
+                Bukkit.getScheduler().runTaskLater(plugin, () -> 
+                    spawnCanopy(player, playerArena, signal, hand), 60L); 
                 return;
             }
             
@@ -453,16 +467,13 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(plugin, 30 * 20);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, String utility, ItemStack hand) {
-        // Make sure the canopy spawn hasn't already been cancelled
-        if (!canopy_cooldown.contains(player.getUniqueId())) {
-            return;
-        }
-    
-        canopy_cooldown.remove(player.getUniqueId());
-    
+    private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal, ItemStack hand) {
         // Ignore offline players. Obviously
         if (!player.isOnline()) {
+            return;
+        }
+        
+        if (canopy_cooldown.remove(player) == null) {
             return;
         }
     
@@ -470,33 +481,33 @@ public class CustomItemListener implements Listener {
         if (playerArena.getMapName() != null) {
             mapName = playerArena.getMapName();
         }
-    
-        int canopy_distance = (int) getItemStat(utility, "distance");
-    
-        // Ignore if player would be going through wall
-        if (player.getTargetBlock(null, canopy_distance + 3).getType() != Material.AIR) {
+        
+        Location spawnLoc = signal.getLocation().toCenterLocation();
+        if (spawnLoc.getBlock().getType() != Material.AIR ||
+            spawnLoc.clone().add(0, 1, 0).getBlock().getType() != Material.AIR) {
             ConfigUtils.sendConfigMessage("messages.canopy-blocked", player, null, null);
+            InventoryUtils.regiveItem(player, hand);
             return;
         }
-    
-        // Finally spawn canopy
-        Vector distance = player.getEyeLocation().getDirection().multiply(canopy_distance);
-        Location spawnLoc = player.getEyeLocation().clone().add(distance);
+        
         if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
+            InventoryUtils.regiveItem(player, hand);
             return;
         }
-            
-        // Teleport and give slowness
-        Location loc = spawnLoc.toCenterLocation().add(0, -0.5, 0);
-        loc.setPitch(90);
-        player.teleport(loc);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5));
         
         // Freeze player for a bit
         canopy_freeze.add(player);
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             canopy_freeze.remove(player);
         }, 30);
+            
+        // Teleport and give slowness
+        Location loc = spawnLoc.add(0, -0.5, 0);
+        loc.setYaw(player.getLocation().getYaw());
+        loc.setPitch(90);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5, true, false));
+        player.teleport(loc);
+        signal.remove();
         
         // Check if can give poison
         double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
@@ -505,47 +516,33 @@ public class CustomItemListener implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
         }
         
-        InventoryUtils.consumeItem(player, playerArena, hand, -1);
         ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
         despawnCanopy(spawnLoc, 5);
     }
     
     private void despawnCanopy(Location loc, int duration) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Location wood = loc.clone().add(0, -1, 0).getBlock().getLocation();
-                if (wood.getBlock().getType() == Material.OAK_WOOD) {
-                    if (canopy_extensions.containsKey(wood)) {
-                        despawnCanopy(loc, canopy_extensions.get(wood));
-                        canopy_extensions.remove(wood);
-                        return;
-                    }
-                    wood.getBlock().setType(Material.AIR);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            Location wood = loc.clone().add(0, -1, 0).getBlock().getLocation();
+            if (wood.getBlock().getType() == Material.OAK_WOOD) {
+                if (canopy_extensions.containsKey(wood)) {
+                    despawnCanopy(loc, canopy_extensions.get(wood));
+                    canopy_extensions.remove(wood);
+                    return;
                 }
+                wood.getBlock().setType(Material.AIR);
             }
-        }.runTaskLater(MissileWarsPlugin.getPlugin(), duration * 20L);
+        }, duration * 20L);
     }
-
-    /** Cancel canopy activation if player jumps falls or something */
+    
+    
+    /** Stop players from moving a second after canopy spawn */
     @EventHandler
-    public void canopyCancel(PlayerMoveEvent e) {
+    public void canopyFreeze(PlayerMoveEvent e) {
         Player player = e.getPlayer();
-        
-        // Stop players from moving a second after canopy spawn
         if (canopy_freeze.contains(player)) {
             e.setCancelled(true);
             return;
-        }
-
-        if (!canopy_cooldown.contains(player.getUniqueId())) {
-            return;
-        }
-
-        if (!player.isOnGround()) {
-            canopy_cooldown.remove(player.getUniqueId());
-            ConfigUtils.sendConfigMessage("messages.canopy-cancel", player, null, null);
         }
     }
 

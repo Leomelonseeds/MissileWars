@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
@@ -134,6 +133,12 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
         
+        // Prevent canopy user from taking fall damage
+        if (event.getCause() == DamageCause.FALL && CustomItemListener.canopy_freeze.contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+        
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
@@ -172,6 +177,7 @@ public class ArenaGameruleListener implements Listener {
         }
 
         Location spawn = playerArena.getPlayerSpawn(player);
+        ItemStack canopy = CustomItemListener.canopy_cooldown.remove(player);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);
@@ -179,6 +185,9 @@ public class ArenaGameruleListener implements Listener {
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.GLOWING);
             player.removePotionEffect(PotionEffectType.SLOW);
+            if (canopy != null) {
+                InventoryUtils.regiveItem(player, canopy);
+            }
         }, 1);
         Component deathMessage = event.deathMessage();
         event.deathMessage(ConfigUtils.toComponent(""));
@@ -217,8 +226,6 @@ public class ArenaGameruleListener implements Listener {
             }
         }
         
-        // Remove canopy cooldown so canopy doesn't get used
-        CustomItemListener.canopy_cooldown.remove(player.getUniqueId());
         mwp.setJustSpawned();
         player.setKiller(null);
 
@@ -576,8 +583,7 @@ public class ArenaGameruleListener implements Listener {
                 }, 1);
                 
                 // Give item back on successful hit
-                Item newitem = damager.getWorld().dropItem(damager.getLocation(), item);
-                newitem.setPickupDelay(0);
+                InventoryUtils.regiveItem(damager, item);
             }
         }
     }
@@ -704,8 +710,7 @@ public class ArenaGameruleListener implements Listener {
         double percentage = ConfigUtils.getAbilityStat("Architect.passive.deconstructor", deconstructor, "percentage") / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
-            Item newitem = player.getWorld().dropItem(player.getLocation(), item);
-            newitem.setPickupDelay(0);
+            InventoryUtils.regiveItem(player, item);
         }
     }
 

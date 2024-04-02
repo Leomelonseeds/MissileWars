@@ -154,3 +154,7 @@ pickup:
   sound: ENTITY_ITEM_PICKUP
   volume: 1.0
   pitch: 1.0
+launch-canopy:
+  sound: ENTITY_ENDER_EYE_LAUNCH
+  volume: 1.0
+  pitch: 1.0

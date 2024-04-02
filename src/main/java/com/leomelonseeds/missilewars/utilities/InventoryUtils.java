@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -119,6 +120,20 @@ public class InventoryUtils {
         } catch (final IOException e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to save inventory to string of " + player.getName());
         }
+    }
+    
+    
+    /** 
+     * Give a player an item by dropping it on the ground, setting
+     * the player as the owner, and setting pickup delay to 0
+     * 
+     * @param player
+     * @param item
+     */
+    public static void regiveItem(Player player, ItemStack item) {
+        Item newitem = player.getWorld().dropItem(player.getLocation(), item);
+        newitem.setOwner(player.getUniqueId());
+        newitem.setPickupDelay(0);
     }
 
 
