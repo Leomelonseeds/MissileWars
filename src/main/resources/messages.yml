@@ -312,7 +312,7 @@ titles:
     length: 100
   stage4:
     title: "&bDefending"
-    subtitle: "&fThrow a projectile at the &d&lX"
+    subtitle: "&fLaunch a throwable at the &d&lX"
     length: 100
   stage5:
     title: "&bDecks"
@@ -343,7 +343,7 @@ scoreboard:
     - "&fmissiles inside their base"
     - "&7(Type &8/skip &7to skip)"
   stage4: 
-    - "&fProjectiles spawn after"
+    - "&fThrowables spawn after"
     - "&a1 second &fand &cbreak &fif"
     - "&fthey hit a block. Throw"
     - "one at the &d&lX&f!"

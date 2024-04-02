@@ -21,8 +21,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.json.JSONObject;
 
@@ -113,19 +111,6 @@ public class DeckManager {
                     name = name.replaceFirst("9", "6");  // Make name orange
                     pmeta.displayName(ConfigUtils.toComponent(name));
                     pmeta.setColor(Color.ORANGE);
-                    i.setItemMeta(pmeta);
-                }
-                
-                // Give slowness arrows in case of berserker
-                int slowarrow = plugin.getJSON().getAbility(uuid, "slownessarrows");
-                if (i.getType() == Material.ARROW && slowarrow > 0) {
-                    int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "amplifier");
-                    int duration = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", slowarrow, "duration") * 20;
-                    i.setType(Material.TIPPED_ARROW);
-                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
-                    pmeta.setColor(Color.fromRGB(92, 110, 131));
-                    pmeta.displayName(ConfigUtils.toComponent("&fArrow of Slowness"));
-                    pmeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, duration, amplifier), true);
                     i.setItemMeta(pmeta);
                 }
                 

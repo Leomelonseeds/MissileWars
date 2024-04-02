@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -77,6 +79,7 @@ public class ArenaGameruleListener implements Listener {
     
     public static Map<Player, Location> bowShots = new HashMap<>();
     public static Set<Player> saidGG = new HashSet<>();
+    private static List<PotionEffectType> effects = null;
 
     /** Event to ignore hunger. */
     @EventHandler
@@ -233,6 +236,7 @@ public class ArenaGameruleListener implements Listener {
         if (event.getEntityType() != EntityType.PLAYER) {
             return;
         }
+        
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = (Player) event.getEntity();
         ArenaManager arenaManager = plugin.getArenaManager();
@@ -246,8 +250,33 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Berserker user
+        UUID uuid = player.getUniqueId();
         if (event.getBow().getType() == Material.CROSSBOW) {
-            player.setCooldown(Material.CROSSBOW, Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW)));
+            player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
+
+            // Spiked Quiver
+            int spiked = plugin.getJSON().getAbility(uuid, "slownessarrows");
+            if (spiked > 0) {
+                if (effects == null) {
+                    effects = List.of(new PotionEffectType[] {
+                        PotionEffectType.BLINDNESS,
+                        PotionEffectType.WEAKNESS,
+                        PotionEffectType.POISON,
+                        PotionEffectType.WITHER,
+                        PotionEffectType.CONFUSION,
+                        PotionEffectType.SLOW,
+                        PotionEffectType.SLOW_DIGGING,
+                    });
+                }
+                
+                Arrow arrow = (Arrow) event.getProjectile();
+                int amplifier = (int) ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", spiked, "amplifier");
+                int duration = (int) (ConfigUtils.getAbilityStat("Berserker.passive.slownessarrows", spiked, "duration") * 20);
+                Random rand = new Random();
+                PotionEffectType type = effects.get(rand.nextInt(effects.size()));
+                arrow.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
+                return;
+            }
             
             // Check for creepershot
             ItemStack crossbow = event.getBow();
@@ -294,20 +323,22 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Longshot
-        if (plugin.getJSON().getAbility(player.getUniqueId(), "longshot") > 0) {
+        if (plugin.getJSON().getAbility(uuid, "longshot") > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 bowShots.remove(player);
             }, 100);
+            return;
         }
         
         // Spectral arrows
-        int spectral = plugin.getJSON().getAbility(player.getUniqueId(), "spectral");
+        int spectral = plugin.getJSON().getAbility(uuid, "spectral");
         if (spectral > 0 && event.getProjectile() instanceof SpectralArrow) {
             SpectralArrow arrow = (SpectralArrow) event.getProjectile();
             int duration = (int) ConfigUtils.getAbilityStat("Sentinel.passive.spectral", spectral, "duration");
             arrow.setGlowingTicks(duration * 20);
+            return;
         }
     }
     
@@ -350,27 +381,31 @@ public class ArenaGameruleListener implements Listener {
         // Creepershot
         if (plugin.getJSON().getAbility(player.getUniqueId(), "creepershot") > 0) {
             ItemStack offhand = inv.getItemInOffHand();
-            if (offhand.getType() == Material.CREEPER_HEAD && !player.hasCooldown(offhand.getType())) {
-                // Prepare fake creeper item
-                boolean charged = ConfigUtils.toPlain(offhand.displayName()).contains("Charged");
-                ItemStack creeper = new ItemStack(Material.FIREWORK_ROCKET);
-                ItemMeta meta = creeper.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent(charged ? "&fCharged Creeper" : "&fCreeper"));
-                creeper.setItemMeta(meta);
-                
-                // Load "creeper" into crossbow
-                InventoryUtils.consumeItem(player, arena, offhand, -1);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    ItemStack crossbow = event.getCrossbow();
-                    CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
-                    List<ItemStack> newProjs = new ArrayList<>();
-                    for (int i = 0; i < cmeta.getChargedProjectiles().size(); i++) {
-                        newProjs.add(new ItemStack(creeper));
-                    }
-                    cmeta.setChargedProjectiles(newProjs);
-                    crossbow.setItemMeta(cmeta);
-                }, 1);
+            if (offhand.getType() != Material.CREEPER_HEAD || player.hasCooldown(offhand.getType())) {
+                return;
             }
+            
+            // Prepare fake creeper item
+            boolean charged = ConfigUtils.toPlain(offhand.displayName()).contains("Charged");
+            ItemStack creeper = new ItemStack(Material.FIREWORK_ROCKET);
+            ItemMeta meta = creeper.getItemMeta();
+            meta.displayName(ConfigUtils.toComponent(charged ? "&fCharged Creeper" : "&fCreeper"));
+            creeper.setItemMeta(meta);
+            
+            // Load "creeper" into crossbow
+            InventoryUtils.consumeItem(player, arena, offhand, -1);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                ItemStack crossbow = event.getCrossbow();
+                CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
+                List<ItemStack> newProjs = new ArrayList<>();
+                for (int i = 0; i < cmeta.getChargedProjectiles().size(); i++) {
+                    newProjs.add(new ItemStack(creeper));
+                }
+                cmeta.setChargedProjectiles(newProjs);
+                crossbow.setItemMeta(cmeta);
+            }, 1);
+            
+            return;
         }
     }
     
@@ -428,8 +463,7 @@ public class ArenaGameruleListener implements Listener {
                     Vector velocity = player.getVelocity();
                     double velx = velocity.getX() * rmult;
                     double velz = velocity.getZ() * rmult;
-                    double vely = velocity.getY() * rmult;
-                    player.setVelocity(new Vector(velx, vely, velz));
+                    player.setVelocity(new Vector(velx, velocity.getY(), velz));
                     if (blastprot > 0) {
                         boots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, blastprot);
                     }
