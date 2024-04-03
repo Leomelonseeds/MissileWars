@@ -7,13 +7,15 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -23,12 +25,8 @@ import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
-import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.kyori.adventure.text.Component;
 
 public class TutorialArena extends ClassicArena {
@@ -93,6 +91,31 @@ public class TutorialArena extends ClassicArena {
         enqueue(uuid, "blue");
         initiateStage(player, stage.get(uuid));
         justReset = false;
+    }
+    
+    @Override
+    public Location getPlayerSpawn(Player player) {
+        Integer s = stage.get(player.getUniqueId());
+        if (blueTeam == null || s == null || s != 3 || !blueTeam.containsPlayer(player.getUniqueId())) {
+            return super.getPlayerSpawn(player);
+        }
+        
+        // Spawn player near blue base, adding a platform and clearing blocks if necessary
+        Location loc = new Location(getWorld(), 0.5, 16, 31.5, 0, 0);
+        loc.getBlock().setType(Material.AIR);
+        loc.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
+        Location spawnBlock = loc.clone().add(0, -1, 0);
+        for (Location l : new Location[] {
+            spawnBlock,
+            spawnBlock.clone().add(1, 0, 0),
+            spawnBlock.clone().add(-1, 0, 0),
+            spawnBlock.clone().add(0, 0, 1),
+            spawnBlock.clone().add(0, 0, -1),
+        }) {
+            l.getBlock().setType(Material.BLUE_STAINED_GLASS);
+        }
+        
+        return loc;
     }
     
     @Override
@@ -162,6 +185,14 @@ public class TutorialArena extends ClassicArena {
         } 
 
         ConfigUtils.sendConfigSound("stage", player);
+        
+        // Teleport player nearer red base on stage 3
+        if (s == 3) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 128, true, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 6, true, false));
+            player.teleport(getPlayerSpawn(player));
+            return;
+        }
         
         // Spawn particles for stage 4 (defense)
         if (s == 4) {
@@ -337,43 +368,10 @@ public class TutorialArena extends ClassicArena {
         registerStageCompletion(player, 3);
     }
     
-    /**
-     * Remove a player with a given UUID from the arena.
-     *
-     * @param uuid the UUID of the player
-     */
     @Override
     public void removePlayer(UUID uuid, Boolean tolobby) {
-        // Remove player from all teams and queues
-        MissileWarsPlayer toRemove = getPlayerInArena(uuid);
-        players.remove(toRemove);
-        voteManager.removePlayer(toRemove.getMCPlayer());
-        for (MissileWarsPlayer mwPlayer : players) {
-            ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
-        }
-        spectators.remove(toRemove);
-        blueTeam.removePlayer(toRemove);
-
-        // Run proper clearing commands on the player
+        super.removePlayer(uuid, tolobby);
         if (tolobby) {
-            Arena arena = this;
-            Player mcPlayer = toRemove.getMCPlayer();
-            mcPlayer.teleport(ConfigUtils.getSpawnLocation());
-            mcPlayer.setGameMode(GameMode.ADVENTURE);
-            mcPlayer.setHealth(20);
-            InventoryUtils.loadInventory(mcPlayer);
-            ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
-            RankUtils.setPlayerExpBar(mcPlayer);
-
-            // Notify discord
-            TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-            discordChannel.sendMessage(":arrow_forward: " + mcPlayer.getName() + " rejoined lobby from arena " + arena.getName()).queue();
-
-            for (Player player : Bukkit.getWorld("world").getPlayers()) {
-                ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
-            }
-            
-            // Remove tutorial stuff
             removeXs(uuid);
         }
     }
