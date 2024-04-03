@@ -1656,7 +1656,7 @@ preset:
     namenotselect: "&cClick &7to select this preset"
   edit:
     item: WRITABLE_BOOK
-    name: "&f&lPreset %preset%"
+    name: "&f&lEdit Preset %preset%"
     lore:
     - ""
     - "&fPassive: &8%passive%"

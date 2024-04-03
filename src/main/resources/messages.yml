@@ -295,30 +295,17 @@ titles:
     title: "&aWelcome!"
     subtitle: "&fPlease complete a short tutorial"
     length: 120
-  stage1:
-    title: "&bPlacing Missiles"
-    subtitle: "&fRight-click any spawn egg"
+  tutorial:
     length: 100
-  stage2:
-    title: "&bRiding Missiles"
-    subtitle: "&fRun and jump on a missile"
-    length: 100
-  stage3:
-    title: "&bAttacking (Optional)"
-    subtitle: "&fDestroy any enemy portal"
-    length: 100
-  stage4:
-    title: "&bDefending"
-    subtitle: "&fLaunch a throwable at the &d&lX"
-    length: 100
-  stage5:
-    title: "&bDecks"
-    subtitle: "&fUse &a/leave &fand change your deck"
-    length: 100
-  stage6:
-    title: "&bCustomization"
-    subtitle: "&fUpgrade or downgrade any missile/utility"
-    length: 100
+    new-objective: "&bNew Objective"
+    remind: "&bObjective"
+    subadd: ": details on sidebar →"
+    stage1: "&fPlace missile"
+    stage2: "&fRide missile"
+    stage3: "&fDestroy enemy portal"
+    stage4: "&fToss throwable"
+    stage5: "&fChange deck"
+    stage6: "&fCustomize deck"
   stagecomplete:
     title: "&f"
     subtitle: "&aWell done!"
@@ -333,22 +320,24 @@ scoreboard:
     - "&fon the edge of the base"
     - "&fto place a missile"
   stage2: 
-    - "&fRide a missile"
+    - "&fPlace a missile, then"
+    - "&frun and jump to ride it"
   stage3: 
     - "&fDestroy any enemy portal"
     - "&fby riding over and placing"
     - "&fmissiles inside their base"
     - "&7(Type &8/skip &7to skip)"
   stage4: 
-    - "&fThrowables spawn after"
-    - "&a1 second &fand &cbreak &fif"
-    - "&fthey hit a block. Throw"
-    - "one at the &d&lX&f!"
+    - "&f&oTorpedos &fand &f&oObsidian"
+    - "&f&oShields &fspawn after &a1s"
+    - "&fand &cbreak &fif they hit a"
+    - "&fblock. Throw one at the &d&lX&f!"
   stage5: 
-    - "&fType &a/leave &fand use the"
-    - "&fNPCs to change your deck"
+    - "&fType &a/leave &fand select"
+    - "&f&lPreset A &fusing the NPCs"
+    - "&fto change your deck"
   stage6: 
-    - "&fSelect &7&lEdit Preset &fin"
+    - "&fSelect &f&lEdit Preset &fin"
     - "&fthe NPCs, and upgrade"
     - "&for downgrade any"
     - "&c&lMissile &for &9&lUtility&f"

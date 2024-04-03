@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.arenas;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -28,6 +29,7 @@ import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 
 public class TutorialArena extends ClassicArena {
     
@@ -101,7 +103,8 @@ public class TutorialArena extends ClassicArena {
         }
         
         // Spawn player near blue base, adding a platform and clearing blocks if necessary
-        Location loc = new Location(getWorld(), 0.5, 16, 31.5, 0, 0);
+        double xspawn = (new Random()).nextInt(-15, 16) + 0.5;
+        Location loc = new Location(getWorld(), xspawn, 17, 31.5, 0, 0);
         loc.getBlock().setType(Material.AIR);
         loc.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
         Location spawnBlock = loc.clone().add(0, -1, 0);
@@ -147,6 +150,24 @@ public class TutorialArena extends ClassicArena {
         }
     }
     
+    private void sendTutorialTitle(String path, Player player, boolean init) {
+        // Find titles and subtitles from config
+        FileConfiguration msg = ConfigUtils.getConfigFile("messages.yml");
+        if (!msg.contains("titles.tutorial." + path)) {
+            ConfigUtils.sendTitle(path, player);
+            return;
+        }
+        
+        String title = msg.getString("titles.tutorial." + (init ? "new-objective" : "remind"));
+        String subtitle = msg.getString("titles.tutorial." + path);
+        subtitle += msg.getString("titles.tutorial.subadd");
+        int dur = msg.getInt("titles.tutorial.length") * 50;
+        
+        Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(dur), Duration.ofMillis(1000));
+        Title finalTitle = Title.title(ConfigUtils.toComponent(title), ConfigUtils.toComponent(subtitle), times);
+        player.showTitle(finalTitle);
+    }
+    
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
         // Cancel if player isn't in the arena anymore
@@ -162,20 +183,22 @@ public class TutorialArena extends ClassicArena {
         }
 
         // Title task: Send titles once every 20 seconds to make sure players on right track
+        sendTutorialTitle("stage" + s, player, true);
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (isInArena(player.getUniqueId()) && stage.get(uuid) == s) {
-                    ConfigUtils.sendTitle("stage" + s, player);;
+                    sendTutorialTitle("stage" + s, player, false);
                 } else {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(plugin, 0, 500);
+        }.runTaskTimer(plugin, 500, 500);
         
-        
-        Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 50);
+        // Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 50);
         if (s == 0) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> 
+                ConfigUtils.sendConfigMessage("messages.stage0", player, null, null), 50);
             ConfigUtils.sendConfigSound("stagecomplete", player);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 stage.put(uuid, 1);
