@@ -890,7 +890,8 @@ canopy:
   - "&7transportation, not great to explain"
   - "&7to the local druids."
   - ""
-  - "&7Warning: prone to decay."
+  - "&7Warning: prone to decay. Beware of"
+  - "&7fall damage."
   - ""
   - "&bDistance: %distance%"
   offset:

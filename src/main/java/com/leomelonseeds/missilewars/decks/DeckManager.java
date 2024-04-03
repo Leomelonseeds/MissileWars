@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.json.JSONObject;
 
@@ -220,19 +219,31 @@ public class DeckManager {
         if (lvl <= 0) {
             return;
         }
-        // Add custom haste effect
-        if (ench.equals("haste")) {
+        
+        // Add custom effects
+        String custom = null;
+        if (ench.equals("blast_protection") && plugin.getJSON().getAbility(json, "boosterball") > 0) {
+            custom = "Blast Protection";
+        } else if (ench.equals("haste")) {
+            custom = "Haste";
+        }
+        
+        if (custom != null) {
             ItemMeta meta = item.getItemMeta();
-            List<Component> loreLines = meta.lore();
             List<Component> newLore = new ArrayList<>();
-            newLore.add(ConfigUtils.toComponent("§7Haste " + roman(lvl)));
-            for (Component c : loreLines) {
-                newLore.add(c);
+            newLore.add(ConfigUtils.toComponent("&7" + custom + " " + roman(lvl)));
+            if (meta.hasLore()) {
+                List<Component> loreLines = meta.lore();
+                for (Component c : loreLines) {
+                    newLore.add(c);
+                }
             }
             meta.lore(newLore);
             item.setItemMeta(meta);
+            item.addUnsafeEnchantment(Enchantment.DURABILITY, lvl); // To add glow
             return;
         }
+        
         Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(ench));
         item.addUnsafeEnchantment(enchant, lvl);
     }
@@ -427,8 +438,7 @@ public class DeckManager {
         // Setup extra item attributes for specific things
         if (name.equals("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
-            PotionData pdata = new PotionData(PotionType.WATER);
-            pmeta.setBasePotionData(pdata);
+            pmeta.setBasePotionType(PotionType.WATER);
         }
         item.setItemMeta(itemMeta);
         return item;

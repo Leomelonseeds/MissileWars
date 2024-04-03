@@ -133,12 +133,6 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
         
-        // Prevent canopy user from taking fall damage
-        if (event.getCause() == DamageCause.FALL && CustomItemListener.canopy_freeze.contains(player)) {
-            event.setCancelled(true);
-            return;
-        }
-        
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         if (playerArena == null) {
@@ -178,6 +172,12 @@ public class ArenaGameruleListener implements Listener {
 
         Location spawn = playerArena.getPlayerSpawn(player);
         ItemStack canopy = CustomItemListener.canopy_cooldown.remove(player);
+        if (canopy != null && CustomItemListener.canopy_freeze.remove(player) && 
+                player.getLastDamageCause().getCause() != DamageCause.FALL) {
+            canopy = null; // If a player recently teleported and did NOT die of fall damage, do not give back canopy
+        }
+        
+        ItemStack fcanopy = canopy;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);
@@ -185,8 +185,8 @@ public class ArenaGameruleListener implements Listener {
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.GLOWING);
             player.removePotionEffect(PotionEffectType.SLOW);
-            if (canopy != null) {
-                InventoryUtils.regiveItem(player, canopy);
+            if (fcanopy != null) {
+                InventoryUtils.regiveItem(player, fcanopy);
             }
         }, 1);
         Component deathMessage = event.deathMessage();
@@ -454,14 +454,13 @@ public class ArenaGameruleListener implements Listener {
             // Check bers rocketeer
             int rocketeer = plugin.getJSON().getAbility(player.getUniqueId(), "boosterball");
             if (rocketeer > 0) {
-                // Temporarily remove blastprot to allow normal explosion
+                // If boots have UNBREAKING, it means the custom blastprot is set (see DeckManager)
+                // In this case, the level of unbreaking corresponds to the level of blastprot
+                // We must also provide manual damage reduction
                 ItemStack boots = player.getInventory().getBoots();
-                int blastprot = boots.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
+                int blastprot = boots.getEnchantmentLevel(Enchantment.DURABILITY);
                 if (blastprot > 0) {
-                    boots.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
-                    // This line isn't needed for some reason, as the game takes it into account
-                    // even though the enchantment has been removed in the same tick
-                    // event.setDamage(event.getDamage() * (1 - 0.15 * blastprot));
+                    event.setDamage(event.getDamage() * (1 - 0.08 * blastprot));
                 }
                 
                 // Apply extra velocity from rocketeer if available and restore enchantment
@@ -471,9 +470,6 @@ public class ArenaGameruleListener implements Listener {
                     double velx = velocity.getX() * rmult;
                     double velz = velocity.getZ() * rmult;
                     player.setVelocity(new Vector(velx, velocity.getY(), velz));
-                    if (blastprot > 0) {
-                        boots.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, blastprot);
-                    }
                 }, 1);
             }
             

@@ -348,6 +348,17 @@ public class JSONManager {
      */
     public int getAbility(UUID uuid, String ability) {
         JSONObject json = getPlayerPreset(uuid);
+        return getAbility(json, ability);
+    }
+    
+    /**
+     * Check if a json has some ability selected
+     * 
+     * @param json
+     * @param ability
+     * @return
+     */
+    public int getAbility(JSONObject json, String ability) {
         for (String s : new String[] {"gpassive", "passive"}) {
             if (json.has(s) && json.getJSONObject(s).getString("selected").equals(ability)) {
                 return json.getJSONObject(s).getInt("level");

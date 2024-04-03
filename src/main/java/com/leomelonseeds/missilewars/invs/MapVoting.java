@@ -25,9 +25,11 @@ public class MapVoting implements MWInventory {
     
     private Inventory inv;
     private Player player;
+    private NamespacedKey mapKey;
     
     public MapVoting(Player player) {
         this.player = player;
+        this.mapKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "map");
         
         String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
         int size = getPlayerArena(player).getVoteManager().getVotes().size();
@@ -72,8 +74,7 @@ public class MapVoting implements MWInventory {
             mapItemMeta.lore(lore);
             
             // Add map name meta
-            mapItemMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"),
-                    PersistentDataType.STRING, mapName);
+            mapItemMeta.getPersistentDataContainer().set(mapKey, PersistentDataType.STRING, mapName);
             
             mapItem.setItemMeta(mapItemMeta);
             inv.addItem(mapItem);
@@ -100,13 +101,12 @@ public class MapVoting implements MWInventory {
         
         // Get meta
         ItemMeta meta = clicked.getItemMeta();
-        if (!meta.getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"))) {
+        if (!meta.getPersistentDataContainer().has(mapKey)) {
             return;
         }
         
         // Get map name
-        String map = meta.getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "map"),
-                PersistentDataType.STRING);
+        String map = meta.getPersistentDataContainer().get(mapKey, PersistentDataType.STRING);
         arena.getVoteManager().registerVote(player, map, type == ClickType.RIGHT);
         ConfigUtils.sendConfigSound("use-skillpoint", player);
         updateInventory();

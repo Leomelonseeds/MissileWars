@@ -270,7 +270,9 @@ public class CustomItemListener implements Listener {
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
                 event.setCancelled(true);
-                InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                if (canopy_cooldown.containsKey(player)) {
+                    return;
+                }
                 
                 // Spawn ender eye
                 Location eyeLoc = player.getEyeLocation();
@@ -284,15 +286,19 @@ public class CustomItemListener implements Listener {
                 signal.setDropItem(false);
                 
                 // Add player to canopy cooldown list to give item back on death
+                InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 canopy_cooldown.put(player, hand);
                 
-                // Send sound 2 seconds later
-                Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    ConfigUtils.sendConfigSound("canopy-activate", player), 40L);
-                
-                // Teleport 3 seconds later
-                Bukkit.getScheduler().runTaskLater(plugin, () -> 
-                    spawnCanopy(player, playerArena, signal, hand), 60L); 
+                // Send sound 2 seconds later, tp 3 sec later
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (!canopy_cooldown.containsKey(player)) {
+                        return;
+                    }
+                    
+                    ConfigUtils.sendConfigSound("canopy-activate", player);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> 
+                        spawnCanopy(player, playerArena, signal, hand), 20L);
+                }, 40L);
                 return;
             }
             
@@ -473,7 +479,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        if (canopy_cooldown.remove(player) == null) {
+        if (!canopy_cooldown.containsKey(player)) {
             return;
         }
     
@@ -494,20 +500,22 @@ public class CustomItemListener implements Listener {
             InventoryUtils.regiveItem(player, hand);
             return;
         }
-        
-        // Freeze player for a bit
-        canopy_freeze.add(player);
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            canopy_freeze.remove(player);
-        }, 30);
             
         // Teleport and give slowness
+        int freezeTime = 30;
+        canopy_freeze.add(player);
         Location loc = spawnLoc.add(0, -0.5, 0);
         loc.setYaw(player.getLocation().getYaw());
-        loc.setPitch(90);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5, true, false));
+        loc.setPitch(player.getLocation().getPitch());
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, freezeTime, 6, true, false));
         player.teleport(loc);
         signal.remove();
+
+        // Freeze player for a bit
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            canopy_freeze.remove(player);
+            canopy_cooldown.remove(player);
+        }, freezeTime);
         
         // Check if can give poison
         double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
@@ -540,9 +548,12 @@ public class CustomItemListener implements Listener {
     @EventHandler
     public void canopyFreeze(PlayerMoveEvent e) {
         Player player = e.getPlayer();
-        if (canopy_freeze.contains(player)) {
-            e.setCancelled(true);
+        if (!canopy_freeze.contains(player)) {
             return;
+        }
+
+        if (e.getFrom().distance(e.getTo()) > 0.1) {
+            e.setCancelled(true);
         }
     }
 
