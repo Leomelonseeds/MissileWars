@@ -279,6 +279,8 @@ public class TutorialArena extends ClassicArena {
         if (actualStage == null || s != actualStage) {
             return;
         }
+        
+        Bukkit.getLogger().info(player.getName() + " completed stage " + s);
 
         // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
