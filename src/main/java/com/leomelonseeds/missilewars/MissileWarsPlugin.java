@@ -19,6 +19,7 @@ import com.leomelonseeds.missilewars.listener.ArenaGameruleListener;
 import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
 import com.leomelonseeds.missilewars.listener.MiscListener;
+import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.packets.DefuseHelper;
 import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
@@ -79,6 +80,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
+        Bukkit.getPluginManager().registerEvents(CanopyManager.getInstance(), this);
         Bukkit.getPluginManager().registerEvents(dfh, this);
         Bukkit.getPluginManager().registerEvents(rh, this);
         ProtocolLibrary.getProtocolManager().addPacketListener(dfh);
