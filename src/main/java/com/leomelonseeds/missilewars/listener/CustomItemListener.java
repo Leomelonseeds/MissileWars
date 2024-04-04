@@ -506,6 +506,7 @@ public class CustomItemListener implements Listener {
             
         // Teleport and give slowness
         int freezeTime = 30;
+        canopy_freeze.add(player);
         Location loc = spawnLoc.add(0, -0.5, 0);
         loc.setYaw(player.getLocation().getYaw());
         loc.setPitch(player.getLocation().getPitch());
@@ -514,7 +515,6 @@ public class CustomItemListener implements Listener {
         signal.remove();
 
         // Freeze player for a bit
-        canopy_freeze.add(player);
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
             canopy_freeze.remove(player), freezeTime);
         

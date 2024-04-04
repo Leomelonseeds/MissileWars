@@ -355,7 +355,7 @@ public class MiscListener implements Listener {
                     target, 
                     DamageCause.ENTITY_ATTACK, 
                     DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).build(), 
-                    null, 
+                    Collections.emptyMap(), 
                     Collections.emptyMap(), 
                     false);
             extraEvent.setDamage(0.001);

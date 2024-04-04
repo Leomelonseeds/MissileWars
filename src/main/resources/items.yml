@@ -1103,10 +1103,10 @@ Vanguard:
     feather_falling:
       cost: 800
       1: 
-        level: 1
+        level: 2
         spcost: 1
       2: 
-        level: 2
+        level: 3
         spcost: 1
   passive:
     adrenaline:
