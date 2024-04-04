@@ -527,7 +527,7 @@ public abstract class Arena implements ConfigurationSerializable {
         player.setHealth(20);
         player.setFoodLevel(20);
         players.add(new MissileWarsPlayer(player.getUniqueId()));
-        player.setBedSpawnLocation(getPlayerSpawn(player), true);
+        player.setRespawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
 
         for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {

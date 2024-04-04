@@ -29,7 +29,8 @@ import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
-import com.leomelonseeds.missilewars.listener.CustomItemListener;
+import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
+import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -375,7 +376,8 @@ public class MissileWarsTeam {
         mcPlayer.setLevel(0);
         mcPlayer.setExp(0F);
         mcPlayer.setGlowing(false);
-        CustomItemListener.canopy_cooldown.remove(mcPlayer);
+        CanopyManager.getInstance().removePlayer(mcPlayer);
+        EnderSplashManager.getInstance().removePlayer(mcPlayer);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){
             mcPlayer.removePotionEffect(effect.getType());
         }

@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.listener;
+package com.leomelonseeds.missilewars.listener.handler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.AreaEffectCloud;

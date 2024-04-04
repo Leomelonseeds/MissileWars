@@ -1,10 +1,8 @@
 package com.leomelonseeds.missilewars.listener;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -18,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.DragonFireball;
-import org.bukkit.entity.EnderSignal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -36,14 +33,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -54,6 +49,9 @@ import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.invs.MapVoting;
+import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
+import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
+import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -62,12 +60,8 @@ import com.leomelonseeds.missilewars.utilities.SchematicManager;
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
     
-    public static Set<Player> canopy_freeze = new HashSet<>();
-    public static Map<Player, ItemStack> canopy_cooldown = new HashMap<>();
-    Map<Location, Integer> canopy_extensions = new HashMap<>();
     public static Map<Location, Integer> leaves = new HashMap<>();
 
-    
     /**
      * Simply get level from name
      * 
@@ -237,7 +231,8 @@ public class CustomItemListener implements Listener {
         Bukkit.getScheduler().runTaskLater(plugin, () -> MiscListener.notLeftClick.remove(uuid), 1);
         
         // Check if player is frozen by a canopy
-        if (canopy_freeze.contains(player)) {
+        CanopyManager canopies = CanopyManager.getInstance();
+        if (canopies.isFrozen(player)) {
             event.setCancelled(true);
             return;
         }
@@ -269,35 +264,7 @@ public class CustomItemListener implements Listener {
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
                 event.setCancelled(true);
-                if (canopy_cooldown.containsKey(player)) {
-                    return;
-                }
-                
-                // Spawn ender eye
-                Location eyeLoc = player.getEyeLocation();
-                EnderSignal signal = (EnderSignal) playerArena.getWorld().spawnEntity(eyeLoc, EntityType.ENDER_SIGNAL);
-                
-                // Set target location
-                int canopy_distance = (int) getItemStat(structureName, "distance");
-                Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
-                signal.setTargetLocation(eyeLoc.clone().add(distance).toCenterLocation());
-                ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
-                signal.setDropItem(false);
-                
-                // Add player to canopy cooldown list to give item back on death
-                InventoryUtils.consumeItem(player, playerArena, hand, -1);
-                canopy_cooldown.put(player, hand);
-                
-                // Send sound 2 seconds later, tp 3 sec later
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (!canopy_cooldown.containsKey(player)) {
-                        return;
-                    }
-                    
-                    ConfigUtils.sendConfigSound("canopy-activate", player);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> 
-                        spawnCanopy(player, playerArena, signal), 20L);
-                }, 40L);
+                canopies.initPlayer(player, hand, playerArena, (int) getItemStat(structureName, "distance"));
                 return;
             }
             
@@ -428,7 +395,7 @@ public class CustomItemListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        if (canopy_freeze.contains(player)) {
+        if (CanopyManager.getInstance().isFrozen(player)) {
             event.setCancelled(true);
             return;
         }
@@ -475,82 +442,6 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(plugin, 30 * 20);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal) {
-        // Ignore offline players. Obviously
-        if (!player.isOnline()) {
-            return;
-        }
-        
-        ItemStack hand = canopy_cooldown.remove(player);
-        if (hand == null) {
-            return;
-        }
-    
-        String mapName = "default-map";
-        if (playerArena.getMapName() != null) {
-            mapName = playerArena.getMapName();
-        }
-        
-        Location spawnLoc = signal.getLocation().toCenterLocation();
-        if (spawnLoc.getBlock().getType() != Material.AIR ||
-            spawnLoc.clone().add(0, 1, 0).getBlock().getType() != Material.AIR) {
-            ConfigUtils.sendConfigMessage("messages.canopy-blocked", player, null, null);
-            InventoryUtils.regiveItem(player, hand);
-            return;
-        }
-        
-        if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRedTeam(player), mapName, false, true)) {
-            InventoryUtils.regiveItem(player, hand);
-            return;
-        }
-            
-        // Teleport and give slowness
-        int freezeTime = 30;
-        canopy_freeze.add(player);
-        Location loc = spawnLoc.add(0, -0.5, 0);
-        loc.setYaw(player.getLocation().getYaw());
-        loc.setPitch(player.getLocation().getPitch());
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, freezeTime, 6, true, false));
-        player.teleport(loc);
-        signal.remove();
-
-        // Freeze player for a bit
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
-            canopy_freeze.remove(player), freezeTime);
-        
-        ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
-        playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
-        despawnCanopy(spawnLoc, 5);
-    }
-    
-    private void despawnCanopy(Location loc, int duration) {
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            Location wood = loc.clone().add(0, -1, 0).getBlock().getLocation();
-            if (wood.getBlock().getType() == Material.OAK_WOOD) {
-                if (canopy_extensions.containsKey(wood)) {
-                    despawnCanopy(loc, canopy_extensions.get(wood));
-                    canopy_extensions.remove(wood);
-                    return;
-                }
-                wood.getBlock().setType(Material.AIR);
-            }
-        }, duration * 20L);
-    }
-    
-    
-    /** Stop players from moving a second after canopy spawn */
-    @EventHandler
-    public void canopyFreeze(PlayerMoveEvent e) {
-        Player player = e.getPlayer();
-        if (!canopy_freeze.contains(player)) {
-            return;
-        }
-
-        if (e.getFrom().distance(e.getTo()) > 0.1) {
-            e.setCancelled(true);
-        }
-    }
-
     /** Handle projectile items structure creation */
     @EventHandler
     public void useProjectile(ProjectileLaunchEvent event) {
@@ -566,7 +457,7 @@ public class CustomItemListener implements Listener {
         }
         
         Player thrower = (Player) thrown.getShooter();
-        if (canopy_freeze.contains(thrower)) {
+        if (CanopyManager.getInstance().isFrozen(thrower)) {
             event.setCancelled(true);
             return;
         }
@@ -785,10 +676,13 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        EnderSplashManager esm = EnderSplashManager.getInstance();
+        esm.addPlayer(thrower, thrown);
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (thrown.isDead()) {
+                    esm.removeSplash(thrower, thrown);
                     this.cancel();
                 }
                 playerArena.getWorld().spawnParticle(Particle.DRAGON_BREATH, thrown.getLocation(), 1, 0, 0, 0, 0);
@@ -837,11 +731,7 @@ public class CustomItemListener implements Listener {
         if (hitBlock.getType() == Material.OAK_WOOD) {
             int extraduration = Integer.parseInt(args[2]);
             Location key = hitBlock.getLocation();
-            if (canopy_extensions.containsKey(key)) {
-                canopy_extensions.put(key, canopy_extensions.get(key) + extraduration);
-            } else {
-                canopy_extensions.put(key, extraduration);
-            }
+            CanopyManager.getInstance().registerExtension(key, extraduration);
             Location newSpawn = hitBlock.getLocation().add(0, 1, 0);
             // map name doesn't matter here because the canopy has already been spawned,
             // we therefore know that the structure was placed successfully and do not need
@@ -860,14 +750,14 @@ public class CustomItemListener implements Listener {
                 if (arena instanceof ClassicArena) {
                     ((ClassicArena) arena).registerPortalBreak(location.clone(), thrower);
                 }
-            } else if (spawnBlock.getType() != Material.MOVING_PISTON) {
-                return;
-            } else {
+            } else if (spawnBlock.getType() == Material.MOVING_PISTON) {
                 Block upper = hitBlock.getRelative(BlockFace.UP);
                 if (upper.getType() != Material.AIR) {
                     return;
                 }
                 location = upper.getLocation();
+            } else if (spawnBlock.getType() != Material.WATER) {
+                return;
             }
         }
 
@@ -883,12 +773,12 @@ public class CustomItemListener implements Listener {
         }, (long) (duration * 20));
         
         // Ender splash
-        if (customName.contains("ender")) {
+        if (customName.contains("ender") && thrower.isOnline() && 
+                EnderSplashManager.getInstance().removeSplash(thrower, event.getEntity())) {
             Location tpLoc = location.toCenterLocation().add(0, -0.5, 0);
             tpLoc.setYaw(thrower.getYaw());
             tpLoc.setPitch(thrower.getPitch());
             thrower.teleport(tpLoc);
-            canopy_freeze.remove(thrower);
             ConfigUtils.sendConfigSound("ender-splash", location);
         }
     }

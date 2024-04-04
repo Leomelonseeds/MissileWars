@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -245,7 +246,7 @@ public class DeckManager {
             return;
         }
         
-        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(ench));
+        Enchantment enchant = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(ench));
         item.addUnsafeEnchantment(enchant, lvl);
     }
     

@@ -62,6 +62,8 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
+import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
+import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
@@ -171,8 +173,8 @@ public class ArenaGameruleListener implements Listener {
         }
 
         Location spawn = playerArena.getPlayerSpawn(player);
-        ItemStack canopy = CustomItemListener.canopy_cooldown.remove(player);
-        CustomItemListener.canopy_freeze.remove(player);
+        ItemStack canopy = CanopyManager.getInstance().removePlayer(player);
+        EnderSplashManager.getInstance().removePlayer(player);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);
@@ -264,6 +266,7 @@ public class ArenaGameruleListener implements Listener {
                         PotionEffectType.BLINDNESS,
                         PotionEffectType.WEAKNESS,
                         PotionEffectType.WITHER,
+                        PotionEffectType.POISON,
                         PotionEffectType.CONFUSION,
                         PotionEffectType.SLOW,
                         PotionEffectType.SLOW_DIGGING,
@@ -479,7 +482,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        if (CustomItemListener.canopy_freeze.contains(damager)) {
+        if (CanopyManager.getInstance().isFrozen(damager)) {
             event.setCancelled(true);
             return;
         }
@@ -785,6 +788,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        @SuppressWarnings("deprecation")
         Player player = event.getAffected().getBase();
         ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
