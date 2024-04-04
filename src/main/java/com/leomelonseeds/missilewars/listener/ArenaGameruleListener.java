@@ -172,12 +172,7 @@ public class ArenaGameruleListener implements Listener {
 
         Location spawn = playerArena.getPlayerSpawn(player);
         ItemStack canopy = CustomItemListener.canopy_cooldown.remove(player);
-        if (canopy != null && CustomItemListener.canopy_freeze.remove(player) && 
-                player.getLastDamageCause().getCause() != DamageCause.FALL) {
-            canopy = null; // If a player recently teleported and did NOT die of fall damage, do not give back canopy
-        }
-        
-        ItemStack fcanopy = canopy;
+        CustomItemListener.canopy_freeze.remove(player);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);
@@ -185,8 +180,8 @@ public class ArenaGameruleListener implements Listener {
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.GLOWING);
             player.removePotionEffect(PotionEffectType.SLOW);
-            if (fcanopy != null) {
-                InventoryUtils.regiveItem(player, fcanopy);
+            if (canopy != null) {
+                InventoryUtils.regiveItem(player, canopy);
             }
         }, 1);
         Component deathMessage = event.deathMessage();
@@ -268,7 +263,6 @@ public class ArenaGameruleListener implements Listener {
                     effects = List.of(new PotionEffectType[] {
                         PotionEffectType.BLINDNESS,
                         PotionEffectType.WEAKNESS,
-                        PotionEffectType.POISON,
                         PotionEffectType.WITHER,
                         PotionEffectType.CONFUSION,
                         PotionEffectType.SLOW,
@@ -723,14 +717,21 @@ public class ArenaGameruleListener implements Listener {
      */
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
+        checkBounds(event.getPlayer(), event.getFrom(), event.getTo());
+    }
+    
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        checkBounds(event.getPlayer(), event.getFrom(), event.getTo());
+    }
+    
+    private void checkBounds(Player player, Location from, Location to) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        Player player = event.getPlayer();
-        
         if (player.getGameMode() != GameMode.SURVIVAL) {
             return;
         }
         
-        ArenaManager arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager arenaManager = plugin.getArenaManager();
         Arena arena = arenaManager.getArena(player.getUniqueId());
         if (arena == null) {
             return;
@@ -744,7 +745,7 @@ public class ArenaGameruleListener implements Listener {
         // Straight up kill people
         double tooLobby = plugin.getConfig().getDouble("barrier.center.x");
         double wayTooHigh = plugin.getConfig().getDouble("max-height");
-        if (event.getTo().getBlockY() >= wayTooHigh || event.getTo().getBlockX() >= tooLobby) {
+        if (to.getBlockY() >= wayTooHigh || to.getBlockX() >= tooLobby) {
             ConfigUtils.sendConfigMessage("messages.out-of-bounds-death", player, null, null);
             player.setHealth(0);
             return;
@@ -753,7 +754,7 @@ public class ArenaGameruleListener implements Listener {
         // Experimental poison 
         if (plugin.getConfig().getBoolean("experimental.poison")) {
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
-            if (event.getFrom().getBlockY() <= toohigh - 1 && event.getTo().getBlockY() >= toohigh) {
+            if (from.getBlockY() <= toohigh - 1 && to.getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (player.getLocation().getBlockY() >= toohigh) {
                         ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
@@ -763,7 +764,7 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            if (event.getTo().getBlockY() <= toohigh - 1 && event.getFrom().getBlockY() >= toohigh) {
+            if (to.getBlockY() <= toohigh - 1 && from.getBlockY() >= toohigh) {
                 player.removePotionEffect(PotionEffectType.POISON);
                 return;
             }

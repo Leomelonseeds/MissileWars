@@ -346,9 +346,14 @@ public class DeckCustomizer implements MWInventory {
 
     // Register stage completion if player upgrades or downgrades and enchant
     private void checkTutorial() {
+        if (!deck.equals("Berserker")) {
+            return;
+        }
+        
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
-        if (arena instanceof TutorialArena) {
+        if (arena instanceof TutorialArena &&
+            presetjson.getJSONObject("missiles").getInt("warhead") == 2) {
             ((TutorialArena) arena).registerStageCompletion(player, 6);
         }
     }

@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.listener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -297,7 +296,7 @@ public class CustomItemListener implements Listener {
                     
                     ConfigUtils.sendConfigSound("canopy-activate", player);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> 
-                        spawnCanopy(player, playerArena, signal, hand), 20L);
+                        spawnCanopy(player, playerArena, signal), 20L);
                 }, 40L);
                 return;
             }
@@ -342,6 +341,9 @@ public class CustomItemListener implements Listener {
                 if (playerArena instanceof TutorialArena) {
                     TutorialArena tutorialArena = (TutorialArena) playerArena;
                     tutorialArena.registerStageCompletion(player, 1);
+                    if (structureName.equals("warhead-2")) {
+                        tutorialArena.registerStageCompletion(player, 7);
+                    }
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         if (!player.isOnline()) {
                             return;
@@ -473,13 +475,14 @@ public class CustomItemListener implements Listener {
         }.runTaskLater(plugin, 30 * 20);
     }
 
-    private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal, ItemStack hand) {
+    private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal) {
         // Ignore offline players. Obviously
         if (!player.isOnline()) {
             return;
         }
         
-        if (!canopy_cooldown.containsKey(player)) {
+        ItemStack hand = canopy_cooldown.remove(player);
+        if (hand == null) {
             return;
         }
     
@@ -503,7 +506,6 @@ public class CustomItemListener implements Listener {
             
         // Teleport and give slowness
         int freezeTime = 30;
-        canopy_freeze.add(player);
         Location loc = spawnLoc.add(0, -0.5, 0);
         loc.setYaw(player.getLocation().getYaw());
         loc.setPitch(player.getLocation().getPitch());
@@ -512,17 +514,9 @@ public class CustomItemListener implements Listener {
         signal.remove();
 
         // Freeze player for a bit
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            canopy_freeze.remove(player);
-            canopy_cooldown.remove(player);
-        }, freezeTime);
-        
-        // Check if can give poison
-        double toohigh = ConfigUtils.getMapNumber(playerArena.getGamemode(), playerArena.getMapName(), "too-high");
-        if (loc.getBlockY() >= toohigh) {
-            ConfigUtils.sendConfigMessage("messages.poison", player, null, null);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60 * 30, 1, false));
-        }
+        canopy_freeze.add(player);
+        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> 
+            canopy_freeze.remove(player), freezeTime);
         
         ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
         playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
@@ -780,9 +774,26 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
-        thrown.customName(ConfigUtils.toComponent("splash:" + duration + ":" + extend));
+        boolean ender = ConfigUtils.toPlain(hand.getItemMeta().displayName()).contains("Ender");
+        String name = (ender ? "ender" : "") + "splash:" + duration + ":" + extend;
+        thrown.customName(ConfigUtils.toComponent(name));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
         projectileConsume(hand, thrower, playerArena);
+        
+        // Add particles if ender splash
+        if (!ender) {
+            return;
+        }
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (thrown.isDead()) {
+                    this.cancel();
+                }
+                playerArena.getWorld().spawnParticle(Particle.DRAGON_BREATH, thrown.getLocation(), 1, 0, 0, 0, 0);
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
 
     /** Handle spawning of splash waters */
@@ -863,42 +874,22 @@ public class CustomItemListener implements Listener {
         // Normal splash manager
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         double duration = Double.parseDouble(args[1]);
-        int lavasplash = plugin.getJSON().getAbility(thrower.getUniqueId(), "lavasplash");
-        if (lavasplash <= 0) {
-            Block actualBlock = location.getBlock();
-            actualBlock.setType(Material.WATER);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (actualBlock.getType() == Material.WATER) {
-                    actualBlock.setType(Material.AIR);
-                }
-            }, (long) (duration * 20));
-            return;
-        }
-        
-        // Lava splash manager
-        double durationmultiplier = ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "multiplier");
-        int radius = (int) ConfigUtils.getAbilityStat("Vanguard.passive.lavasplash", lavasplash, "radius");
-        List<Location> locations = new ArrayList<>();
-        locations.add(location);
-        if (radius == 1) {
-            locations.add(location.clone().add(1, 0, 0));
-            locations.add(location.clone().add(-1, 0, 0));
-            locations.add(location.clone().add(0, 0, 1));
-            locations.add(location.clone().add(0, 0, -1));
-        }
-        
-        // Spawn and then remove lavasplash after a while
-        for (int i = 0; i < locations.size(); i++) {
-            Location l = locations.get(i);
-            if (i > 0 && l.getBlock().getType() != Material.AIR) {
-                continue;
+        Block actualBlock = location.getBlock();
+        actualBlock.setType(Material.WATER);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (actualBlock.getType() == Material.WATER) {
+                actualBlock.setType(Material.AIR);
             }
-            l.getBlock().setType(Material.LAVA);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (l.getBlock().getType() == Material.LAVA) {
-                    l.getBlock().setType(Material.AIR);
-                }
-            }, (long) (duration * 20 * durationmultiplier));
+        }, (long) (duration * 20));
+        
+        // Ender splash
+        if (customName.contains("ender")) {
+            Location tpLoc = location.toCenterLocation().add(0, -0.5, 0);
+            tpLoc.setYaw(thrower.getYaw());
+            tpLoc.setPitch(thrower.getPitch());
+            thrower.teleport(tpLoc);
+            canopy_freeze.remove(thrower);
+            ConfigUtils.sendConfigSound("ender-splash", location);
         }
     }
 }

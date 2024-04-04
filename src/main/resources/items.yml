@@ -1141,21 +1141,15 @@ Vanguard:
         spcost: 1
         amplifier: 2
     lavasplash:
-      name: "&eLava Splash"
+      name: "&eEnder Splash"
       lore:
       - ""
-      - "&7Spawns lava with horizontal radius of %radius%"
-      - "&7instead of water when throwing a splash. The"
-      - "&7lava will have %multiplier%x &7the normal duration."
+      - "&7Splahes teleport you to their hit"
+      - "&7location in addition to spawning"
+      - "&7water."
       cost: 1200
       1:
-        spcost: 1
-        radius: 0
-        multiplier: 1.5
-      2:
-        spcost: 1
-        radius: 1
-        multiplier: 2
+        spcost: 3
 Sentinel:
   weapon:
     item: BOW

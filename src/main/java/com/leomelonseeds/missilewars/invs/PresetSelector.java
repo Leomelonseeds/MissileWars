@@ -50,7 +50,7 @@ public class PresetSelector implements MWInventory {
         // Register stage completion if player selects non-sentinel kit
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
         Arena arena = manager.getArena(player.getUniqueId());
-        if (arena instanceof TutorialArena && !playerJson.getString("Deck").equals("Sentinel")) {
+        if (arena instanceof TutorialArena && playerJson.getString("Deck").equals("Berserker")) {
             ((TutorialArena) arena).registerStageCompletion(player, 5);
         }
         

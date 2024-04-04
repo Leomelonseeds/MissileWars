@@ -90,7 +90,7 @@
 				"juggernaut": 1,
 				"breaker": 1,
 				"cuboid": 2,
-				"warhead": 2
+				"warhead": 1
 			},
 			"passive": {
 				"selected": "slownessarrows",

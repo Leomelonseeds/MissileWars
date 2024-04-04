@@ -128,48 +128,6 @@ messages:
     - "&b========================================"
   training-time: "&7You spent &3%time% &7in this game."
   stage0: "&a&l[!] &7If you already know how to play Ultima Missile Wars, you can use &f/lobby &7to skip the introduction."
-  stage1:
-    - "&b============ Placing Missiles ==============="
-    - "&f&aRight-click &fa spawn egg at the edge of the base"
-    - "&fbase to place a missile. Missiles will &cignite &fand"
-    - "&4explode &fif they encouter obstacles."
-    - "&b========================================"
-  stage2:
-    - "&b============ Riding Missiles ================"
-    - "&fPlace a missile on the the edge of the base,"
-    - "&fthen run and jump on it to ride it."
-    - "&b========================================"
-  stage3:
-    - "&b============== Attacking =================="
-    - "&7&oThis part is optional - type &f/skip &7to skip it"
-    - "&fBehind the enemy base are &5nether portals &fthat"
-    - "&fmust be blown up to win the game. Ride a missile"
-    - "&fto &cred team &fand &espawn a bunch of missiles &linside"
-    - "&e&ltheir base &fto blow up their portal!"
-    - "&b========================================"
-  stage4:
-    - "&b============= Defending ================="
-    - "&fThe &5Obsidian Shield &7(e-pearl) &fand &0Torpedo &7(egg)"
-    - "&fcan be thrown to defend against oncoming missiles."
-    - "&fThey spawn after &a1 second &fand will &cbreak &fif"
-    - "&fthey hit a block before then. Throw one at the &dX&f!"
-    - "&b========================================"
-  stage5:
-    - "&b=============== Decks ==================="
-    - "&fThere are 4 decks &7(kits) &favailable to play."
-    - "&fEach contains its own unique &cmissiles&f, &9utilities&f,"
-    - "&6weapon&f, &3enchantments&f, and &epassive abilities."
-    - "&fBy default, you are using &b&lSentinel&f. Use"
-    - "&a/leave&f, and interact with the NPCs to select"
-    - "&fanother deck of your choice."
-    - "&b========================================"
-  stage6:
-    - "&b============ Customization ================"
-    - "&fEach deck has many options available to customize."
-    - "&fUpgrading them costs &askillpoints, &fand each preset"
-    - "&fhas &a16 &fin total. Select '&7&lEdit Preset&f' and"
-    - "&fupgrade or downgrade any &cMissile &for &9Utility&f."
-    - "&b========================================"
   tutorial-complete:
     - "&b=========== Tutorial Complete ============="
     - "&fYou have successfully completed the tutorial. If"
@@ -306,6 +264,7 @@ titles:
     stage4: "&fToss throwable"
     stage5: "&fChange deck"
     stage6: "&fCustomize deck"
+    stage7: "&fSpawn Bullet"
   stagecomplete:
     title: "&f"
     subtitle: "&aWell done!"
@@ -325,8 +284,8 @@ scoreboard:
   stage3: 
     - "&fDestroy any enemy portal"
     - "&fby riding over and placing"
-    - "&fmissiles inside their base"
-    - "&7(Type &8/skip &7to skip)"
+    - "&fmany missiles in the same"
+    - "&fspot inside their base"
   stage4: 
     - "&f&oTorpedos &fand &f&oObsidian"
     - "&f&oShields &fspawn after &a1s"
@@ -334,14 +293,18 @@ scoreboard:
     - "&fblock. Throw one at the &d&lX&f!"
   stage5: 
     - "&fType &a/leave &fand select"
-    - "&f&lPreset A &fusing the NPCs"
-    - "&fto change your deck"
+    - "&f&lPreset A &fin the"
+    - "&c&lBerserker &fNPC."
   stage6: 
-    - "&fSelect &f&lEdit Preset &fin"
-    - "&fthe NPCs, and upgrade"
-    - "&for downgrade any"
-    - "&c&lMissile &for &9&lUtility&f"
+    - "&fSelect &f&lEdit Preset A &fin"
+    - "&fthe &c&lBerserker &fNPC, and"
+    - "&fupgrade the &cWarhead"
+    - "&fmissile to &c&lBullet"
   stage7: 
+    - "&fRejoin &9Blue &fteam using"
+    - "&a/blue&f, and spawn your new"
+    - "&c&lBullet &fmissile!"
+  stage8: 
     - "&fFinished the tutorial!"
   
 

@@ -107,9 +107,10 @@ public class DeckManager {
                 if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
                     String name = ConfigUtils.toPlain(pmeta.displayName());
-                    name = name.replaceFirst("9", "6");  // Make name orange
+                    name = name.replaceFirst("9", "d");  // Make name pink
+                    name = name.replaceFirst("Splash", "Ender Splash");  // Add "ender"
                     pmeta.displayName(ConfigUtils.toComponent(name));
-                    pmeta.setColor(Color.ORANGE);
+                    pmeta.setColor(Color.FUCHSIA);
                     i.setItemMeta(pmeta);
                 }
                 

@@ -251,17 +251,15 @@ public class TutorialArena extends ClassicArena {
         // Spawn particles above NPCs
         if (s == 5 || s == 6) {
             FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
-            for (String npc : new String[] {"berserker", "architect", "vanguard", "sentinel"}) { 
-                Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + npc, null, null);
-                Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
-                particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                    player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 10, 0.4, 0.4, 0.4);
-                }, 0, 20));
-            }
+            Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
+            Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
+            particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 10, 0.4, 0.4, 0.4);
+            }, 0, 20));
         }
 
-        // Close inventory for stage 6 so people can see the instructions
-        if (s == 6) {
+        // Close inventory for stage 6 + 7 so people can see the instructions
+        if (s == 6 || s == 7) {
             player.closeInventory();
         }
         
@@ -284,8 +282,8 @@ public class TutorialArena extends ClassicArena {
 
         // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
-        if (s == 6) {
-            stage.put(uuid, 7);
+        if (s == 7) {
+            stage.put(uuid, 8);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
                 stage.remove(uuid);

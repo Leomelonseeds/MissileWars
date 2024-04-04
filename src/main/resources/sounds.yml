@@ -158,3 +158,7 @@ launch-canopy:
   sound: ENTITY_ENDER_EYE_LAUNCH
   volume: 1.0
   pitch: 1.0
+ender-splash:
+  sound: ENTITY_ENDERMAN_TELEPORT
+  volume: 1.0
+  pitch: 1.0
