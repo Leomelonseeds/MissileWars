@@ -43,16 +43,18 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
+import com.leomelonseeds.missilewars.decks.Passive;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
@@ -80,25 +82,11 @@ public class CustomItemListener implements Listener {
      * @return true if they are on the red team, false otherwise (including if they are not on any team at all)
      */
     private boolean isRedTeam(Player player) {
-        // Find player's team (Default to blue)
-        boolean redTeam = false;
-        Arena arena = getPlayerArena(player);
+        Arena arena = ArenaUtils.getArena(player);
         if (arena != null) {
-            redTeam = arena.getTeam(player.getUniqueId()).equalsIgnoreCase("red");
+            return arena.getTeam(player.getUniqueId()) == TeamName.RED;
         }
-        return redTeam;
-    }
-
-    /**
-     * Get the Arena the current player is in.
-     *
-     * @param player the player
-     * @return the Arena the player is in
-     */
-    private Arena getPlayerArena(Player player) {
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
-        return arena;
+        return false;
     }
     
     /**
@@ -124,7 +112,7 @@ public class CustomItemListener implements Listener {
     public void giveHaste(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         
-        if (getPlayerArena(player) == null) {
+        if (ArenaUtils.getArena(player) == null) {
             return;
         }
         
@@ -174,8 +162,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Check arena
-        Arena playerArena = getPlayerArena(player);
-        String held = ConfigUtils.getStringFromItem(hand, "held");
+        Arena playerArena = ArenaUtils.getArena(player);
+        String held = InventoryUtils.getStringFromItem(hand, "held");
         if (playerArena == null) {
             // Player is using a held item
             if (held == null) {
@@ -239,8 +227,8 @@ public class CustomItemListener implements Listener {
         
         // Check if player used a structure or utility
         Block clicked = event.getClickedBlock();
-        String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
-        String utility = ConfigUtils.getStringFromItem(hand, "item-utility");
+        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+        String utility = InventoryUtils.getStringFromItem(hand, "item-utility");
         if (structureName == null && utility == null) {
             return;
         }
@@ -400,7 +388,7 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        Arena playerArena = getPlayerArena(player);
+        Arena playerArena = ArenaUtils.getArena(player);
         ItemStack item = event.getItemInHand();
         if ((playerArena == null) || !item.getType().toString().contains("LEAVES")) {
             return;
@@ -462,14 +450,14 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Arena playerArena = getPlayerArena(thrower);
+        Arena playerArena = ArenaUtils.getArena(thrower);
         if (playerArena == null) {
             return;
         }
 
         // Check if player is holding a structure item
         ItemStack hand = thrown.getItem();
-        String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");
+        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
         if (structureName == null) {
             return;
         }
@@ -478,9 +466,9 @@ public class CustomItemListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
         UUID uuid = thrower.getUniqueId();
-        int poke = plugin.getJSON().getAbility(uuid, "poke");
+        int poke = plugin.getJSON().getAbility(uuid, Passive.POKEMISSILES);
         if (poke > 0) {
-            String offName = ConfigUtils.getStringFromItem(offhand, "item-structure");
+            String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
             if (offName != null && !thrower.hasCooldown(offhand.getType()) && offhand.getType().toString().contains("SPAWN_EGG")) {
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
                 InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
@@ -502,7 +490,7 @@ public class CustomItemListener implements Listener {
             Location spawnLoc = thrown.getLocation();
             String mapName = playerArena.getMapName();
             ItemStack item = thrown.getItem();
-            if (playerArena.getTeam(uuid) == "no team") {
+            if (playerArena.getTeam(uuid) == TeamName.NONE) {
                 return;
             }
             
@@ -568,7 +556,7 @@ public class CustomItemListener implements Listener {
         }, 20);
         
         // Add particle effects for prickly/poke
-        int prickly = plugin.getJSON().getAbility(uuid, "prickly");
+        int prickly = plugin.getJSON().getAbility(uuid, Passive.PRICKLY_PROJECTILES);
         if (prickly <= 0 && poke <= 0) {
             return;
         }
@@ -602,7 +590,7 @@ public class CustomItemListener implements Listener {
 
         // Make sure it's in an arena
         Player thrower = (Player) thrown.getShooter();
-        Arena playerArena = getPlayerArena(thrower);
+        Arena playerArena = ArenaUtils.getArena(thrower);
         if (playerArena == null) {
             return;
         }
@@ -614,9 +602,9 @@ public class CustomItemListener implements Listener {
         
         // Always disallow projectiles to collide with players of same team
         Player hit = (Player) event.getHitEntity();
-        String team1 = playerArena.getTeam(thrower.getUniqueId());
-        String team2 = playerArena.getTeam(hit.getUniqueId());
-        if (!team1.equals("no team") && team1.equals(team2)) {
+        TeamName team1 = playerArena.getTeam(thrower.getUniqueId());
+        TeamName team2 = playerArena.getTeam(hit.getUniqueId());
+        if (team1 != TeamName.NONE && team1 == team2) {
             event.setCancelled(true);
             return;
         }
@@ -628,7 +616,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Allow collisions if prickly projectiles
-        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), "prickly") > 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), Passive.PRICKLY_PROJECTILES) > 0) {
             return;
         }
 
@@ -648,14 +636,14 @@ public class CustomItemListener implements Listener {
             return;
         }
         Player thrower = (Player) thrown.getShooter();
-        Arena playerArena = getPlayerArena(thrower);
+        Arena playerArena = ArenaUtils.getArena(thrower);
         if (playerArena == null) {
             return;
         }
 
         // Check if player is holding a utility item
         ItemStack hand = thrown.getItem();
-        String utility = ConfigUtils.getStringFromItem(hand, "item-utility");
+        String utility = InventoryUtils.getStringFromItem(hand, "item-utility");
 
         // Make sure it's splash potion of water
         if (utility == null || !thrown.getEffects().isEmpty()) {
@@ -747,8 +735,8 @@ public class CustomItemListener implements Listener {
         if (spawnBlock.getType() != Material.AIR) {
             if (spawnBlock.getType() == Material.NETHER_PORTAL) {
                 Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(thrower.getWorld());
-                if (arena instanceof ClassicArena) {
-                    ((ClassicArena) arena).registerPortalBreak(location.clone(), thrower);
+                if (arena instanceof ClassicArena carena) {
+                    carena.registerPortalBreak(location.clone(), thrower);
                 }
             } else if (spawnBlock.getType() == Material.MOVING_PISTON) {
                 Block upper = hitBlock.getRelative(BlockFace.UP);

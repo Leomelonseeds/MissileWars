@@ -20,6 +20,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 
@@ -62,7 +63,7 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
             return;
         }
         
-        if (playerArena.getTeam(player.getUniqueId()).equals("no team")) {
+        if (playerArena.getTeam(player.getUniqueId()) == TeamName.NONE) {
             return;
         }
         

@@ -25,12 +25,14 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -104,8 +106,7 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Check if player is in an active arena
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {
             // Stop guests from using elytra
             if (player.hasPermission("umw.elytra")) {
@@ -170,14 +171,13 @@ public class ArenaInventoryListener implements Listener {
         }
 
         // Check if player is in Arena
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {
             return;
         }
 
         // Stop drops entirely if player not on team
-        if ((arena.getTeam(player.getUniqueId()).equals("no team"))) {
+        if ((arena.getTeam(player.getUniqueId()) == TeamName.NONE)) {
             event.setCancelled(true);
             return;
         }
@@ -242,8 +242,7 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         Player player = (Player) event.getEntity();
-        ArenaManager manager = plugin.getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {
             return;
         }
@@ -266,7 +265,8 @@ public class ArenaInventoryListener implements Listener {
         
         // Cancel event if player cannot pick up item based on their given deck
         DeckItem di = deck.getDeckItem(item);
-        if (di == null && item.getType().toString().contains("ARROW") && (deck.getName().equals("Sentinel") || deck.getName().equals("Berserker"))) {
+        if (di == null && item.getType().toString().contains("ARROW") && 
+                (deck.getType() == DeckStorage.SENTINEL || deck.getType() == DeckStorage.BERSERKER)) {
             for (DeckItem temp : deck.getItems()) {
                 if (temp.getInstanceItem().getType().toString().contains("ARROW")) {
                     di = temp;
@@ -287,8 +287,7 @@ public class ArenaInventoryListener implements Listener {
     public void onArrowPickup(PlayerPickupArrowEvent event) {
         // Check if player is in Arena
         Player player = event.getPlayer();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {
             return;
         }
@@ -301,7 +300,7 @@ public class ArenaInventoryListener implements Listener {
         }
         
         // Stop decks without bows to pick up arrows
-        if (deck.getName().equals("Vanguard") || deck.getName().equals("Architect")) {
+        if (deck.getType() == DeckStorage.VANGUARD || deck.getType() == DeckStorage.ARCHITECT) {
             event.setCancelled(true);
             return;
         }

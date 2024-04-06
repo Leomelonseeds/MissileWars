@@ -20,11 +20,13 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.PresetSelector;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -562,7 +564,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
                 
-                if (!(arena.getTeam(player.getUniqueId()).equals("no team") || sender.hasPermission("umw.enqueue"))) {
+                if (!(arena.getTeam(player.getUniqueId()) == TeamName.NONE || sender.hasPermission("umw.enqueue"))) {
                     sendErrorMsg(sender, "You are already on a team!");
                     return true;
                 }
@@ -674,7 +676,7 @@ public class MissileWarsCommand implements CommandExecutor {
 
             Arena arena = arenaManager.getArena(player.getUniqueId());
 
-            if (!(arena == null || arena.getTeam(player.getUniqueId()).equals("no team"))) {
+            if (!(arena == null || arena.getTeam(player.getUniqueId()) == TeamName.NONE)) {
                 sendErrorMsg(sender, "You cannot change decks while playing.");
                 return true;
             }
@@ -685,8 +687,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             String deck = StringUtils.capitalize(args[1].toLowerCase());
-
-            if (!plugin.getDeckManager().getDecks().contains(deck)) {
+            if (DeckStorage.fromString(deck) == null) {
                 sendErrorMsg(sender, "Please specify a valid deck!");
                 return true;
             }

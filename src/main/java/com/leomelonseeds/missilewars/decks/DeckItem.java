@@ -12,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 
 public class DeckItem {
     

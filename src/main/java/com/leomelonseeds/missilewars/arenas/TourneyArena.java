@@ -9,7 +9,7 @@ import java.util.Map;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 
 
 /**

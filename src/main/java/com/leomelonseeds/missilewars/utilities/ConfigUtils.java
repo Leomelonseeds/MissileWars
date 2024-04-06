@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -23,17 +22,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.minecart.ExplosiveMinecart;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.Passive;
+import com.leomelonseeds.missilewars.decks.Passive.Stat;
+import com.leomelonseeds.missilewars.decks.Passive.Type;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.citizensnpcs.Citizens;
@@ -126,11 +122,9 @@ public class ConfigUtils {
             if (player != null) {
                 msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
                 if (msg.contains("%umw_team%")) {
-                    String team = arena.getTeam(player.getUniqueId()) + "§r";
-                    if (team.equals("red")) {
-                        msg = msg.replaceAll("%umw_team%", "§c" + team);
-                    } else if (team.equals("blue")) {
-                        msg = msg.replaceAll("%umw_team%", "§9" + team);
+                    TeamName team = arena.getTeam(player.getUniqueId());
+                    if (team != TeamName.NONE) {
+                        msg = msg.replaceAll("%umw_team%", team.getColor() + team + "§r");
                     }
                 }
             }
@@ -178,6 +172,17 @@ public class ConfigUtils {
             list.add(setPlaceholders(msg, player, arena, focus));
         }
         return list;
+    }
+    
+    /**
+     * Shorthand for sending a chat message without arena and focus context.
+     * The chat message does NOT need to include "messages."
+     *      
+     * @param path
+     * @param player
+     */
+    public static void sendConfigMessage(String path, Player player) {
+        sendConfigMessage("messages." + path, player, null, null);
     }
 
     /**
@@ -274,7 +279,7 @@ public class ConfigUtils {
         // Janky way of including team-based placeholders
         Arena a = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
         if (a != null) {
-            if (a.getTeam(player.getUniqueId()).contains("red")) {
+            if (a.getTeam(player.getUniqueId()) == TeamName.RED) {
                 if (subtitle.contains("umw_red")) {
                     subtitle = subtitle.replace("red", "blue");
                 } else if (subtitle.contains("umw_blue")) {
@@ -370,48 +375,6 @@ public class ConfigUtils {
     }
     
     /**
-     * inShield with no biases
-     * 
-     * @param arena
-     * @param location
-     * @param team
-     * @return
-     */
-    public static boolean inShield(Arena arena, Location location, String team) {
-        return inShield(arena, location, team, 0);
-    }
-    
-    
-    /**
-     * Check if given location is in given arena with given team
-     * 
-     * @param arena
-     * @param location
-     * @param team
-     * @param bias Number of blocks on all directions of shield that are also counted
-     * @return
-     */
-    public static boolean inShield(Arena arena, Location location, String team, int bias) {
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
-        String gamemode = arena.getGamemode();
-        String mapName = arena.getMapName();
-        int x1 = (int) getMapNumber(gamemode, mapName, team + "-shield.x1");
-        int x2 = (int) getMapNumber(gamemode, mapName, team + "-shield.x2");
-        int y1 = (int) getMapNumber(gamemode, mapName, team + "-shield.y1");
-        int y2 = (int) getMapNumber(gamemode, mapName, team + "-shield.y2");
-        int z1 = (int) getMapNumber(gamemode, mapName, team + "-shield.z1");
-        int z2 = (int) getMapNumber(gamemode, mapName, team + "-shield.z2");
-        if (x1 - bias <= x && x <= x2 + bias && 
-            y1 - bias <= y && y <= y2 + bias &&
-            z1 - bias <= z && z <= z2 + bias) {
-            return true;
-        }
-        return false;
-    }
-    
-    /**
      * Acquire data for an item
      * 
      * @param item
@@ -443,8 +406,16 @@ public class ConfigUtils {
      * @param stat
      * @return
      */
-    public static double getAbilityStat(String abilityPath, int level, String stat) {
-        Object o = getItemValue(abilityPath, level, stat);
+    public static double getAbilityStat(Passive ability, int level, Stat stat) {
+        String abilityPath;
+        Passive.Type type = ability.getType();
+        if (type == Type.GPASSIVE) {
+            abilityPath = type + "." + ability;
+        } else {
+            abilityPath = ability.getDeck() + "." + type + "." + ability;
+        }
+
+        Object o = getItemValue(abilityPath, level, stat.toString());
         if (o == null) {
             return 0;
         }
@@ -505,65 +476,5 @@ public class ConfigUtils {
      */
     public static String toPlain(Component component) {
         return LegacyComponentSerializer.legacySection().serialize(component);
-    }
-    
-    /**
-     * Gets the cause/associated player of a spawned entity
-     * mainly used for tracking kills and broken portals
-     * 
-     * @param killerEntity
-     * @param arena
-     * @return
-     */
-    public static Player getAssociatedPlayer(Entity killerEntity, Arena arena) {
-        Player player = null;
-        if (killerEntity.getType() == EntityType.CREEPER) {
-            Creeper creeper = (Creeper) killerEntity;
-            if (creeper.isCustomNameVisible()) {
-                String name = removeColors(toPlain(creeper.customName()));
-                String[] args = name.split("'");
-                player = Bukkit.getPlayer(args[0]);
-            }
-        } else if (killerEntity.getType() == EntityType.PRIMED_TNT) {
-            TNTPrimed tnt = (TNTPrimed) killerEntity;
-            if (tnt.getSource() instanceof Player) {
-                player = (Player) tnt.getSource();
-            }
-        } else if (killerEntity.getType() == EntityType.MINECART_TNT) {
-            ExplosiveMinecart cart = (ExplosiveMinecart) killerEntity;
-            player = arena.getTracker().getTNTMinecartSource(cart);
-        }
-        return player;
-    }
-    
-    /**
-     * Get string data from custom item
-     * 
-     * @param item
-     * @param id
-     * @return
-     */
-    public static String getStringFromItem(ItemStack item, String id) {
-        if (item == null) {
-            return null;
-        }
-        
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
-                PersistentDataType.STRING)) {
-            return null;
-        }
-        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
-                id), PersistentDataType.STRING);
-    }
-    
-    // Determine if a player is out of bounds
-    public static boolean outOfBounds(Player player, Arena arena) {
-        if (arena == null || !arena.isRunning() || arena.isWaitingForTie()) {
-            return false;
-        }
-        double toohigh = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
-        double toofar = getMapNumber(arena.getGamemode(), arena.getMapName(), "too-far");
-        Location loc = player.getLocation();
-        return loc.getBlockY() > toohigh || loc.getBlockX() < toofar;
     }
 }

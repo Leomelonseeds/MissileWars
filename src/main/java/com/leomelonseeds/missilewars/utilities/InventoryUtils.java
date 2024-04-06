@@ -21,9 +21,9 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
 
 import io.github.a5h73y.parkour.Parkour;
 
@@ -248,5 +248,25 @@ public class InventoryUtils {
             if (i == null) continue;
             player.setCooldown(i.getType(), 0);
         }
+    }
+
+    /**
+     * Get string data from custom item
+     * 
+     * @param item
+     * @param id
+     * @return
+     */
+    public static String getStringFromItem(ItemStack item, String id) {
+        if (item == null) {
+            return null;
+        }
+        
+        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
+                PersistentDataType.STRING)) {
+            return null;
+        }
+        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
+                id), PersistentDataType.STRING);
     }
 }

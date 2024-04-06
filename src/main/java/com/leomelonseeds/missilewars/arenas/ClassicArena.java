@@ -16,8 +16,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -80,7 +82,7 @@ public class ClassicArena extends Arena {
         List<MissileWarsPlayer> mostKills = new ArrayList<>();
         List<MissileWarsPlayer> mostDeaths = new ArrayList<>();
         for (MissileWarsPlayer player : players) {
-            if (getTeam(player.getMCPlayerId()).equals("no team")) {
+            if (getTeam(player.getMCPlayerId()) == TeamName.NONE) {
                 continue;
             }
             
@@ -160,7 +162,7 @@ public class ClassicArena extends Arena {
 
             // Calculate currency gain per-game
             UUID uuid = player.getMCPlayerId();
-            if (getTeam(uuid).equals("no team")) {
+            if (getTeam(uuid) == TeamName.NONE) {
                 continue;
             }
 
@@ -246,11 +248,11 @@ public class ClassicArena extends Arena {
         if (entity instanceof Player) {
             player = (Player) entity;
         } else {
-            player = ConfigUtils.getAssociatedPlayer(entity, this);
+            player = ArenaUtils.getAssociatedPlayer(entity, this);
         }
         
         // Send messages if player found
-        if (player != null && !getTeam(player.getUniqueId()).equals("no team")) {
+        if (player != null && getTeam(player.getUniqueId()) != TeamName.NONE) {
             // Only add to stats if on opposite team
             if (enemy.containsPlayer(player.getUniqueId())) {
                 getPlayerInArena(player.getUniqueId()).addToMVP(1);

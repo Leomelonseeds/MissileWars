@@ -22,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
+import com.leomelonseeds.missilewars.decks.Passive;
 
 public class JSONManager {
 
@@ -30,7 +32,7 @@ public class JSONManager {
     private Map<UUID, JSONObject> playerCache;
     
     private JSONObject defaultJson;
-    private Map<String, JSONObject> defaultPresets;
+    private Map<DeckStorage, JSONObject> defaultPresets;
     private String[] allPresets;
 
     public JSONManager(MissileWarsPlugin plugin) {
@@ -49,8 +51,9 @@ public class JSONManager {
             String jsonString = IOUtils.toString(is, "UTF-8");
             defaultJson = new JSONObject(jsonString);
             // Initialize default presets
-            for (String deck : plugin.getDeckManager().getDecks()) {
-                defaultPresets.put(deck, defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
+            for (DeckStorage ds : DeckStorage.values()) {
+                String deck = ds.toString();
+                defaultPresets.put(ds, defaultJson.getJSONObject(deck).getJSONObject("defaultpreset"));
                 defaultJson.getJSONObject(deck).remove("defaultpreset");
             }
         } catch (IOException e) {
@@ -89,7 +92,8 @@ public class JSONManager {
                         }
                     }
                 }
-                for (String deck : plugin.getDeckManager().getDecks()) {
+                for (DeckStorage ds : DeckStorage.values()) {
+                    String deck = ds.toString();
                     JSONObject deckjson = newJson.getJSONObject(deck);
                     updateJson(deckjson, defaultJson.getJSONObject(deck));
                     if (player.hasPermission("umw.unlockall")) {
@@ -99,7 +103,7 @@ public class JSONManager {
                             }
                         }
                     }
-                    JSONObject defaultpreset = getDefaultPreset(deck);
+                    JSONObject defaultpreset = getDefaultPreset(ds);
                     for (String preset : plugin.getDeckManager().getPresets()) {
                         // Only load presets player has permissions for to save on storage
                         boolean hasPreset = Bukkit.getPlayer(uuid).hasPermission("umw.preset." + preset.toLowerCase());
@@ -150,46 +154,25 @@ public class JSONManager {
                             }
                         }
                         
-                        // Calculate sp spent on gpassives, and delete if gpassive not exist
-                        String gpassive = currentpreset.getJSONObject("gpassive").getString("selected");
-                        int gpassivelevel = currentpreset.getJSONObject("gpassive").getInt("level");
-                        Set<String> passives = itemConfig.getConfigurationSection("gpassive").getKeys(false);
-                        if (!passives.contains(gpassive)) {
-                            currentpreset.getJSONObject("gpassive").put("selected", "None");
-                            currentpreset.getJSONObject("gpassive").put("level", 0);
-                        } else {
-                            int maxLevel = plugin.getDeckManager().getMaxLevel("gpassive." + gpassive);
-                            if (gpassivelevel > maxLevel) {
-                                currentpreset.getJSONObject("gpassive").put("level", maxLevel);
-                                gpassivelevel = maxLevel;
-                            }
-                            while (gpassivelevel > 0) {
-                                int cost = itemConfig.getInt("gpassive." + gpassive + "." + gpassivelevel + ".spcost");
-                                finalsp -= cost;
-                                gpassivelevel--;
-                            }
-                        }
-                        
-                        // Calculate sp spent on passives, and delete if not exist (RIP abilities)
-                        for (String s : new String[] {"passive"}) {
-                            int level = currentpreset.getJSONObject(s).getInt("level");
-                            String ability = currentpreset.getJSONObject(s).getString("selected");
-                            // Change ".passive" to "." + s when abilities come out :sob:
-                            Set<String> abilities = itemConfig.getConfigurationSection(deck + ".passive").getKeys(false);
-                            if (!abilities.contains(ability)) {
-                                currentpreset.getJSONObject(s).put("selected", "None");
-                                currentpreset.getJSONObject(s).put("level", 0);
-                            }
-                            else {
-                                int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".passive." + ability);
-                                if (level > maxLevel) {
-                                    currentpreset.getJSONObject(s).put("level", maxLevel);
-                                    level = maxLevel;
+                        // Calculate sp spent on gpassives/passives, and delete if gpassive not exist
+                        for (String ptype : new String[] {"gpassive", "passive"}) {
+                            String path = ptype.equals("gpassive") ? ptype : deck + "." + ptype;
+                            String passive = currentpreset.getJSONObject(ptype).getString("selected");
+                            int passivelevel = currentpreset.getJSONObject(ptype).getInt("level");
+                            Set<String> passives = itemConfig.getConfigurationSection(path).getKeys(false);
+                            if (!passives.contains(passive)) {
+                                currentpreset.getJSONObject(ptype).put("selected", "None");
+                                currentpreset.getJSONObject(ptype).put("level", 0);
+                            } else {
+                                int maxLevel = plugin.getDeckManager().getMaxLevel(path + "." + passive);
+                                if (passivelevel > maxLevel) {
+                                    currentpreset.getJSONObject(ptype).put("level", maxLevel);
+                                    passivelevel = maxLevel;
                                 }
-                                while (level > 0) {
-                                    int cost = itemConfig.getInt(deck + ".passive." + ability + "." + level + ".spcost");
+                                while (passivelevel > 0) {
+                                    int cost = itemConfig.getInt(path + "." + passive + "." + passivelevel + ".spcost");
                                     finalsp -= cost;
-                                    level--;
+                                    passivelevel--;
                                 }
                             }
                         }
@@ -333,8 +316,19 @@ public class JSONManager {
      * 
      * @param deck
      */
-    public JSONObject getDefaultPreset(String deck) {
+    public JSONObject getDefaultPreset(DeckStorage deck) {
         String json = defaultPresets.get(deck).toString();
+        return new JSONObject(json);
+    }
+    
+    /**
+     * Returns a copy of the default preset for a deck
+     * 
+     * @param deck
+     */
+    public JSONObject getDefaultPreset(String deck) {
+        DeckStorage ds = DeckStorage.fromString(deck);
+        String json = defaultPresets.get(ds).toString();
         return new JSONObject(json);
     }
     
@@ -346,7 +340,7 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getAbility(UUID uuid, String ability) {
+    public int getAbility(UUID uuid, Passive ability) {
         JSONObject json = getPlayerPreset(uuid);
         return getAbility(json, ability);
     }
@@ -358,11 +352,10 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getAbility(JSONObject json, String ability) {
-        for (String s : new String[] {"gpassive", "passive"}) {
-            if (json.has(s) && json.getJSONObject(s).getString("selected").equals(ability)) {
-                return json.getJSONObject(s).getInt("level");
-            }
+    public int getAbility(JSONObject json, Passive ability) {
+        String type = ability.getType().toString();
+        if (json.has(type) && json.getJSONObject(type).getString("selected").equals(ability.toString())) {
+            return json.getJSONObject(type).getInt("level");
         }
         return 0;
     }

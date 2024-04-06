@@ -9,8 +9,7 @@ import org.bukkit.inventory.ItemStack;
 /** A class representing a generic Deck. */
 public class Deck {
 
-    /** The name of the Deck. */
-    private String name;
+    private DeckStorage type;
     /** Items given at the start of the game. */
     private List<ItemStack> gear;
     /** Combined for ease of use */
@@ -22,14 +21,14 @@ public class Deck {
      * @param gear the gear for the Deck
      * @param pool the utilities, missiles and items given throughout the game
      */
-    public Deck(String name, List<ItemStack> gear, List<DeckItem> pool) {
-        this.name = name;
+    public Deck(DeckStorage type, List<ItemStack> gear, List<DeckItem> pool) {
+        this.type = type;
         this.gear = gear;
         this.pool = pool;
     }
     
-    public String getName() {
-        return name;
+    public DeckStorage getType() {
+        return type;
     }
 
     /**

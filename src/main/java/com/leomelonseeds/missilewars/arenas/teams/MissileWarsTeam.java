@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.teams;
+package com.leomelonseeds.missilewars.arenas.teams;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -29,8 +29,11 @@ import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.decks.Passive;
+import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -44,7 +47,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class MissileWarsTeam {
 
     /** The name of the team */
-    private String name;
+    private TeamName name;
     /** The arena this team is linked to. */
     private Arena arena;
     /** The members of the team. */
@@ -71,7 +74,7 @@ public class MissileWarsTeam {
      * @param spawn the spawn for the team
      * @param arena the arena the team is linked to
      */
-    public MissileWarsTeam(String name, Arena arena, Location spawn) {
+    public MissileWarsTeam(TeamName name, Arena arena, Location spawn) {
         this.name = name;
         this.members = new HashSet<>();
         this.portals = new HashMap<>();
@@ -138,7 +141,7 @@ public class MissileWarsTeam {
         return multiplier;
     }
     
-    public String getName() {
+    public TeamName getName() {
         return name;
     }
     
@@ -287,40 +290,42 @@ public class MissileWarsTeam {
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
         }
         
-        // Passive activation
-        String passive = json.getJSONObject("passive").getString("selected");
+        // Potion effect passive activation
+        Passive passive = Passive.fromString(json.getJSONObject("passive").getString("selected"));
         int level = json.getJSONObject("passive").getInt("level");
-        switch (passive) {
-        case "bunny":
-            int bamp = (int) ConfigUtils.getAbilityStat("Vanguard.passive.bunny", level, "amplifier");
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, bamp));
-            break;
-        case "adrenaline":
-            int aamp = (int) ConfigUtils.getAbilityStat("Vanguard.passive.adrenaline", level, "amplifier");
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, aamp));
-            break;
-        case "warden":
-            Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
-            int amplifier = (int) ConfigUtils.getAbilityStat("Sentinel.passive.warden", level, "amplifier");
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    // Cancel if no team
-                    if (!containsPlayer(player.getMCPlayerId())) {
-                        this.cancel();
-                        return;
-                    }
-                    // Don't allow if not in base
-                    if (!ConfigUtils.inShield(arena, mcPlayer.getLocation(), name, 5)) {
-                        return;
-                    }
-                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amplifier));
-                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, amplifier));
-                }
-            }.runTaskTimer(plugin, 10, 10);
-            break;
-        default:
+        int amp = (int) ConfigUtils.getAbilityStat(passive, level, Stat.AMPLIFIER);
+        if (amp == 0) {
             return;
+        }
+        
+        switch (passive) {
+            case BUNNY:
+                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, amp));
+                break;
+            case ADRENALINE:
+                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
+                break;
+            case WARDEN:
+                Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        // Cancel if no team
+                        if (!containsPlayer(player.getMCPlayerId())) {
+                            this.cancel();
+                            return;
+                        }
+                        // Don't allow if not in base
+                        if (!ArenaUtils.inShield(arena, mcPlayer.getLocation(), name, 5)) {
+                            return;
+                        }
+                        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amp));
+                        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, amp));
+                    }
+                }.runTaskTimer(plugin, 10, 10);
+                break;
+            default:
+                return;
         }
     }
 
@@ -351,7 +356,7 @@ public class MissileWarsTeam {
     private ItemStack createColoredArmor(Material type) {
         ItemStack item = new ItemStack(type);
         LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
-        meta.setColor(DyeColor.valueOf(name.toUpperCase()).getColor());
+        meta.setColor(DyeColor.valueOf(name.toString().toUpperCase()).getColor());
         meta.setUnbreakable(true);
         item.setItemMeta(meta);
         return item;
@@ -479,7 +484,7 @@ public class MissileWarsTeam {
      */
     public boolean registerShieldBlockUpdate(Location location, boolean place) {
         // Check if block was in shield location
-        if (ConfigUtils.inShield(arena, location, name)) {
+        if (ArenaUtils.inShield(arena, location, name)) {
             shieldBlocksBroken += place ? -1 : 1;
             return true;
         }

@@ -23,7 +23,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 
 /* Tracks missiles, utilities, and TNT minecarts to be used for tracking kills/portal breaks */
 public class Tracker {
@@ -99,7 +100,7 @@ public class Tracker {
         }
         
         // Must have a source
-        Player source = ConfigUtils.getAssociatedPlayer(exploded, arena);
+        Player source = ArenaUtils.getAssociatedPlayer(exploded, arena);
         if (source == null) {
             return;
         }
@@ -229,7 +230,7 @@ public class Tracker {
     private boolean isEmbedded(Tracked t) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Arena arena = plugin.getArenaManager().getArena(t.getPos1().getWorld());
-        String oppositeTeam = t.isRed() ? "blue" : "red";
-        return ConfigUtils.inShield(arena, t.getPos1(), oppositeTeam) || ConfigUtils.inShield(arena, t.getPos2(), oppositeTeam);
+        TeamName oppositeTeam = t.isRed() ? TeamName.BLUE : TeamName.RED;
+        return ArenaUtils.inShield(arena, t.getPos1(), oppositeTeam) || ArenaUtils.inShield(arena, t.getPos2(), oppositeTeam);
     }
 }

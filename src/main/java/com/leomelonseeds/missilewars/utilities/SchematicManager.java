@@ -27,6 +27,7 @@ import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.sk89q.worldedit.EditSession;
@@ -171,8 +172,8 @@ public class SchematicManager {
         if (checkCollision) {
             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
             Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
-            boolean missileInBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "red" : "blue");
-            boolean missileInOtherBase = isMissile && ConfigUtils.inShield(arena, spawnLoc, redMissile ? "blue" : "red", 4);
+            boolean missileInBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.RED : TeamName.BLUE);
+            boolean missileInOtherBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.BLUE : TeamName.RED, 4);
             boolean isTutorial = loc.getWorld().getName().contains("tutorial");
             int x1, x2, z1, z2;
             if (redMissile) {

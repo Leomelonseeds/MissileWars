@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -13,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -25,7 +25,8 @@ import org.bukkit.potion.PotionType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
@@ -34,20 +35,14 @@ import net.kyori.adventure.text.Component;
 public class DeckManager {
     
     private MissileWarsPlugin plugin;
-    
     private final List<String> presets;
-    private final List<String> decks;
-    
-    FileConfiguration itemsConfig;
+    private FileConfiguration itemsConfig;
 
     /** Set up the DeckManager with loaded decks. */
     public DeckManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
-        
-        presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
-        decks = new ArrayList<>(List.of(new String[]{"Vanguard", "Sentinel", "Berserker", "Architect"}));
-        
-        itemsConfig = ConfigUtils.getConfigFile("items.yml");
+        this.presets = new ArrayList<>(List.of(new String[]{"A", "B", "C"}));
+        this.itemsConfig = ConfigUtils.getConfigFile("items.yml");
     }
     
     /**
@@ -73,16 +68,16 @@ public class DeckManager {
         List<ItemStack> gear = new ArrayList<>();
         
         // Figure out utility and missile multipliers
-        String gpassive = json.getJSONObject("gpassive").getString("selected");
+        Passive gpassive = Passive.fromString(json.getJSONObject("gpassive").getString("selected"));
         int glevel = json.getJSONObject("gpassive").getInt("level");
         double mmult = 1;
         double umult = 1;
         double maxmult = 1;
         if (glevel > 0) {
-            if (!gpassive.equals("hoarder")) {
-                double mperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "mpercentage") / 100;
-                double uperc = ConfigUtils.getAbilityStat("gpassive." + gpassive, glevel, "upercentage") / 100;
-                if (gpassive.equals("missilespec")) {
+            if (gpassive != Passive.HOARDER) {
+                double mperc = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.MPERCENTAGE) / 100;
+                double uperc = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.UPERCENTAGE) / 100;
+                if (gpassive == Passive.MISSILE_SPEC) {
                     mmult = 1 - mperc;
                     umult = uperc + 1;
                 } else {
@@ -90,10 +85,10 @@ public class DeckManager {
                     umult = 1 - uperc;
                 }
             } else {
-                double perc = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "percentage") / 100;
+                double perc = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.PERCENTAGE) / 100;
                 mmult = perc + 1;
                 umult = perc + 1;
-                maxmult = ConfigUtils.getAbilityStat("gpassive.hoarder", glevel, "max");
+                maxmult = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.MAX);
             }
         }
         
@@ -105,7 +100,7 @@ public class DeckManager {
                 ItemStack i = createItem(key, level, isMissile);
                 
                 // Change color of lava splash
-                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, "lavasplash") > 0) {
+                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, Passive.ENDER_SPLASH) > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
                     String name = ConfigUtils.toPlain(pmeta.displayName());
                     name = name.replaceFirst("9", "d");  // Make name pink
@@ -116,7 +111,7 @@ public class DeckManager {
                 }
                 
                 // Give spectral arrows in case of sentinel
-                int spectral = plugin.getJSON().getAbility(uuid, "spectral");
+                int spectral = plugin.getJSON().getAbility(uuid, Passive.SPECTRAL_ARROWS);
                 if (i.getType() == Material.ARROW && spectral > 0) {
                     i.setType(Material.SPECTRAL_ARROW);
                 }
@@ -132,54 +127,18 @@ public class DeckManager {
         }
         
         // Create gear items
+        DeckStorage ds = DeckStorage.fromString(deck);
         ItemStack weapon = createItem(deck + ".weapon", 0, false);
-        switch (deck) {
-        case "Vanguard": 
-        {
-            addEnch(weapon, "sharpness", deck, json);
-            addEnch(weapon, "fire_aspect", deck, json);
-            ItemStack boots = new ItemStack(Material.GOLDEN_BOOTS);
-            addEnch(boots, "feather_falling", deck, json);
-            gear.add(boots);
-            
-            break;
+        for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
+            addEnch(weapon, e.getKey(), e.getValue(), deck, json);
         }
-        case "Berserker":
-        {
-            addEnch(weapon, "sharpness", deck, json);
-            addEnch(weapon, "multishot", deck, json);
-            addEnch(weapon, "quick_charge", deck, json);
-            ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
-            addEnch(boots, "blast_protection", deck, json);
-            gear.add(boots);
-            
-            break;
-        }
-        case "Sentinel":
-        {
-            addEnch(weapon, "sharpness", deck, json);
-            addEnch(weapon, "flame", deck, json);
-            addEnch(weapon, "punch", deck, json);
-            ItemStack boots = new ItemStack(Material.IRON_BOOTS);
-            addEnch(boots, "fire_protection", deck, json);
-            gear.add(boots);
-            
-            break;
-        }
-        case "Architect":
-        {
-            addEnch(weapon, "sharpness", deck, json);
-            addEnch(weapon, "efficiency", deck, json);
-            addEnch(weapon, "haste", deck, json);
-            ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
-            addEnch(boots, "projectile_protection", deck, json);
-            gear.add(boots);
-            
-            break;
-        }
-        }
-        
         gear.add(weapon);
+        
+        ItemStack boots = ds.getBoots();
+        for (Entry<String, Enchantment> e : ds.getBootEnchants().entrySet()) {
+            addEnch(boots, e.getKey(), e.getValue(), deck, json);
+        }
+        gear.add(boots);
         
         // Make gear items unbreakable
         for (ItemStack item : gear) {
@@ -188,16 +147,7 @@ public class DeckManager {
             item.setItemMeta(meta);
         }
         
-        return new Deck(deck, gear, pool);
-    }
-    
-    /**
-     * Check validity of deck
-     *
-     * @return the decks
-     */
-    public List<String> getDecks() {
-        return decks;
+        return new Deck(ds, gear, pool);
     }
     
     /**
@@ -216,17 +166,17 @@ public class DeckManager {
      * @param ench
      * @param lvl
      */
-    private void addEnch(ItemStack item, String ench, String deck, JSONObject json) {
-        int lvl = itemsConfig.getInt(deck + ".enchants." + ench + "." + json.getInt(ench) + ".level");
+    private void addEnch(ItemStack item, String enchID, Enchantment ench, String deck, JSONObject json) {
+        int lvl = itemsConfig.getInt(deck + ".enchants." + enchID + "." + json.getInt(enchID) + ".level");
         if (lvl <= 0) {
             return;
         }
         
         // Add custom effects
         String custom = null;
-        if (ench.equals("blast_protection") && plugin.getJSON().getAbility(json, "boosterball") > 0) {
+        if (ench == Enchantment.PROTECTION_EXPLOSIONS && plugin.getJSON().getAbility(json, Passive.ROCKETEER) > 0) {
             custom = "Blast Protection";
-        } else if (ench.equals("haste")) {
+        } else if (ench == Enchantment.LOOT_BONUS_BLOCKS) {
             custom = "Haste";
         }
         
@@ -246,8 +196,7 @@ public class DeckManager {
             return;
         }
         
-        Enchantment enchant = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(ench));
-        item.addUnsafeEnchantment(enchant, lvl);
+        item.addUnsafeEnchantment(ench, lvl);
     }
     
     /**

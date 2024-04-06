@@ -13,7 +13,9 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
-import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
@@ -58,41 +60,30 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.contains("team")) {
-            String team = playerArena == null ? "no team" : playerArena.getTeam(player.getUniqueId());
+            TeamName team = playerArena == null ? TeamName.NONE : playerArena.getTeam(player.getUniqueId());
             if (params.equals("team")) {
-                return team;
+                return team.toString();
             }
             if (params.equals("team_color")) {
-                return team.equals("no team") ? "&f" : team.equals("red") ? "&c" : "&9";
+                return team.getColor();
             }
         }
         
         if (params.contains("deck")) {
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
-            String deck = json.getString("Deck");
+            DeckStorage deck = DeckStorage.fromString(json.getString("Deck"));
             if (params.equals("deck_plain")) {
-                return json.getString("Deck");
+                return deck.toString();
             }
 
             String preset = json.getString("Preset");
             if (params.equals("deck")) {
-                String chatcolor = "§2";
-                switch (deck) {
-                    case "Vanguard":
-                        chatcolor = "§6";
-                        break;
-                    case "Sentinel":
-                        chatcolor = "§b";
-                        break;
-                    case "Berserker":
-                        chatcolor = "§c";
-                }
-                return chatcolor + json.getString("Deck") + "§7 [" + preset + "]";
+                return deck.getColor() + deck + "§7 [" + preset + "]";
             }
             
             FileConfiguration sec = ConfigUtils.getConfigFile("items.yml");
             String type = params.split("_")[1];
-            String passive = json.getJSONObject(deck).getJSONObject(preset).getJSONObject(type).getString("selected");
+            String passive = json.getJSONObject(deck.toString()).getJSONObject(preset).getJSONObject(type).getString("selected");
             if (passive.equals("None")) {
                 return "None";
             }

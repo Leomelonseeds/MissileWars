@@ -17,10 +17,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
@@ -114,9 +116,22 @@ public class CanopyManager implements Listener {
         
         // Set target location
         Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
-        signal.setTargetLocation(eyeLoc.clone().add(distance).toCenterLocation());
+        Location target = eyeLoc.clone().add(distance).toCenterLocation();
         ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
         signal.setDropItem(false);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (signal.isDead()) {
+                    this.cancel();
+                    return;
+                }
+                
+                // Updates canopy so it travels to the correct location
+                // No clue why I need to do this but oh well
+                signal.setTargetLocation(target);
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 0, 5);
         
         // Add player to canopy cooldown list to give item back on death
         InventoryUtils.consumeItem(player, playerArena, hand, -1);
@@ -158,7 +173,7 @@ public class CanopyManager implements Listener {
             return;
         }
         
-        boolean isRed = playerArena.getTeam(player.getUniqueId()).equalsIgnoreCase("red");
+        boolean isRed = playerArena.getTeam(player.getUniqueId()) == TeamName.RED;
         if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRed, mapName, false, true)) {
             InventoryUtils.regiveItem(player, hand);
             return;

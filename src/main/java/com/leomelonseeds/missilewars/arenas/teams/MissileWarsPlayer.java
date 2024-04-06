@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.teams;
+package com.leomelonseeds.missilewars.arenas.teams;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +24,9 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 /** Represents a Missile Wars Player. */
@@ -109,8 +111,8 @@ public class MissileWarsPlayer {
                 }
                 
                 // If the player left, cancel task
-                String team = arena.getTeam(playerId);
-                if (team == "no team") {
+                TeamName team = arena.getTeam(playerId);
+                if (team == TeamName.NONE) {
                     this.cancel();
                     return;
                 }
@@ -140,7 +142,7 @@ public class MissileWarsPlayer {
                 }
 
                 // Item must be a missile
-                String structureName = ConfigUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
+                String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
                 if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
                         structureName.contains("torpedo-") || structureName.contains("canopy")) {
                     return;
@@ -148,7 +150,7 @@ public class MissileWarsPlayer {
 
                 // At this point, we know the player is holding a missile item facing a block
                 Location loc = target.getLocation();
-                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == "red", player.hasPermission("umw.oldoffsets"));
+                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == TeamName.RED, player.hasPermission("umw.oldoffsets"));
                 double x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
                 double x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
                 double y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
@@ -190,7 +192,7 @@ public class MissileWarsPlayer {
                     return;
                 }
                 
-                if (ConfigUtils.outOfBounds(player, arena)) {
+                if (ArenaUtils.outOfBounds(player, arena)) {
                     player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
                     outOfBounds = true;
                     lastAvailable = false;

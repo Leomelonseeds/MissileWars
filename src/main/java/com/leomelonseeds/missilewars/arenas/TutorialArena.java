@@ -22,8 +22,11 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
@@ -219,7 +222,7 @@ public class TutorialArena extends ClassicArena {
         
         // Spawn particles for stage 4 (defense)
         if (s == 4) {
-            if (!ConfigUtils.inShield(this, player.getLocation(), "blue", 2)) {
+            if (!ArenaUtils.inShield(this, player.getLocation(), TeamName.BLUE, 2)) {
                 player.teleport(getPlayerSpawn(player));
             }
             
@@ -241,8 +244,8 @@ public class TutorialArena extends ClassicArena {
                 }
             }, 10, 5));
             
-            String deck = getPlayerInArena(player.getUniqueId()).getDeck().getName();
-            if (deck.equals("Berserker") || deck.equals("Vanguard")) {
+            DeckStorage deck = getPlayerInArena(player.getUniqueId()).getDeck().getType();
+            if (deck == DeckStorage.BERSERKER || deck == DeckStorage.VANGUARD) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
             }
             return;
@@ -372,7 +375,7 @@ public class TutorialArena extends ClassicArena {
         if (entity instanceof Player) {
             player = (Player) entity;
         } else {
-            player = ConfigUtils.getAssociatedPlayer(entity, this);
+            player = ArenaUtils.getAssociatedPlayer(entity, this);
         }
         
         Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());

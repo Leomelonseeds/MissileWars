@@ -37,11 +37,12 @@ import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckManager;
-import com.leomelonseeds.missilewars.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -347,17 +348,17 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid the UUID to check for
      * @return the team that the player with uuid is on
      */
-    public String getTeam(UUID uuid) {
+    public TeamName getTeam(UUID uuid) {
         if (redTeam == null || blueTeam == null) {
-            return "no team";
+            return TeamName.NONE;
         }
         if (redTeam.containsPlayer(uuid)) {
-            return "red";
+            return redTeam.getName();
         }
         if (blueTeam.containsPlayer(uuid)) {
-            return "blue";
+            return blueTeam.getName();
         }
-        return "no team";
+        return TeamName.NONE;
     }
 
     /**
@@ -891,7 +892,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 continue;
             }
             
-            if (!(running || resetting) || getTeam(uuid).equals("no team")) {
+            if (!(running || resetting) || getTeam(uuid) == TeamName.NONE) {
                 announceMessage("messages.spectate-join-others", player);
                 spectators.add(player);
                 redQueue.remove(player);
@@ -976,8 +977,8 @@ public abstract class Arena implements ConfigurationSerializable {
             redSpawn.setWorld(getWorld());
 
             // Setup scoreboard and teams
-            blueTeam = new MissileWarsTeam("blue", this, blueSpawn);
-            redTeam = new MissileWarsTeam("red", this, redSpawn);
+            blueTeam = new MissileWarsTeam(TeamName.BLUE, this, blueSpawn);
+            redTeam = new MissileWarsTeam(TeamName.RED, this, redSpawn);
             
             // Setup game timers
             // Game start
