@@ -407,6 +407,10 @@ public class ConfigUtils {
      * @return
      */
     public static double getAbilityStat(Passive ability, int level, Stat stat) {
+        if (ability == null) {
+            return 0;
+        }
+        
         String abilityPath;
         Passive.Type type = ability.getType();
         if (type == Type.GPASSIVE) {

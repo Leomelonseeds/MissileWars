@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -333,6 +334,19 @@ public class JSONManager {
     }
     
     /**
+     * Get a passive and level from a player json.
+     * 
+     * @param json must be a preset json
+     * @param type
+     * @return right is 0 if passive does not exist or no passive selected
+     */
+    public Pair<Passive, Integer> getPassive(JSONObject json, Passive.Type type) {
+        JSONObject typeJSON = json.getJSONObject(type.toString());
+        Passive passive = Passive.fromString(typeJSON.getString("selected"));
+        return Pair.of(passive, passive == null ? 0 : typeJSON.getInt("level"));
+    }
+    
+    /**
      * Check if player has some ability selected. 
      * If so, return the level. If not, return 0.
      * 
@@ -340,9 +354,9 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getAbility(UUID uuid, Passive ability) {
+    public int getLevel(UUID uuid, Passive ability) {
         JSONObject json = getPlayerPreset(uuid);
-        return getAbility(json, ability);
+        return getLevel(json, ability);
     }
     
     /**
@@ -352,12 +366,9 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getAbility(JSONObject json, Passive ability) {
-        String type = ability.getType().toString();
-        if (json.has(type) && json.getJSONObject(type).getString("selected").equals(ability.toString())) {
-            return json.getJSONObject(type).getInt("level");
-        }
-        return 0;
+    public int getLevel(JSONObject json, Passive ability) {
+        Pair<Passive, Integer> res = getPassive(json, ability.getType());
+        return res.getLeft() == ability ? res.getRight() : 0;
     }
     
     /**

@@ -31,6 +31,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
@@ -355,10 +356,9 @@ public class MiscListener implements Listener {
                     target, 
                     DamageCause.ENTITY_ATTACK, 
                     DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).build(), 
-                    Collections.emptyMap(), 
+                    Map.of(DamageModifier.BASE, 0.001), 
                     Collections.emptyMap(), 
                     false);
-            extraEvent.setDamage(0.001);
             Bukkit.getPluginManager().callEvent(extraEvent);
             return;
         }

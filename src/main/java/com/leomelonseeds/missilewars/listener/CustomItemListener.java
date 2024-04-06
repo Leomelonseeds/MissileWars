@@ -466,7 +466,7 @@ public class CustomItemListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
         UUID uuid = thrower.getUniqueId();
-        int poke = plugin.getJSON().getAbility(uuid, Passive.POKEMISSILES);
+        int poke = plugin.getJSON().getLevel(uuid, Passive.POKEMISSILES);
         if (poke > 0) {
             String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
             if (offName != null && !thrower.hasCooldown(offhand.getType()) && offhand.getType().toString().contains("SPAWN_EGG")) {
@@ -556,7 +556,7 @@ public class CustomItemListener implements Listener {
         }, 20);
         
         // Add particle effects for prickly/poke
-        int prickly = plugin.getJSON().getAbility(uuid, Passive.PRICKLY_PROJECTILES);
+        int prickly = plugin.getJSON().getLevel(uuid, Passive.PRICKLY_PROJECTILES);
         if (prickly <= 0 && poke <= 0) {
             return;
         }
@@ -616,7 +616,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Allow collisions if prickly projectiles
-        if (MissileWarsPlugin.getPlugin().getJSON().getAbility(thrower.getUniqueId(), Passive.PRICKLY_PROJECTILES) > 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Passive.PRICKLY_PROJECTILES) > 0) {
             return;
         }
 

@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.Passive.Stat;
+import com.leomelonseeds.missilewars.decks.Passive.Type;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
@@ -68,8 +70,9 @@ public class DeckManager {
         List<ItemStack> gear = new ArrayList<>();
         
         // Figure out utility and missile multipliers
-        Passive gpassive = Passive.fromString(json.getJSONObject("gpassive").getString("selected"));
-        int glevel = json.getJSONObject("gpassive").getInt("level");
+        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(json, Type.GPASSIVE);
+        Passive gpassive = jsonPassive.getLeft();
+        int glevel = jsonPassive.getRight();
         double mmult = 1;
         double umult = 1;
         double maxmult = 1;
@@ -100,7 +103,7 @@ public class DeckManager {
                 ItemStack i = createItem(key, level, isMissile);
                 
                 // Change color of lava splash
-                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getAbility(uuid, Passive.ENDER_SPLASH) > 0) {
+                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getLevel(uuid, Passive.ENDER_SPLASH) > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
                     String name = ConfigUtils.toPlain(pmeta.displayName());
                     name = name.replaceFirst("9", "d");  // Make name pink
@@ -111,7 +114,7 @@ public class DeckManager {
                 }
                 
                 // Give spectral arrows in case of sentinel
-                int spectral = plugin.getJSON().getAbility(uuid, Passive.SPECTRAL_ARROWS);
+                int spectral = plugin.getJSON().getLevel(uuid, Passive.SPECTRAL_ARROWS);
                 if (i.getType() == Material.ARROW && spectral > 0) {
                     i.setType(Material.SPECTRAL_ARROW);
                 }
@@ -174,7 +177,7 @@ public class DeckManager {
         
         // Add custom effects
         String custom = null;
-        if (ench == Enchantment.PROTECTION_EXPLOSIONS && plugin.getJSON().getAbility(json, Passive.ROCKETEER) > 0) {
+        if (ench == Enchantment.PROTECTION_EXPLOSIONS && plugin.getJSON().getLevel(json, Passive.ROCKETEER) > 0) {
             custom = "Blast Protection";
         } else if (ench == Enchantment.LOOT_BONUS_BLOCKS) {
             custom = "Haste";

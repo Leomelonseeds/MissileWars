@@ -257,7 +257,7 @@ public class ArenaGameruleListener implements Listener {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
 
             // Spiked Quiver
-            int spiked = plugin.getJSON().getAbility(uuid, Passive.SPIKED_QUIVER);
+            int spiked = plugin.getJSON().getLevel(uuid, Passive.SPIKED_QUIVER);
             if (spiked > 0) {
                 if (effects == null) {
                     effects = List.of(new PotionEffectType[] {
@@ -325,7 +325,7 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Longshot
-        if (plugin.getJSON().getAbility(uuid, Passive.LONGSHOT) > 0) {
+        if (plugin.getJSON().getLevel(uuid, Passive.LONGSHOT) > 0) {
             bowShots.put(player, player.getLocation());
             // 5 seconds should be enough for a bow shot, riiiight
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -335,7 +335,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Spectral arrows
-        int spectral = plugin.getJSON().getAbility(uuid, Passive.SPECTRAL_ARROWS);
+        int spectral = plugin.getJSON().getLevel(uuid, Passive.SPECTRAL_ARROWS);
         if (spectral > 0 && event.getProjectile() instanceof SpectralArrow) {
             SpectralArrow arrow = (SpectralArrow) event.getProjectile();
             int duration = (int) ConfigUtils.getAbilityStat(Passive.SPECTRAL_ARROWS, spectral, Stat.DURATION);
@@ -380,7 +380,7 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Creepershot
-        if (plugin.getJSON().getAbility(player.getUniqueId(), Passive.CREEPERSHOT) > 0) {
+        if (plugin.getJSON().getLevel(player.getUniqueId(), Passive.CREEPERSHOT) > 0) {
             ItemStack offhand = inv.getItemInOffHand();
             if (offhand.getType() != Material.CREEPER_HEAD || player.hasCooldown(offhand.getType())) {
                 return;
@@ -438,7 +438,7 @@ public class ArenaGameruleListener implements Listener {
                 eventDamager instanceof ExplosiveMinecart ||
                 eventDamager instanceof Creeper) {
                 // Check bers rocketeer
-                int rocketeer = plugin.getJSON().getAbility(player.getUniqueId(), Passive.ROCKETEER);
+                int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Passive.ROCKETEER);
                 if (rocketeer > 0) {
                     // If boots have UNBREAKING, it means the custom blastprot is set (see DeckManager)
                     // In this case, the level of unbreaking corresponds to the level of blastprot
@@ -508,7 +508,7 @@ public class ArenaGameruleListener implements Listener {
             // Longshot calculations
             if (projectile.getType() == EntityType.ARROW) {
                 if (bowShots.containsKey(damager) && bowShots.get(damager).getWorld().equals(damager.getWorld())) {
-                    int longshot = plugin.getJSON().getAbility(damager.getUniqueId(), Passive.LONGSHOT);
+                    int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT);
                     double plus = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PLUS);
                     double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
                     double dmg = event.getDamage();
@@ -547,7 +547,7 @@ public class ArenaGameruleListener implements Listener {
                 }
                 
                 // Check for the passive
-                int prickly = plugin.getJSON().getAbility(damager.getUniqueId(), Passive.PRICKLY_PROJECTILES);
+                int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.PRICKLY_PROJECTILES);
                 if (prickly == 0) {
                     return;
                 }
@@ -683,7 +683,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        int deconstructor = plugin.getJSON().getAbility(player.getUniqueId(), Passive.DECONSTRUCTOR);
+        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Passive.DECONSTRUCTOR);
         if (deconstructor <= 0) {
             return;
         }

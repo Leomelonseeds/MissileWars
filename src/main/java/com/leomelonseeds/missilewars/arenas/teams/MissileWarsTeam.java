@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -31,6 +32,7 @@ import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.decks.Passive;
 import com.leomelonseeds.missilewars.decks.Passive.Stat;
+import com.leomelonseeds.missilewars.decks.Passive.Type;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -88,8 +90,8 @@ public class MissileWarsTeam {
         team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
         if (team == null) {
             team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName);
-            team.displayName(name.equals("red") ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
-            team.color(name.equals("red") ? NamedTextColor.RED : NamedTextColor.BLUE);
+            team.displayName(name == TeamName.RED ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
+            team.color(name == TeamName.RED ? NamedTextColor.RED : NamedTextColor.BLUE);
         }
         
         // Temp value while async calculations run
@@ -291,8 +293,13 @@ public class MissileWarsTeam {
         }
         
         // Potion effect passive activation
-        Passive passive = Passive.fromString(json.getJSONObject("passive").getString("selected"));
-        int level = json.getJSONObject("passive").getInt("level");
+        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(json, Type.PASSIVE);
+        Passive passive = jsonPassive.getLeft();
+        int level = jsonPassive.getRight();
+        if (level <= 0) {
+            return;
+        }
+        
         int amp = (int) ConfigUtils.getAbilityStat(passive, level, Stat.AMPLIFIER);
         if (amp == 0) {
             return;
