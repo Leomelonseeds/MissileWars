@@ -327,13 +327,13 @@ public class TutorialArena extends ClassicArena {
     
     // Remove the Xs for obsidian shield throw
     private void removeXs(UUID uuid) {
-        if (!xs.containsKey(uuid)) {
-            return;
+        if (xs.containsKey(uuid)) {
+            xs.remove(uuid);
         }
         
-        xs.remove(uuid);
-        particles.get(uuid).cancel();
-        particles.remove(uuid);
+        if (particles.containsKey(uuid)) {
+            particles.remove(uuid).cancel();
+        }
     }
     
     /**
