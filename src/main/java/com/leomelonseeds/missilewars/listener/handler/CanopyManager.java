@@ -119,6 +119,10 @@ public class CanopyManager implements Listener {
         Location target = eyeLoc.clone().add(distance).toCenterLocation();
         ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
         signal.setDropItem(false);
+        
+        // Add player to canopy cooldown list to give item back on death
+        InventoryUtils.consumeItem(player, playerArena, hand, -1);
+        canopy_cooldown.put(player, hand);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -129,13 +133,9 @@ public class CanopyManager implements Listener {
                 
                 // Updates canopy so it travels to the correct location
                 // No clue why I need to do this but oh well
-                signal.setTargetLocation(target);
+                signal.setTargetLocation(target, false);
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 0, 5);
-        
-        // Add player to canopy cooldown list to give item back on death
-        InventoryUtils.consumeItem(player, playerArena, hand, -1);
-        canopy_cooldown.put(player, hand);
         
         // Send sound 2 seconds later, tp 3 sec later
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
@@ -150,8 +150,8 @@ public class CanopyManager implements Listener {
     }
     
     private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal) {
-        // Ignore offline players. Obviously
-        if (!player.isOnline()) {
+        // Ignore offline players, or if signal is dead
+        if (!player.isOnline() || signal.isDead()) {
             return;
         }
         
