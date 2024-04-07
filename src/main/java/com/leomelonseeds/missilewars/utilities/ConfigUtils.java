@@ -334,9 +334,9 @@ public class ConfigUtils {
         Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(uuid);
         String displayName = player.isOnline() ? toPlain(Bukkit.getPlayer(uuid).displayName()) : player.getName();
         if (playerArena != null) {
-            String teamColor = playerArena.getTeamColor(player.getUniqueId());
-            if (teamColor != null) {
-                return teamColor + removeColors(displayName);
+            TeamName team = playerArena.getTeam(uuid);
+            if (team != TeamName.NONE) {
+                return team.getColor() + removeColors(displayName);
             }
         }
         return displayName;

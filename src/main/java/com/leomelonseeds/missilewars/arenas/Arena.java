@@ -390,6 +390,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
     /**
      * Get the number of seconds until the game starts.
+     * Adds offset of 50ms to account for a tick of lag
      *
      * @return the number of seconds until the game starts
      */
@@ -398,11 +399,12 @@ public abstract class Arena implements ConfigurationSerializable {
         if (startTime == null) {
             return 0;
         }
-        return Duration.between(LocalDateTime.now(), startTime).toSeconds();
+        return Duration.between(LocalDateTime.now(), startTime).plusMillis(50).toSeconds();
     }
 
     /**
      * Get the number of seconds remaining in the game.
+     * Adds offset of 50ms to account for a tick of lag
      *
      * @return the number of seconds remaining in the game
      */
@@ -411,7 +413,7 @@ public abstract class Arena implements ConfigurationSerializable {
             return 0;
         }
         int totalSecs = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length") * 60;
-        long secsTaken = Duration.between(startTime, LocalDateTime.now()).toSeconds();
+        long secsTaken = Duration.between(startTime, LocalDateTime.now()).plusMillis(50).toSeconds();
         return totalSecs - secsTaken;
     }
 
@@ -422,7 +424,7 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public String getTimeRemaining() {
         // Adjust for correct timings
-        int seconds = Math.max((int) getSecondsRemaining() - 1, 0);
+        int seconds = Math.max((int) getSecondsRemaining(), 0);
         int untilNextStage;
         String status;
         if (seconds > 1200) {
@@ -942,7 +944,12 @@ public abstract class Arena implements ConfigurationSerializable {
                 if (finalSecInCd <= cdNear) {
                     announceMessage("messages.lobby-countdown-near", null);
                 }
-                setXpLevel(finalSecInCd);  
+                
+                for (MissileWarsPlayer player : players) {
+                    if (player.getMCPlayer() != null) {
+                        player.getMCPlayer().setLevel(finalSecInCd);
+                    }
+                }
             }, (secCountdown - secInCd) * 20));
         }
     }
@@ -1357,35 +1364,6 @@ public abstract class Arena implements ConfigurationSerializable {
         for (MissileWarsPlayer player : players) {
         	Player mcPlayer = player.getMCPlayer();
             ConfigUtils.sendConfigMessage(path, mcPlayer, this, focus != null ? focus.getMCPlayer() : null);
-        }
-    }
-
-    /**
-     * Sets the XP level for everyone in the arena.
-     *
-     * @param level the level to set XP to
-     */
-    public void setXpLevel(int level) {
-        for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayer() != null) {
-                player.getMCPlayer().setLevel(level);
-            }
-        }
-    }
-
-    /**
-     * Get the team color of a given player.
-     *
-     * @param id the player's UUID
-     * @return the team color of the given player, in the form of a readily available chatcolor string
-     */
-    public String getTeamColor(UUID id) {
-        if (blueTeam != null && blueTeam.containsPlayer(id)) {
-            return "§9";
-        } else if (redTeam != null && redTeam.containsPlayer(id)) {
-            return "§c";
-        } else {
-            return null;
         }
     }
 
