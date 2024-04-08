@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -35,6 +34,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.exception.NPCLoadException;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -217,7 +217,7 @@ public class ConfigUtils {
     }
 
     /**
-     * Send a sound to the player.
+     * Send a sound to the player. Sound follows player.
      *
      * @param path the key of the sound in the sounds.yml file
      * @param player the player to send sound to
@@ -229,11 +229,12 @@ public class ConfigUtils {
         	return;
         }
 
-        Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
+        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundConfig.getString(path + ".sound"));
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
-        player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
+        Sound res = Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch);
+        player.playSound(res, Sound.Emitter.self());
     }
 
     /**
@@ -251,7 +252,7 @@ public class ConfigUtils {
         	return;
         }
 
-        Sound sound = Sound.valueOf(soundConfig.getString(path + ".sound"));
+        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundConfig.getString(path + ".sound"));
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
