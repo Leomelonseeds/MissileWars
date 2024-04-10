@@ -73,6 +73,7 @@ messages:
     - "&b========================================"
   rankup-others: "&b%umw_focus% &franked up from %previous% &fto %current%&f!"
   canopy-blocked: "&cYour teleportation destination is blocked!"
+  canopy-fall: "&cYou've fallen too far to survive!"
   purchase-unsuccessful: "&cYou don't have enough for this purchase!"
   cannot-purchase: "&cYou may only choose one passive/ability per category!"
   tutorial-new:

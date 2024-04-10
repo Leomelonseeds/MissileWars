@@ -22,6 +22,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -481,5 +482,17 @@ public class ConfigUtils {
      */
     public static String toPlain(Component component) {
         return LegacyComponentSerializer.legacySection().serialize(component);
+    }
+    
+    
+    /**
+     * Shorthand for scheduling a task
+     * 
+     * @param ticks
+     * @param runnable
+     * @return the task
+     */
+    public static BukkitTask schedule(int ticks, Runnable runnable) {
+        return Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> runnable.run(), ticks);
     }
 }

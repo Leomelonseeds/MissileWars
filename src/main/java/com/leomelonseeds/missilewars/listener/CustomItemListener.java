@@ -382,12 +382,6 @@ public class CustomItemListener implements Listener {
     public void architectLeaves(BlockPlaceEvent event) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
-        Block block = event.getBlock();
-        if (CanopyManager.getInstance().isFrozen(player)) {
-            event.setCancelled(true);
-            return;
-        }
-
         Arena playerArena = ArenaUtils.getArena(player);
         ItemStack item = event.getItemInHand();
         if ((playerArena == null) || !item.getType().toString().contains("LEAVES")) {
@@ -395,7 +389,7 @@ public class CustomItemListener implements Listener {
         }
         
         // no max height
-        Location loc = block.getLocation();
+        Location loc = event.getBlock().getLocation();
         if (loc.getBlockY() > plugin.getConfig().getInt("max-height")) {
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", event.getPlayer(), null, null);
             event.setCancelled(true);
@@ -411,23 +405,19 @@ public class CustomItemListener implements Listener {
             return;
         }
 
-        // Register block place
-        playerArena.registerShieldBlockEdit(block.getLocation(), true);
+        // Register block place.
         InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? 
                     player.getInventory().getHeldItemSlot() : 40);
         
         // Remove leaves after 30 sec
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Must still be leaves
-                if (!loc.getBlock().getType().toString().contains("LEAVES")) {
-                    return;
-                }
-                
-                loc.getBlock().setType(Material.AIR);
+        ConfigUtils.schedule(30 * 20, () -> {
+            // Must still be leaves
+            if (!loc.getBlock().getType().toString().contains("LEAVES")) {
+                return;
             }
-        }.runTaskLater(plugin, 30 * 20);
+            
+            loc.getBlock().setType(Material.AIR);
+        });
     }
 
     /** Handle projectile items structure creation */

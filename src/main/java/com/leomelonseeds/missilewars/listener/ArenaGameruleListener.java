@@ -479,16 +479,6 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
         }
-        
-        if (CanopyManager.getInstance().isFrozen(damager)) {
-            event.setCancelled(true);
-            return;
-        }
-        
-        // Bow boosting calculation
-        if (player.equals(damager)) {
-            
-        }
 
         // Stop event if damager and damaged are on same team
         TeamName team = arena.getTeam(player.getUniqueId());

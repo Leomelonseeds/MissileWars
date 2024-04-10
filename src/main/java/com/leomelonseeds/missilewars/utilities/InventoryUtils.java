@@ -134,6 +134,14 @@ public class InventoryUtils {
         Item newitem = player.getWorld().dropItem(player.getLocation(), item);
         newitem.setOwner(player.getUniqueId());
         newitem.setPickupDelay(0);
+        
+        // If the player is falling into the void, the item may not get picked up.
+        // Teleport the item back to player, slightly underneath them to make sure.
+        ConfigUtils.schedule(1, () -> {
+            if (!newitem.isDead()) {
+                newitem.teleport(player.getLocation().add(0, -1, 0));
+            }
+        });
     }
 
 
