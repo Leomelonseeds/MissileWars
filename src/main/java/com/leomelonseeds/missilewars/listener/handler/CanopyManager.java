@@ -197,7 +197,7 @@ public class CanopyManager {
         // Stop players from placing missiles or using utility for a second
         loc.getBlock().setType(Material.COBWEB);
         canopy_freeze.add(player);
-        ConfigUtils.schedule(30, () -> canopy_freeze.remove(player));
+        ConfigUtils.schedule(10, () -> canopy_freeze.remove(player));
         
         // Do final checks
         ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
