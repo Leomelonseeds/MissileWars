@@ -6,12 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
@@ -460,11 +458,9 @@ public class CustomItemListener implements Listener {
         if (poke > 0) {
             String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
             if (offName != null && !thrower.hasCooldown(offhand.getType()) && offhand.getType().toString().contains("SPAWN_EGG")) {
+                thrown.setItem(offhand);
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
                 InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
-            } else {
-                // Set poke to 0 so the particles won't activate
-                poke = 0;
             }
         }
         projectileConsume(hand, thrower, playerArena);
@@ -545,9 +541,9 @@ public class CustomItemListener implements Listener {
             }
         }, 20);
         
-        // Add particle effects for prickly/poke
+        // Add particle effects for prickly
         int prickly = plugin.getJSON().getLevel(uuid, Passive.PRICKLY_PROJECTILES);
-        if (prickly <= 0 && poke <= 0) {
+        if (prickly <= 0) {
             return;
         }
         
@@ -557,8 +553,7 @@ public class CustomItemListener implements Listener {
                 if (thrown.isDead()) {
                     this.cancel();
                 }
-                DustOptions dustOptions = new DustOptions(prickly > 0 ? Color.MAROON : Color.LIME, 1.0F);
-                playerArena.getWorld().spawnParticle(Particle.REDSTONE, thrown.getLocation(), 1, dustOptions);
+                playerArena.getWorld().spawnParticle(Particle.CRIT, thrown.getLocation(), 1, 0, 0, 0, 0);
             }
         }.runTaskTimer(plugin, 1, 1);
     }

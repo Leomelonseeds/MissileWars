@@ -120,9 +120,6 @@ public class TutorialArena extends ClassicArena {
         }) {
             l.getBlock().setType(Material.BLUE_STAINED_GLASS);
         }
-
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 128, true, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 6, true, false));
         
         return loc;
     }
@@ -218,6 +215,8 @@ public class TutorialArena extends ClassicArena {
         // Teleport player nearer red base on stage 3
         if (s == 3) {
             player.teleport(getPlayerSpawn(player));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 128, true, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 6, true, false));
             return;
         }
         
