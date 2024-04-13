@@ -20,7 +20,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.json.JSONObject;
 
@@ -311,25 +310,6 @@ public class MissileWarsTeam {
                 break;
             case ADRENALINE:
                 mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
-                break;
-            case WARDEN:
-                Arena arena = plugin.getArenaManager().getArena(player.getMCPlayerId());
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        // Cancel if no team
-                        if (!containsPlayer(player.getMCPlayerId())) {
-                            this.cancel();
-                            return;
-                        }
-                        // Don't allow if not in base
-                        if (!ArenaUtils.inShield(arena, mcPlayer.getLocation(), name, 5)) {
-                            return;
-                        }
-                        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, amp));
-                        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, amp));
-                    }
-                }.runTaskTimer(plugin, 10, 10);
                 break;
             default:
                 return;

@@ -10,7 +10,7 @@ public enum Passive {
     ENDER_SPLASH("lavasplash", Type.PASSIVE, DeckStorage.VANGUARD),
     
     // Sentinel
-    WARDEN("warden", Type.PASSIVE, DeckStorage.SENTINEL),
+    IMPACT_TRIGGER("warden", Type.PASSIVE, DeckStorage.SENTINEL),
     LONGSHOT("longshot", Type.PASSIVE, DeckStorage.SENTINEL),
     SPECTRAL_ARROWS("spectral", Type.PASSIVE, DeckStorage.SENTINEL),
     

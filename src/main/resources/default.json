@@ -44,7 +44,7 @@
 			"skillpoints": 2,
 			"fire_protection": 0,
 			"flame": 1,
-			"punch": 1,
+			"punch": 0,
 			"sharpness": 2,
 			"utility": {
 				"torpedo": 2,

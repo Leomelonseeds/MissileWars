@@ -139,6 +139,7 @@ messages:
   stage-skip-fail-game: "&c&l[!] &7You must be in-game to skip this stage."
   wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
   map: "&7Current map: %map%"
+  structure-too-close: "&cYou cannot spawn structures this close to yourself!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -284,9 +285,9 @@ scoreboard:
     - "&frun and jump to ride it"
   stage3: 
     - "&fDestroy any enemy portal"
-    - "&fby riding over and placing"
-    - "&fmany missiles in the same"
-    - "&fspot inside their base"
+    - "&fby &f&nriding over&f and placing"
+    - "&fmany missiles in the &f&nsame"
+    - "&f&nspot&f inside their base"
   stage4: 
     - "&f&oTorpedos &fand &f&oObsidian"
     - "&f&oShields &fspawn after &a1s"

@@ -1189,21 +1189,14 @@ Sentinel:
         spcost: 1
   passive:
     warden:
-      name: "&eWarden"
+      name: "&eImpact Trigger"
       lore:
       - ""
-      - "&7Receive Strength and Resistance with"
-      - "&7amplifier %amplifier% &7while in your base."
-      cost: 1000
+      - "&7Projectile utilities now spawn"
+      - "&7immediately when they impact a"
+      - "&7block, instead of breaking."
       1:
-        spcost: 1
-        amplifier: 0
-      2:
-        spcost: 1
-        amplifier: 1
-      3:
-        spcost: 1
-        amplifier: 2
+        spcost: 3
     longshot:
       name: "&eLongshot"
       lore:

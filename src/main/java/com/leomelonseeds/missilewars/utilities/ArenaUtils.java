@@ -6,8 +6,10 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -110,5 +112,27 @@ public class ArenaUtils {
      */
     public static Arena getArena(Player player) {
         return MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+    }
+    
+    
+    /**
+     * Perform an action every tick, typically adding a projectile trail,
+     * until the given projectile is dead
+     * 
+     * @param projectile
+     * @param runnable
+     */
+    public static void doUntilDead(Projectile projectile, Runnable runnable) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (projectile.isDead()) {
+                    this.cancel();
+                    return;
+                }
+                
+                runnable.run();
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
 }

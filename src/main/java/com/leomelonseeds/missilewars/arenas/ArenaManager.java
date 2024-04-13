@@ -391,7 +391,7 @@ public class ArenaManager {
                 Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team, null, null);
                 Location teamLoc = new Location(arenaWorld, teamVec.getX(), teamVec.getY(), teamVec.getZ(), 90, 0);
                 NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, 
-                        (team.equals("red") ? "§cRed" : "§9Blue") + " Team");
+                        (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team");
                 CommandTrait enqueue = new CommandTrait();
                 enqueue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueue" + team,
                         CommandTrait.Hand.BOTH).player(true));
