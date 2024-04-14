@@ -13,7 +13,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -262,11 +262,11 @@ public class MiscListener implements Listener {
     
     @EventHandler
     public void igniteTNT(ProjectileHitEvent e) {
-        if (e.getEntityType() != EntityType.ARROW) {
+        if (!e.getEntityType().toString().contains("ARROW")) {
             return;
         }
         
-        Arrow arrow = (Arrow) e.getEntity();
+        AbstractArrow arrow = (AbstractArrow) e.getEntity();
         if (arrow.getFireTicks() <= 0) {
             return;
         }

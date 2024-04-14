@@ -28,8 +28,7 @@ public enum DeckStorage {
         "&b",
         Map.of(
             "sharpness", Enchantment.DAMAGE_ALL,
-            "flame", Enchantment.ARROW_FIRE,
-            "punch", Enchantment.ARROW_KNOCKBACK
+            "flame", Enchantment.ARROW_FIRE
         ),
         Map.of("fire_protection", Enchantment.PROTECTION_FIRE)
     ),

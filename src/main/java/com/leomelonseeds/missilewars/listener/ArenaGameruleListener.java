@@ -340,7 +340,7 @@ public class ArenaGameruleListener implements Listener {
             arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
             arrow.setFireTicks(proj.getFireTicks());
             arrow.setShooter(player);
-            arrow.setDamage(proj.getDamage() + multiplier); // This makes the arrow damage seem closer to that of a normal speed arrow
+            arrow.setDamage(proj.getDamage() + heavy * 0.5); // This makes the arrow damage seem closer to that of a normal speed arrow
             arrow.setCritical(proj.isCritical());
             arrow.setPickupStatus(proj.getPickupStatus());
             
@@ -369,7 +369,7 @@ public class ArenaGameruleListener implements Listener {
                 
                 Location projLoc = proj.getLocation();
                 double extradmg = getExtraLongshotDamage(proj, longshot, projLoc);
-                double ratio = extradmg / max;
+                double ratio = Math.min(1, 2 * extradmg / max );
                 int g = (int) (255 * (1 - ratio));
                 int r = (int) (255 * ratio);
                 DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
@@ -630,7 +630,7 @@ public class ArenaGameruleListener implements Listener {
     
     // Multiply current player velocity. Only call during a damage event!
     private void multiplyKnockback(Player player, double multiplier) {
-        ConfigUtils.schedule(1, () -> {
+        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
             Vector velocity = player.getVelocity();
             double velx = velocity.getX() * multiplier;
             double velz = velocity.getZ() * multiplier;
