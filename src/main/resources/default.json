@@ -12,12 +12,12 @@
 		"defaultpreset": {
 			"skillpoints": 2,
 			"feather_falling": 0,
-			"sharpness": 2,
+			"sharpness": 3,
 			"fire_aspect": 0,
 			"utility": {
 				"splash": 2,
 				"lingering_harming": 2,
-				"canopy": 2
+				"canopy": 3
 			},
 			"missiles": {
 				"tomahawk": 2,
@@ -75,14 +75,14 @@
 		"boosterball": false,
 		"creepershot": false,
 		"defaultpreset": {
-			"skillpoints": 1,
+			"skillpoints": 5,
 			"blast_protection": 0,
 			"multishot": 0,
 			"quick_charge": 0,
 			"sharpness": 2,
 			"utility": {
 				"creeper": 1,
-				"fireball": 2,
+				"fireball": 3,
 				"arrows": 3
 			},
 			"missiles": {
@@ -94,7 +94,7 @@
 			},
 			"passive": {
 				"selected": "slownessarrows",
-				"level": 2
+				"level": 3
 			},
 			"gpassive": {
 				"selected": "None",
