@@ -45,11 +45,11 @@
 			"fire_protection": 0,
 			"flame": 1,
 			"punch": 0,
-			"sharpness": 2,
+			"sharpness": 3,
 			"utility": {
 				"torpedo": 2,
 				"obsidianshield": 2,
-				"arrows": 2
+				"arrows": 3
 			},
 			"missiles": {
 				"guardian": 1,
