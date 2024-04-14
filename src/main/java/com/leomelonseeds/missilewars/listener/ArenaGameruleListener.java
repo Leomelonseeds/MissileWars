@@ -22,6 +22,7 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -85,7 +86,7 @@ import net.kyori.adventure.text.Component;
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleListener implements Listener {
     
-    public static Map<Player, Location> longShots = new HashMap<>();
+    public static Map<Arrow, Location> longShots = new HashMap<>(); // Origin location of projectile
     public static Set<Player> saidGG = new HashSet<>();
     private static List<PotionEffectType> effects = null;
 
@@ -257,7 +258,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Berserker user
         UUID uuid = player.getUniqueId();
-        Projectile proj = (Projectile) event.getProjectile();
+        Arrow proj = (Arrow) event.getProjectile();
         if (event.getBow().getType() == Material.CROSSBOW) {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
 
@@ -330,42 +331,57 @@ public class ArenaGameruleListener implements Listener {
         }
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
+        // Heavy arrows
+        int heavy = plugin.getJSON().getLevel(uuid, Passive.HEAVY_ARROWS);
+        if (heavy > 0) {
+            double slow = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.PERCENTAGE) / 100;
+            double multiplier = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.MULTIPLIER);
+            SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);
+            arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
+            arrow.setFireTicks(proj.getFireTicks());
+            arrow.setShooter(player);
+            arrow.setDamage(proj.getDamage() + multiplier); // This makes the arrow damage seem closer to that of a normal speed arrow
+            arrow.setCritical(proj.isCritical());
+            arrow.setPickupStatus(proj.getPickupStatus());
+            
+            // Encode knockback information into glowing ticks. This means that multiplier * 4
+            // must be an int for this calculation to be accurate
+            arrow.setGlowingTicks((int) (4 * multiplier));
+            event.setProjectile(arrow);
+            return;
+        }
+        
+        // Past this point, we are for sure shooting a normal arrow. 
+        // Force client sync by setting velocity, preventing arrow bounce
+        proj.setVelocity(proj.getVelocity());
+        
         // Longshot
         int longshot = plugin.getJSON().getLevel(uuid, Passive.LONGSHOT);
         if (longshot > 0) {
-            longShots.put(player, player.getLocation());
+            longShots.put(proj, player.getLocation());
             
             // Add gradually increasing color particles
             double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
             BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
-                if (!longShots.containsKey(player)) {
+                if (!longShots.containsKey(proj) || ((AbstractArrow) proj).isInBlock()) {
                     return;
                 }
                 
                 Location projLoc = proj.getLocation();
-                double extradmg = getExtraLongshotDamage(player, longshot, projLoc);
+                double extradmg = getExtraLongshotDamage(proj, longshot, projLoc);
                 double ratio = extradmg / max;
                 int g = (int) (255 * (1 - ratio));
                 int r = (int) (255 * ratio);
-                DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 1.0F);
+                DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
                 proj.getWorld().spawnParticle(Particle.REDSTONE, projLoc, 1, dust);
             });
             
             // 5 seconds should be enough for a bow shot, riiiight
             ConfigUtils.schedule(100, () -> {
-                longShots.remove(player);
+                longShots.remove(proj);
                 particles.cancel();
             });
             
-            return;
-        }
-        
-        // Spectral arrows
-        int spectral = plugin.getJSON().getLevel(uuid, Passive.SPECTRAL_ARROWS);
-        if (spectral > 0 && event.getProjectile() instanceof SpectralArrow) {
-            SpectralArrow arrow = (SpectralArrow) proj;
-            int duration = (int) ConfigUtils.getAbilityStat(Passive.SPECTRAL_ARROWS, spectral, Stat.DURATION);
-            arrow.setGlowingTicks(duration * 20);
             return;
         }
     }
@@ -475,14 +491,8 @@ public class ArenaGameruleListener implements Listener {
                         event.setDamage(event.getDamage() * (1 - 0.08 * blastprot));
                     }
                     
-                    // Apply extra velocity from rocketeer if available and restore enchantment
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        double rmult = ConfigUtils.getAbilityStat(Passive.ROCKETEER, rocketeer, Stat.MULTIPLIER);
-                        Vector velocity = player.getVelocity();
-                        double velx = velocity.getX() * rmult;
-                        double velz = velocity.getZ() * rmult;
-                        player.setVelocity(new Vector(velx, velocity.getY(), velz));
-                    }, 1);
+                    // Apply extra velocity from rocketeer if available
+                    multiplyKnockback(player, ConfigUtils.getAbilityStat(Passive.ROCKETEER, rocketeer, Stat.MULTIPLIER));
                 }
                 
                 // Fireballs should not do dmg to players
@@ -514,97 +524,100 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Do arrowhealth/longshot calculations
-        if (isProjectile) {
-            // Do sentinel longshot checks
-            Projectile projectile = (Projectile) event.getDamager();
-            if (!(projectile.getShooter() instanceof Player)) {
-                return;
-            }
-            
-            if (projectile.getType() == EntityType.ARROW) {
-                // Check for longshot
-                double extradmg = getExtraLongshotDamage(
-                        damager, 
+        if (!isProjectile) {
+            return;
+        }
+        
+        Projectile projectile = (Projectile) event.getDamager();
+        if (!(projectile.getShooter() instanceof Player)) {
+            return;
+        }
+
+        EntityType type = projectile.getType();
+        if (type.toString().contains("ARROW")) {
+            // Do sentinel longshot checks. Otherwise, if its spectral arrow,
+            // multiply knockback by glowing ticks / 4
+            double extradmg = 0;
+            if (type == EntityType.ARROW) {
+                extradmg = getExtraLongshotDamage(
+                        projectile, 
                         plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT), 
                         player.getLocation());
                 if (extradmg > 0) {
                     event.setDamage(event.getDamage() + extradmg);
                 }
-
-                // Arrowhealth message
-                if (player.getHealth() - event.getFinalDamage() > 0 && !player.equals(damager)) {
-                    DecimalFormat df = new DecimalFormat("0.0");
-                    df.setRoundingMode(RoundingMode.UP);
-                    String health = df.format(player.getHealth() - event.getFinalDamage());
-                    String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
-                    msg = msg.replace("%health%", health);
-                    if (extradmg > 0) {
-                        msg += ConfigUtils.getConfigText("messages.longshot-extra", damager, arena, player);
-                        msg = msg.replace("%dmg%", df.format(extradmg));
-                    }
-                    damager.sendMessage(ConfigUtils.toComponent(msg));
-                }
-            } 
-            
-            // Check for prickly projectiles
-            else if (projectile.getType() == EntityType.EGG || 
-                     projectile.getType() == EntityType.SNOWBALL || 
-                     projectile.getType() == EntityType.ENDER_PEARL) {
-                
-                // Cancel ender pearl damage (or something, idk oldcombatmechanics did this so)
-                if (event.getDamage() != 0.0) {
-                    return;
-                }
-                
-                // Check for the passive
-                int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.PRICKLY_PROJECTILES);
-                if (prickly == 0) {
-                    return;
-                }
-
-                ThrowableProjectile proj = (ThrowableProjectile) projectile;
-                ItemStack item = proj.getItem();
-                int maxmultiplier = (int) ConfigUtils.getAbilityStat(Passive.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
-                
-                // Make sure its custom item
-                if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
-                        new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
-                    return;
-                }
-                
-                // Get level of the item
-                String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
-                        "item-structure"), PersistentDataType.STRING);
-                String[] args = itemString.split("-");
-                int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
-                
-                // Set custom damage and knockback
-                event.setDamage(0.0001);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Vector velocity = player.getVelocity();
-                    double velx = velocity.getX() * multiplier;
-                    double velz = velocity.getZ() * multiplier;
-                    double vely = velocity.getY();
-                    player.setVelocity(new Vector(velx, vely, velz));
-                }, 1);
-                
-                // Give item back on successful hit
-                InventoryUtils.regiveItem(damager, item);
+            } else if (type == EntityType.SPECTRAL_ARROW) {
+                SpectralArrow sa = (SpectralArrow) projectile;
+                multiplyKnockback(player, sa.getGlowingTicks() / 4.0);
             }
+
+            // Arrowhealth message
+            if (player.getHealth() - event.getFinalDamage() > 0 && !player.equals(damager)) {
+                DecimalFormat df = new DecimalFormat("0.0");
+                df.setRoundingMode(RoundingMode.UP);
+                String health = df.format(player.getHealth() - event.getFinalDamage());
+                String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
+                msg = msg.replace("%health%", health);
+                if (extradmg > 0) {
+                    msg += ConfigUtils.getConfigText("messages.longshot-extra", damager, arena, player);
+                    msg = msg.replace("%dmg%", df.format(extradmg));
+                }
+                damager.sendMessage(ConfigUtils.toComponent(msg));
+            }
+            
+            return;
+        } 
+        
+        // Check for prickly projectiles
+        if (type == EntityType.EGG ||  type == EntityType.SNOWBALL || type == EntityType.ENDER_PEARL) {
+            // Cancel ender pearl damage (or something, idk oldcombatmechanics did this so)
+            if (event.getDamage() != 0.0) {
+                return;
+            }
+            
+            // Check for the passive
+            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.PRICKLY_PROJECTILES);
+            if (prickly == 0) {
+                return;
+            }
+
+            ThrowableProjectile proj = (ThrowableProjectile) projectile;
+            ItemStack item = proj.getItem();
+            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Passive.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
+            
+            // Make sure its custom item
+            if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
+                    new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
+                return;
+            }
+            
+            // Get level of the item
+            String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
+                    "item-structure"), PersistentDataType.STRING);
+            String[] args = itemString.split("-");
+            int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
+            
+            // Set custom damage and knockback
+            event.setDamage(0.0001);
+            multiplyKnockback(player, multiplier);
+            
+            // Give item back on successful hit
+            InventoryUtils.regiveItem(damager, item);
+            return;
         }
     }
     
     // Get extra damage for a shooter player and arrow location
-    private double getExtraLongshotDamage(Player shooter, int longshot, Location loc) {
-        Location longOrigin = longShots.get(shooter);
+    private double getExtraLongshotDamage(Projectile proj, int longshot, Location loc) {
+        Location longOrigin = longShots.get(proj);
         if (longshot <= 0 || longOrigin == null) {
             return 0;
         }
         
         double plus = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PLUS);
         double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
-        double distance = longOrigin.distance(loc);
         double cutoff = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.CUTOFF);
+        double distance = longOrigin.distance(loc);
         
         // Calculate damage
         if (distance <= cutoff) {
@@ -613,6 +626,17 @@ public class ArenaGameruleListener implements Listener {
         
         double extradistance = distance - cutoff;
         return Math.min(extradistance * plus, max);
+    }
+    
+    // Multiply current player velocity. Only call during a damage event!
+    private void multiplyKnockback(Player player, double multiplier) {
+        ConfigUtils.schedule(1, () -> {
+            Vector velocity = player.getVelocity();
+            double velx = velocity.getX() * multiplier;
+            double velz = velocity.getZ() * multiplier;
+            double vely = velocity.getY();
+            player.setVelocity(new Vector(velx, vely, velz));
+        });
     }
 
     /** Make sure players can't create portals */

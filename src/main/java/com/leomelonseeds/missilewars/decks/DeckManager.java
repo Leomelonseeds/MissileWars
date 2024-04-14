@@ -113,12 +113,6 @@ public class DeckManager {
                     i.setItemMeta(pmeta);
                 }
                 
-                // Give spectral arrows in case of sentinel
-                int spectral = plugin.getJSON().getLevel(uuid, Passive.SPECTRAL_ARROWS);
-                if (i.getType() == Material.ARROW && spectral > 0) {
-                    i.setType(Material.SPECTRAL_ARROW);
-                }
-                
                 // Hide enchants (for cooldown completion)
                 i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 

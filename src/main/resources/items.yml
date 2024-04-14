@@ -1210,41 +1210,41 @@ Sentinel:
       name: "&eLongshot"
       lore:
       - ""
-      - "&7Your arrows now favor long-range shots."
-      - "&7Arrows travelling more than %cutoff%m &7will do"
-      - "&7an additional %plus% &7damage per block, up"
-      - "&7to a maximum of %max% &7extra damage."
+      - "&7Arrows travelling more than %cutoff%m &7do"
+      - "&7an additional %plus% &7damage per block."
       cost: 1500
-      cutoff: 24
+      cutoff: 20
+      max: 20
       1:
-        spcost: 1
-        plus: 0.10
-        max: 4
-      2:
         spcost: 1
         plus: 0.15
-        max: 6
-      3:
-        spcost: 1
-        plus: 0.20
-        max: 8
-    spectral:
-      name: "&eSpectral Arrows"
-      lore:
-      - ""
-      - "&7Instead of normal arrows, recieve spectral"
-      - "&7arrows that make players glow through walls"
-      - "&7for %duration% &7seconds on hit."
-      cost: 600
-      1:
-        spcost: 1
-        duration: 15
       2:
         spcost: 1
-        duration: 30
+        plus: 0.20
       3:
         spcost: 1
-        duration: 60
+        plus: 0.25
+    spectral:
+      name: "&eHeavy Arrows"
+      lore:
+      - ""
+      - "&7Shoot special, gold-weighted arrows"
+      - "&7that travel %percentage%%&7 slower, but"
+      - "&7pack a (literal) punch, multiplying"
+      - "&7knockback by %multiplier%&7x."
+      cost: 1200
+      1:
+        spcost: 1
+        percentage: 15
+        multiplier: 2
+      2:
+        spcost: 1
+        percentage: 30
+        multiplier: 3
+      3:
+        spcost: 1
+        percentage: 45
+        multiplier: 4
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1425,13 +1425,13 @@ Architect:
       - "&cleaves."
       cost: 2200
       1: 
-        percentage: 15
+        percentage: 33
         spcost: 1
       2: 
-        percentage: 20
+        percentage: 67
         spcost: 1
       3:
-        percentage: 25
+        percentage: 100
         spcost: 1
         
 # Held items 

@@ -12,7 +12,7 @@ public enum Passive {
     // Sentinel
     IMPACT_TRIGGER("warden", Type.PASSIVE, DeckStorage.SENTINEL),
     LONGSHOT("longshot", Type.PASSIVE, DeckStorage.SENTINEL),
-    SPECTRAL_ARROWS("spectral", Type.PASSIVE, DeckStorage.SENTINEL),
+    HEAVY_ARROWS("spectral", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
     SPIKED_QUIVER("slownessarrows", Type.PASSIVE, DeckStorage.BERSERKER),
