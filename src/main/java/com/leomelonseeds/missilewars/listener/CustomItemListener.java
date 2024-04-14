@@ -473,12 +473,14 @@ public class CustomItemListener implements Listener {
                 playerArena.getWorld().spawnParticle(Particle.CRIT, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
 
-        // More delay for impact trigger
+        // More delay + particles for impact trigger
         String structure = structureName;
         int delay = 20;
         int impactTrigger = plugin.getJSON().getLevel(uuid, Passive.IMPACT_TRIGGER);
         if (impactTrigger > 0) {
             delay = (int) (delay * ConfigUtils.getAbilityStat(Passive.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
+            ArenaUtils.doUntilDead(thrown, () -> 
+                playerArena.getWorld().spawnParticle(Particle.SMOKE_NORMAL, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive

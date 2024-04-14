@@ -10,6 +10,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -122,8 +123,8 @@ public class ArenaUtils {
      * @param projectile
      * @param runnable
      */
-    public static void doUntilDead(Projectile projectile, Runnable runnable) {
-        new BukkitRunnable() {
+    public static BukkitTask doUntilDead(Projectile projectile, Runnable runnable) {
+        return new BukkitRunnable() {
             @Override
             public void run() {
                 if (projectile.isDead()) {

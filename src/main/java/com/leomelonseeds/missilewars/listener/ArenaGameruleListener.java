@@ -13,10 +13,13 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
@@ -56,6 +59,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -81,7 +85,7 @@ import net.kyori.adventure.text.Component;
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleListener implements Listener {
     
-    public static Map<Player, Location> bowShots = new HashMap<>();
+    public static Map<Player, Location> longShots = new HashMap<>();
     public static Set<Player> saidGG = new HashSet<>();
     private static List<PotionEffectType> effects = null;
 
@@ -253,6 +257,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Berserker user
         UUID uuid = player.getUniqueId();
+        Projectile proj = (Projectile) event.getProjectile();
         if (event.getBow().getType() == Material.CROSSBOW) {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
 
@@ -285,21 +290,22 @@ public class ArenaGameruleListener implements Listener {
             CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
             boolean charged = false;
             boolean creepershot = false;
-            for (ItemStack proj : cmeta.getChargedProjectiles()) {
-                if (proj.getType() == Material.FIREWORK_ROCKET) {
-                    creepershot = true;
-                    if (ConfigUtils.toPlain(proj.displayName()).contains("Charged")) {
-                        charged = true;
-                    }
-                    break;
+            for (ItemStack itemProj : cmeta.getChargedProjectiles()) {
+                if (itemProj.getType() != Material.FIREWORK_ROCKET) {
+                    continue;
                 }
+                
+                creepershot = true;
+                if (ConfigUtils.toPlain(itemProj.displayName()).contains("Charged")) {
+                    charged = true;
+                }
+                break;
             }
             
             if (!creepershot) {
                 return;
             }
             
-            Entity proj = event.getProjectile();
             Location spawnLoc = proj.getLocation();
             Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
             if (charged) {
@@ -325,19 +331,39 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Longshot
-        if (plugin.getJSON().getLevel(uuid, Passive.LONGSHOT) > 0) {
-            bowShots.put(player, player.getLocation());
+        int longshot = plugin.getJSON().getLevel(uuid, Passive.LONGSHOT);
+        if (longshot > 0) {
+            longShots.put(player, player.getLocation());
+            
+            // Add gradually increasing color particles
+            double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
+            BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
+                if (!longShots.containsKey(player)) {
+                    return;
+                }
+                
+                Location projLoc = proj.getLocation();
+                double extradmg = getExtraLongshotDamage(player, longshot, projLoc);
+                double ratio = extradmg / max;
+                int g = (int) (255 * (1 - ratio));
+                int r = (int) (255 * ratio);
+                DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 1.0F);
+                proj.getWorld().spawnParticle(Particle.REDSTONE, projLoc, 1, dust);
+            });
+            
             // 5 seconds should be enough for a bow shot, riiiight
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                bowShots.remove(player);
-            }, 100);
+            ConfigUtils.schedule(100, () -> {
+                longShots.remove(player);
+                particles.cancel();
+            });
+            
             return;
         }
         
         // Spectral arrows
         int spectral = plugin.getJSON().getLevel(uuid, Passive.SPECTRAL_ARROWS);
         if (spectral > 0 && event.getProjectile() instanceof SpectralArrow) {
-            SpectralArrow arrow = (SpectralArrow) event.getProjectile();
+            SpectralArrow arrow = (SpectralArrow) proj;
             int duration = (int) ConfigUtils.getAbilityStat(Passive.SPECTRAL_ARROWS, spectral, Stat.DURATION);
             arrow.setGlowingTicks(duration * 20);
             return;
@@ -495,24 +521,14 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            // Longshot calculations
             if (projectile.getType() == EntityType.ARROW) {
-                if (bowShots.containsKey(damager) && bowShots.get(damager).getWorld().equals(damager.getWorld())) {
-                    int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT);
-                    double plus = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PLUS);
-                    double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
-                    double dmg = event.getDamage();
-                    double distance = bowShots.get(damager).distance(player.getLocation());
-                    double cutoff = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.CUTOFF);
-                    
-                    // Calculate damage
-                    if (distance >= cutoff) {
-                        double extradistance = distance - cutoff;
-                        double extradmg = Math.min(extradistance * plus, max);
-                        event.setDamage(dmg + extradmg);
-                    }
-                    
-                    bowShots.remove(damager);
+                // Check for longshot
+                double extradmg = getExtraLongshotDamage(
+                        damager, 
+                        plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT), 
+                        player.getLocation());
+                if (extradmg > 0) {
+                    event.setDamage(event.getDamage() + extradmg);
                 }
 
                 // Arrowhealth message
@@ -522,6 +538,10 @@ public class ArenaGameruleListener implements Listener {
                     String health = df.format(player.getHealth() - event.getFinalDamage());
                     String msg = ConfigUtils.getConfigText("messages.arrow-damage", damager, arena, player);
                     msg = msg.replace("%health%", health);
+                    if (extradmg > 0) {
+                        msg += ConfigUtils.getConfigText("messages.longshot-extra", damager, arena, player);
+                        msg = msg.replace("%dmg%", df.format(extradmg));
+                    }
                     damager.sendMessage(ConfigUtils.toComponent(msg));
                 }
             } 
@@ -572,6 +592,27 @@ public class ArenaGameruleListener implements Listener {
                 InventoryUtils.regiveItem(damager, item);
             }
         }
+    }
+    
+    // Get extra damage for a shooter player and arrow location
+    private double getExtraLongshotDamage(Player shooter, int longshot, Location loc) {
+        Location longOrigin = longShots.get(shooter);
+        if (longshot <= 0 || longOrigin == null) {
+            return 0;
+        }
+        
+        double plus = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PLUS);
+        double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
+        double distance = longOrigin.distance(loc);
+        double cutoff = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.CUTOFF);
+        
+        // Calculate damage
+        if (distance <= cutoff) {
+            return 0;
+        }
+        
+        double extradistance = distance - cutoff;
+        return Math.min(extradistance * plus, max);
     }
 
     /** Make sure players can't create portals */

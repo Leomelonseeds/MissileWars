@@ -1,6 +1,5 @@
 package com.leomelonseeds.missilewars.listener;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -357,7 +356,7 @@ public class MiscListener implements Listener {
                     DamageCause.ENTITY_ATTACK, 
                     DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).build(), 
                     Map.of(DamageModifier.BASE, 0.001), 
-                    Collections.emptyMap(), 
+                    Map.of(DamageModifier.BASE, d -> d), 
                     false);
             Bukkit.getPluginManager().callEvent(extraEvent);
             return;

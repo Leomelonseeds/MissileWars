@@ -96,6 +96,7 @@ messages:
   leave-parkour: "&c&l[!] &7Please leave the Parkour before joining an arena."
   requeue-failed: "&c&l[!] &7All arenas were full, so you were put back into the lobby."
   arrow-damage: "%umw_focus% &7is now on &f%health%❤"
+  longshot-extra: " &7(+&f%dmg% &7extra damage)"
   missile-cooldown: "&c&l[!] &7You cannot place a missile yet!"
   preset-b-locked: "&c&l[!] &7You must have &e&lESQUIRE &7rank to use this preset!"
   preset-c-locked: "&c&l[!] &7You must have &b&lKNIGHT &7rank to use this preset!"
