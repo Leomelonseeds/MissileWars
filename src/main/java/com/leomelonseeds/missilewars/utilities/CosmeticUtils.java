@@ -82,7 +82,11 @@ public class CosmeticUtils {
      */
     public static Component getDeathMessage(Player dead, Player killer) {
         FileConfiguration messages = ConfigUtils.getConfigFile("death-messages.yml", "/cosmetics");
-        String damageCause = dead.getLastDamageCause().getCause().toString().toLowerCase();
+        String damageCause = "";
+        if (dead.getLastDamageCause() != null) {
+            damageCause = dead.getLastDamageCause().getCause().toString().toLowerCase();
+        }
+        
         String format;
         String result;
         if (killer == null || !killer.isOnline()) {

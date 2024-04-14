@@ -48,6 +48,7 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.Passive;
+import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
@@ -472,9 +473,16 @@ public class CustomItemListener implements Listener {
                 playerArena.getWorld().spawnParticle(Particle.CRIT, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
 
-        // Schedule structure spawn after 1 second if snowball is still alive
+        // More delay for impact trigger
         String structure = structureName;
-        ConfigUtils.schedule(20, () -> {
+        int delay = 20;
+        int impactTrigger = plugin.getJSON().getLevel(uuid, Passive.IMPACT_TRIGGER);
+        if (impactTrigger > 0) {
+            delay = (int) (delay * ConfigUtils.getAbilityStat(Passive.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
+        }
+
+        // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
+        ConfigUtils.schedule(delay, () -> {
             if (spawnUtility(thrower, thrown, structure, playerArena, thrown.getLocation())) {
                 return;
             }

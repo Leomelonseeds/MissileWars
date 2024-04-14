@@ -1195,8 +1195,17 @@ Sentinel:
       - "&7Projectile utilities now spawn"
       - "&7immediately when they impact a"
       - "&7block, instead of breaking."
+      - "&7Otherwise, they spawn after"
+      - "%duration% &7seconds."
       1:
-        spcost: 3
+        spcost: 1
+        duration: 1
+      2:
+        spcost: 1
+        duration: 1.25
+      3:
+        spcost: 1
+        duration: 1.5
     longshot:
       name: "&eLongshot"
       lore:
