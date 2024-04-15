@@ -1,19 +1,25 @@
 package com.leomelonseeds.missilewars.arenas.teams;
 
 public enum TeamName {
-    RED("red"),
-    BLUE("blue"),
-    NONE("no team");
+    RED("red", "&c"),
+    BLUE("blue", "&9"),
+    NONE("no team", "&f");
     
     private String id;
+    private String color;
     
-    private TeamName(String id) {
+    private TeamName(String id, String color) {
         this.id = id;
+        this.color = color;
     }
     
     @Override
     public String toString() {
         return id;
+    }
+    
+    public String getColor() {
+        return color;
     }
     
     public TeamName getOpposite() {
@@ -24,17 +30,6 @@ public enum TeamName {
                 return RED;
             default:
                 return NONE;
-        }
-    }
-    
-    public String getColor() {
-        switch (this) {
-            case RED:
-                return "&c";
-            case BLUE:
-                return "&9";
-            default:
-                return "&f";
         }
     }
 }

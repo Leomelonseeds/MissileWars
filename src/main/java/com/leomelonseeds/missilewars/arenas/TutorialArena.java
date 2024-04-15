@@ -108,7 +108,7 @@ public class TutorialArena extends ClassicArena {
         
         // Spawn player near blue base, adding a platform and clearing blocks if necessary
         double xspawn = (new Random()).nextInt(-15, 16) + 0.5;
-        Location loc = new Location(getWorld(), xspawn, 17, 31.5, 0, 0);
+        Location loc = new Location(getWorld(), xspawn, 17, 42.5, 0, 0);
         loc.getBlock().setType(Material.AIR);
         loc.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
         Location spawnBlock = loc.clone().add(0, -1, 0);
