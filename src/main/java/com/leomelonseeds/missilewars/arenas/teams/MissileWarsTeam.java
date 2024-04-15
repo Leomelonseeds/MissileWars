@@ -20,7 +20,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -38,8 +37,6 @@ import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
-import net.kyori.adventure.text.format.NamedTextColor;
-
 /** Represents a team of Missile Wars Players. */
 /**
  * @author leona
@@ -54,7 +51,6 @@ public class MissileWarsTeam {
     private Map<Location, Boolean> portals;
     private int shieldBlocksBroken;
     private int shieldVolume;
-    private Team team;
     private double multiplier;
 
     /**
@@ -72,15 +68,6 @@ public class MissileWarsTeam {
         this.arena = arena;
         this.shieldBlocksBroken = 0;
         this.multiplier = 1;
-        
-        // Register team
-        String teamName = arena.getName() + "." + name;
-        team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
-        if (team == null) {
-            team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName);
-            team.displayName(name == TeamName.RED ? ConfigUtils.toComponent("&cRED") : ConfigUtils.toComponent("&9BLUE"));
-            team.color(name == TeamName.RED ? NamedTextColor.RED : NamedTextColor.BLUE);
-        }
         
         // Temp value while async calculations run
         shieldVolume = 23850;
@@ -115,12 +102,6 @@ public class MissileWarsTeam {
             }
             shieldVolume = tempShieldVolume;
         }, 20L);
-    }
-    
-    public void unregisterTeam() {
-        if (Bukkit.getScoreboardManager().getMainScoreboard().getTeams().contains(team)) {
-            team.unregister();
-        }
     }
     
     public void setMultiplier(double multiplier) {
@@ -196,7 +177,6 @@ public class MissileWarsTeam {
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
-        team.addPlayer(mcPlayer);
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
@@ -321,7 +301,6 @@ public class MissileWarsTeam {
         }
         
     	Player mcPlayer = player.getMCPlayer();
-    	team.removePlayer(mcPlayer);
         members.remove(player);
         InventoryUtils.clearInventory(mcPlayer);
         player.stopDeck();

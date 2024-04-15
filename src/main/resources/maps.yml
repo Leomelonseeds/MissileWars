@@ -85,9 +85,19 @@ classic:
   - divider
   - light-smog
   - 23andtnt
+  - biblically-accurate
+  - darkness-fortress
+  - coppercastle
+  - umbrella-beach
+  - trinitrotoluene
+  - traffic-light-cake
+  - butterflies
+  - minefield
+  - middle-ground
   default-map:
     name: '&fStandoff'
     file: DefaultMap.schem
+    required-rank: 0
     pos:
       x: 0
       y: 17
@@ -132,6 +142,7 @@ classic:
   palisade:
     name: '&fPalisade (&e&lNEW!&f)'
     file: Palisade.schem
+    required-rank: 4
     pos:
       x: 0
       y: 17
@@ -164,6 +175,7 @@ classic:
   mountains:
     name: '&fMountains (&e&lNEW!&f)'
     file: Mountains.schem
+    required-rank: 4
     pos:
       x: 0
       y: 17
@@ -214,6 +226,7 @@ classic:
   book:
     name: '&fBooks'
     file: Book.schem
+    required-rank: 1
     pos:
       x: 0
       y: 16
@@ -248,6 +261,7 @@ classic:
   trinitrotoluene:
     name: '&fTrinitrotoluene'
     file: TNT.schem
+    required-rank: 1
     portals:
       '1':
         x: 21
@@ -270,6 +284,7 @@ classic:
   your-reality:
     name: '&fYour Reality'
     file: YourReality.schem
+    required-rank: 3
     pos:
       x: 0
       y: 17
@@ -312,6 +327,7 @@ classic:
   miku:
     name: '&fMiku'
     file: Miku.schem
+    required-rank: 2
     pos:
       x: 0
       y: 16
@@ -354,6 +370,7 @@ classic:
   biblically-accurate:
     name: '&fBiblically Accurate'
     file: BiblicallyAccurateMap.schem
+    required-rank: 2
     pos:
       x: 0
       y: 17
@@ -392,6 +409,7 @@ classic:
   traffic-light-cake:
     name: '&fTraffic Light Cake'
     file: TrafficLightCake.schem
+    required-rank: 1
     pos:
       x: 0
       y: 17
@@ -426,6 +444,7 @@ classic:
   umbrella-beach:
     name: '&fUmbrella Beach'
     file: UmbrellaBeach.schem
+    required-rank: 0
     pos:
       x: 0
       y: 17
@@ -439,6 +458,7 @@ classic:
   darkness-fortress:
     name: '&fDarkness Fortress'
     file: DarknessFortress.schem
+    required-rank: 1
     pos:
       x: 0
       y: 19
@@ -474,6 +494,7 @@ classic:
   light-smog:
     name: '&fLight Smog'
     file: LightSmog.schem
+    required-rank: 2
     portals:
       '1':
         x: -12
@@ -490,9 +511,11 @@ classic:
   middle-ground:
     name: '&fMiddle Ground'
     file: MiddleGround.schem
+    required-rank: 1
   double-layer:
     name: '&fDouble Layer'
     file: DoubleLayer.schem
+    required-rank: 1
     blue-shield:
       z2: -42
     red-shield:
@@ -500,9 +523,11 @@ classic:
   minefield:
     name: '&fMinefield'
     file: Minefield.schem
+    required-rank: 0
   cubecrowd:
     name: '&fCube Crowd'
     file: CubeCrowd.schem
+    required-rank: 3
     pos:
       x: 0
       y: 14
@@ -558,6 +583,7 @@ classic:
     name: '&fDivider'
     file: Divider.schem
     too-high: 22
+    required-rank: 1
     portals:
       '1':
         x: 22
@@ -576,6 +602,7 @@ classic:
   coppercastle:
     name: '&fCopper Castle'
     file: CopperCastle.schem
+    required-rank: 1
     portals:
       '1':
         x: -10
@@ -606,6 +633,7 @@ classic:
   formal:
     name: '&fFormal'
     file: Formal.schem
+    required-rank: 2
     too-high: 38
     blue-shield:
       y2: 34
@@ -643,6 +671,7 @@ classic:
   swept:
     name: '&fSwept'
     file: Swept.schem
+    required-rank: 4
     pos:
       x: 0
       y: 17
@@ -685,6 +714,7 @@ classic:
   butterflies:
     name: '&fButterflies'
     file: Butterflies.schem
+    required-rank: 3
     pos:
       x: 0
       y: 19
@@ -736,6 +766,7 @@ classic:
   towers:
     name: '&fTowers'
     file: Towers.schem
+    required-rank: 4
     pos:
       x: 0
       y: 17
@@ -762,6 +793,7 @@ classic:
   23andtnt:
     name: '&f23andTNT'
     file: 23andTNT.schem
+    required-rank: 1
     pos:
       x: 0
       y: 17

@@ -122,7 +122,6 @@ public class ArenaManager {
 
         // Unload each Arena
         for (Arena arena : loadedArenas) {
-            arena.unregisterTeams();
             arena.stopTrackers();
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
@@ -166,8 +165,7 @@ public class ArenaManager {
             logger.log(Level.WARNING, "An arena with players in it cannot be deleted");
             return false;
         }
-        // Unregister teams
-        arena.unregisterTeams();
+        
         // Remove citizens
         for (int id : arena.getNPCs()) {
             if (CitizensAPI.getNPCRegistry().getById(id) != null) {

@@ -59,43 +59,26 @@ public abstract class Arena implements ConfigurationSerializable {
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
     public static Comparator<Arena> byName = Comparator.comparing(a -> a.getName());
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
-    /** The arena name. */
+    
     protected String name;
-    /** The map for the arena. */
     protected String mapName;
-    /** The gamemode type for the map for the arena. */
     protected String gamemode;
-    /** The max number of players for this arena. */
     protected int capacity;
-    /** The ids of the NPCs */
     protected List<Integer> npcs;
-    /** The list of all players currently in the arena. */
     protected Set<MissileWarsPlayer> players;
-    /** The list of all spectators currently in the arena. */
     protected Set<MissileWarsPlayer> spectators;
-    /** The queue to join the red team. Active before the game. */
     protected Queue<MissileWarsPlayer> redQueue;
-    /** The queue to join the blue team. Active before the game. */
     protected Queue<MissileWarsPlayer> blueQueue;
-    /** The red team. */
     protected MissileWarsTeam redTeam;
-    /** The blue team. */
     protected MissileWarsTeam blueTeam;
-    /** The start time of the game. In the future if game is yet to start, otherwise, in the past. */
     protected LocalDateTime startTime;
-    /** Whether a game is currently running */
     protected boolean running;
-    /** Are we waiting for a tie or no */
     protected boolean waitingForTie;
-    /** List of currently running tasks. */
     protected List<BukkitTask> tasks;
-    /** Whether the arena is currently resetting the world. */
     protected boolean resetting;
-    /** A task for if we are waiting for a game to auto-end */
+    /** task for automatically ending the game if no players are present */
     protected BukkitTask autoEnd;
-    /** The tracker for all missiles and utilities */
     protected Tracker tracker;
-    /** The vote manager for this arena */
     protected VoteManager voteManager;
     /** Set of players who have played but have since left */
     protected HashMap<UUID, Integer> leftPlayers;
@@ -164,13 +147,6 @@ public abstract class Arena implements ConfigurationSerializable {
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
         voteManager = new VoteManager(this);
-    }
-    
-    public void unregisterTeams() {
-        if (redTeam != null && blueTeam != null) {
-            redTeam.unregisterTeam();
-            blueTeam.unregisterTeam();
-        }
     }
     
     /**
@@ -1324,7 +1300,6 @@ public abstract class Arena implements ConfigurationSerializable {
         for (Chunk chunk : world.getLoadedChunks()) {
             chunk.unload(false);
         }
-        unregisterTeams();
         startTime = null;
         voteManager = new VoteManager(this);
         Bukkit.unloadWorld(world, false);
