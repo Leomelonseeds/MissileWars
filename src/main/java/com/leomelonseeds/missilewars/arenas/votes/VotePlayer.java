@@ -28,7 +28,7 @@ public class VotePlayer {
      * @return Vote or null if no previous vote was removed
      */
     public Vote addVote(String map, boolean negative) {
-        int maxVotes = player.hasPermission("umw.extravote") ? 2 : 1;
+        int maxVotes = getMaxVotes(player);
         int voteAmount = negative ? -1 : 1;
         
         // Check for a vote that resets a previous vote
@@ -55,5 +55,15 @@ public class VotePlayer {
      */
     public List<Vote> getVotes() {
         return votes;
+    }
+    
+    /**
+     * Get the maximum number of times a player can vote
+     * 
+     * @param player
+     * @return
+     */
+    public static int getMaxVotes(Player player) {
+        return player.hasPermission("umw.extravote") ? 2 : 1;
     }
 }

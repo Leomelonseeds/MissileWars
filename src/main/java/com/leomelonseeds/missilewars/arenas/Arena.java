@@ -43,6 +43,7 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckManager;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -84,6 +85,8 @@ public abstract class Arena implements ConfigurationSerializable {
     protected HashMap<UUID, Integer> leftPlayers;
     /** Helper variable to check when all queues are done */
     protected int queueCount;
+    /** The rank level to evaluate map selection by */
+    protected int rankMode;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -95,15 +98,8 @@ public abstract class Arena implements ConfigurationSerializable {
         this.name = name;
         this.capacity = capacity;
         this.gamemode = "classic";
-        players = new HashSet<>();
-        spectators = new HashSet<>();
-        redQueue = new LinkedList<>();
-        blueQueue = new LinkedList<>();
-        tasks = new LinkedList<>();
         npcs = new ArrayList<>();
-        tracker = new Tracker();
-        leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(this);
+        init();
     }
 
     /**
@@ -139,6 +135,10 @@ public abstract class Arena implements ConfigurationSerializable {
         for (String s : npcIDs.split(",")) {
             npcs.add(Integer.parseInt(s));
         }
+        init();
+    }
+    
+    private void init() {
         players = new HashSet<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
@@ -146,9 +146,9 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(this);
+        voteManager = new VoteManager(gamemode);
     }
-    
+     
     /**
      * Call when a player leaves the game/arena
      * 
@@ -451,6 +451,44 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
+     * Check if the given map is available to play (i.e. lobby
+     * meets the rank requirements)
+     * 
+     * @param map
+     * @return
+     */
+    public boolean isAvailable(String map) {
+        return rankMode >= ArenaUtils.getRankRequirement(gamemode, map);
+    }
+    
+    /**
+     * Re-calculates the mode of the rank in this arena to
+     * evaluate map selection by
+     */
+    private void calculateRankMode() {
+        if (running || resetting) {
+            return;
+        }
+        
+        List<Integer> ranks = new ArrayList<>();
+        for (MissileWarsPlayer mwp : players) {
+            if (spectators.contains(mwp)) {
+                continue;
+            }
+            
+            int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(mwp.getMCPlayerId());
+            ranks.add(RankUtils.getRankLevel(exp));
+        }
+        
+        if (ranks.isEmpty()) {
+            return;
+        }
+        
+        Collections.sort(ranks);
+        this.rankMode = ranks.get((ranks.size() - 1) / 2);
+    }
+    
+    /**
      * Join a player without setting them to spectator mode
      * 
      * @param player
@@ -545,6 +583,10 @@ public abstract class Arena implements ConfigurationSerializable {
                 enqueue(player.getUniqueId(), blueSize > redSize ? "red" : "blue");
             }
         }
+       
+        else {
+            calculateRankMode();
+        }
     }
     
     // Give player necessary items
@@ -608,6 +650,7 @@ public abstract class Arena implements ConfigurationSerializable {
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         players.remove(toRemove);
         voteManager.removePlayer(toRemove.getMCPlayer());
+        calculateRankMode();
 
         for (MissileWarsPlayer mwPlayer : players) {
             ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
@@ -855,6 +898,7 @@ public abstract class Arena implements ConfigurationSerializable {
             announceMessage("messages.spectate-leave-others", player);
             player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
             player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            calculateRankMode();
             checkForStart();
         }
     }
@@ -878,6 +922,8 @@ public abstract class Arena implements ConfigurationSerializable {
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
                 mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /sp to stop spectating"));
+                voteManager.removePlayer(mcPlayer);
+                calculateRankMode();
                 checkEmpty();
             } else {
                 ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
@@ -943,7 +989,7 @@ public abstract class Arena implements ConfigurationSerializable {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Select Map
-        mapName = voteManager.getVotedMap();
+        mapName = voteManager.getVotedMap(map -> isAvailable(map));
 
         // Generate map.
         announceMessage("messages.starting", null);
@@ -1301,7 +1347,7 @@ public abstract class Arena implements ConfigurationSerializable {
             chunk.unload(false);
         }
         startTime = null;
-        voteManager = new VoteManager(this);
+        voteManager = new VoteManager(gamemode);
         Bukkit.unloadWorld(world, false);
         Bukkit.getWorlds().remove(world);
         

@@ -7,13 +7,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.TrainingArena;
-import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class VoteManager {
@@ -21,20 +19,31 @@ public class VoteManager {
     private SortedMap<String, Integer> allVotes;
     private Set<VotePlayer> playerVotes;
     
-    public VoteManager(Arena arena) {
+    public VoteManager(String gamemode) {
         this.allVotes = new TreeMap<>();
         this.playerVotes = new HashSet<>();
         
         // Add all arena maps to the list
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        for (String m : mapConfig.getStringList(arena.getGamemode() + ".rotation")) {
+        for (String m : mapConfig.getStringList(gamemode + ".rotation")) {
             allVotes.put(m, 0);
         }
-        
-        // Troll for training arena
-        if (arena instanceof TrainingArena || arena instanceof TutorialArena) {
-            allVotes.put("default-map", 64);
+    }
+    
+    /**
+     * Manually adds admin votes to a specific map,
+     * if that map exists.
+     * 
+     * @param map
+     * @param votes
+     */
+    public void addVote(String map, int votes) {
+        Integer cur = allVotes.get(map);
+        if (cur == null) {
+            return;
         }
+        
+        allVotes.put(map, cur + votes);
     }
     
     // Get voter
@@ -103,12 +112,17 @@ public class VoteManager {
     /**
      * Gets the most voted for map, or random if tie
      * 
+     * @param filter add an additional filter
      * @return
      */
-    public String getVotedMap() {
+    public String getVotedMap(Predicate<String> filter) {
         String mapName = "default-map";
         List<String> mapsWithTopVotes = new LinkedList<>();
         for (String map : allVotes.keySet()) {
+            if (!filter.test(mapName)) {
+                continue;
+            }
+            
             if (mapsWithTopVotes.isEmpty()) {
                 mapsWithTopVotes.add(map);
             } else {
@@ -121,10 +135,12 @@ public class VoteManager {
                 }
             }
         }
+        
+        // Set map to random map with top votes
         if (!mapsWithTopVotes.isEmpty()) {
-            // Set map to random map with top votes
             mapName = mapsWithTopVotes.get(new Random().nextInt(mapsWithTopVotes.size()));
         }
+        
         return mapName;
     }
     

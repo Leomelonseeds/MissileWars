@@ -57,6 +57,7 @@ public class TutorialArena extends ClassicArena {
         this.xs = new HashMap<>();
         this.particles = new HashMap<>();
         this.justReset = true;
+        voteManager.addVote("default-map", 64);
         Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
         
         // World reset task

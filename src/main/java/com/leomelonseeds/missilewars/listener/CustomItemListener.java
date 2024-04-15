@@ -185,7 +185,7 @@ public class CustomItemListener implements Listener {
             event.setCancelled(true);
             switch(held) {
             case "votemap":
-                new MapVoting(player);
+                new MapVoting(player, playerArena);
                 break;
             case "to-lobby":
                 playerArena.removePlayer(uuid, true);

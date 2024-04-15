@@ -136,4 +136,15 @@ public class ArenaUtils {
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
+    
+    /**
+     * Get the rank requirement to play a certain map
+     * 
+     * @param gamemode
+     * @param map
+     * @return
+     */
+    public static int getRankRequirement(String gamemode, String map) {
+        return (int) ConfigUtils.getMapNumber(gamemode, map, "required-rank");
+    }
 }

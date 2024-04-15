@@ -94,6 +94,9 @@ classic:
   - butterflies
   - minefield
   - middle-ground
+  - your-reality
+  - swept
+  - towers
   default-map:
     name: '&fStandoff'
     file: DefaultMap.schem

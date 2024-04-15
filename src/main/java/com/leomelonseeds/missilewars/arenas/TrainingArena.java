@@ -40,14 +40,18 @@ public class TrainingArena extends ClassicArena {
     
     public TrainingArena() {
         super("training", 100);
-        hasTurret = false;
-        missiles = 0;
+        init();
     }
 
     public TrainingArena(Map<String, Object> serializedArena) {
         super(serializedArena);
+        init();
+    }
+    
+    private void init() {
         hasTurret = false;
         missiles = 0;
+        voteManager.addVote("default-map", 64);
     }
     
     // No need to track who left the arena here
@@ -149,6 +153,12 @@ public class TrainingArena extends ClassicArena {
         }
         
         autoEnd.cancel();
+    }
+    
+    @Override
+    public void resetWorld() {
+        super.resetWorld();
+        init();
     }
     
     @Override

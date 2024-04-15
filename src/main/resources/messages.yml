@@ -322,14 +322,23 @@ inventories:
         - "&7Status: %umw_arena_status%"
         - "&7Click to join, %player_name%!"
   map-voting:
-    title: "Vote for a map"
-    vote-item:
-      name: "&f%umw_map%"
+    title: "You have %amount% total vote(s)"
+    name: "%umw_map%" # Unused, map name is taken directly from maps.yml
+    req: "&7Requires: %rank%" # Inserted as the first lore line, if req level > 0
+    item:
+      item: PAPER
       lore:
         - "&7Votes: &c%umw_map_votes%"
         - ""
         - "&cLeft-click &7to upvote"
         - "&cRight-click &7to downvote"
+    item-unavailable:
+      item: BARRIER
+      lore:
+        - ""
+        - "&cYour lobby isn't high enough"
+        - "&crank to play this map!"
+      
   cosmetics:
     locked:
       - ""

@@ -7,8 +7,6 @@ import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
-import net.md_5.bungee.api.ChatColor;
-
 public class RankUtils {
 
     /**
@@ -102,8 +100,8 @@ public class RankUtils {
             progress = progress + "|";
         }
         int index = (int) (size * getExpProgress(exp));
-        progress = ChatColor.LIGHT_PURPLE + progress.substring(0, index) +
-                ChatColor.GRAY + progress.substring(index, size);
+        progress = "&d" + progress.substring(0, index) +
+                "&7" + progress.substring(index, size);
         return progress;
     }
 
@@ -114,11 +112,20 @@ public class RankUtils {
      * @return Rank name of rank
      */
     public static String getRankName(int exp) {
-        int rank = getRankLevel(exp);
-        FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
-        String rankName = rankConfig.getString("ranks." + rank + ".name");
-        return ChatColor.translateAlternateColorCodes('&', rankName);
+        return getRankNameFromLevel(getRankLevel(exp));
     }
+    
+    /**
+     * Get rank name for certain rank level
+    *
+    * @param rank
+    * @return Rank name of rank
+    */
+   public static String getRankNameFromLevel(int rank) {
+       FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
+       String rankName = rankConfig.getString("ranks." + rank + ".name");
+       return ConfigUtils.convertAmps(rankName);
+   }
 
     /**
      * Get rank symbol for certain exp value
@@ -131,7 +138,7 @@ public class RankUtils {
         FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
         String rankColor = rankConfig.getString("ranks." + rank + ".color");
         String rankSymbol = rankConfig.getString("ranks." + rank + ".symbol");
-        return ChatColor.translateAlternateColorCodes('&', rankColor + rankSymbol);
+        return ConfigUtils.convertAmps(rankColor + rankSymbol);
     }
 
     /**

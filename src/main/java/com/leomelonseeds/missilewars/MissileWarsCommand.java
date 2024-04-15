@@ -209,7 +209,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Open voting menu
-            new MapVoting(player);
+            new MapVoting(player, playerArena);
 
             return true;
         }

@@ -6,9 +6,12 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -16,8 +19,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
+import com.leomelonseeds.missilewars.arenas.votes.VotePlayer;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -26,13 +32,18 @@ public class MapVoting implements MWInventory {
     private Inventory inv;
     private Player player;
     private NamespacedKey mapKey;
+    private VoteManager voteManager;
+    private Arena arena;
     
-    public MapVoting(Player player) {
+    public MapVoting(Player player, Arena arena) {
         this.player = player;
         this.mapKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "map");
+        this.arena = arena;
+        this.voteManager = arena.getVoteManager();
         
         String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
-        int size = getPlayerArena(player).getVoteManager().getVotes().size();
+        title = title.replace("%amount%", VotePlayer.getMaxVotes(player) + "");
+        int size = voteManager.getVotes().size();
         inv = Bukkit.createInventory(null, (int) Math.ceil((double) size / 9) * 9, ConfigUtils.toComponent(title));
         manager.registerInventory(player, this);
         
@@ -52,38 +63,46 @@ public class MapVoting implements MWInventory {
     // Register all maps and their votes to items
     @Override
     public void updateInventory() {
-        Arena arena = getPlayerArena(player);
         inv.clear();
-        for (String mapName : arena.getVoteManager().getVotes().keySet()) {
-            // Set item + amount
-            ItemStack mapItem = new ItemStack(Material.PAPER);
-            int votes = arena.getVoteManager().getVotes().get(mapName);
-            mapItem.setAmount(Math.max(votes, 1));
+        ConfigurationSection sec = ConfigUtils.getConfigFile("messages.yml")
+                .getConfigurationSection("inventories.map-voting");
+        for (String mapName : voteManager.getVotes().keySet()) {
+            boolean available = arena.isAvailable(mapName);
+            String path = available ? "item" : "item-unavailable";
+            int votes = voteManager.getVotes().get(mapName);
             
-            // Set display name to map name
+            // Set item, add name
+            ItemStack mapItem = new ItemStack(Material.valueOf(sec.getString(path + ".item")));
             ItemMeta mapItemMeta = mapItem.getItemMeta();
             String display = ConfigUtils.getMapText(arena.getGamemode(), mapName, "name");
             mapItemMeta.displayName(ConfigUtils.toComponent(display));
-            
+
             // Add lore
             List<Component> lore = new ArrayList<>();
-            for (String s : ConfigUtils.getConfigTextList("inventories.map-voting.vote-item.lore", player, null, null)) {
+            int req = ArenaUtils.getRankRequirement(arena.getGamemode(), mapName);
+            if (req > 0) {
+                String reqStr = sec.getString("req");
+                reqStr = reqStr.replace("%rank%", RankUtils.getRankNameFromLevel(req));
+                lore.add(ConfigUtils.toComponent(reqStr));
+            }
+            for (String s : sec.getStringList(path + ".lore")) {
                 String sn = s.replaceAll("%umw_map_votes%", "" + votes);
                 lore.add(ConfigUtils.toComponent(sn));
             }
             mapItemMeta.lore(lore);
             
-            // Add map name meta
-            mapItemMeta.getPersistentDataContainer().set(mapKey, PersistentDataType.STRING, mapName);
+            if (available) {
+                mapItem.setAmount(Math.min(Math.max(votes, 1), 64));
+                mapItemMeta.getPersistentDataContainer().set(mapKey, PersistentDataType.STRING, mapName);
+                if (votes > 0) {
+                    mapItem.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                    mapItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                }
+            }
             
             mapItem.setItemMeta(mapItemMeta);
             inv.addItem(mapItem);
         }
-    }
-    
-    private Arena getPlayerArena(Player player) {
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        return manager.getArena(player.getUniqueId());
     }
 
     @Override
@@ -93,7 +112,6 @@ public class MapVoting implements MWInventory {
 
     @Override
     public void registerClick(int slot, ClickType type) {
-        Arena arena = getPlayerArena(player);
         ItemStack clicked = inv.getItem(slot);
         if (clicked == null) {
             return;
@@ -107,7 +125,7 @@ public class MapVoting implements MWInventory {
         
         // Get map name
         String map = meta.getPersistentDataContainer().get(mapKey, PersistentDataType.STRING);
-        arena.getVoteManager().registerVote(player, map, type == ClickType.RIGHT);
+        voteManager.registerVote(player, map, type == ClickType.RIGHT);
         ConfigUtils.sendConfigSound("use-skillpoint", player);
         updateInventory();
     }
