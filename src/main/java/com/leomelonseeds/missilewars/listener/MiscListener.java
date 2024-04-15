@@ -11,8 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -30,7 +28,6 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
@@ -350,14 +347,12 @@ public class MiscListener implements Listener {
         
         // Handle dragon fireballs by registering an EDBEE for the handler
         if (target instanceof Slime) {
+            @SuppressWarnings("removal")
             EntityDamageByEntityEvent extraEvent = new EntityDamageByEntityEvent(
                     player, 
                     target, 
                     DamageCause.ENTITY_ATTACK, 
-                    DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).build(), 
-                    Map.of(DamageModifier.BASE, 0.001), 
-                    Map.of(DamageModifier.BASE, d -> d), 
-                    false);
+                    0.001);
             Bukkit.getPluginManager().callEvent(extraEvent);
             return;
         }

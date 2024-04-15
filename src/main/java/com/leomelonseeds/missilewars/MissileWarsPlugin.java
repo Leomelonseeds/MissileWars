@@ -33,21 +33,13 @@ import net.milkbowl.vault.economy.Economy;
 /** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
 
-    /** Singleton instance of this class. */
     private static MissileWarsPlugin plugin;
-    /** The loaded ArenaManager for the plugin. */
     private ArenaManager arenaManager;
-    /** The loaded DeckManager for this plugin. */
     private DeckManager deckManager;
-    /** The loaded economy for this plugin */
     private static Economy econ;
-    /** The loaded chat API for this plugin */
     private static Chat chat;
-    /** The loaded sql manager for this plugin */
     private SQLManager sqlManager;
-    /** The loaded json manager for this plugin */
     private JSONManager jsonManager;
-    /** The loaded json manager for this plugin */
     private InventoryManager invManager;
 
     @Override

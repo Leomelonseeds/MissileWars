@@ -47,25 +47,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
  */
 public class MissileWarsTeam {
 
-    /** The name of the team */
     private TeamName name;
-    /** The arena this team is linked to. */
     private Arena arena;
-    /** The members of the team. */
     private Set<MissileWarsPlayer> members;
-    /** The spawn location for the team. */
     private Location spawn;
-    /** Whether the team's decks should be distributing items in chaos-mode. */
-    private boolean chaosMode;
-    /** Map containing locations and statuses of all portals */
     private Map<Location, Boolean> portals;
-    /** The number of shield blocks broken. */
     private int shieldBlocksBroken;
-    /** The number of shield blocks in total */
     private int shieldVolume;
-    /** Register this team to a vanilla team */
     private Team team;
-    /** the multiplier for all cooldown items */
     private double multiplier;
 
     /**
@@ -164,15 +153,6 @@ public class MissileWarsTeam {
     }
 
     /**
-     * Set the status of chaos mode.
-     *
-     * @param chaosMode the new status of chaos mode
-     */
-    public void setChaosMode(boolean chaosMode) {
-        this.chaosMode = chaosMode;
-    }
-
-    /**
      * Get the team's spawn location.
      *
      * @return the team's spawn location
@@ -188,25 +168,6 @@ public class MissileWarsTeam {
      */
     public int getShieldBlocksBroken() {
         return shieldBlocksBroken;
-    }
-    
-    /**
-     * Get remaining portals
-     * 
-     * @return
-     */
-    public int getRemainingPortals() {
-        int count = 0;
-        for (Location loc : portals.keySet()) {
-            if (portals.get(loc)) {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    public int getTotalPortals() {
-        return portals.size();
     }
  
     /**
@@ -405,22 +366,19 @@ public class MissileWarsTeam {
             loc.add(0, 1, 0);
         }
         
-        // Return if no registered portal at location
-        if (portals.get(loc) == null) {
+        // Return if no registered portal at location, or somehow already broken
+        if (!portals.containsKey(loc) || !portals.get(loc)) {
             return false;
         }
         
-        // If portal still exists there
-        if (portals.get(loc)) {
-            portals.put(loc, false);
-            // Reset this to true after 5 sec if don't count
-            if (!count) {
-                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portals.put(loc, true), 100);
-            }
-            return true;
+        portals.put(loc, false);
+        
+        // Reset this to true after 5 sec if don't count
+        if (!count) {
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portals.put(loc, true), 100);
         }
         
-        return false;
+        return true;
     }
 
     /**
@@ -429,12 +387,20 @@ public class MissileWarsTeam {
      * @return true if either the first or second portal for this team exists
      */
     public boolean hasLivingPortal() {
-        for (Location loc : portals.keySet()) {
-            if (portals.get(loc)) {
-                return true;
-            }
-        }
-        return false;
+        return getRemainingPortals() > 0;
+    }
+    
+    /**
+     * Get remaining portals
+     * 
+     * @return
+     */
+    public int getRemainingPortals() {
+        return (int) portals.values().stream().filter(b -> b).count();
+    }
+    
+    public int getTotalPortals() {
+        return portals.size();
     }
 
     /**
@@ -496,9 +462,5 @@ public class MissileWarsTeam {
         int totalBlocks = shieldVolume;
         double percentage = Math.abs((totalBlocks - shieldBlocksBroken) / (double) totalBlocks);
         return Math.min(100 * percentage, 100);
-    }
-
-    public Boolean isChaos() {
-        return chaosMode;
     }
 }

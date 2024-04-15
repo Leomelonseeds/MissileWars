@@ -157,7 +157,7 @@ public class DeckItem {
     }
     
     public int getCooldown() {
-        return (int) (cooldown * team.getMultiplier() / (team.isChaos() ? 2 : 1));
+        return (int) (cooldown * team.getMultiplier());
     }
      
     public int getMax() {
