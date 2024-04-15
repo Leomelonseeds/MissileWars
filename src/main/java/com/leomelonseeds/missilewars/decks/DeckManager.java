@@ -350,7 +350,7 @@ public class DeckManager {
                     lore.add(itemsConfig.getString("text.locked1").replace("%cost%", cost + ""));
                     lore.add(itemsConfig.getString("text.locked2").replace("%cost%", cost + ""));
                     if (intangible) {
-                        item.setType(Material.getMaterial(itemsConfig.getString("intangibles.locked")));
+                        item = item.withType(Material.getMaterial(itemsConfig.getString("intangibles.locked")));
                     }
                 } else {
                     // Possibility of upgrading
@@ -363,7 +363,7 @@ public class DeckManager {
                         int spCost = (int) ConfigUtils.getItemValue(name, level, "spcost");
                         lore.add(itemsConfig.getString("text.downgradable").replace("%spcost%", spCost + ""));
                         if (intangible) {
-                            item.setType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
+                            item = item.withType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
                         }
                     }
                     

@@ -119,7 +119,7 @@ public class PresetSelector implements MWInventory {
                 select = "select";
             }
             
-            sel.setType(Material.valueOf(itemConfig.getString("preset.normal.item" + select)));
+            sel = sel.withType(Material.valueOf(itemConfig.getString("preset.normal.item" + select)));
             selMeta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.normal.name" + select)));
             selMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
                     PersistentDataType.STRING, p);

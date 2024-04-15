@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -95,8 +96,8 @@ public class MapVoting implements MWInventory {
                 mapItem.setAmount(Math.min(Math.max(votes, 1), 64));
                 mapItemMeta.getPersistentDataContainer().set(mapKey, PersistentDataType.STRING, mapName);
                 if (votes > 0) {
-                    mapItem.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
                     mapItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    mapItemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
                 }
             }
             
@@ -114,6 +115,10 @@ public class MapVoting implements MWInventory {
     public void registerClick(int slot, ClickType type) {
         ItemStack clicked = inv.getItem(slot);
         if (clicked == null) {
+            return;
+        }
+        
+        if (player.getGameMode() == GameMode.SPECTATOR) {
             return;
         }
         
