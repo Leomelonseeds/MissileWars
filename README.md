@@ -16,7 +16,7 @@ There are now 4 different Decks (kits), each with 5 different missiles, 3 unique
 Each deck can be upgraded and customized to your liking, with up to 3 custom presets available, and by default 18 skillpoints per preset. Change the power of your missiles, the defensive capability of your utility items, the level of your enchantments, and add passives that change your gameplay and rng. The possibilities are pretty much endless. Here's some examples of available passives:
 * **Adrenaline** (Vanguard) - Permanent Speed effect. Another passive called **Bunny** gives permanent jump boost.
 * **Longshot** (Sentinel) - Increases bow damage the further the shot.
-* **Warden** (Sentinel) - Gives Strength and Resistance when on your own base.
+* **Heavy Arrows** (Sentinel) - Shoot special gold-weighted arrows that travel slower, but deal more knockback.
 * **Creepershot** (Berserker) - Allows you to load creepers as projectiles into your crossbow and fire them at enemies.
 * **Prickly Projectiles** (Architect) - Thrown eggs and snowballs do knockback to enemies, and are given back on a successful hit.
 * **Deconstructor** (Architect) - Random chance for mined missile-related blocks to be picked up in your inventory.
@@ -26,12 +26,12 @@ Hours have been spent balancing each item and passive. Any build you can come up
 
 ## Items
 The decks include over 35 new unique missiles (most credited to the Rocket Riders team!) and utility items, making gameplay more fun and interesting, offering many new strategies and possibilities for team collaboration. Below are some new utility items:
-* **Torpedo** - A block-based sky mine that explodes on contact with missiles and players
-* **Canopy** - A nerfed version of the Rocket Riders canopy that requires a player to be on the ground to use, and only teleports after 1 second.
-* **Platform** - Rotate a shield 90 degrees, and you get a perfect space to party
-* **Leaves** - Temporary building blocks that decay after a while
-* **Obsidian Shield** - A pretty strong shield that will disappear after a few seconds
-* **Fireball** - Point and click firing mechanism, instead of placing on ground
+* **Torpedo** - A block-based sky mine that explodes on contact with missiles and players.
+* **Canopy** - A nerfed version of the Rocket Riders canopy that throws an eye of ender, and teleports after 3 seconds.
+* **Platform** - Rotate a shield 90 degrees, and you get a perfect space to party.
+* **Leaves** - Temporary building blocks that decay after a while.
+* **Obsidian Shield** - A pretty strong shield that will disappear after a few seconds.
+* **Fireball** - Point and click firing mechanism, instead of placing on ground.
 * **Lingering Harming Potion**
 * **Spawn Creeper**
 
@@ -54,6 +54,8 @@ The decks include over 35 new unique missiles (most credited to the Rocket Rider
 * **Darkness Fortress** - by Lizzem
 ![2023-05-07_20 29 03](https://user-images.githubusercontent.com/17891302/236728000-7e9d4134-46bc-4a49-b3ea-026610548b3d.png)
 
+With maps varying in gameplay difficulty, each map has been given a minimum rank requirement that the lobby must meet in order to play on it, giving players incentive to level up, and easing new players into the game.
+
 ## Gameplay & QOL
 Here are just a few of the most important features that you might not have seen before.
 * Per-item cooldowns - each item has its own cooldown and max items, removing almost all RNG associated with the game.
@@ -61,8 +63,8 @@ Here are just a few of the most important features that you might not have seen 
 ![image](https://user-images.githubusercontent.com/17891302/236728106-6d1055b5-4e29-49d3-841c-e84e4ec02ef4.png)
 * You now need to blow up *all* enemy portals to win (and there can be many :).
 * A tracker system associates portal breaks and kills from TNT to yourself. Blocked a missile with a shield or your own missile? That's your kill. Sniped someone with a Slingshot missile? That's your kill.
-* A rankup and stats system has been added. Gain more skillpoints with each rankup to use in your decks, and climb the leaderboards.
-* A 30 minute game timer, after which the team with the most portals remaining wins. Chaos mode starts when there are 10 minutes remaining, with halved item cooldowns.
+* A rankup and stats system has been added. Climb the leaderboards, and unlock new maps and cosmetics.
+* A 30 minute game timer, after which the team with the most portals remaining wins. At 20 minutes left, item cooldowns are reduced by 25%, and at 10 minutes, they are reduced by 50%.
 * Cooldowns in 1v2s and 2v3s adjust to 1/2 and 2/3 of their normal times respectively to balance unfair teams.
 * A particle preview of the location of a spawnable missile.
 * A cooldown of 0.4 seconds between each missile spawn.
