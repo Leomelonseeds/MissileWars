@@ -1005,7 +1005,7 @@ lingering_harming:
     
 arrows:
   index: 7
-  cooldown: 16
+  cooldown: 20
   item: ARROW
   name: "&fArrows"
   lore:
