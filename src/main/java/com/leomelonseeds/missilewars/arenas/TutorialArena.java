@@ -2,8 +2,10 @@ package com.leomelonseeds.missilewars.arenas;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -39,6 +41,7 @@ public class TutorialArena extends ClassicArena {
     private Map<UUID, Integer> stage;
     private Map<UUID, Location> xs;
     private Map<UUID, BukkitTask> particles;
+    private Set<UUID> hasGlow;
     private boolean justReset;
     
     public TutorialArena() {
@@ -56,6 +59,7 @@ public class TutorialArena extends ClassicArena {
         this.stage = new HashMap<>();
         this.xs = new HashMap<>();
         this.particles = new HashMap<>();
+        this.hasGlow = new HashSet<>();
         this.justReset = true;
         voteManager.addVote("default-map", 64);
         ConfigUtils.schedule(1, () -> start());
@@ -77,7 +81,6 @@ public class TutorialArena extends ClassicArena {
                 running = false;
                 resetting = true;
                 stopTrackers();
-                redTeam.unglowPortals();
                 resetWorld();
                 init();
                 this.cancel();
@@ -219,6 +222,8 @@ public class TutorialArena extends ClassicArena {
             player.teleport(getPlayerSpawn(player));
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 128, true, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 6, true, false));
+            redTeam.setPortalGlow(getPlayerInArena(uuid), true);
+            hasGlow.add(uuid);
             return;
         }
         
@@ -246,7 +251,7 @@ public class TutorialArena extends ClassicArena {
                 }
             }, 10, 5));
             
-            DeckStorage deck = getPlayerInArena(player.getUniqueId()).getDeck().getType();
+            DeckStorage deck = DeckStorage.fromString(plugin.getJSON().getPlayer(uuid).getString("Deck"));
             if (deck == DeckStorage.BERSERKER || deck == DeckStorage.VANGUARD) {
                 ConfigUtils.schedule(100, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null));
             }
@@ -287,9 +292,11 @@ public class TutorialArena extends ClassicArena {
         
         Bukkit.getLogger().info(player.getName() + " completed stage " + s);
 
-        // End tutorial if stage 6 passes
         ConfigUtils.sendTitle("stagecomplete", player);
-        if (s == 7) {
+        if (s == 3) {
+            redTeam.setPortalGlow(getPlayerInArena(uuid), false);
+            hasGlow.remove(uuid);
+        } else if (s == 7) {
             stage.put(uuid, 8);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
@@ -372,8 +379,8 @@ public class TutorialArena extends ClassicArena {
         // Reset map after 5 sec
         ConfigUtils.schedule(100, () -> SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null));
         ConfigUtils.schedule(140, () -> {
-            redTeam.unglowPortals();
-            glowPortals(redTeam);
+            redTeam.destroyPortals(true);
+            hasGlow.forEach(uid -> redTeam.setPortalGlow(getPlayerInArena(uid), true));
         });
         
         // Check if has associated player
@@ -400,10 +407,10 @@ public class TutorialArena extends ClassicArena {
     
     @Override
     public void removePlayer(UUID uuid, Boolean tolobby) {
+        redTeam.setPortalGlow(getPlayerInArena(uuid), false);
+        hasGlow.remove(uuid);
+        removeXs(uuid);
         super.removePlayer(uuid, tolobby);
-        if (tolobby) {
-            removeXs(uuid);
-        }
     }
     
     @Override
@@ -425,13 +432,10 @@ public class TutorialArena extends ClassicArena {
     }
     
     @Override
-    protected void glowPortals(MissileWarsTeam team) {
-        if (team.getName() != TeamName.RED) {
-            return;
-        }
-        
-        team.glowPortals(0.8F);
-    }
+    protected void glowPortals(MissileWarsTeam team) {}
+    
+    @Override
+    protected void glowPortals(MissileWarsTeam team, MissileWarsPlayer player) {}
     
     // No need to track who left the arena here
     @Override

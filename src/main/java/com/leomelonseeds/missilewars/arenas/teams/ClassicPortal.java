@@ -8,28 +8,31 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.GlassPane;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class ClassicPortal {
+    
+    private final static float GLOW_DISTANCE = 10F;
+    private static MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
     
     private boolean alive;
     private Location loc1; // Corner 1, defined in config
     private Location loc2; // Corner 2, always -x and -y from corner 1 (west)
     private BlockDisplay glow;
-    private Color teamColor;
     
     public ClassicPortal(Location loc1) {
         this.alive = true;
         this.loc1 = loc1;
         this.loc2 = loc1.clone();
-        this.teamColor = loc1.getZ() < 0 ? Color.BLUE : Color.RED;
         
-        // Find loc2
-        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+        // Find loc2, then setup glow 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             while (loc2.clone().add(-1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
                 loc2.add(-1, 0, 0);
             }
@@ -37,33 +40,15 @@ public class ClassicPortal {
             while (loc2.clone().add(0, -1, 0).getBlock().getType() != Material.OBSIDIAN) {
                 loc2.add(0, -1, 0);
             }
+            
+            Bukkit.getScheduler().runTask(plugin, () -> setupGlow());
         });
     }
     
-    public boolean isAlive() {
-        return alive;
-    }
-    
-    /**
-     * If alive is set to false, automatically tries to remove glow
-     * 
-     * @param alive
-     */
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-        if (!alive) {
-            unglow();
-        }
-    }
-    
-    /**
-     * Make portal glow, showing its location to all players
-     * Does nothing if portal is dead, or already glowing
-     * 
-     * @param distance the distance that players can see the glow from
-     */
-    public void glow(float distance) {
-        if (!alive || glow != null) {
+    private void setupGlow() {
+        // If server just started, wait a bit for everything to calm down
+        if (!MissileWarsPlugin.glow_safe) {
+            ConfigUtils.schedule(MissileWarsPlugin.seconds_until_glow * 20, () -> setupGlow());
             return;
         }
         
@@ -72,25 +57,92 @@ public class ClassicPortal {
         pane.setFace(BlockFace.EAST, true);
         pane.setFace(BlockFace.WEST, true);
         glow.setBlock(pane);
-        glow.setViewRange(distance);
+        glow.setViewRange(GLOW_DISTANCE);
         
         // Figure out transformation vector
         Vector3f scale = new Vector3f(loc2.getBlockX() - loc1.getBlockX() - 1, loc2.getBlockY() - loc1.getBlockY() - 1, 1);
         Transformation trans = new Transformation(new Vector3f(), new AxisAngle4f(), scale, new AxisAngle4f());
         glow.setTransformation(trans);
-        glow.setGlowing(true);
+        
+        // Set glow
+        Color teamColor = loc1.getZ() < 0 ? Color.BLUE : Color.RED;
         glow.setGlowColorOverride(teamColor);
+        glow.setGlowing(true);
+        
+        glow.setVisibleByDefault(false);
     }
     
     /**
-     * Remove the glow from this portal
+     * Removes and restores the glow for this portal. Only
+     * useful in arenas where portals can regenerate
      */
-    public void unglow() {
+    public void resetGlow() {
+        removeGlow();
+        setupGlow();
+    }
+    
+    /**
+     * Remove the glow from this portal for all players
+     */
+    public void removeGlow() {
         if (glow == null) {
             return;
         }
         
         glow.remove();
         glow = null;
+    }
+    
+    public boolean isAlive() {
+        return alive;
+    }
+    
+    /**
+     * If alive is set to false, the glow for the portal
+     * will be removed for all players
+     * 
+     * @param alive
+     */
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+        if (!alive) {
+            removeGlow();
+        }
+    }
+    
+    /**
+     * Makes the portal glow for a certain player
+     * 
+     * @param player
+     */
+    public void glow(MissileWarsPlayer mwp) {
+        Player player = mwp.getMCPlayer();
+        if (glow == null || player == null || !player.isOnline()) {
+            return;
+        }
+        
+        if (player.canSee(glow)) {
+            return;
+        }
+        
+        player.showEntity(plugin, glow);
+    }
+    
+    /**
+     * Hides portal glow for a player
+     * 
+     * @param player
+     */
+    public void hideGlow(MissileWarsPlayer mwp) {
+        Player player = mwp.getMCPlayer();
+        if (glow == null || player == null || !player.isOnline()) {
+            return;
+        }
+        
+        if (!player.canSee(glow)) {
+            return;
+        }
+        
+        player.hideEntity(plugin, glow);
     }
 }

@@ -157,6 +157,7 @@ public class MissileWarsPlayer {
     // EXP bar cooldown preview + out of bounds handling
     // TODO: Enemy in-base red vignette
     private void cooldownPreview(Arena arena) {
+        Player player = getMCPlayer();
         tasks.add(new BukkitRunnable() {
             
             ItemStack lastItem = null;
@@ -164,8 +165,6 @@ public class MissileWarsPlayer {
             
             @Override
             public void run() {
-                // Player left the server
-                Player player = getMCPlayer();
                 if (ArenaUtils.outOfBounds(player, arena)) {
                     player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
                     outOfBounds = true;

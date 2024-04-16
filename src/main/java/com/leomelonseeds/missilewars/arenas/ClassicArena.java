@@ -3,10 +3,12 @@ package com.leomelonseeds.missilewars.arenas;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,16 +34,39 @@ import net.milkbowl.vault.economy.Economy;
 
 public class ClassicArena extends Arena {
     
-    private BukkitTask redUnglowTask;
-    private BukkitTask blueUnglowTask;
+    private final static int GLOW_TICKS = 300;
+    
+    /** LEFT = RED, RIGHT = BLUE */
+    private Map<MissileWarsPlayer, MutablePair<BukkitTask, BukkitTask>> glowTasks;
     
     public ClassicArena(String name, int capacity) {
         super(name, capacity);
         gamemode = "classic";
+        this.glowTasks = new HashMap<>();
     }
 
     public ClassicArena(Map<String, Object> serializedArena) {
         super(serializedArena);
+        this.glowTasks = new HashMap<>();
+    }
+    
+    @Override
+    public void resetWorld() {
+        glowTasks.values().forEach(t -> {
+            t.getLeft().cancel();
+            t.getRight().cancel();
+        });
+        glowTasks.clear();
+        redTeam.destroyPortals(false);
+        blueTeam.destroyPortals(false);
+        super.resetWorld();
+    }
+
+    @Override
+    public void addCallback(MissileWarsPlayer player) {
+        glowPortals(blueTeam, player);
+        glowPortals(redTeam, player);
+        super.addCallback(player);
     }
     
     @Override
@@ -62,9 +87,6 @@ public class ClassicArena extends Arena {
                 }
                 team.addPortal(new Location(getWorld(), x, y, z));
             }
-            
-            // Make portals glow to show players where they are
-            ConfigUtils.schedule(20, () -> glowPortals(team));
         }
     }
     
@@ -290,24 +312,46 @@ public class ClassicArena extends Arena {
     }
     
     /**
-     * Hard 10 second limit on portal glow time
+     * Makes portals from the specified team glow for every player
+     * in the arena. Portals are hidden after 10 seconds
      * 
      * @param team
      */
     protected void glowPortals(MissileWarsTeam team) {
-        team.glowPortals(10F);
+        players.forEach(mwp -> glowPortals(team, mwp));
+    }
+    
+    /**
+     * Makes all available portals from the specified team glow for the specified
+     * player. The portals are hidden after 10 seconds.
+     * 
+     * @param player
+     * @param keep
+     */
+    protected void glowPortals(MissileWarsTeam team, MissileWarsPlayer player) {
+        team.setPortalGlow(player, true);
+        boolean isRed = team.getName() == TeamName.RED;
+        BukkitTask remTask = ConfigUtils.schedule(GLOW_TICKS, () -> team.setPortalGlow(player, false));
+        MutablePair<BukkitTask, BukkitTask> curTasks = glowTasks.get(player);
+        if (curTasks == null) {
+            if (isRed) {
+                glowTasks.put(player, MutablePair.of(remTask, null));
+            } else {
+                glowTasks.put(player, MutablePair.of(null, remTask));
+            }
+            return;
+        }
         
-        BukkitTask unglowTask = ConfigUtils.schedule(200, () -> team.unglowPortals());
-        if (team.getName() == TeamName.RED) {
-            if (redUnglowTask != null) {
-                redUnglowTask.cancel();
+        if (isRed) {
+            if (curTasks.getLeft() != null) {
+                curTasks.getLeft().cancel();
             }
-            redUnglowTask = unglowTask;
+            curTasks.setLeft(remTask);
         } else {
-            if (blueUnglowTask != null) {
-                blueUnglowTask.cancel();
+            if (curTasks.getRight() != null) {
+                curTasks.getRight().cancel();
             }
-            blueUnglowTask = unglowTask;
+            curTasks.setRight(remTask);
         }
     }
 }

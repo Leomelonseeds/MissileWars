@@ -380,14 +380,30 @@ public class MissileWarsTeam {
     }
     
     /**
-     * @param distance 0.5 blocks < 0.01F < 1 block
+     * Show or hide portals for the specified player.
+     * 
+     * @param player
+     * @param show shows if true, hides if false
      */
-    public void glowPortals(float distance) {
-        portals.values().forEach(p -> p.glow(distance));
+    public void setPortalGlow(MissileWarsPlayer player, boolean show) {
+        if (show) {
+            portals.values().forEach(p -> p.glow(player));
+        } else {
+            portals.values().forEach(p -> p.hideGlow(player));
+        }
     }
     
-    public void unglowPortals() {
-        portals.values().forEach(p -> p.unglow());
+    /**
+     * Kills the glowing entity for all portals
+     * 
+     * @param reset whether to respawn the glows
+     */
+    public void destroyPortals(boolean reset) {
+        if (reset) {
+            portals.values().forEach(p -> p.resetGlow());
+        } else {
+            portals.values().forEach(p -> p.removeGlow());
+        }
     }
     
     /**

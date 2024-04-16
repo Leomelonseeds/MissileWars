@@ -22,6 +22,7 @@ import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.listener.packets.DefuseHelper;
 import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
@@ -32,6 +33,10 @@ import net.milkbowl.vault.economy.Economy;
 
 /** Base class for the Missile Wars plugin */
 public final class MissileWarsPlugin extends JavaPlugin {
+    
+    /** Whether it is currently safe to spawn a glow entity */
+    public static boolean glow_safe = false;
+    public static int seconds_until_glow = 10;
 
     private static MissileWarsPlugin plugin;
     private ArenaManager arenaManager;
@@ -115,6 +120,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
         setupDatabase();
         log("MySQL setup complete.");
 
+        // Enable spawning of glow display entities after 10 seconds
+        ConfigUtils.schedule(seconds_until_glow * 20, () -> glow_safe = true);
         log("Missile Wars is ready to play :)");
     }
     
