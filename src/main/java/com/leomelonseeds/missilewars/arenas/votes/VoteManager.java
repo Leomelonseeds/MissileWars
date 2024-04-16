@@ -119,7 +119,7 @@ public class VoteManager {
         String mapName = "default-map";
         List<String> mapsWithTopVotes = new LinkedList<>();
         for (String map : allVotes.keySet()) {
-            if (!filter.test(mapName)) {
+            if (!filter.test(map)) {
                 continue;
             }
             

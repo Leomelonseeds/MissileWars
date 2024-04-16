@@ -14,6 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
@@ -29,6 +30,9 @@ import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 
 public class ClassicArena extends Arena {
+    
+    private BukkitTask redUnglowTask;
+    private BukkitTask blueUnglowTask;
     
     public ClassicArena(String name, int capacity) {
         super(name, capacity);
@@ -55,9 +59,11 @@ public class ClassicArena extends Arena {
                 if (team == redTeam) {
                     z = z * -1;
                 }
-                Location portalLoc = new Location(getWorld(), x, y, z);
-                team.getPortals().put(portalLoc, true);
+                team.addPortal(new Location(getWorld(), x, y, z));
             }
+            
+            // Make portals glow to show players where they are
+            ConfigUtils.schedule(20, () -> glowPortals(team));
         }
     }
     
@@ -241,6 +247,7 @@ public class ClassicArena extends Arena {
         if (broketeam.hasLivingPortal()) {
             broketeam.sendTitle("own-portal-destroyed");
             enemy.sendTitle("enemy-portal-destroyed");
+            glowPortals(broketeam);
         }
         
         // Check if has associated player
@@ -284,6 +291,7 @@ public class ClassicArena extends Arena {
         // and furthermore, the team that is ALIVE is enemy since break was registered for broketeam
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         int wait = plugin.getConfig().getInt("tie-wait-time");
+        glowPortals(enemy);
         if (getSecondsRemaining() <= 300) {
             endGame(enemy);
         } else {
@@ -305,6 +313,28 @@ public class ClassicArena extends Arena {
                     endGame(enemy);
                 }
             }, wait * 20L));
+        }
+    }
+    
+    /**
+     * Hard 10 second limit on portal glow time
+     * 
+     * @param team
+     */
+    protected void glowPortals(MissileWarsTeam team) {
+        team.glowPortals(10F);
+        
+        BukkitTask unglowTask = ConfigUtils.schedule(200, () -> team.unglowPortals());
+        if (team.getName() == TeamName.RED) {
+            if (redUnglowTask != null) {
+                redUnglowTask.cancel();
+            }
+            redUnglowTask = unglowTask;
+        } else {
+            if (blueUnglowTask != null) {
+                blueUnglowTask.cancel();
+            }
+            blueUnglowTask = unglowTask;
         }
     }
 }

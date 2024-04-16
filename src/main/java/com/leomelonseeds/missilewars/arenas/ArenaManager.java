@@ -102,10 +102,6 @@ public class ArenaManager {
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
             arena.loadWorldFromDisk(false);
-            if (arena instanceof TutorialArena) {
-                Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aStarting tutorial arena..."));
-                arena.start();
-            }
         }
 
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 

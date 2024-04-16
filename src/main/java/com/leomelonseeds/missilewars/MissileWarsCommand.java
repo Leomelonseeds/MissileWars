@@ -8,22 +8,12 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.GlassPane;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -54,22 +44,6 @@ public class MissileWarsCommand implements CommandExecutor {
         String action = args[0];
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ArenaManager arenaManager = plugin.getArenaManager();
-        
-        // TEST TEST TEST
-        if (action.equalsIgnoreCase("testdisplay")) {
-            Player player = (Player) sender;
-            Location spawnLoc = player.getLocation().toCenterLocation().add(0, -0.5, 0);
-            BlockDisplay display = (BlockDisplay) player.getWorld().spawnEntity(spawnLoc, EntityType.BLOCK_DISPLAY);
-            GlassPane pane = (GlassPane) Material.PURPLE_STAINED_GLASS_PANE.createBlockData();
-            pane.setFace(BlockFace.EAST, true);
-            pane.setFace(BlockFace.WEST, true);
-            display.setBlock(pane);
-            Transformation trans = new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(10, 10, 1), new AxisAngle4f());
-            display.setTransformation(trans);
-            display.setViewRange(256F);
-            display.setGlowing(true);
-            display.setGlowColorOverride(Color.BLUE);
-        }
         
         // Reload all config files
         if (action.equalsIgnoreCase("reload")) {

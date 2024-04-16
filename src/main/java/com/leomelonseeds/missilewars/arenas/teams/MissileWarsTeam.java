@@ -48,7 +48,7 @@ public class MissileWarsTeam {
     private Arena arena;
     private Set<MissileWarsPlayer> members;
     private Location spawn;
-    private Map<Location, Boolean> portals;
+    private Map<Location, ClassicPortal> portals;
     private int shieldBlocksBroken;
     private int shieldVolume;
     private double multiplier;
@@ -114,10 +114,6 @@ public class MissileWarsTeam {
     
     public TeamName getName() {
         return name;
-    }
-    
-    public Map<Location, Boolean> getPortals() {
-        return portals;
     }
     
     public Set<MissileWarsPlayer> getMembers() {
@@ -191,17 +187,13 @@ public class MissileWarsTeam {
         
         // Drop any alcohol items and clear inventory, then add armor
         PlayerInventory inv = mcPlayer.getInventory();
-        boolean dropped = false;
         for (int i = 0; i <= 8; i++) {
             ItemStack ci = inv.getContents()[i];
             if (InventoryUtils.isPotion(ci)) {
-                arena.getWorld().dropItem(spawn, ci);
-                dropped = true;
+                InventoryUtils.regiveItem(mcPlayer, ci);
             }
         }
-        if (dropped) {
-            ConfigUtils.sendConfigMessage("messages.dropped-alcohol", mcPlayer, null, null);
-        }
+        
         InventoryUtils.clearInventory(mcPlayer, true);
         inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
         inv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
@@ -346,18 +338,23 @@ public class MissileWarsTeam {
         }
         
         // Return if no registered portal at location, or somehow already broken
-        if (!portals.containsKey(loc) || !portals.get(loc)) {
+        ClassicPortal portal = portals.get(loc);
+        if (portal == null || !portal.isAlive()) {
             return false;
         }
         
-        portals.put(loc, false);
+        portal.setAlive(false);
         
         // Reset this to true after 5 sec if don't count
         if (!count) {
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portals.put(loc, true), 100);
+            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portal.setAlive(true), 100);
         }
         
         return true;
+    }
+    
+    public void addPortal(Location loc) {
+        portals.put(loc, new ClassicPortal(loc));
     }
 
     /**
@@ -375,13 +372,24 @@ public class MissileWarsTeam {
      * @return
      */
     public int getRemainingPortals() {
-        return (int) portals.values().stream().filter(b -> b).count();
+        return (int) portals.values().stream().filter(p -> p.isAlive()).count();
     }
     
     public int getTotalPortals() {
         return portals.size();
     }
-
+    
+    /**
+     * @param distance 0.5 blocks < 0.01F < 1 block
+     */
+    public void glowPortals(float distance) {
+        portals.values().forEach(p -> p.glow(distance));
+    }
+    
+    public void unglowPortals() {
+        portals.values().forEach(p -> p.unglow());
+    }
+    
     /**
      * Send the team a title at a given path.
      *

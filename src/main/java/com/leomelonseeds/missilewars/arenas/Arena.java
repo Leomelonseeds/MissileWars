@@ -86,7 +86,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /** Helper variable to check when all queues are done */
     protected int queueCount;
     /** The rank level to evaluate map selection by */
-    protected int rankMode;
+    protected int rankMedian;
 
     /**
      * Create a new Arena with a given name and max capacity.
@@ -458,14 +458,14 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return
      */
     public boolean isAvailable(String map) {
-        return rankMode >= ArenaUtils.getRankRequirement(gamemode, map);
+        return rankMedian >= ArenaUtils.getRankRequirement(gamemode, map);
     }
     
     /**
      * Re-calculates the mode of the rank in this arena to
      * evaluate map selection by
      */
-    private void calculateRankMode() {
+    private void calculateRankMedian() {
         if (running || resetting) {
             return;
         }
@@ -485,7 +485,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         Collections.sort(ranks);
-        this.rankMode = ranks.get((ranks.size() - 1) / 2);
+        this.rankMedian = ranks.get((ranks.size() - 1) / 2);
     }
     
     /**
@@ -585,7 +585,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
        
         else {
-            calculateRankMode();
+            calculateRankMedian();
         }
     }
     
@@ -650,7 +650,7 @@ public abstract class Arena implements ConfigurationSerializable {
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         players.remove(toRemove);
         voteManager.removePlayer(toRemove.getMCPlayer());
-        calculateRankMode();
+        calculateRankMedian();
 
         for (MissileWarsPlayer mwPlayer : players) {
             ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
@@ -898,7 +898,7 @@ public abstract class Arena implements ConfigurationSerializable {
             announceMessage("messages.spectate-leave-others", player);
             player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
             player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-            calculateRankMode();
+            calculateRankMedian();
             checkForStart();
         }
     }
@@ -923,7 +923,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
                 mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /sp to stop spectating"));
                 voteManager.removePlayer(mcPlayer);
-                calculateRankMode();
+                calculateRankMedian();
                 checkEmpty();
             } else {
                 ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
@@ -1096,10 +1096,10 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Assign queued players. If a queue is larger than a team size put remaining
         // players into the front of the queue to be assigned first into random teams
-        queueCount = toAssign.size();
+        queueCount = Math.min(capacity, toAssign.size());
+        double maxTeamSize = capacity / 2;
+        double maxQueue = Math.ceil(toAssign.size() / 2.0);
         Collections.shuffle(toAssign);
-        double maxSize = getCapacity() / 2;
-        double maxQueue = Math.ceil((double) (players.size() - spectators.size()) / 2);
         while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
             if (!redQueue.isEmpty()) {
                 MissileWarsPlayer toAdd = redQueue.remove();
@@ -1124,13 +1124,13 @@ public abstract class Arena implements ConfigurationSerializable {
         // Assign remaining players
         for (MissileWarsPlayer player : toAssign) {
             if (blueTeam.getSize() <= redTeam.getSize()) {
-                if (blueTeam.getSize() >= maxSize) {
+                if (blueTeam.getSize() >= maxTeamSize) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
                 } else {
                     blueTeam.addPlayer(player);
                 }
             } else {
-                if (redTeam.getSize() >= maxSize) {
+                if (redTeam.getSize() >= maxTeamSize) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
                 } else {
                     redTeam.addPlayer(player);

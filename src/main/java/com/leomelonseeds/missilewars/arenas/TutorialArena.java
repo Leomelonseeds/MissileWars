@@ -58,7 +58,7 @@ public class TutorialArena extends ClassicArena {
         this.particles = new HashMap<>();
         this.justReset = true;
         voteManager.addVote("default-map", 64);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> start(), 1);
+        ConfigUtils.schedule(1, () -> start());
         
         // World reset task
         int minute = 20 * 60;
@@ -77,6 +77,7 @@ public class TutorialArena extends ClassicArena {
                 running = false;
                 resetting = true;
                 stopTrackers();
+                redTeam.unglowPortals();
                 resetWorld();
                 init();
                 this.cancel();
@@ -247,7 +248,7 @@ public class TutorialArena extends ClassicArena {
             
             DeckStorage deck = getPlayerInArena(player.getUniqueId()).getDeck().getType();
             if (deck == DeckStorage.BERSERKER || deck == DeckStorage.VANGUARD) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null), 100);
+                ConfigUtils.schedule(100, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null));
             }
             return;
         }
@@ -369,9 +370,11 @@ public class TutorialArena extends ClassicArena {
         }
         
         // Reset map after 5 sec
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-            SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null);
-        }, 100);
+        ConfigUtils.schedule(100, () -> SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null));
+        ConfigUtils.schedule(140, () -> {
+            redTeam.unglowPortals();
+            glowPortals(redTeam);
+        });
         
         // Check if has associated player
         Player player;
@@ -419,6 +422,15 @@ public class TutorialArena extends ClassicArena {
             queueCount++;
             blueTeam.addPlayer(player);
         }
+    }
+    
+    @Override
+    protected void glowPortals(MissileWarsTeam team) {
+        if (team.getName() != TeamName.RED) {
+            return;
+        }
+        
+        team.glowPortals(0.8F);
     }
     
     // No need to track who left the arena here
