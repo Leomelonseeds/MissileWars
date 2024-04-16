@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -279,15 +278,7 @@ public class ClassicArena extends Arena {
         } else {
             enemy.sendTitle("enemy-portals-destroyed");
             broketeam.sendTitle("own-portals-destroyed");
-            waitingForTie = true;
-            
-            // Set all to spectator to prevent further action
-            for (MissileWarsPlayer mwp : broketeam.getMembers()) {
-                mwp.getMCPlayer().setGameMode(GameMode.SPECTATOR);
-            }
-            for (MissileWarsPlayer mwp : enemy.getMembers()) {
-                mwp.getMCPlayer().setGameMode(GameMode.SPECTATOR);
-            }
+            setWaitingForTie();
             
             // Setup tie for tie wait time
             tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {

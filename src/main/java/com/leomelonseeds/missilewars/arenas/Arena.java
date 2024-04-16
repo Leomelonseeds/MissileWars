@@ -421,8 +421,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the number of player currently in the game.
-     *
      * @return the number of player currently in the game
      */
     public int getNumPlayers() {
@@ -433,18 +431,14 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get total number of players in the arena
-     *
-     * @return the number of player currently in the game
+     * @return the total number of players in the arena
      */
     public int getTotalPlayers() {
         return players.size();
     }
 
     /**
-     * Get the max number of players allowed in the game.
-     *
-     * @return the max number of players allowed in the game
+     * @return the max number of allowed participants
      */
     public int getCapacity() {
         return capacity;
@@ -685,7 +679,6 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         checkEmpty();
-
     }
 
     /**
@@ -699,7 +692,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Player player = Bukkit.getPlayer(uuid);
 
         if (!isRunning() || redTeam == null || blueTeam == null) {
-            removePlayer(player.getUniqueId(), true);
+            removePlayer(uuid, true);
             return true;
         }
 
@@ -714,7 +707,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
             }
         } else {
-            removePlayer(player.getUniqueId(), true);
+            removePlayer(uuid, true);
             return true;
         }
 
@@ -1208,6 +1201,22 @@ public abstract class Arena implements ConfigurationSerializable {
         one.broadcastConfigMsg("messages.team-balancing", null);
         two.setMultiplier(1);
     }
+    
+    /**
+     * Makes the game wait for a tie. This means no further action can be done
+     * by any of the players, and the game is effectively over. endGame should
+     * be called after this function. If there is no tie wait, call endGame
+     * immediately after this.
+     */
+    protected void setWaitingForTie() {
+        waitingForTie = true;
+        for (MissileWarsPlayer player : players) {
+            player.stopDeck();
+            Player p = player.getMCPlayer();
+            p.setGameMode(GameMode.SPECTATOR);
+            p.removePotionEffect(PotionEffectType.GLOWING);
+        }
+    }
 
     /**
      * End a MissileWars game with a winning team
@@ -1265,13 +1274,6 @@ public abstract class Arena implements ConfigurationSerializable {
             SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, mapName, false, false);
         }
         discordChannel.sendMessage(discordMessage).queue();
-        
-        for (MissileWarsPlayer player : players) {
-            player.stopDeck();
-            Player p = player.getMCPlayer();
-            p.setGameMode(GameMode.SPECTATOR);
-            p.removePotionEffect(PotionEffectType.GLOWING);
-        }
         leftPlayers.clear();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 

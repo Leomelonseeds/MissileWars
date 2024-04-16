@@ -21,6 +21,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -45,6 +46,7 @@ public class MissileWarsPlayer {
     private UUID playerId;
     private Deck deck;
     private Map<Stat, Integer> stats;
+    private List<BukkitTask> tasks;
     /** The time that the player joined the game */
     private LocalDateTime joinTime;
     /** Player should be invulnerable and not be able to spawn missiles if this is true */
@@ -61,6 +63,7 @@ public class MissileWarsPlayer {
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
         this.stats = new HashMap<>();
+        this.tasks = new ArrayList<>();
         resetPlayer();
     }
     
@@ -92,83 +95,69 @@ public class MissileWarsPlayer {
     /**
      * Missile preview feature
      */
-    public void missilePreview(Arena arena) {
+    public void missilePreview(boolean isRed) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!arena.isRunning() || arena.isWaitingForTie()) {
-                    this.cancel();
-                    return;
-                }
-                
-                // If the player left, cancel task
-                TeamName team = arena.getTeam(playerId);
-                if (team == TeamName.NONE) {
-                    this.cancel();
-                    return;
-                }
+        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            Player player = getMCPlayer();
+            if (player == null) {
+                return;
+            }
+            
+            if (player.getLocation().getBlockY() < -64) {
+                return;
+            }
 
-                Player player = getMCPlayer();
-                if (player == null) {
-                    return;
-                }
-                
-                if (player.getLocation().getBlockY() < -64) {
-                    return;
-                }
+            // Make sure player is aiming for a block
+            Block target = player.getTargetBlock(null, 4);
+            if (target == null || target.getType() == Material.AIR) {
+                return;
+            }
 
-                // Make sure player is aiming for a block
-                Block target = player.getTargetBlock(null, 4);
-                if (target == null || target.getType() == Material.AIR) {
-                    return;
-                }
+            // Player must be holding item
+            PlayerInventory inv = player.getInventory();
+            ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
+            ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
+            ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
+            if (hand == null || player.hasCooldown(hand.getType())) {
+                return;
+            }
 
-                // Player must be holding item
-                PlayerInventory inv = player.getInventory();
-                ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
-                ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
-                ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
-                if (hand == null || player.hasCooldown(hand.getType())) {
-                    return;
-                }
+            // Item must be a missile
+            String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
+            if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
+                    structureName.contains("torpedo-") || structureName.contains("canopy")) {
+                return;
+            }
 
-                // Item must be a missile
-                String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
-                if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
-                        structureName.contains("torpedo-") || structureName.contains("canopy")) {
-                    return;
-                }
-
-                // At this point, we know the player is holding a missile item facing a block
-                Location loc = target.getLocation();
-                Location[] spawns = SchematicManager.getCorners(structureName, loc, team == TeamName.RED, player.hasPermission("umw.oldoffsets"));
-                double x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
-                double x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
-                double y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
-                double y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
-                double z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
-                double z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
-                DustOptions dustOptions = new DustOptions(Color.LIME, 1.0F);
-                for (double x = x1; x <= x2; x++) {
-                    for (double y = y1; y <= y2; y++) {
-                        for (double z = z1; z <= z2; z++) {
-                            boolean isX = x == x1 || x == x2;
-                            boolean isY = y == y1 || y == y2;
-                            boolean isZ = z == z1 || z == z2;
-                            if (isX ? (isY || isZ) : (isY && isZ)) {
-                                player.spawnParticle(Particle.REDSTONE, x, y, z, 1, dustOptions);
-                            }
+            // At this point, we know the player is holding a missile item facing a block
+            Location loc = target.getLocation();
+            Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
+            double x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
+            double x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
+            double y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
+            double y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
+            double z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
+            double z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
+            DustOptions dustOptions = new DustOptions(Color.LIME, 1.0F);
+            for (double x = x1; x <= x2; x++) {
+                for (double y = y1; y <= y2; y++) {
+                    for (double z = z1; z <= z2; z++) {
+                        boolean isX = x == x1 || x == x2;
+                        boolean isY = y == y1 || y == y2;
+                        boolean isZ = z == z1 || z == z2;
+                        if (isX ? (isY || isZ) : (isY && isZ)) {
+                            player.spawnParticle(Particle.REDSTONE, x, y, z, 1, dustOptions);
                         }
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20, 10);
+        }, 20, 10));
     }
 
     // EXP bar cooldown preview + out of bounds handling
+    // TODO: Enemy in-base red vignette
     private void cooldownPreview(Arena arena) {
-        new BukkitRunnable() {
+        tasks.add(new BukkitRunnable() {
             
             ItemStack lastItem = null;
             boolean lastAvailable = false;
@@ -177,17 +166,6 @@ public class MissileWarsPlayer {
             public void run() {
                 // Player left the server
                 Player player = getMCPlayer();
-                if (player == null) {
-                    this.cancel();
-                    return;
-                }
-
-                if (!arena.isRunning() || arena.isWaitingForTie() || deck == null) {
-                    player.sendActionBar(ConfigUtils.toComponent(""));
-                    this.cancel();
-                    return;
-                }
-                
                 if (ArenaUtils.outOfBounds(player, arena)) {
                     player.sendActionBar(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.out-of-bounds", player, null, null)));
                     outOfBounds = true;
@@ -243,7 +221,7 @@ public class MissileWarsPlayer {
                 player.sendActionBar(ConfigUtils.toComponent(action));
                 lastItem = di.getInstanceItem();
             }
-        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2);
+        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 2, 2));
     }
 
     /**
@@ -364,10 +342,40 @@ public class MissileWarsPlayer {
         justSpawned = false;
         outOfBounds = false;
     }
+    
+    /**
+     * Stops all deck and tasks associated with this player. Run this when
+     * the player should not be able play anymore
+     */
+    public void stopDeck() {
+        tasks.forEach(t -> t.cancel());
+        if (getMCPlayer() != null) {
+            getMCPlayer().sendActionBar(ConfigUtils.toComponent(""));
+        }
+        tasks.clear();
+        
+        if (deck == null) {
+            return;
+        }
+        
+        for (DeckItem di : deck.getItems()) {
+            di.stop();
+        }
+    }
 
     /** Set the join time of this {@link MissileWarsPlayer} */
     public void setJoinTime(LocalDateTime time) {
         joinTime = time;
+    }
+
+    /** Resets missile preview and deck actionbar for {@link MissileWarsPlayer} */
+    public void resetTasks() {
+        tasks.forEach(t -> t.cancel());
+        Player player = getMCPlayer();
+        if (player != null) {
+            player.sendActionBar(ConfigUtils.toComponent(""));
+        }
+        tasks.clear();
     }
 
     /**
@@ -377,16 +385,6 @@ public class MissileWarsPlayer {
      */
     public LocalDateTime getJoinTime() {
         return joinTime;
-    }
-    
-    public void stopDeck() {
-        if (deck == null) {
-            return;
-        }
-        
-        for (DeckItem di : deck.getItems()) {
-            di.stop();
-        }
     }
 
     /**
