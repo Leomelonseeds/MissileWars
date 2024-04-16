@@ -3,7 +3,9 @@ package com.leomelonseeds.missilewars.arenas.teams;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,29 +33,22 @@ import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
+    
+    public enum Stat {
+        PORTALS,
+        KILLS,
+        DEATHS,
+        UTILITY,
+        MISSILES
+    }
 
-    /** The UUID of the Spigot player this player represents. */
     private UUID playerId;
-    /** The current deck the player has selected. */
     private Deck deck;
-    /** The mvp stat of whatever gamemode the player is in */
-    private int mvpStat;
-    /** The number of kills the player has. */
-    private int kills;
-    /** The number of deaths the player has. */
-    private int deaths;
-    /** The number of utility the player used */
-    private int utility;
-    /** The number of missiles the player spawned */
-    private int missiles;
+    private Map<Stat, Integer> stats;
     /** The time that the player joined the game */
     private LocalDateTime joinTime;
     /** Player should be invulnerable and not be able to spawn missiles if this is true */
     private boolean justSpawned;
-    /** Stores the last item previewed so it knows when to stop showing ready sign */
-    private ItemStack lastItem;
-    /** If the last item stored was available or not */
-    private boolean lastAvailable;
     /** If the player is out of bounds */
     private boolean outOfBounds;
 
@@ -65,10 +60,8 @@ public class MissileWarsPlayer {
      */
     public MissileWarsPlayer(UUID playerID) {
         this.playerId = playerID;
-        lastItem = null;
-        justSpawned = false;
-        lastAvailable = false;
-        outOfBounds = false;
+        this.stats = new HashMap<>();
+        resetPlayer();
     }
     
     /**
@@ -76,11 +69,10 @@ public class MissileWarsPlayer {
      * for a short time
      */
     public void setJustSpawned() {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         justSpawned = true;
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        ConfigUtils.schedule(MissileWarsPlugin.getPlugin().getConfig().getInt("respawn-disable"), () -> {
             justSpawned = false;
-        }, plugin.getConfig().getInt("respawn-disable"));
+        });
     }
     
     /**
@@ -177,6 +169,10 @@ public class MissileWarsPlayer {
     // EXP bar cooldown preview + out of bounds handling
     private void cooldownPreview(Arena arena) {
         new BukkitRunnable() {
+            
+            ItemStack lastItem = null;
+            boolean lastAvailable = false;
+            
             @Override
             public void run() {
                 // Player left the server
@@ -340,80 +336,32 @@ public class MissileWarsPlayer {
         return Bukkit.getPlayer(playerId);
     }
     
-    public int getMVP() {
-        return mvpStat;
+    /**
+     * Fetch a statistic
+     * 
+     * @param stat
+     * @return
+     */
+    public int getStat(Stat stat) {
+        return stats.get(stat);
     }
     
-    public void addToMVP(int add) {
-        mvpStat += add;
-    }
-
     /**
-     * Get the number of kills this {@link MissileWarsPlayer} has.
-     *
-     * @return the number of kills this {@link MissileWarsPlayer} has
+     * Increment a statistic
+     * 
+     * @param stat
      */
-    public int getKills() {
-        return kills;
-    }
-
-    /** Increment the kill count for this {@link MissileWarsPlayer}. */
-    public void incrementKills() {
-        kills++;
-    }
-
-    /**
-     * Get the number of deaths this {@link MissileWarsPlayer} has.
-     *
-     * @return the number of deaths this {@link MissileWarsPlayer} has
-     */
-    public int getDeaths() {
-        return deaths;
-    }
-
-    /** Increment the kill count for this {@link MissileWarsPlayer}. */
-    public void incrementDeaths() {
-        deaths++;
-    }
-
-    /** Increment the utility count for this {@link MissileWarsPlayer}. */
-    public void incrementUtility() {
-        utility++;
-    }
-
-    /**
-     * Get the number of utility spawns this {@link MissileWarsPlayer} has.
-     *
-     * @return the number of utility spawns this {@link MissileWarsPlayer} has
-     */
-    public int getUtility() {
-        return utility;
-    }
-
-    /** Increment the missile count for this {@link MissileWarsPlayer}. */
-    public void incrementMissiles() {
-        missiles++;
-    }
-
-    /**
-     * Get the number of missile spawns this {@link MissileWarsPlayer} has.
-     *
-     * @return the number of missile spawns this {@link MissileWarsPlayer} has
-     */
-    public int getMissiles() {
-        return missiles;
+    public void incrementStat(Stat stat) {
+        stats.put(stat, stats.get(stat) + 1);
     }
 
     /** Reset the stats of this {@link MissileWarsPlayer} back to 0 */
     public void resetPlayer() {
-        missiles = 0;
-        utility = 0;
-        kills = 0;
-        deaths = 0;
+        for (Stat stat : Stat.values()) {
+            stats.put(stat, 0);
+        }
         deck = null;
-        lastItem = null;
         justSpawned = false;
-        lastAvailable = false;
         outOfBounds = false;
     }
 
@@ -429,6 +377,16 @@ public class MissileWarsPlayer {
      */
     public LocalDateTime getJoinTime() {
         return joinTime;
+    }
+    
+    public void stopDeck() {
+        if (deck == null) {
+            return;
+        }
+        
+        for (DeckItem di : deck.getItems()) {
+            di.stop();
+        }
     }
 
     /**
@@ -448,16 +406,6 @@ public class MissileWarsPlayer {
     @Override
     public int hashCode() {
         return Objects.hash(playerId);
-    }
-    
-    public void stopDeck() {
-        if (deck == null) {
-            return;
-        }
-        
-        for (DeckItem di : deck.getItems()) {
-            di.stop();
-        }
     }
 
 }

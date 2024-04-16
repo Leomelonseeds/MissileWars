@@ -13,6 +13,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
@@ -322,7 +323,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equals("kills")) {
-            return playerArena.getPlayerInArena(player.getUniqueId()).getKills() + "";
+            return playerArena.getPlayerInArena(player.getUniqueId()).getStat(Stat.KILLS) + "";
         }
 
         return null; // Placeholder is unknown by the Expansion

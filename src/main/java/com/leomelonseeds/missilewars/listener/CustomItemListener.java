@@ -289,7 +289,7 @@ public class CustomItemListener implements Listener {
                     }
                 }
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
-                mwp.incrementMissiles();
+                mwp.incrementStat(MissileWarsPlayer.Stat.MISSILES);
                 
                 // Training arena things
                 if (playerArena instanceof TutorialArena) {
@@ -341,7 +341,7 @@ public class CustomItemListener implements Listener {
                     creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
                     creeper.setCustomNameVisible(true);
                     InventoryUtils.consumeItem(player, playerArena, hand, -1);
-                    mwp.incrementUtility();
+                    mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
                 }
                 return;
             }
@@ -370,7 +370,7 @@ public class CustomItemListener implements Listener {
                 fireball.setShooter(player);
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
-                mwp.incrementUtility();
+                mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
                 return;
             }
         }
@@ -565,7 +565,7 @@ public class CustomItemListener implements Listener {
             return false;
         }
         
-        playerArena.getPlayerInArena(uuid).incrementUtility();
+        playerArena.getPlayerInArena(uuid).incrementStat(MissileWarsPlayer.Stat.UTILITY);
         String sound;
         if (structure.contains("obsidianshield")) {
             sound = "spawn-obsidian-shield";
@@ -723,7 +723,7 @@ public class CustomItemListener implements Listener {
         boolean ender = ConfigUtils.toPlain(hand.getItemMeta().displayName()).contains("Ender");
         String name = (ender ? "ender" : "") + "splash:" + duration + ":" + extend;
         thrown.customName(ConfigUtils.toComponent(name));
-        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementUtility();
+        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.UTILITY);
         projectileConsume(hand, thrower, playerArena);
         
         // Add particles if ender splash

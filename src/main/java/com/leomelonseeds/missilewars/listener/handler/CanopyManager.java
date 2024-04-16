@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -201,7 +202,7 @@ public class CanopyManager {
         
         // Do final checks
         ConfigUtils.sendConfigSound("spawn-canopy", spawnLoc);
-        playerArena.getPlayerInArena(player.getUniqueId()).incrementUtility();
+        playerArena.getPlayerInArena(player.getUniqueId()).incrementStat(Stat.UTILITY);
         despawnCanopy(spawnLoc, 5);
     }
     

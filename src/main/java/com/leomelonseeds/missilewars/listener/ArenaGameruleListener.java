@@ -198,7 +198,7 @@ public class ArenaGameruleListener implements Listener {
 
         // Count death if player is on a team
         MissileWarsPlayer mwp = playerArena.getPlayerInArena(player.getUniqueId());
-        mwp.incrementDeaths();
+        mwp.incrementStat(MissileWarsPlayer.Stat.DEATHS);
         
         // Find the player's killer
         Player killer = player.getKiller();
@@ -212,7 +212,7 @@ public class ArenaGameruleListener implements Listener {
             TeamName team1 = playerArena.getTeam(player.getUniqueId());
             TeamName team2 = playerArena.getTeam(killer.getUniqueId());
             if (!(killer.equals(player) || team1.equals(team2))) {
-                playerArena.getPlayerInArena(killer.getUniqueId()).incrementKills();
+                playerArena.getPlayerInArena(killer.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.KILLS);
                 ConfigUtils.sendConfigSound("player-kill", killer);
             }
         }

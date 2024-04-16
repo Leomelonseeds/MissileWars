@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
@@ -212,7 +213,7 @@ public class TrainingArena extends ClassicArena {
             
             // Exp calculation
             Player mcplayer = player.getMCPlayer();
-            int amountEarned = portal_reward * player.getMVP() + shield_health_reward + defense_reward;
+            int amountEarned = portal_reward * player.getStat(Stat.MISSILES) + shield_health_reward + defense_reward;
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
             mcplayer.sendMessage(ConfigUtils.toComponent(earnMessagePlayer));

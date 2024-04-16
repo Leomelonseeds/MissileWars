@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -67,6 +69,31 @@ public class ClassicArena extends Arena {
         }
     }
     
+    private Pair<Integer, String> getTopStat(Stat stat) {
+        List<MissileWarsPlayer> most = new ArrayList<>();
+        for (MissileWarsPlayer player : players) {
+            if (getTeam(player.getMCPlayerId()) == TeamName.NONE) {
+                continue;
+            }
+            
+            if (most.isEmpty() || most.get(0).getStat(stat) < player.getStat(stat)) {
+                most.clear();
+                most.add(player);
+            } else if (most.get(0).getStat(stat) == player.getStat(stat)) {
+                most.add(player);
+            }
+        }
+        
+        List<String> mostList = new ArrayList<>();
+        for (MissileWarsPlayer player : most) {
+            mostList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
+        }
+        
+        String mostString = String.join(", ", mostList);
+        int mostAmount = most.isEmpty() ? 0 : most.get(0).getStat(stat);
+        return Pair.of(mostAmount, mostString);
+    }
+    
     @Override
     protected void calculateStats(MissileWarsTeam winningTeam) {
         // Setup player variables
@@ -84,59 +111,9 @@ public class ClassicArena extends Arena {
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
 
         // Find players with mvp, most deaths, and kills
-        List<MissileWarsPlayer> mvp = new ArrayList<>();
-        List<MissileWarsPlayer> mostKills = new ArrayList<>();
-        List<MissileWarsPlayer> mostDeaths = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
-            if (getTeam(player.getMCPlayerId()) == TeamName.NONE) {
-                continue;
-            }
-            
-            // Top MVPs
-            if (mvp.isEmpty() || mvp.get(0).getMVP() < player.getMVP()) {
-                mvp.clear();
-                mvp.add(player);
-            } else if (mvp.get(0).getMVP() == player.getMVP()) {
-                mvp.add(player);
-            }
-            // Top kills
-            if (mostKills.isEmpty() || mostKills.get(0).getKills() < player.getKills()) {
-                mostKills.clear();
-                mostKills.add(player);
-            } else if (mostKills.get(0).getKills() == player.getKills()) {
-                mostKills.add(player);
-            }
-            // Top deaths
-            if (mostDeaths.isEmpty() || mostDeaths.get(0).getDeaths() < player.getDeaths()) {
-                mostDeaths.clear();
-                mostDeaths.add(player);
-            } else if (mostDeaths.get(0).getDeaths() == player.getDeaths()) {
-                mostDeaths.add(player);
-            }
-        }
-
-        // Produce most mvp/kills/deaths list
-        List<String> mostMVPList = new ArrayList<>();
-        for (MissileWarsPlayer player : mvp) {
-            mostMVPList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_mvp = String.join(", ", mostMVPList);
-        
-        List<String> mostKillsList = new ArrayList<>();
-        for (MissileWarsPlayer player : mostKills) {
-            mostKillsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_kills = String.join(", ", mostKillsList);
-
-        List<String> mostDeathsList = new ArrayList<>();
-        for (MissileWarsPlayer player : mostDeaths) {
-            mostDeathsList.add(ConfigUtils.getFocusName(player.getMCPlayer()));
-        }
-        String most_deaths = String.join(", ", mostDeathsList);
-
-        int most_mvp_amount = mvp.isEmpty() ? 0 : mvp.get(0).getMVP();
-        int most_kills_amount = mostKills.isEmpty() ? 0 : mostKills.get(0).getKills();
-        int most_deaths_amount = mostDeaths.isEmpty() ? 0 : mostDeaths.get(0).getDeaths();
+        Pair<Integer, String> mostPortals = getTopStat(Stat.PORTALS);
+        Pair<Integer, String> mostKills = getTopStat(Stat.KILLS);
+        Pair<Integer, String> mostDeaths = getTopStat(Stat.DEATHS);
 
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
@@ -147,12 +124,12 @@ public class ClassicArena extends Arena {
         String winner = winningTeam == null ? "&e&lNONE" : winningTeam == blueTeam ? "&9&lBLUE" : "&c&lRED";
         for (String s : winningMessages) {
             s = s.replaceAll("%umw_winning_team%", winner);
-            s = s.replaceAll("%umw_most_mvp_amount%", Integer.toString(most_mvp_amount));
-            s = s.replaceAll("%umw_most_kills_amount%", Integer.toString(most_kills_amount));
-            s = s.replaceAll("%umw_most_deaths_amount%", Integer.toString(most_deaths_amount));
-            s = s.replaceAll("%umw_most_mvp%", most_mvp);
-            s = s.replaceAll("%umw_most_kills%", most_kills);
-            s = s.replaceAll("%umw_most_deaths%", most_deaths);
+            s = s.replaceAll("%umw_most_mvp_amount%", mostPortals.getLeft() + "");
+            s = s.replaceAll("%umw_most_kills_amount%", mostKills.getLeft() + "");
+            s = s.replaceAll("%umw_most_deaths_amount%", mostDeaths.getLeft() + "");
+            s = s.replaceAll("%umw_most_mvp%", mostPortals.getRight());
+            s = s.replaceAll("%umw_most_kills%", mostKills.getRight());
+            s = s.replaceAll("%umw_most_deaths%", mostDeaths.getRight());
             actualWinMessages.add(s);
         }
 
@@ -180,11 +157,16 @@ public class ClassicArena extends Arena {
                 ConfigUtils.sendConfigMessage("messages.earn-none-time", player.getMCPlayer(), null, null);
                 continue;
             }
-            
-            playerAmount = spawn_missile * player.getMissiles() +
-                           use_utility * player.getUtility() +
-                           kill * player.getKills() +
-                           (int) (portal_broken * player.getMVP());
+
+            int portals = player.getStat(Stat.PORTALS);
+            int missiles = player.getStat(Stat.MISSILES);
+            int utility = player.getStat(Stat.UTILITY);
+            int kills = player.getStat(Stat.KILLS);
+            int deaths = player.getStat(Stat.DEATHS);
+            playerAmount = spawn_missile * missiles +
+                           use_utility * utility +
+                           kill * kills +
+                           (int) (portal_broken * portals);
             if (blueTeam.containsPlayer(uuid)) {
                 teamAmount = blue_shield_health_amount;
                 if (winningTeam == blueTeam) {
@@ -205,7 +187,7 @@ public class ClassicArena extends Arena {
             // Update player stats
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
 
-            sql.updateClassicStats(uuid, player.getMVP(), won, 1, player.getKills(), player.getMissiles(), player.getUtility(), player.getDeaths());
+            sql.updateClassicStats(uuid, portals, won, 1, kills, missiles, utility, deaths);
             sql.updateWinstreak(uuid, gamemode, won);
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
 
@@ -262,7 +244,7 @@ public class ClassicArena extends Arena {
         if (player != null && getTeam(player.getUniqueId()) != TeamName.NONE) {
             // Only add to stats if on opposite team
             if (enemy.containsPlayer(player.getUniqueId())) {
-                getPlayerInArena(player.getUniqueId()).addToMVP(1);
+                getPlayerInArena(player.getUniqueId()).incrementStat(Stat.PORTALS);
             }
         }
         Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());

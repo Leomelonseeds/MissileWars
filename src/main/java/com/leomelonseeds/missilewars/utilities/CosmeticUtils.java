@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 
 import net.kyori.adventure.text.Component;
@@ -122,7 +123,8 @@ public class CosmeticUtils {
                     TeamName teamKiller = arena.getTeam(killerID);
                     TeamName teamDead = arena.getTeam(dead.getUniqueId());
                     if (teamKiller != teamDead) {
-                        int kills = sql.getStatSync(killerID, "kills", "overall") + arena.getPlayerInArena(killerID).getKills();
+                        int kills = sql.getStatSync(killerID, "kills", "overall") + 
+                                arena.getPlayerInArena(killerID).getStat(Stat.KILLS);
                         result += "&7's kill &e#" + kills;
                     } else {
                         result = getFromConfig(messages, "default", "kill." + s);
@@ -187,7 +189,8 @@ public class CosmeticUtils {
             if (arena != null) {
                 TeamName teamKiller = arena.getTeam(killerID);
                 if (teamKiller != brokeTeam) {
-                    int portals = sql.getStatSync(killerID, "portals", "classic") + arena.getPlayerInArena(killerID).getMVP();
+                    int portals = sql.getStatSync(killerID, "portals", "classic") + 
+                            arena.getPlayerInArena(killerID).getStat(Stat.PORTALS);
                     result += "&7's portal break &e#" + portals;
                 } else {
                     result = getFromConfig(messages, "default", "portal");
