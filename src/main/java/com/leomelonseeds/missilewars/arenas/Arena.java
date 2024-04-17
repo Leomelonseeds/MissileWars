@@ -1062,7 +1062,7 @@ public abstract class Arena implements ConfigurationSerializable {
                         }
                     }));
                 }
-            }, 30 * 20, 20));
+            }, 200, 20));
         });
     }
     

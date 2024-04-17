@@ -95,7 +95,16 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         if (bp.getY() == 0) {
             return;
         }
-
+        
+        // A bit of a dumb way to wait a bit before processing packet,
+        // to give piston events time to register a defuse block.
+        // Theoretically, the compiler removes this dead code, but
+        // it still makes the defuse helper more reliable!?
+        // Note to future self: don't touch this, you'll just waste more time
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            continue;
+        }
+        
         Player player = event.getPlayer();
         World world = player.getWorld();
         int ping = player.getPing();
@@ -137,7 +146,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 if (i == 1) {
                     return;
                 }
-                
+
                 // If AIR, do the loop again to check if
                 // any block have moved 2 forward
                 checkLoc.setZ(db.getZ());
