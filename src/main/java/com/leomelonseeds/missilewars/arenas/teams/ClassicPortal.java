@@ -17,7 +17,9 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class ClassicPortal {
-    
+
+    private static boolean GLOW_SAFE = false;  
+    private final static int GLOW_WAIT = 200; 
     private final static float GLOW_DISTANCE = 10F;
     private static MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
     
@@ -47,8 +49,8 @@ public class ClassicPortal {
     
     private void setupGlow() {
         // If server just started, wait a bit for everything to calm down
-        if (!MissileWarsPlugin.glow_safe) {
-            ConfigUtils.schedule(MissileWarsPlugin.seconds_until_glow * 20, () -> setupGlow());
+        if (!GLOW_SAFE) {
+            ConfigUtils.schedule(GLOW_WAIT, () -> setupGlow());
             return;
         }
         
@@ -144,5 +146,16 @@ public class ClassicPortal {
         }
         
         player.hideEntity(plugin, glow);
+    }
+    
+    /**
+     * Call during onEnable to start the glow timer.
+     */
+    public static void onEnable() {
+        if (GLOW_SAFE) {
+            return;
+        }
+        
+        ConfigUtils.schedule(GLOW_WAIT, () -> GLOW_SAFE = true);
     }
 }

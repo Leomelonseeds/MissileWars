@@ -369,7 +369,7 @@ public class ArenaGameruleListener implements Listener {
                 
                 Location projLoc = proj.getLocation();
                 double extradmg = getExtraLongshotDamage(proj, longshot, projLoc);
-                double ratio = Math.min(1, 2 * extradmg / max);
+                double ratio = Math.min(1, 1.5 * extradmg / max); // 1.5x makes damage increase more apparent 
                 int g = (int) (255 * (1 - ratio));
                 int r = extradmg > 0 ? 255 : 0;
                 DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);

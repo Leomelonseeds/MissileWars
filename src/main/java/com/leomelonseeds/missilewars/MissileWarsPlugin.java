@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.teams.ClassicPortal;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.invs.InventoryManager;
@@ -22,7 +23,6 @@ import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.listener.packets.DefuseHelper;
 import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
@@ -54,6 +54,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Register serializable data
         ConfigurationSerialization.registerClass(Arena.class);
+        ClassicPortal.onEnable();
 
         // Save data files
         log("Loading and saving config files...");
@@ -120,8 +121,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         setupDatabase();
         log("MySQL setup complete.");
 
-        // Enable spawning of glow display entities after 10 seconds
-        ConfigUtils.schedule(seconds_until_glow * 20, () -> glow_safe = true);
         log("Missile Wars is ready to play :)");
     }
     
