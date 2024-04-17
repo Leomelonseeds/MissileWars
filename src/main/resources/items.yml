@@ -391,20 +391,20 @@ cuboid:
 warhead: 
   index: 4
   1:
-    file: 'warhead.nbt'
+    file: 'trifecta.nbt'
     item: CHICKEN_SPAWN_EGG
-    name: "&c☢ Warhead &c&l☣"
+    name: "&c☢ Trifecta &c&l☣"
     lore:
     - ""
-    - "&7The activation TNT on this missile entered"
-    - "&7its goth phase and hides itself from the"
-    - "&7piercing gaze of missile wars players."
+    - "&7Apparently, trifecta means a type"
+    - "&7of bet for horse racing. Same here,"
+    - "&7but the horses are explosive."
     offset:
       x: -1
       y: -5
       z: 3
-    speed: 1.7
-    tnt: 27
+    speed: 2.0
+    tnt: 25
   2:
     file: 'bullet.nbt'
     item: CHICKEN_SPAWN_EGG
@@ -1638,7 +1638,7 @@ preset:
       - "&7Diamond Boots"
       - ""
       - "&cMissiles"
-      - "&7Cruiser, Warhead, Juggernaut, Breaker,"
+      - "&7Cruiser, Trifecta, Juggernaut, Breaker,"
       - "&7Shieldbuster"
       - ""
       - "&9Utility:"
