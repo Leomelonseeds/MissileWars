@@ -1,5 +1,5 @@
 name: MissileWars
-version: 0.7.2
+version: 0.8
 main: com.leomelonseeds.missilewars.MissileWarsPlugin
 api-version: 1.20
 authors: [ M310N, Vhbob ]
