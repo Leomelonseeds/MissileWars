@@ -1203,35 +1203,44 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Makes the game wait for a tie. This means no further action can be done
-     * by any of the players, and the game is effectively over. endGame should
-     * be called after this function. If there is no tie wait, call endGame
-     * immediately after this.
+     * Instantly end a game, with a winning team
+     * 
+     * @param winningTeam, null for tie
      */
-    protected void setWaitingForTie() {
-        waitingForTie = true;
+    public void endGame(MissileWarsTeam winningTeam) {
+        endGame(winningTeam, 0);
+    }
+
+    /**
+     * End a MissileWars game with a winning team
+     *
+     * @param winningTeam the winning team, null for tie
+     * @param how long to wait for a tie in ticks
+     */
+    public void endGame(MissileWarsTeam winningTeam, int delay) {
+        // Ignore if game isn't running
+        if (!running) {
+            return;
+        }
+        
+        // Players shouldn't be able to play anymore
         for (MissileWarsPlayer player : players) {
             player.stopDeck();
             Player p = player.getMCPlayer();
             p.setGameMode(GameMode.SPECTATOR);
             p.removePotionEffect(PotionEffectType.GLOWING);
         }
-    }
-
-    /**
-     * End a MissileWars game with a winning team
-     *
-     * @param winningTeam the winning team
-     */
-    public void endGame(MissileWarsTeam winningTeam) {
-        // Ignore if game isn't running
-        if (!running) {
+        
+        // Schedule tie wait. If endGame gets called from somewhere else,
+        // the scheduled task will ignore endGame since running will be false
+        if (delay > 0) {
+            waitingForTie = true;
+            tasks.add(ConfigUtils.schedule(delay, () -> endGame(winningTeam)));
             return;
-        }
-
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        }             
 
         // Cancel all tasks
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         for (BukkitTask task : tasks) {
             task.cancel();
         }
@@ -1239,10 +1248,7 @@ public abstract class Arena implements ConfigurationSerializable {
         running = false;
         resetting = true;
         waitingForTie = false;
-        if (!plugin.isEnabled()) {
-            return;
-        }
-
+        
         // Produce winner/discord messages
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         String discordMessage;

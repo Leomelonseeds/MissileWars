@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -52,10 +51,11 @@ public class ClassicArena extends Arena {
     
     @Override
     public void resetWorld() {
-        glowTasks.values().forEach(t -> {
-            t.getLeft().cancel();
-            t.getRight().cancel();
-        });
+        glowTasks.values().forEach(p -> List.of(p.getLeft(), p.getRight()).forEach(t -> {
+            if (t != null && !t.isCancelled()) {
+                t.cancel();
+            }
+        }));
         glowTasks.clear();
         redTeam.destroyPortals(false);
         blueTeam.destroyPortals(false);
@@ -292,22 +292,13 @@ public class ClassicArena extends Arena {
         // Check if either team's last portal has been broken
         // We know from the above conditions that only one team has a living portal in this case
         // and furthermore, the team that is ALIVE is enemy since break was registered for broketeam
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        int wait = plugin.getConfig().getInt("tie-wait-time");
         glowPortals(enemy);
         if (getSecondsRemaining() <= 300) {
             endGame(enemy);
         } else {
             enemy.sendTitle("enemy-portals-destroyed");
             broketeam.sendTitle("own-portals-destroyed");
-            setWaitingForTie();
-            
-            // Setup tie for tie wait time
-            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (enemy.hasLivingPortal()) {
-                    endGame(enemy);
-                }
-            }, wait * 20L));
+            endGame(enemy, MissileWarsPlugin.getPlugin().getConfig().getInt("tie-wait-time") * 20);
         }
     }
     
