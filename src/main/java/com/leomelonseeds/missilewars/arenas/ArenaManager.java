@@ -3,7 +3,6 @@ package com.leomelonseeds.missilewars.arenas;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -66,17 +65,14 @@ import net.citizensnpcs.trait.VillagerProfession;
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
     
-    private final static List<String> specialArenas = new ArrayList<>(Arrays.asList(new String[] {"tutorial", "training"}));
+    private final static List<String> specialArenas = List.of("tutorial", "training");
 
     private final MissileWarsPlugin plugin;
-
-    /** A list of all loaded arenas. */
     private List<Arena> loadedArenas;
 
-    /** Default constructor */
     public ArenaManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
-        loadedArenas = new ArrayList<>();
+        this.loadedArenas = new ArrayList<>();
     }
 
     /** Load arenas from data file */
@@ -118,7 +114,7 @@ public class ArenaManager {
 
         // Unload each Arena
         for (Arena arena : loadedArenas) {
-            arena.stopTrackers();
+            arena.cancelTasks();
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
 
@@ -157,8 +153,9 @@ public class ArenaManager {
     public Boolean removeArena(Arena arena) {
         World arenaWorld = arena.getWorld();
         Logger logger = Bukkit.getLogger();
+        logger.info("Removing arena " + arena.getName() + "...");
         if (!arenaWorld.getPlayers().isEmpty()) {
-            logger.log(Level.WARNING, "An arena with players in it cannot be deleted");
+            logger.warning("An arena with players in it cannot be deleted");
             return false;
         }
         
@@ -166,7 +163,7 @@ public class ArenaManager {
         for (int id : arena.getNPCs()) {
             if (CitizensAPI.getNPCRegistry().getById(id) != null) {
                 CitizensAPI.getNPCRegistry().getById(id).destroy();
-                logger.log(Level.INFO, "Citizen with ID " + id + " deleted.");
+                logger.info("Citizen with ID " + id + " deleted.");
             }
         }
         CitizensAPI.getNPCRegistry().saveToStore();
@@ -176,7 +173,7 @@ public class ArenaManager {
         try {
             FileUtils.deleteDirectory(worldFolder);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "The world file couldn't be removed! Please remove manually.");
+            logger.warning("The world file couldn't be removed! Please remove manually.");
         }
         loadedArenas.remove(arena);
         // Remove arena from file
@@ -186,7 +183,7 @@ public class ArenaManager {
         try {
             arenaConfig.save(arenaFile);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Arena file couldn't be saved!");
+            logger.warning("Arena file couldn't be saved!");
         }
         return true;
     }

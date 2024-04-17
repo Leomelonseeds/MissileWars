@@ -80,7 +80,7 @@ public class TutorialArena extends ClassicArena {
                 plugin.log("Resetting tutorial arena...");
                 running = false;
                 resetting = true;
-                stopTrackers();
+                cancelTasks();
                 resetWorld();
                 init();
                 this.cancel();

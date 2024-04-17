@@ -340,7 +340,7 @@ public class ArenaGameruleListener implements Listener {
             arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
             arrow.setFireTicks(proj.getFireTicks());
             arrow.setShooter(player);
-            arrow.setDamage(proj.getDamage() + heavy * 0.5); // This makes the arrow damage seem closer to that of a normal speed arrow
+            arrow.setDamage(proj.getDamage() + heavy * 0.35); // This makes the arrow damage seem closer to that of a normal speed arrow
             arrow.setCritical(proj.isCritical());
             arrow.setPickupStatus(proj.getPickupStatus());
             

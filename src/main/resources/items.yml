@@ -1236,15 +1236,15 @@ Sentinel:
       cost: 1200
       1:
         spcost: 1
-        percentage: 15
+        percentage: 12
         multiplier: 2
       2:
         spcost: 1
-        percentage: 30
+        percentage: 24
         multiplier: 3
       3:
         spcost: 1
-        percentage: 45
+        percentage: 36
         multiplier: 4
 Berserker:
   weapon:

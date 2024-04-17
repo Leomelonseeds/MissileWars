@@ -300,6 +300,7 @@ public class MissileWarsTeam {
         mcPlayer.setLevel(0);
         mcPlayer.setExp(0F);
         mcPlayer.setGlowing(false);
+        mcPlayer.setWorldBorder(null);
         CanopyManager.getInstance().removePlayer(mcPlayer);
         EnderSplashManager.getInstance().removePlayer(mcPlayer);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){

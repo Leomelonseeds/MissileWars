@@ -20,6 +20,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -174,7 +175,8 @@ public abstract class Arena implements ConfigurationSerializable {
     /**
      * Stops all async tasks from trackers
      */
-    public void stopTrackers() {
+    public void cancelTasks() {
+        tasks.forEach(t -> t.cancel());
         tracker.stopAll();
     }
 
@@ -756,9 +758,7 @@ public abstract class Arena implements ConfigurationSerializable {
         // Don't cancel game if its in the process of starting
         if (!running && startTime != null && getSecondsUntilStart() >= 0 && 
                 getNumPlayers() < plugin.getConfig().getInt("minimum-players")) {
-            for (BukkitTask task : tasks) {
-                task.cancel();
-            }
+            cancelTasks();
             startTime = null;
             return;
         }
@@ -995,8 +995,9 @@ public abstract class Arena implements ConfigurationSerializable {
             Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
             Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
             redSpawn.setYaw(180);
-            blueSpawn.setWorld(getWorld());
-            redSpawn.setWorld(getWorld());
+            World world = getWorld();
+            blueSpawn.setWorld(world);
+            redSpawn.setWorld(world);
 
             // Setup scoreboard and teams
             blueTeam = new MissileWarsTeam(TeamName.BLUE, this, blueSpawn);
@@ -1023,6 +1024,45 @@ public abstract class Arena implements ConfigurationSerializable {
                 }
                 startTeams();
             }, 5L));
+            
+            // Tint task if any player is in the other team's base
+            WorldBorder virtualBorder = Bukkit.createWorldBorder();
+            virtualBorder.setSize(world.getWorldBorder().getSize());
+            virtualBorder.setCenter(world.getWorldBorder().getCenter());
+            virtualBorder.setWarningDistance(2048);
+            tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+                for (MissileWarsTeam team : List.of(redTeam, blueTeam)) {
+                    MissileWarsTeam opposite = team == redTeam ? blueTeam : redTeam;
+                    boolean isInShield = false;
+                    for (MissileWarsPlayer mwp : team.getMembers()) {
+                        Player player = mwp.getMCPlayer();
+                        if (player == null) {
+                            continue;
+                        }
+                        
+                        if (!ArenaUtils.inShield(this, player.getLocation(), opposite.getName(), 8)) {
+                            continue;
+                        }
+                        
+                        isInShield = true;
+                        break;
+                    }
+                    
+                    boolean inShieldFinal = isInShield;
+                    ConfigUtils.schedule(0, () -> opposite.getMembers().forEach(mwp -> {
+                        Player player = mwp.getMCPlayer();
+                        if (player == null) {
+                            return;
+                        }
+                        
+                        if (inShieldFinal) {
+                            player.setWorldBorder(virtualBorder);
+                        } else {
+                            player.setWorldBorder(null);
+                        }
+                    }));
+                }
+            }, 30 * 20, 20));
         });
     }
     
@@ -1240,11 +1280,8 @@ public abstract class Arena implements ConfigurationSerializable {
         }             
 
         // Cancel all tasks
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        for (BukkitTask task : tasks) {
-            task.cancel();
-        }
-        stopTrackers();
+        cancelTasks();
+        leftPlayers.clear();
         running = false;
         resetting = true;
         waitingForTie = false;
@@ -1279,20 +1316,18 @@ public abstract class Arena implements ConfigurationSerializable {
             // Spawn victory pegasus
             SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, mapName, false, false);
         }
+
+        // Send messages, calculate winning stats
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         discordChannel.sendMessage(discordMessage).queue();
-        leftPlayers.clear();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         // Remove all players after a short time, then reset the world a bit after
-        long waitTime = plugin.getConfig().getInt("victory-wait-time") * 20L;
+        int waitTime = plugin.getConfig().getInt("victory-wait-time") * 20;
         if (players.size() > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                removePlayers();
-            }, waitTime);
+            ConfigUtils.schedule(waitTime, () -> removePlayers());
         }
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            resetWorld();
-        }, waitTime + 40L);
+        ConfigUtils.schedule(waitTime + 40, () -> resetWorld());
     }
     
     // Calculate and store all player stats from the game
