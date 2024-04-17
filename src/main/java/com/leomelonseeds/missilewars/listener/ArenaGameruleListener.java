@@ -369,9 +369,9 @@ public class ArenaGameruleListener implements Listener {
                 
                 Location projLoc = proj.getLocation();
                 double extradmg = getExtraLongshotDamage(proj, longshot, projLoc);
-                double ratio = Math.min(1, 2 * extradmg / max );
+                double ratio = Math.min(1, 2 * extradmg / max);
                 int g = (int) (255 * (1 - ratio));
-                int r = (int) (255 * ratio);
+                int r = extradmg > 0 ? 255 : 0;
                 DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
                 proj.getWorld().spawnParticle(Particle.REDSTONE, projLoc, 1, dust);
             });
@@ -539,12 +539,13 @@ public class ArenaGameruleListener implements Listener {
             // multiply knockback by glowing ticks / 4
             double extradmg = 0;
             if (type == EntityType.ARROW) {
-                extradmg = getExtraLongshotDamage(
-                        projectile, 
-                        plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT), 
-                        player.getLocation());
+                int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT);
+                extradmg = getExtraLongshotDamage(projectile, longshot, player.getLocation());
                 if (extradmg > 0) {
                     event.setDamage(event.getDamage() + extradmg);
+                } else {
+                    double reduction = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PERCENTAGE);
+                    event.setDamage(event.getDamage() * (1 - (reduction / 100)));
                 }
             } else if (type == EntityType.SPECTRAL_ARROW) {
                 SpectralArrow sa = (SpectralArrow) projectile;

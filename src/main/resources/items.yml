@@ -1208,18 +1208,23 @@ Sentinel:
       - ""
       - "&7Arrows travelling more than %cutoff%m &7do"
       - "&7an additional %plus% &7damage per block."
+      - "&7However, arrows travelling less than"
+      - "&7%cutoff%m &7do %percentage%% &7less damage."
       cost: 1500
       cutoff: 25
       max: 20
       1:
         spcost: 1
         plus: 0.15
+        percentage: 15
       2:
         spcost: 1
         plus: 0.20
+        percentage: 20
       3:
         spcost: 1
         plus: 0.25
+        percentage: 25
     spectral:
       name: "&eHeavy Arrows"
       lore:
