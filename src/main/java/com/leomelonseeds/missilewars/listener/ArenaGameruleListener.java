@@ -248,7 +248,7 @@ public class ArenaGameruleListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = (Player) event.getEntity();
         Arena arena = ArenaUtils.getArena(player);
-        if ((arena == null) || !arena.isRunning()) {
+        if (arena == null || !arena.isRunning()) {
             return;
         }
         
@@ -256,9 +256,12 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Force client sync by setting velocity, preventing arrow bounce
+        Projectile eventProj = (Projectile) event.getProjectile();
+        eventProj.setVelocity(eventProj.getVelocity());
+        
         // Berserker user
         UUID uuid = player.getUniqueId();
-        Arrow proj = (Arrow) event.getProjectile();
         if (event.getBow().getType() == Material.CROSSBOW) {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
 
@@ -307,15 +310,15 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            Location spawnLoc = proj.getLocation();
+            Location spawnLoc = eventProj.getLocation();
             Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
             if (charged) {
                 creeper.setPowered(true);
             }
             creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
             creeper.setCustomNameVisible(true);
-            creeper.setVelocity(proj.getVelocity().multiply(2.5));
-            proj.remove();
+            creeper.setVelocity(eventProj.getVelocity().multiply(2.5));
+            eventProj.remove();
             
             ConfigUtils.sendConfigSound("creepershot", player);
             return;
@@ -332,6 +335,7 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Heavy arrows
+        Arrow proj = (Arrow) eventProj;
         int heavy = plugin.getJSON().getLevel(uuid, Passive.HEAVY_ARROWS);
         if (heavy > 0) {
             double slow = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.PERCENTAGE) / 100;
@@ -350,10 +354,6 @@ public class ArenaGameruleListener implements Listener {
             event.setProjectile(arrow);
             return;
         }
-        
-        // Past this point, we are for sure shooting a normal arrow. 
-        // Force client sync by setting velocity, preventing arrow bounce
-        proj.setVelocity(proj.getVelocity());
         
         // Longshot
         int longshot = plugin.getJSON().getLevel(uuid, Passive.LONGSHOT);
