@@ -250,7 +250,6 @@ public class CustomItemListener implements Listener {
             
             // We can handle canopies now!
             if (structureName.contains("canopy")) {
-                event.setCancelled(true);
                 canopies.initPlayer(player, hand, playerArena, (int) getItemStat(structureName, "distance"));
                 return;
             }
@@ -270,20 +269,16 @@ public class CustomItemListener implements Listener {
             }
 
             // Place structure
-            String mapName = "default-map";
-            if (playerArena.getMapName() != null) {
-                mapName = playerArena.getMapName();
-            }
-            
+            String mapName = playerArena.getMapName() == null ? "default-map" : playerArena.getMapName();
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
                 if (player.getGameMode() != GameMode.CREATIVE) {
-                    int cooldown = plugin.getConfig().getInt("experimental.missile-cooldown");
                     for (ItemStack i : player.getInventory().getContents()) {
                         if (i == null) continue;
                         Material material = i.getType();
                         if (!player.hasCooldown(material) && material.toString().contains("SPAWN_EGG")) {
+                            int cooldown = plugin.getConfig().getInt("experimental.missile-cooldown");
                             player.setCooldown(material, cooldown);
                         }
                     }
@@ -292,87 +287,82 @@ public class CustomItemListener implements Listener {
                 mwp.incrementStat(MissileWarsPlayer.Stat.MISSILES);
                 
                 // Training arena things
-                if (playerArena instanceof TutorialArena) {
-                    TutorialArena tutorialArena = (TutorialArena) playerArena;
+                if (playerArena instanceof TutorialArena tutorialArena) {
                     tutorialArena.registerStageCompletion(player, 1);
                     if (structureName.equals("warhead-2")) {
                         tutorialArena.registerStageCompletion(player, 7);
                     }
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    ConfigUtils.schedule(100, () -> {
                         if (!player.isOnline()) {
                             return;
                         }
                         
                         for (Tracked t : tutorialArena.getTracker().getMissiles()) {
-                            if (!(t instanceof TrackedMissile)) {
+                            if (!(t instanceof TrackedMissile tm)) {
                                 continue;
                             }
                             
-                            if (t.contains(player.getLocation(), 2)) {
+                            if (tm.contains(player.getLocation(), 2) && tm.isInMotion()) {
                                 tutorialArena.registerStageCompletion(player, 2);
                                 return;
                             }
                         }
-                    }, 100);
+                    });
                 }
             }
             return;
         }
         
         // Spawn a utility item. At this point we know the item MUST have a utility tag
-        else {
-            if (utility.contains("creeper")) {
-                if (event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) {
-                    event.setCancelled(true);
-                    // Can't place creepers on obsidian, otherwise broken game
-                    List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
-                    for (String s : cancel) {
-                        if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
-                            ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
-                            return;
-                        }
-                    }
-                    
-                    Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
-                    Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
-                    if (utility.contains("2")) {
-                        creeper.setPowered(true);
-                    }
-                    creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
-                    creeper.setCustomNameVisible(true);
-                    InventoryUtils.consumeItem(player, playerArena, hand, -1);
-                    mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
+        if (utility.contains("creeper") && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            event.setCancelled(true);
+            // Can't place creepers on obsidian, otherwise broken game
+            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+            for (String s : cancel) {
+                if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
+                    ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
+                    return;
                 }
-                return;
+            }
+            
+            Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
+            Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
+            if (utility.contains("2")) {
+                creeper.setPowered(true);
+            }
+            creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
+            creeper.setCustomNameVisible(true);
+            InventoryUtils.consumeItem(player, playerArena, hand, -1);
+            mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
+            return;
+        }
+
+        // Spawn a fireball/dragon fireball
+        if (utility.contains("fireball") || utility.contains("lingering")) {
+            event.setCancelled(true);
+            Fireball fireball;
+            if (utility.contains("lingering")) {
+                Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
+                fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
+                int amplifier = (int) getItemStat(utility, "amplifier");
+                int duration = (int) getItemStat(utility, "duration");
+                fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
+                fireball.setCustomNameVisible(false);
+                Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
+            } else {
+                fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
+                        player.getEyeLocation().getDirection()), EntityType.FIREBALL);
+                fireball.setIsIncendiary(true);
+                float yield = (float) getItemStat(utility, "power");
+                fireball.setYield(yield);
             }
 
-            // Spawn a fireball/dragon fireball
-            if (utility.contains("fireball") || utility.contains("lingering")) {
-                event.setCancelled(true);
-                Fireball fireball;
-                if (utility.contains("lingering")) {
-                    Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
-                    fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
-                    int amplifier = (int) getItemStat(utility, "amplifier");
-                    int duration = (int) getItemStat(utility, "duration");
-                    fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
-                    fireball.setCustomNameVisible(false);
-                    Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
-                } else {
-                    fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
-                            player.getEyeLocation().getDirection()), EntityType.FIREBALL);
-                    fireball.setIsIncendiary(true);
-                    float yield = (float) getItemStat(utility, "power");
-                    fireball.setYield(yield);
-                }
-
-                fireball.setDirection(player.getEyeLocation().getDirection());
-                fireball.setShooter(player);
-                InventoryUtils.consumeItem(player, playerArena, hand, -1);
-                ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
-                mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
-                return;
-            }
+            fireball.setDirection(player.getEyeLocation().getDirection());
+            fireball.setShooter(player);
+            InventoryUtils.consumeItem(player, playerArena, hand, -1);
+            ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
+            mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
+            return;
         }
     }
 

@@ -172,7 +172,7 @@ public class DeckItem {
         return getItem(true);
     }
     
-    public ItemStack getItem(boolean reAdd) {
+    private ItemStack getItem(boolean reAdd) {
         Player player = mwp.getMCPlayer();
         for (ItemStack i : player.getInventory().getContents()) {
             if (matches(i)) {
@@ -180,13 +180,13 @@ public class DeckItem {
             }
         }
         
-        if (reAdd) {
-            player.getInventory().addItem(item);
-            Bukkit.getLogger().log(Level.WARNING, "A player is missing an item " + item.getType() + ", so it was re-added to their inventory.");
-            return getItem(true);
+        if (!reAdd) {
+            return null;
         }
         
-        return null;
+        player.getInventory().addItem(item);
+        Bukkit.getLogger().log(Level.WARNING, "A player is missing an item " + item.getType() + ", so it was re-added to their inventory.");
+        return getItem(true);
     }
     
     /**
@@ -254,15 +254,21 @@ public class DeckItem {
         return true;
     }
     
-    // Returns 0 if on visual cooldown
+    /**
+     * @return 0 if on visual cooldown
+     */
     public int getActualAmount() {
         return unavailable ? 0 : getItem().getAmount();
     }
 
-    // Sets a visual cooldown
-    // If the item is an arrow, set a cooldown for the bow/crossbow too
-    // Also sets unavailable to true
-    // No workie if player in creative mode
+    /**
+     * Sets a visual cooldown.
+     * If the item is an arrow, set a cooldown for the bow/crossbow too.
+     * Also sets unavailable to true.
+     * No workie if player in creative mode.
+     * 
+     * @param c in seconds
+     */
     public void setVisualCooldown(int c) {
         Player player = mwp.getMCPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) {

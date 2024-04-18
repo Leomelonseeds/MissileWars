@@ -12,8 +12,10 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -220,6 +222,18 @@ public class InventoryUtils {
         DeckItem di = deck.getDeckItem(item);
         int amt = item.getAmount();
         boolean deplete = slot == -1;
+        
+        // Add cooldown to offhand item if item is manually depleted, to prevent offhand items
+        // from being used in the same tick without warning
+        PlayerInventory pinv = player.getInventory();
+        if (deplete && pinv.getItem(EquipmentSlot.HAND).equals(item)) {
+            int cooldown = MissileWarsPlugin.getPlugin().getConfig().getInt("experimental.missile-cooldown");
+            Material off = pinv.getItem(EquipmentSlot.OFF_HAND).getType();
+            if (off != Material.AIR && !player.hasCooldown(off)) {
+                player.setCooldown(off, cooldown);
+            }
+        }
+        
         if (di == null) {
             if (deplete) {
                 item.setAmount(item.getAmount() - 1);
@@ -231,13 +245,13 @@ public class InventoryUtils {
         if (amt == 1) {
             makeUnavailable = true;
             if (!deplete) {
-                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
                     item.setAmount(1);
-                    player.getInventory().setItem(slot, item);
+                    pinv.setItem(slot, item);
                     if (item.getType() == Material.ENDER_PEARL) {
                         di.setVisualCooldown(di.getCurrentCooldown()); 
                     }
-                }, 1);
+                });
             }
         } else if (deplete) {
             item.setAmount(amt - 1);
