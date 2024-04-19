@@ -96,13 +96,12 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             return;
         }
         
-        // A bit of a dumb way to wait a bit before processing packet,
-        // to give piston events time to register a defuse block.
-        // Theoretically, the compiler removes this dead code, but
-        // it still makes the defuse helper more reliable!?
-        // Note to future self: don't touch this, you'll just waste more time
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            continue;
+        // Wait a bit before processing packet, to give piston events time to register
+        long waitTime = (long) Math.max(50 - Bukkit.getAverageTickTime(), 0);
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException e) {
+            Bukkit.getLogger().warning("DefuseHelper thread sleep was interrupted somehow??");
         }
         
         Player player = event.getPlayer();
@@ -118,7 +117,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             // As mentioned above, only continue if piston was pushed less than player ping time ago
             // Add 10 to the ping for players hovering around the border of ticks
             int since = db.getTicks();
-            if (since * 50 > ping + 10) {
+            if (since * 50 > ping + 20) {
                 return;
             }
             
