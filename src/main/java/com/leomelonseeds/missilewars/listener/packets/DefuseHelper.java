@@ -97,9 +97,10 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         }
         
         // Wait a bit before processing packet, to give piston events time to register
-        long waitTime = (long) Math.max(50 - Bukkit.getAverageTickTime(), 0);
+        // long avgTick = (long) Math.min(Bukkit.getAverageTickTime(), 50);
+        // long untilNextTick = 50 - avgTick;
         try {
-            Thread.sleep(waitTime);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             Bukkit.getLogger().warning("DefuseHelper thread sleep was interrupted somehow??");
         }
@@ -115,7 +116,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             }
                 
             // As mentioned above, only continue if piston was pushed less than player ping time ago
-            // Add 10 to the ping for players hovering around the border of ticks
+            // Add 10 to the ping for players hovering around the border of ticks.
             int since = db.getTicks();
             if (since * 50 > ping + 20) {
                 return;
