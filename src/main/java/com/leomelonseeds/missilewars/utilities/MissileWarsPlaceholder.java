@@ -206,9 +206,18 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             if (!(playerArena instanceof TutorialArena)) {
                 return null;
             }
+
+            String arg = params.split("_")[1];
+            if (arg.equals("maxstages")) {
+                return TutorialArena.MAX_STAGES + "";
+            }
+            
+            Integer stage = ((TutorialArena) playerArena).getStage(player.getUniqueId());
+            if (arg.equals("stage")) {
+                return stage + "";
+            }
             
             int line = Integer.parseInt(params.split("_")[1]);
-            Integer stage = ((TutorialArena) playerArena).getStage(player.getUniqueId());
             if (stage == null) {
                 return "";
             }

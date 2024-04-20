@@ -38,6 +38,8 @@ import net.kyori.adventure.title.Title;
 
 public class TutorialArena extends ClassicArena {
     
+    public static int MAX_STAGES = 8;
+    
     private Map<UUID, Integer> stage;
     private Map<UUID, Location> xs;
     private Map<UUID, BukkitTask> particles;
@@ -296,8 +298,8 @@ public class TutorialArena extends ClassicArena {
         if (s == 3) {
             redTeam.setPortalGlow(getPlayerInArena(uuid), false);
             hasGlow.remove(uuid);
-        } else if (s == 7) {
-            stage.put(uuid, 8);
+        } else if (s == MAX_STAGES - 1) {
+            stage.put(uuid, MAX_STAGES);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
                 stage.remove(uuid);
