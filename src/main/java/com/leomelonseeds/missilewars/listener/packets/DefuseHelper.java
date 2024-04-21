@@ -125,7 +125,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             // As mentioned above, only continue if piston was pushed less than player ping time ago
             DefuseBlock db = pdb.getLeft();
             long aliveTime = db.aliveTime();
-            long adjustedPing = player.getPing() + System.currentTimeMillis() - time;
+            long adjustedPing = player.getPing() + plugin.getConfig().getInt("experimental.dh-bias");
             plugin.debug("Block found, alive time: " + aliveTime);
             if (aliveTime > adjustedPing) {
                 plugin.debug("RIP, adjusted ping was " + adjustedPing);
