@@ -1,7 +1,6 @@
 package com.leomelonseeds.missilewars;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -280,6 +279,19 @@ public final class MissileWarsPlugin extends JavaPlugin {
      * @param message
      */
     public void log(String message) {
-        Bukkit.getLogger().log(Level.INFO, "[MissileWars] " + message);
+        Bukkit.getLogger().info("[MissileWars] " + message);
+    }
+    
+    /**
+     * Log a debug message. Only if config.yml debug is true
+     * 
+     * @param message
+     */
+    public void debug(String message) {
+        if (!getConfig().getBoolean("debug")) {
+            return;
+        }
+        
+        Bukkit.getLogger().info("[UMW-Debug] " + message);
     }
 }

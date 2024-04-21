@@ -3,7 +3,9 @@ package com.leomelonseeds.missilewars.listener.packets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -27,11 +30,14 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /**
  * This class helps high-ping users break TNT and slime
  */
 public class DefuseHelper extends PacketAdapter implements Listener {
+    
+    private static final int TICKS_BEFORE_REMOVAL = 7;
     
     // Basically, if a slime/honey/tnt is broken that was recently pushed with a piston,
     // and the player mined the block on the client before that piston push was registered
@@ -72,8 +78,9 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     // through the list of blocks looking for a block that was moved less than player ping ago
     // that also has the same X and Y and has Z in the opposite direction of when it was last moved.
     
+    private Map<Location, Pair<DefuseBlock, BukkitTask>> blocks;
+    private long stupid;
     private MissileWarsPlugin plugin;
-    private Map<Location, DefuseBlock> blocks;
 
     public DefuseHelper(MissileWarsPlugin plugin) {
         super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG);
@@ -84,6 +91,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     @Override
     public void onPacketReceiving(PacketEvent event) {
         // Start destroy block is sent when an instabreak block is broken
+        long time = System.currentTimeMillis();
         PacketContainer packet = event.getPacket();
         if (packet.getPlayerDigTypes().read(0) != PlayerDigType.START_DESTROY_BLOCK) {
             return;
@@ -96,29 +104,31 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             return;
         }
         
-        // Wait a bit before processing packet, to give piston events time to register
-        // long avgTick = (long) Math.min(Bukkit.getAverageTickTime(), 50);
-        // long untilNextTick = 50 - avgTick;
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            Bukkit.getLogger().warning("DefuseHelper thread sleep was interrupted somehow??");
+        // Dumb way of waiting a bit (it works, don't touch it)
+        this.stupid = 0;
+        Random rand = new Random(0);
+        for (int i = 0; i < plugin.getConfig().getInt("experimental.dh-iterations"); i++) {
+            this.stupid += rand.nextInt(0, 10);
         }
+        plugin.debug("DH process delay: " + (System.currentTimeMillis() - time) + ", Avg tick time: " + Bukkit.getAverageTickTime());
         
         Player player = event.getPlayer();
         World world = player.getWorld();
-        int ping = player.getPing();
         Location checkLoc = new Location(world, bp.getX(), bp.getY(), bp.getZ());
         for (int i = 0; i <= 1; i++) {
-            DefuseBlock db = blocks.get(checkLoc);
-            if (db == null) {
+            Pair<DefuseBlock, BukkitTask> pdb = blocks.get(checkLoc);
+            if (pdb == null) {
                 return;
             }
+            
                 
             // As mentioned above, only continue if piston was pushed less than player ping time ago
-            // Add 10 to the ping for players hovering around the border of ticks.
-            int since = db.getTicks();
-            if (since * 50 > ping + 20) {
+            DefuseBlock db = pdb.getLeft();
+            long aliveTime = db.aliveTime();
+            long adjustedPing = player.getPing() + System.currentTimeMillis() - time;
+            plugin.debug("Block found, alive time: " + aliveTime);
+            if (aliveTime > adjustedPing) {
+                plugin.debug("RIP, adjusted ping was " + adjustedPing);
                 return;
             }
             
@@ -133,14 +143,16 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 // Since must be 0 or 1 if its a moving piston
                 // 0 = 2t delay, 1 = 1t delay
                 event.setCancelled(true);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                int delay = (int) (aliveTime / 50) * -1 + 2;
+                ConfigUtils.schedule(delay, () -> {
                     Block cur = world.getBlockAt(bploc);
                     if (cur.getType() != Material.AIR) {
                         player.breakBlock(cur);
                         sm.write(0, newbp);
                     }
                     ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
-                }, since * -1 + 2);
+                });
+                plugin.debug("b36: Packet sent forward " + delay + "t");
                 return;
             } else if (block.getType() == Material.AIR) {
                 if (i == 1) {
@@ -149,6 +161,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
 
                 // If AIR, do the loop again to check if
                 // any block have moved 2 forward
+                plugin.debug("Found air, checking again...");
                 checkLoc.setZ(db.getZ());
                 continue;
             }
@@ -183,18 +196,18 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             }
             
             Location loc = block.getLocation();
-            DefuseBlock db = blocks.get(loc);
-            if (db == null) {
-                db = new DefuseBlock(loc, dir, this);
-                blocks.put(loc, db);
-            } else {
-                db.resetTicks();
-                db.setZ(loc, dir);
+            Pair<DefuseBlock, BukkitTask> pdb = blocks.get(loc);
+            if (pdb != null) {
+                pdb.getRight().cancel();
             }
+            
+            int nextZ = loc.getBlockZ() + (dir == BlockFace.SOUTH ? 1 : -1);
+            DefuseBlock db = new DefuseBlock(nextZ, dir);
+            blocks.put(loc, Pair.of(db, ConfigUtils.schedule(TICKS_BEFORE_REMOVAL, () -> blocks.remove(loc))));
         }
     }
     
-    public void removeDefuseBlock(Location loc) {
-        blocks.remove(loc);
+    public long placeholder() {
+        return stupid;
     }
 }

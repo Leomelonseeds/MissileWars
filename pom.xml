@@ -162,7 +162,7 @@
 	            </exclusion>
 	        </exclusions>
         </dependency>
-        <!--  Sentinel (for training bots) -->
+        <!--  Sentinel (for training bots)>
         <dependency>
             <groupId>org.mcmonkey</groupId>
             <artifactId>sentinel</artifactId>
@@ -175,7 +175,7 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
         <!-- Parkour (No join on parkour) -->
         <dependency>
 		    <groupId>com.github.A5H73Y</groupId>

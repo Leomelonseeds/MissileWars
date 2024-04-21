@@ -7,6 +7,8 @@ experimental:
   poison: true
   # in ticks
   missile-cooldown: 8
+  # don't touch meeeeeeeee
+  dh-iterations: 100000
 
 # Blocks that cannot intersect bounding boxes of schematics
 # Players also cannot right click on these blocks with items.
@@ -105,3 +107,5 @@ spawn:
   z: 89.5
   yaw: -90.0
   pitch: 0.0
+  
+debug: false
