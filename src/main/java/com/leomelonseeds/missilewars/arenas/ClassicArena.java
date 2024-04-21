@@ -51,11 +51,13 @@ public class ClassicArena extends Arena {
     
     @Override
     public void resetWorld() {
-        glowTasks.values().forEach(p -> List.of(p.getLeft(), p.getRight()).forEach(t -> {
-            if (t != null && !t.isCancelled()) {
-                t.cancel();
+        glowTasks.values().forEach(p -> {
+            for (BukkitTask t : new BukkitTask[] {p.getLeft(), p.getRight()}) {
+                if (t != null && !t.isCancelled()) {
+                    t.cancel();
+                }
             }
-        }));
+        });
         glowTasks.clear();
         redTeam.destroyPortals(false);
         blueTeam.destroyPortals(false);
