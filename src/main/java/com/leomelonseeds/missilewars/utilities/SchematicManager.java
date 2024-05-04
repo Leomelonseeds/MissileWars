@@ -175,17 +175,19 @@ public class SchematicManager {
             boolean missileInBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.RED : TeamName.BLUE);
             boolean missileInOtherBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.BLUE : TeamName.RED, 4);
             boolean isTutorial = loc.getWorld().getName().contains("tutorial");
-            int x1, x2, z1, z2;
+            int x1, x2, z1, z2, tg; 
             if (redMissile) {
                 z1 = spawnz - sizez + 1;
                 z2 = spawnz;
                 x1 = spawnx - sizex + 1;
                 x2 = spawnx;
+                tg = spawnz - 1;
             } else {
                 z1 = spawnz;
                 z2 = spawnz + sizez - 1;
                 x1 = spawnx;
                 x2 = spawnx + sizex - 1;
+                tg = spawnz + 1;
             }
             
             for (int z = z1; z <= z2; z++) {
@@ -205,7 +207,7 @@ public class SchematicManager {
                         }
                         
                         // Check for teamgrief
-                        if (missileInBase && z == spawnz - 1) {
+                        if (missileInBase && z == tg) {
                             sendError(player, "You cannot spawn missiles inside your base!");
                             return false;
                         }
