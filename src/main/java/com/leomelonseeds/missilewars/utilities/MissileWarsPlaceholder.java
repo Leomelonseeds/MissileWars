@@ -263,10 +263,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return Integer.toString(blueTeam.getSize());
         }
 
-        if (!inGame) {
-            return null;
-        }
-
         if (params.equals("map")) {
             return ConfigUtils.getMapText(playerArena.getGamemode(), playerArena.getMapName(), "name");
         }
