@@ -196,6 +196,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return playerArena == null ? "Lobby" : StringUtils.capitalize(playerArena.getName());
         }
 
+        if (params.equals("ingame")) {
+            return playerArena == null ? "false" : Boolean.toString(playerArena.isRunning() || playerArena.isResetting());
+        }
+
         if (playerArena == null) {
             return null;
         }
@@ -231,12 +235,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
         if (params.equals("gamemode")) {
             return "§a" + "Classic";
-        }
-
-        boolean inGame = playerArena.isRunning() || playerArena.isResetting();
-
-        if (params.equals("ingame")) {
-            return inGame ? "true" : "false";
         }
 
         if (params.equals("red_queue")) {
