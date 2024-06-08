@@ -362,6 +362,7 @@ public class CustomItemListener implements Listener {
             InventoryUtils.consumeItem(player, playerArena, hand, -1);
             ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
             mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
+            Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(fireball));
             return;
         }
     }
