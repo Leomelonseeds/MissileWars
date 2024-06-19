@@ -48,6 +48,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -352,6 +353,7 @@ public class ArenaGameruleListener implements Listener {
             // must be an int for this calculation to be accurate
             arrow.setGlowingTicks((int) (4 * multiplier));
             event.setProjectile(arrow);
+            Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(arrow));
             return;
         }
         
