@@ -30,7 +30,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
     @Override
     public String getAuthor() {
-        return "Vhbob";
+        return "M310N";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, String params) {
 
         // Stop trying to fetch placeholders if the plugin is disabled
-        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+        if (!MissileWarsPlugin.getPlugin().isEnabled() || player == null) {
             return null;
         }
 

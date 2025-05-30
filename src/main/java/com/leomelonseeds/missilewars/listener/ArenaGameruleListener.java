@@ -22,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -186,7 +185,7 @@ public class ArenaGameruleListener implements Listener {
             player.setSaturation(5F);
             player.removePotionEffect(PotionEffectType.POISON);
             player.removePotionEffect(PotionEffectType.GLOWING);
-            player.removePotionEffect(PotionEffectType.SLOW);
+            player.removePotionEffect(PotionEffectType.SLOWNESS);
             if (canopy != null) {
                 InventoryUtils.regiveItem(player, canopy);
             }
@@ -275,9 +274,9 @@ public class ArenaGameruleListener implements Listener {
                         PotionEffectType.WEAKNESS,
                         PotionEffectType.WITHER,
                         PotionEffectType.POISON,
-                        PotionEffectType.CONFUSION,
-                        PotionEffectType.SLOW,
-                        PotionEffectType.SLOW_DIGGING,
+                        PotionEffectType.NAUSEA,
+                        PotionEffectType.SLOWNESS,
+                        PotionEffectType.MINING_FATIGUE,
                     });
                 }
                 
@@ -365,7 +364,7 @@ public class ArenaGameruleListener implements Listener {
             // Add gradually increasing color particles
             double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
             BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
-                if (!longShots.containsKey(proj) || ((AbstractArrow) proj).isInBlock()) {
+                if (!longShots.containsKey(proj) || proj.isInBlock()) {
                     return;
                 }
                 
@@ -375,7 +374,7 @@ public class ArenaGameruleListener implements Listener {
                 int g = (int) (255 * (1 - ratio));
                 int r = extradmg > 0 ? 255 : 0;
                 DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
-                proj.getWorld().spawnParticle(Particle.REDSTONE, projLoc, 1, dust);
+                proj.getWorld().spawnParticle(Particle.DUST, projLoc, 1, dust);
             });
             
             // 5 seconds should be enough for a bow shot, riiiight
@@ -488,7 +487,7 @@ public class ArenaGameruleListener implements Listener {
                     // In this case, the level of unbreaking corresponds to the level of blastprot
                     // We must also provide manual damage reduction
                     ItemStack boots = player.getInventory().getBoots();
-                    int blastprot = boots.getEnchantmentLevel(Enchantment.DURABILITY);
+                    int blastprot = boots.getEnchantmentLevel(Enchantment.UNBREAKING);
                     if (blastprot > 0) {
                         event.setDamage(event.getDamage() * (1 - 0.08 * blastprot));
                     }
@@ -700,7 +699,7 @@ public class ArenaGameruleListener implements Listener {
             }
         }
         // Check for TNT explosions of portals
-        else if ((entity == EntityType.PRIMED_TNT || entity == EntityType.MINECART_TNT ||
+        else if ((entity == EntityType.TNT || entity == EntityType.TNT_MINECART ||
                  entity == EntityType.CREEPER) && possibleArena instanceof ClassicArena) {
             event.blockList().forEach(block -> {
                 // Register portal brake if block was broken

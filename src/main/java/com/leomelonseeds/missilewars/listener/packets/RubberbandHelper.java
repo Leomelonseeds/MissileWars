@@ -1,22 +1,27 @@
 package com.leomelonseeds.missilewars.listener.packets;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.StructureModifier;
-import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPosition;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPositionAndRotation;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
@@ -24,7 +29,7 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 
-public class RubberbandHelper extends PacketAdapter implements Listener {
+public class RubberbandHelper implements PacketListener, Listener {
     
     // When you're on a missile, each time you are pushed by a piston the server will
     // update your location by sending a movement packet. This movement packet unfortunately
@@ -37,24 +42,23 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
     // to relative teleport the player to the position he is supposed to be in instead. Do this 
     // only if the player is detected to be within the bounds of a tracked missile.
     
-    // Relative teleport modifies the RelativeMovement flags of the PlayServerPosition packet
-    // by hooking into NMS. This was absolutely insane to figure out.
-    
-    private static final Class<?> RELATIVE_MOVEMENT_CLASS = MinecraftReflection.getMinecraftClass("world.entity.RelativeMovement");
     private MissileWarsPlugin plugin;
-    public static Set<UUID> teleportQueue = new HashSet<>();
+    private Set<UUID> teleportQueue;
+    private Map<UUID, com.github.retrooper.packetevents.protocol.world.Location> clientPosition;
     
     public RubberbandHelper(MissileWarsPlugin plugin) {
-        super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.POSITION);
         this.plugin = plugin;
-    }
-    
-    public enum PlayerTeleportFlag {
-        X, Y, Z, Y_ROT, X_ROT
+        this.teleportQueue = new HashSet<>();
+        this.clientPosition = new HashMap<>();
     }
 
     @Override
-    public void onPacketSending(PacketEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
+        // Needs to be position packet
+        if (event.getPacketType() != PacketType.Play.Server.PLAYER_POSITION_AND_LOOK) {
+            return;
+        }
+        
         // Make sure player is in an arena
         Player player = event.getPlayer();
         ArenaManager manager = plugin.getArenaManager();
@@ -68,15 +72,13 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         }
         
         // If yaw or pitch is an exact multiple of 90 then it's a server teleport
-        PacketContainer packet = event.getPacket();
-        StructureModifier<Float> smf = packet.getFloat(); // 0 yaw 1 pitch
-        if (smf.read(0) % 90 == 0 || smf.read(1) % 90 == 0) {
+        WrapperPlayServerPlayerPositionAndLook posPacket = new WrapperPlayServerPlayerPositionAndLook(event);
+        if (posPacket.getYaw() % 90 == 0 || posPacket.getPitch() % 90 == 0) {
             return;
         }
         
         // Check if the toLocation is a missile
-        StructureModifier<Double> smd = packet.getDoubles(); // 0 x 1 y 2 z
-        Location toLoc = new Location(player.getWorld(), smd.read(0), smd.read(1), smd.read(2));
+        Location toLoc = new Location(player.getWorld(), posPacket.getX(), posPacket.getY(), posPacket.getZ());
         boolean isMissile = false;
         for (Tracked t : playerArena.getTracker().getMissiles()) {
             if (!(t instanceof TrackedMissile)) {
@@ -94,35 +96,47 @@ public class RubberbandHelper extends PacketAdapter implements Listener {
         }
         
         // Rewrite to relative teleport
-        Set<PlayerTeleportFlag> flags = new HashSet<>();
         if (player.hasPermission("umw.positionrubberbandfix")) {
-            flags.add(PlayerTeleportFlag.X);
-            flags.add(PlayerTeleportFlag.Y);
-            flags.add(PlayerTeleportFlag.Z);
-            smd.write(0, 0.0);
-            smd.write(1, 0.0);
-            smd.write(2, 0.0);
+            posPacket.setRelative(RelativeFlag.X, true);
+            posPacket.setRelative(RelativeFlag.Y, true);
+            posPacket.setRelative(RelativeFlag.Z, true);
+            posPacket.setPosition(new Vector3d());
             
             // Sync server location with client by teleporting them
             UUID uuid = player.getUniqueId();
             if (!teleportQueue.contains(uuid)) {
-                PacketContainer clientPacket = PositionListener.clientPosition.get(uuid);
-                StructureModifier<Double> lcsmd = clientPacket.getDoubles(); // 0 x 1 y 2 z
-                StructureModifier<Float> lcsmf = clientPacket.getFloat(); // 0 yaw 1 pitch
-                float yaw = lcsmf.read(0) == 0 ? smf.read(0) : lcsmf.read(0);
-                float pitch = lcsmf.read(1) == 0 ? smf.read(1) : lcsmf.read(1);
-                Location teleportTo = new Location(player.getWorld(), lcsmd.read(0), lcsmd.read(1), lcsmd.read(2), yaw, pitch);
+                com.github.retrooper.packetevents.protocol.world.Location loc = clientPosition.get(uuid);
+                Location teleportTo = new Location(player.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
                 teleportQueue.add(uuid);
                 Bukkit.getScheduler().runTask(plugin, () -> player.teleport(teleportTo));
             } else {
                 teleportQueue.remove(uuid);
             }
         }
+
+        posPacket.setRelative(RelativeFlag.PITCH, true);
+        posPacket.setRelative(RelativeFlag.YAW, true);
+        posPacket.setPitch(0);
+        posPacket.setYaw(0);
+        posPacket.write();
+    }
+    
+    // Tracks the client's position so we know where to teleport them to
+    @Override
+    public void onPacketReceive(PacketReceiveEvent event) {
+        if (event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION) {
+            WrapperPlayClientPlayerPosition posPacket = new WrapperPlayClientPlayerPosition(event);
+            clientPosition.put(event.getUser().getUUID(), posPacket.getLocation());
+        }
         
-        flags.add(PlayerTeleportFlag.X_ROT);
-        flags.add(PlayerTeleportFlag.Y_ROT);
-        packet.getSets(EnumWrappers.getGenericConverter(RELATIVE_MOVEMENT_CLASS, PlayerTeleportFlag.class)).write(0, flags);
-        smf.write(0, 0.0F);
-        smf.write(1, 0.0F);
+        if (event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            WrapperPlayClientPlayerPositionAndRotation posPacket = new WrapperPlayClientPlayerPositionAndRotation(event);
+            clientPosition.put(event.getUser().getUUID(), posPacket.getLocation());
+        }
+    }
+    
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        clientPosition.remove(event.getPlayer().getUniqueId());
     }
 }

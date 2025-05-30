@@ -124,8 +124,8 @@ public class CustomItemListener implements Listener {
         // Clear haste if switching off from pickaxe
         ItemStack prev = player.getInventory().getItem(event.getPreviousSlot());
         if (prev != null && prev.getType() == Material.IRON_PICKAXE) {
-            if (player.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
-                player.removePotionEffect(PotionEffectType.FAST_DIGGING);
+            if (player.hasPotionEffect(PotionEffectType.HASTE)) {
+                player.removePotionEffect(PotionEffectType.HASTE);
             }
             return;
         }
@@ -140,7 +140,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, level * 2 - 1));
     }
 
     /** Handle right clicking missiles and utility items */
@@ -175,7 +175,7 @@ public class CustomItemListener implements Listener {
             }
             
             event.setCancelled(true);
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "bossshop open menu " + player.getName());
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "genesis open menu " + player.getName());
             return;
         }
         
@@ -471,7 +471,7 @@ public class CustomItemListener implements Listener {
         if (impactTrigger > 0) {
             delay = (int) (delay * ConfigUtils.getAbilityStat(Passive.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
             ArenaUtils.doUntilDead(thrown, () -> 
-                playerArena.getWorld().spawnParticle(Particle.SMOKE_NORMAL, thrown.getLocation(), 1, 0, 0, 0, 0));
+                playerArena.getWorld().spawnParticle(Particle.SMOKE, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
@@ -602,7 +602,7 @@ public class CustomItemListener implements Listener {
                         tntLoc.clone().add(0, 0, -1)
                     )) {
                     tnt.getBlock().setType(Material.AIR);
-                    TNTPrimed entTnt = (TNTPrimed) tnt.getWorld().spawnEntity(tnt.toCenterLocation().add(0, -0.5, 0), EntityType.PRIMED_TNT);
+                    TNTPrimed entTnt = (TNTPrimed) tnt.getWorld().spawnEntity(tnt.toCenterLocation().add(0, -0.5, 0), EntityType.TNT);
                     entTnt.setSource(thrower);
                     entTnt.setFuseTicks(80);
                 }
@@ -610,7 +610,7 @@ public class CustomItemListener implements Listener {
             
             // Register all spawned TNT minecarts into the tracker
             for (Entity e : spawnLoc.getNearbyEntities(2, 3, 2)) {
-                if (e.getType() == EntityType.MINECART_TNT) {
+                if (e.getType() == EntityType.TNT_MINECART) {
                     playerArena.getTracker().registerTNTMinecart((ExplosiveMinecart) e, thrower);
                 }
             }
@@ -763,7 +763,7 @@ public class CustomItemListener implements Listener {
         
         // Defuse primed TNT
         if (hitEntity != null) {
-            if (hitEntity.getType() != EntityType.PRIMED_TNT) {
+            if (hitEntity.getType() != EntityType.TNT) {
                 return;
             }
             Location loc = hitEntity.getLocation();

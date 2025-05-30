@@ -222,8 +222,8 @@ public class TutorialArena extends ClassicArena {
         // Teleport player nearer red base on stage 3
         if (s == 3) {
             player.teleport(getPlayerSpawn(player));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 128, true, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 6, true, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 40, 128, true, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 6, true, false));
             redTeam.setPortalGlow(getPlayerInArena(uuid), true);
             hasGlow.add(uuid);
             return;
@@ -246,8 +246,8 @@ public class TutorialArena extends ClassicArena {
                 double yneg = Y - 1;
                 double ypos = Y + 1;
                 for (double x = X - 1; x <= X + 1; x += 0.25) {
-                    player.spawnParticle(Particle.REDSTONE, x, yneg, Z, 2, dustOptions);
-                    player.spawnParticle(Particle.REDSTONE, x, ypos, Z, 2, dustOptions);
+                    player.spawnParticle(Particle.DUST, x, yneg, Z, 2, dustOptions);
+                    player.spawnParticle(Particle.DUST, x, ypos, Z, 2, dustOptions);
                     yneg += 0.25;
                     ypos -= 0.25;
                 }
@@ -266,7 +266,7 @@ public class TutorialArena extends ClassicArena {
             Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
             Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
             particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 10, 0.4, 0.4, 0.4);
+                player.spawnParticle(Particle.HAPPY_VILLAGER, loc, 10, 0.4, 0.4, 0.4);
             }, 0, 20));
         }
 

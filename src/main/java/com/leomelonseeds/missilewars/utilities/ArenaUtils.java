@@ -52,12 +52,12 @@ public class ArenaUtils {
                 String[] args = name.split("'");
                 player = Bukkit.getPlayer(args[0]);
             }
-        } else if (killerEntity.getType() == EntityType.PRIMED_TNT) {
+        } else if (killerEntity.getType() == EntityType.TNT) {
             TNTPrimed tnt = (TNTPrimed) killerEntity;
             if (tnt.getSource() instanceof Player) {
                 player = (Player) tnt.getSource();
             }
-        } else if (killerEntity.getType() == EntityType.MINECART_TNT) {
+        } else if (killerEntity.getType() == EntityType.TNT_MINECART) {
             ExplosiveMinecart cart = (ExplosiveMinecart) killerEntity;
             player = arena.getTracker().getTNTMinecartSource(cart);
         }

@@ -89,7 +89,7 @@ public class Tracker {
         EntityType type = e.getEntityType();
         
         // Must be tnt minecart/creeper
-        if (type != EntityType.CREEPER && type != EntityType.MINECART_TNT) {
+        if (type != EntityType.CREEPER && type != EntityType.TNT_MINECART) {
             return;
         }
         
@@ -109,7 +109,7 @@ public class Tracker {
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             // Set source
             for (Entity entity : exploded.getNearbyEntities(6, 6, 6)) {
-                if (entity.getType() == EntityType.PRIMED_TNT) {
+                if (entity.getType() == EntityType.TNT_MINECART) {
                     TNTPrimed tnt = (TNTPrimed) entity;
                     Entity actualSource = tnt.getSource();
                     if (actualSource == null || actualSource.getType() == type) {
@@ -119,7 +119,7 @@ public class Tracker {
             }
             
             // Remove from tracker if tnt minecart
-            if (type == EntityType.MINECART_TNT) {
+            if (type == EntityType.TNT_MINECART) {
                 ExplosiveMinecart cart = (ExplosiveMinecart) exploded;
                 minecarts.remove(cart);
             }

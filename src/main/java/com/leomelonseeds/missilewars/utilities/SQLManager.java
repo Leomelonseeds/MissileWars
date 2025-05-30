@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
@@ -724,19 +726,32 @@ public class SQLManager {
      */
     public String getPlayerNick(UUID uuid) {
         String nick = Bukkit.getOfflinePlayer(uuid).getName();
+        String data = null;
         try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
-                "SELECT Nick FROM ChatControl WHERE uuid = ?;"
+                "SELECT Data FROM ChatControl WHERE uuid = ?;"
         )) {
             stmt.setString(1, uuid.toString());
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
-                if (resultSet.getString("Nick") != null) {
-                    nick = resultSet.getString("Nick");
-                }
+                data = resultSet.getString("Data");
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to get nickname of player " + nick + " from CHC database.");
+            return nick;
         }
+        
+        if (data == null) {
+            return nick;
+        }
+        
+        // Attempt to get the nick, default to username if fail
+        try {
+            JSONObject json = new JSONObject(data);
+            nick = json.getJSONObject("Tags").getString("nick");
+        } catch (JSONException e) {
+            // Do nothing
+        }
+        
         return nick;
     }
 

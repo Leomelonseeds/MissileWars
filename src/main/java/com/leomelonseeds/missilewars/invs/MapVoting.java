@@ -97,7 +97,7 @@ public class MapVoting implements MWInventory {
                 mapItemMeta.getPersistentDataContainer().set(mapKey, PersistentDataType.STRING, mapName);
                 if (votes > 0) {
                     mapItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    mapItemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                    mapItemMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
                 }
             }
             

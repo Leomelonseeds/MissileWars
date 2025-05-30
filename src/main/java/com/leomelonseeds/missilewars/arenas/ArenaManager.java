@@ -279,7 +279,7 @@ public class ArenaManager {
         enterCommands.add("/kit " + team + "waitinglobby %username%");
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_ENTRY, enterCommands);
         Set<PotionEffect> effects = new HashSet<>();
-        effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999999, 5));
+        effects.add(new PotionEffect(PotionEffectType.RESISTANCE, 99999999, 5));
         effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 99999999, 5));
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.DENY);
@@ -360,6 +360,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
+        arenaWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
         arenaWorld.setDifficulty(Difficulty.EASY);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
@@ -374,7 +375,7 @@ public class ArenaManager {
 
             logger.log(Level.INFO, "Lobby generated!");
             Gravity gravity = new Gravity();
-            gravity.gravitate(true);
+            gravity.setHasGravity(false);
 
             // Spawn red NPC
             for (String team : new String[] {"red", "blue"}) {

@@ -55,7 +55,7 @@ public class CosmeticUtils {
             String toUse = "locked";
             if (json.getString(cosmetic).equals(s)) {
                 toUse = "selected";
-                meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             } else if (hasPermission(player, cosmetic, s)) {
                 toUse = "not-selected";

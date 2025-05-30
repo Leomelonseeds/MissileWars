@@ -98,7 +98,7 @@ public class CanopyManager {
         
         // Spawn ender eye
         Location eyeLoc = player.getEyeLocation();
-        EnderSignal signal = (EnderSignal) playerArena.getWorld().spawnEntity(eyeLoc, EntityType.ENDER_SIGNAL);
+        EnderSignal signal = (EnderSignal) playerArena.getWorld().spawnEntity(eyeLoc, EntityType.EYE_OF_ENDER);
         
         // Set target location
         Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
@@ -164,12 +164,12 @@ public class CanopyManager {
         // Each level of jump boost further reduces fall damage by 1
         // Each feather falling level reduces fall damage by 12%
         double rawDmg = Math.ceil(player.getFallDistance()) - 3;
-        PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
+        PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP_BOOST);
         if (jump != null) {
             rawDmg -= jump.getAmplifier() + 1;
         }
         
-        int ff = player.getInventory().getItem(EquipmentSlot.FEET).getEnchantmentLevel(Enchantment.PROTECTION_FALL);
+        int ff = player.getInventory().getItem(EquipmentSlot.FEET).getEnchantmentLevel(Enchantment.FEATHER_FALLING);
         if (ff > 0) {
             rawDmg *= 1 - 0.12 * ff;
         }

@@ -20,22 +20,20 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.StructureModifier;
-import com.comphenix.protocol.wrappers.BlockPosition;
-import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /**
  * This class helps high-ping users break TNT and slime
  */
-public class DefuseHelper extends PacketAdapter implements Listener {
+public class DefuseHelper implements PacketListener, Listener {
     
     private static final int TICKS_BEFORE_REMOVAL = 7;
     
@@ -83,24 +81,22 @@ public class DefuseHelper extends PacketAdapter implements Listener {
     private MissileWarsPlugin plugin;
 
     public DefuseHelper(MissileWarsPlugin plugin) {
-        super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG);
+        // super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG);
         this.plugin = plugin;
         this.blocks = new HashMap<>();
     }
      
     @Override
-    public void onPacketReceiving(PacketEvent event) {
-        // Start destroy block is sent when an instabreak block is broken
-        long time = System.currentTimeMillis();
-        PacketContainer packet = event.getPacket();
-        if (packet.getPlayerDigTypes().read(0) != PlayerDigType.START_DESTROY_BLOCK) {
+    public void onPacketReceive(PacketReceiveEvent event) {
+        // Check for client block dig
+        if (event.getPacketType() != PacketType.Play.Client.PLAYER_DIGGING) {
             return;
         }
-
-        // If y == 0, then it is instead a drop, eat, shoot arrow, or swap action
-        StructureModifier<BlockPosition> sm = packet.getBlockPositionModifier();
-        BlockPosition bp = sm.read(0);
-        if (bp.getY() == 0) {
+        
+        // Start destroy block is sent when an instabreak block is broken
+        long time = System.currentTimeMillis();
+        WrapperPlayClientPlayerDigging digPacket = new WrapperPlayClientPlayerDigging(event);
+        if (digPacket.getAction() != DiggingAction.START_DIGGING) {
             return;
         }
         
@@ -114,6 +110,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
         
         Player player = event.getPlayer();
         World world = player.getWorld();
+        Vector3i bp = digPacket.getBlockPosition();
         Location checkLoc = new Location(world, bp.getX(), bp.getY(), bp.getZ());
         for (int i = 0; i <= 1; i++) {
             Pair<DefuseBlock, BukkitTask> pdb = blocks.get(checkLoc);
@@ -136,7 +133,7 @@ public class DefuseHelper extends PacketAdapter implements Listener {
             // If the location already contains air, then move the packet forward another block.
             // Then do the same checks again. If the checks happen to fail, then do nothing.
             // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
-            BlockPosition newbp = new BlockPosition(bp.getX(), bp.getY(), db.getZ());
+            Vector3i newbp = new Vector3i(bp.getX(), bp.getY(), db.getZ());
             Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
             Block block = world.getBlockAt(bploc);
             if (block.getType() == Material.MOVING_PISTON) {
@@ -148,9 +145,9 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                     Block cur = world.getBlockAt(bploc);
                     if (cur.getType() != Material.AIR) {
                         player.breakBlock(cur);
-                        sm.write(0, newbp);
+                        digPacket.setBlockPosition(newbp);
                     }
-                    ProtocolLibrary.getProtocolManager().receiveClientPacket(player, packet, false);
+                    PacketEvents.getAPI().getPlayerManager().receivePacket(player, digPacket);
                 });
                 plugin.debug("b36: Packet sent forward " + delay + "t");
                 return;
@@ -166,7 +163,8 @@ public class DefuseHelper extends PacketAdapter implements Listener {
                 continue;
             }
 
-            sm.write(0, newbp);
+            digPacket.setBlockPosition(newbp);
+            digPacket.write();
             return;
         }
     }

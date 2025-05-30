@@ -146,7 +146,7 @@ public class MissileWarsPlayer {
                         boolean isY = y == y1 || y == y2;
                         boolean isZ = z == z1 || z == z2;
                         if (isX ? (isY || isZ) : (isY && isZ)) {
-                            player.spawnParticle(Particle.REDSTONE, x, y, z, 1, dustOptions);
+                            player.spawnParticle(Particle.DUST, x, y, z, 1, dustOptions);
                         }
                     }
                 }

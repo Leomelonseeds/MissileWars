@@ -1,7 +1,7 @@
 name: MissileWars
 version: 0.8
 main: com.leomelonseeds.missilewars.MissileWarsPlugin
-api-version: 1.20
+api-version: 1.21
 authors: [ M310N, Vhbob ]
 description: A MissileWars plugin for UltimaMC
 commands:
@@ -25,4 +25,4 @@ depend:
   - Parkour
   - Essentials
   - ProtocolLib
-  - ChatControlRed
+  - ChatControl

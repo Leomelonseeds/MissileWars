@@ -221,7 +221,7 @@ public class MissileWarsTeam {
                 return;
             }
             
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 30 * 60 * 20, level * 2 - 1));
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, level * 2 - 1));
         }
         
         // Potion effect passive activation
@@ -239,7 +239,7 @@ public class MissileWarsTeam {
         
         switch (passive) {
             case BUNNY:
-                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30 * 60 * 20, amp));
+                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 30 * 60 * 20, amp));
                 break;
             case ADRENALINE:
                 mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));

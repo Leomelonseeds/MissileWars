@@ -35,26 +35,40 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.mineacademy.chatcontrol.api.ChannelPreChatEvent;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
-import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 public class MiscListener implements Listener {
     
-    // WORLD CREATION LISTENER
-    
+    // PER-WORLD CHAT HANDLER
     @EventHandler
-    public void worldInit(WorldInitEvent e) {
-        e.getWorld().setKeepSpawnInMemory(false);
+    public void onChat(ChannelPreChatEvent e) {
+        if (!(e.getSender() instanceof Player)) {
+            return;
+        }
+        
+        // Messages sent from tutorial or lobby are broadcast everywhere
+        Player sender = (Player) e.getSender();
+        World world = sender.getWorld();
+        if (world.getName().equals("world") || world.getName().equals("mwarena_tutorial")) {
+            return;
+        }
+        
+        // Messages sent from arenas are sent to the arena and to hub/tutorial
+        Set<Player> recipients = e.getRecipients();
+        recipients.clear();
+        recipients.addAll(world.getPlayers());
+        recipients.addAll(Bukkit.getWorld("world").getPlayers());
+        recipients.addAll(Bukkit.getWorld("mwarena_tutorial").getPlayers());
     }
     
     // TRACKER LISTENER
@@ -106,7 +120,6 @@ public class MiscListener implements Listener {
         }
 
         playerArena.removePlayer(player.getUniqueId(), false);
-        PositionListener.clientPosition.remove(player.getUniqueId());
         player.teleport(ConfigUtils.getSpawnLocation());
     }
 
@@ -124,7 +137,7 @@ public class MiscListener implements Listener {
         
         // Remove potion effects
         for (PotionEffect effect : player.getActivePotionEffects()){
-            if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE) {
+            if (effect.getType() == PotionEffectType.RESISTANCE) {
                 continue;
             }
             player.removePotionEffect(effect.getType());
@@ -284,7 +297,7 @@ public class MiscListener implements Listener {
         
         b.setType(Material.AIR);
         Location spawnLoc = tnt.remove(loc).subtract(0, 0.5, 0);
-        TNTPrimed primed = (TNTPrimed) b.getWorld().spawnEntity(spawnLoc, EntityType.PRIMED_TNT);
+        TNTPrimed primed = (TNTPrimed) b.getWorld().spawnEntity(spawnLoc, EntityType.TNT);
         primed.setFuseTicks(80);
         
         // Get source

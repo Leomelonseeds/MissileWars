@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.comphenix.protocol.ProtocolLibrary;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.teams.ClassicPortal;
@@ -20,7 +21,6 @@ import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
 import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.listener.packets.DefuseHelper;
-import com.leomelonseeds.missilewars.listener.packets.PositionListener;
 import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -78,9 +78,8 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new CustomItemListener(), this);
         Bukkit.getPluginManager().registerEvents(dfh, this);
         Bukkit.getPluginManager().registerEvents(rh, this);
-        ProtocolLibrary.getProtocolManager().addPacketListener(dfh);
-        ProtocolLibrary.getProtocolManager().addPacketListener(rh);
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PositionListener(this));
+        PacketEvents.getAPI().getEventManager().registerListener(dfh, PacketListenerPriority.NORMAL);
+        PacketEvents.getAPI().getEventManager().registerListener(rh, PacketListenerPriority.NORMAL);
         log("Commands and events loaded.");
 
         // Load decks

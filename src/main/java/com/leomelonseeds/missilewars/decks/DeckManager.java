@@ -171,9 +171,9 @@ public class DeckManager {
         
         // Add custom effects
         String custom = null;
-        if (ench == Enchantment.PROTECTION_EXPLOSIONS && plugin.getJSON().getLevel(json, Passive.ROCKETEER) > 0) {
+        if (ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Passive.ROCKETEER) > 0) {
             custom = "Blast Protection";
-        } else if (ench == Enchantment.LOOT_BONUS_BLOCKS) {
+        } else if (ench == Enchantment.FORTUNE) {
             custom = "Haste";
         }
         
@@ -189,7 +189,7 @@ public class DeckManager {
             }
             meta.lore(newLore);
             item.setItemMeta(meta);
-            item.addUnsafeEnchantment(Enchantment.DURABILITY, lvl); // To add glow
+            item.addUnsafeEnchantment(Enchantment.UNBREAKING, lvl); // To add glow
             return;
         }
         

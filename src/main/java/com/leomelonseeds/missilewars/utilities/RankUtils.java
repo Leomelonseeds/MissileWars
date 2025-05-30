@@ -178,7 +178,7 @@ public class RankUtils {
         }
         int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
 
-        return prefix + nick + " " + getRankSymbol(exp);
+        return prefix + "&r" + nick + " " + getRankSymbol(exp);
     }
     
     /**

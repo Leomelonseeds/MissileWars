@@ -56,7 +56,7 @@ public class DeckItem {
         }
         
         ItemStack toMatch = i.clone();
-        toMatch.removeEnchantment(Enchantment.DURABILITY);
+        toMatch.removeEnchantment(Enchantment.UNBREAKING);
         return item.isSimilar(toMatch);
     }
     
@@ -283,9 +283,9 @@ public class DeckItem {
         ItemStack actual = getItem(false);
         if (actual != null) {
             if (c == 0) {
-                actual.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                actual.addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
             } else {
-                actual.removeEnchantment(Enchantment.DURABILITY);
+                actual.removeEnchantment(Enchantment.UNBREAKING);
             } 
         }
             

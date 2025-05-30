@@ -15,10 +15,10 @@ public enum DeckStorage {
         "§6§lVanguard §6⚡§f",
         "&6",
         Map.of(
-            "sharpness", Enchantment.DAMAGE_ALL,
+            "sharpness", Enchantment.SHARPNESS,
             "fire_aspect", Enchantment.FIRE_ASPECT
         ),
-        Map.of("feather_falling", Enchantment.PROTECTION_FALL)
+        Map.of("feather_falling", Enchantment.FEATHER_FALLING)
     ),
     SENTINEL(
         "Sentinel",
@@ -27,10 +27,10 @@ public enum DeckStorage {
         "§b§lSentinel §b✟§f",
         "&b",
         Map.of(
-            "sharpness", Enchantment.DAMAGE_ALL,
-            "flame", Enchantment.ARROW_FIRE
+            "sharpness", Enchantment.SHARPNESS,
+            "flame", Enchantment.FLAME
         ),
-        Map.of("fire_protection", Enchantment.PROTECTION_FIRE)
+        Map.of("fire_protection", Enchantment.FIRE_PROTECTION)
     ),
     BERSERKER(
         "Berserker",
@@ -39,11 +39,11 @@ public enum DeckStorage {
         "§c§lBerserker ☣§f",
         "&c",
         Map.of(
-            "sharpness", Enchantment.DAMAGE_ALL,
+            "sharpness", Enchantment.SHARPNESS,
             "multishot", Enchantment.MULTISHOT,
             "quick_charge", Enchantment.QUICK_CHARGE
         ),
-        Map.of("blast_protection", Enchantment.PROTECTION_EXPLOSIONS)
+        Map.of("blast_protection", Enchantment.BLAST_PROTECTION)
     ),
     ARCHITECT(
         "Architect",
@@ -52,11 +52,11 @@ public enum DeckStorage {
         "§2§lArchitect §2⚒§f",
         "&2",
         Map.of(
-            "sharpness", Enchantment.DAMAGE_ALL,
-            "efficiency", Enchantment.DIG_SPEED,
-            "haste", Enchantment.LOOT_BONUS_BLOCKS    // Dummy enchant to represent haste!!
+            "sharpness", Enchantment.SHARPNESS,
+            "efficiency", Enchantment.EFFICIENCY,
+            "haste", Enchantment.FORTUNE    // Dummy enchant to represent haste!!
         ),
-        Map.of("projectile_protection", Enchantment.PROTECTION_PROJECTILE)
+        Map.of("projectile_protection", Enchantment.PROJECTILE_PROTECTION)
     );
     
     private String name;
