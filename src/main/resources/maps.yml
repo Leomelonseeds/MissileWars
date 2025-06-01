@@ -73,6 +73,14 @@ lobby:
       x: 98
       y: 5
       z: -13
+      
+# Tutorial replay stuff
+tutorial-replay:
+  file: DefaultMap.schem
+  pos:
+    x: 150
+    y: 17
+    z: -65
 
 # Settings for the Default map. Persists unless overridden
 classic:

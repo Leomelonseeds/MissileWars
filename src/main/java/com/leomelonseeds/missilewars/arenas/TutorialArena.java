@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -64,7 +65,24 @@ public class TutorialArena extends ClassicArena {
         this.hasGlow = new HashSet<>();
         this.justReset = true;
         voteManager.addVote("default-map", 64);
-        ConfigUtils.schedule(1, () -> start());
+        ConfigUtils.schedule(1, () -> {
+            start();
+            
+            // Spawn another default map for replays
+            World world = getWorld();
+            SchematicManager.spawnFAWESchematic("tutorial-replay", world);
+            
+            // Spawn a barrier wall for the replay map
+            FileConfiguration settings = plugin.getConfig();
+            int length = settings.getInt("barrier.length");
+            int x = 99;
+            int zCenter = settings.getInt("barrier.center.z");
+            for (int y = 0; y <= 320; ++y) {
+                for (int z = zCenter - length / 2; z < zCenter + length / 2; z++) {
+                    world.getBlockAt(x, y, z).setType(Material.BARRIER);
+                }
+            }
+        });
         
         // World reset task
         int minute = 20 * 60;

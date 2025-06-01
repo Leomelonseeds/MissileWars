@@ -991,13 +991,11 @@ public abstract class Arena implements ConfigurationSerializable {
             // Acquire red and blue spawns
             FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
             Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", gamemode, mapName);
-            Location blueSpawn = new Location(getWorld(), blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-            Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
-            Location redSpawn = new Location(getWorld(), redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
-            redSpawn.setYaw(180);
             World world = getWorld();
-            blueSpawn.setWorld(world);
-            redSpawn.setWorld(world);
+            Location blueSpawn = new Location(world, blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
+            Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
+            Location redSpawn = new Location(world, redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
+            redSpawn.setYaw(180);
 
             // Setup scoreboard and teams
             blueTeam = new MissileWarsTeam(TeamName.BLUE, this, blueSpawn);

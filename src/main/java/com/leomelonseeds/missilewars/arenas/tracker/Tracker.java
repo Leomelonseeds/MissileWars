@@ -109,7 +109,7 @@ public class Tracker {
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
             // Set source
             for (Entity entity : exploded.getNearbyEntities(6, 6, 6)) {
-                if (entity.getType() == EntityType.TNT_MINECART) {
+                if (entity.getType() == EntityType.TNT) {
                     TNTPrimed tnt = (TNTPrimed) entity;
                     Entity actualSource = tnt.getSource();
                     if (actualSource == null || actualSource.getType() == type) {
@@ -198,9 +198,10 @@ public class Tracker {
             for (int j = tracked.size() - 1; j > i; j--) {
                 Tracked t2 = tracked.get(j);
                 // Cannot be the same team
-                if (tm.isRed() == t2.isRed()) {
+                if (t2 == null || tm.isRed() == t2.isRed()) {
                     continue;
                 }
+                
                 if (tm.contains(t2)) {
                     igniter = t2.getPlayer();
                     break;

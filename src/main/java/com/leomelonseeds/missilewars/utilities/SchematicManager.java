@@ -386,6 +386,17 @@ public class SchematicManager {
         
         return new Location[] {pos1.toCenterLocation(), pos2.toCenterLocation()};
     }
+    
+    /**
+     * Spawn a base-level maps.yml fawe schematic
+     * 
+     * @param schematicName
+     * @param world
+     * @return
+     */
+    public static boolean spawnFAWESchematic(String schematicName, World world) {
+        return spawnFAWESchematic(schematicName, world, null, null);
+    }
 
     /**
      * Spawn a WorldEdit schematic in a given world. The "maps.yml" file should have data on the spawn location and
@@ -393,7 +404,8 @@ public class SchematicManager {
      *
      * @param schematicName the name of the schematic in the maps.yml file
      * @param world the world to spawn the schematic in
-     * @param async to run async
+     * @param mapType the gamemode of the map, used for searching for the maps in the file
+     * @param callback sync stuff to run after the map is generated
      * @return true if the schematic was generated successfully, otherwise false
      */
     public static boolean spawnFAWESchematic(String schematicName, World world, String mapType, DBCallback callback) {
