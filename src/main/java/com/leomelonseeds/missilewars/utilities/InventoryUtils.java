@@ -209,6 +209,20 @@ public class InventoryUtils {
      * @param slot -1 if should be manually depleted, provide slot otherwise
      */
     public static void consumeItem(Player player, Arena arena, ItemStack item, int slot) {
+        consumeItem(player, arena, item, slot, false);
+    }
+    
+    /**
+     * Tell plugin that an item was consumed, specifically for bow shots
+     * 
+     * @param player
+     * @param arena
+     * @param item
+     * @param slot -1 if should be manually depleted, provide slot otherwise
+     * @param isBowShot set to true to indicate that the item amount should 
+     * be returned to the amount before the bow was fired
+     */
+    public static void consumeItem(Player player, Arena arena, ItemStack item, int slot, boolean isBowShot) {
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
         if (mwp == null) {
             return;
@@ -220,7 +234,7 @@ public class InventoryUtils {
         }
 
         DeckItem di = deck.getDeckItem(item);
-        int amt = item.getAmount();
+        int amt = isBowShot ? item.getAmount() + 1: item.getAmount();
         boolean deplete = slot == -1;
         
         // Add cooldown to offhand item if item is manually depleted, to prevent offhand items

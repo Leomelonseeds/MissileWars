@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
@@ -63,6 +65,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
@@ -88,7 +91,22 @@ public class ArenaGameruleListener implements Listener {
     
     public static Map<Arrow, Location> longShots = new HashMap<>(); // Origin location of projectile
     public static Set<Player> saidGG = new HashSet<>();
-    private static List<PotionEffectType> effects = null;
+    private List<PotionEffectType> effects;
+    private Map<Player, Pair<Integer, Integer>> arrowInventoryItem; // Amount, Slot
+    
+    public ArenaGameruleListener() {
+        effects = List.of(new PotionEffectType[] {
+            PotionEffectType.BLINDNESS,
+            PotionEffectType.WEAKNESS,
+            PotionEffectType.WITHER,
+            PotionEffectType.POISON,
+            PotionEffectType.NAUSEA,
+            PotionEffectType.SLOWNESS,
+            PotionEffectType.MINING_FATIGUE,
+        });
+        
+        arrowInventoryItem = new HashMap<>();
+    }
 
     /** Event to ignore hunger. */
     @EventHandler
@@ -237,6 +255,37 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
+    // Handle storing arrow from the inventory to handle firing arrows from a bow
+    @EventHandler
+    public void onArrowReady(PlayerReadyArrowEvent event) {
+        if (event.getBow().getType() != Material.BOW) {
+            return;
+        }
+        
+        Player player = event.getPlayer();
+        Arena arena = ArenaUtils.getArena(player);
+        if (arena == null || !arena.isRunning()) {
+            return;
+        }
+        
+        if (arena.getTeam(player.getUniqueId()) == TeamName.NONE) {
+            return;
+        }
+        
+
+        ItemStack[] contents = player.getInventory().getContents();
+        ItemStack arrowItem = event.getArrow();
+        int slot = -1;
+        for (int i = 0; i < contents.length; i++) {
+            if (arrowItem.isSimilar(contents[i])) {
+                slot = i;
+            }
+        }
+        
+        arrowInventoryItem.put(player, Pair.of(arrowItem.getAmount(), slot));
+        ConfigUtils.schedule(1, () -> arrowInventoryItem.remove(player));
+    }
+    
     // Handle sentinel longshot bow shoot event + bow cooldowns
     @EventHandler
     public void onBowShoot(EntityShootBowEvent event) {
@@ -268,18 +317,6 @@ public class ArenaGameruleListener implements Listener {
             // Spiked Quiver
             int spiked = plugin.getJSON().getLevel(uuid, Passive.SPIKED_QUIVER);
             if (spiked > 0) {
-                if (effects == null) {
-                    effects = List.of(new PotionEffectType[] {
-                        PotionEffectType.BLINDNESS,
-                        PotionEffectType.WEAKNESS,
-                        PotionEffectType.WITHER,
-                        PotionEffectType.POISON,
-                        PotionEffectType.NAUSEA,
-                        PotionEffectType.SLOWNESS,
-                        PotionEffectType.MINING_FATIGUE,
-                    });
-                }
-                
                 Arrow arrow = (Arrow) event.getProjectile();
                 int amplifier = (int) ConfigUtils.getAbilityStat(Passive.SPIKED_QUIVER, spiked, Stat.AMPLIFIER);
                 int duration = (int) (ConfigUtils.getAbilityStat(Passive.SPIKED_QUIVER, spiked, Stat.DURATION) * 20);
@@ -290,24 +327,19 @@ public class ArenaGameruleListener implements Listener {
             }
             
             // Check for creepershot
-            ItemStack crossbow = event.getBow();
-            CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
-            boolean charged = false;
-            boolean creepershot = false;
-            for (ItemStack itemProj : cmeta.getChargedProjectiles()) {
-                if (itemProj.getType() != Material.FIREWORK_ROCKET) {
-                    continue;
-                }
-                
-                creepershot = true;
-                if (ConfigUtils.toPlain(itemProj.displayName()).contains("Charged")) {
-                    charged = true;
-                }
-                break;
+            if (event.getProjectile().getType() != EntityType.FIREWORK_ROCKET) {
+                return;
             }
             
-            if (!creepershot) {
+            Firework firework = (Firework) event.getProjectile();
+            String itemName = ConfigUtils.toPlain(firework.getItem().displayName());
+            boolean charged = false;
+            if (!itemName.contains("Creeper")) {
                 return;
+            }
+            
+            if (itemName.contains("Charged")) {
+                charged = true;
             }
             
             Location spawnLoc = eventProj.getLocation();
@@ -318,21 +350,16 @@ public class ArenaGameruleListener implements Listener {
             creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
             creeper.setCustomNameVisible(true);
             creeper.setVelocity(eventProj.getVelocity().multiply(2.5));
-            eventProj.remove();
+            Bukkit.getScheduler().runTask(plugin, () -> eventProj.remove());
             
             ConfigUtils.sendConfigSound("creepershot", player);
             return;
         }
         
-        ItemStack toConsume = event.getConsumable();
-        ItemStack[] contents = player.getInventory().getContents();
-        int slot = -1;
-        for (int i = 0; i < contents.length; i++) {
-            if (toConsume.isSimilar(contents[i])) {
-                slot = i;
-            }
-        }
-        InventoryUtils.consumeItem(player, arena, toConsume, slot);
+        Pair<Integer, Integer> consume = arrowInventoryItem.get(player);
+        ItemStack consumedItem = event.getConsumable().clone();
+        consumedItem.setAmount(consume.getLeft());
+        InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
         
         // Heavy arrows
         Arrow proj = (Arrow) eventProj;
@@ -342,11 +369,15 @@ public class ArenaGameruleListener implements Listener {
             double multiplier = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.MULTIPLIER);
             SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);
             arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
-            arrow.setFireTicks(proj.getFireTicks());
             arrow.setShooter(player);
             arrow.setDamage(proj.getDamage() + heavy * 0.35); // This makes the arrow damage seem closer to that of a normal speed arrow
             arrow.setCritical(proj.isCritical());
             arrow.setPickupStatus(proj.getPickupStatus());
+            
+            // Add flame (since getFireTicks doesn't work anymore)
+            if (event.getBow().containsEnchantment(Enchantment.FLAME)) {
+                arrow.setFireTicks(20 * 60);
+            }
             
             // Encode knockback information into glowing ticks. This means that multiplier * 4
             // must be an int for this calculation to be accurate
@@ -404,7 +435,7 @@ public class ArenaGameruleListener implements Listener {
         if (arena.getTeam(player.getUniqueId()) == TeamName.NONE) {
             return;
         }
-        
+
         // At this point, the player is 100% using berserker. Obtain the arrow item
         PlayerInventory inv = player.getInventory();
         ItemStack toConsume = null;

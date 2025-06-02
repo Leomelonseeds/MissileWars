@@ -22,9 +22,9 @@ public class DeckItem {
     private int max;
     private int curCooldown;
     private MissileWarsPlayer mwp;
-    BukkitTask cooldownTask;
+    private BukkitTask cooldownTask;
     boolean unavailable;
-    MissileWarsTeam team; // Where to fetch the cooldown multiplier
+    private MissileWarsTeam team; // Where to fetch the cooldown multiplier
     
     /**
      * @param item should correspond directly the player inventory's item (but its fine if it doesn't I guess)
