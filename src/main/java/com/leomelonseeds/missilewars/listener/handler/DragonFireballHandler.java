@@ -43,7 +43,7 @@ public class DragonFireballHandler implements Listener {
         // Spawn slime following the fireball so it can be deflected
         slime = (Slime) fireball.getWorld().spawnEntity(fireball.getLocation(), EntityType.SLIME);
         slime.setSize(2);
-        slime.setInvisible(true);
+        slime.setInvisible(true); // Set to false to debug
         slime.setSilent(true);
         slime.setAI(false);
         updateTask = (Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1));
@@ -109,6 +109,8 @@ public class DragonFireballHandler implements Listener {
         hitDetected = true;
         fireball.teleport(fireball.getLocation());
         fireball.setDirection(direction);
+        fireball.setVelocity(direction);
+        fireball.setAcceleration(direction);
         hitDetected = false;
     }
     

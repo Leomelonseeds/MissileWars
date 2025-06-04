@@ -353,6 +353,7 @@ public class MiscListener implements Listener {
             return;
         }
 
+        // TODO: Raytrace according to player ping and where target was ping/2 time ago
         Entity target = player.getTargetEntity(2); // 2 is enough for 3 block reach (for some reason)
         if (target == null) {
             return;

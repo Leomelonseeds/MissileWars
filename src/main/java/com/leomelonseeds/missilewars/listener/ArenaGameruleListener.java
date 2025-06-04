@@ -493,6 +493,7 @@ public class ArenaGameruleListener implements Listener {
         if (event.getEntityType() != EntityType.PLAYER) {
             return;
         }
+        
         Player player = (Player) event.getEntity();
         Arena arena = ArenaUtils.getArena(player);
         if (arena == null || !arena.isRunning()) {
@@ -555,11 +556,28 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        // Do arrowhealth/longshot calculations
+        // Add back crit particles if player is attacking using custom sharpness item
         if (!isProjectile) {
+            ItemStack weapon = damager.getInventory().getItemInMainHand();
+            if (weapon.getType() != Material.BOW && weapon.getType() != Material.CROSSBOW) {
+                return;
+            }
+            
+            for (Component lore : weapon.lore()) {
+                if (ConfigUtils.toPlain(lore).contains("Sharpness")) {
+                    arena.getWorld().spawnParticle(
+                        Particle.ENCHANTED_HIT, 
+                        player.getLocation().add(0, 1, 0), 
+                        20, 
+                        0, 0.3, 0, 
+                        0.4);
+                    break;
+                }
+            }
             return;
         }
-        
+
+        // Do arrowhealth/longshot calculations
         Projectile projectile = (Projectile) event.getDamager();
         if (!(projectile.getShooter() instanceof Player)) {
             return;

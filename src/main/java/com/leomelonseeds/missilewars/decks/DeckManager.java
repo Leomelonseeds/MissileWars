@@ -15,8 +15,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -129,6 +132,11 @@ public class DeckManager {
         for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
             addEnch(weapon, e.getKey(), e.getValue(), deck, json);
         }
+        
+        // For custom enchantments, remove unbreaking if the item has more than 2 enchantments
+        if (weapon.getEnchantments().size() >= 2) {
+            weapon.removeEnchantment(Enchantment.UNBREAKING);
+        }
         gear.add(weapon);
         
         ItemStack boots = ds.getBoots();
@@ -175,6 +183,18 @@ public class DeckManager {
             custom = "Blast Protection";
         } else if (ench == Enchantment.FORTUNE) {
             custom = "Haste";
+        } else if (ench == Enchantment.SHARPNESS && (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW)) {
+            custom = "Sharpness";
+            
+            // Newer versions of MC have changed how bows works with sharpness, the arrow
+            // damage now scales according to the sharpness level of the bow. To combat this,
+            // add sharpness as a custom enchant and adjust the attributes ourselves
+            ItemMeta meta = item.getItemMeta();
+            double extraDmg = 0.5 * lvl + 0.5;
+            NamespacedKey key = new NamespacedKey(MissileWarsPlugin.getPlugin(), "umw-sharpness");
+            AttributeModifier at = new AttributeModifier(key, extraDmg, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+            meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, at);
+            item.setItemMeta(meta);
         }
         
         if (custom != null) {
