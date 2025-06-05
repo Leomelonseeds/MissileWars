@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,9 +53,9 @@ public class ArenaSelector implements MWInventory {
     public void updateInventory() {
         inv.clear();
         for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
-            ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, arena.getNumPlayers()));
+            int playerCount = arena.getNumPlayers();
+            ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, playerCount));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
-            assert arenaItemMeta != null;
             String display = ConfigUtils.getConfigText("inventories.game-selector.game-item.name", player, arena, null);
             List<Component> lore = new ArrayList<>();
             for (String s : ConfigUtils.getConfigTextList("inventories.game-selector.game-item.lore", player, arena, null)) {
@@ -61,6 +63,13 @@ public class ArenaSelector implements MWInventory {
             }
             arenaItemMeta.displayName(ConfigUtils.toComponent(display));
             arenaItemMeta.lore(lore);
+            
+            // Add glowing effect if people are inside
+            if (playerCount >= 1) {
+                arenaItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                arenaItemMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            }
+
             arenaItem.setItemMeta(arenaItemMeta);
             inv.addItem(arenaItem);
         }

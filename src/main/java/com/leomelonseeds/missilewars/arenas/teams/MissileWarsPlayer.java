@@ -155,7 +155,6 @@ public class MissileWarsPlayer {
     }
 
     // EXP bar cooldown preview + out of bounds handling
-    // TODO: Enemy in-base red vignette
     private void cooldownPreview(Arena arena) {
         Player player = getMCPlayer();
         tasks.add(new BukkitRunnable() {

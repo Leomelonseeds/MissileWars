@@ -78,7 +78,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected boolean waitingForTie;
     protected List<BukkitTask> tasks;
     protected boolean resetting;
-    /** task for automatically ending the game if no players are present */
+    /** Task for automatically ending the game if no players are present */
     protected BukkitTask autoEnd;
     protected Tracker tracker;
     protected VoteManager voteManager;
@@ -148,6 +148,20 @@ public abstract class Arena implements ConfigurationSerializable {
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
         voteManager = new VoteManager(gamemode);
+        startSpectatorActionBarTask();
+    }
+    
+    /**
+     * Simple task to remind players how to exit spectator mode
+     */
+    private void startSpectatorActionBarTask() {
+        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(
+                MissileWarsPlugin.getPlugin(), () -> {
+            for (MissileWarsPlayer mwp : spectators) {
+                Player player = mwp.getMCPlayer();
+                player.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
+            }
+        }, 20, 2));
     }
      
     /**
@@ -889,8 +903,10 @@ public abstract class Arena implements ConfigurationSerializable {
     public void removeSpectator(MissileWarsPlayer player) {
         if (spectators.remove(player)) {
             announceMessage("messages.spectate-leave-others", player);
-            player.getMCPlayer().setGameMode(GameMode.ADVENTURE);
-            player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
+            Player mcPlayer = player.getMCPlayer();
+            mcPlayer.setGameMode(GameMode.ADVENTURE);
+            mcPlayer.teleport(getPlayerSpawn(mcPlayer));
+            mcPlayer.sendActionBar(ConfigUtils.toComponent(""));
             calculateRankMedian();
             checkForStart();
         }
@@ -914,7 +930,6 @@ public abstract class Arena implements ConfigurationSerializable {
                 blueQueue.remove(player);
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.setGameMode(GameMode.SPECTATOR);
-                mcPlayer.sendActionBar(ConfigUtils.toComponent("Type /sp to stop spectating"));
                 voteManager.removePlayer(mcPlayer);
                 calculateRankMedian();
                 checkEmpty();
@@ -1393,6 +1408,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.getWorlds().remove(world);
         
         loadWorldFromDisk(true);
+        startSpectatorActionBarTask();
         resetting = false;
     }
 

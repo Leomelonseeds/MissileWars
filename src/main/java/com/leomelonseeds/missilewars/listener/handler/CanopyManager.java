@@ -30,6 +30,9 @@ public class CanopyManager {
     
     private static CanopyManager instance;
     
+    /** Time after throwing a canopy that it spawns. Must be >= 20 */
+    private final int CANOPY_DELAY = 40;
+    
     private Set<Player> canopy_freeze;
     private Map<Player, ItemStack> canopy_cooldown;
     private Map<Location, Integer> canopy_extensions;
@@ -123,15 +126,14 @@ public class CanopyManager {
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 0, 5);
         
-        // Send sound 2 seconds later, tp 3 sec later
-        ConfigUtils.schedule(40, () -> {
-            if (!canopy_cooldown.containsKey(player)) {
-                return;
+        // Send sound 1 second before the tp
+        ConfigUtils.schedule(CANOPY_DELAY - 20, () -> {
+            if (canopy_cooldown.containsKey(player)) {
+                ConfigUtils.sendConfigSound("canopy-activate", player);
             }
-            
-            ConfigUtils.sendConfigSound("canopy-activate", player);
-            ConfigUtils.schedule(20, () -> spawnCanopy(player, playerArena, signal));
         });
+
+        ConfigUtils.schedule(CANOPY_DELAY, () -> spawnCanopy(player, playerArena, signal));
     }
     
     private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal) {
