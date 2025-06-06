@@ -3,10 +3,8 @@ package com.leomelonseeds.missilewars.listener.packets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -77,11 +75,9 @@ public class DefuseHelper implements PacketListener, Listener {
     // that also has the same X and Y and has Z in the opposite direction of when it was last moved.
     
     private Map<Location, Pair<DefuseBlock, BukkitTask>> blocks;
-    private long stupid;
     private MissileWarsPlugin plugin;
 
     public DefuseHelper(MissileWarsPlugin plugin) {
-        // super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG);
         this.plugin = plugin;
         this.blocks = new HashMap<>();
     }
@@ -94,19 +90,19 @@ public class DefuseHelper implements PacketListener, Listener {
         }
         
         // Start destroy block is sent when an instabreak block is broken
-        long time = System.currentTimeMillis();
         WrapperPlayClientPlayerDigging digPacket = new WrapperPlayClientPlayerDigging(event);
         if (digPacket.getAction() != DiggingAction.START_DIGGING) {
             return;
         }
         
-        // Dumb way of waiting a bit (it works, don't touch it)
-        this.stupid = 0;
-        Random rand = new Random(0);
-        for (int i = 0; i < plugin.getConfig().getInt("experimental.dh-iterations"); i++) {
-            this.stupid += rand.nextInt(0, 10);
-        }
-        plugin.debug("DH process delay: " + (System.currentTimeMillis() - time) + ", Avg tick time: " + Bukkit.getAverageTickTime());
+        // Dumb way of waiting a bit for piston events to register
+        // Set iterations to 10k for 5-20ms of delay
+        // Since 1.21 and moving to PacketEvents, it doesn't seem needed anymore
+        // this.stupid = 0;
+        // Random rand = new Random(0);
+        // for (int i = 0; i < plugin.getConfig().getInt("experimental.dh-iterations"); i++) {
+        //     this.stupid += rand.nextInt(0, 10);
+        // }
         
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -147,7 +143,7 @@ public class DefuseHelper implements PacketListener, Listener {
                         player.breakBlock(cur);
                         digPacket.setBlockPosition(newbp);
                     }
-                    PacketEvents.getAPI().getPlayerManager().receivePacket(player, digPacket);
+                    PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, digPacket);
                 });
                 plugin.debug("b36: Packet sent forward " + delay + "t");
                 return;
@@ -203,9 +199,5 @@ public class DefuseHelper implements PacketListener, Listener {
             DefuseBlock db = new DefuseBlock(nextZ, dir);
             blocks.put(loc, Pair.of(db, ConfigUtils.schedule(TICKS_BEFORE_REMOVAL, () -> blocks.remove(loc))));
         }
-    }
-    
-    public long placeholder() {
-        return stupid;
     }
 }

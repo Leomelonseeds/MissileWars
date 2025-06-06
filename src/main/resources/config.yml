@@ -7,9 +7,10 @@ experimental:
   poison: true
   # in ticks
   missile-cooldown: 8
-  # don't touch meeeeeeeee
-  dh-iterations: 100000
-  dh-bias: 15
+
+  # defuse helper uneeded setting
+  # dh-iterations: 0
+  dh-bias: 20
 
 # Blocks that cannot intersect bounding boxes of schematics
 # Players also cannot right click on these blocks with items.
