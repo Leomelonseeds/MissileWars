@@ -57,6 +57,16 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // Get a player's live ping
+        if (action.equalsIgnoreCase("ping")) {
+            Player target = getCommandTarget(args, sender);
+            if (target == null) {
+                return true;
+            }
+            
+            plugin.getPinger().sendPing(target, sender);
+        }
+        
         // Go to lobby
         if (action.equalsIgnoreCase("lobby")) {
             if (!(sender instanceof Player)) {
