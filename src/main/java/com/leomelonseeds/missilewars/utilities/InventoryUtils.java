@@ -302,7 +302,7 @@ public class InventoryUtils {
                 PersistentDataType.STRING)) {
             return null;
         }
-        return item.getItemMeta().getPersistentDataContainer().get( new NamespacedKey(MissileWarsPlugin.getPlugin(),
+        return item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(),
                 id), PersistentDataType.STRING);
     }
 }

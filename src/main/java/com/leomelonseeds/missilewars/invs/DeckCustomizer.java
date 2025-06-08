@@ -5,14 +5,12 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -21,6 +19,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 
 import net.kyori.adventure.text.Component;
@@ -196,16 +195,12 @@ public class DeckCustomizer implements MWInventory {
             return;
         }
         
-        ItemMeta meta = item.getItemMeta();
-        
         // Ensure it's clickable :))
-        if (!meta.getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
-                PersistentDataType.STRING)) {
+        String storedName = InventoryUtils.getStringFromItem(item, "item-gui");
+        if (storedName == null) {
             return;
         }
         
-        String storedName = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-gui"),
-                PersistentDataType.STRING);
         String[] args = storedName.split("-");
         String name = args[0];
         int level = Integer.parseInt(args[1]);

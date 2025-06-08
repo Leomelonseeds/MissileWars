@@ -18,7 +18,6 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
@@ -59,7 +58,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -637,14 +635,12 @@ public class ArenaGameruleListener implements Listener {
             int maxmultiplier = (int) ConfigUtils.getAbilityStat(Passive.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
             
             // Make sure its custom item
-            if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(
-                    new NamespacedKey(plugin, "item-structure"), PersistentDataType.STRING)) {
+            String itemString = InventoryUtils.getStringFromItem(item, "item-structure");
+            if (itemString == null) {
                 return;
             }
             
             // Get level of the item
-            String itemString = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,
-                    "item-structure"), PersistentDataType.STRING);
             String[] args = itemString.split("-");
             int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
             

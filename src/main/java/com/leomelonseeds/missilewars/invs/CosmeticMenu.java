@@ -2,18 +2,17 @@ package com.leomelonseeds.missilewars.invs;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class CosmeticMenu implements MWInventory {
     
@@ -73,26 +72,28 @@ public class CosmeticMenu implements MWInventory {
             return;
         }
         
-        if (item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), "name"))) {
-            String name = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "name"),
-                    PersistentDataType.STRING);
-            JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
-            String selected = json.getString(cosmetic);
-            // Return if clicked already selected
-            if (selected.equals(name)) {
-                return;
-            }
-            // Select if player has permissions for it
-            if (CosmeticUtils.hasPermission(player, cosmetic, name)) {
-                json.put(cosmetic, name);
-                ConfigUtils.sendConfigMessage("messages.cosmetic-selected", player, null, null);
-                ConfigUtils.sendConfigSound("change-preset", player);
-                updateInventory();
-            } else {
-                ConfigUtils.sendConfigMessage("messages.cosmetic-locked", player, null, null);
-                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                return;
-            }
+        String name = InventoryUtils.getStringFromItem(item, "name");
+        if (name == null) {
+            return;
+        }
+
+        // Return if clicked already selected
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+        String selected = json.getString(cosmetic);
+        if (selected.equals(name)) {
+            return;
+        }
+        
+        // Select if player has permissions for it
+        if (CosmeticUtils.hasPermission(player, cosmetic, name)) {
+            json.put(cosmetic, name);
+            ConfigUtils.sendConfigMessage("messages.cosmetic-selected", player, null, null);
+            ConfigUtils.sendConfigSound("change-preset", player);
+            updateInventory();
+        } else {
+            ConfigUtils.sendConfigMessage("messages.cosmetic-locked", player, null, null);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
         }
     }
 

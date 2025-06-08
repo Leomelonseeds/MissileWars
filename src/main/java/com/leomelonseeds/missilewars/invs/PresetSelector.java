@@ -23,6 +23,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -215,8 +216,7 @@ public class PresetSelector implements MWInventory {
         Material selection = Material.getMaterial(itemConfig.getString("preset.normal.item"));
         Material edit = Material.getMaterial(itemConfig.getString("preset.edit.item"));
         if (itemType == selection || itemType == edit) {
-            String p = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
-                    PersistentDataType.STRING);
+            String p = InventoryUtils.getStringFromItem(item, "preset");
             
             // Check permission for B
             if (p.equals("B") && !player.hasPermission("umw.preset.b")) {
