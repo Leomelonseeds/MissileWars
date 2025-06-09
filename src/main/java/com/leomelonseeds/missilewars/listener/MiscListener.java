@@ -234,7 +234,7 @@ public class MiscListener implements Listener {
     // Extend TNT event already handled above
     // ---------------------------------------------------------
     
-    public static Map<Location, Location> tnt = new HashMap<>();
+    private static Map<Location, Location> tnt = new HashMap<>();
     
     @EventHandler
     public void retractTNT(BlockPistonRetractEvent e) {
@@ -256,17 +256,17 @@ public class MiscListener implements Listener {
         for (int i = 1; i <= 3; i++) {
             Vector toAdd = direction.clone().multiply(0.33 * i);
             int index = i;
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+            ConfigUtils.schedule(i, () -> {
                 if (!tnt.containsKey(finalLoc)) {
                     return;
                 }
+                
                 if (index < 3) {
                     tnt.get(finalLoc).add(toAdd);
-                }
-                else {
+                } else {
                     tnt.remove(finalLoc);
                 }
-            }, i);
+            });
         }
     }
     

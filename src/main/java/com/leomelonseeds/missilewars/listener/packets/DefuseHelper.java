@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
@@ -165,12 +166,14 @@ public class DefuseHelper implements PacketListener, Listener {
         }
     }
     
-    @EventHandler
+    // Tracked events must execute first to make sure they're added to the list
+    // before packets reach the server
+    @EventHandler(priority = EventPriority.LOWEST)
     public void extend(BlockPistonExtendEvent e) {
         addToList(e.getBlocks(), e);
     }
-    
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void retract(BlockPistonRetractEvent e) {
         addToList(e.getBlocks(), e);
     }
