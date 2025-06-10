@@ -12,7 +12,7 @@ public enum DeckStorage {
         "Vanguard",
         Material.GOLDEN_BOOTS,
         Material.GOLDEN_SWORD,
-        "§6§lVanguard §6⚡§f",
+        "§6§lVanguard §r§6⚡§f",
         "&6",
         Map.of(
             "sharpness", Enchantment.SHARPNESS,
@@ -24,7 +24,7 @@ public enum DeckStorage {
         "Sentinel",
         Material.IRON_BOOTS,
         Material.BOW,
-        "§b§lSentinel §b✟§f",
+        "§b§lSentinel §r§b✟§f",
         "&b",
         Map.of(
             "sharpness", Enchantment.SHARPNESS,
@@ -49,7 +49,7 @@ public enum DeckStorage {
         "Architect",
         Material.CHAINMAIL_BOOTS,
         Material.IRON_PICKAXE,
-        "§2§lArchitect §2⚒§f",
+        "§2§lArchitect §r§2⚒§f",
         "&2",
         Map.of(
             "sharpness", Enchantment.SHARPNESS,

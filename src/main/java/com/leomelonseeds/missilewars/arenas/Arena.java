@@ -270,20 +270,28 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get people in red queue
+     * Get people in red queue. If the game has already started,
+     * it returns the corresponding team's size.
      *
      * @return
      */
     public int getRedQueue() {
+        if (running) {
+            return getRedTeam().getSize();
+        }
         return redQueue.size();
     }
 
     /**
-     * Get people in blue queue
+     * Get people in blue queue. If the game has already started,
+     * it returns the corresponding team's size.
      *
      * @return
      */
     public int getBlueQueue() {
+        if (running) {
+            return getBlueTeam().getSize();
+        }
         return blueQueue.size();
     }
 

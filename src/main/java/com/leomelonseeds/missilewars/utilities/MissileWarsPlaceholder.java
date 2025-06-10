@@ -71,10 +71,31 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         if (params.contains("deck")) {
+            // If the json hasn't finished loading yet what are ya gonna do
             JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+            if (json == null) {
+                return null;
+            }
+            
             DeckStorage deck = DeckStorage.fromString(json.getString("Deck"));
             if (params.equals("deck_plain")) {
                 return deck.toString();
+            }
+            
+            // umw_deck_npcname_[deck]
+            // Changes based on player's selected deck
+            if (params.contains("npcname")) {
+                DeckStorage plDeck = DeckStorage.fromString(params.split("_")[2]);
+                String res = plDeck.getNPCName();
+                if (plDeck == deck) {
+                    String stripped = ConfigUtils.removeColors(res);
+                    String[] parts = stripped.split(" ");
+                    String symbold = res.contains("§r") ? "" : "&l";
+                    res = "&7› " + deck.getColor() + "&l&n" + parts[0] + " " + 
+                                   deck.getColor() + "&n" + symbold + parts[1] + "&r &7‹";
+                }
+                
+                return res;
             }
 
             String preset = json.getString("Preset");

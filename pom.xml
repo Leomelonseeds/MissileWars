@@ -233,6 +233,13 @@
             <version>2.8.0</version>
             <scope>provided</scope>
         </dependency>
+        <!-- DecentHolograms (Selected deck holograms) -->
+        <dependency>
+            <groupId>com.github.decentsoftware-eu</groupId>
+            <artifactId>decentholograms</artifactId>
+            <version>2.8.17</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.json/json (JSON) -->
         <dependency>
             <groupId>org.json</groupId>

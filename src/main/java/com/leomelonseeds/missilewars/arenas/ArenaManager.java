@@ -51,6 +51,7 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import eu.decentsoftware.holograms.api.DHAPI;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.trait.Equipment;
@@ -150,7 +151,7 @@ public class ArenaManager {
      * @param name the name of the Arena
      * @return true if the arena was successfully deleted
      */
-    public Boolean removeArena(Arena arena) {
+    public boolean removeArena(Arena arena) {
         World arenaWorld = arena.getWorld();
         Logger logger = Bukkit.getLogger();
         logger.info("Removing arena " + arena.getName() + "...");
@@ -165,7 +166,11 @@ public class ArenaManager {
                 CitizensAPI.getNPCRegistry().getById(id).destroy();
                 logger.info("Citizen with ID " + id + " deleted.");
             }
+            
+            // Delete the hologram associated with the id
+            DHAPI.removeHologram("" + id);
         }
+        
         CitizensAPI.getNPCRegistry().saveToStore();
         Bukkit.unloadWorld(arenaWorld, false);
         Bukkit.getWorlds().remove(arenaWorld);
@@ -176,6 +181,7 @@ public class ArenaManager {
             logger.warning("The world file couldn't be removed! Please remove manually.");
         }
         loadedArenas.remove(arena);
+        
         // Remove arena from file
         File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
         FileConfiguration arenaConfig = new YamlConfiguration();
@@ -380,22 +386,32 @@ public class ArenaManager {
             // Spawn red NPC
             for (String team : new String[] {"red", "blue"}) {
                 String upper = team.toUpperCase();
+                String teamName = (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team";
                 Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team, null, null);
                 Location teamLoc = new Location(arenaWorld, teamVec.getX(), teamVec.getY(), teamVec.getZ(), 90, 0);
-                NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, 
-                        (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team");
-                CommandTrait enqueue = new CommandTrait();
+                NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, teamName);
+                
+                // Team queuing command
+                CommandTrait enqueue = teamNPC.getOrAddTrait(CommandTrait.class);
                 enqueue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueue" + team,
                         CommandTrait.Hand.BOTH).player(true));
-                teamNPC.addTrait(enqueue);
+                
+                // Make sheep the same color as the team
                 SheepTrait sheepTrait = teamNPC.getOrAddTrait(SheepTrait.class);
                 sheepTrait.setColor(DyeColor.valueOf(upper));
+                
+                // Hologram to get queued placeholder
+                Location holoLoc = teamLoc.clone().add(0, 1.8, 0);
+                DHAPI.createHologram(teamNPC.getId() + "", holoLoc, true, List.of(teamName + " (%umw_" + team + "_queue%)"));
+                
+                // Add misc traits and spawn in
+                teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
                 teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
                 teamNPC.addTrait(gravity);
                 arenaWorld.loadChunk(teamLoc.getChunk());
                 teamNPC.spawn(teamLoc);
                 arena.addNPC(teamNPC.getId());
-                logger.log(Level.INFO, upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned."); 
+                logger.log(Level.INFO, upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
             }
 
             // Spawn bar NPC
@@ -422,19 +438,30 @@ public class ArenaManager {
                 String id = deck.toString().toLowerCase();
                 Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id, null, null);
                 Location deckLoc = new Location(arenaWorld, deckVec.getX(), deckVec.getY(), deckVec.getZ(), -90, 0);
-                deckLoc.setYaw(-90);
                 NPC deckNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, deck.getNPCName());
+                deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
+                deckNPC.addTrait(gravity);
+                
+                // Add skin
                 SkinTrait deckSkin = deckNPC.getOrAddTrait(SkinTrait.class);
                 deckSkin.setSkinPersistent(id, schematicConfig.getString("lobby.npc-pos." + id + ".signature"),
                                                schematicConfig.getString("lobby.npc-pos." + id + ".value"));
-                CommandTrait deckCommand = new CommandTrait();
+                
+                // Deck info command
+                CommandTrait deckCommand = deckNPC.getOrAddTrait(CommandTrait.class);
                 deckCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck " + id, CommandTrait.Hand.BOTH).player(true));
-                deckNPC.addTrait(deckCommand);
-                deckNPC.addTrait(gravity);
+                
+                // Hologram name, to be able to use placeholders
+                Location holoLoc = deckLoc.clone().add(0, 2.2, 0);
+                DHAPI.createHologram(deckNPC.getId() + "", holoLoc, true, List.of("%umw_deck_npcname_" + id + "%"));
+                
+                // Add deck-specific equipment
                 Equipment deckEquip = new Equipment();
                 deckNPC.addTrait(deckEquip);
                 deckEquip.set(EquipmentSlot.HAND, deck.getWeapon());
                 deckEquip.set(EquipmentSlot.BOOTS, deck.getBoots());
+                
+                // Spawn the NPC
                 arenaWorld.loadChunk(deckLoc.getChunk());
                 deckNPC.spawn(deckLoc);
                 arena.addNPC(deckNPC.getId());
