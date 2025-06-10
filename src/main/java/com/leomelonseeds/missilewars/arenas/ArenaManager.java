@@ -119,15 +119,7 @@ public class ArenaManager {
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
 
-        // Save Arenas to file
-        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
-        FileConfiguration arenaConfig = new YamlConfiguration();
-        arenaConfig.set("arenas", loadedArenas);
-        try {
-            arenaConfig.save(arenaFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveArenasToFile();
     }
 
     /**
@@ -181,21 +173,12 @@ public class ArenaManager {
             logger.warning("The world file couldn't be removed! Please remove manually.");
         }
         loadedArenas.remove(arena);
-        
-        // Remove arena from file
-        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
-        FileConfiguration arenaConfig = new YamlConfiguration();
-        arenaConfig.set("arenas", loadedArenas);
-        try {
-            arenaConfig.save(arenaFile);
-        } catch (IOException e) {
-            logger.warning("Arena file couldn't be saved!");
-        }
+        saveArenasToFile();
         return true;
     }
 
     /**
-     * Deletes and re-creates all arenas to implement new settings
+     * Deletes and re-creates all arenas to implement new settings/schematics
      */
     public void performArenaUpgrade() {
         Logger logger = Bukkit.getLogger();
@@ -212,6 +195,21 @@ public class ArenaManager {
             String gamemode = arena.getGamemode();
             removeArena(arena);
             createArena(rawname, specialArenas.contains(rawname) ? rawname : gamemode, capacity);
+        }
+    }
+    
+    /**
+     * Save currently loaded arenas to file
+     */
+    private void saveArenasToFile() {
+        File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
+        FileConfiguration arenaConfig = new YamlConfiguration();
+        arenaConfig.set("arenas", loadedArenas);
+        try {
+            arenaConfig.save(arenaFile);
+        } catch (IOException e) {
+            Bukkit.getLogger().warning("Arena file couldn't be saved!");
+            e.printStackTrace();
         }
     }
 
@@ -352,7 +350,6 @@ public class ArenaManager {
         arenaCreator.type(WorldType.FLAT);
         arenaCreator.generator(new ChunkGenerator() {});
         World arenaWorld = arenaCreator.createWorld();
-        assert arenaWorld != null;
         arenaWorld.setAutoSave(false);
         arenaWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
@@ -513,6 +510,7 @@ public class ArenaManager {
                 arenaWorld.save();
                 logger.log(Level.INFO, "Saving new arena " + name);
                 logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
+                saveArenasToFile();
             }, 200);
 
         })) {
