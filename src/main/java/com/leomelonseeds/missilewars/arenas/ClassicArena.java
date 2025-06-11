@@ -94,7 +94,7 @@ public class ClassicArena extends Arena {
     
     private Pair<Integer, String> getTopStat(Stat stat) {
         List<MissileWarsPlayer> most = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (getTeam(player.getMCPlayerId()) == TeamName.NONE) {
                 continue;
             }
@@ -157,7 +157,7 @@ public class ClassicArena extends Arena {
         }
 
         // Update stats for each player
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             // Send win message
             for (String s : actualWinMessages) {
                 player.getMCPlayer().sendMessage(ConfigUtils.toComponent(s));
@@ -271,7 +271,7 @@ public class ClassicArena extends Arena {
             }
         }
         Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());
-        for (MissileWarsPlayer mwPlayer : players) {
+        for (MissileWarsPlayer mwPlayer : players.values()) {
             mwPlayer.getMCPlayer().sendMessage(msg);
         }
         
@@ -311,7 +311,7 @@ public class ClassicArena extends Arena {
      * @param team
      */
     protected void glowPortals(MissileWarsTeam team) {
-        players.forEach(mwp -> glowPortals(team, mwp));
+        players.values().forEach(mwp -> glowPortals(team, mwp));
     }
     
     /**

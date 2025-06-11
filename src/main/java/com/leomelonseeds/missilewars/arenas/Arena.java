@@ -15,18 +15,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -49,6 +45,13 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -62,12 +65,13 @@ public abstract class Arena implements ConfigurationSerializable {
     public static Comparator<Arena> byName = Comparator.comparing(a -> a.getName());
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
     
+    protected MissileWarsPlugin plugin;
     protected String name;
     protected String mapName;
     protected String gamemode;
     protected int capacity;
     protected List<Integer> npcs;
-    protected Set<MissileWarsPlayer> players;
+    protected Map<UUID, MissileWarsPlayer> players;
     protected Set<MissileWarsPlayer> spectators;
     protected Queue<MissileWarsPlayer> redQueue;
     protected Queue<MissileWarsPlayer> blueQueue;
@@ -96,6 +100,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param capacity the max capacity
      */
     public Arena(String name, int capacity) {
+        this.plugin = MissileWarsPlugin.getPlugin();
         this.name = name;
         this.capacity = capacity;
         this.gamemode = "classic";
@@ -128,6 +133,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param serializedArena the yml serialized Arena
      */
     public Arena(Map<String, Object> serializedArena) {
+        plugin = MissileWarsPlugin.getPlugin();
         name = (String) serializedArena.get("name");
         capacity = (int) serializedArena.get("capacity");
         gamemode = (String) serializedArena.get("gamemode");
@@ -140,7 +146,7 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     private void init() {
-        players = new HashSet<>();
+        players = new HashMap<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
         blueQueue = new LinkedList<>();
@@ -155,8 +161,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * Simple task to remind players how to exit spectator mode
      */
     private void startSpectatorActionBarTask() {
-        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(
-                MissileWarsPlugin.getPlugin(), () -> {
+        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (MissileWarsPlayer mwp : spectators) {
                 Player player = mwp.getMCPlayer();
                 player.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
@@ -312,20 +317,6 @@ public abstract class Arena implements ConfigurationSerializable {
     public MissileWarsTeam getBlueTeam() {
         return blueTeam;
     }
-    
-    /**
-     * Get all players that the arena thinks are participating
-     * as Player objects
-     * 
-     * @return
-     */
-    public Set<Player> getPlayers() {
-        Set<Player> result = new HashSet<>();
-        for (MissileWarsPlayer mwp : players) {
-            result.add(mwp.getMCPlayer());
-        }
-        return result;
-    }
 
     /**
      * Get a {@link MissileWarsPlayer} in this arena from a given UUID.
@@ -334,12 +325,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return the {@link MissileWarsPlayer} with the given UUID in this Arena, otherwise null
      */
     public MissileWarsPlayer getPlayerInArena(UUID uuid) {
-        for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                return player;
-            }
-        }
-        return null;
+        return players.get(uuid);
     }
 
     /**
@@ -412,7 +398,7 @@ public abstract class Arena implements ConfigurationSerializable {
         if (startTime == null || resetting) {
             return 0;
         }
-        int totalSecs = MissileWarsPlugin.getPlugin().getConfig().getInt("game-length") * 60;
+        int totalSecs = plugin.getConfig().getInt("game-length") * 60;
         long secsTaken = Duration.between(startTime, LocalDateTime.now()).plusMillis(50).toSeconds();
         return totalSecs - secsTaken;
     }
@@ -489,12 +475,12 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         List<Integer> ranks = new ArrayList<>();
-        for (MissileWarsPlayer mwp : players) {
+        for (MissileWarsPlayer mwp : players.values()) {
             if (spectators.contains(mwp)) {
                 continue;
             }
             
-            int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(mwp.getMCPlayerId());
+            int exp = plugin.getSQL().getExpSync(mwp.getMCPlayerId());
             ranks.add(RankUtils.getRankLevel(exp));
         }
         
@@ -552,7 +538,7 @@ public abstract class Arena implements ConfigurationSerializable {
         InventoryUtils.clearInventory(player, true);
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
-        for (MissileWarsPlayer mwPlayer : players) {
+        for (MissileWarsPlayer mwPlayer : players.values()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
         }
 
@@ -561,7 +547,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
         player.setHealth(20);
         player.setFoodLevel(20);
-        players.add(new MissileWarsPlayer(player.getUniqueId()));
+        players.put(player.getUniqueId(), new MissileWarsPlayer(player.getUniqueId()));
         player.setRespawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
 
@@ -609,7 +595,7 @@ public abstract class Arena implements ConfigurationSerializable {
     
     // Give player necessary items
     protected void giveHeldItems(Player player) {
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        DeckManager dm = plugin.getDeckManager();
         String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
         FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
         for (String i : items) {
@@ -630,7 +616,7 @@ public abstract class Arena implements ConfigurationSerializable {
         if (running || resetting) {
             return;
         }
-        int minPlayers = MissileWarsPlugin.getPlugin().getConfig().getInt("minimum-players");
+        int minPlayers = plugin.getConfig().getInt("minimum-players");
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
@@ -640,7 +626,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * Equivalent to starting with the default timer
      */
     public void scheduleStart() {
-        scheduleStart(MissileWarsPlugin.getPlugin().getConfig().getInt("lobby-wait-time"));
+        scheduleStart(plugin.getConfig().getInt("lobby-wait-time"));
     }
     
     /**
@@ -650,12 +636,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return true if the player is in this Arena, otherwise false
      */
     public boolean isInArena(UUID uuid) {
-        for (MissileWarsPlayer player : players) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                return true;
-            }
-        }
-        return false;
+        return players.containsKey(uuid);
     }
 
     /**
@@ -666,11 +647,11 @@ public abstract class Arena implements ConfigurationSerializable {
     public void removePlayer(UUID uuid, Boolean tolobby) {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
-        players.remove(toRemove);
+        players.remove(uuid);
         voteManager.removePlayer(toRemove.getMCPlayer());
         calculateRankMedian();
 
-        for (MissileWarsPlayer mwPlayer : players) {
+        for (MissileWarsPlayer mwPlayer : players.values()) {
             ConfigUtils.sendConfigMessage("messages.leave-arena-others", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
         }
 
@@ -722,12 +703,12 @@ public abstract class Arena implements ConfigurationSerializable {
 
         if (redTeam.containsPlayer(uuid)) {
             redTeam.removePlayer(toRemove);
-            for (MissileWarsPlayer mwPlayer : players) {
+            for (MissileWarsPlayer mwPlayer : players.values()) {
                 ConfigUtils.sendConfigMessage("messages.leave-team-red", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
             }
         } else if (blueTeam.containsPlayer(uuid)) {
             blueTeam.removePlayer(toRemove);
-            for (MissileWarsPlayer mwPlayer : players) {
+            for (MissileWarsPlayer mwPlayer : players.values()) {
                 ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
             }
         } else {
@@ -748,7 +729,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is not empty, and cancels game end task if so
      */
     public void checkNotEmpty() {
-        if (!MissileWarsPlugin.getPlugin().isEnabled()) {
+        if (!plugin.isEnabled()) {
             return;
         }
         
@@ -771,7 +752,6 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is empty, and ends game/cancels tasks if so
      */
     private void checkEmpty() {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();   
         if (!plugin.isEnabled()) {
             return;
         }
@@ -793,7 +773,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     protected void autoEnd() {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();   
         if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
             endGame(null);
         } else if (redTeam.getSize() <= 0) {
@@ -837,57 +816,51 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param force whether to allow uneven team sizes
      */
     public void enqueue(UUID uuid, String team, boolean force) {
-        for (MissileWarsPlayer player : players) {
-            if (!player.getMCPlayerId().equals(uuid)) {
-                continue;
+        // Make sure people can't break the game
+        MissileWarsPlayer player = getPlayerInArena(uuid);
+        Player mcPlayer = player.getMCPlayer();
+        if (startTime != null) {
+            long time = getSecondsUntilStart();
+            if (time <= 1 && time >= -1) {
+                ConfigUtils.sendConfigMessage("messages.queue-join-time", mcPlayer, this, null);
+                return;
             }
-            
-            // Make sure people can't break the game
-            if (startTime != null) {
-                long time = getSecondsUntilStart();
-                if (time <= 1 && time >= -1) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                    return;
-                }
-            }
-            
-            Player mcPlayer = player.getMCPlayer();
-            if (!running) {
-                Queue<MissileWarsPlayer> queue = team.equals("red") ? redQueue : blueQueue;
-                Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : redQueue;
-                if (!queue.contains(player)) {
-                    if (queue.size() >= getCapacity() / 2) {
-                        ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
-                    } else {
-                        otherQueue.remove(player);
-                        queue.add(player);
-                        ConfigUtils.sendConfigMessage("messages.queue-waiting-" + team, mcPlayer, this, null);
-                        removeSpectator(player);
-                    }
-                } else {
-                    queue.remove(player);
-                    ConfigUtils.sendConfigMessage("messages.queue-leave-" + team, mcPlayer, this, null);
-                }
-            } else {
-                MissileWarsTeam joinTeam = team.equals("red") ? redTeam : blueTeam;
-                MissileWarsTeam otherTeam = team.equals("red") ? blueTeam : redTeam;
-                if (joinTeam.containsPlayer(uuid)) {
-                    return;
-                }
-                
-                if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !force) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
-                } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
+        }
+
+        if (!running) {
+            Queue<MissileWarsPlayer> queue = team.equals("red") ? redQueue : blueQueue;
+            Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : redQueue;
+            if (!queue.contains(player)) {
+                if (queue.size() >= getCapacity() / 2) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
                 } else {
+                    otherQueue.remove(player);
+                    queue.add(player);
+                    ConfigUtils.sendConfigMessage("messages.queue-waiting-" + team, mcPlayer, this, null);
                     removeSpectator(player);
-                    otherTeam.removePlayer(player);
-                    joinTeam.addPlayer(player);
-                    checkNotEmpty();
-                    announceMessage("messages.queue-join-" + team, player);
                 }
+            } else {
+                queue.remove(player);
+                ConfigUtils.sendConfigMessage("messages.queue-leave-" + team, mcPlayer, this, null);
             }
-            return;
+        } else {
+            MissileWarsTeam joinTeam = team.equals("red") ? redTeam : blueTeam;
+            MissileWarsTeam otherTeam = team.equals("red") ? blueTeam : redTeam;
+            if (joinTeam.containsPlayer(uuid)) {
+                return;
+            }
+            
+            if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !force) {
+                ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
+            } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
+                ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
+            } else {
+                removeSpectator(player);
+                otherTeam.removePlayer(player);
+                joinTeam.addPlayer(player);
+                checkNotEmpty();
+                announceMessage("messages.queue-join-" + team, player);
+            }
         }
     }
     
@@ -909,15 +882,17 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param player the player
      */
     public void removeSpectator(MissileWarsPlayer player) {
-        if (spectators.remove(player)) {
-            announceMessage("messages.spectate-leave-others", player);
-            Player mcPlayer = player.getMCPlayer();
-            mcPlayer.setGameMode(GameMode.ADVENTURE);
-            mcPlayer.teleport(getPlayerSpawn(mcPlayer));
-            mcPlayer.sendActionBar(ConfigUtils.toComponent(""));
-            calculateRankMedian();
-            checkForStart();
+        if (!spectators.remove(player)) {
+            return;
         }
+        
+        announceMessage("messages.spectate-leave-others", player);
+        Player mcPlayer = player.getMCPlayer();
+        mcPlayer.setGameMode(GameMode.ADVENTURE);
+        mcPlayer.teleport(getPlayerSpawn(mcPlayer));
+        mcPlayer.sendActionBar(ConfigUtils.toComponent(""));
+        calculateRankMedian();
+        checkForStart();
     }
 
     /**
@@ -926,32 +901,24 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid the UUID of the player
      */
     public void addSpectator(UUID uuid) {
-        for (MissileWarsPlayer player : players) {
-            if (!player.getMCPlayerId().equals(uuid)) {
-                continue;
-            }
-            
-            if (!(running || resetting) || getTeam(uuid) == TeamName.NONE) {
-                announceMessage("messages.spectate-join-others", player);
-                spectators.add(player);
-                redQueue.remove(player);
-                blueQueue.remove(player);
-                Player mcPlayer = player.getMCPlayer();
-                mcPlayer.setGameMode(GameMode.SPECTATOR);
-                voteManager.removePlayer(mcPlayer);
-                calculateRankMedian();
-                checkEmpty();
-            } else {
-                ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
-            }
-            break;
+        MissileWarsPlayer player = getPlayerInArena(uuid);
+        if (!(running || resetting) || getTeam(uuid) == TeamName.NONE) {
+            announceMessage("messages.spectate-join-others", player);
+            spectators.add(player);
+            redQueue.remove(player);
+            blueQueue.remove(player);
+            Player mcPlayer = player.getMCPlayer();
+            mcPlayer.setGameMode(GameMode.SPECTATOR);
+            voteManager.removePlayer(mcPlayer);
+            calculateRankMedian();
+            checkEmpty();
+        } else {
+            ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
         }
     }
 
     /** Schedule the start of the game based on the config time. */
     public void scheduleStart(int secCountdown) {
-    	MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-
         // Schedule the start of the game if not already running
         if (startTime != null) {
             return;
@@ -983,7 +950,7 @@ public abstract class Arena implements ConfigurationSerializable {
                     announceMessage("messages.lobby-countdown-near", null);
                 }
                 
-                for (MissileWarsPlayer player : players) {
+                for (MissileWarsPlayer player : players.values()) {
                     if (player.getMCPlayer() != null) {
                         player.getMCPlayer().setLevel(finalSecInCd);
                     }
@@ -1001,8 +968,6 @@ public abstract class Arena implements ConfigurationSerializable {
         if (running) {
             return false;
         }
-
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
 
         // Select Map
         mapName = voteManager.getVotedMap(map -> isAvailable(map));
@@ -1031,7 +996,7 @@ public abstract class Arena implements ConfigurationSerializable {
             performGamemodeSetup();
             
             // Teleport all players to center to remove lobby minigame items/dismount
-            for (MissileWarsPlayer player : players) {
+            for (MissileWarsPlayer player : players.values()) {
                 player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
                 player.getMCPlayer().closeInventory();
             }
@@ -1083,7 +1048,7 @@ public abstract class Arena implements ConfigurationSerializable {
                         }
                     }));
                 }
-            }, 200, 20));
+            }, 200, 10));
         });
     }
     
@@ -1091,7 +1056,6 @@ public abstract class Arena implements ConfigurationSerializable {
      * Time specific setup
      */
     protected void performTimeSetup() {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         BukkitScheduler scheduler = Bukkit.getScheduler();
         
         // Stage 1 chaos
@@ -1142,7 +1106,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected void startTeams() {
         // Assign players to teams based on queue (which removes their items)
         List<MissileWarsPlayer> toAssign = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (!spectators.contains(player)) {
                 toAssign.add(player);
             }
@@ -1214,7 +1178,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Return if player is not in game, decrease queuecount to not hang game
-        if (!players.contains(player) || spectators.contains(player)) {
+        if (!players.containsKey(player.getMCPlayerId()) || spectators.contains(player)) {
             queueCount--;
         }
 
@@ -1285,7 +1249,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Players shouldn't be able to play anymore
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             player.stopDeck();
             Player p = player.getMCPlayer();
             p.setGameMode(GameMode.SPECTATOR);
@@ -1339,7 +1303,6 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         // Send messages, calculate winning stats
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         discordChannel.sendMessage(discordMessage).queue();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
@@ -1356,11 +1319,11 @@ public abstract class Arena implements ConfigurationSerializable {
     
     /** Remove Players from the map */
     public void removePlayers() {
-        int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-        for (MissileWarsPlayer mwPlayer : new HashSet<>(players)) {
+        int cap = plugin.getConfig().getInt("arena-cap");
+        for (MissileWarsPlayer mwPlayer : new HashSet<>(players.values())) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             // Also only requeue if capacity is 20
-            List<Arena> togo = MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode);
+            List<Arena> togo = plugin.getArenaManager().getLoadedArenas(gamemode);
             Player player = mwPlayer.getMCPlayer();
             if (!player.hasPermission("umw.disablerequeue") && capacity == cap) {
                 Boolean success = false;
@@ -1385,39 +1348,43 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Just in case there are stragglers somehow
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+        ConfigUtils.schedule(1, () -> {
             for (Player player : getWorld().getPlayers()) {
                 player.teleport(ConfigUtils.getSpawnLocation());
             }
-        }, 1);
-    }
-
-    /** Load this Arena's world from the disk. */
-    public void loadWorldFromDisk(boolean reloadCitizens) {
-        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
-        arenaCreator.type(WorldType.FLAT);
-        arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
-        if (reloadCitizens) {
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
-                    () -> ConfigUtils.reloadCitizens(), 10);
-        }
+        });
     }
     
-    /** Reset the arena world. */
+    /** Reset the arena world using FAWE */
     public void resetWorld() {
-        World world = getWorld();
-        MissileWarsPlugin.getPlugin().log("Unloading " + world.getLoadedChunks().length + " chunks and resetting world...");
-        for (Chunk chunk : world.getLoadedChunks()) {
-            chunk.unload(false);
-        }
+        plugin.log("Resetting arena " + name + "...");
+        tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            clearArena();
+            plugin.log("First arena clear finished");
+            clearArena();
+            resetting = false;
+            plugin.log("Reset completed");
+        }));
+        
         startTime = null;
         voteManager = new VoteManager(gamemode);
-        Bukkit.unloadWorld(world, false);
-        Bukkit.getWorlds().remove(world);
-        
-        loadWorldFromDisk(true);
         startSpectatorActionBarTask();
-        resetting = false;
+    }
+    
+    /** 
+     * Replace the entire arena area with air using WorldEdit.
+     * This needs to be done at least twice to clear the arena due to piston stuff
+     */
+    private void clearArena() {
+        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(getWorld());
+        int maxHeight = MissileWarsPlugin.getPlugin().getConfig().getInt("max-height");
+        int maxX = MissileWarsPlugin.getPlugin().getConfig().getInt("barrier.center.x") - 1;
+        BlockVector3 pos1 = BlockVector3.at(-250, -64, -250);
+        BlockVector3 pos2 = BlockVector3.at(maxX, maxHeight, 250);
+        Region region = new CuboidRegion(weWorld, pos1, pos2);
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            editSession.setBlocks(region, BlockTypes.AIR);
+        }
     }
 
     /**
@@ -1447,7 +1414,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param path the path to the configurable message
      */
     public void announceMessage(String path, MissileWarsPlayer focus) {
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
         	Player mcPlayer = player.getMCPlayer();
             ConfigUtils.sendConfigMessage(path, mcPlayer, this, focus != null ? focus.getMCPlayer() : null);
         }

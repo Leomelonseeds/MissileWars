@@ -151,31 +151,25 @@ public class TutorialArena extends ClassicArena {
     
     @Override
     public void enqueue(UUID uuid, String team, boolean force) {
-        for (MissileWarsPlayer player : players) {
-            if (!player.getMCPlayerId().equals(uuid)) {
-                continue;
-            }
-            
-            if (!running) {
-                ConfigUtils.sendConfigMessage("messages.tutorial-not-available", player.getMCPlayer(), this, null); 
-                return; 
-            }
-            
-            if (team.equals("red")) {
-                ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
-                return;
-            }
-            
-            // The game should NEVER be ended in this situation
-            if (blueTeam.containsPlayer(uuid)) {
-                return;
-            }
-            
-            removeSpectator(player);
-            blueTeam.addPlayer(player);
-            checkNotEmpty();
-            break;
+        MissileWarsPlayer player = players.get(uuid);
+        if (!running) {
+            ConfigUtils.sendConfigMessage("messages.tutorial-not-available", player.getMCPlayer(), this, null); 
+            return; 
         }
+        
+        if (team.equals("red")) {
+            ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
+            return;
+        }
+        
+        // The game should NEVER be ended in this situation
+        if (blueTeam.containsPlayer(uuid)) {
+            return;
+        }
+        
+        removeSpectator(player);
+        blueTeam.addPlayer(player);
+        checkNotEmpty();
     }
     
     private void sendTutorialTitle(String path, Player player, boolean init) {
@@ -412,7 +406,7 @@ public class TutorialArena extends ClassicArena {
         }
         
         Component msg = CosmeticUtils.getPortalMessage(player, broketeam.getName());
-        for (MissileWarsPlayer mwPlayer : players) {
+        for (MissileWarsPlayer mwPlayer : players.values()) {
             mwPlayer.getMCPlayer().sendMessage(msg);
         }
         
@@ -442,7 +436,7 @@ public class TutorialArena extends ClassicArena {
     protected void startTeams() {
         // Literally place everyone on blue
         queueCount = 0;
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (spectators.contains(player)) {
                 continue;
             }

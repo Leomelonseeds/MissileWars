@@ -61,40 +61,34 @@ public class TrainingArena extends ClassicArena {
 
     @Override
     public void enqueue(UUID uuid, String team, boolean force) {
-        for (MissileWarsPlayer player : players) {
-            if (!player.getMCPlayerId().equals(uuid)) {
-                continue;
+        MissileWarsPlayer player = players.get(uuid);
+        if (team.equals("red")) {
+            ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
+            return;
+        }
+        
+        // Make sure people can't break the game
+        if (startTime != null) {
+            long time = getSecondsUntilStart();
+            if (time <= 1 && time >= -1) {
+                ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
+                return;
             }
-            
-            if (team.equals("red")) {
-                ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
+        }
+        
+        if (!running) {
+            blueQueue.add(player);
+            ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
+            removeSpectator(player);
+        } else {
+            if (blueTeam.containsPlayer(uuid)) {
                 return;
             }
             
-            // Make sure people can't break the game
-            if (startTime != null) {
-                long time = getSecondsUntilStart();
-                if (time <= 1 && time >= -1) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-time", player.getMCPlayer(), this, null);
-                    return;
-                }
-            }
-            
-            if (!running) {
-                blueQueue.add(player);
-                ConfigUtils.sendConfigMessage("messages.queue-waiting-blue", player.getMCPlayer(), this, null);
-                removeSpectator(player);
-            } else {
-                if (blueTeam.containsPlayer(uuid)) {
-                    return;
-                }
-                
-                removeSpectator(player);
-                blueTeam.addPlayer(player);
-                checkNotEmpty();
-                announceMessage("messages.queue-join-blue", player);
-            }
-            break;
+            removeSpectator(player);
+            blueTeam.addPlayer(player);
+            checkNotEmpty();
+            announceMessage("messages.queue-join-blue", player);
         }
     }
     
@@ -185,7 +179,7 @@ public class TrainingArena extends ClassicArena {
     protected void startTeams() {
         // Literally place everyone on blue
         queueCount = 0;
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (spectators.contains(player)) {
                 continue;
             }
@@ -206,7 +200,7 @@ public class TrainingArena extends ClassicArena {
         int defense_reward = (int) (missiles * blueTeam.getShieldHealth() / 100);
         this.missiles = 0;
         
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (getTeam(player.getMCPlayerId()) == TeamName.NONE) {
                 continue;
             }

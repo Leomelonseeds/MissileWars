@@ -31,7 +31,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -164,68 +163,6 @@ public class MiscListener implements Listener {
                 arena.joinPlayer(player);
             }
         }, 20);
-    }
-    
-    // JOIN/LEAVE LISTENERS
-
-    /** Remove player from Arena if they leave the world. */
-    @EventHandler
-    public void onWorldChange(PlayerChangedWorldEvent event) {
-
-        Player player = event.getPlayer();
-        World from = event.getFrom();
-        World to = player.getWorld();
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        
-        // Idk why this check is here but whatever
-        if (from.equals(to)) {
-            return;
-        }
-
-        if (from.getName().contains("mwarena")) {
-            Arena fromArena = manager.getArena(from);
-            if (fromArena == null) {
-                return;
-            }
-            
-            // Arena to arena transfers
-            if (to.getName().contains("mwarena")) {
-                Arena toArena = manager.getArena(player.getUniqueId());
-                if (toArena == null) {
-                    return;
-                }
-                
-                if (fromArena.getPlayers().contains(player)) {
-                    fromArena.removePlayer(player.getUniqueId(), false);
-                }
-                
-                if (!toArena.getPlayers().contains(player)) {
-                    toArena.joinPlayer(player);
-                }
-                return;
-            }
-            
-            // Arena to world transfer
-            if (to.getName().equals("world")) {
-                if (fromArena.getPlayers().contains(player)) {
-                    fromArena.removePlayer(player.getUniqueId(), true);
-                }
-                return;
-            }
-            return;
-        }
-        
-        // World to arena transfers
-        if (from.getName().equals("world") && to.getName().contains("mwarena")) {
-            Arena toArena = manager.getArena(player.getUniqueId());
-            if (toArena == null) {
-                return;
-            }
-            
-            if (!toArena.getPlayers().contains(player)) {
-                toArena.joinPlayer(player);
-            }
-        }
     }
 
     

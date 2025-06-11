@@ -98,7 +98,9 @@ public class ArenaManager {
         if (loadedArenas == null) return;
         for (Arena arena : loadedArenas) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
-            arena.loadWorldFromDisk(false);
+            WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
+            arenaCreator.type(WorldType.FLAT);
+            arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
         }
 
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
@@ -405,7 +407,7 @@ public class ArenaManager {
                 teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
                 teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
                 teamNPC.addTrait(gravity);
-                arenaWorld.loadChunk(teamLoc.getChunk());
+                arenaWorld.getChunkAt(teamLoc);
                 teamNPC.spawn(teamLoc);
                 arena.addNPC(teamNPC.getId());
                 logger.log(Level.INFO, upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
@@ -425,7 +427,7 @@ public class ArenaManager {
             profession.setProfession(Villager.Profession.NITWIT);
             bartender.data().setPersistent(NPC.Metadata.SILENT, true);
             bartender.addTrait(gravity); 
-            arenaWorld.loadChunk(barLoc.getChunk());
+            arenaWorld.getChunkAt(barLoc);
             bartender.spawn(barLoc);
             arena.addNPC(bartender.getId());
             logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
@@ -459,7 +461,7 @@ public class ArenaManager {
                 deckEquip.set(EquipmentSlot.BOOTS, deck.getBoots());
                 
                 // Spawn the NPC
-                arenaWorld.loadChunk(deckLoc.getChunk());
+                arenaWorld.getChunkAt(deckLoc);
                 deckNPC.spawn(deckLoc);
                 arena.addNPC(deckNPC.getId());
                 logger.log(Level.INFO, deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");

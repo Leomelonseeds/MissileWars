@@ -45,7 +45,7 @@ public class TourneyArena extends ClassicArena {
     public void startTeams() {
         // Assign players to teams based on queue (which removes their items)
         List<MissileWarsPlayer> toAssign = new ArrayList<>();
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             if (!spectators.contains(player)) {
                 toAssign.add(player);
             }
@@ -54,7 +54,7 @@ public class TourneyArena extends ClassicArena {
         double maxQueue = Math.ceil((double) players.size() / 2);
         
         // Teleport all players to center to remove lobby minigame items/dismount
-        for (MissileWarsPlayer player : players) {
+        for (MissileWarsPlayer player : players.values()) {
             player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
             player.getMCPlayer().closeInventory();
         }
@@ -105,7 +105,7 @@ public class TourneyArena extends ClassicArena {
     /** Remove Players from the map. */
     @Override
     public void removePlayers() {
-        for (MissileWarsPlayer player : new HashSet<>(players)) {
+        for (MissileWarsPlayer player : new HashSet<>(players.values())) {
             removePlayer(player.getMCPlayerId(), true);
         }
     }
