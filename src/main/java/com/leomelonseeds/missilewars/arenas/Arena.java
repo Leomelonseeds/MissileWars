@@ -45,13 +45,6 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -1358,10 +1351,12 @@ public abstract class Arena implements ConfigurationSerializable {
     /** Reset the arena world using FAWE */
     public void resetWorld() {
         plugin.log("Resetting arena " + name + "...");
+        int maxHeight = MissileWarsPlugin.getPlugin().getConfig().getInt("max-height");
+        int maxX = MissileWarsPlugin.getPlugin().getConfig().getInt("barrier.center.x") - 1;
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            clearArena();
+            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
             plugin.log("First arena clear finished");
-            clearArena();
+            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
             resetting = false;
             plugin.log("Reset completed");
         }));
@@ -1369,22 +1364,6 @@ public abstract class Arena implements ConfigurationSerializable {
         startTime = null;
         voteManager = new VoteManager(gamemode);
         startSpectatorActionBarTask();
-    }
-    
-    /** 
-     * Replace the entire arena area with air using WorldEdit.
-     * This needs to be done at least twice to clear the arena due to piston stuff
-     */
-    private void clearArena() {
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(getWorld());
-        int maxHeight = MissileWarsPlugin.getPlugin().getConfig().getInt("max-height");
-        int maxX = MissileWarsPlugin.getPlugin().getConfig().getInt("barrier.center.x") - 1;
-        BlockVector3 pos1 = BlockVector3.at(-250, -64, -250);
-        BlockVector3 pos2 = BlockVector3.at(maxX, maxHeight, 250);
-        Region region = new CuboidRegion(weWorld, pos1, pos2);
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            editSession.setBlocks(region, BlockTypes.AIR);
-        }
     }
 
     /**

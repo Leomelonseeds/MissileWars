@@ -46,6 +46,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 /** A class to handle loading/placing of NBT and WorldEdit schematics */
 public class SchematicManager {
@@ -516,6 +517,49 @@ public class SchematicManager {
                 Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.onQueryDone(null));
             } 
         });
+    }
+    
+    /**
+     * Use FAWE to fill a region asynchronously with air.
+     * 
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param world
+     * @param callback code to run when finished. This is called using a BukkitTask. Can be null
+     */
+    public static void setAirAsync(int x1, int y1, int z1, int x2, int y2, int z2, World world, DBCallback callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+            setAir(x1, y1, z1, x2, y2, z2, world);
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.onQueryDone(null));
+            }
+        });
+    }
+    
+    /**
+     * Use FAWE to fill a region synchronously with air.
+     * This method can be manually called asynchronously if necessary.
+     * 
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param world
+     */
+    public static void setAir(int x1, int y1, int z1, int x2, int y2, int z2, World world) {
+        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
+        BlockVector3 pos1 = BlockVector3.at(x1, y1, z1);
+        BlockVector3 pos2 = BlockVector3.at(x2, y2, z2);
+        Region region = new CuboidRegion(weWorld, pos1, pos2);
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            editSession.setBlocks(region, BlockTypes.AIR);
+        }
     }
 
 }

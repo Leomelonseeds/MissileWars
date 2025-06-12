@@ -21,7 +21,6 @@ import com.leomelonseeds.missilewars.listener.ArenaInventoryListener;
 import com.leomelonseeds.missilewars.listener.CustomItemListener;
 import com.leomelonseeds.missilewars.listener.MiscListener;
 import com.leomelonseeds.missilewars.listener.packets.DefuseHelper;
-import com.leomelonseeds.missilewars.listener.packets.Pinger;
 import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -46,7 +45,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private SQLManager sqlManager;
     private JSONManager jsonManager;
     private InventoryManager invManager;
-    private Pinger pinger;
 
     @Override
     public void onEnable() {
@@ -73,7 +71,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Loading commands and events...");
         DefuseHelper dfh = new DefuseHelper(this);
         RubberbandHelper rh = new RubberbandHelper(this);
-        pinger = new Pinger();
         getCommand("MissileWars").setExecutor(new MissileWarsCommand());
         Bukkit.getPluginManager().registerEvents(new ArenaGameruleListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArenaInventoryListener(), this);
@@ -83,7 +80,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(rh, this);
         PacketEvents.getAPI().getEventManager().registerListener(dfh, PacketListenerPriority.NORMAL);
         PacketEvents.getAPI().getEventManager().registerListener(rh, PacketListenerPriority.NORMAL);
-        PacketEvents.getAPI().getEventManager().registerListener(pinger, PacketListenerPriority.NORMAL);
         log("Commands and events loaded.");
 
         // Load decks
@@ -274,15 +270,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public InventoryManager getInvs() {
         return invManager;
-    }
-    
-    /**
-     * Gets the plugin's player pinger
-     * 
-     * @return
-     */
-    public Pinger getPinger() {
-        return pinger;
     }
 
     /**

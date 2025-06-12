@@ -20,6 +20,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.TutorialReplay;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
@@ -57,14 +58,15 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
-        // Get a player's live ping
-        if (action.equalsIgnoreCase("ping")) {
+        // Test npc
+        if (action.equalsIgnoreCase("testnpc")) {
             Player target = getCommandTarget(args, sender);
             if (target == null) {
                 return true;
             }
             
-            plugin.getPinger().sendPing(target, sender);
+            TutorialReplay replay = new TutorialReplay(target.getLocation(), target.getEyeLocation().getDirection());
+            replay.testNPC();
         }
         
         // Go to lobby
