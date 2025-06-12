@@ -154,12 +154,7 @@ public class MissileWarsTeam {
      * @return true if the player is on this team
      */
     public boolean containsPlayer(UUID uuid) {
-        for (MissileWarsPlayer player : members) {
-            if (player.getMCPlayerId().equals(uuid)) {
-                return true;
-            }
-        }
-        return false;
+        return members.stream().anyMatch(p -> p.getMCPlayerId().equals(uuid));
     }
 
     /**
