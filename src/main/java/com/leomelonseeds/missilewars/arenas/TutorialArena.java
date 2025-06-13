@@ -101,8 +101,7 @@ public class TutorialArena extends ClassicArena {
                 running = false;
                 resetting = true;
                 cancelTasks();
-                resetWorld();
-                init();
+                resetWorld(r -> init());
                 this.cancel();
             }
         }.runTaskTimer(plugin, minute, minute);

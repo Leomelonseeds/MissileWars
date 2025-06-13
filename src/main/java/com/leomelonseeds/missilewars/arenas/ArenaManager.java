@@ -382,7 +382,7 @@ public class ArenaManager {
             Gravity gravity = new Gravity();
             gravity.setHasGravity(false);
 
-            // Spawn red NPC
+            // Spawn team selection NPCs
             for (String team : new String[] {"red", "blue"}) {
                 String upper = team.toUpperCase();
                 String teamName = (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team";
@@ -407,7 +407,6 @@ public class ArenaManager {
                 teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
                 teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
                 teamNPC.addTrait(gravity);
-                arenaWorld.getChunkAt(teamLoc);
                 teamNPC.spawn(teamLoc);
                 arena.addNPC(teamNPC.getId());
                 logger.log(Level.INFO, upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
@@ -438,8 +437,6 @@ public class ArenaManager {
                 Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id, null, null);
                 Location deckLoc = new Location(arenaWorld, deckVec.getX(), deckVec.getY(), deckVec.getZ(), -90, 0);
                 NPC deckNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, deck.getNPCName());
-                deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
-                deckNPC.addTrait(gravity);
                 
                 // Add skin
                 SkinTrait deckSkin = deckNPC.getOrAddTrait(SkinTrait.class);
@@ -460,8 +457,9 @@ public class ArenaManager {
                 deckEquip.set(EquipmentSlot.HAND, deck.getWeapon());
                 deckEquip.set(EquipmentSlot.BOOTS, deck.getBoots());
                 
-                // Spawn the NPC
-                arenaWorld.getChunkAt(deckLoc);
+                // Add misc traits, spawn
+                deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
+                deckNPC.addTrait(gravity);
                 deckNPC.spawn(deckLoc);
                 arena.addNPC(deckNPC.getId());
                 logger.log(Level.INFO, deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");
@@ -505,7 +503,7 @@ public class ArenaManager {
             createWaitingLobby("red", arena, lobbyRegion);
             createWaitingLobby("blue", arena, lobbyRegion);
 
-            logger.log(Level.INFO, "Arena " + name + " generated. World will save in 10 seconds.");
+            logger.log(Level.INFO, "Arena " + name + " generated. World will save in 5 seconds.");
 
             // Wait to ensure schematic is spawned
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -513,7 +511,7 @@ public class ArenaManager {
                 logger.log(Level.INFO, "Saving new arena " + name);
                 logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
                 saveArenasToFile();
-            }, 200);
+            }, 100);
 
         })) {
             logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
@@ -553,7 +551,7 @@ public class ArenaManager {
                 sortedArenas.add(a);
             }
         }
-        sortedArenas.sort(Collections.reverseOrder(sortingType));
+        sortedArenas.sort(Collections.reverseOrder(sortingType).thenComparing(Arena.byName));
         return sortedArenas;
     }
     

@@ -42,6 +42,7 @@ import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.DBCallback;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.SchematicManager;
@@ -1347,18 +1348,31 @@ public abstract class Arena implements ConfigurationSerializable {
             }
         });
     }
+
+    /** Reset the arena world */
+    protected void resetWorld() {
+        resetWorld(null);
+    }
     
-    /** Reset the arena world using FAWE */
-    public void resetWorld() {
+    /**
+     * Reset the arena world
+     * 
+     * @param callback to run when reset completes
+     */
+    protected void resetWorld(DBCallback callback) {
         plugin.log("Resetting arena " + name + "...");
-        int maxHeight = MissileWarsPlugin.getPlugin().getConfig().getInt("max-height");
-        int maxX = MissileWarsPlugin.getPlugin().getConfig().getInt("barrier.center.x") - 1;
+        int maxHeight = plugin.getConfig().getInt("max-height");
+        int maxX = plugin.getConfig().getInt("barrier.center.x") - 1;
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
             plugin.log("First arena clear finished");
             SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
             resetting = false;
             plugin.log("Reset completed");
+            
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.onQueryDone(null));
+            }
         }));
         
         startTime = null;
