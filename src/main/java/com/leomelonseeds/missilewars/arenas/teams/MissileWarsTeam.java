@@ -13,15 +13,18 @@ import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
@@ -36,6 +39,14 @@ import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.mask.InverseSingleBlockTypeMask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 /** Represents a team of Missile Wars Players. */
 /**
@@ -77,6 +88,7 @@ public class MissileWarsTeam {
             // Ignore if arena not running
             if (arena == null || !(arena.isRunning() || arena.isResetting())) {
                 shieldVolume = 1;
+                return;
             }
 
             // Get locations
@@ -87,20 +99,14 @@ public class MissileWarsTeam {
             int z1 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.z1");
             int z2 = (int) ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), name + "-shield.z2");
             
-            // Calculate volume by adding up all non-air locations
-            int tempShieldVolume = 0;
-            for (int x = x1; x <= x2; x++) {
-                for (int y = y1; y <= y2; y++) {
-                    for (int z = z1; z <= z2; z++) {
-                        Location l = new Location(arena.getWorld(), x, y, z);
-                        Block b = l.getBlock();
-                        if (b.getType() != Material.AIR) {
-                            tempShieldVolume++;
-                        }
-                    }
-                }
+            // Set WE parameters and count
+            com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(arena.getWorld());
+            BlockVector3 pos1 = BlockVector3.at(x1, y1, z1);
+            BlockVector3 pos2 = BlockVector3.at(x2, y2, z2);
+            Region region = new CuboidRegion(weWorld, pos1, pos2);
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                shieldVolume = editSession.countBlocks(region, new InverseSingleBlockTypeMask(weWorld, BlockTypes.AIR));
             }
-            shieldVolume = tempShieldVolume;
         }, 20L);
     }
     
@@ -315,26 +321,28 @@ public class MissileWarsTeam {
      * @return true if a portal's broken status was changed
      */
     public boolean registerPortalBreak(Location loc) {
-        return registerPortalBreak(loc, true);
+        return registerPortalBreak(loc, -1);
     }
     
     /**
      * @param loc
-     * @param count set to false to not count the portal as broken
+     * @param secondsBeforeRestore how long to wait before restoring portal as alive.
+     * Set to 0 or below to not restore the portal
      * @return
      */
-    public boolean registerPortalBreak(Location loc, boolean count) {
+    public boolean registerPortalBreak(Location loc, int secondsBeforeRestore) {
         // Trace portal block to the most positive x and y positions
-        while (loc.clone().add(1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
-            loc.add(1, 0, 0);
+        Location p1 = loc.clone();
+        while (p1.clone().add(1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
+            p1.add(1, 0, 0);
         }
         
-        while (loc.clone().add(0, 1, 0).getBlock().getType() != Material.OBSIDIAN) {
-            loc.add(0, 1, 0);
+        while (p1.clone().add(0, 1, 0).getBlock().getType() != Material.OBSIDIAN) {
+            p1.add(0, 1, 0);
         }
         
         // Return if no registered portal at location, or somehow already broken
-        ClassicPortal portal = portals.get(loc);
+        ClassicPortal portal = portals.get(p1);
         if (portal == null || !portal.isAlive()) {
             return false;
         }
@@ -342,9 +350,46 @@ public class MissileWarsTeam {
         portal.setAlive(false);
         
         // Reset this to true after 5 sec if don't count
-        if (!count) {
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> portal.setAlive(true), 100);
+        if (secondsBeforeRestore > 0) {
+            ConfigUtils.schedule(secondsBeforeRestore * 20, () -> portal.setAlive(true));
         }
+        
+        // Play effects and break portal using FAWE to prevent lag from large portals
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
+            Location p2 = loc.clone();
+            while (p2.clone().add(-1, 0, 0).getBlock().getType() != Material.OBSIDIAN) {
+                p2.add(-1, 0, 0);
+            }
+            
+            while (p2.clone().add(0, -1, 0).getBlock().getType() != Material.OBSIDIAN) {
+                p2.add(0, -1, 0);
+            }
+            
+            // Replace all portal blocks with air (because portals can be broken by liquids)
+            World world = loc.getWorld();
+            com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
+            Region region = new CuboidRegion(
+                weWorld,
+                BlockVector3.at(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ()),
+                BlockVector3.at(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ())
+            );
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                editSession.replaceBlocks(
+                    region, 
+                    new SingleBlockTypeMask(weWorld, BlockTypes.NETHER_PORTAL), 
+                    BlockTypes.AIR
+                );
+            }
+
+            // Find midpoint and play SFX
+            // Sounds need to be played sync
+            Vector mid = p2.toVector().getMidpoint(p1.toVector());
+            Location midLoc = new Location(world, mid.getX(), mid.getY(), mid.getZ());
+            Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
+                world.playSound(midLoc, Sound.BLOCK_GLASS_BREAK, 2.0f, 0.8f);
+                world.playSound(midLoc, Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.0f);
+            });
+        });
         
         return true;
     }
@@ -394,7 +439,7 @@ public class MissileWarsTeam {
      * 
      * @param reset whether to respawn the glows
      */
-    public void destroyPortals(boolean reset) {
+    public void destroyPortalGlow(boolean reset) {
         if (reset) {
             portals.values().forEach(p -> p.resetGlow());
         } else {

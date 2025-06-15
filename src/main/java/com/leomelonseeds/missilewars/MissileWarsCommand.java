@@ -514,12 +514,6 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "You must be in the lobby to use this!");
                 return true;
             }
-            
-            // Ensure player can play >:D
-            if (player.hasPermission("umw.new")) {
-                ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, null, null);
-                return false;
-            }
 
             // Allow player to join the fullest arena, or specify an arena name
             if (args.length == 1) {

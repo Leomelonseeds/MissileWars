@@ -59,8 +59,8 @@ public class ClassicArena extends Arena {
             }
         });
         glowTasks.clear();
-        redTeam.destroyPortals(false);
-        blueTeam.destroyPortals(false);
+        redTeam.destroyPortalGlow(false);
+        blueTeam.destroyPortalGlow(false);
         super.resetWorld();
     }
 

@@ -25,6 +25,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 /* Tracks missiles, utilities, and TNT minecarts to be used for tracking kills/portal breaks */
 public class Tracker {
@@ -106,7 +107,7 @@ public class Tracker {
         }
         
         // Register tnt around
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+        ConfigUtils.schedule(1, () -> {
             // Set source
             for (Entity entity : exploded.getNearbyEntities(6, 6, 6)) {
                 if (entity.getType() == EntityType.TNT) {
@@ -123,7 +124,7 @@ public class Tracker {
                 ExplosiveMinecart cart = (ExplosiveMinecart) exploded;
                 minecarts.remove(cart);
             }
-        }, 1);
+        });
     }
     
     /**

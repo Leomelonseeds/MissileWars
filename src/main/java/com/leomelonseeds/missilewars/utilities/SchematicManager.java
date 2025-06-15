@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,8 @@ import org.bukkit.block.data.type.RedstoneRail;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
@@ -89,7 +92,6 @@ public class SchematicManager {
      * @return true if the NBT structure was found and spawned, otherwise false
      */
     private static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
-
         // Don't kill the lobby
         if (loc.getWorld().getName().equals("world")){
             sendError(player, "How the hell did you get that here?");
@@ -105,7 +107,7 @@ public class SchematicManager {
         // Attempt to get structure file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
-        String [] args = structureName.split("-");
+        String[] args = structureName.split("-");
         int level = Integer.parseInt(args[1]);
 
         // Attempt to get structure file
@@ -262,8 +264,25 @@ public class SchematicManager {
             new TrackedUtility(args[0], level, player, pos1, pos2, direction, redMissile);
         }
         
+        // Spawn TNT minecarts in torpedos
+        if (args[0].equals("torpedo")) {
+            final int minecarts = 4;
+            List<Location> minecartLocs = new ArrayList<>();
+            Location minecartLoc1 = loc.clone().toCenterLocation().add(0, -0.5, 0);
+            minecartLocs.add(minecartLoc1);
+            if (args[1].equals("2")) {
+                minecartLocs.add(minecartLoc1.clone().add(0, -2, 0));
+            }
+            
+            for (Location minecartLoc : minecartLocs) {
+                for (int i = 0; i < minecarts; i++) {
+                    world.spawnEntity(minecartLoc, EntityType.TNT_MINECART);
+                }
+            }
+        }
+        
         // Temp hotfix for structure rail rotation bug
-        if (redMissile && structureName.contains("lifter-2")) {
+        if (redMissile && structureName.equals("lifter-2")) {
             Location railLoc = spawnLoc.add(-1, 2, -8);
             Block block = railLoc.getBlock();
             block.setType(Material.DETECTOR_RAIL);
@@ -520,7 +539,8 @@ public class SchematicManager {
     }
     
     /**
-     * Use FAWE to fill a region asynchronously with air.
+     * Use FAWE to fill a region asynchronously with air,
+     * removing all non-player entities also in the region
      * 
      * @param x1
      * @param y1
@@ -542,6 +562,7 @@ public class SchematicManager {
     
     /**
      * Use FAWE to fill a region synchronously with air.
+     * Non-player entities within this region are also removed 1 tick later.
      * This method can be manually called asynchronously if necessary.
      * 
      * @param x1
@@ -553,6 +574,23 @@ public class SchematicManager {
      * @param world
      */
     public static void setAir(int x1, int y1, int z1, int x2, int y2, int z2, World world) {
+        setAir(x1, y1, z1, x2, y2, z2, world, true);
+    }
+    
+    /**
+     * Use FAWE to fill a region synchronously with air.
+     * This method can be manually called asynchronously if necessary.
+     * 
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param world
+     * @param removeEntities whether non-player entities within the region should be removed
+     */
+    public static void setAir(int x1, int y1, int z1, int x2, int y2, int z2, World world, boolean removeEntities) {
         com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
         BlockVector3 pos1 = BlockVector3.at(x1, y1, z1);
         BlockVector3 pos2 = BlockVector3.at(x2, y2, z2);
@@ -560,6 +598,28 @@ public class SchematicManager {
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
             editSession.setBlocks(region, BlockTypes.AIR);
         }
+        
+        if (!removeEntities) {
+            return;
+        }
+        
+        int xmin = Math.min(x1, x2), xmax = Math.max(x1, x2);
+        int ymin = Math.min(y1, y2), ymax = Math.max(y1, y2);
+        int zmin = Math.min(z1, z2), zmax = Math.max(z1, z2);
+        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
+            for (Entity e : world.getEntities()) {
+                if (e.getType() == EntityType.PLAYER) {
+                    continue;
+                }
+                
+                Location l = e.getLocation();
+                if (xmin < l.getX() && l.getX() < xmax &&
+                    ymin < l.getY() && l.getY() < ymax &&
+                    zmin < l.getZ() && l.getZ() < zmax) {
+                    e.remove();
+                }
+            }
+        });
     }
 
 }

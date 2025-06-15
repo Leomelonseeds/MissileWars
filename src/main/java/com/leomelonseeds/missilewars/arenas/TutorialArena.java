@@ -385,14 +385,14 @@ public class TutorialArena extends ClassicArena {
         MissileWarsTeam broketeam = location.getBlockZ() > 0 ? redTeam : blueTeam;
         
         // Check if portal break was registered
-        if (!broketeam.registerPortalBreak(location, false)) {
+        if (!broketeam.registerPortalBreak(location, 5)) {
             return;
         }
         
         // Reset map after 5 sec
         ConfigUtils.schedule(100, () -> SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null));
         ConfigUtils.schedule(140, () -> {
-            redTeam.destroyPortals(true);
+            redTeam.destroyPortalGlow(true);
             hasGlow.forEach(uid -> redTeam.setPortalGlow(getPlayerInArena(uid), true));
         });
         

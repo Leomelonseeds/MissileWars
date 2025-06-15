@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -721,41 +722,40 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         // Ensure it was in an arena world
-        Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getEntity().getWorld());
-        if (possibleArena == null) {
+        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getEntity().getWorld());
+        if (arena == null) {
             return;
         }
 
+        // Register explosion to tracker
+        arena.getTracker().registerExplosion(event);
+
         // Check for shield breaks
         Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
-                () -> event.blockList().forEach(block -> possibleArena.registerShieldBlockEdit(block.getLocation(), false)));
+                () -> event.blockList().forEach(block -> arena.registerShieldBlockEdit(block.getLocation(), false)));
         
-        // Fireball checks
+        // Check for and remove portal breaks
+        Predicate<Block> isPortal = b -> b.getType() == Material.NETHER_PORTAL;
+        List<Block> portals = event.blockList().stream().filter(isPortal).toList();
+        if (!event.blockList().removeIf(isPortal)) {
+            return;
+        }
+        
+        // Fireballs can't blow up portals
         EntityType entity = event.getEntityType();
         if (entity == EntityType.FIREBALL) {
-            // Check for boosterball. If so, prevent block damage.
-            Fireball fb = (Fireball) event.getEntity();
-            if (!fb.isIncendiary()) {
-                event.blockList().clear();
-            }
-            // Otherwise, don't allow portals to be broken
-            else {
-                event.blockList().removeIf(block -> block.getType() == Material.NETHER_PORTAL);
-            }
-        }
-        // Check for TNT explosions of portals
-        else if ((entity == EntityType.TNT || entity == EntityType.TNT_MINECART ||
-                 entity == EntityType.CREEPER) && possibleArena instanceof ClassicArena) {
-            event.blockList().forEach(block -> {
-                // Register portal brake if block was broken
-                if (block.getType() == Material.NETHER_PORTAL) {
-                    ((ClassicArena) possibleArena).registerPortalBreak(block.getLocation(), event.getEntity());
-                }
-            });
+            return;
         }
         
-        // Register explosion to tracker
-        possibleArena.getTracker().registerExplosion(event);
+        // Must be TNT, minecarts, or creeper
+        if (!(entity == EntityType.TNT || entity == EntityType.TNT_MINECART || entity == EntityType.CREEPER)) {
+            return;
+        }
+        
+        // Must be in a classic arena
+        if (arena instanceof ClassicArena carena) {
+            portals.forEach(b -> carena.registerPortalBreak(b.getLocation(), event.getEntity()));
+        }
     }
 
     /** Handle shield block breaks breaks. */

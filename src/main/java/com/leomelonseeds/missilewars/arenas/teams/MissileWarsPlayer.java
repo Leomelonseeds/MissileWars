@@ -97,61 +97,73 @@ public class MissileWarsPlayer {
      */
     public void missilePreview(boolean isRed) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            Player player = getMCPlayer();
-            if (player == null) {
-                return;
-            }
+        tasks.add(new BukkitRunnable() {
+
+            // Store the last structure in case player is still holding it
+            double x1, x2, y1, y2, z1, z2;
+            String lastName = "";
             
-            if (player.getLocation().getBlockY() < -64) {
-                return;
-            }
+            @Override
+            public void run() {
+                Player player = getMCPlayer();
+                if (player == null) {
+                    return;
+                }
+                
+                if (player.getLocation().getY() < -64) {
+                    return;
+                }
 
-            // Make sure player is aiming for a block
-            Block target = player.getTargetBlock(null, 4);
-            if (target == null || target.getType() == Material.AIR) {
-                return;
-            }
+                // Make sure player is aiming for a block
+                Block target = player.getTargetBlock(null, 4);
+                if (target == null || target.getType() == Material.AIR) {
+                    return;
+                }
 
-            // Player must be holding item
-            PlayerInventory inv = player.getInventory();
-            ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
-            ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
-            ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
-            if (hand == null || player.hasCooldown(hand.getType())) {
-                return;
-            }
+                // Player must be holding item
+                PlayerInventory inv = player.getInventory();
+                ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
+                ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
+                ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
+                if (hand == null || player.hasCooldown(hand.getType())) {
+                    return;
+                }
 
-            // Item must be a missile
-            String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");// Switch to throwing logic if using a throwable
-            if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
-                    structureName.contains("torpedo-") || structureName.contains("canopy")) {
-                return;
-            }
+                // Item must be a missile
+                String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+                if (!lastName.equals(structureName)) {
+                    if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
+                            structureName.contains("torpedo-") || structureName.contains("canopy")) {
+                        return;
+                    }
 
-            // At this point, we know the player is holding a missile item facing a block
-            Location loc = target.getLocation();
-            Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
-            double x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
-            double x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
-            double y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
-            double y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
-            double z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
-            double z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
-            DustOptions dustOptions = new DustOptions(Color.LIME, 1.0F);
-            for (double x = x1; x <= x2; x++) {
-                for (double y = y1; y <= y2; y++) {
-                    for (double z = z1; z <= z2; z++) {
-                        boolean isX = x == x1 || x == x2;
-                        boolean isY = y == y1 || y == y2;
-                        boolean isZ = z == z1 || z == z2;
-                        if (isX ? (isY || isZ) : (isY && isZ)) {
-                            player.spawnParticle(Particle.DUST, x, y, z, 1, dustOptions);
+                    Location loc = target.getLocation();
+                    Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
+                    x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
+                    x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
+                    y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
+                    y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
+                    z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
+                    z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
+                    lastName = structureName;
+                }
+
+                // At this point, we know the player is holding a missile item facing a block
+                DustOptions dustOptions = new DustOptions(Color.LIME, 0.5F);
+                for (double x = x1; x <= x2; x+=0.5) {
+                    for (double y = y1; y <= y2; y+=0.5) {
+                        for (double z = z1; z <= z2; z+=0.5) {
+                            boolean isX = x == x1 || x == x2;
+                            boolean isY = y == y1 || y == y2;
+                            boolean isZ = z == z1 || z == z2;
+                            if (isX ? (isY || isZ) : (isY && isZ)) {
+                                player.spawnParticle(Particle.DUST, x, y, z, 1, dustOptions);
+                            }
                         }
                     }
                 }
             }
-        }, 20, 10));
+        }.runTaskTimerAsynchronously(plugin, 20, 6));
     }
 
     // EXP bar cooldown preview + out of bounds handling

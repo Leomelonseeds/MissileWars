@@ -87,12 +87,6 @@ public class ArenaSelector implements MWInventory {
         if (selectedArena == null) {
             return;
         }
-        
-        // Ensure player can play >:D
-        if (player.hasPermission("umw.new")) {
-            ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, null, null);
-            return;
-        }
 
         // Attempt to send player to arena
         if (selectedArena.joinPlayer(player)) {

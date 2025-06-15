@@ -510,12 +510,6 @@ public abstract class Arena implements ConfigurationSerializable {
             ConfigUtils.sendConfigMessage("messages.arena-full", player, this, null);
             return false;
         }
-        
-        // Ensure player can play >:D
-        if (player.hasPermission("umw.new")) {
-            ConfigUtils.sendConfigMessage("messages.watch-the-fucking-video", player, this, null);
-            return false;
-        }
 
         // Make sure player not in parkour
         if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
@@ -1366,7 +1360,7 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
             plugin.log("First arena clear finished");
-            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
+            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld(), false);
             resetting = false;
             plugin.log("Reset completed");
             

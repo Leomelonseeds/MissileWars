@@ -61,6 +61,19 @@ public class TutorialReplay {
     
     // TODO: One method each for each replay, will be controlled by Citizens NPCs
     // TODO: This class can be a parent (maybe abstract), and abstract method will be implemented by subclasses for each replay
+    // Replay 1:
+    // - Spawning and riding missiles
+    // - View location: 161.5 17 -50.5 y=(-125 to -25) p=(0 to 20)
+    // Replay 2:
+    // - Blowing up portals
+    // - View location 1: 173.5 14 49.5 y=(130 to 30) p=(9 to 25) 
+    // - Can stop at yaw 70 to view missile placement
+    // - After the missile placement view, smoothly transition to 173 6 86 y165 p6 to see portal being broken
+    // Replay 3:
+    // - Using utility items
+    // - NPC should be left handed
+    // - View location: 136.5 17 -52.5 y12 p0 
+    // - After egg throw, to 144 18 -13 y140 p6
     
 
 }

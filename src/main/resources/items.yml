@@ -826,7 +826,7 @@ torpedo:
     file: 'torpedo_1.nbt'
     offset:
       x: -2
-      y: -4
+      y: -3
       z: -2
     size: "Small"
   2:

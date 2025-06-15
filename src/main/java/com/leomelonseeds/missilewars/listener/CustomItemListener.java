@@ -791,13 +791,15 @@ public class CustomItemListener implements Listener {
         // Check for portal breaks / moving pistons
         Location location = hitBlock.getRelative(event.getHitBlockFace()).getLocation();
         Block spawnBlock = location.getBlock();// Check for splashes going through moving pistons
+        boolean blockUpdates = true;
         if (spawnBlock.getType() != Material.AIR) {
             if (spawnBlock.getType() == Material.NETHER_PORTAL) {
+                blockUpdates = false;
                 Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(thrower.getWorld());
                 if (arena instanceof ClassicArena carena) {
                     carena.registerPortalBreak(location.clone(), thrower);
                 }
-            } else if (spawnBlock.getType() == Material.MOVING_PISTON) {
+            } else if (spawnBlock.getType().toString().contains("PISTON")) {
                 Block upper = hitBlock.getRelative(BlockFace.UP);
                 if (upper.getType() != Material.AIR) {
                     return;
@@ -809,15 +811,24 @@ public class CustomItemListener implements Listener {
         }
 
         // Normal splash manager
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         double duration = Double.parseDouble(args[1]);
         Block actualBlock = location.getBlock();
-        actualBlock.setType(Material.WATER);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        actualBlock.setType(Material.WATER, blockUpdates);
+        if (!blockUpdates) {
+            // Since portals are broken with FAWE, wait a bit before
+            // sending out block update telling water to flow
+            ConfigUtils.schedule(5, () -> {
+                actualBlock.setType(Material.AIR);
+                actualBlock.setType(Material.WATER);
+            });
+        }
+        
+        // Replace back with air after the set splash duration
+        ConfigUtils.schedule((int) (duration * 20), () -> {
             if (actualBlock.getType() == Material.WATER) {
                 actualBlock.setType(Material.AIR);
             }
-        }, (long) (duration * 20));
+        });
         
         // Ender splash
         if (customName.contains("ender") && thrower.isOnline() && 
