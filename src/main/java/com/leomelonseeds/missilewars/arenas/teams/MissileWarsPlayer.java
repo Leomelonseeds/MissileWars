@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -97,10 +98,15 @@ public class MissileWarsPlayer {
      */
     public void missilePreview(boolean isRed) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        final int INTERVAL = plugin.getConfig().getInt("missile-preview.interval");
+        final int DIV = plugin.getConfig().getInt("missile-preview.div");
+        final float SIZE = (float) plugin.getConfig().getDouble("missile-preview.size");
         tasks.add(new BukkitRunnable() {
 
             // Store the last structure in case player is still holding it
-            double x1, x2, y1, y2, z1, z2;
+            Vector p1 = new Vector();
+            Vector p2 = new Vector();
+            Vector lastTarget = null;
             String lastName = "";
             
             @Override
@@ -131,39 +137,66 @@ public class MissileWarsPlayer {
 
                 // Item must be a missile
                 String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+                Location loc = target.getLocation();
+                Vector locVector = loc.toVector();
                 if (!lastName.equals(structureName)) {
                     if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
                             structureName.contains("torpedo-") || structureName.contains("canopy")) {
                         return;
                     }
 
-                    Location loc = target.getLocation();
+                    // Spawns are slightly outside the border in order to detect if the missile would touch a block
                     Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
-                    x1 = Math.min(spawns[0].getX(), spawns[1].getX()) + 0.5;
-                    x2 = Math.max(spawns[0].getX(), spawns[1].getX()) - 0.5;
-                    y1 = Math.min(spawns[0].getY(), spawns[1].getY()) + 0.5;
-                    y2 = Math.max(spawns[0].getY(), spawns[1].getY()) - 0.5;
-                    z1 = Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.5;
-                    z2 = Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.5;
+                    p1.setX(Math.min(spawns[0].getX(), spawns[1].getX()) + 0.49);
+                    p1.setY(Math.min(spawns[0].getY(), spawns[1].getY()) + 0.49);
+                    p1.setZ(Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.49);
+                    p2.setX(Math.max(spawns[0].getX(), spawns[1].getX()) - 0.49);
+                    p2.setY(Math.max(spawns[0].getY(), spawns[1].getY()) - 0.49);
+                    p2.setZ(Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.49);
                     lastName = structureName;
+                } else if (!locVector.equals(lastTarget)) {
+                    Vector difference = locVector.clone().subtract(lastTarget);
+                    p1.add(difference);
+                    p2.add(difference);
                 }
 
                 // At this point, we know the player is holding a missile item facing a block
-                DustOptions dustOptions = new DustOptions(Color.LIME, 0.5F);
-                for (double x = x1; x <= x2; x+=0.5) {
-                    for (double y = y1; y <= y2; y+=0.5) {
-                        for (double z = z1; z <= z2; z+=0.5) {
-                            boolean isX = x == x1 || x == x2;
-                            boolean isY = y == y1 || y == y2;
-                            boolean isZ = z == z1 || z == z2;
-                            if (isX ? (isY || isZ) : (isY && isZ)) {
-                                player.spawnParticle(Particle.DUST, x, y, z, 1, dustOptions);
+                lastTarget = locVector;
+                int lenx = (int) Math.round(p2.getX() - p1.getX()) * DIV;
+                int leny = (int) Math.round(p2.getY() - p1.getY()) * DIV;
+                int lenz = (int) Math.round(p2.getZ() - p1.getZ()) * DIV;
+                for (int x = 0; x <= lenx; x++) {
+                    for (int y = 0; y <= leny; y++) {
+                        for (int z = 0; z <= lenz; z++) {
+                            boolean isX = x == 0 || x == lenx;
+                            boolean isY = y == 0 || y == leny;
+                            boolean isZ = z == 0 || z == lenz;
+                            
+                            // This condition checks if we are on the outline
+                            if (!(isX ? (isY || isZ) : (isY && isZ))) {
+                                continue;
                             }
+                            
+                            // If block is not air, dust should be red
+                            Color color = Color.LIME;
+                            Location cur = new Location(
+                                loc.getWorld(),
+                                p1.getX() + (double) x / DIV,
+                                p1.getY() + (double) y / DIV, 
+                                p1.getZ() + (double) z / DIV
+                            );
+                            
+                            if (cur.getBlock().getType() != Material.AIR) {
+                                color = Color.RED;
+                            }
+
+                            DustOptions dustOptions = new DustOptions(color, SIZE);
+                            player.spawnParticle(Particle.DUST, cur, 1, dustOptions);
                         }
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20, 6));
+        }.runTaskTimerAsynchronously(plugin, 20, INTERVAL));
     }
 
     // EXP bar cooldown preview + out of bounds handling
