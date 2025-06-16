@@ -404,7 +404,8 @@ public class ArenaManager {
                 DHAPI.createHologram(teamNPC.getId() + "", holoLoc, true, List.of(teamName + " (%umw_" + team + "_queue%)"));
                 
                 // Add misc traits and spawn in
-                teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
+                teamNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
+                teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
                 teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
                 teamNPC.addTrait(gravity);
                 teamNPC.spawn(teamLoc);
@@ -425,6 +426,7 @@ public class ArenaManager {
             VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
             profession.setProfession(Villager.Profession.NITWIT);
             bartender.data().setPersistent(NPC.Metadata.SILENT, true);
+            bartender.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
             bartender.addTrait(gravity); 
             arenaWorld.getChunkAt(barLoc);
             bartender.spawn(barLoc);
@@ -459,6 +461,7 @@ public class ArenaManager {
                 
                 // Add misc traits, spawn
                 deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
+                deckNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
                 deckNPC.addTrait(gravity);
                 deckNPC.spawn(deckLoc);
                 arena.addNPC(deckNPC.getId());

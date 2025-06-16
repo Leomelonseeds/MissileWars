@@ -98,6 +98,14 @@ public class MissileWarsPlayer {
      */
     public void missilePreview(boolean isRed) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        
+        // TEST TEST TEST
+        if (getMCPlayer().hasPermission("umw.test")) {
+            tasks.add(new MissilePreviewTask(getMCPlayer(), isRed).runTaskTimer(plugin, 20, 2));
+            return;
+        }
+        
+        
         final int INTERVAL = plugin.getConfig().getInt("missile-preview.interval");
         final int DIV = plugin.getConfig().getInt("missile-preview.div");
         final float SIZE = (float) plugin.getConfig().getDouble("missile-preview.size");
@@ -145,23 +153,24 @@ public class MissileWarsPlayer {
                         return;
                     }
 
-                    // Spawns are slightly outside the border in order to detect if the missile would touch a block
+                    // Spawns are slightly inside the border in order for good coords
                     Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
-                    p1.setX(Math.min(spawns[0].getX(), spawns[1].getX()) + 0.49);
-                    p1.setY(Math.min(spawns[0].getY(), spawns[1].getY()) + 0.49);
-                    p1.setZ(Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.49);
-                    p2.setX(Math.max(spawns[0].getX(), spawns[1].getX()) - 0.49);
-                    p2.setY(Math.max(spawns[0].getY(), spawns[1].getY()) - 0.49);
-                    p2.setZ(Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.49);
+                    p1.setX(Math.min(spawns[0].getX(), spawns[1].getX()) + 0.51);
+                    p1.setY(Math.min(spawns[0].getY(), spawns[1].getY()) + 0.51);
+                    p1.setZ(Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.51);
+                    p2.setX(Math.max(spawns[0].getX(), spawns[1].getX()) - 0.51);
+                    p2.setY(Math.max(spawns[0].getY(), spawns[1].getY()) - 0.51);
+                    p2.setZ(Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.51);
                     lastName = structureName;
                 } else if (!locVector.equals(lastTarget)) {
                     Vector difference = locVector.clone().subtract(lastTarget);
                     p1.add(difference);
                     p2.add(difference);
                 }
-
+                
                 // At this point, we know the player is holding a missile item facing a block
                 lastTarget = locVector;
+                DustOptions dustOptions = new DustOptions(Color.LIME, SIZE);
                 int lenx = (int) Math.round(p2.getX() - p1.getX()) * DIV;
                 int leny = (int) Math.round(p2.getY() - p1.getY()) * DIV;
                 int lenz = (int) Math.round(p2.getZ() - p1.getZ()) * DIV;
@@ -177,20 +186,13 @@ public class MissileWarsPlayer {
                                 continue;
                             }
                             
-                            // If block is not air, dust should be red
-                            Color color = Color.LIME;
                             Location cur = new Location(
                                 loc.getWorld(),
                                 p1.getX() + (double) x / DIV,
                                 p1.getY() + (double) y / DIV, 
                                 p1.getZ() + (double) z / DIV
                             );
-                            
-                            if (cur.getBlock().getType() != Material.AIR) {
-                                color = Color.RED;
-                            }
 
-                            DustOptions dustOptions = new DustOptions(color, SIZE);
                             player.spawnParticle(Particle.DUST, cur, 1, dustOptions);
                         }
                     }
