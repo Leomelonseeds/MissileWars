@@ -298,11 +298,30 @@ public class InventoryUtils {
             return null;
         }
         
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(MissileWarsPlugin.getPlugin(), id),
-                PersistentDataType.STRING)) {
+        NamespacedKey key = new NamespacedKey(MissileWarsPlugin.getPlugin(), id);
+        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return null;
         }
-        return item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(MissileWarsPlugin.getPlugin(),
-                id), PersistentDataType.STRING);
+        
+        return item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
+    }
+    
+    /**
+     * Check if the given structure id is a missile
+     * 
+     * @param id
+     * @return
+     */
+    public static boolean isMissile(String id) {
+        if (id == null) {
+            return false;
+        }
+        
+        if (id.contains("shield-") || id.contains("platform-") || 
+                id.contains("torpedo-") || id.contains("canopy")) {
+            return false;
+        }
+        
+        return true;
     }
 }

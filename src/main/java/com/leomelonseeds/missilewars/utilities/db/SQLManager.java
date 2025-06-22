@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.utilities;
+package com.leomelonseeds.missilewars.utilities.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

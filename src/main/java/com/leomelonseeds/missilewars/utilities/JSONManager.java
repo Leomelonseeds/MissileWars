@@ -18,7 +18,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +44,7 @@ public class JSONManager {
         
         
         // Find and parse the default json object
-        String dir = MissileWarsPlugin.getPlugin().getDataFolder().toString();
+        String dir = plugin.getDataFolder().toString();
         File json = new File(dir, "default.json");
         try {
             InputStream is = new FileInputStream(json);
@@ -292,12 +291,7 @@ public class JSONManager {
      * Saves the player cache to the database once every 10 minutes
      */
     private void periodicSave() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                saveAll(true);
-            }
-        }.runTaskTimer(plugin, 12000, 12000);
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> saveAll(true), 12000, 12000);
     }
 
     /**

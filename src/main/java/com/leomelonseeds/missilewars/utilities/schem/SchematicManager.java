@@ -1,15 +1,18 @@
-package com.leomelonseeds.missilewars.utilities;
+package com.leomelonseeds.missilewars.utilities.schem;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,18 +28,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
-import org.bukkit.structure.StructureManager;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
@@ -61,19 +64,135 @@ public class SchematicManager {
      * @param path the path to the x, y, z vector data
      * @return the x, y, z as a vector
      */
-    public static Vector getVector(FileConfiguration config, String path, String mapType, String mapName) {
-        Vector vector = new Vector();
+    public static Vector getVector(FileConfiguration config, String path) {
         if (config.contains(path)) {
-            vector = new Vector(config.getDouble(path + ".x"), config.getDouble(path + ".y"),
+            return new Vector(config.getDouble(path + ".x"), config.getDouble(path + ".y"),
                     config.getDouble(path + ".z"));
-        } else {
-            // If config does not contain path, then it's definitely a map
-            vector = new Vector(ConfigUtils.getMapNumber(mapType, mapName, path + ".x"),
-                                ConfigUtils.getMapNumber(mapType, mapName, path + ".y"),
-                                ConfigUtils.getMapNumber(mapType, mapName, path + ".z"));
         }
-        return vector;
+        return null;
     }
+    
+    /**
+     * Get the vector for a given structure/schematic path and map in a given config.
+     * 
+     * @param config
+     * @param path
+     * @param mapType
+     * @param mapName
+     * @return
+     */
+    public static Vector getVector(FileConfiguration config, String path, String mapType, String mapName) {
+        return new Vector(ConfigUtils.getMapNumber(mapType, mapName, path + ".x"),
+                          ConfigUtils.getMapNumber(mapType, mapName, path + ".y"),
+                          ConfigUtils.getMapNumber(mapType, mapName, path + ".z"));
+    }
+    
+    // Store the clipboard and file for each structure so it doesn't have to be dynamically loaded each time.
+    // Don't store a SchematicLoadResult, just store file and clipboard since the result is used in other stuff,
+    // and has status/other variables that might screw things up if not changed
+    public static Map<String, Pair<File, Clipboard>> structureCache = new HashMap<>();
+
+    /**
+     * Load an NBT structure and return the necessary parameters to spawn it
+     * 
+     * @param player
+     * @param structureName
+     * @param loc
+     * @param isRed
+     * @param mapName
+     * @param isMissile
+     * @param checkCollision
+     * @return
+     */
+    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, boolean isRed, String mapName, Boolean isMissile, Boolean checkCollision) {
+        SchematicLoadResult result = new SchematicLoadResult(isMissile, structureName);
+        result.setStatus(SchematicLoadStatus.OUT_OF_BOUNDS);
+        if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
+            return result;
+        }
+        
+        // Attempt to get structure file
+        result.setStatus(SchematicLoadStatus.FILE_MISSING);
+        FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
+        String[] args = structureName.split("-");
+        int level = Integer.parseInt(args[1]);
+        Pair<File, Clipboard> structureInfo = structureCache.get(structureName);
+        if (structureInfo == null) {
+            // Get the structure file and store it
+            if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
+                return result;
+            }
+            
+            String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
+            if (fileName == null) {
+                return result;
+            }
+            
+            if (isRed) {
+                fileName = fileName.replaceAll(".nbt", "_red.nbt");
+            }
+
+            File file = new File(MissileWarsPlugin.getPlugin().getDataFolder() + File.separator + "structures", fileName);
+            
+            // Load and store file into a worldedit clipboard for easy block info access
+            ClipboardFormat format = BuiltInClipboardFormat.MINECRAFT_STRUCTURE;
+            Clipboard clipboard;
+            try {
+                ClipboardReader reader = format.getReader(new FileInputStream(file));
+                clipboard = reader.read();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return result;
+            }
+            
+            // Save to cache
+            structureInfo = Pair.of(file, clipboard);
+            structureCache.put(structureName, structureInfo);
+        }
+        
+        result.setFile(structureInfo.getLeft());
+        result.setClipboard(structureInfo.getRight());
+        
+        // Find structure spawn location by applying offset
+        Location spawnLoc = loc.clone();
+        Vector offset;
+        if (structureConfig.contains(args[0] + ".offset")) {
+            offset = getVector(structureConfig, args[0] + ".offset");
+        } else {
+            offset = getVector(structureConfig, args[0] + "." + level + ".offset");
+        }
+        
+        // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
+        if (isMissile && player != null && player.hasPermission("umw.oldoffsets")) {
+            offset.setZ(offset.getZ() + (Double.valueOf(ConfigUtils.getItemValue(args[0], level, "speed") + "") > 3 ? 2 : 1));
+        }
+        
+        // Check for pokemissile
+        BlockVector3 size = structureInfo.getRight().getDimensions();
+        if (args.length == 3 && args[2].equals("p")) {
+            isMissile = true;
+            offset.setZ(-1 * size.getBlockZ() / 2);
+            offset.setY(-1 * size.getBlockY() / 2);
+        }
+        
+        if (isRed) {
+            offset.setZ(offset.getZ() * -1);
+            offset.setX(offset.getX() * -1);
+            result.setRotation(StructureRotation.CLOCKWISE_180);
+        }
+        result.setSpawnPos(spawnLoc.add(offset));
+       
+        // Epic in-class collision check
+        if (checkCollision) {
+            result.checkCollisions();
+        } else {
+            result.setStatus(SchematicLoadStatus.SUCCESS);
+        }
+        
+        return result;
+    }
+    
+    
     
     public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision) {
         return spawnNBTStructure(player, structureName, loc, redMissile, mapName, isMissile, checkCollision, 0);
@@ -92,179 +211,41 @@ public class SchematicManager {
      * @return true if the NBT structure was found and spawned, otherwise false
      */
     private static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
-        // Don't kill the lobby
-        if (loc.getWorld().getName().equals("world")){
-            sendError(player, "How the hell did you get that here?");
+        SchematicLoadResult loadResult = loadNBTStructure(player, structureName, loc, redMissile, mapName, isMissile, checkCollision);
+        if (!loadResult.isAllowSpawn()) {
+            sendError(player, loadResult.getStatus().getMessage());
             return false;
         }
-        
-        // Don't be too high
-        if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
-            sendError(player, "Structures cannot be spawned this high!");
-            return false;
-        }
-
-        // Attempt to get structure file
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
-        String[] args = structureName.split("-");
-        int level = Integer.parseInt(args[1]);
-
-        // Attempt to get structure file
-        if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
-            sendError(player, "The file for this structure is missing! Please contact an admin.");
-            return false;
-        }
-        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
-        if (fileName == null) {
-            sendError(player, "The file for this structure is missing! Please contact an admin.");
-            return false;
-        }
-        if (redMissile) {
-            fileName = fileName.replaceAll(".nbt", "_red.nbt");
-        }
-        File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
-                fileName);
 
         // Load structure data
-        StructureManager manager = Bukkit.getStructureManager();
+        // TODO: Remove icarus missile and don't spawn entities to save on performance
         Structure structure;
         try {
-            structure = manager.loadStructure(structureFile);
+            structure = Bukkit.getStructureManager().loadStructure(loadResult.getFile());
         } catch (IOException e) {
-            sendError(player, "The file for this structure is missing! Please contact an admin.");
+            // This should never happen because the file was already fcking loaded
+            Bukkit.getLogger().severe("Structure " + structureName + " somehow failed to load...");
             return false;
         }
-
-        // Apply offset
-        Location spawnLoc = loc.clone();
-        Vector offset;
-        if (structureConfig.contains(args[0] + ".offset")) {
-            offset = getVector(structureConfig, args[0] + ".offset", null, null);
-        } else {
-            offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
-        }
-        
-        // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
-        if (isMissile && player != null && player.hasPermission("umw.oldoffsets")) {
-            offset.setZ(offset.getZ() + (Double.valueOf(ConfigUtils.getItemValue(args[0], level, "speed") + "") > 3 ? 2 : 1));
-        }
-        
-        // Check for pokemissile
-        int sizex = structure.getSize().getBlockX();
-        int sizey = structure.getSize().getBlockY();
-        int sizez = structure.getSize().getBlockZ();
-        if (args.length == 3 && args[2].equals("p")) {
-            isMissile = true;
-            offset.setZ(-1 * sizez / 2);
-            offset.setY(-1 * sizey / 2);
-        }
-        
-        StructureRotation rotation = StructureRotation.NONE;
-        if (redMissile) {
-            offset.setZ(offset.getZ() * -1);
-            offset.setX(offset.getX() * -1);
-            rotation = StructureRotation.CLOCKWISE_180;
-        }
-        spawnLoc = spawnLoc.add(offset);
-        
-        // Checks if the missile intersects with an obsidian/barrier structure
-        int spawnx = spawnLoc.getBlockX();
-        int spawny = spawnLoc.getBlockY();
-        int spawnz = spawnLoc.getBlockZ();
-        if (checkCollision) {
-            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
-            Arena arena = plugin.getArenaManager().getArena(player.getUniqueId());
-            boolean missileInBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.RED : TeamName.BLUE);
-            boolean missileInOtherBase = isMissile && ArenaUtils.inShield(arena, spawnLoc, redMissile ? TeamName.BLUE : TeamName.RED, 4);
-            boolean isTutorial = loc.getWorld().getName().contains("tutorial");
-            int x1, x2, z1, z2, tg; 
-            if (redMissile) {
-                z1 = spawnz - sizez + 1;
-                z2 = spawnz;
-                x1 = spawnx - sizex + 1;
-                x2 = spawnx;
-                tg = spawnz - 1;
-            } else {
-                z1 = spawnz;
-                z2 = spawnz + sizez - 1;
-                x1 = spawnx;
-                x2 = spawnx + sizex - 1;
-                tg = spawnz + 1;
-            }
-            
-            for (int z = z1; z <= z2; z++) {
-                for (int y = spawny; y < spawny + sizey; y++) {
-                    for (int x = x1; x <= x2; x++) {
-                        // Only check non-air blocks for missile collision
-                        Location l = new Location(loc.getWorld(), x, y, z);
-                        Material b = l.getBlock().getType();
-                        if (b == Material.AIR) {
-                            continue;
-                        }
-                        
-                        // Check for tutorial arena
-                        if (isMissile && z < 0 && isTutorial) {
-                            sendError(player, "Missiles spawned on your side of this arena must be clear of obstacles!");
-                            return false;
-                        }
-                        
-                        // Check for teamgrief
-                        if (missileInBase && z == tg) {
-                            sendError(player, "You cannot spawn missiles inside your base!");
-                            return false;
-                        }
-                        
-                        // Check all other cancellable blocks
-                        if (cancel.contains(b.toString())) {
-                            // Move missile backwards if it would spawn in another base (it has definitely collided with the portal)
-                            if (missileInOtherBase) {
-                                Location testAgain = loc.clone().add(0, 0, redMissile ? 1 : -1);
-                                return spawnNBTStructure(player, structureName, testAgain, redMissile, mapName, isMissile, checkCollision, ++attempt);
-                            }
-                            sendError(player, "You cannot spawn structures inside unbreakable blocks!");
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Place structure
-        structure.place(spawnLoc, true, rotation, Mirror.NONE, 0, 1, new Random());
-        if (player != null && attempt > 0) {
-            ConfigUtils.sendConfigMessage("messages.missile-moved", player, null, null);
-        }
+        Location spawnPos = loadResult.getSpawnPos().clone();
+        StructureRotation rotation = loadResult.getRotation();
+        structure.place(spawnPos, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Add structure to tracker list
         World world = loc.getWorld();
-        Location pos1;
-        Location pos2;
-        BlockFace direction;
-        if (rotation == StructureRotation.NONE) {
-            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
-            pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
-            direction = BlockFace.SOUTH;
-        } else if (rotation == StructureRotation.CLOCKWISE_180) {
-            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
-            pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
-            direction = BlockFace.NORTH;
-        } else if (rotation == StructureRotation.CLOCKWISE_90) {
-            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
-            pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
-            direction = BlockFace.WEST;
-        } else {
-            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
-            pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
-            direction = BlockFace.EAST;
-        }
+        Location[] corners = loadResult.getCorners();
+        corners[0].add(-1, -1, -1);
+        corners[1].add(1, 1, 1);
+        BlockFace direction = loadResult.getRotation() == StructureRotation.NONE ? BlockFace.SOUTH : BlockFace.NORTH;
+        String[] args = structureName.split("-");
+        int level = Integer.parseInt(args[1]);
         if (isMissile) {
-            new TrackedMissile(args[0], level, player, pos1, pos2, direction, redMissile);
+            new TrackedMissile(args[0], level, player, corners[0], corners[1], direction, redMissile);
         } else {
-            new TrackedUtility(args[0], level, player, pos1, pos2, direction, redMissile);
+            new TrackedUtility(args[0], level, player, corners[0], corners[1], direction, redMissile);
         }
         
-        // Spawn TNT minecarts in torpedos
+        // Manually spawn TNT minecarts in torpedos
         if (args[0].equals("torpedo")) {
             final int minecarts = 4;
             List<Location> minecartLocs = new ArrayList<>();
@@ -283,7 +264,7 @@ public class SchematicManager {
         
         // Temp hotfix for structure rail rotation bug
         if (redMissile && structureName.equals("lifter-2")) {
-            Location railLoc = spawnLoc.add(-1, 2, -8);
+            Location railLoc = spawnPos.add(-1, 2, -8);
             Block block = railLoc.getBlock();
             block.setType(Material.DETECTOR_RAIL);
             RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
@@ -311,100 +292,6 @@ public class SchematicManager {
         }
         
         player.sendMessage(ConfigUtils.toComponent("&c" + message));
-    }
-    
-    /**
-     * Returns the 2 positions in which this missile will be spawned. Contains tons of
-     * duplicated code which I am very unproud of
-     * 
-     * @param structureName
-     * @param loc
-     * @param redMissile
-     * @return
-     */
-    public static Location[] getCorners(String structureName, Location loc, boolean redMissile, boolean oldOffsets) {
-        // Attempt to get structure file
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
-        String [] args = structureName.split("-");
-        int level = Integer.parseInt(args[1]);
-
-        // Attempt to get structure file
-        if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
-            return null;
-        }
-        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
-        if (fileName == null) {
-            return null;
-        }
-        if (redMissile) {
-            fileName = fileName.replaceAll(".nbt", "_red.nbt");
-        }
-        File structureFile = new File(plugin.getDataFolder() + File.separator + "structures",
-                fileName);
-
-        // Load structure data
-        StructureManager manager = Bukkit.getStructureManager();
-        Structure structure;
-        try {
-            structure = manager.loadStructure(structureFile);
-        } catch (IOException e) {
-            return null;
-        }
-
-        // Apply offset
-        Location spawnLoc = loc.clone();
-
-        Vector offset;
-        if (structureConfig.contains(args[0] + ".offset")) {
-            offset = getVector(structureConfig, args[0] + ".offset", null, null);
-        } else {
-            offset = getVector(structureConfig, args[0] + "." + level + ".offset", null, null);
-        }
-        
-        // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
-        if (oldOffsets) {
-            offset.setZ(offset.getZ() + (Double.valueOf(ConfigUtils.getItemValue(args[0], level, "speed") + "") > 3 ? 2 : 1));
-        }
-        
-        // Flip z if on red team
-        StructureRotation rotation = StructureRotation.NONE;
-        
-        // Normal red missile offset adjustment
-        if (redMissile) {
-            offset.setZ(offset.getZ() * -1);
-            offset.setX(offset.getX() * -1);
-            rotation = StructureRotation.CLOCKWISE_180;
-        }
-        spawnLoc = spawnLoc.add(offset);
-
-        int spawnx = spawnLoc.getBlockX();
-        int spawny = spawnLoc.getBlockY();
-        int spawnz = spawnLoc.getBlockZ();
-
-        int sizex = structure.getSize().getBlockX();
-        int sizey = structure.getSize().getBlockY();
-        int sizez = structure.getSize().getBlockZ();
-        
-        // Add structure to tracker list
-        World world = loc.getWorld();
-        Location pos1;
-        Location pos2;
-        if (rotation == StructureRotation.NONE) {
-            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz - 1);
-            pos2 = new Location(world, spawnx + sizex, spawny + sizey, spawnz + sizez);
-        } else if (rotation == StructureRotation.CLOCKWISE_180) {
-            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz + 1);
-            pos2 = new Location(world, spawnx - sizex, spawny + sizey, spawnz - sizez);
-        } else if (rotation == StructureRotation.CLOCKWISE_90) {
-            pos1 = new Location(world, spawnx + 1, spawny - 1, spawnz - 1);
-            pos2 = new Location(world, spawnx - sizez, spawny + sizey, spawnz + sizex);
-        } else {
-            pos1 = new Location(world, spawnx - 1, spawny - 1, spawnz + 1);
-            pos2 = new Location(world, spawnx + sizez, spawny + sizey, spawnz - sizex);
-        }
-        
-        return new Location[] {pos1.toCenterLocation(), pos2.toCenterLocation()};
     }
     
     /**
@@ -454,7 +341,7 @@ public class SchematicManager {
         // Paste WE clipboard
         Vector spawnPos;
         if (mapType == null) {
-            spawnPos = getVector(schematicConfig, schematicName + ".pos", null, null);
+            spawnPos = getVector(schematicConfig, schematicName + ".pos");
         } else {
             spawnPos = getVector(schematicConfig, "pos", mapType, schematicName);
         }

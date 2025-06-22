@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
+import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 
 import net.kyori.adventure.text.Component;

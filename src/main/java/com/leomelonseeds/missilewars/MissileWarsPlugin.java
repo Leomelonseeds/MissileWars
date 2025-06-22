@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.teams.ClassicPortal;
@@ -25,7 +26,8 @@ import com.leomelonseeds.missilewars.listener.packets.RubberbandHelper;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
-import com.leomelonseeds.missilewars.utilities.SQLManager;
+import com.leomelonseeds.missilewars.utilities.VanillaTeamManager;
+import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -45,6 +47,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private SQLManager sqlManager;
     private JSONManager jsonManager;
     private InventoryManager invManager;
+    private VanillaTeamManager vanillaTeamManager;
 
     @Override
     public void onEnable() {
@@ -96,7 +99,12 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Starting player inventory cache...");
         invManager = new InventoryManager();
         log("Player inventory cache loaded!");
-
+        
+        // Load vanilla team manager
+        log("Starting vanilla team manager...");
+        vanillaTeamManager = new VanillaTeamManager();
+        log("Vanilla team manager loaded!");
+        
         // Load arenas
         log("Loading up arenas...");
         arenaManager = new ArenaManager(this);
@@ -118,6 +126,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
         log("Setting up the MySQL database...");
         setupDatabase();
         log("MySQL setup complete.");
+        
+        // Load block mappings so first missile preview isn't screwed up
+        WrappedBlockState.getByGlobalId(1);
 
         log("Missile Wars is ready to play :)");
     }
@@ -201,8 +212,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Get the instance of the plugin running.
-     *
      * @return the instance of the plugin running
      */
     public static MissileWarsPlugin getPlugin() {
@@ -210,8 +219,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the plugin's current DeckManager.
-     *
      * @return the plugin's current DeckManager
      */
     public DeckManager getDeckManager() {
@@ -219,8 +226,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the plugin's current ArenaManager.
-     *
      * @return the plugin's current ArenaManager
      */
     public ArenaManager getArenaManager() {
@@ -228,8 +233,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the plugin's current Economy
-     *
      * @return the plugin's current Economy
      */
     public Economy getEconomy() {
@@ -237,8 +240,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the vault chat API
-     *
      * @return the vault chat API
      */
     public Chat getChat() {
@@ -246,8 +247,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the plugin's current database manager
-     *
      * @return the plugin's database manager
      */
     public SQLManager getSQL() {
@@ -255,8 +254,6 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the plugin's current json manager
-     *
      * @return the plugin's json manager
      */
     public JSONManager getJSON() {
@@ -264,16 +261,21 @@ public final class MissileWarsPlugin extends JavaPlugin {
     }
     
     /**
-     * Gets the plugin's current inv manager
-     *
      * @return the plugin's inv manager
      */
     public InventoryManager getInvs() {
         return invManager;
     }
+    
+    /**
+     * @return The plugin's vanilla team manager
+     */
+    public VanillaTeamManager getVanillaTeams() {
+        return vanillaTeamManager;
+    }
 
     /**
-     * Send a logging message to the console
+     * Send an info logging message to the console
      *
      * @param message
      */

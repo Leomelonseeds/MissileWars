@@ -10,28 +10,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.listener.packets.MissilePreview;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
@@ -54,7 +46,8 @@ public class MissileWarsPlayer {
     private boolean justSpawned;
     /** If the player is out of bounds */
     private boolean outOfBounds;
-
+    // The current class controlling the player's missile preview
+    private MissilePreview missilePreview;
 
     /**
      * Create a MissileWarsPlayer from a Minecraft player.
@@ -91,114 +84,6 @@ public class MissileWarsPlayer {
      */
     public boolean outOfBounds() {
         return outOfBounds;
-    }
-        
-    /**
-     * Missile preview feature
-     */
-    public void missilePreview(boolean isRed) {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        
-        // TEST TEST TEST
-        if (getMCPlayer().hasPermission("umw.test")) {
-            tasks.add(new MissilePreviewTask(getMCPlayer(), isRed).runTaskTimer(plugin, 20, 2));
-            return;
-        }
-        
-        
-        final int INTERVAL = plugin.getConfig().getInt("missile-preview.interval");
-        final int DIV = plugin.getConfig().getInt("missile-preview.div");
-        final float SIZE = (float) plugin.getConfig().getDouble("missile-preview.size");
-        tasks.add(new BukkitRunnable() {
-
-            // Store the last structure in case player is still holding it
-            Vector p1 = new Vector();
-            Vector p2 = new Vector();
-            Vector lastTarget = null;
-            String lastName = "";
-            
-            @Override
-            public void run() {
-                Player player = getMCPlayer();
-                if (player == null) {
-                    return;
-                }
-                
-                if (player.getLocation().getY() < -64) {
-                    return;
-                }
-
-                // Make sure player is aiming for a block
-                Block target = player.getTargetBlock(null, 4);
-                if (target == null || target.getType() == Material.AIR) {
-                    return;
-                }
-
-                // Player must be holding item
-                PlayerInventory inv = player.getInventory();
-                ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
-                ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
-                ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
-                if (hand == null || player.hasCooldown(hand.getType())) {
-                    return;
-                }
-
-                // Item must be a missile
-                String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
-                Location loc = target.getLocation();
-                Vector locVector = loc.toVector();
-                if (!lastName.equals(structureName)) {
-                    if (structureName == null || structureName.contains("shield-") || structureName.contains("platform-") || 
-                            structureName.contains("torpedo-") || structureName.contains("canopy")) {
-                        return;
-                    }
-
-                    // Spawns are slightly inside the border in order for good coords
-                    Location[] spawns = SchematicManager.getCorners(structureName, loc, isRed, player.hasPermission("umw.oldoffsets"));
-                    p1.setX(Math.min(spawns[0].getX(), spawns[1].getX()) + 0.51);
-                    p1.setY(Math.min(spawns[0].getY(), spawns[1].getY()) + 0.51);
-                    p1.setZ(Math.min(spawns[0].getZ(), spawns[1].getZ()) + 0.51);
-                    p2.setX(Math.max(spawns[0].getX(), spawns[1].getX()) - 0.51);
-                    p2.setY(Math.max(spawns[0].getY(), spawns[1].getY()) - 0.51);
-                    p2.setZ(Math.max(spawns[0].getZ(), spawns[1].getZ()) - 0.51);
-                    lastName = structureName;
-                } else if (!locVector.equals(lastTarget)) {
-                    Vector difference = locVector.clone().subtract(lastTarget);
-                    p1.add(difference);
-                    p2.add(difference);
-                }
-                
-                // At this point, we know the player is holding a missile item facing a block
-                lastTarget = locVector;
-                DustOptions dustOptions = new DustOptions(Color.LIME, SIZE);
-                int lenx = (int) Math.round(p2.getX() - p1.getX()) * DIV;
-                int leny = (int) Math.round(p2.getY() - p1.getY()) * DIV;
-                int lenz = (int) Math.round(p2.getZ() - p1.getZ()) * DIV;
-                for (int x = 0; x <= lenx; x++) {
-                    for (int y = 0; y <= leny; y++) {
-                        for (int z = 0; z <= lenz; z++) {
-                            boolean isX = x == 0 || x == lenx;
-                            boolean isY = y == 0 || y == leny;
-                            boolean isZ = z == 0 || z == lenz;
-                            
-                            // This condition checks if we are on the outline
-                            if (!(isX ? (isY || isZ) : (isY && isZ))) {
-                                continue;
-                            }
-                            
-                            Location cur = new Location(
-                                loc.getWorld(),
-                                p1.getX() + (double) x / DIV,
-                                p1.getY() + (double) y / DIV, 
-                                p1.getZ() + (double) z / DIV
-                            );
-
-                            player.spawnParticle(Particle.DUST, cur, 1, dustOptions);
-                        }
-                    }
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 20, INTERVAL));
     }
 
     // EXP bar cooldown preview + out of bounds handling
@@ -292,11 +177,11 @@ public class MissileWarsPlayer {
     }
     
     /**
-     * Initialize deck cooldowns and exp cooldown
+     * Initialize deck cooldowns and exp cooldown, start missile preview
      * 
      * @param joinedBefore
      */
-    public void initDeck(boolean joinedBefore, Arena arena) {
+    public void initDeck(boolean joinedBefore, Arena arena, boolean isRed) {
         Player player = getMCPlayer(); // Not null due to check in arena
 
         // Game start randomizer
@@ -330,6 +215,7 @@ public class MissileWarsPlayer {
         }
         
         cooldownPreview(arena);
+        missilePreview = new MissilePreview(player, isRed);
     }
  
     /**
@@ -399,6 +285,11 @@ public class MissileWarsPlayer {
         }
         tasks.clear();
         
+        if (missilePreview != null) {
+            missilePreview.disable();
+            missilePreview = null;
+        }
+        
         if (deck == null) {
             return;
         }
@@ -450,5 +341,4 @@ public class MissileWarsPlayer {
     public int hashCode() {
         return Objects.hash(playerId);
     }
-
 }

@@ -39,7 +39,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -274,8 +274,8 @@ public class ArenaManager {
         // Setup region
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
         WorldGuard wg = WorldGuard.getInstance();
-        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min", null, null);
-        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max", null, null);
+        Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.min");
+        Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby." + team + "-lobby-region.max");
         ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(arena.getName() + "-" + team + "-lobby",
                 BlockVector3.at(minLobby.getX(), minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(),
                 maxLobby.getY(), maxLobby.getZ()));
@@ -386,7 +386,7 @@ public class ArenaManager {
             for (String team : new String[] {"red", "blue"}) {
                 String upper = team.toUpperCase();
                 String teamName = (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team";
-                Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team, null, null);
+                Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team);
                 Location teamLoc = new Location(arenaWorld, teamVec.getX(), teamVec.getY(), teamVec.getZ(), 90, 0);
                 NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, teamName);
                 
@@ -414,7 +414,7 @@ public class ArenaManager {
             }
 
             // Spawn bar NPC
-            Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar", null, null);
+            Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
             Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ(), -90, 0);
             NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "§2§lBartender");
             CommandTrait openBar = new CommandTrait();
@@ -436,7 +436,7 @@ public class ArenaManager {
             //Spawn 4 deck selection NPCs
             for (DeckStorage deck : DeckStorage.values()) {
                 String id = deck.toString().toLowerCase();
-                Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id, null, null);
+                Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id);
                 Location deckLoc = new Location(arenaWorld, deckVec.getX(), deckVec.getY(), deckVec.getZ(), -90, 0);
                 NPC deckNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, deck.getNPCName());
                 
@@ -492,8 +492,8 @@ public class ArenaManager {
             globalRegion.setPriority(10);
             manager.addRegion(globalRegion);
             
-            Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min", null, null);
-            Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max", null, null);
+            Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min");
+            Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max");
             ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
                     minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(), maxLobby.getY(), maxLobby.getZ()));
             lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);

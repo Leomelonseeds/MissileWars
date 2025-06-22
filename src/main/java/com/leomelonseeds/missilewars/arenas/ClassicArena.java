@@ -26,7 +26,7 @@ import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
-import com.leomelonseeds.missilewars.utilities.SQLManager;
+import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;

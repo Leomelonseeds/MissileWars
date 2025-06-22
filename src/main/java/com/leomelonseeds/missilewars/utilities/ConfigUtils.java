@@ -30,6 +30,7 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Passive;
 import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.decks.Passive.Type;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.citizensnpcs.Citizens;
@@ -81,6 +82,7 @@ public class ConfigUtils {
     public static void reloadConfigs() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         configCache.clear();
+        SchematicManager.structureCache.clear();
         plugin.reloadConfig();
         plugin.getDeckManager().reload();
     }

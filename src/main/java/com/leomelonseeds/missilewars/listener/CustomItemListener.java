@@ -56,7 +56,7 @@ import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
@@ -215,7 +215,7 @@ public class CustomItemListener implements Listener {
         
         // Make sure this action can't deflect a fireball
         MiscListener.notLeftClick.add(uuid);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> MiscListener.notLeftClick.remove(uuid), 1);
+        ConfigUtils.schedule(1, () -> MiscListener.notLeftClick.remove(uuid));
         
         // Check if player is frozen by a canopy
         CanopyManager canopies = CanopyManager.getInstance();
@@ -256,14 +256,12 @@ public class CustomItemListener implements Listener {
             
             // Check if a block was clicked, including a moving block
             if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-                for (int i = 1; i <= 4; i++) {
-                    Block temp = player.getTargetBlock(null, i);
-                    if (temp != null && temp.getType() == Material.MOVING_PISTON) {
-                        clicked = temp;
-                        break;
-                    }
+                Block temp = player.getTargetBlock(null, 4);
+                if (temp.getType() == Material.MOVING_PISTON) {
+                    clicked = temp;
                 }
             }
+            
             if (clicked == null) {
                 return;
             }

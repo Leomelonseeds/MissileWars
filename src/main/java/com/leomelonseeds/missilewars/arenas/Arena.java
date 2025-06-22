@@ -42,10 +42,10 @@ import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.DBCallback;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.db.DBCallback;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -1160,8 +1160,8 @@ public abstract class Arena implements ConfigurationSerializable {
         // If game is running, no null/queuecount checks are needed
         if (running) {
             applyMultipliers();
-            player.initDeck(leftPlayers.containsKey(player.getMCPlayerId()) && 
-                    leftPlayers.get(player.getMCPlayerId()) >= 3, this);
+            UUID uuid = player.getMCPlayerId();
+            player.initDeck(leftPlayers.getOrDefault(uuid, 0) >= 3, this, redTeam.containsPlayer(uuid));
             return;
         }
         
@@ -1177,11 +1177,11 @@ public abstract class Arena implements ConfigurationSerializable {
         
         applyMultipliers();
         for (MissileWarsPlayer mwp : redTeam.getMembers()) {
-            mwp.initDeck(false, this);
+            mwp.initDeck(false, this, true);
         }
         
         for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
-            mwp.initDeck(false, this);
+            mwp.initDeck(false, this, false);
         }
         running = true;
     }
@@ -1388,7 +1388,7 @@ public abstract class Arena implements ConfigurationSerializable {
 		}
          else {
         	FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
-            Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn", null, null);
+            Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
             Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
             spawnLoc.setYaw(90);
             return spawnLoc;

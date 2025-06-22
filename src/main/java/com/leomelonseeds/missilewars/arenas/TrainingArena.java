@@ -32,7 +32,7 @@ import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 public class TrainingArena extends ClassicArena {
     

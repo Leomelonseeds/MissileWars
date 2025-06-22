@@ -202,7 +202,6 @@ public class MissileWarsTeam {
         // Create and register deck. Initdeck is in arena code!
         Deck deck = plugin.getDeckManager().getPlayerDeck(player);
         player.setDeck(deck);
-        player.missilePreview(name == TeamName.RED);
         for (DeckItem di : deck.getItems()) {
             mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
             di.registerTeam(this);

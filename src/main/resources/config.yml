@@ -11,15 +11,6 @@ experimental:
   # defuse helper uneeded setting
   # dh-iterations: 0
   dh-bias: 20
-  
-# Shows green particle outline where your missile will spawn
-# interval: How long between refreshes/dust spawns
-# div: How many particles for a 1 block length
-# size: How large the dust particles are
-missile-preview:
-  interval: 1
-  div: 5
-  size: 0.3
 
 # Blocks that cannot intersect bounding boxes of schematics
 # Players also cannot right click on these blocks with items.

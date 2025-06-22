@@ -32,7 +32,7 @@ import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
-import com.leomelonseeds.missilewars.utilities.SchematicManager;
+import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -274,7 +274,7 @@ public class TutorialArena extends ClassicArena {
         // Spawn particles above NPCs
         if (s == 5 || s == 6) {
             FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
-            Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker", null, null);
+            Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker");
             Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
             particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
                 player.spawnParticle(Particle.HAPPY_VILLAGER, loc, 10, 0.4, 0.4, 0.4);
