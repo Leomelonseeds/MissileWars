@@ -118,6 +118,10 @@ public class ClassicPortal {
      * @param player
      */
     public void glow(MissileWarsPlayer mwp) {
+        if (mwp == null) {
+            return;
+        }
+        
         Player player = mwp.getMCPlayer();
         if (glow == null || player == null || !player.isOnline()) {
             return;
@@ -136,6 +140,10 @@ public class ClassicPortal {
      * @param player
      */
     public void hideGlow(MissileWarsPlayer mwp) {
+        if (mwp == null) {
+            return;
+        }
+        
         Player player = mwp.getMCPlayer();
         if (glow == null || player == null || !player.isOnline()) {
             return;
