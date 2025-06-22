@@ -2,7 +2,6 @@ package com.leomelonseeds.missilewars.utilities.schem;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,13 +45,13 @@ public class SchematicLoadResult {
     }
     
     /**
-     * Get non-modifiable structure block data. Checkcollisions must have been
+     * Get clipboard block data. Checkcollisions must have been
      * called at least once, call it again to update the list
      * 
      * @return All non-air locations and blocks in the schematic, adjusted for rotation
      */
     public List<Pair<Location, BlockData>> getBlocks() {
-        return Collections.unmodifiableList(blockList);
+        return blockList;
     }
     
     /**
@@ -71,8 +70,11 @@ public class SchematicLoadResult {
         int teamGrief = spawnPos.getBlockZ() + (redMissile ? -1 : 1);
         blockList.clear();
         for (BlockVector3 locVec : clipboard) {
-            // Get the data of the block that will be pasted. Use another block so command blocks don't show
-            BlockData data = BukkitAdapter.adapt(clipboard.getBlock(locVec));
+            // Get the data of the block that will be pasted. Use another block so command blocks don't show.
+            // Here lies the weirdest bug I've ever seen. Rotating the data somehow rotated the state of the
+            // next adapted blockdata, turning it back into the same facing piston. To fix this, simply clone
+            // the first adapted blockdata. But wtf...
+            BlockData data = BukkitAdapter.adapt(clipboard.getBlock(locVec)).clone();
             if (data.getMaterial() == Material.COMMAND_BLOCK) {
                 data = Material.CHISELED_DEEPSLATE.createBlockData();
             }

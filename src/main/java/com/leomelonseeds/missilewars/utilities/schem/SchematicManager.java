@@ -116,25 +116,19 @@ public class SchematicManager {
         FileConfiguration structureConfig = ConfigUtils.getConfigFile("items.yml");
         String[] args = structureName.split("-");
         int level = Integer.parseInt(args[1]);
-        Pair<File, Clipboard> structureInfo = structureCache.get(structureName);
+        String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
+        if (fileName == null) {
+            return result;
+        }
+        
+        if (isRed) {
+            fileName = fileName.replaceAll(".nbt", "_red.nbt");
+        }
+        
+        Pair<File, Clipboard> structureInfo = structureCache.get(fileName);
         if (structureInfo == null) {
-            // Get the structure file and store it
-            if (ConfigUtils.getItemValue(args[0], level, "file") == null) {
-                return result;
-            }
-            
-            String fileName = (String) ConfigUtils.getItemValue(args[0], level, "file");
-            if (fileName == null) {
-                return result;
-            }
-            
-            if (isRed) {
-                fileName = fileName.replaceAll(".nbt", "_red.nbt");
-            }
-
+            // Load file and save into clipboard
             File file = new File(MissileWarsPlugin.getPlugin().getDataFolder() + File.separator + "structures", fileName);
-            
-            // Load and store file into a worldedit clipboard for easy block info access
             ClipboardFormat format = BuiltInClipboardFormat.MINECRAFT_STRUCTURE;
             Clipboard clipboard;
             try {
