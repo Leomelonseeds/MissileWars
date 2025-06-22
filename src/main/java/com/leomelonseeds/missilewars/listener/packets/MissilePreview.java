@@ -294,7 +294,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         UUID uuid = UUID.randomUUID();
         WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(
             id, 
-            UUID.randomUUID(), 
+            uuid, 
             SpigotConversionUtil.fromBukkitEntityType(EntityType.BLOCK_DISPLAY),
             SpigotConversionUtil.fromBukkitLocation(loc.clone().add(-0.001, -0.001, -0.001)),
             0,
