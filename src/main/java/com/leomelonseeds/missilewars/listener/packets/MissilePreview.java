@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -207,13 +206,20 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         // Raytrace blocks from player direction
         // Moving pistons don't get detected by raytraces, so we need another check for those
         RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, 4.5);
-        if (rayTrace != null) {
-            // MissileWarsPlugin.getPlugin().log("Found a " + rayTrace.getHitBlock().getType() + " at " + rayTrace.getHitBlock().getLocation());
-        }
-        Block target = player.getTargetBlock(null, 4);
-        if (target != null && target.getType() == Material.MOVING_PISTON) {
-            // MissileWarsPlugin.getPlugin().log("Found a moving piston at: " + target.getLocation());
-            rayTrace = new RayTraceResult(target.getLocation().toVector(), target, null);
+        for (int i = 1; i <= 9; i++) {
+            double dist = i * 0.5;
+            Location check = playerEyeLocation.clone().add(playerEyeDirection.clone().multiply(dist));
+            if (check.getBlock().getType() != Material.MOVING_PISTON) {
+                continue;
+            }
+            
+            // Check if the moving piston is closer to the player than the raytraced block
+            // We don't break early if another block is detected since this check doesn't consider exact hitboxes
+            if (rayTrace == null || dist * dist < rayTrace.getHitPosition().distanceSquared(playerEyeLocation.toVector())) {
+                rayTrace = new RayTraceResult(check.toVector(), check.getBlock(), null);
+            }
+            
+            break;
         }
             
         if (rayTrace == null) {
