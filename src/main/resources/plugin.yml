@@ -27,3 +27,4 @@ depend:
   - ProtocolLib
   - ChatControl
   - DecentHolograms
+  - NoteBlockAPI

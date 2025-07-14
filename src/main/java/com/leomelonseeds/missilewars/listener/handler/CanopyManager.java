@@ -146,11 +146,6 @@ public class CanopyManager {
         if (hand == null) {
             return;
         }
-    
-        String mapName = "default-map";
-        if (playerArena.getMapName() != null) {
-            mapName = playerArena.getMapName();
-        }
         
         // Check if canopy destination is blocked
         Location spawnLoc = signal.getLocation().toCenterLocation();
@@ -184,7 +179,7 @@ public class CanopyManager {
         
         // Try to teleport player finally (but regive if unbreakable blocks)
         boolean isRed = playerArena.getTeam(player.getUniqueId()) == TeamName.RED;
-        if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRed, mapName, false, true)) {
+        if (!SchematicManager.spawnNBTStructure(player, "canopy-1", spawnLoc, isRed, false, true)) {
             InventoryUtils.regiveItem(player, hand);
             return;
         }

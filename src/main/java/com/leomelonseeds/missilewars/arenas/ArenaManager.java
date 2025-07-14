@@ -362,7 +362,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
-        arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
+        arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, gamemode.equals("tutorial"));
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);

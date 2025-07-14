@@ -207,6 +207,9 @@ public class MissileWarsTeam {
             di.registerTeam(this);
         }
         arena.addCallback(player);
+        
+        // Give night vision
+        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 30 * 60 * 20, 0, true, false, false));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
@@ -340,19 +343,6 @@ public class MissileWarsTeam {
             p1.add(0, 1, 0);
         }
         
-        // Return if no registered portal at location, or somehow already broken
-        ClassicPortal portal = portals.get(p1);
-        if (portal == null || !portal.isAlive()) {
-            return false;
-        }
-        
-        portal.setAlive(false);
-        
-        // Reset this to true after 5 sec if don't count
-        if (secondsBeforeRestore > 0) {
-            ConfigUtils.schedule(secondsBeforeRestore * 20, () -> portal.setAlive(true));
-        }
-        
         // Play effects and break portal using FAWE to prevent lag from large portals
         Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
             Location p2 = loc.clone();
@@ -389,6 +379,19 @@ public class MissileWarsTeam {
                 world.playSound(midLoc, Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.0f);
             });
         });
+        
+        // Return if no registered portal at location, or somehow already broken
+        ClassicPortal portal = portals.get(p1);
+        if (portal == null || !portal.isAlive()) {
+            return false;
+        }
+        
+        portal.setAlive(false);
+        
+        // Reset this to true after 5 sec if don't count
+        if (secondsBeforeRestore > 0) {
+            ConfigUtils.schedule(secondsBeforeRestore * 20, () -> portal.setAlive(true));
+        }
         
         return true;
     }

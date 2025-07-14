@@ -104,7 +104,7 @@ public class SchematicManager {
      * @param checkCollision
      * @return
      */
-    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, boolean isRed, String mapName, Boolean isMissile, Boolean checkCollision) {
+    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, boolean isRed, Boolean isMissile, Boolean checkCollision) {
         SchematicLoadResult result = new SchematicLoadResult(isMissile, structureName);
         result.setStatus(SchematicLoadStatus.OUT_OF_BOUNDS);
         if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
@@ -185,12 +185,6 @@ public class SchematicManager {
         
         return result;
     }
-    
-    
-    
-    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision) {
-        return spawnNBTStructure(player, structureName, loc, redMissile, mapName, isMissile, checkCollision, 0);
-    }
 
     /**
      * Spawn a structure at a given location with a given rotation.
@@ -204,8 +198,8 @@ public class SchematicManager {
      * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    private static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, String mapName, Boolean isMissile, Boolean checkCollision, int attempt) {
-        SchematicLoadResult loadResult = loadNBTStructure(player, structureName, loc, redMissile, mapName, isMissile, checkCollision);
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, Boolean isMissile, Boolean checkCollision) {
+        SchematicLoadResult loadResult = loadNBTStructure(player, structureName, loc, redMissile, isMissile, checkCollision);
         if (!loadResult.isAllowSpawn()) {
             sendError(player, loadResult.getStatus().getMessage());
             return false;

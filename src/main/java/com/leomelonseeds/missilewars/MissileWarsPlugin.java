@@ -27,6 +27,7 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 import com.leomelonseeds.missilewars.utilities.MissileWarsPlaceholder;
 import com.leomelonseeds.missilewars.utilities.VanillaTeamManager;
+import com.leomelonseeds.missilewars.utilities.cinematic.CinematicManager;
 import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 
 import net.milkbowl.vault.chat.Chat;
@@ -48,6 +49,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
     private JSONManager jsonManager;
     private InventoryManager invManager;
     private VanillaTeamManager vanillaTeamManager;
+    private CinematicManager cinematicManager;
 
     @Override
     public void onEnable() {
@@ -111,6 +113,12 @@ public final class MissileWarsPlugin extends JavaPlugin {
         arenaManager.loadArenas();
         setupSpeeds();
         log("All arenas ready to go.");
+        
+        // Load cinematic
+        log("Initializing the new player cinematic...");
+        cinematicManager = new CinematicManager();
+        Bukkit.getPluginManager().registerEvents(cinematicManager, this);
+        log("New player cinematic initialized.");
 
         // Load placeholders
         log("Hooking into PlaceholderAPI...");
@@ -186,6 +194,12 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Disable the various managers
+        log("Disabling managers");
+        vanillaTeamManager.deleteTeams();
+        cinematicManager.disable();
+        log("Managers disabled!");
+        
         // Save arenas to data file
         log("Saving arenas to file...");
         arenaManager.saveArenas();
@@ -272,6 +286,13 @@ public final class MissileWarsPlugin extends JavaPlugin {
      */
     public VanillaTeamManager getVanillaTeams() {
         return vanillaTeamManager;
+    }
+    
+    /**
+     * @return The plugin's cinematic team manager
+     */
+    public CinematicManager getCinematicManager() {
+        return cinematicManager;
     }
 
     /**

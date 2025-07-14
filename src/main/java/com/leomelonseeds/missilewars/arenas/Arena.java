@@ -1287,7 +1287,7 @@ public abstract class Arena implements ConfigurationSerializable {
             discordMessage = ":tada: Team **" + winningTeam.getName() + "** (" + winners + ") has won a game in arena " + this.getName();
             
             // Spawn victory pegasus
-            SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, mapName, false, false);
+            SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, false, false);
         }
 
         // Send messages, calculate winning stats

@@ -31,6 +31,9 @@ import com.leomelonseeds.missilewars.decks.Passive;
 import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.decks.Passive.Type;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
+import com.xxmicloxx.NoteBlockAPI.model.Song;
+import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
+import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.citizensnpcs.Citizens;
@@ -47,6 +50,7 @@ public class ConfigUtils {
 
     // Map of open cached config files
     private static Map<String, FileConfiguration> configCache = new HashMap<>();
+    private static Map<String, Song> songCache = new HashMap<>();
     
     /**
      * Get config file from default folder
@@ -85,6 +89,7 @@ public class ConfigUtils {
         SchematicManager.structureCache.clear();
         plugin.reloadConfig();
         plugin.getDeckManager().reload();
+        plugin.getCinematicManager().init();
     }
     
     /**
@@ -218,6 +223,7 @@ public class ConfigUtils {
         String soundPath = path.replace("messages.", "");
         sendConfigSound(soundPath, player);
     }
+    
 
     /**
      * Send a sound to the player. Sound follows player.
@@ -226,13 +232,39 @@ public class ConfigUtils {
      * @param player the player to send sound to
      */
     public static void sendConfigSound(String path, Player player) {
+        sendConfigSound(path, player, false);
+    }
+
+    /**
+     * Send a sound to the player. Sound follows player.
+     *
+     * @param path the key of the sound in the sounds.yml file
+     * @param player the player to send sound to
+     * @param noteBlockSong set to true to play a song file 
+     */
+    public static void sendConfigSound(String path, Player player, boolean noteBlockSong) {
         FileConfiguration soundConfig = getConfigFile("sounds.yml");
 
         if (!soundConfig.contains(path)) {
         	return;
         }
+        
+        String soundId = soundConfig.getString(path + ".sound");
+        if (noteBlockSong) {
+            Song song = songCache.get(path);
+            if (song == null) {
+                song = NBSDecoder.parse(new File(MissileWarsPlugin.getPlugin().getDataFolder().toString() + "/songs", soundId));
+                songCache.put(path, song);
+            }
+            RadioSongPlayer esp = new RadioSongPlayer(song);
+            // esp.setEntity(player);
+            // esp.setDistance(1000);
+            esp.addPlayer(player);
+            esp.setPlaying(true);
+            return;
+        }
 
-        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundConfig.getString(path + ".sound"));
+        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundId);
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 

@@ -29,6 +29,8 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+
 public class RubberbandHelper implements PacketListener, Listener {
     
     // When you're on a missile, each time you are pushed by a piston the server will
@@ -105,8 +107,11 @@ public class RubberbandHelper implements PacketListener, Listener {
             // Sync server location with client by teleporting them
             UUID uuid = player.getUniqueId();
             if (!teleportQueue.contains(uuid)) {
-                com.github.retrooper.packetevents.protocol.world.Location loc = clientPosition.get(uuid);
-                Location teleportTo = new Location(player.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+                Location teleportTo = SpigotConversionUtil.toBukkitLocation(player.getWorld(), clientPosition.get(uuid));
+                if (teleportTo.getYaw() == 0) {
+                    teleportTo.setYaw(player.getYaw());
+                    teleportTo.setPitch(player.getPitch());
+                }
                 teleportQueue.add(uuid);
                 Bukkit.getScheduler().runTask(plugin, () -> player.teleport(teleportTo));
             } else {

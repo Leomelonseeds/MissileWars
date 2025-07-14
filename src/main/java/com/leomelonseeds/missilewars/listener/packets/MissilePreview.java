@@ -203,6 +203,11 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
             return;
         }
         
+        // Somehow this can happen??
+        if (!player.getWorld().equals(playerEyeLocation.getWorld())) {
+            return;
+        }
+        
         // Raytrace blocks from player direction
         // Moving pistons don't get detected by raytraces, so we need another check for those
         RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, 4.5);
@@ -264,7 +269,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
                 return;
             }
         } else {
-            curResult = SchematicManager.loadNBTStructure(player, structureName, loc, isRed, structureName, true, true);
+            curResult = SchematicManager.loadNBTStructure(player, structureName, loc, isRed, true, true);
             lastCollisionCheckTime = System.currentTimeMillis();
         }
         

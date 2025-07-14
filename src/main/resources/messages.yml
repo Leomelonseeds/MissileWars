@@ -272,6 +272,50 @@ titles:
     title: "&f"
     subtitle: "&aWell done!"
     length: 60
+  cinematic-1:
+    title: "&f"
+    subtitle: "&5&lUltima &f&lpresents"
+    length: 60
+  cinematic-2:
+    title: ""
+    subtitle: "&fBased on &aCubehamster &f+ &cSethbling&f's original game"
+    length: 40
+  cinematic-3:
+    title: "&f"
+    subtitle: "&fWith inspiration from &6&lMineplex &f&lChampions"
+    length: 20
+  cinematic-4:
+    title: "&f"
+    subtitle: "&fAnd missiles from &9&lRocket Riders &fand more"
+    length: 20
+  cinematic-5:
+    title: "&f"
+    subtitle: "&f&lSpawn and ride missiles"
+    length: 20
+  cinematic-6:
+    title: "&f"
+    subtitle: "&f&lEmbed missiles for massive damage"
+    length: 30
+  cinematic-7:
+    title: "&f"
+    subtitle: "&f&lBreak all enemy &d&lportals &f&lto win"
+    length: 40
+  cinematic-8:
+    title: "&f"
+    subtitle: "&f&lUse utilities to defend"
+    length: 20
+  cinematic-9:
+    title: "&f"
+    subtitle: "&f&lSpice-up gameplay with abilities"
+    length: 20
+  cinematic-10:
+    title: "&f"
+    subtitle: "&f&l4 decks (kits)"
+    length: 20
+  cinematic-11:
+    title: "&f"
+    subtitle: "&f&lEach with unique &c&lmissiles &f&l+ &9&lutilities"
+    length: 30
     
 # Scoreboard goals (use with PAPI %umw_tutorial_#%)
 scoreboard:

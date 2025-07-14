@@ -267,8 +267,7 @@ public class CustomItemListener implements Listener {
             }
 
             // Place structure
-            String mapName = playerArena.getMapName() == null ? "default-map" : playerArena.getMapName();
-            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), mapName, true, true)) {
+            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), true, true)) {
                 ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
                 if (player.getGameMode() != GameMode.CREATIVE) {
@@ -530,7 +529,6 @@ public class CustomItemListener implements Listener {
             return true;
         }
 
-        String mapName = playerArena.getMapName();
         ItemStack item = thrown.getItem();
         UUID uuid = thrower.getUniqueId();
         if (playerArena.getTeam(uuid) == TeamName.NONE) {
@@ -549,7 +547,7 @@ public class CustomItemListener implements Listener {
         }
         
         boolean red = isRedTeam(thrower);
-        if (!SchematicManager.spawnNBTStructure(thrower, structure, spawnLoc, red, mapName, false, true)) {
+        if (!SchematicManager.spawnNBTStructure(thrower, structure, spawnLoc, red, false, true)) {
             InventoryUtils.regiveItem(thrower, item);
             return false;
         }
@@ -569,12 +567,12 @@ public class CustomItemListener implements Listener {
                     }
                     
                     if (finalDuration == duration) {
-                        SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, mapName, false, false);
+                        SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, false, false);
                         ConfigUtils.sendConfigSound("break-obsidian-shield", spawnLoc);
                     } else if (finalDuration % 2 == 0) {
-                        SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", spawnLoc, red, mapName, false, false);
+                        SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", spawnLoc, red, false, false);
                     } else {
-                        SchematicManager.spawnNBTStructure(null, "obsidianshield-1", spawnLoc, red, mapName, false, false);
+                        SchematicManager.spawnNBTStructure(null, "obsidianshield-1", spawnLoc, red, false, false);
                     }
                 }, i * 10L);
             }
@@ -781,7 +779,7 @@ public class CustomItemListener implements Listener {
             // map name doesn't matter here because the canopy has already been spawned,
             // we therefore know that the structure was placed successfully and do not need
             // to perform validity checks based on the map
-            SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), "default-map", false, false);
+            SchematicManager.spawnNBTStructure(null, "canopy-1", newSpawn, isRedTeam(thrower), false, false);
             thrower.sendMessage(ConfigUtils.toComponent("&7This canopy will now last &a" + extraduration + " &7seconds longer."));
             return;
         }

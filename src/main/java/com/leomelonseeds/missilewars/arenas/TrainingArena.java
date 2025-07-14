@@ -322,15 +322,15 @@ public class TrainingArena extends ClassicArena {
                 if (Math.abs(esty - cpy) <= 5) {
                     // Spawn arrow turret if player is within range of a spawner, despawn 10 sec later
                     Location tloc = new Location(world, spawnx, y2 + 1, z);
-                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "turret-0", tloc, false, mapName, false, false));
+                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "turret-0", tloc, false, false, false));
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        SchematicManager.spawnNBTStructure(null, "turret_clear-0", tloc, false, mapName, false, false);
+                        SchematicManager.spawnNBTStructure(null, "turret_clear-0", tloc, false, false, false);
                         hasTurret = false;
                     }, 20 * 10L);
                 } else if (cpz < z - 10 && (random.nextDouble() < 0.33 || cpy < y1-5 || cpy > y2+2 || cpx < x1-5 || cpx > x2+5)) {
                     // Otherwise, if 33% chance or if player cannot be nuked by missile, spawn a fireball turret at 0, 17, 51, with fire location at 0, 22, 51 
                     Location tloc = new Location(world, 0, y2 + 1, z);
-                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "fireball_turret-0", tloc, false, mapName, false, false));
+                    Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, "fireball_turret-0", tloc, false, false, false));
 
                     // Fireball 3 sec after loading turret
                     int flevel = Math.min(maxLevel, 3);
@@ -347,7 +347,7 @@ public class TrainingArena extends ClassicArena {
                     
                     // Despawn turret
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        SchematicManager.spawnNBTStructure(null, "fireball_turret_clear-0", tloc, false, mapName, false, false);
+                        SchematicManager.spawnNBTStructure(null, "fireball_turret_clear-0", tloc, false, false, false);
                         hasTurret = false;
                     }, 20 * 6L);
                 } else {
@@ -411,7 +411,7 @@ public class TrainingArena extends ClassicArena {
             // Spawn missile
             this.missiles++;
             Location floc = loc;
-            Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, mapName, true, false));    
+            Bukkit.getScheduler().runTask(plugin, () -> SchematicManager.spawnNBTStructure(null, missile + "-" + level, floc, true, true, false));    
         }
         
         // Take an average time to spawn next random missile and spawn

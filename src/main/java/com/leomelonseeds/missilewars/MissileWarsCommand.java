@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,6 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
-import com.leomelonseeds.missilewars.arenas.TutorialReplay;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
@@ -30,6 +30,12 @@ import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.PresetSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+import com.leomelonseeds.missilewars.utilities.cinematic.AbilitiesReplay;
+import com.leomelonseeds.missilewars.utilities.cinematic.CinematicManager;
+import com.leomelonseeds.missilewars.utilities.cinematic.DefendingReplay;
+import com.leomelonseeds.missilewars.utilities.cinematic.PortalReplay;
+import com.leomelonseeds.missilewars.utilities.cinematic.RidingReplay;
+import com.leomelonseeds.missilewars.utilities.cinematic.TutorialReplay;
 
 public class MissileWarsCommand implements CommandExecutor {
 
@@ -58,15 +64,56 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
-        // Test npc
-        if (action.equalsIgnoreCase("testnpc")) {
-            Player target = getCommandTarget(args, sender);
-            if (target == null) {
+        // Test commands
+        if (action.equalsIgnoreCase("test")) {
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            Player target = (Player) sender;
+            if (args[1].equals("npc")) {
+                int replayId = 0;
+                if (args.length > 2) {
+                    replayId = Integer.parseInt(args[2]);
+                }
+                
+                World tutorialWorld = Bukkit.getWorld("mwarena_tutorial");
+                TutorialReplay replay;
+                switch (replayId) {
+                    case 0:
+                        replay = new RidingReplay(tutorialWorld);
+                        break;
+                    case 1:
+                        replay = new PortalReplay(tutorialWorld);
+                        break;
+                    case 2:
+                        replay = new DefendingReplay(tutorialWorld);
+                        break;
+                    case 3:
+                        replay = new AbilitiesReplay(tutorialWorld);
+                        break;
+                    default:
+                        return true;
+                }
+                
+                replay.startReplay();
                 return true;
             }
             
-            TutorialReplay replay = new TutorialReplay(target.getLocation(), target.getEyeLocation().getDirection());
-            replay.testNPC();
+            if (args[1].equals("cinematic")) {
+                CinematicManager cm = MissileWarsPlugin.getPlugin().getCinematicManager();
+                cm.setStartingFrame(0);
+                if (args.length > 2) {
+                    if (Bukkit.getPlayer(args[2]) != null) {
+                        target = Bukkit.getPlayer(args[2]);
+                    } else {
+                        cm.setStartingFrame(Integer.parseInt(args[2]));
+                    }
+                }
+                cm.play(target);
+                return true;
+            }
         }
         
         // Go to lobby
