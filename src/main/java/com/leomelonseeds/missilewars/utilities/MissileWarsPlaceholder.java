@@ -129,7 +129,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
 
             int exp = plugin.getSQL().getExpSync(player.getUniqueId());
             int level = RankUtils.getRankLevel(exp);
-            int max = 10;
 
             if (params.equals("rank_level")) {
                 return Integer.toString(level);
@@ -148,36 +147,20 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             }
 
             if (params.equals("rank_exp")) {
-                if (level >= max) {
-                    return "0";
-                }
                 return Integer.toString(RankUtils.getCurrentExp(exp));
             }
 
             if (params.equals("rank_exp_next")) {
-                if (level >= max) {
-                    return "N/A";
-                }
                 return Integer.toString(RankUtils.getNextExp(exp));
             }
 
             if (params.equals("rank_progress_percentage")) {
-                if (level >= max) {
-                    return "0%";
-                }
                 return df.format(RankUtils.getExpProgress(exp) * 100) + "%";
             }
 
             if (params.contains("rank_progress_bar")) {
                 String[] args = params.split("_");
                 int size = Integer.parseInt(args[3]);
-                if (level >= max) {
-                    String result = "";
-                    for (int i = 0; i < size; i++) {
-                        result = result + "|";
-                    }
-                    return "§7" + result;
-                }
                 return RankUtils.getProgressBar(exp, size);
             }
 

@@ -20,8 +20,8 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
-import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.utilities.db.SQLManager;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -226,6 +226,25 @@ public class CosmeticUtils {
         return player.hasPermission("umw." + cosmetic + "." + name);
     }
     
+    // Makes a text rainbow.
+    public static TextComponent toRainbow(String input) {
+        return toRainbow(input, 21);
+    }
+    
+    // Makes a text rainbow.
+    public static TextComponent toRainbow(String input, int charsBeforeFlip) {
+        String stripped = ConfigUtils.removeColors(input);
+        Builder result = Component.text();
+        String[] characters = stripped.split("");
+        double step = (double) 1 / charsBeforeFlip;
+        for (int i = 0; i < characters.length; i++) {
+            float hsv = (float) (step * i - Math.floor(step * i));
+            result.append(Component.text().content(characters[i]).color(TextColor.color(HSVLike.hsvLike(hsv, 1, 1))));
+        }
+        
+        return result.build();
+    }
+    
     // Get from config or return default if not found
     private static String getFromConfig(FileConfiguration config, String format, String path) {
         if (config.contains(format + "." + path)) {
@@ -239,20 +258,5 @@ public class CosmeticUtils {
     private static String getFormat(String cosmetic, Player player) {
         JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         return json.getString(cosmetic);
-    }
-    
-    // Makes a text rainbow.
-    private static TextComponent toRainbow(String input) {
-        String stripped = ConfigUtils.removeColors(input);
-        Builder result = Component.text();
-        String[] characters = stripped.split("");
-        int charsBeforeFlip = 21;
-        double step = (double) 1 / charsBeforeFlip;
-        for (int i = 0; i < characters.length; i++) {
-            float hsv = (float) (step * i - Math.floor(step * i));
-            result.append(Component.text().content(characters[i]).color(TextColor.color(HSVLike.hsvLike(hsv, 1, 1))));
-        }
-        
-        return result.build();
     }
 }

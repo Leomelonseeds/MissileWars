@@ -7,7 +7,11 @@ import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
+import net.kyori.adventure.text.TextComponent;
+
 public class RankUtils {
+    
+    private static final int MAX_DISPLAY_RANK = 10;
 
     /**
      * Function for converting rank level to exp required for next level
@@ -30,15 +34,17 @@ public class RankUtils {
      * @return the rank level
      */
     public static int getRankLevel(int exp) {
-
         int total = 0;
-        for (int i = 0; i <= 10; i++) {
+        
+        // I could use a while loop here but to be honest I don't have enough
+        // brainpower to think about off-by-1 errors and I need sleep soon
+        for (int i = 0; i <= 1000; i++) {
             total = total + f(i);
             if (total > exp) {
                 return i;
             }
         }
-        return 10;
+        return 0;
     }
 
     /**
@@ -123,6 +129,7 @@ public class RankUtils {
     */
    public static String getRankNameFromLevel(int rank) {
        FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
+       rank = rank > MAX_DISPLAY_RANK ? MAX_DISPLAY_RANK : rank;
        String rankName = rankConfig.getString("ranks." + rank + ".name");
        return ConfigUtils.convertAmps(rankName);
    }
@@ -135,10 +142,16 @@ public class RankUtils {
      */
     public static String getRankSymbol(int exp) {
         int rank = getRankLevel(exp);
+        int rankSection = rank > MAX_DISPLAY_RANK ? MAX_DISPLAY_RANK : rank;
         FileConfiguration rankConfig = ConfigUtils.getConfigFile("ranks.yml");
-        String rankColor = rankConfig.getString("ranks." + rank + ".color");
-        String rankSymbol = rankConfig.getString("ranks." + rank + ".symbol");
-        return ConfigUtils.convertAmps(rankColor + rankSymbol);
+        String rankColor = rankConfig.getString("ranks." + rankSection + ".color");
+        String rankSymbol = rankConfig.getString("ranks." + rankSection + ".symbol");
+        String text = rankColor + "(" + rank + rankSymbol + ")";
+        if (rank >= MAX_DISPLAY_RANK) {
+            TextComponent rainbowText = CosmeticUtils.toRainbow(text, text.length() - 1);
+            text = ConfigUtils.toPlain(rainbowText);
+        }
+        return ConfigUtils.convertAmps(text);
     }
 
     /**

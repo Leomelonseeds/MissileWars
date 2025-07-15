@@ -24,44 +24,45 @@ ranks:
   0:
     name: "&7Private ◆"
     color: "&7"
-    symbol: "(◆)"
+    symbol: "◆"
   1:
     name: "&fGunner ✦"
     color: "&f"
-    symbol: "(✦)"
+    symbol: "✦"
   2:
     name: "&aBombardier ♠"
     color: "&a"
-    symbol: "(♠)"
+    symbol: "♠"
   3:
     name: "&2Corporal ❉"
     color: "&2"
-    symbol: "(❉)"
+    symbol: "❉"
   4:
     name: "&bSergeant ❂"
     color: "&b"
-    symbol: "(❂)"
+    symbol: "❂"
   5:
     name: "&3Lieutenant ❁"
     color: "&3"
-    symbol: "(❁)"
+    symbol: "❁"
   6:
     name: "&dColonel ✌"
     color: "&d"
-    symbol: "(✌)"
+    symbol: "✌"
   7:
     name: "&5General ❃"
     color: "&5"
-    symbol: "(❃)"
+    symbol: "❃"
   8:
     name: "&6&lDuke ⚜"
     color: "&6"
-    symbol: "(⚜)"
+    symbol: "⚜"
   9:
     name: "&4&lEmperor 🔥"
     color: "&4"
-    symbol: "(🔥)"
+    symbol: "🔥"
   10:
     name: "&0&k&l[ &c&lO&d&lv&6&le&e&lr&a&ll&b&lo&9&lr&5&ld &0&k&l]"
     color: "&0"
-    symbol: "&c(&e⌐&a▨&b_&d▨&5)"
+    symbol: "⌐▨_▨"
+    # symbol: "&c(&e⌐&a▨&b_&d▨&5)"
