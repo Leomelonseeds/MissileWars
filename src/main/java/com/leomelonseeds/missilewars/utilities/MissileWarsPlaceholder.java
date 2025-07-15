@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -48,17 +50,23 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, String params) {
 
         // Stop trying to fetch placeholders if the plugin is disabled
-        if (!MissileWarsPlugin.getPlugin().isEnabled() || player == null) {
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        if (!plugin.isEnabled() || player == null) {
             return null;
         }
 
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
+        ArenaManager manager = plugin.getArenaManager();
         Arena playerArena = manager.getArena(player.getUniqueId());
         DecimalFormat df = new DecimalFormat("##.##");
 
         // General purpose placeholders
         if (params.equals("focus")) {
             return ConfigUtils.getFocusName(player);
+        }
+        
+        if (params.equals("in_cinematic")) {
+            Player target = Bukkit.getPlayer(player.getUniqueId());
+            return plugin.getCinematicManager().isWatching(target) ? "true" : "false";
         }
 
         if (params.contains("team")) {
@@ -73,7 +81,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         
         if (params.contains("deck")) {
             // If the json hasn't finished loading yet what are ya gonna do
-            JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
+            JSONObject json = plugin.getJSON().getPlayer(player.getUniqueId());
             if (json == null) {
                 return null;
             }
@@ -119,7 +127,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         // Rank placeholders
         if (params.contains("rank_")) {
 
-            int exp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+            int exp = plugin.getSQL().getExpSync(player.getUniqueId());
             int level = RankUtils.getRankLevel(exp);
             int max = 10;
 
@@ -179,7 +187,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         // Stats placeholders. Includes top 10 placeholders, which includes top 10 exp values.
         if (params.contains("stats")) {
 
-            SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
+            SQLManager sql = plugin.getSQL();
             String[] args = params.split("_");
             String gamemode = args[1];
             String stat = args[2];

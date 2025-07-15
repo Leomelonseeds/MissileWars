@@ -359,6 +359,15 @@ public class CinematicManager implements Listener {
         ConfigUtils.schedule(200, () -> justChangedWorld.remove(event.getPlayer()));
     }
     
+    /**
+     * Check if a player is watching the cinematic
+     * 
+     * @param player
+     */
+    public boolean isWatching(Player player) {
+        return cache.containsKey(player);
+    }
+    
     public void disable() {
         cache.values().forEach(as -> as.remove());
     }
