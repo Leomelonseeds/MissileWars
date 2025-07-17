@@ -37,6 +37,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -491,12 +492,6 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Block block = event.getHitBlock();
-        BlockFace face = event.getHitBlockFace();
-        if (block == null || face == null) {
-            return;
-        }
-        
         ThrowableProjectile thrown = (ThrowableProjectile) event.getEntity();
         if (!(thrown.getShooter() instanceof Player thrower)) {
             return;
@@ -505,6 +500,17 @@ public class CustomItemListener implements Listener {
         // The all important line for this event
         if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Passive.IMPACT_TRIGGER) <= 0) {
             return;
+        }
+        
+        Location spawnLoc;
+        if (event.getHitEntity() != null) {
+            Vector back = thrown.getVelocity().normalize().multiply(-0.5);
+            spawnLoc = thrown.getLocation().add(back);
+        } else if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
+            Block block = event.getHitBlock();
+            spawnLoc = block.getRelative(event.getHitBlockFace()).getLocation();
+        } else {
+          return;
         }
         
         Arena playerArena = ArenaUtils.getArena(thrower);
@@ -518,7 +524,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        spawnUtility(thrower, thrown, structureName, playerArena, block.getRelative(face).getLocation());
+        spawnUtility(thrower, thrown, structureName, playerArena, spawnLoc);
     }
     
     // Returns false ONLY IF the utility spawn failed due to the schematic manager returned false
