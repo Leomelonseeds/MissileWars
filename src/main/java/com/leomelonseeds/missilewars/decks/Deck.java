@@ -1,8 +1,8 @@
 package com.leomelonseeds.missilewars.decks;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -41,14 +41,10 @@ public class Deck {
     }
     
     public List<ItemStack> getMissiles() {
-        List<ItemStack> result = new ArrayList<>();
-        for (DeckItem di : pool) {
-            ItemStack i = di.getInstanceItem();
-            if (i.getType().toString().contains("SPAWN_EGG")) {
-                result.add(i);
-            }
-        }
-        return result;
+        return pool.stream()
+                .map(di -> di.getInstanceItem())
+                .filter(i -> i.getType().toString().contains("SPAWN_EGG"))
+                .toList();
     }
     
     /**
@@ -64,6 +60,22 @@ public class Deck {
             }
         }
         return null;
+    }
+    
+    /**
+     * Disable all deck items that match the given predicate
+     * 
+     * @param p
+     */
+    public void disableItems(Predicate<ItemStack> p) {
+        pool.stream().filter(di -> p.test(di.getInstanceItem())).forEach(di -> di.setDisabled(true));
+    }
+    
+    /**
+     * Sets isDisabled to false for every deck item
+     */
+    public void enableAllItems() {
+        pool.forEach(di -> di.setDisabled(false));
     }
     
     /**

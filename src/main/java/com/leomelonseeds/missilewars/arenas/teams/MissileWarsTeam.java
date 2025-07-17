@@ -207,9 +207,6 @@ public class MissileWarsTeam {
             di.registerTeam(this);
         }
         arena.addCallback(player);
-        
-        // Give night vision
-        mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 30 * 60 * 20, 0, true, false, false));
      
         // Architect Haste
         JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());

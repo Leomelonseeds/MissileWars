@@ -68,6 +68,7 @@ import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Passive;
@@ -729,6 +730,15 @@ public class ArenaGameruleListener implements Listener {
 
         // Register explosion to tracker
         arena.getTracker().registerExplosion(event);
+        
+        // Register tutorial completion if stage 4
+        EntityType entity = event.getEntityType();
+        if (entity == EntityType.TNT && arena instanceof TutorialArena tutorialArena) {
+            Player source = ArenaUtils.getAssociatedPlayer(event.getEntity(), tutorialArena);
+            if (source != null) {
+                tutorialArena.registerStageCompletion(source, 4);
+            }
+        }
 
         // Check for shield breaks
         Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
@@ -742,7 +752,6 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Fireballs can't blow up portals
-        EntityType entity = event.getEntityType();
         if (entity == EntityType.FIREBALL) {
             return;
         }

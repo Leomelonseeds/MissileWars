@@ -9,25 +9,23 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
+import org.bukkit.util.BoundingBox;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -39,11 +37,13 @@ import net.kyori.adventure.title.Title;
 
 public class TutorialArena extends ClassicArena {
     
-    public static int MAX_STAGES = 8;
+    // The number of stages in the tutorial + 1
+    // Last stage is for completion
+    public static final int MAX_STAGES = 5;
     
     private Map<UUID, Integer> stage;
-    private Map<UUID, Location> xs;
-    private Map<UUID, BukkitTask> particles;
+    private Set<Player> stage4Disabled;
+    private Map<UUID, Location> attackLocs;
     private Set<UUID> hasGlow;
     private boolean justReset;
     
@@ -60,8 +60,8 @@ public class TutorialArena extends ClassicArena {
     private void init() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         this.stage = new HashMap<>();
-        this.xs = new HashMap<>();
-        this.particles = new HashMap<>();
+        this.stage4Disabled = new HashSet<>();
+        this.attackLocs = new HashMap<>();
         this.hasGlow = new HashSet<>();
         this.justReset = true;
         voteManager.addVote("default-map", 64);
@@ -107,8 +107,14 @@ public class TutorialArena extends ClassicArena {
         }.runTaskTimer(plugin, minute, minute);
     }
     
+    /**
+     * Get the stage of a player. Returns -1 if the player isn't in any stage
+     * 
+     * @param uuid
+     * @return
+     */
     public Integer getStage(UUID uuid) {
-        return stage.get(uuid);
+        return stage.getOrDefault(uuid, -1);
     }
 
     @Override
@@ -122,29 +128,35 @@ public class TutorialArena extends ClassicArena {
         justReset = false;
     }
     
+    /**
+     * Mark the player in the arena but don't give him anything, use for cinematic entry
+     * 
+     * @param player
+     */
+    public void softJoin(Player player) {
+        players.put(player.getUniqueId(), new MissileWarsPlayer(player.getUniqueId()));
+    }
+    
     @Override
     public Location getPlayerSpawn(Player player) {
-        Integer s = stage.get(player.getUniqueId());
-        if (blueTeam == null || s == null || s != 3 || !blueTeam.containsPlayer(player.getUniqueId())) {
+        UUID uuid = player.getUniqueId();
+        Integer s = stage.get(uuid);
+        if (blueTeam == null || s == null || s != 3 || !blueTeam.containsPlayer(uuid)) {
             return super.getPlayerSpawn(player);
         }
         
         // Spawn player near blue base, adding a platform and clearing blocks if necessary
-        double xspawn = (new Random()).nextInt(-15, 16) + 0.5;
-        Location loc = new Location(getWorld(), xspawn, 17, 42.5, 0, 0);
+        Location loc = attackLocs.get(uuid);
+        if (loc == null) {
+            double xspawn = getRandomLane() + 0.5;
+            loc = new Location(getWorld(), xspawn, 17, 25.5, 0, 0);
+            attackLocs.put(uuid, loc);
+        }
+        
         loc.getBlock().setType(Material.AIR);
         loc.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
         Location spawnBlock = loc.clone().add(0, -1, 0);
-        for (Location l : new Location[] {
-            spawnBlock,
-            spawnBlock.clone().add(1, 0, 0),
-            spawnBlock.clone().add(-1, 0, 0),
-            spawnBlock.clone().add(0, 0, 1),
-            spawnBlock.clone().add(0, 0, -1),
-        }) {
-            l.getBlock().setType(Material.BLUE_STAINED_GLASS);
-        }
-        
+        SchematicManager.spawnNBTStructure(player, "platform-2", spawnBlock, false, false, false);
         return loc;
     }
     
@@ -171,7 +183,7 @@ public class TutorialArena extends ClassicArena {
         checkNotEmpty();
     }
     
-    private void sendTutorialTitle(String path, Player player, boolean init) {
+    private void sendTutorialTitle(String path, Player player) {
         // Find titles and subtitles from config
         FileConfiguration msg = ConfigUtils.getConfigFile("messages.yml");
         if (!msg.contains("titles.tutorial." + path)) {
@@ -179,9 +191,9 @@ public class TutorialArena extends ClassicArena {
             return;
         }
         
-        String title = msg.getString("titles.tutorial." + (init ? "new-objective" : "remind"));
+        String title = msg.getString("titles.tutorial.new-objective");
         String subtitle = msg.getString("titles.tutorial." + path);
-        subtitle += msg.getString("titles.tutorial.subadd");
+        // subtitle += msg.getString("titles.tutorial.subadd");
         int dur = msg.getInt("titles.tutorial.length") * 50;
         
         Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(dur), Duration.ofMillis(1000));
@@ -192,100 +204,75 @@ public class TutorialArena extends ClassicArena {
     // Activates bossbar, chat, and title of a stage
     private void initiateStage(Player player, int s) {
         // Cancel if player isn't in the arena anymore
-        if (!isInArena(player.getUniqueId())) {
+        UUID uuid = player.getUniqueId();
+        if (!isInArena(uuid)) {
             return;
         }
         
         // Cancel if player not on correct stage
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        UUID uuid = player.getUniqueId();
         if (stage.get(uuid) != s) {
             return;
         }
 
-        // Title task: Send titles once every 20 seconds to make sure players on right track
-        sendTutorialTitle("stage" + s, player, true);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (isInArena(player.getUniqueId()) && stage.get(uuid) == s) {
-                    sendTutorialTitle("stage" + s, player, false);
-                } else {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(plugin, 500, 500);
-        
         // Bukkit.getScheduler().runTaskLater(plugin, () -> ConfigUtils.sendConfigMessage("messages.stage" + s, player, null, null), 50);
+        sendTutorialTitle("stage" + s, player);
+        
+        // Stage-specific tasks
         if (s == 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> 
-                ConfigUtils.sendConfigMessage("messages.stage0", player, null, null), 50);
             ConfigUtils.sendConfigSound("stagecomplete", player);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            ConfigUtils.schedule(80, () -> ConfigUtils.sendTitle("stage0b", player));
+            ConfigUtils.schedule(140, () -> ConfigUtils.sendTitle("stage0c", player));
+            ConfigUtils.schedule(200, () -> {
                 stage.put(uuid, 1);
                 initiateStage(player, 1);
-            }, 160);
+            });
             return;
-        } 
+        } else {
+            
+        }
+        
+        Deck playerDeck = getPlayerInArena(uuid).getDeck();
+        if (s == 1 && playerDeck != null) {
+            playerDeck.disableItems(i -> !playerDeck.getMissiles().contains(i));
+        }
 
         ConfigUtils.sendConfigSound("stage", player);
         
         // Teleport player nearer red base on stage 3
         if (s == 3) {
             player.teleport(getPlayerSpawn(player));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 40, 128, true, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 6, true, false));
             redTeam.setPortalGlow(getPlayerInArena(uuid), true);
             hasGlow.add(uuid);
             return;
         }
         
-        // Spawn particles for stage 4 (defense)
+        // Spawn missile for stage 4 (defense)
         if (s == 4) {
             if (!ArenaUtils.inShield(this, player.getLocation(), TeamName.BLUE, 2)) {
                 player.teleport(getPlayerSpawn(player));
             }
+
+            // Disable all items except the ones to be used (assuming Sentinel)
+            if (playerDeck != null) {
+                playerDeck.enableAllItems();
+                playerDeck.disableItems(i -> 
+                    i.getType().toString().contains("SPAWN_EGG") || 
+                    i.getType().toString().contains("BOW") ||
+                    i.getType() == Material.ARROW);
+            }
             
-            // Give player location to throw shield at if stage 4
-            Random random = new Random();
-            final double X = random.nextInt(-15, 16) + 0.5;
-            final double Y = 13.5;
-            final double Z = -24.5;
-            xs.put(uuid, new Location(getWorld(), X, Y, Z));
-            DustOptions dustOptions = new DustOptions(Color.FUCHSIA, 1.5F);
-            particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                double yneg = Y - 1;
-                double ypos = Y + 1;
-                for (double x = X - 1; x <= X + 1; x += 0.25) {
-                    player.spawnParticle(Particle.DUST, x, yneg, Z, 2, dustOptions);
-                    player.spawnParticle(Particle.DUST, x, ypos, Z, 2, dustOptions);
-                    yneg += 0.25;
-                    ypos -= 0.25;
-                }
-            }, 10, 5));
+            // Spawn the attacking missile
+            spawnAttackingMissile(player);
             
+            // Warn players if they are using the wrong deck
             DeckStorage deck = DeckStorage.fromString(plugin.getJSON().getPlayer(uuid).getString("Deck"));
-            if (deck == DeckStorage.BERSERKER || deck == DeckStorage.VANGUARD) {
+            if (deck == DeckStorage.VANGUARD) {
                 ConfigUtils.schedule(100, () -> ConfigUtils.sendConfigMessage("messages.wrong-tutorial-deck", player, null, null));
             }
             return;
         }
-        
-        // Spawn particles above NPCs
-        if (s == 5 || s == 6) {
-            FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
-            Vector vec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.berserker");
-            Location loc = new Location(getWorld(), vec.getX(), vec.getY() + 1, vec.getZ());
-            particles.put(uuid, Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                player.spawnParticle(Particle.HAPPY_VILLAGER, loc, 10, 0.4, 0.4, 0.4);
-            }, 0, 20));
-        }
-
-        // Close inventory for stage 6 + 7 so people can see the instructions
-        if (s == 6 || s == 7) {
-            player.closeInventory();
-        }
-        
     }
     
     /**
@@ -303,19 +290,26 @@ public class TutorialArena extends ClassicArena {
             return;
         }
         
+        if (s == 4 && stage4Disabled.contains(player)) {
+            return;
+        }
+        
         Bukkit.getLogger().info(player.getName() + " completed stage " + s);
 
         ConfigUtils.sendTitle("stagecomplete", player);
         if (s == 3) {
             redTeam.setPortalGlow(getPlayerInArena(uuid), false);
             hasGlow.remove(uuid);
+            attackLocs.remove(uuid);
+            stage4Disabled.add(player);
+            ConfigUtils.schedule(200, () -> stage4Disabled.remove(player));
         } else if (s == MAX_STAGES - 1) {
             stage.put(uuid, MAX_STAGES);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
                 stage.remove(uuid);
                 removePlayer(uuid, true);
-            }, 60);
+            }, 80);
             return;
         }
 
@@ -347,36 +341,59 @@ public class TutorialArena extends ClassicArena {
         initiateStage(player, s + 1);
     }
     
-    // Remove the Xs for obsidian shield throw
-    private void removeXs(UUID uuid) {
-        if (xs.containsKey(uuid)) {
-            xs.remove(uuid);
+    /**
+     * Spawn a missile that the player can defend against
+     */
+    private void spawnAttackingMissile(Player player) {
+        boolean foundLane = false;
+        Location loc1 = null;
+        Location loc2 = null;
+        World world = getWorld();
+        
+        // Make up to 10 attempts to find a valid lane to spawn a missile in
+        // A lane is valid simply if no players are detected in it
+        for (int i = 0; i < 10; i++) {
+            int testLane = getRandomLane();
+            loc1 = new Location(world, testLane - 2, 17, 10);
+            loc2 = new Location(world, testLane + 2, 11, -47);
+            if (world.getNearbyEntities(
+                    BoundingBox.of(loc1, loc2), 
+                    e -> e.getType() == EntityType.PLAYER)
+                .isEmpty()) {
+                foundLane = true;
+                break;
+            }
         }
         
-        if (particles.containsKey(uuid)) {
-            particles.remove(uuid).cancel();
+        // Spawn another missile/try again if this player hasn't completed in 30 seconds
+        ConfigUtils.schedule(20 * 30, () -> {
+           if (getStage(player.getUniqueId()) == 4) {
+               spawnAttackingMissile(player);
+           }
+        });
+        
+        // It would be crazy if this actually happened
+        if (!foundLane) {
+            return;
         }
+        
+        // Clear the lane and then spawn a missile
+        Location spawnLoc = loc1.clone().add(2, 0, 0);
+        SchematicManager.setAirAsync(
+                loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), 
+                loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ(),
+                world, o -> {
+            SchematicManager.spawnNBTStructure(null, "warhead-2", spawnLoc, true, true, false);
+        });
     }
     
     /**
-     * Register placing a throwable projectile 
+     * Gets a random x-coord to use as a lane for a player
      * 
-     * @param location
-     * @param player
+     * @return
      */
-    public void registerProjectilePlacement(Location location, Player player) {
-        UUID uuid = player.getUniqueId();
-        if (stage.get(uuid) != 4) {
-            return;
-        }
-        
-        Location loc = xs.get(uuid);
-        if (loc.distance(location) > 3) {
-            return;
-        }
-        
-        registerStageCompletion(player, 4);
-        removeXs(player.getUniqueId());
+    private int getRandomLane() {
+        return new Random().nextInt(-15, 16);
     }
     
     @Override
@@ -422,7 +439,6 @@ public class TutorialArena extends ClassicArena {
     public void removePlayer(UUID uuid, Boolean tolobby) {
         redTeam.setPortalGlow(getPlayerInArena(uuid), false);
         hasGlow.remove(uuid);
-        removeXs(uuid);
         super.removePlayer(uuid, tolobby);
     }
     

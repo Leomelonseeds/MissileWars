@@ -28,6 +28,7 @@ public class DefendingReplay extends TutorialReplay {
         ConfigUtils.schedule(30, () -> setCrouched(true));
         ConfigUtils.schedule(35, () -> {
             botPlayer.swingMainHand();
+            ConfigUtils.sendConfigSound("throw-projectile", botPlayer.getLocation());
             Egg torp = botPlayer.launchProjectile(Egg.class);
             
             // Egg smoke particles cause why not

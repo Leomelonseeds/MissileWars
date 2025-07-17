@@ -114,6 +114,7 @@ messages:
   nobody-on: "&a&l[!] &7Since nobody else is on, you have been placed in the training arena."
   item-ready: "&a[✔] Ready"
   item-cooldown: "&c[✕] Cooldown for %cd%s"
+  item-disabled: "&c[✕] Item disabled"
   already-joined: "&c&l[!] &7You have rejoined this game too many times, so all your cooldowns have been maximized."
   tutorial-not-available: "&c&l[!] &cPlease wait for this arena to start..."
   team-balancing: "&a&l[!] &7Your cooldowns are &afaster &7because the teams are unbalanced."
@@ -254,17 +255,29 @@ titles:
     length: 200
   stage0:
     title: "&aWelcome!"
-    subtitle: "&fPlease complete a short tutorial"
-    length: 120
+    subtitle: "&fHere's a quick tutorial"
+    length: 90
+    fadeout: 0
+  stage0b:
+    title: "&aWelcome!"
+    subtitle: "&fUse &b/lobby &fto skip the tutorial..."
+    length: 70
+    fadein: 0
+    fadeout: 0
+  stage0c:
+    title: "&aWelcome!"
+    subtitle: "&f...but staying is a better idea"
+    fadein: 0
+    length: 60
   tutorial:
-    length: 100
+    length: 80
     new-objective: "&bNew Objective"
-    remind: "&bObjective"
-    subadd: ": details on sidebar →"
-    stage1: "&fPlace missile"
-    stage2: "&fRide missile"
-    stage3: "&fDestroy enemy portal"
-    stage4: "&fToss throwable"
+    # remind: "&bObjective"
+    # subadd: ": details on sidebar →"
+    stage1: "&fPlace a missile - details on sidebar →"
+    stage2: "&fRide a missile - details on sidebar →"
+    stage3: "&fDestroy an enemy portal"
+    stage4: "&fDefend using a throwable utility"
     stage5: "&fChange deck"
     stage6: "&fCustomize deck"
     stage7: "&fSpawn Bullet"
@@ -290,11 +303,11 @@ titles:
     length: 20
   cinematic-5:
     title: "&f"
-    subtitle: "&f&lSpawn and ride missiles"
+    subtitle: "&f&lSpawn and ride &c&lmissiles"
     length: 20
   cinematic-6:
     title: "&f"
-    subtitle: "&f&lEmbed missiles for massive damage"
+    subtitle: "&e&lEmbed &f&lmissiles for massive damage"
     length: 30
   cinematic-7:
     title: "&f"
@@ -302,11 +315,11 @@ titles:
     length: 40
   cinematic-8:
     title: "&f"
-    subtitle: "&f&lUse utilities to defend"
+    subtitle: "&f&lUse &9&lutilities &f&lto defend"
     length: 20
   cinematic-9:
     title: "&f"
-    subtitle: "&f&lSpice-up gameplay with abilities"
+    subtitle: "&f&lSpice-up gameplay with &e&labilities"
     length: 20
   cinematic-10:
     title: "&f"
@@ -322,7 +335,7 @@ scoreboard:
   stage0: 
     - "&fWelcome to Missile Wars!"
   stage1: 
-    - "&f&lRight-click &fa spawn egg"
+    - "&aRight-click &fa spawn egg"
     - "&fon the edge of the base"
     - "&fto place a missile"
   stage2: 
@@ -330,28 +343,28 @@ scoreboard:
     - "&frun and jump to ride it"
   stage3: 
     - "&fDestroy any enemy portal"
-    - "&fby &f&nriding over&f and placing"
-    - "&fmany missiles in the &f&nsame"
-    - "&f&nspot&f inside their base"
+    - "&fby riding over and &aembedding"
+    - "&fmultiple missiles at the &esame"
+    - "&espot &finside their base."
   stage4: 
-    - "&f&oTorpedos &fand &f&oObsidian"
-    - "&f&oShields &fspawn after &a1s"
-    - "&fand &cbreak &fif they hit a"
-    - "&fblock. Throw one at the &d&lX&f!"
+    - "&c&l!! &fA missile is heading for"
+    - "&fyour base! Destroy it by"
+    - "&fthrowing a &eTorpedo &for"
+    - "&5Obsidian Shield&f!"
+  # stage5: 
+  #   - "&fType &a/leave &fand select"
+  #   - "&f&lPreset A &fin the"
+  #   - "&c&lBerserker &fNPC."
+  # stage6: 
+  #   - "&fSelect &f&lEdit Preset A &fin"
+  #   - "&fthe &c&lBerserker &fNPC, and"
+  #   - "&fupgrade the &cTrifecta"
+  #   - "&fmissile to &c&lBullet"
+  # stage7: 
+  #   - "&fRejoin &9Blue &fteam using"
+  #   - "&a/blue&f, and spawn your new"
+  #   - "&c&lBullet &fmissile!"
   stage5: 
-    - "&fType &a/leave &fand select"
-    - "&f&lPreset A &fin the"
-    - "&c&lBerserker &fNPC."
-  stage6: 
-    - "&fSelect &f&lEdit Preset A &fin"
-    - "&fthe &c&lBerserker &fNPC, and"
-    - "&fupgrade the &cTrifecta"
-    - "&fmissile to &c&lBullet"
-  stage7: 
-    - "&fRejoin &9Blue &fteam using"
-    - "&a/blue&f, and spawn your new"
-    - "&c&lBullet &fmissile!"
-  stage8: 
     - "&fFinished the tutorial!"
   
 

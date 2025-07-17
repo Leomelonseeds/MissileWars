@@ -1005,6 +1005,10 @@ public abstract class Arena implements ConfigurationSerializable {
             virtualBorder.setCenter(world.getWorldBorder().getCenter());
             virtualBorder.setWarningDistance(2048);
             tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+                if (!running) {
+                    return;
+                }
+                
                 for (MissileWarsTeam team : List.of(redTeam, blueTeam)) {
                     MissileWarsTeam opposite = team == redTeam ? blueTeam : redTeam;
                     boolean isInShield = false;

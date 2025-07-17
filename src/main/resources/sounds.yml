@@ -166,3 +166,7 @@ intro-1:
   sound: "intro-1.nbs"
 intro-2:
   sound: "intro-2.nbs"
+throw-projectile:
+  sound: "ENTITY_EGG_THROW"
+  volume: 1.0
+  pitch: 1.0

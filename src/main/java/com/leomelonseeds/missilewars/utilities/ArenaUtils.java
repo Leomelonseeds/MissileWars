@@ -36,7 +36,7 @@ public class ArenaUtils {
     }
 
     /**
-     * Gets the cause/associated player of a spawned entity
+     * Gets the cause/associated player of an explosive entity
      * mainly used for tracking kills and broken portals
      * 
      * @param killerEntity

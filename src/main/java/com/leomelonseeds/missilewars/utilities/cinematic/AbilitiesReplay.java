@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.utilities.cinematic;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
@@ -72,8 +73,10 @@ public class AbilitiesReplay extends TutorialReplay {
             creeper.setVelocity(arrow.getVelocity().multiply(1.2));
             arrow.remove();
             
-            // Remove item from bot hand
+            // SFX
+            tutorialWorld.playSound(botPlayer, Sound.ITEM_CROSSBOW_SHOOT, 1f, 1f);
             ConfigUtils.sendConfigSound("creepershot", spawnLoc);
+            
             setHandItem(new ItemStack(Material.CROSSBOW));
             ConfigUtils.schedule(20, () -> creeper.setIgnited(true));
         });

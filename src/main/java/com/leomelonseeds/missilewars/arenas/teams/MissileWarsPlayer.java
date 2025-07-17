@@ -138,7 +138,10 @@ public class MissileWarsPlayer {
 
                 // Actionbar stuff
                 String action;
-                if (player.hasCooldown(item.getType())) {
+                if (di.isDisabled()) {
+                    action = ConfigUtils.getConfigText("messages.item-disabled", player, null, null);
+                    lastAvailable = false;
+                } else if (player.hasCooldown(item.getType())) {
                     action = ConfigUtils.getConfigText("messages.item-cooldown", player, null, null);
                     action = action.replace("%cd%", cd + "");
                     lastAvailable = false;

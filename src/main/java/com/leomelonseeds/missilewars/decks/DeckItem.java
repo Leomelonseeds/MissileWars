@@ -23,7 +23,8 @@ public class DeckItem {
     private int curCooldown;
     private MissileWarsPlayer mwp;
     private BukkitTask cooldownTask;
-    boolean unavailable;
+    private boolean unavailable;
+    private boolean isDisabled;
     private MissileWarsTeam team; // Where to fetch the cooldown multiplier
     
     /**
@@ -37,7 +38,6 @@ public class DeckItem {
         this.max = max;
         this.curCooldown = 0;
         this.mwp = mwp;
-        this.unavailable = false;
     }
     
     public void registerTeam(MissileWarsTeam team) {
@@ -78,6 +78,11 @@ public class DeckItem {
     public void updateItem() {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         cooldownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (isDisabled) {
+                setVisualCooldown(Integer.MAX_VALUE / 100);
+                return;
+            }
+            
             if (curCooldown - 1 <= 0) {
                 curCooldown = 0;
                 int amt = getActualAmount();
@@ -124,6 +129,29 @@ public class DeckItem {
      */
     public void setCurrentCooldown(int c) {
         curCooldown = c;
+    }
+
+    
+    /**
+     * If an item is disabled, it is not useable until this value is set to true again
+     * 
+     * @param disabled
+     */
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+        if (!isDisabled) {
+            setVisualCooldown(curCooldown);
+        }
+        updateItem();
+    }
+
+    /**
+     * If an item is disabled, it is not useable at all
+     * 
+     * @param disabled
+     */
+    public boolean isDisabled() {
+        return isDisabled;
     }
     
     /**

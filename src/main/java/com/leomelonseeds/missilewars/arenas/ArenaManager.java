@@ -285,8 +285,9 @@ public class ArenaManager {
         enterCommands.add("/kit " + team + "waitinglobby %username%");
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_ENTRY, enterCommands);
         Set<PotionEffect> effects = new HashSet<>();
-        effects.add(new PotionEffect(PotionEffectType.RESISTANCE, 99999999, 5));
-        effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 99999999, 5));
+        effects.add(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 4));
+        effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, PotionEffect.INFINITE_DURATION, 0));
+        effects.add(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0, true, false, false));
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.PVP, StateFlag.State.ALLOW);
@@ -489,6 +490,9 @@ public class ArenaManager {
             
             GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("__global__");
             globalRegion.setFlag(Flags.CHEST_ACCESS, State.DENY);
+            Set<PotionEffect> effects = new HashSet<>();
+            effects.add(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0, true, false, false));
+            globalRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
             globalRegion.setPriority(10);
             manager.addRegion(globalRegion);
             

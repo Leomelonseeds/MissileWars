@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -27,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.cinematic.TutorialReplay.Type;
 
@@ -39,6 +41,7 @@ public class CinematicManager implements Listener {
     private Set<Player> justChangedWorld;
     private List<Location> frames;
     private int startingFrame = 0;
+    private TutorialArena tutorialArena;
     int nextTaskId;
     
     public CinematicManager() {
@@ -66,6 +69,8 @@ public class CinematicManager implements Listener {
         if (world == null || tutorial == null) {
             return;
         }
+        
+        tutorialArena = (TutorialArena) MissileWarsPlugin.getPlugin().getArenaManager().getArena(tutorial);
         
         // Initiate bot replays
         replays.put(Type.RIDING, new RidingReplay(tutorial));
@@ -137,7 +142,10 @@ public class CinematicManager implements Listener {
         replayTasks.put(90, p -> ConfigUtils.sendTitle("cinematic-2", p));
         replayTasks.put(162, p -> ConfigUtils.sendTitle("cinematic-3", p));
         replayTasks.put(203, p -> ConfigUtils.sendTitle("cinematic-4", p));
-        replayTasks.put(342, p -> ConfigUtils.sendConfigSound("intro-2", p, true));
+        replayTasks.put(342, p -> {
+            tutorialArena.softJoin(p);
+            ConfigUtils.sendConfigSound("intro-2", p, true);
+        });
         replayTasks.put(454, p -> {
             ConfigUtils.sendTitle("cinematic-5", p);
             replays.get(Type.RIDING).startReplay();
@@ -211,6 +219,9 @@ public class CinematicManager implements Listener {
                     cache.remove(player);
                     bukkitTasks.remove(id);
                     this.cancel();
+                    if (player.isOnline()) {
+                        tutorialArena.joinPlayer(player);
+                    }
                     return;
                 }
                 
@@ -357,6 +368,14 @@ public class CinematicManager implements Listener {
     private void onWorldChange(PlayerChangedWorldEvent event) {
         justChangedWorld.add(event.getPlayer());
         ConfigUtils.schedule(200, () -> justChangedWorld.remove(event.getPlayer()));
+    }
+    
+    @EventHandler
+    private void onCommand(PlayerCommandPreprocessEvent event) {
+        if (cache.containsKey(event.getPlayer())) {
+            event.getPlayer().sendMessage(ConfigUtils.toComponent("&cYou cannot use commands while the cinematic is playing!"));
+            event.setCancelled(true);
+        }
     }
     
     /**

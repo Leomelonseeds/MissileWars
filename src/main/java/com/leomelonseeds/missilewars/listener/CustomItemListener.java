@@ -616,12 +616,6 @@ public class CustomItemListener implements Listener {
         }
 
         ConfigUtils.sendConfigSound(sound, spawnLoc);
-        
-        // Register tutorial arena stage
-        if (playerArena instanceof TutorialArena) {
-            ((TutorialArena) playerArena).registerProjectilePlacement(spawnLoc, thrower);
-        }
-        
         return true;
     }
     
