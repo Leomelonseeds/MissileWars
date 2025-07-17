@@ -271,7 +271,7 @@ titles:
     length: 60
   tutorial:
     length: 80
-    new-objective: "&bNew Objective"
+    new-objective: "&dNew Objective"
     # remind: "&bObjective"
     # subadd: ": details on sidebar →"
     stage1: "&fPlace a missile - details on sidebar →"
@@ -285,6 +285,10 @@ titles:
     title: "&f"
     subtitle: "&aWell done!"
     length: 60
+  cinematic-0:
+    title: "&f"
+    subtitle: "&eLoading cinematic, please wait..."
+    length: 120
   cinematic-1:
     title: "&f"
     subtitle: "&5&lUltima &f&lpresents"

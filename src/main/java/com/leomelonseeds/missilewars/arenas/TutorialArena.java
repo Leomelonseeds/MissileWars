@@ -43,6 +43,7 @@ public class TutorialArena extends ClassicArena {
     
     private Map<UUID, Integer> stage;
     private Set<Player> stage4Disabled;
+    private Set<Integer> occupiedLanes;
     private Map<UUID, Location> attackLocs;
     private Set<UUID> hasGlow;
     private boolean justReset;
@@ -61,6 +62,7 @@ public class TutorialArena extends ClassicArena {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         this.stage = new HashMap<>();
         this.stage4Disabled = new HashSet<>();
+        this.occupiedLanes = new HashSet<>();
         this.attackLocs = new HashMap<>();
         this.hasGlow = new HashSet<>();
         this.justReset = true;
@@ -345,6 +347,7 @@ public class TutorialArena extends ClassicArena {
      * Spawn a missile that the player can defend against
      */
     private void spawnAttackingMissile(Player player) {
+        int lane = 0;
         boolean foundLane = false;
         Location loc1 = null;
         Location loc2 = null;
@@ -353,9 +356,25 @@ public class TutorialArena extends ClassicArena {
         // Make up to 10 attempts to find a valid lane to spawn a missile in
         // A lane is valid simply if no players are detected in it
         for (int i = 0; i < 10; i++) {
-            int testLane = getRandomLane();
-            loc1 = new Location(world, testLane - 2, 17, 15);
-            loc2 = new Location(world, testLane + 2, 11, -47);
+            lane = getRandomLane();
+            loc1 = new Location(world, lane - 2, 17, 15);
+            loc2 = new Location(world, lane + 2, 11, -47);
+            
+            // Don't spawn this in an already occupied lane
+            // Lanes are stored individually. Need to check up to 3 blocks in each direction
+            // due to the size of the missile
+            boolean occupied = false;
+            for (int l = lane - 3; l <= lane + 3; l++) {
+                if (occupiedLanes.contains(l)) {
+                    occupied = true;
+                    break;
+                }
+            }
+            if (occupied) {
+                continue;
+            }
+            
+            // Otherwise if there are no players in this lane, we're golden
             if (world.getNearbyEntities(
                     BoundingBox.of(loc1, loc2), 
                     e -> e.getType() == EntityType.PLAYER)
@@ -366,7 +385,9 @@ public class TutorialArena extends ClassicArena {
         }
         
         // Spawn another missile/try again if this player hasn't completed in 30 seconds
+        int finalLane = lane;
         ConfigUtils.schedule(20 * 30, () -> {
+           occupiedLanes.remove(finalLane);
            if (getStage(player.getUniqueId()) == 4) {
                spawnAttackingMissile(player);
            }
@@ -376,6 +397,9 @@ public class TutorialArena extends ClassicArena {
         if (!foundLane) {
             return;
         }
+        
+        // Store lane so that other missiles don't spawn in the same one
+        occupiedLanes.add(finalLane);
         
         // Clear the lane and then spawn a missile
         Location spawnLoc = loc1.clone().add(2, 0, 0);
@@ -393,7 +417,7 @@ public class TutorialArena extends ClassicArena {
      * @return
      */
     private int getRandomLane() {
-        return new Random().nextInt(-15, 16);
+        return new Random().nextInt(-20, 20);
     }
     
     @Override

@@ -171,11 +171,6 @@ public class Tracker {
             }
             TrackedMissile tm = (TrackedMissile) t;
             
-            // If tm doesn't have associated player, it's probably spawned by the training arena
-            if (tm.getPlayer() == null) {
-                return;
-            }
-            
             // Shortcut if explosion occurs for an embedded missile
             if (isEmbedded(tm)) {
                 igniter = tm.getPlayer();

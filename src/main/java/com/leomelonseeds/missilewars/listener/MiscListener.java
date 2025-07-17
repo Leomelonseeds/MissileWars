@@ -82,8 +82,8 @@ public class MiscListener implements Listener {
             return;
         }
         
-        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), 
-                () -> arena.getTracker().assignPrimeSource(e));
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MissileWarsPlugin.getPlugin(), 
+                () -> arena.getTracker().assignPrimeSource(e), 1);
     }
     
     @EventHandler
@@ -150,19 +150,11 @@ public class MiscListener implements Listener {
             RankUtils.setPlayerExpBar(player);
         });
         
-        // Teleport new players to join arena
-        if (player.hasPlayedBefore()) {
-            return;
+        // Let new players watch the cinematic
+        if (!player.hasPlayedBefore()) {
+            ConfigUtils.sendTitle("cinematic-0", player);
+            ConfigUtils.schedule(100, () -> plugin.getCinematicManager().play(player));
         }
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            Arena arena = plugin.getArenaManager().getArena("tutorial");
-            if (arena.isResetting()) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> arena.joinPlayer(player), 20);
-            } else {
-                arena.joinPlayer(player);
-            }
-        }, 20);
     }
 
     
