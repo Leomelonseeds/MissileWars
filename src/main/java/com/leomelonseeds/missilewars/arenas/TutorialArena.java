@@ -309,7 +309,7 @@ public class TutorialArena extends ClassicArena {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
                 stage.remove(uuid);
                 removePlayer(uuid, true);
-            }, 80);
+            }, 100);
             return;
         }
 
@@ -354,7 +354,7 @@ public class TutorialArena extends ClassicArena {
         // A lane is valid simply if no players are detected in it
         for (int i = 0; i < 10; i++) {
             int testLane = getRandomLane();
-            loc1 = new Location(world, testLane - 2, 17, 10);
+            loc1 = new Location(world, testLane - 2, 17, 15);
             loc2 = new Location(world, testLane + 2, 11, -47);
             if (world.getNearbyEntities(
                     BoundingBox.of(loc1, loc2), 
