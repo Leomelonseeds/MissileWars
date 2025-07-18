@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.JSONObject;
@@ -14,19 +13,13 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
-public class CosmeticMenu implements MWInventory {
+public class CosmeticMenu extends MWInventory {
     
-    private Inventory inv;
-    private Player player;
     private String cosmetic;
     
     public CosmeticMenu(Player player, String cosmetic) {
-        this.player = player;
+        super(player, 36, ConfigUtils.getConfigText("inventories.cosmetics." + cosmetic + ".title", null, null, null));
         this.cosmetic = cosmetic;
-        
-        String title = ConfigUtils.getConfigText("inventories.cosmetics." + cosmetic + ".title", null, null, null);
-        inv = Bukkit.createInventory(null, 36, ConfigUtils.toComponent(title));
-        manager.registerInventory(player, this); 
     }
 
     @Override
@@ -96,10 +89,4 @@ public class CosmeticMenu implements MWInventory {
             return;
         }
     }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
-    }
-
 }

@@ -100,6 +100,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
         // Load player inventory cache
         log("Starting player inventory cache...");
         invManager = new InventoryManager();
+        Bukkit.getPluginManager().registerEvents(invManager, this);
         log("Player inventory cache loaded!");
         
         // Load vanilla team manager
@@ -196,6 +197,10 @@ public final class MissileWarsPlugin extends JavaPlugin {
     public void onDisable() {
         // Disable the various managers
         log("Disabling managers");
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            p.closeInventory();
+            invManager.unregister(p);
+        });
         vanillaTeamManager.deleteTeams();
         cinematicManager.disable();
         log("Managers disabled!");

@@ -3,7 +3,6 @@ package com.leomelonseeds.missilewars.invs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -11,12 +10,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -28,37 +25,22 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class MapVoting implements MWInventory {
+public class MapVoting extends MWInventory {
     
-    private Inventory inv;
-    private Player player;
     private NamespacedKey mapKey;
     private VoteManager voteManager;
     private Arena arena;
     
     public MapVoting(Player player, Arena arena) {
-        this.player = player;
+        super(player, 
+            (int) Math.ceil(arena.getVoteManager().getVotes().size() / 9.0) * 9,
+            ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null)
+                .replace("%amount%", VotePlayer.getMaxVotes(player) + "")
+        );
         this.mapKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "map");
         this.arena = arena;
         this.voteManager = arena.getVoteManager();
-        
-        String title = ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null);
-        title = title.replace("%amount%", VotePlayer.getMaxVotes(player) + "");
-        int size = voteManager.getVotes().size();
-        inv = Bukkit.createInventory(null, (int) Math.ceil((double) size / 9) * 9, ConfigUtils.toComponent(title));
-        manager.registerInventory(player, this);
-        
-        // Refresh inventory once in a while
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (manager.getInventory(player) != null) {
-                    updateInventory();
-                } else {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 20, 20);
+        autoRefresh(20);
     }
     
     // Register all maps and their votes to items
@@ -104,11 +86,6 @@ public class MapVoting implements MWInventory {
             mapItem.setItemMeta(mapItemMeta);
             inv.addItem(mapItem);
         }
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
     }
 
     @Override

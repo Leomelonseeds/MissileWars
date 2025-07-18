@@ -10,7 +10,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,23 +26,21 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class PresetSelector implements MWInventory {
+public class PresetSelector extends MWInventory {
     
-    private Inventory inv;
     private String deck;
-    private Player player;
     private FileConfiguration itemConfig;
     private JSONObject playerJson;
     
     public PresetSelector(Player player, String deck) {
-        this.player = player;
+        super(player, 54, 
+            ConfigUtils.getConfigFile("items.yml")
+                .getString("title.preset")
+                .replace("%deck%", deck)
+        );
         this.deck = deck;
         itemConfig = ConfigUtils.getConfigFile("items.yml");
         playerJson = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
-        
-        String title = itemConfig.getString("title.preset").replace("%deck%", deck);
-        inv = Bukkit.createInventory(null, 54, ConfigUtils.toComponent(title));
-        manager.registerInventory(player, this);
     }
 
     @Override
@@ -181,11 +178,6 @@ public class PresetSelector implements MWInventory {
             }
             inv.setItem(i, item);
         }
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
     }
 
     @Override

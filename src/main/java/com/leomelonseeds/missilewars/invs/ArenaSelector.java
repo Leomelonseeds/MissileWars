@@ -3,16 +3,13 @@ package com.leomelonseeds.missilewars.invs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -21,31 +18,14 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class ArenaSelector implements MWInventory {
+public class ArenaSelector extends MWInventory {
 
-    private Inventory inv;
-    private Player player;
     private String gamemode;
     
     public ArenaSelector(Player player, String gamemode) {
-        this.player = player;
+        super(player, 27, ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null));
         this.gamemode = gamemode;
-        
-        String title = ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null);
-        inv = Bukkit.createInventory(null, 27, ConfigUtils.toComponent(title));
-        manager.registerInventory(player, this);
-        
-        // Refresh inventory once in a while
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (manager.getInventory(player) != null) {
-                    updateInventory();
-                } else {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 20, 20);
+        autoRefresh(20);
     }
     
     // Create a list of all arenas from ArenaManager list
@@ -73,11 +53,6 @@ public class ArenaSelector implements MWInventory {
             arenaItem.setItemMeta(arenaItemMeta);
             inv.addItem(arenaItem);
         }
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
     }
 
     @Override

@@ -11,14 +11,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
@@ -30,66 +28,12 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
-import com.leomelonseeds.missilewars.invs.InventoryManager;
-import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 /** Class to manage arena joining and pregame events. */
 public class ArenaInventoryListener implements Listener {
-    
-    /** Handle clicking of custom GUIs */
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
-        
-        if (!(manager.getInventory(player) instanceof MWInventory)) {
-            return;
-        }
-        
-        Inventory inv = event.getClickedInventory();
-        
-        if (inv == null) {
-            return;
-        }
-        
-        if (inv.equals(event.getView().getBottomInventory()) && event.getClick().isShiftClick()) {
-            event.setCancelled(true);
-            return;
-        }
-        
-        if (!inv.equals(event.getView().getTopInventory())){
-            return; 
-        }
-        
-        event.setCancelled(true);
-
-        manager.getInventory(player).registerClick(event.getSlot(), event.getClick());
-    }
-    
-    /** Unregister custom mwinventories when they are closed. */
-    @EventHandler
-    public void unregisterCustomInventories(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        
-        // Stop stupid people from exiting the tutorial GUI
-        if (ConfigUtils.toPlain(event.getView().title()).contains("Have you played Missile Wars")) {
-            Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
-                if (!player.hasPermission("umw.tutorial")) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bossshop open tutorial " + player.getName());
-                }
-            }, 5);
-            return;
-        }
-        
-        // Unregister
-        InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
-        if (manager.getInventory(player) instanceof MWInventory) {
-            manager.removePlayer(player);
-        }
-    }
 
     /** Stop players from changing their armor/bow items. */
     @EventHandler

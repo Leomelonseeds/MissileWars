@@ -1,29 +1,22 @@
 package com.leomelonseeds.missilewars.invs;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
-public class ConfirmAction implements MWInventory {
+public class ConfirmAction extends MWInventory {
     
-    private Inventory inv;
     private ConfirmCallback callback;
     private MWInventory mwinv;
-    private Player player;
     
     public ConfirmAction(String action, Player player, MWInventory mwinv, ConfirmCallback callback) {
-        this.player = player;
+        super(player, 27, "Confirm - " + action);
         this.callback = callback;
         this.mwinv = mwinv;
-        
-        inv = Bukkit.createInventory(null, 27, ConfigUtils.toComponent("Confirm - " + action));
-        manager.registerInventory(player, this);
     }
 
     @Override
@@ -67,10 +60,4 @@ public class ConfirmAction implements MWInventory {
             callback.onConfirm(false);
         }
     }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
-    }
-
 }

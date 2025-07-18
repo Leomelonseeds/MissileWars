@@ -3,12 +3,10 @@ package com.leomelonseeds.missilewars.invs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.JSONObject;
@@ -24,12 +22,10 @@ import com.leomelonseeds.missilewars.utilities.JSONManager;
 
 import net.kyori.adventure.text.Component;
 
-public class DeckCustomizer implements MWInventory {
+public class DeckCustomizer extends MWInventory {
     
-    private Inventory inv;
     private JSONObject init;
     private JSONObject presetjson;
-    private Player player;
     private String deck;
     private String preset;
     private FileConfiguration itemConfig;
@@ -39,19 +35,20 @@ public class DeckCustomizer implements MWInventory {
     private String[] abilities;
     
     public DeckCustomizer(Player player, String deck, String preset) {
+        super(player, 45, 
+            ConfigUtils.getConfigFile("items.yml")
+                .getString("title.deck")
+                .replace("%deck%", deck)
+                .replace("%preset%", preset)
+        );
         deckManager = MissileWarsPlugin.getPlugin().getDeckManager();
         jsonManager = MissileWarsPlugin.getPlugin().getJSON();
         itemConfig = ConfigUtils.getConfigFile("items.yml");
         init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         items = new String[] {"missiles", "utility"};
         abilities = new String[] {"gpassive", "passive"};
-        this.player = player;
         this.deck = deck;
         this.preset = preset;
-        
-        String title = itemConfig.getString("title.deck").replace("%deck%", deck).replace("%preset%", preset);
-        inv = Bukkit.createInventory(null, 45, ConfigUtils.toComponent(title));
-        manager.registerInventory(player, this);
     }
 
     @Override
@@ -261,11 +258,6 @@ public class DeckCustomizer implements MWInventory {
                 return;
             }
         }
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inv;
     }
     
     // Return an item with a blank name
