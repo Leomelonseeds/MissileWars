@@ -130,8 +130,9 @@ public class DeckManager {
         // Create gear items
         DeckStorage ds = DeckStorage.fromString(deck);
         ItemStack weapon = createItem(deck + ".weapon", 0, false);
+        JSONObject enchantJson = json.getJSONObject("enchants");
         for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
-            addEnch(weapon, e.getKey(), e.getValue(), deck, json);
+            addEnch(weapon, e.getKey(), e.getValue(), deck, enchantJson);
         }
         
         // For custom enchantments, remove unbreaking if the item has more than 2 enchantments
@@ -142,7 +143,7 @@ public class DeckManager {
         
         ItemStack boots = ds.getBoots();
         for (Entry<String, Enchantment> e : ds.getBootEnchants().entrySet()) {
-            addEnch(boots, e.getKey(), e.getValue(), deck, json);
+            addEnch(boots, e.getKey(), e.getValue(), deck, enchantJson);
         }
         gear.add(boots);
         

@@ -4,6 +4,7 @@
 	"missilespec": false,
 	"utilityspec": false,
 	"death-messages": "default",
+    "version": 1,
 	"Vanguard": {
         "last-preset": "A",
 		"feather_falling": false,
@@ -12,9 +13,11 @@
 		"lavasplash": false,
 		"defaultpreset": {
 			"skillpoints": 2,
-			"feather_falling": 0,
-			"sharpness": 3,
-			"fire_aspect": 0,
+            "enchants": {
+                "feather_falling": 0,
+                "sharpness": 3,
+                "fire_aspect": 0
+            },
 			"utility": {
 				"splash": 2,
 				"lingering_harming": 2,
@@ -48,9 +51,11 @@
 		"spectral": false,
 		"defaultpreset": {
 			"skillpoints": 2,
-			"fire_protection": 0,
-			"flame": 1,
-			"sharpness": 3,
+            "enchants": {
+                "fire_protection": 0,
+                "flame": 1,
+                "sharpness": 3
+            },
 			"utility": {
 				"torpedo": 2,
 				"obsidianshield": 2,
@@ -86,10 +91,12 @@
 		"creepershot": false,
 		"defaultpreset": {
 			"skillpoints": 5,
-			"blast_protection": 0,
-			"multishot": 0,
-			"quick_charge": 0,
-			"sharpness": 2,
+            "enchants": {
+                "blast_protection": 0,
+                "multishot": 0,
+                "quick_charge": 0,
+                "sharpness": 2
+            },
 			"utility": {
 				"creeper": 1,
 				"fireball": 3,
@@ -125,10 +132,12 @@
 		"deconstructor": false,
 		"defaultpreset": {
 			"skillpoints": 2,
-			"projectile_protection": 0,
-			"sharpness": 3,
-			"efficiency": 0,
-			"haste": 0,
+            "enchants": {
+                "projectile_protection": 0,
+                "sharpness": 3,
+                "efficiency": 0,
+                "haste": 0
+            },
 			"utility": {
 				"platform": 2,
 				"shield": 2,

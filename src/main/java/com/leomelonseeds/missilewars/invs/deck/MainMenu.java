@@ -116,6 +116,8 @@ public class MainMenu extends DeckSubInventory {
             playerJson.put("Preset", preset);
             playerJson.getJSONObject(deck).put("last-preset", preset);
             fillItems();
+            
+            // TODO: Send message
             return;
         }
         

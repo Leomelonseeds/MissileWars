@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars.invs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -107,8 +108,8 @@ public class DeckCustomizer extends MWInventory {
         // Enchantments
         int index_e = getIndex("enchants");
         for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
-            ItemStack item = deckManager.createItem(deck + ".enchants." + key, presetjson.getInt(key), 
-                        false, init, deck, true, preset);
+            ItemStack item = deckManager.createItem(deck + ".enchants." + key, 
+                    presetjson.getJSONObject("enchants").getInt(key), false, init, deck, true, preset);
             inv.setItem(index_e, item);
             index_e++;
         }
@@ -238,18 +239,12 @@ public class DeckCustomizer extends MWInventory {
         int sp = presetjson.getInt("skillpoints");
         
         // Upgrade/downgade missiles/utility
-        for (String s : items) {
+        for (String s : ArrayUtils.add(items, "enchants")) {
             JSONObject cjson = presetjson.getJSONObject(s);
             if (cjson.has(realname)) {
                 processClick(sp, name, level, cjson, type, realname);
                 return;
             }
-        }
-        
-        // Enchantments
-        if (presetjson.has(realname)) {
-            processClick(sp, name, level, presetjson, type, realname);
-            return;
         }
         
         // Global Passive

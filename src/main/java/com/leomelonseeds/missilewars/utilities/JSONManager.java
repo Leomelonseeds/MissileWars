@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -72,17 +73,23 @@ public class JSONManager {
      */
     public void loadPlayer(UUID uuid) {
         plugin.getSQL().getPlayerDeck(uuid, result -> {
+            if (Bukkit.getPlayer(uuid) == null) {
+                return;
+            }
+            
+            Player player = Bukkit.getPlayer(uuid);
             String jsonString = (String) result;
             JSONObject newJson = new JSONObject();
             if (jsonString != null) {
                 newJson = new JSONObject(jsonString);
             }
+            boolean isNew = newJson.isEmpty();
             
             try {
-                if (Bukkit.getPlayer(uuid) == null) {
-                    return;
+                // Update versioning
+                if (!isNew) {
+                    updateVersion1(newJson);
                 }
-                Player player = Bukkit.getPlayer(uuid);
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
                 // Recursively update json file
@@ -134,8 +141,6 @@ public class JSONManager {
                         JSONObject currentpreset = deckjson.getJSONObject(preset);
                         updateJson(currentpreset, defaultpreset);
                         int finalsp = getMaxSkillpoints(uuid);
-                        // Anything not in this array is an enchantment
-                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
                         
                         // Calculate sp spent on missiles and utility
                         // Also updates their jsons
@@ -154,6 +159,23 @@ public class JSONManager {
                                     finalsp -= cost;
                                     level--;
                                 }
+                            }
+                        }
+                        
+                        // Update and calculate sp spent on enchantments
+                        JSONObject enchantJson = currentpreset.getJSONObject("enchants");
+                        updateJson(enchantJson, defaultpreset.getJSONObject("enchants"));
+                        for (String k : enchantJson.keySet()) {
+                            int level = enchantJson.getInt(k);
+                            int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
+                            if (level > maxLevel) {
+                                enchantJson.put(k, maxLevel);
+                                level = maxLevel;
+                            }
+                            while (level > 0) {
+                                int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
+                                finalsp -= cost;
+                                level--;
                             }
                         }
                         
@@ -177,25 +199,6 @@ public class JSONManager {
                                     finalsp -= cost;
                                     passivelevel--;
                                 }
-                            }
-                        }
-                        
-                        // Calculate sp spent on enchantments
-                        for (String k : currentpreset.keySet()) {
-                            if (all.contains(k)) {
-                                continue;
-                            }
-                            
-                            int level = currentpreset.getInt(k);
-                            int maxLevel = plugin.getDeckManager().getMaxLevel(deck + ".enchants." + k);
-                            if (level > maxLevel) {
-                                currentpreset.put(k, maxLevel);
-                                level = maxLevel;
-                            }
-                            while (level > 0) {
-                                int cost = itemConfig.getInt(deck + ".enchants." + k + "." + level + ".spcost");
-                                finalsp -= cost;
-                                level--;
                             }
                         }
                         
@@ -226,7 +229,6 @@ public class JSONManager {
      * 
      * @param original the original preset
      * @param updated an object within the defaultJson
-     * @param preset
      */
     private void updateJson(JSONObject original, JSONObject updated) {
         // Add new keys if not exist
@@ -239,6 +241,44 @@ public class JSONManager {
         for (String key : JSONObject.getNames(original)) {
             if (!(updated.has(key) || Arrays.asList(allPresets).contains(key))) {
                 original.remove(key);
+            }
+        }
+    }
+    
+    /**
+     * Version 1 introduces the versioning system and 
+     * changes all enchants to be stored in their own object
+     * 
+     * @param json
+     */
+    private void updateVersion1(JSONObject json) {
+        if (json.has("version")) {
+            return;
+        }
+        
+        // Anything not in this list in a preset is an enchantment
+        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
+        
+        json.put("version", 1);
+        for (DeckStorage deck : DeckStorage.values()) {
+            JSONObject deckJson = json.getJSONObject(deck.toString());
+            for (String preset : plugin.getDeckManager().getPresets()) {
+                if (!deckJson.has(preset)) {
+                    continue;
+                }
+
+                JSONObject presetJson = deckJson.getJSONObject(preset);
+                JSONObject enchantJson = new JSONObject();
+                for (String key : new HashSet<>(presetJson.keySet())) {
+                    if (all.contains(key)) {
+                        continue;
+                    }
+                    
+                    enchantJson.put(key, presetJson.getInt(key));
+                    presetJson.remove(key);
+                }
+                
+                presetJson.put("enchants", enchantJson);
             }
         }
     }
