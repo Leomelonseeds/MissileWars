@@ -61,6 +61,16 @@ public abstract class MWInventory {
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), ticks, ticks);
     }
     
+    /**
+     * Change the title of the inventory
+     * 
+     * @param title
+     */
+    @SuppressWarnings("deprecation")
+    public void setTitle(String title) {
+        player.getOpenInventory().setTitle(title);
+    }
+    
     public abstract void updateInventory();
     
     public abstract void registerClick(int slot, ClickType type);

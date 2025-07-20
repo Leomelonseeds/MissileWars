@@ -723,7 +723,8 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         // Ensure it was in an arena world
-        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getEntity().getWorld());
+        Entity entity = event.getEntity();
+        Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(entity.getWorld());
         if (arena == null) {
             return;
         }
@@ -732,9 +733,10 @@ public class ArenaGameruleListener implements Listener {
         arena.getTracker().registerExplosion(event);
         
         // Register tutorial completion if stage 4
-        EntityType entity = event.getEntityType();
-        if (entity == EntityType.TNT && arena instanceof TutorialArena tutorialArena) {
-            Player source = ArenaUtils.getAssociatedPlayer(event.getEntity(), tutorialArena);
+        // The explosion must be on the blue side of the arena for it to count
+        EntityType entityType = event.getEntityType();
+        if (entityType == EntityType.TNT && arena instanceof TutorialArena tutorialArena && entity.getLocation().getZ() < 5) {
+            Player source = ArenaUtils.getAssociatedPlayer(entity, tutorialArena);
             if (source != null) {
                 tutorialArena.registerStageCompletion(source, 4);
             }
@@ -752,18 +754,18 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Fireballs can't blow up portals
-        if (entity == EntityType.FIREBALL) {
+        if (entityType == EntityType.FIREBALL) {
             return;
         }
         
         // Must be TNT, minecarts, or creeper
-        if (!(entity == EntityType.TNT || entity == EntityType.TNT_MINECART || entity == EntityType.CREEPER)) {
+        if (!(entityType == EntityType.TNT || entityType == EntityType.TNT_MINECART || entityType == EntityType.CREEPER)) {
             return;
         }
         
         // Must be in a classic arena
         if (arena instanceof ClassicArena carena) {
-            portals.forEach(b -> carena.registerPortalBreak(b.getLocation(), event.getEntity()));
+            portals.forEach(b -> carena.registerPortalBreak(b.getLocation(), entity));
         }
     }
 

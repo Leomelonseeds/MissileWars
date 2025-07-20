@@ -1108,6 +1108,7 @@ Vanguard:
       2: 
         level: 3
         spcost: 1
+  ability: {}
   passive:
     adrenaline:
       name: "&eAdrenaline"
@@ -1183,6 +1184,7 @@ Sentinel:
       2:
         level: 4
         spcost: 1
+  ability: {}
   passive:
     warden:
       name: "&eImpact Trigger"
@@ -1287,6 +1289,7 @@ Berserker:
       2: 
         level: 4
         spcost: 1
+  ability: {}
   passive:
     slownessarrows:
       name: "&eSpiked Quiver"
@@ -1383,6 +1386,7 @@ Architect:
       2: 
         level: 6
         spcost: 1
+  ability: {}
   passive:
     prickly:
       name: "&ePrickly Projectiles"
@@ -1474,60 +1478,72 @@ held:
 default-skillpoints: 16
 
 intangibles:
-  locked: RED_WOOL
-  unlocked: ORANGE_WOOL
-  selected: LIME_WOOL
+  locked: PAPER
+  unlocked: BOOK
+  selected: BOOK
 
 title:
   preset: "%deck% - Preset Selection"
   deck: "%deck% - Editing Preset %preset%"
 
 indicators:
+  info:
+    item: COMPASS
+    name: "&fMenu Information"
+    lore:
+    - ""
+    - "&aAvailable Skillpoints: &f%sp%"
+    - "&aBalance: &f%mokens% Mokens"
+    - ""
+    - "&7• Select and customize your deck."
+    - "&7• Each preset has &a16 &7skillpoints."
+    - "&7• You &ccannot &7get more skillpoints."
+    - "&7• Earn &fMokens &7by playing games."
+    slot-old: 8
+    slot: 4
   missiles:
     item: TNT
-    name: "&c&lMissiles"
+    name: "&c&lMissile Upgrades"
     lore:
       - "&7Make your missiles stronger and faster"
-    slot: 0
+    slot-old: 0
+    slot: 46
   utility:
     item: COMPARATOR
-    name: "&9&lUtility"
+    name: "&9&lUtility Upgrades"
     lore:
       - "&7Improve the effectiveness of utilities"
-    slot: 9
+    slot-old: 9
+    slot: 47
   enchants:
-    item: ENCHANTED_BOOK
+    item: ENCHANTING_TABLE
     name: "&3&lGear Enchantments"
     lore:
       - "&7Enhance your weapons and armor"
-    slot: 18
+    slot-old: 18
+    slot: 48
+  ability:
+    item: ORANGE_DYE
+    name: "&6&lAbility &7(Choose 1)"
+    lore:
+      - "&7Perks that might take some"
+      - "&7practice to use well"
+    slot: 50
   passive:
     item: YELLOW_DYE
-    name: "&e&lPassive &8(1 only)"
+    name: "&e&lPassive &7(Choose 1)"
     lore:
       - "&7Perks that are always active"
-    slot: 27
+    slot-old: 27
+    slot: 51
   gpassive:
     item: PURPLE_DYE
     name: "&5&lGlobal Passive &8(1 only)"
     lore:
       - "&7Perks available to all decks"
       - "&7that are always active"
-    slot: 36
-  info:
-    item: COMPASS
-    name: "&fMenu Information"
-    lore:
-    - ""
-    - "&7- Each row is a different category."
-    - "&7- Left click an item to upgrade it."
-    - "&7- Right click items to downgrade."
-    - "&7- Presets have &f16 &7skillpoints."
-    - "&7- Earn &fMokens &7by playing games."
-    - ""
-    - "&aAvailable Skillpoints: &f%sp%"
-    - "&aBalance: &f%mokens% Mokens"
-    slot: 8
+    slot-old: 36
+    slot: 52
   skillpoints:
     item: EMERALD
     name: "&aReturn Skillpoints"
@@ -1535,7 +1551,7 @@ indicators:
     - ""
     - "&cClick to downgrade all items"
     - "&cand return all skillpoints."
-    slot: 17
+    slot-old: 17
   reset:
     item: BARRIER
     name: "&cReset Preset"
@@ -1544,11 +1560,13 @@ indicators:
     - "&cClick to reset this preset to a default"
     - "&cconfiguration. All previously unlocked"
     - "&cpassives/abilities will remain unlocked."
-    slot: 26
+    slot-old: 26
   back:
     item: RED_STAINED_GLASS_PANE
     name: "&cBack"
-    slot: 44
+    slot-old: 44
+    slot: 49
+    
   
 text:
   locked1: "&4Locked &c(Requires %cost% Mokens)"
@@ -1664,6 +1682,46 @@ preset:
     - "&7and purchase passives and abilities."
     - ""
     - "&cClick &7to edit this preset"
+  deck:
+    name: "%color%&l%deck% &7[%preset%] &8- %select%"
+    notselected: "&cClick &7to use this preset"
+    selected: "&aYou are using this preset"
+    lore:
+    - ""
+    - "&fAbility: &8%ability%"
+    - "&fPassive: &8%passive%"
+    - "&fGlobal Passive: &8%gpassive%"
+    - ""
+    description:
+      Sentinel:
+      - "&7A defensive deck with a military-grade"
+      - "&7(or so we were told) bow, sturdy missiles,"
+      - "&7and solid utility, such as the Torpedo"
+      - "&7sky-mine. Protect your base against all"
+      - "&7forms of physical and emotional damage."
+      Berserker:
+      - "&7Carry on the spirit of TF2 Heavy with"
+      - "&7a rugged crossbow, creepers, fireballs,"
+      - "&7and all the most explosive missiles to"
+      - "&7satisfy your world-ending cravings."
+      Vanguard:
+      - "&7An agile deck that attacks fast and"
+      - "&7furiously (without the family). Although"
+      - "&7lacking in defensive power, outrun your"
+      - "&7enemies with the teleporting Canopy and"
+      - "&7the fastest missile in the game."
+      Architect:
+      - "&7Meet the Deck that could put at least"
+      - "&73 flags in its Twitter bio due to its"
+      - "&7quirky missiles and ability to build"
+      - "&7with leaves, platforms, and shields."
+  selector:
+    item: BOOKSHELF
+    name: "&f&lChange Preset"
+    lore:
+    - "Create and choose different"
+    - "configurations for this deck"
+    
   
 enchants:
   name: "&b%enchant%"

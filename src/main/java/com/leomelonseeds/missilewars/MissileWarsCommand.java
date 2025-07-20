@@ -28,6 +28,7 @@ import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.PresetSelector;
+import com.leomelonseeds.missilewars.invs.deck.DeckInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.cinematic.AbilitiesReplay;
@@ -114,6 +115,17 @@ public class MissileWarsCommand implements CommandExecutor {
                 cm.play(target);
                 return true;
             }
+            
+            if (args[1].equals("deckmenu")) {
+                String deck = "Sentinel";
+                if (args.length > 2) {
+                    deck = args[2];
+                }
+                new DeckInventory(target, deck);
+                return true;
+            }
+            
+            return true;
         }
         
         // Go to lobby

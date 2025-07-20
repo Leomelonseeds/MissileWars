@@ -344,10 +344,11 @@ scoreboard:
     - "&fto place a missile"
   stage2: 
     - "&fPlace a missile, then"
-    - "&frun and jump to ride it"
+    - "&fsprint and jump to ride it."
+    - "&fKeep moving to stay on!"
   stage3: 
     - "&fDestroy any enemy portal"
-    - "&fby riding over and &aembedding"
+    - "&fby &driding over &fand &aembedding"
     - "&fmultiple missiles at the &esame"
     - "&espot &finside their base."
   stage4: 

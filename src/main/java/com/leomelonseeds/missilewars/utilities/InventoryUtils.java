@@ -10,10 +10,12 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -179,7 +181,7 @@ public class InventoryUtils {
                 // Add elytra if ranked
                 if (player.hasPermission("umw.elytra")) {
                     if (!inventory.contains(Material.ELYTRA)) {
-                        ItemStack elytra = plugin.getDeckManager().createItem("elytra", 0, false);
+                        ItemStack elytra = createItem("elytra");
                         ItemMeta meta = elytra.getItemMeta();
                         meta.setUnbreakable(true);
                         elytra.setItemMeta(meta);
@@ -284,6 +286,53 @@ public class InventoryUtils {
             if (i == null) continue;
             player.setCooldown(i.getType(), 0);
         }
+    }
+    
+    /**
+     * Adds glow to an item by applying unbreaking and
+     * the hide enchants itemflag
+     * 
+     * @param item
+     */
+    public static void addGlow(ItemStack item) {
+        item.addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
+        item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+    
+    /**
+     * Adds glow to an itemMeta by applying unbreaking and
+     * the hide enchants itemflag
+     * 
+     * @param item
+     */
+    public static void addGlow(ItemMeta meta) {
+        meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+    
+    /**
+     * Creates a completely blank item from the material
+     * 
+     * @param material
+     * @return
+     */
+    public static ItemStack createBlankItem(Material material) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent(""));
+        item.setItemMeta(meta);
+        return item;
+    }
+    
+    /**
+     * Shorthand for using the DeckManager to create a simple GUI item.
+     * The item should not have any levels
+     * 
+     * @param path a path from the items.yml file
+     * @return
+     */
+    public static ItemStack createItem(String path) {
+        return MissileWarsPlugin.getPlugin().getDeckManager().createItem(path, 0, false);
     }
 
     /**

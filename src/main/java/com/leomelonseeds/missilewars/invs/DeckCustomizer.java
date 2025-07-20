@@ -53,10 +53,17 @@ public class DeckCustomizer extends MWInventory {
 
     @Override
     public void updateInventory() {
+        // TODO: Optimize by splitting into different functions and only updating what is needed
+        // when a click is registered
         presetjson = init.getJSONObject(deck).getJSONObject(preset);
         // Add indicators
         for (String key : itemConfig.getConfigurationSection("indicators").getKeys(false)) {
-            ItemStack item = deckManager.createItem("indicators." + key, 0, false);
+            String slotPath = "indicators." + key + ".slot-old";
+            if (!itemConfig.contains(slotPath)) {
+                continue;
+            }
+            
+            ItemStack item = InventoryUtils.createItem("indicators." + key);
             if (key.equals("info")) {
                 ItemMeta meta = item.getItemMeta();
                 List<String> newLore = new ArrayList<>();
@@ -73,7 +80,7 @@ public class DeckCustomizer extends MWInventory {
                 meta.lore(ConfigUtils.toComponent(newLore));
                 item.setItemMeta(meta);
             }
-            inv.setItem(itemConfig.getInt("indicators." + key + ".slot"), item);
+            inv.setItem(itemConfig.getInt(slotPath), item);
         }
         
         // Add panes and misc items
@@ -140,13 +147,13 @@ public class DeckCustomizer extends MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         // Back button
-        if (slot == itemConfig.getInt("indicators.back.slot")) {
+        if (slot == itemConfig.getInt("indicators.back.slot-old")) {
             new PresetSelector(player, deck);
             return;
         }
         
         // Reset to default config
-        if (slot == itemConfig.getInt("indicators.reset.slot")) {
+        if (slot == itemConfig.getInt("indicators.reset.slot-old")) {
             new ConfirmAction("Reset Preset", player, this, (confirm) -> {
                 if (!confirm) {
                     return;
@@ -159,7 +166,7 @@ public class DeckCustomizer extends MWInventory {
         }
         
         // Give back all skillpoints (oh boy this is a toughie) (wait no nevermind)
-        if (slot == itemConfig.getInt("indicators.skillpoints.slot")) {
+        if (slot == itemConfig.getInt("indicators.skillpoints.slot-old")) {
             new ConfirmAction("Reclaim Skillpoints", player, this, (confirm) -> {
                 if (!confirm) {
                     return;
@@ -276,7 +283,7 @@ public class DeckCustomizer extends MWInventory {
      * @return
      */
     private int getIndex(String key) {
-        return itemConfig.getInt("indicators." + key + ".slot") + 2;
+        return itemConfig.getInt("indicators." + key + ".slot-old") + 2;
     }
     
     /**

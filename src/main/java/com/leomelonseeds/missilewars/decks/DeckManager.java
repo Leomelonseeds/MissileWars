@@ -33,6 +33,7 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.Passive.Stat;
 import com.leomelonseeds.missilewars.decks.Passive.Type;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -251,7 +252,8 @@ public class DeckManager {
     }
     
     /**
-     * Same as createItem, but json is default null
+     * Same as createItem, but json is default null. Use for
+     * creating a poolitem for in-game use
      * 
      * @param name
      * @param level
@@ -384,6 +386,7 @@ public class DeckManager {
                         lore.add(itemsConfig.getString("text.downgradable").replace("%spcost%", spCost + ""));
                         if (intangible) {
                             item = item.withType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
+                            InventoryUtils.addGlow(itemMeta);
                         }
                     }
                     

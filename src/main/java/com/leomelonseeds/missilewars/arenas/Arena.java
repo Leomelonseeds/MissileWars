@@ -39,7 +39,6 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
-import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -583,12 +582,11 @@ public abstract class Arena implements ConfigurationSerializable {
     
     // Give player necessary items
     protected void giveHeldItems(Player player) {
-        DeckManager dm = plugin.getDeckManager();
         String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
         FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
         for (String i : items) {
             String path = "held." + i;
-            ItemStack item = dm.createItem(path, 0, false);
+            ItemStack item = InventoryUtils.createItem(path);
             ItemMeta meta = item.getItemMeta();
             meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
                     PersistentDataType.STRING, i);

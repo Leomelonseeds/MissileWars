@@ -60,6 +60,9 @@ public class JSONManager {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
     }
+    
+    // TODO: Consider moving enchantments to its own section so reading old code is not so damn confusing
+    // Use a versioning system to make this possible (move enchants, give back moken in future etc)
 
     /**
      * Call when a previously joined player joins.
@@ -132,7 +135,7 @@ public class JSONManager {
                         updateJson(currentpreset, defaultpreset);
                         int finalsp = getMaxSkillpoints(uuid);
                         // Anything not in this array is an enchantment
-                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "skillpoints", "layout"});
+                        List<String> all = List.of(new String[] {"missiles", "utility", "gpassive", "passive", "ability", "skillpoints", "layout"});
                         
                         // Calculate sp spent on missiles and utility
                         // Also updates their jsons
@@ -155,7 +158,7 @@ public class JSONManager {
                         }
                         
                         // Calculate sp spent on gpassives/passives, and delete if gpassive not exist
-                        for (String ptype : new String[] {"gpassive", "passive"}) {
+                        for (String ptype : new String[] {"gpassive", "passive", "ability"}) {
                             String path = ptype.equals("gpassive") ? ptype : deck + "." + ptype;
                             String passive = currentpreset.getJSONObject(ptype).getString("selected");
                             int passivelevel = currentpreset.getJSONObject(ptype).getInt("level");

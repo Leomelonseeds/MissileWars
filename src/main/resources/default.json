@@ -5,6 +5,7 @@
 	"utilityspec": false,
 	"death-messages": "default",
 	"Vanguard": {
+        "last-preset": "A",
 		"feather_falling": false,
 		"fire_aspect": false,
 		"bunny": false,
@@ -26,6 +27,10 @@
 				"supersonic": 1,
 				"cronullifier": 2
 			},
+            "ability": {
+                "selected": "None",
+                "level": 0
+            },
 			"passive": {
 				"selected": "adrenaline",
 				"level": 2
@@ -37,6 +42,7 @@
 		}
 	},
 	"Sentinel": {
+        "last-preset": "A",
 		"fire_protection": false,
 		"longshot": false,
 		"spectral": false,
@@ -57,6 +63,10 @@
 				"concorde": 1,
 				"supporter": 2
 			},
+            "ability": {
+                "selected": "None",
+                "level": 0
+            },
 			"passive": {
 				"selected": "warden",
 				"level": 1
@@ -68,6 +78,7 @@
 		}
 	},
 	"Berserker": {
+        "last-preset": "A",
 		"blast_protection": false,
 		"multishot": false,
 		"quick_charge": false,
@@ -91,6 +102,10 @@
 				"cuboid": 2,
 				"warhead": 1
 			},
+            "ability": {
+                "selected": "None",
+                "level": 0
+            },
 			"passive": {
 				"selected": "slownessarrows",
 				"level": 3
@@ -102,6 +117,7 @@
 		}
 	},
 	"Architect": {
+        "last-preset": "A",
 		"haste": false,
 		"efficiency": false,
 		"projectile_protection": false,
@@ -125,6 +141,10 @@
 				"slingshot": 2,
 				"pisces": 2
 			},
+            "ability": {
+                "selected": "None",
+                "level": 0
+            },
 			"passive": {
 				"selected": "prickly",
 				"level": 2

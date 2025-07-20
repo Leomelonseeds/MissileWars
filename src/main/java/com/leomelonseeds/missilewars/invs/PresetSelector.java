@@ -20,7 +20,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
-import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -53,7 +52,6 @@ public class PresetSelector extends MWInventory {
         }
         
         // Add preset items
-        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
         List<String> presets = MissileWarsPlugin.getPlugin().getDeckManager().getPresets();
         for (int i = 0; i < presets.size(); i++) {
             String p = presets.get(i);
@@ -79,18 +77,21 @@ public class PresetSelector extends MWInventory {
             // Use null if player doesn't have the json, otherwise do manual replacements
             for (String l : itemConfig.getStringList("preset.edit.lore")) {
                 if (current == null) {
-                    l = l.replaceAll("%gpassive%", "None");
-                    l = l.replaceAll("%passive%", "None");
+                    l = l
+                        .replace("%ability%", "None")
+                        .replace("%passive%", "None")
+                        .replace("%gpassive%", "None");
                 } else {
-                    for (String type : new String[] {"passive", "gpassive"}) {
-                        String passive = current.getJSONObject(type).getString("selected");
+                    for (String type : new String[] {"ability", "passive", "gpassive"}) {
                         String placeholder = "%" + type + "%";
-                        String path = type.equals("gpassive") ? "gpassive." + passive + ".name" :
-                            deck + "." + type + "." + passive + ".name";
-                        if (!passive.equals("None")) {
-                            l = l.replaceAll(placeholder, itemConfig.getString(path));
+                        String passive = current.getJSONObject(type).getString("selected");
+                        if (passive.equals("None")) {
+                            l = l.replace(placeholder, "None");
                         } else {
-                            l = l.replaceAll(placeholder, "None");
+                            String path = type.equals("gpassive") ? 
+                                "gpassive." + passive + ".name" :
+                                deck + "." + type + "." + passive + ".name"; 
+                            l = l.replace(placeholder, itemConfig.getString(path));
                         }
                     }
                 }
@@ -108,7 +109,7 @@ public class PresetSelector extends MWInventory {
             
             
             // Create deck selection item
-            ItemStack sel = dm.createItem("preset.normal", 0, false);
+            ItemStack sel = InventoryUtils.createItem("preset.normal");
             ItemMeta selMeta = sel.getItemMeta();
             
             // Different material and name if selected
@@ -129,7 +130,7 @@ public class PresetSelector extends MWInventory {
         // inv.setItem(25, ranked);
         
         // Add top info
-        ItemStack info = dm.createItem("preset.info." + deck, 0, false);
+        ItemStack info = InventoryUtils.createItem("preset.info." + deck);
         ItemMeta infoMeta = info.getItemMeta();
         infoMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
         if (playerJson.getString("Deck").equals(deck)) {
@@ -155,27 +156,20 @@ public class PresetSelector extends MWInventory {
             case "Vanguard":
                 color = Material.ORANGE_STAINED_GLASS_PANE;
             }
-            ItemStack item = new ItemStack(color);
-            ItemMeta meta = item.getItemMeta();
-            meta.displayName(ConfigUtils.toComponent(""));
-            item.setItemMeta(meta);
-            inv.setItem(i, item);
+            inv.setItem(i, InventoryUtils.createBlankItem(color));
         }
         
         // Add bottom panes
         for (int i = 45; i < 54; i++) {
-            ItemStack item;
             if (i != 49) {
-                item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent(""));
-                item.setItemMeta(meta);
-            } else {
-                item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent("&cBack"));
-                item.setItemMeta(meta);
-            }
+                inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
+                continue;
+            } 
+            
+            ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemMeta meta = item.getItemMeta();
+            meta.displayName(ConfigUtils.toComponent("&cBack"));
+            item.setItemMeta(meta);
             inv.setItem(i, item);
         }
     }
@@ -197,9 +191,10 @@ public class PresetSelector extends MWInventory {
         
         // Info button
         if (slot == 4) {
+            String preset = playerJson.getJSONObject(deck).getString("last-preset");
             playerJson.put("Deck", deck);
-            playerJson.put("Preset", "A");
-            presetMessage("A");
+            playerJson.put("Preset", preset);
+            presetMessage(preset);
             updateInventory();
         }
         
@@ -236,6 +231,7 @@ public class PresetSelector extends MWInventory {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
+                playerJson.getJSONObject(deck).put("last-preset", p);
                 presetMessage(p);
                 updateInventory();
             }
