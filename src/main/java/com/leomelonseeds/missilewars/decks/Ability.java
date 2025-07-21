@@ -3,7 +3,7 @@ package com.leomelonseeds.missilewars.decks;
 /**
  * Storage for passives and global passives
  */
-public enum Passive {
+public enum Ability {
     // Vanguard
     ADRENALINE("adrenaline", Type.PASSIVE, DeckStorage.VANGUARD),
     BUNNY("bunny", Type.PASSIVE, DeckStorage.VANGUARD),
@@ -34,7 +34,7 @@ public enum Passive {
     private Type type; // Either "passive" or "gpassive"
     private DeckStorage deck;
     
-    private Passive(String id, Type type, DeckStorage deck) {
+    private Ability(String id, Type type, DeckStorage deck) {
         this.id = id;
         this.type = type;
         this.deck = deck;
@@ -53,8 +53,8 @@ public enum Passive {
         return deck;
     }
     
-    public static Passive fromString(String s) {
-        for (Passive p : Passive.values()) {
+    public static Ability fromString(String s) {
+        for (Ability p : Ability.values()) {
             if (s.equals(p.toString())) {
                 return p;
             }

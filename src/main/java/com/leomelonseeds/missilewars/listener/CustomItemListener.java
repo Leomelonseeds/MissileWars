@@ -47,8 +47,8 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
-import com.leomelonseeds.missilewars.decks.Passive;
-import com.leomelonseeds.missilewars.decks.Passive.Stat;
+import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
@@ -438,7 +438,7 @@ public class CustomItemListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
         UUID uuid = thrower.getUniqueId();
-        boolean poke = plugin.getJSON().getLevel(thrower.getUniqueId(), Passive.POKEMISSILES) > 0;
+        boolean poke = plugin.getJSON().getLevel(thrower.getUniqueId(), Ability.POKEMISSILES) > 0;
         if (poke) {
             String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
             if (offName != null && !thrower.hasCooldown(offhand.getType()) && 
@@ -451,7 +451,7 @@ public class CustomItemListener implements Listener {
         projectileConsume(hand, thrower, playerArena);
         
         // Add particle effects for prickly
-        if (plugin.getJSON().getLevel(uuid, Passive.PRICKLY_PROJECTILES) > 0) {
+        if (plugin.getJSON().getLevel(uuid, Ability.PRICKLY_PROJECTILES) > 0) {
             ArenaUtils.doUntilDead(thrown, () -> 
                 playerArena.getWorld().spawnParticle(Particle.CRIT, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
@@ -459,9 +459,9 @@ public class CustomItemListener implements Listener {
         // More delay + particles for impact trigger
         String structure = structureName;
         int delay = 20;
-        int impactTrigger = plugin.getJSON().getLevel(uuid, Passive.IMPACT_TRIGGER);
+        int impactTrigger = plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER);
         if (impactTrigger > 0) {
-            delay = (int) (delay * ConfigUtils.getAbilityStat(Passive.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
+            delay = (int) (delay * ConfigUtils.getAbilityStat(Ability.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
             ArenaUtils.doUntilDead(thrown, () -> 
                 playerArena.getWorld().spawnParticle(Particle.SMOKE, thrown.getLocation(), 1, 0, 0, 0, 0));
         }
@@ -492,7 +492,7 @@ public class CustomItemListener implements Listener {
         }
         
         // The all important line for this event
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Passive.IMPACT_TRIGGER) <= 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.IMPACT_TRIGGER) <= 0) {
             return;
         }
         
@@ -663,7 +663,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Allow collisions if prickly projectiles
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Passive.PRICKLY_PROJECTILES) > 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.PRICKLY_PROJECTILES) > 0) {
             return;
         }
 

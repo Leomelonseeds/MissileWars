@@ -30,9 +30,9 @@ import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
-import com.leomelonseeds.missilewars.decks.Passive;
-import com.leomelonseeds.missilewars.decks.Passive.Stat;
-import com.leomelonseeds.missilewars.decks.Passive.Type;
+import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.Ability.Stat;
+import com.leomelonseeds.missilewars.decks.Ability.Type;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -219,9 +219,9 @@ public class MissileWarsTeam {
         }
         
         // Potion effect passive activation
-        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(
+        Pair<Ability, Integer> jsonPassive = plugin.getJSON().getPassive(
                 plugin.getJSON().getPlayerPreset(player.getMCPlayerId()), Type.PASSIVE);
-        Passive passive = jsonPassive.getLeft();
+        Ability passive = jsonPassive.getLeft();
         int level = jsonPassive.getRight();
         if (level <= 0) {
             return;

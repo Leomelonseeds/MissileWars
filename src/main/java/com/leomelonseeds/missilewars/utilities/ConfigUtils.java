@@ -28,9 +28,9 @@ import org.bukkit.scheduler.BukkitTask;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
-import com.leomelonseeds.missilewars.decks.Passive;
-import com.leomelonseeds.missilewars.decks.Passive.Stat;
-import com.leomelonseeds.missilewars.decks.Passive.Type;
+import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.Ability.Stat;
+import com.leomelonseeds.missilewars.decks.Ability.Type;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
@@ -458,13 +458,13 @@ public class ConfigUtils {
      * @param stat
      * @return
      */
-    public static double getAbilityStat(Passive ability, int level, Stat stat) {
+    public static double getAbilityStat(Ability ability, int level, Stat stat) {
         if (ability == null) {
             return 0;
         }
         
         String abilityPath;
-        Passive.Type type = ability.getType();
+        Ability.Type type = ability.getType();
         if (type == Type.GPASSIVE) {
             abilityPath = type + "." + ability;
         } else {

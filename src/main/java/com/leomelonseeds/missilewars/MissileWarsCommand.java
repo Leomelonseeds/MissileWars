@@ -116,15 +116,6 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
-            if (args[1].equals("deckmenu")) {
-                String deck = "Sentinel";
-                if (args.length > 2) {
-                    deck = args[2];
-                }
-                new DeckInventory(target, deck);
-                return true;
-            }
-            
             return true;
         }
         
@@ -738,7 +729,6 @@ public class MissileWarsCommand implements CommandExecutor {
         if (action.equalsIgnoreCase("Deck")) {
 
             Player player = (Player) sender;
-
             Arena arena = arenaManager.getArena(player.getUniqueId());
 
             if (!(arena == null || arena.getTeam(player.getUniqueId()) == TeamName.NONE)) {
@@ -781,7 +771,11 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             // Open preset selector if player doesn't specify
-            new OldPresetSelector(player, deck);
+            if (sender.hasPermission("umw.olddeckmenu")) {
+                new OldPresetSelector(player, deck);
+            } else {
+                new DeckInventory(player, deck);
+            }
             return true;
         }
         

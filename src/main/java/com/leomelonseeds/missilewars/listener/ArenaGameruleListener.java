@@ -71,8 +71,8 @@ import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
-import com.leomelonseeds.missilewars.decks.Passive;
-import com.leomelonseeds.missilewars.decks.Passive.Stat;
+import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -315,11 +315,11 @@ public class ArenaGameruleListener implements Listener {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
 
             // Spiked Quiver
-            int spiked = plugin.getJSON().getLevel(uuid, Passive.SPIKED_QUIVER);
+            int spiked = plugin.getJSON().getLevel(uuid, Ability.SPIKED_QUIVER);
             if (spiked > 0) {
                 Arrow arrow = (Arrow) event.getProjectile();
-                int amplifier = (int) ConfigUtils.getAbilityStat(Passive.SPIKED_QUIVER, spiked, Stat.AMPLIFIER);
-                int duration = (int) (ConfigUtils.getAbilityStat(Passive.SPIKED_QUIVER, spiked, Stat.DURATION) * 20);
+                int amplifier = (int) ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.AMPLIFIER);
+                int duration = (int) (ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.DURATION) * 20);
                 Random rand = new Random();
                 PotionEffectType type = effects.get(rand.nextInt(effects.size()));
                 arrow.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
@@ -363,10 +363,10 @@ public class ArenaGameruleListener implements Listener {
         
         // Heavy arrows
         Arrow proj = (Arrow) eventProj;
-        int heavy = plugin.getJSON().getLevel(uuid, Passive.HEAVY_ARROWS);
+        int heavy = plugin.getJSON().getLevel(uuid, Ability.HEAVY_ARROWS);
         if (heavy > 0) {
-            double slow = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.PERCENTAGE) / 100;
-            double multiplier = ConfigUtils.getAbilityStat(Passive.HEAVY_ARROWS, heavy, Stat.MULTIPLIER);
+            double slow = ConfigUtils.getAbilityStat(Ability.HEAVY_ARROWS, heavy, Stat.PERCENTAGE) / 100;
+            double multiplier = ConfigUtils.getAbilityStat(Ability.HEAVY_ARROWS, heavy, Stat.MULTIPLIER);
             SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);
             arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
             arrow.setShooter(player);
@@ -388,12 +388,12 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Longshot
-        int longshot = plugin.getJSON().getLevel(uuid, Passive.LONGSHOT);
+        int longshot = plugin.getJSON().getLevel(uuid, Ability.LONGSHOT);
         if (longshot > 0) {
             longShots.put(proj, player.getLocation());
             
             // Add gradually increasing color particles
-            double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
+            double max = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.MAX);
             BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
                 if (!longShots.containsKey(proj) || proj.isInBlock()) {
                     return;
@@ -454,7 +454,7 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Creepershot
-        if (plugin.getJSON().getLevel(player.getUniqueId(), Passive.CREEPERSHOT) > 0) {
+        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.CREEPERSHOT) > 0) {
             ItemStack offhand = inv.getItemInOffHand();
             if (offhand.getType() != Material.CREEPER_HEAD || player.hasCooldown(offhand.getType())) {
                 return;
@@ -513,7 +513,7 @@ public class ArenaGameruleListener implements Listener {
                 eventDamager instanceof ExplosiveMinecart ||
                 eventDamager instanceof Creeper) {
                 // Check bers rocketeer
-                int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Passive.ROCKETEER);
+                int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ROCKETEER);
                 if (rocketeer > 0) {
                     // If boots have UNBREAKING, it means the custom blastprot is set (see DeckManager)
                     // In this case, the level of unbreaking corresponds to the level of blastprot
@@ -525,7 +525,7 @@ public class ArenaGameruleListener implements Listener {
                     }
                     
                     // Apply extra velocity from rocketeer if available
-                    multiplyKnockback(player, ConfigUtils.getAbilityStat(Passive.ROCKETEER, rocketeer, Stat.MULTIPLIER));
+                    multiplyKnockback(player, ConfigUtils.getAbilityStat(Ability.ROCKETEER, rocketeer, Stat.MULTIPLIER));
                 }
                 
                 // Fireballs should not do dmg to players
@@ -589,12 +589,12 @@ public class ArenaGameruleListener implements Listener {
             // multiply knockback by glowing ticks / 4
             double extradmg = 0;
             if (type == EntityType.ARROW) {
-                int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.LONGSHOT);
+                int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.LONGSHOT);
                 extradmg = getExtraLongshotDamage(projectile, longshot, player.getLocation());
                 if (extradmg > 0) {
                     event.setDamage(event.getDamage() + extradmg);
                 } else {
-                    double reduction = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PERCENTAGE);
+                    double reduction = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.PERCENTAGE);
                     event.setDamage(event.getDamage() * (1 - (reduction / 100)));
                 }
             } else if (type == EntityType.SPECTRAL_ARROW) {
@@ -627,14 +627,14 @@ public class ArenaGameruleListener implements Listener {
             }
             
             // Check for the passive
-            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Passive.PRICKLY_PROJECTILES);
+            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.PRICKLY_PROJECTILES);
             if (prickly == 0) {
                 return;
             }
 
             ThrowableProjectile proj = (ThrowableProjectile) projectile;
             ItemStack item = proj.getItem();
-            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Passive.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
+            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Ability.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
             
             // Make sure its custom item
             String itemString = InventoryUtils.getStringFromItem(item, "item-structure");
@@ -663,9 +663,9 @@ public class ArenaGameruleListener implements Listener {
             return 0;
         }
         
-        double plus = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.PLUS);
-        double max = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.MAX);
-        double cutoff = ConfigUtils.getAbilityStat(Passive.LONGSHOT, longshot, Stat.CUTOFF);
+        double plus = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.PLUS);
+        double max = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.MAX);
+        double cutoff = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.CUTOFF);
         double distance = longOrigin.distance(loc);
         
         // Calculate damage
@@ -796,7 +796,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Passive.DECONSTRUCTOR);
+        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Ability.DECONSTRUCTOR);
         if (deconstructor <= 0) {
             return;
         }
@@ -816,7 +816,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         Random random = new Random();
-        double percentage = ConfigUtils.getAbilityStat(Passive.DECONSTRUCTOR, deconstructor, Stat.PERCENTAGE) / 100;
+        double percentage = ConfigUtils.getAbilityStat(Ability.DECONSTRUCTOR, deconstructor, Stat.PERCENTAGE) / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
             InventoryUtils.regiveItem(player, item);

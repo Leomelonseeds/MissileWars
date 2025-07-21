@@ -170,3 +170,7 @@ throw-projectile:
   sound: "ENTITY_EGG_THROW"
   volume: 1.0
   pitch: 1.0
+deck-upgrade-tab:
+  sound: "ITEM_BOOK_PAGE_TURN"
+  volume: 1.0
+  pitch: 1.0

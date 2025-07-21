@@ -1526,6 +1526,7 @@ indicators:
     item: ORANGE_DYE
     name: "&6&lAbility &7(Choose 1)"
     lore:
+      - "&dCOMING SOON"
       - "&7Perks that might take some"
       - "&7practice to use well"
     slot: 50

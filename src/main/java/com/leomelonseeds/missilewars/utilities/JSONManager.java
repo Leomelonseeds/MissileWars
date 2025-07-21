@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
-import com.leomelonseeds.missilewars.decks.Passive;
+import com.leomelonseeds.missilewars.decks.Ability;
 
 public class JSONManager {
 
@@ -377,9 +377,9 @@ public class JSONManager {
      * @param type
      * @return right is 0 if passive does not exist or no passive selected
      */
-    public Pair<Passive, Integer> getPassive(JSONObject json, Passive.Type type) {
+    public Pair<Ability, Integer> getPassive(JSONObject json, Ability.Type type) {
         JSONObject typeJSON = json.getJSONObject(type.toString());
-        Passive passive = Passive.fromString(typeJSON.getString("selected"));
+        Ability passive = Ability.fromString(typeJSON.getString("selected"));
         return Pair.of(passive, passive == null ? 0 : typeJSON.getInt("level"));
     }
     
@@ -391,7 +391,7 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getLevel(UUID uuid, Passive ability) {
+    public int getLevel(UUID uuid, Ability ability) {
         JSONObject json = getPlayerPreset(uuid);
         return getLevel(json, ability);
     }
@@ -403,8 +403,8 @@ public class JSONManager {
      * @param ability
      * @return
      */
-    public int getLevel(JSONObject json, Passive ability) {
-        Pair<Passive, Integer> res = getPassive(json, ability.getType());
+    public int getLevel(JSONObject json, Ability ability) {
+        Pair<Ability, Integer> res = getPassive(json, ability.getType());
         return res.getLeft() == ability ? res.getRight() : 0;
     }
     

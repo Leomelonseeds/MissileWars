@@ -29,9 +29,9 @@ public class DeckInventory extends MWInventory {
         MISSILES,
         UTILITY,
         ENCHANTS,
-        ABILITIES,
-        PASSIVES,
-        GPASSIVES
+        ABILITY,
+        PASSIVE,
+        GPASSIVE
     }
 
     private String deck;
@@ -139,6 +139,7 @@ public class DeckInventory extends MWInventory {
         // If not, see if the currently open sub inventory can 
         if (curSubInventory.registerClick(item, slot, type, player)) {
             curSubInventory.fillItems();
+            updateInfoItem();
             updateTitle();
         }
     }
@@ -161,24 +162,28 @@ public class DeckInventory extends MWInventory {
      * @param slot the slot of the indicator, to change its color
      */
     private void openSubInventory(SubInventory type, int slot) {
-        if (type.equals(curSubInventoryType)) {
+        if (type == curSubInventoryType) {
+            return;
+        }
+        
+        // Only I can use ability hehe
+        if (type == SubInventory.ABILITY && !player.hasPermission("umw.admin")) {
             return;
         }
 
         updatePreset();
         curSubInventoryType = type;
+        String typeString = type.toString().toLowerCase();
         switch (type) {
             case MISSILES:
             case UTILITY:
             case ENCHANTS:
-                String typeString = type.toString().toLowerCase();
                 curSubInventory = new ItemUpgrades(this, deck, itemConfig, playerJson, typeString, preset, presetJson);
                 break;
-            case ABILITIES:
-                break;
-            case GPASSIVES:
-                break;
-            case PASSIVES:
+            case ABILITY:
+            case GPASSIVE:
+            case PASSIVE:
+                curSubInventory = new AbilityUpgrades(this, deck, itemConfig, playerJson, typeString, preset, presetJson);
                 break;
             case PRESETS:
                 curSubInventory = new PresetSelector(this, deck, itemConfig, playerJson, deckJson);
@@ -198,6 +203,7 @@ public class DeckInventory extends MWInventory {
             inv.setItem(slot - 9, InventoryUtils.createBlankItem(Material.LIME_STAINED_GLASS_PANE));
         }
         curSubInventory.fillItems();
+        ConfigUtils.sendConfigSound("deck-upgrade-tab", player);
     }
     
     /**

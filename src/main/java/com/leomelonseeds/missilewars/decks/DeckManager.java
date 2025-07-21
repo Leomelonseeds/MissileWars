@@ -30,8 +30,8 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.decks.Passive.Stat;
-import com.leomelonseeds.missilewars.decks.Passive.Type;
+import com.leomelonseeds.missilewars.decks.Ability.Stat;
+import com.leomelonseeds.missilewars.decks.Ability.Type;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -74,17 +74,17 @@ public class DeckManager {
         List<ItemStack> gear = new ArrayList<>();
         
         // Figure out utility and missile multipliers
-        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(json, Type.GPASSIVE);
-        Passive gpassive = jsonPassive.getLeft();
+        Pair<Ability, Integer> jsonPassive = plugin.getJSON().getPassive(json, Type.GPASSIVE);
+        Ability gpassive = jsonPassive.getLeft();
         int glevel = jsonPassive.getRight();
         double mmult = 1;
         double umult = 1;
         double maxmult = 1;
         if (glevel > 0) {
-            if (gpassive != Passive.HOARDER) {
+            if (gpassive != Ability.HOARDER) {
                 double mperc = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.MPERCENTAGE) / 100;
                 double uperc = ConfigUtils.getAbilityStat(gpassive, glevel, Stat.UPERCENTAGE) / 100;
-                if (gpassive == Passive.MISSILE_SPEC) {
+                if (gpassive == Ability.MISSILE_SPEC) {
                     mmult = 1 - mperc;
                     umult = uperc + 1;
                 } else {
@@ -107,7 +107,7 @@ public class DeckManager {
                 ItemStack i = createItem(key, level, isMissile);
                 
                 // Change color of lava splash
-                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getLevel(uuid, Passive.ENDER_SPLASH) > 0) {
+                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getLevel(uuid, Ability.ENDER_SPLASH) > 0) {
                     PotionMeta pmeta = (PotionMeta) i.getItemMeta();
                     String name = ConfigUtils.toPlain(pmeta.displayName());
                     name = name.replaceFirst("9", "d");  // Make name pink
@@ -181,7 +181,7 @@ public class DeckManager {
         
         // Add custom effects
         String custom = null;
-        if (ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Passive.ROCKETEER) > 0) {
+        if (ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Ability.ROCKETEER) > 0) {
             custom = "Blast Protection";
         } else if (ench == Enchantment.FORTUNE) {
             custom = "Haste";
