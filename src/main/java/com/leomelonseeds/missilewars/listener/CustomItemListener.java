@@ -38,7 +38,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -117,8 +116,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Makes sure player is using architect
-        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayerPreset(player.getUniqueId());
-        if (!json.has("haste")) {
+        int haste = MissileWarsPlugin.getPlugin().getJSON().getEnchantLevel(player.getUniqueId(), "haste");
+        if (haste <= 0) {
             return;
         }
         
@@ -136,12 +135,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        int level = json.getInt("haste");
-        if (level <= 0) {
-            return;
-        }
-        
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, level * 2 - 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, haste * 2 - 1));
     }
 
     /** Handle right clicking missiles and utility items */

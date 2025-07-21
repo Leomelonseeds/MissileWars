@@ -417,4 +417,20 @@ public class JSONManager {
     public int getMaxSkillpoints(UUID uuid) {
         return ConfigUtils.getConfigFile("items.yml").getInt("default-skillpoints");
     }
+    
+    /**
+     * Get the level of a specified enchantment
+     * 
+     * @param uuid
+     * @param enchant
+     * @return
+     */
+    public int getEnchantLevel(UUID uuid, String enchant) {
+        JSONObject enchantsJson = getPlayerPreset(uuid).getJSONObject("enchants");
+        if (!enchantsJson.has(enchant)) {
+            return 0;
+        }
+        
+        return enchantsJson.getInt(enchant);
+    }
 }

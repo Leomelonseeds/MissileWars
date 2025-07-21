@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.json.JSONObject;
 
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -209,23 +208,19 @@ public class MissileWarsTeam {
         arena.addCallback(player);
      
         // Architect Haste
-        JSONObject json = plugin.getJSON().getPlayerPreset(mcPlayer.getUniqueId());
-        if (json.has("haste")) {
+        int haste = plugin.getJSON().getEnchantLevel(mcPlayer.getUniqueId(), "haste");
+        if (haste > 0) {
             ItemStack item = mcPlayer.getInventory().getItemInMainHand();
             if (item == null || item.getType() != Material.IRON_PICKAXE) {
                 return;
             }
             
-            int level = json.getInt("haste");
-            if (level <= 0) {
-                return;
-            }
-            
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, level * 2 - 1));
+            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, haste * 2 - 1));
         }
         
         // Potion effect passive activation
-        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(json, Type.PASSIVE);
+        Pair<Passive, Integer> jsonPassive = plugin.getJSON().getPassive(
+                plugin.getJSON().getPlayerPreset(player.getMCPlayerId()), Type.PASSIVE);
         Passive passive = jsonPassive.getLeft();
         int level = jsonPassive.getRight();
         if (level <= 0) {
