@@ -1478,7 +1478,7 @@ held:
 default-skillpoints: 16
 
 intangibles:
-  locked: PAPER
+  locked: MAP
   unlocked: BOOK
   selected: BOOK
 
@@ -1538,7 +1538,7 @@ indicators:
     slot: 51
   gpassive:
     item: PURPLE_DYE
-    name: "&5&lGlobal Passive &8(1 only)"
+    name: "&5&lGlobal Passive &7(Choose 1)"
     lore:
       - "&7Perks available to all decks"
       - "&7that are always active"
@@ -1586,6 +1586,7 @@ text:
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
 
 preset:
+  # The items below are used for the old preset and deck customization menu
   info:
     Architect:
       item: IRON_PICKAXE
@@ -1682,6 +1683,8 @@ preset:
     - "&7and purchase passives and abilities."
     - ""
     - "&cClick &7to edit this preset"
+    
+  # Items for the updated deck and preset selection menu
   deck:
     name: "%color%&l%deck% &7[%preset%] &8- %select%"
     notselected: "&cClick &7to use this preset"
@@ -1716,11 +1719,34 @@ preset:
       - "&7quirky missiles and ability to build"
       - "&7with leaves, platforms, and shields."
   selector:
-    item: BOOKSHELF
-    name: "&f&lChange Preset"
-    lore:
-    - "Create and choose different"
-    - "configurations for this deck"
+    indicator:
+      item: BOOKSHELF
+      name: "&f&lChange Preset"
+      lore:
+      - "&7Create and choose different"
+      - "&7configurations for this deck"
+    preset:
+      name: "&f&lPreset %preset%"
+      item: BOOKSHELF
+      item-editing: CHISELED_BOOKSHELF
+      lore:
+      - ""
+      - "&fAbility: &8%ability%"
+      - "&fPassive: &8%passive%"
+      - "&fGlobal Passive: &8%gpassive%"
+      - ""
+      - "%select%"
+      - "%edit%"
+      name-rank-requirement:
+        B: " &8(requires &e&lESQUIRE&8)"
+        C: " &8(requires &b&lKNIGHT&8)"
+        D: " &8(requires &d&lNOBLE&8)"
+        E: " &8(requires &5&lROYAL&8)"
+      selected: "&aYou are using this preset"
+      notselected: "&cLeft-click &7to use this preset"
+      editing: "&2You are editing this preset"
+      notediting: "&cRight-click &7to edit this preset"
+      
     
   
 enchants:

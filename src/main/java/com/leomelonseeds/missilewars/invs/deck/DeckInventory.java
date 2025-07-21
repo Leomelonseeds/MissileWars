@@ -1,12 +1,12 @@
 package com.leomelonseeds.missilewars.invs.deck;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -35,16 +35,15 @@ public class DeckInventory extends MWInventory {
     }
 
     private String deck;
-    private String preset;
     private FileConfiguration itemConfig;
     private JSONManager jsonManager;
     private JSONObject playerJson;
     private JSONObject deckJson;
+    private String preset;
     private JSONObject presetJson;
     private BiMap<Integer, String> indicators;
     private DeckSubInventory curSubInventory;
     private SubInventory curSubInventoryType;
-    private HashMap<SubInventory, DeckSubInventory> subInventoryCache;
     
     public DeckInventory(Player player, String deck) {
         super(player, 54, deck);
@@ -54,16 +53,7 @@ public class DeckInventory extends MWInventory {
         jsonManager = MissileWarsPlugin.getPlugin().getJSON();
         playerJson = jsonManager.getPlayer(player.getUniqueId());
         deckJson = playerJson.getJSONObject(deck);
-        preset = getPreset();
-        if (deckJson.has(preset)) {
-            presetJson = deckJson.getJSONObject(preset);
-        }
-        
-        // Set main menu as the default sub inventory
-        subInventoryCache = new HashMap<>();
-        curSubInventory = new MainMenu(inv, deck, preset, playerJson, presetJson, itemConfig, o -> openSubInventory(SubInventory.PRESETS));
-        curSubInventoryType = SubInventory.MAIN;
-        subInventoryCache.put(curSubInventoryType, curSubInventory);
+        updatePreset();
     }
     
     @Override
@@ -106,8 +96,11 @@ public class DeckInventory extends MWInventory {
         }
         
         updateInfoItem();
-        curSubInventory.fillItems();
-        updateTitle();
+        
+        // Open main menu if not set
+        if (curSubInventoryType == null) {
+            openSubInventory(SubInventory.MAIN);
+        }
     }
 
     @Override
@@ -129,7 +122,34 @@ public class DeckInventory extends MWInventory {
             return;
         }
         
-        curSubInventory.registerClick(item, slot, type);
+        // Check if we can open a sub inventory
+        String indicator = indicators.get(slot);
+        if (indicator != null) {
+            SubInventory toOpen;
+            try {
+                toOpen = SubInventory.valueOf(indicator.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return;
+            }
+            
+            openSubInventory(toOpen, slot);
+            return;
+        }
+        
+        // If not, see if the currently open sub inventory can 
+        if (curSubInventory.registerClick(item, slot, type, player)) {
+            curSubInventory.fillItems();
+            updateTitle();
+        }
+    }
+    
+    /**
+     * Opens an un-tabbed sub inventory
+     * 
+     * @param type
+     */
+    private void openSubInventory(SubInventory type) {
+        openSubInventory(type, -1);
     }
     
     /**
@@ -138,42 +158,45 @@ public class DeckInventory extends MWInventory {
      * It then clears the current items in the middle and fills
      * 
      * @param type
+     * @param slot the slot of the indicator, to change its color
      */
-    private void openSubInventory(SubInventory type) {
+    private void openSubInventory(SubInventory type, int slot) {
         if (type.equals(curSubInventoryType)) {
             return;
         }
 
+        updatePreset();
         curSubInventoryType = type;
-        if (subInventoryCache.containsKey(type)) {
-            curSubInventory = subInventoryCache.get(type);
-        } else {
-            // Set curSubInventory here
-            switch (type) {
-                case MISSILES:
-                    break;
-                case UTILITY:
-                    break;
-                case ENCHANTS:
-                    break;
-                case ABILITIES:
-                    break;
-                case GPASSIVES:
-                    break;
-                case PASSIVES:
-                    break;
-                case PRESETS:
-                    break;
-                default:
-                    // This cannot possibly happen
-                    break;
-            }
-            
-            subInventoryCache.put(type, curSubInventory);
+        switch (type) {
+            case MISSILES:
+            case UTILITY:
+            case ENCHANTS:
+                String typeString = type.toString().toLowerCase();
+                curSubInventory = new ItemUpgrades(this, deck, itemConfig, playerJson, typeString, preset, presetJson);
+                break;
+            case ABILITIES:
+                break;
+            case GPASSIVES:
+                break;
+            case PASSIVES:
+                break;
+            case PRESETS:
+                curSubInventory = new PresetSelector(this, deck, itemConfig, playerJson, deckJson);
+                break;
+            case MAIN:
+                curSubInventory = new MainMenu(this, deck, itemConfig, playerJson, preset, presetJson, () -> openSubInventory(SubInventory.PRESETS));
+                break;
+            default:
+                // This cannot possibly happen
+                break;
         }
         
         updateTitle();
         clearMiddleSlots();
+        if (slot > 0) {
+            InventoryUtils.addGlow(inv.getItem(slot));
+            inv.setItem(slot - 9, InventoryUtils.createBlankItem(Material.LIME_STAINED_GLASS_PANE));
+        }
         curSubInventory.fillItems();
     }
     
@@ -181,17 +204,24 @@ public class DeckInventory extends MWInventory {
      * Updates the title according to currently selected deck, preset, and sub inventory
      */
     private void updateTitle() {
-        setTitle(deck + " [" + preset + "] - " + curSubInventory.getSubTitle());
+        setTitle(deck + " [" + updatePreset() + "] - " + curSubInventory.getSubTitle());
     }
     
     /**
      * Clear all the middle slots for swithcing between tabs
+     * Also clear glow and stuff of bottom indicators
      */
     private void clearMiddleSlots() {
         for (int i = 10; i <= 34; i++) {
             if (isMiddleSlot(i)) {
                 inv.setItem(i, null);
             }
+        }
+        
+        for (int i = 37; i <= 43; i++) {
+            Material defaultMat = inv.getItem(40).getType();
+            inv.setItem(i, new ItemStack(defaultMat));
+            inv.getItem(i + 9).removeEnchantment(Enchantment.UNBREAKING);
         }
     }
     
@@ -227,7 +257,19 @@ public class DeckInventory extends MWInventory {
         item.setItemMeta(meta);
     }
     
-    private String getPreset() {
-        return deckJson.getString("last-preset");
+    /**
+     * Updates the preset with the last selected one.
+     * presetJson is updated after this one
+     * 
+     * @return the preset string
+     */
+    private String updatePreset() {
+        String newPreset = deckJson.getString("last-preset");
+        if (!newPreset.equals(preset)) {
+            preset = newPreset;
+            presetJson = deckJson.getJSONObject(newPreset);
+        }
+        
+        return newPreset;
     }
 }

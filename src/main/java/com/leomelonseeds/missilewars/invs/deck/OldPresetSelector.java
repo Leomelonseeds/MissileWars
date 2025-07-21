@@ -1,7 +1,8 @@
-package com.leomelonseeds.missilewars.invs;
+package com.leomelonseeds.missilewars.invs.deck;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,18 +21,19 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class PresetSelector extends MWInventory {
+public class OldPresetSelector extends MWInventory {
     
     private String deck;
     private FileConfiguration itemConfig;
     private JSONObject playerJson;
     
-    public PresetSelector(Player player, String deck) {
+    public OldPresetSelector(Player player, String deck) {
         super(player, 54, 
             ConfigUtils.getConfigFile("items.yml")
                 .getString("title.preset")
@@ -204,17 +206,8 @@ public class PresetSelector extends MWInventory {
         Material edit = Material.getMaterial(itemConfig.getString("preset.edit.item"));
         if (itemType == selection || itemType == edit) {
             String p = InventoryUtils.getStringFromItem(item, "preset");
-            
-            // Check permission for B
-            if (p.equals("B") && !player.hasPermission("umw.preset.b")) {
-                ConfigUtils.sendConfigMessage("messages.preset-b-locked", player, null, null);
-                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                return;
-            }
-            
-            // Check permission for C
-            if (p.equals("C") && !player.hasPermission("umw.preset.c")) {
-                ConfigUtils.sendConfigMessage("messages.preset-c-locked", player, null, null);
+            if (!player.hasPermission("umw.preset." + p.toLowerCase())) {
+                ConfigUtils.sendConfigMessage("messages.preset-locked", player);
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
             }
@@ -222,7 +215,7 @@ public class PresetSelector extends MWInventory {
             // Check item types
             if (itemType == edit) {
                 // Open deck customizer
-                new DeckCustomizer(player, deck, p);
+                new OldDeckCustomizer(player, deck, p);
                 return;
             }
             
@@ -239,10 +232,7 @@ public class PresetSelector extends MWInventory {
     }
     
     private void presetMessage(String preset) {
-        String msg = ConfigUtils.getConfigText("messages.change-preset", player, null, null);
-        msg = msg.replace("%deck%", deck);
-        msg = msg.replace("%preset%", preset);
-        player.sendMessage(ConfigUtils.toComponent(msg));
+        ConfigUtils.sendConfigMessage("change-preset", player, Map.of("%deck%", deck, "%preset%", preset));
         ConfigUtils.sendConfigSound("change-preset", player);
     }
 }

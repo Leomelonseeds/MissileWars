@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -180,6 +181,21 @@ public class ConfigUtils {
             list.add(setPlaceholders(msg, player, arena, focus));
         }
         return list;
+    }
+    
+    /**
+     * Send a message with our own placeholders
+     * 
+     * @param path a messages.yml path without "messages."
+     * @param player
+     * @param placeholders a map with %placeholder% -> replacement
+     */
+    public static void sendConfigMessage(String path, Player player, Map<String, String> placeholders) {
+        String msg = getConfigText("messages." + path, player, null, null);
+        for (Entry<String, String> placeholder : placeholders.entrySet()) {
+            msg = msg.replace(placeholder.getKey(), placeholder.getValue());
+        }
+        player.sendMessage(ConfigUtils.toComponent(msg));
     }
     
     /**

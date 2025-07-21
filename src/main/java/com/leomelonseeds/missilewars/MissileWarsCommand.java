@@ -27,8 +27,8 @@ import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.invs.ArenaSelector;
 import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
-import com.leomelonseeds.missilewars.invs.PresetSelector;
 import com.leomelonseeds.missilewars.invs.deck.DeckInventory;
+import com.leomelonseeds.missilewars.invs.deck.OldPresetSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.cinematic.AbilitiesReplay;
@@ -781,7 +781,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             // Open preset selector if player doesn't specify
-            new PresetSelector(player, deck);
+            new OldPresetSelector(player, deck);
             return true;
         }
         

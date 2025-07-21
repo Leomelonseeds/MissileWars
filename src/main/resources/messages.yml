@@ -98,6 +98,7 @@ messages:
   arrow-damage: "%umw_focus% &7is now on &f%health%❤"
   longshot-extra: " &7(+&f%dmg% &7extra damage)"
   missile-cooldown: "&c&l[!] &7You cannot place a missile yet!"
+  preset-locked: "&c&l[!] &7You cannot use this preset! Create more presets by donating using &a/buy"
   preset-b-locked: "&c&l[!] &7You must have &e&lESQUIRE &7rank to use this preset!"
   preset-c-locked: "&c&l[!] &7You must have &b&lKNIGHT &7rank to use this preset!"
   sp-negative: "&c&l[!] &cYour %deck% Preset %preset% was reset due to skillpoint count being negative."

@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.invs;
+package com.leomelonseeds.missilewars.invs.deck;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +17,15 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
+import com.leomelonseeds.missilewars.invs.ConfirmAction;
+import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
 
 import net.kyori.adventure.text.Component;
 
-public class DeckCustomizer extends MWInventory {
+public class OldDeckCustomizer extends MWInventory {
     
     private JSONObject init;
     private JSONObject presetjson;
@@ -35,7 +37,7 @@ public class DeckCustomizer extends MWInventory {
     private String[] items;
     private String[] abilities;
     
-    public DeckCustomizer(Player player, String deck, String preset) {
+    public OldDeckCustomizer(Player player, String deck, String preset) {
         super(player, 45, 
             ConfigUtils.getConfigFile("items.yml")
                 .getString("title.deck")
@@ -149,7 +151,7 @@ public class DeckCustomizer extends MWInventory {
     public void registerClick(int slot, ClickType type) {
         // Back button
         if (slot == itemConfig.getInt("indicators.back.slot-old")) {
-            new PresetSelector(player, deck);
+            new OldPresetSelector(player, deck);
             return;
         }
         
