@@ -235,7 +235,7 @@ public class SchematicManager {
         
         // Manually spawn TNT minecarts in torpedos
         if (args[0].equals("torpedo")) {
-            final int minecarts = 4;
+            final int minecarts = 2;
             List<Location> minecartLocs = new ArrayList<>();
             Location minecartLoc1 = loc.clone().toCenterLocation().add(0, -0.5, 0);
             minecartLocs.add(minecartLoc1);
