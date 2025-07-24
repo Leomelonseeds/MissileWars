@@ -120,7 +120,7 @@ public class TutorialArena extends ClassicArena {
     }
 
     @Override
-    protected void postJoin(Player player, boolean asSpectator) { 
+    protected void postJoin(Player player, boolean asSpectator) {
         UUID uuid = player.getUniqueId();
         if (!stage.containsKey(uuid)) {
             stage.put(uuid, 0);
@@ -128,6 +128,10 @@ public class TutorialArena extends ClassicArena {
         enqueue(uuid, "blue");
         initiateStage(player, stage.get(uuid));
         justReset = false;
+        if (player.hasPermission("umw.new")) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
+                    "lp user " + player.getName() + " permission unset umw.new");
+        }
     }
     
     /**

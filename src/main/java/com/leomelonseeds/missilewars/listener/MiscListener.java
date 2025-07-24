@@ -36,6 +36,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.mineacademy.chatcontrol.api.ChannelPreChatEvent;
 
@@ -150,10 +151,40 @@ public class MiscListener implements Listener {
             RankUtils.setPlayerExpBar(player);
         });
         
+        // Make people who are new but didn't do the tutorial yet do the tutorial
+        if (player.hasPermission("umw.new")) {
+            ConfigUtils.schedule(20, () -> {
+                Arena arena = plugin.getArenaManager().getArena("tutorial");
+                if (arena.isResetting()) {
+                    ConfigUtils.schedule(20, () -> arena.joinPlayer(player));
+                } else {
+                    arena.joinPlayer(player);
+                }
+            });
+            
+            return;
+        }
+
         // Let new players watch the cinematic
+        // Give players permission and then play the cinematic once they move
         if (!player.hasPlayedBefore()) {
-            ConfigUtils.sendTitle("cinematic-0", player);
-            ConfigUtils.schedule(100, () -> plugin.getCinematicManager().play(player));
+            Location initLoc = player.getLocation();
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
+                    "lp user " + player.getName() + " permission set umw.new");
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline()) {
+                        this.cancel();
+                        return;
+                    }
+                    
+                    if (player.getLocation().distanceSquared(initLoc) > 1) {
+                        plugin.getCinematicManager().play(player);
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 20, 20);
         }
     }
 
