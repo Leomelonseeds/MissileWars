@@ -909,6 +909,11 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Don't afk kick people doing the tutorial
+        if (arena.getName().equals("tutorial")) {
+            return;
+        }
+        
         MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         if (arena.isSpectating(mwPlayer)) {
             return;
