@@ -152,7 +152,8 @@ public class MiscListener implements Listener {
         });
         
         // Make people who are new but didn't do the tutorial yet do the tutorial
-        if (player.hasPermission("umw.new")) {
+        // Bedrock players shouldn't get the cinematic as its fucked
+        if (player.hasPermission("umw.new") || ConfigUtils.isBedrockPlayer(player)) {
             ConfigUtils.schedule(20, () -> {
                 Arena arena = plugin.getArenaManager().getArena("tutorial");
                 if (arena.isResetting()) {

@@ -243,7 +243,14 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             if (line >= lines.size()) {
                 return "";
             }
-            return lines.get(line);
+            
+            // Add unicode to make bedrock lines smaller
+            String lineText = lines.get(line);
+            if (ConfigUtils.isBedrockPlayer(player)) {
+                lineText += "⬞";
+            }
+            
+            return lineText;
         }
 
         if (params.equals("gamemode")) {

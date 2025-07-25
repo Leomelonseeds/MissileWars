@@ -91,7 +91,7 @@ public class PresetSelector extends DeckSubInventory {
         }
         
         if (!player.hasPermission("umw.preset." + preset.toLowerCase())) {
-            ConfigUtils.sendConfigMessage("messages.preset-locked", player);
+            ConfigUtils.sendConfigMessage("preset-locked", player);
             ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             return false;
         }

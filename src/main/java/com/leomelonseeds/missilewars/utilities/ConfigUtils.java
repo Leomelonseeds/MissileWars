@@ -317,7 +317,12 @@ public class ConfigUtils {
      */
     public static void sendTitle(String path, Player player) {
         // Find titles and subtitles from config
+        // Bedrock players don't get subtitles for empty titles, add a dot for them
         String title = getConfigText("titles." + path + ".title", null, null, null);
+        if (isBedrockPlayer(player) && removeColors(title).isEmpty()) {
+            title += ".";
+        }
+        
         List<String> subtitles = getConfigTextList("titles." + path + ".subtitle", null,
                 null, null);
         String subtitle;
@@ -544,5 +549,9 @@ public class ConfigUtils {
      */
     public static BukkitTask schedule(int ticks, Runnable runnable) {
         return Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> runnable.run(), ticks);
+    }
+    
+    public static boolean isBedrockPlayer(OfflinePlayer player) {
+        return player.getName().startsWith("~");
     }
 }

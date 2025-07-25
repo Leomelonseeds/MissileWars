@@ -207,7 +207,7 @@ public class OldPresetSelector extends MWInventory {
         if (itemType == selection || itemType == edit) {
             String p = InventoryUtils.getStringFromItem(item, "preset");
             if (!player.hasPermission("umw.preset." + p.toLowerCase())) {
-                ConfigUtils.sendConfigMessage("messages.preset-locked", player);
+                ConfigUtils.sendConfigMessage("preset-locked", player);
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
             }
