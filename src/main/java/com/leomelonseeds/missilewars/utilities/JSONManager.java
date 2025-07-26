@@ -23,8 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 public class JSONManager {
 
@@ -89,6 +89,7 @@ public class JSONManager {
                 // Update versioning
                 if (!isNew) {
                     updateVersion1(newJson);
+                    updateVersion2(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -248,8 +249,6 @@ public class JSONManager {
     /**
      * Version 1 introduces the versioning system and 
      * changes all enchants to be stored in their own object
-     * 
-     * @param json
      */
     private void updateVersion1(JSONObject json) {
         if (json.has("version")) {
@@ -279,6 +278,40 @@ public class JSONManager {
                 }
                 
                 presetJson.put("enchants", enchantJson);
+            }
+        }
+    }
+    
+    /**
+     * Version 2 
+     * - renamed passive "warden" to "impacttrigger"
+     * - renamed passive "spectral" to "exoticarrows"
+     */
+    private void updateVersion2(JSONObject json) {
+        if (json.getInt("version") >= 2) {
+            return;
+        }
+
+        json.put("version", 2);
+        
+        JSONObject sentinelJson = json.getJSONObject("Sentinel");
+        
+        boolean purchased = sentinelJson.getBoolean("spectral");
+        sentinelJson.remove("spectral");
+        sentinelJson.put("exoticarrows", purchased);
+        
+        
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!sentinelJson.has(preset)) {
+                continue;
+            }
+
+            JSONObject passiveJson = sentinelJson.getJSONObject(preset).getJSONObject("passive");
+            String curPassive = passiveJson.getString("selected");
+            if (curPassive.equals("warden")) {
+                passiveJson.put("selected", "impacttrigger");
+            } else if (curPassive.equals("spectral")) {
+                passiveJson.put("selected", "exoticarrows");
             }
         }
     }

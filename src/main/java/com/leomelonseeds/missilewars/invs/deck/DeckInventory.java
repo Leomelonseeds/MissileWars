@@ -165,11 +165,6 @@ public class DeckInventory extends MWInventory {
         if (type == curSubInventoryType) {
             return;
         }
-        
-        // Only I can use ability hehe
-        if (type == SubInventory.ABILITY && !player.hasPermission("umw.admin")) {
-            return;
-        }
 
         updatePreset();
         curSubInventoryType = type;

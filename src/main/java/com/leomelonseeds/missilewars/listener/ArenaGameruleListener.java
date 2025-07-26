@@ -22,7 +22,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -62,8 +65,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -89,10 +94,12 @@ import net.kyori.adventure.text.Component;
 /** Class to listen for events relating to Arena game rules. */
 public class ArenaGameruleListener implements Listener {
     
-    public static Map<Arrow, Location> longShots = new HashMap<>(); // Origin location of projectile
-    public static Set<Player> saidGG = new HashSet<>();
-    private List<PotionEffectType> effects;
+    private static List<PotionEffectType> effects;
+    
+    private Map<AbstractArrow, Location> longShots = new HashMap<>(); // Origin location of projectile
+    private Set<Player> saidGG = new HashSet<>();
     private Map<Player, Pair<Integer, Integer>> arrowInventoryItem; // Amount, Slot
+    private Map<Player, Double> knockbackMultipliers;
     
     public ArenaGameruleListener() {
         effects = List.of(new PotionEffectType[] {
@@ -105,7 +112,10 @@ public class ArenaGameruleListener implements Listener {
             PotionEffectType.MINING_FATIGUE,
         });
         
+        longShots = new HashMap<>();
+        saidGG = new HashSet<>();
         arrowInventoryItem = new HashMap<>();
+        knockbackMultipliers = new HashMap<>();
     }
 
     /** Event to ignore hunger. */
@@ -362,16 +372,15 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
         
         // Heavy arrows
-        Arrow proj = (Arrow) eventProj;
-        int heavy = plugin.getJSON().getLevel(uuid, Ability.HEAVY_ARROWS);
-        if (heavy > 0) {
-            double slow = ConfigUtils.getAbilityStat(Ability.HEAVY_ARROWS, heavy, Stat.PERCENTAGE) / 100;
-            double multiplier = ConfigUtils.getAbilityStat(Ability.HEAVY_ARROWS, heavy, Stat.MULTIPLIER);
+        AbstractArrow proj = (AbstractArrow) eventProj;
+        int exotic = plugin.getJSON().getLevel(uuid, Ability.EXOTIC_ARROWS);
+        if (exotic > 0 && !proj.isCritical()) {
             SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);
-            arrow.setVelocity(proj.getVelocity().multiply(1 - slow));
+            arrow.setRotation(proj.getYaw(), proj.getPitch());
+            arrow.setVelocity(proj.getVelocity());
             arrow.setShooter(player);
-            arrow.setDamage(proj.getDamage() + heavy * 0.35); // This makes the arrow damage seem closer to that of a normal speed arrow
-            arrow.setCritical(proj.isCritical());
+            arrow.setDamage(proj.getDamage());
+            arrow.setCritical(false);
             arrow.setPickupStatus(proj.getPickupStatus());
             
             // Add flame (since getFireTicks doesn't work anymore)
@@ -379,11 +388,29 @@ public class ArenaGameruleListener implements Listener {
                 arrow.setFireTicks(20 * 60);
             }
             
-            // Encode knockback information into glowing ticks. This means that multiplier * 4
-            // must be an int for this calculation to be accurate
-            arrow.setGlowingTicks((int) (4 * multiplier));
+            // Encode level information into glowing ticks
+            arrow.setGlowingTicks(5 * exotic);
             event.setProjectile(arrow);
+            proj = arrow;
             Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(arrow));
+            ConfigUtils.schedule(10, () -> {
+                ArenaUtils.doUntilDead(arrow, () -> {
+                   BoundingBox bb = arrow.getBoundingBox(); 
+                   for (Entity entity : arrow.getNearbyEntities(1, 1, 1)) {
+                       if (entity.getType() != EntityType.PLAYER) {
+                           continue;
+                       }
+                       
+                       BoundingBox other = entity.getBoundingBox();
+                       if (bb.overlaps(other) && !arrow.isInBlock()) {
+                           plugin.log("Detected a bounding box overlap!");
+                           DamageSource source = DamageSource.builder(DamageType.ARROW).withDirectEntity(arrow).withDamageLocation(arrow.getLocation()).build();
+                           ((Player) entity).damage(2 * arrow.getVelocity().length(), source);
+                           arrow.remove();
+                       }
+                   }
+                });
+            });
             return;
         }
         
@@ -394,23 +421,24 @@ public class ArenaGameruleListener implements Listener {
             
             // Add gradually increasing color particles
             double max = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.MAX);
+            AbstractArrow finalArrow = proj;
             BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
-                if (!longShots.containsKey(proj) || proj.isInBlock()) {
+                if (!longShots.containsKey(finalArrow) || finalArrow.isInBlock()) {
                     return;
                 }
                 
-                Location projLoc = proj.getLocation();
-                double extradmg = getExtraLongshotDamage(proj, longshot, projLoc);
+                Location projLoc = finalArrow.getLocation();
+                double extradmg = getExtraLongshotDamage(finalArrow, longshot, projLoc);
                 double ratio = Math.min(1, 1.5 * extradmg / max); // 1.5x makes damage increase more apparent 
                 int g = (int) (255 * (1 - ratio));
                 int r = extradmg > 0 ? 255 : 0;
                 DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
-                proj.getWorld().spawnParticle(Particle.DUST, projLoc, 1, dust);
+                finalArrow.getWorld().spawnParticle(Particle.DUST, projLoc, 1, dust);
             });
             
             // 5 seconds should be enough for a bow shot, riiiight
             ConfigUtils.schedule(100, () -> {
-                longShots.remove(proj);
+                longShots.remove(finalArrow);
                 particles.cancel();
             });
             
@@ -550,8 +578,9 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Stop event if damager and damaged are on same team
+        // But allow player to hit himself with whatever
         TeamName team = arena.getTeam(player.getUniqueId());
-        if (team.equals(arena.getTeam(damager.getUniqueId())) && team != TeamName.NONE) {
+        if (!player.equals(damager) && team.equals(arena.getTeam(damager.getUniqueId())) && team != TeamName.NONE) {
             event.setCancelled(true);
             return;
         }
@@ -598,8 +627,12 @@ public class ArenaGameruleListener implements Listener {
                     event.setDamage(event.getDamage() * (1 - (reduction / 100)));
                 }
             } else if (type == EntityType.SPECTRAL_ARROW) {
-                SpectralArrow sa = (SpectralArrow) projectile;
-                multiplyKnockback(player, sa.getGlowingTicks() / 4.0);
+                plugin.log("Detected a spectral arrow hit!");
+                int level = ((SpectralArrow) projectile).getGlowingTicks() / 5;
+                double multiplier = ConfigUtils.getAbilityStat(Ability.EXOTIC_ARROWS, level, Stat.MULTIPLIER);
+                double plus = ConfigUtils.getAbilityStat(Ability.EXOTIC_ARROWS, level, Stat.PLUS);
+                double plusMultiplier = Math.max(0, 3 - projectile.getVelocity().length());
+                multiplyKnockback(player, multiplier + plus * plusMultiplier);
             }
 
             // Arrowhealth message
@@ -656,6 +689,26 @@ public class ArenaGameruleListener implements Listener {
         }
     }
     
+    // Used for entity knockback
+    @EventHandler
+    public void onEntityKnockback(EntityKnockbackByEntityEvent event) {
+        Entity entity = event.getEntity();
+        if (!knockbackMultipliers.containsKey(entity)) {
+            return;
+        }
+        
+        Vector kb = event.getKnockback();
+        double multiplier = knockbackMultipliers.get(entity);
+        event.setKnockback(new Vector(kb.getX() * multiplier, kb.getY(), kb.getZ() * multiplier));
+        knockbackMultipliers.remove(entity);
+    }
+    
+    // Multiply current player velocity. Only call during a damage event!
+    private void multiplyKnockback(Player player, double multiplier) {
+        knockbackMultipliers.put(player, multiplier);
+        ConfigUtils.schedule(1, () -> knockbackMultipliers.remove(player));
+    }
+    
     // Get extra damage for a shooter player and arrow location
     private double getExtraLongshotDamage(Projectile proj, int longshot, Location loc) {
         Location longOrigin = longShots.get(proj);
@@ -675,17 +728,6 @@ public class ArenaGameruleListener implements Listener {
         
         double extradistance = distance - cutoff;
         return Math.min(extradistance * plus, max);
-    }
-    
-    // Multiply current player velocity. Only call during a damage event!
-    private void multiplyKnockback(Player player, double multiplier) {
-        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
-            Vector velocity = player.getVelocity();
-            double velx = velocity.getX() * multiplier;
-            double velz = velocity.getZ() * multiplier;
-            double vely = velocity.getY();
-            player.setVelocity(new Vector(velx, vely, velz));
-        });
     }
 
     /** Make sure players can't create portals */

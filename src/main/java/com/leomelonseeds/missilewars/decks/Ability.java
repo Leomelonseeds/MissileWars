@@ -10,9 +10,9 @@ public enum Ability {
     ENDER_SPLASH("lavasplash", Type.PASSIVE, DeckStorage.VANGUARD),
     
     // Sentinel
-    IMPACT_TRIGGER("warden", Type.PASSIVE, DeckStorage.SENTINEL),
+    IMPACT_TRIGGER("impacttrigger", Type.PASSIVE, DeckStorage.SENTINEL),
     LONGSHOT("longshot", Type.PASSIVE, DeckStorage.SENTINEL),
-    HEAVY_ARROWS("spectral", Type.PASSIVE, DeckStorage.SENTINEL),
+    EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
     SPIKED_QUIVER("slownessarrows", Type.PASSIVE, DeckStorage.BERSERKER),

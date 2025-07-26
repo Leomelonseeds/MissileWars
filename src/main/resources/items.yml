@@ -1186,7 +1186,7 @@ Sentinel:
         spcost: 1
   ability: {}
   passive:
-    warden:
+    impacttrigger:
       name: "&eImpact Trigger"
       lore:
       - ""
@@ -1227,27 +1227,30 @@ Sentinel:
         spcost: 1
         plus: 0.25
         percentage: 25
-    spectral:
-      name: "&eHeavy Arrows"
+    exoticarrows:
+      name: "&eExotic Arrows"
       lore:
       - ""
-      - "&7Shoot special, gold-weighted arrows"
-      - "&7that travel %percentage%%&7 slower, but"
-      - "&7pack a (literal) punch, multiplying"
-      - "&7knockback by %multiplier%&7x."
+      - "&7Fire arrows plated with exotic matter"
+      - "&7when your bow is &cnot &7fully drawn."
+      - "&7Knockback from these arrows are"
+      - "&7multiplied by %multiplier%&7, with an additional"
+      - "&7%plus% &7added to the multiplier for"
+      - "&7every &f1b/t &7slower the arrow travels"
+      - "&7than the &f3b/t &7of full-speed arrows."
       cost: 1200
       1:
         spcost: 1
-        percentage: 12
         multiplier: 2
+        plus: 0.5
       2:
         spcost: 1
-        percentage: 24
-        multiplier: 3
+        multiplier: 2.5
+        plus: 0.6
       3:
         spcost: 1
-        percentage: 36
-        multiplier: 4
+        multiplier: 3
+        plus: 0.7
 Berserker:
   weapon:
     item: CROSSBOW
@@ -1526,9 +1529,12 @@ indicators:
     item: ORANGE_DYE
     name: "&6&lAbility &7(Choose 1)"
     lore:
-      - "&dCOMING SOON"
       - "&7Perks that might take some"
       - "&7practice to use well"
+      - ""
+      - "&dNote: Abilities are currently"
+      - "&dunder development! There may"
+      - "&dbe nothing here."
     slot: 50
   passive:
     item: YELLOW_DYE
