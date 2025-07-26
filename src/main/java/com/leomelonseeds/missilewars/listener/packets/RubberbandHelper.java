@@ -96,36 +96,18 @@ public class RubberbandHelper implements PacketListener, Listener {
         if (!isMissile) {
             return;
         }
-
-        // Checks if the player might fall off the missile if they weren't teleported
-        // This checks the blocks around the current client position's hitbox to see if they would land on a block
-        // To do this, we check 5 locations: the center and corners of the player's hitbox (which is 0.6 wide)
-        boolean wouldFall = true;
-        UUID uuid = player.getUniqueId();
-        Location curPlayerPos = SpigotConversionUtil.toBukkitLocation(player.getWorld(), clientPosition.get(uuid));
-        Location[] toCheck = new Location[5];
-        toCheck[0] = curPlayerPos.clone().add( 0,   -1,    0);
-        toCheck[1] = curPlayerPos.clone().add( 0.3, -1,  0.3);
-        toCheck[2] = curPlayerPos.clone().add( 0.3, -1, -0.3);
-        toCheck[3] = curPlayerPos.clone().add(-0.3, -1,  0.3);
-        toCheck[4] = curPlayerPos.clone().add(-0.3, -1, -0.3);
-        for (Location check : toCheck) {
-            if (!check.getBlock().getType().isAir()) {
-                wouldFall = false;
-                break;
-            }
-        }
         
-        // Cancel the teleport, but only if the player would not fall off the missile
-        if (player.hasPermission("umw.positionrubberbandfix") && !wouldFall) {
+        // Rewrite to relative teleport
+        if (player.hasPermission("umw.positionrubberbandfix")) {
             posPacket.setRelative(RelativeFlag.X, true);
             posPacket.setRelative(RelativeFlag.Y, true);
             posPacket.setRelative(RelativeFlag.Z, true);
             posPacket.setPosition(new Vector3d());
             
             // Sync server location with client by teleporting them
+            UUID uuid = player.getUniqueId();
             if (!teleportQueue.contains(uuid)) {
-                Location teleportTo = curPlayerPos.clone();
+                Location teleportTo = SpigotConversionUtil.toBukkitLocation(player.getWorld(), clientPosition.get(uuid));
                 if (teleportTo.getYaw() == 0) {
                     teleportTo.setYaw(player.getYaw());
                     teleportTo.setPitch(player.getPitch());
