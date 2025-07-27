@@ -1190,8 +1190,8 @@ Sentinel:
       lore:
       - ""
       - "&7Hold arrows in your &foffhand &7and fire"
-      - "&7a fully-drawn shot to activate Longshot."
-      - "&7Arrows travelling more than %cutoff%m &7do"
+      - "&7a fully-charged shot. When activated,"
+      - "&7arrows travelling more than %cutoff%m &7do"
       - "&7an additional %plus% &7damage per block."
       - "&7However, arrows travelling less than"
       - "&7%cutoff%m &7do %percentage%% &7less damage."
