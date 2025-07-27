@@ -90,6 +90,7 @@ public class JSONManager {
                 if (!isNew) {
                     updateVersion1(newJson);
                     updateVersion2(newJson);
+                    updateVersion3(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -313,6 +314,38 @@ public class JSONManager {
             } else if (curPassive.equals("spectral")) {
                 passiveJson.put("selected", "exoticarrows");
             }
+        }
+    }
+    
+    /**
+     * Version 3 
+     * - move longshot to abilities
+     */
+    private void updateVersion3(JSONObject json) {
+        if (json.getInt("version") >= 3) {
+            return;
+        }
+
+        json.put("version", 3);
+        
+        JSONObject sentinelJson = json.getJSONObject("Sentinel");
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!sentinelJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = sentinelJson.getJSONObject(preset);
+            JSONObject passiveJson = presetJson.getJSONObject("passive");
+            if (!passiveJson.getString("selected").equals("longshot")) {
+                return;
+            }
+            
+            JSONObject abilityJson = presetJson.getJSONObject("ability");
+            abilityJson.put("selected", "longshot");
+            abilityJson.put("level", passiveJson.getInt("level"));
+            
+            passiveJson.put("selected", "None");
+            passiveJson.put("level", 0);
         }
     }
 

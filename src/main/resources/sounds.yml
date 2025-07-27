@@ -174,3 +174,15 @@ deck-upgrade-tab:
   sound: "ITEM_BOOK_PAGE_TURN"
   volume: 1.0
   pitch: 1.0
+longshot-shoot:
+  sound: "ENTITY_FIREWORK_ROCKET_LAUNCH"
+  volume: 1.0
+  pitch: 2.0
+longshot-hit:
+  sound: "ENTITY_ZOMBIE_ATTACK_IRON_DOOR"
+  volume: 0.5
+  pitch: 1.2
+longshot-travel:
+  sound: "ENTITY_GHAST_SCREAM"
+  volume: 0.15
+  pitch: 2.0

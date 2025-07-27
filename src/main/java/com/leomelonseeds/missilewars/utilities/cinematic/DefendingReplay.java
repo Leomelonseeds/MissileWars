@@ -32,8 +32,7 @@ public class DefendingReplay extends TutorialReplay {
             Egg torp = botPlayer.launchProjectile(Egg.class);
             
             // Egg smoke particles cause why not
-            ArenaUtils.doUntilDead(torp, () -> 
-                botPlayer.getWorld().spawnParticle(Particle.SMOKE, torp.getLocation(), 1, 0, 0, 0, 0));
+            ArenaUtils.spiralTrail(torp, Particle.SMOKE, null);
             
             ConfigUtils.schedule(10, () -> setCrouched(false));
             ConfigUtils.schedule(20, () -> {

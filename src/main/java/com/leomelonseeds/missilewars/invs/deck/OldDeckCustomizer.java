@@ -38,7 +38,7 @@ public class OldDeckCustomizer extends MWInventory {
     private String[] abilities;
     
     public OldDeckCustomizer(Player player, String deck, String preset) {
-        super(player, 45, 
+        super(player, 54, 
             ConfigUtils.getConfigFile("items.yml")
                 .getString("title.deck")
                 .replace("%deck%", deck)
@@ -49,7 +49,7 @@ public class OldDeckCustomizer extends MWInventory {
         itemConfig = ConfigUtils.getConfigFile("items.yml");
         init = MissileWarsPlugin.getPlugin().getJSON().getPlayer(player.getUniqueId());
         items = new String[] {"missiles", "utility"};
-        abilities = new String[] {"gpassive", "passive"};
+        abilities = new String[] {"gpassive", "passive", "ability"};
         this.deck = deck;
         this.preset = preset;
     }
@@ -87,11 +87,12 @@ public class OldDeckCustomizer extends MWInventory {
         }
         
         // Add panes and misc items
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             inv.setItem(i * 9 + 1, blankName(new ItemStack(Material.IRON_NUGGET)));
             inv.setItem(i * 9 + 7, blankName(new ItemStack(Material.IRON_BARS)));
         }
         inv.setItem(35, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
+        inv.setItem(44, blankName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         
         // Missile + Utility items
         for (String s : items) {
@@ -131,7 +132,7 @@ public class OldDeckCustomizer extends MWInventory {
         }
         
         // Normal passives and abilities
-        for (String p : new String[] {"passive"}) {
+        for (String p : new String[] {"passive", "ability"}) {
             int index = getIndex(p);
             JSONObject currentjson = presetjson.getJSONObject(p);
             for (String key : itemConfig.getConfigurationSection(deck + "." + p).getKeys(false)) {
@@ -256,7 +257,7 @@ public class OldDeckCustomizer extends MWInventory {
         }
         
         // Passives or abilities
-        for (String p : new String[] {"passive"}) {
+        for (String p : new String[] {"passive", "ability"}) {
             if (itemConfig.getConfigurationSection(deck + "." + p).getKeys(false).contains(realname)) {
                 processAbilityClick(p, sp, name, realname, level, type);
                 return;

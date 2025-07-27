@@ -452,8 +452,7 @@ public class CustomItemListener implements Listener {
         
         // Add particle effects for prickly
         if (plugin.getJSON().getLevel(uuid, Ability.PRICKLY_PROJECTILES) > 0) {
-            ArenaUtils.doUntilDead(thrown, () -> 
-                playerArena.getWorld().spawnParticle(Particle.CRIT, thrown.getLocation(), 1, 0, 0, 0, 0));
+            ArenaUtils.spiralTrail(thrown, Particle.INSTANT_EFFECT, null);
         }
 
         // More delay + particles for impact trigger
@@ -462,8 +461,7 @@ public class CustomItemListener implements Listener {
         int impactTrigger = plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER);
         if (impactTrigger > 0) {
             delay = (int) (delay * ConfigUtils.getAbilityStat(Ability.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
-            ArenaUtils.doUntilDead(thrown, () -> 
-                playerArena.getWorld().spawnParticle(Particle.SMOKE, thrown.getLocation(), 1, 0, 0, 0, 0));
+            ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive

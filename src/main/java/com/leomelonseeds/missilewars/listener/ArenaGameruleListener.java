@@ -22,8 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
@@ -65,7 +63,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
@@ -371,7 +368,7 @@ public class ArenaGameruleListener implements Listener {
         consumedItem.setAmount(consume.getLeft());
         InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
         
-        // Heavy arrows
+        // Exotic arrows
         AbstractArrow proj = (AbstractArrow) eventProj;
         int exotic = plugin.getJSON().getLevel(uuid, Ability.EXOTIC_ARROWS);
         if (exotic > 0 && !proj.isCritical()) {
@@ -393,55 +390,36 @@ public class ArenaGameruleListener implements Listener {
             event.setProjectile(arrow);
             proj = arrow;
             Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(arrow));
-            ConfigUtils.schedule(10, () -> {
-                ArenaUtils.doUntilDead(arrow, () -> {
-                   BoundingBox bb = arrow.getBoundingBox(); 
-                   for (Entity entity : arrow.getNearbyEntities(1, 1, 1)) {
-                       if (entity.getType() != EntityType.PLAYER) {
-                           continue;
-                       }
-                       
-                       BoundingBox other = entity.getBoundingBox();
-                       if (bb.overlaps(other) && !arrow.isInBlock()) {
-                           plugin.log("Detected a bounding box overlap!");
-                           DamageSource source = DamageSource.builder(DamageType.ARROW).withDirectEntity(arrow).withDamageLocation(arrow.getLocation()).build();
-                           ((Player) entity).damage(2 * arrow.getVelocity().length(), source);
-                           arrow.remove();
-                       }
-                   }
-                });
-            });
             return;
         }
         
         // Longshot
         int longshot = plugin.getJSON().getLevel(uuid, Ability.LONGSHOT);
-        if (longshot > 0) {
+        ItemStack offhand = player.getInventory().getItemInOffHand();
+        boolean hasOffhandCooldown = player.hasCooldown(offhand.getType());
+        if (longshot > 0 && proj.isCritical() && offhand.getType() == Material.ARROW && !hasOffhandCooldown) {
             longShots.put(proj, player.getLocation());
             
-            // Add gradually increasing color particles
+            // Add gradually increasing color particles and play sounds in the meantime
             double max = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.MAX);
-            AbstractArrow finalArrow = proj;
-            BukkitTask particles = ArenaUtils.doUntilDead(proj, () -> {
-                if (!longShots.containsKey(finalArrow) || finalArrow.isInBlock()) {
-                    return;
-                }
-                
-                Location projLoc = finalArrow.getLocation();
-                double extradmg = getExtraLongshotDamage(finalArrow, longshot, projLoc);
+            BukkitTask particles = ArenaUtils.spiralTrail(proj, Particle.DUST, p -> {
+                Location projLoc = p.getLocation();
+                ConfigUtils.sendConfigSound("longshot-travel", projLoc);
+                double extradmg = getExtraLongshotDamage(p, longshot, projLoc);
                 double ratio = Math.min(1, 1.5 * extradmg / max); // 1.5x makes damage increase more apparent 
                 int g = (int) (255 * (1 - ratio));
                 int r = extradmg > 0 ? 255 : 0;
-                DustOptions dust = new DustOptions(Color.fromRGB(r, g, 0), 2.0F);
-                finalArrow.getWorld().spawnParticle(Particle.DUST, projLoc, 1, dust);
+                return new DustOptions(Color.fromRGB(r, g, 0), 1.0F);
             });
             
             // 5 seconds should be enough for a bow shot, riiiight
+            AbstractArrow finalArrow = proj;
             ConfigUtils.schedule(100, () -> {
                 longShots.remove(finalArrow);
                 particles.cancel();
             });
             
+            ConfigUtils.sendConfigSound("longshot-shoot", player.getLocation());
             return;
         }
     }
@@ -622,12 +600,12 @@ public class ArenaGameruleListener implements Listener {
                 extradmg = getExtraLongshotDamage(projectile, longshot, player.getLocation());
                 if (extradmg > 0) {
                     event.setDamage(event.getDamage() + extradmg);
+                    ConfigUtils.sendConfigSound("longshot-hit", player.getLocation());
                 } else {
                     double reduction = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.PERCENTAGE);
                     event.setDamage(event.getDamage() * (1 - (reduction / 100)));
                 }
             } else if (type == EntityType.SPECTRAL_ARROW) {
-                plugin.log("Detected a spectral arrow hit!");
                 int level = ((SpectralArrow) projectile).getGlowingTicks() / 5;
                 double multiplier = ConfigUtils.getAbilityStat(Ability.EXOTIC_ARROWS, level, Stat.MULTIPLIER);
                 double plus = ConfigUtils.getAbilityStat(Ability.EXOTIC_ARROWS, level, Stat.PLUS);

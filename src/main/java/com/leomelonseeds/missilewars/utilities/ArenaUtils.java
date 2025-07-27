@@ -1,7 +1,13 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -11,6 +17,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -118,21 +125,31 @@ public class ArenaUtils {
     
     /**
      * Perform an action every tick, typically adding a projectile trail,
-     * until the given projectile is dead
+     * until the given projectile is dead (if its an arrow, if it hits a block)
      * 
      * @param projectile
-     * @param runnable
+     * @param consumer the action to run every tick, with parameter as the ticks this has run
      */
-    public static BukkitTask doUntilDead(Projectile projectile, Runnable runnable) {
+    public static BukkitTask doUntilDead(Projectile projectile, Consumer<Integer> consumer) {
+        boolean isArrow = projectile instanceof AbstractArrow;
         return new BukkitRunnable() {
+            
+            int timeAlive = 0;
+            
             @Override
             public void run() {
+                if (isArrow && ((AbstractArrow) projectile).isInBlock()) {
+                    this.cancel();
+                    return;
+                }
+                
                 if (projectile.isDead()) {
                     this.cancel();
                     return;
                 }
                 
-                runnable.run();
+                consumer.accept(timeAlive);
+                timeAlive++;
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
     }
@@ -146,5 +163,46 @@ public class ArenaUtils {
      */
     public static int getRankRequirement(String gamemode, String map) {
         return (int) ConfigUtils.getMapNumber(gamemode, map, "required-rank");
+    }
+    
+    /**
+     * Spawn a spiral trail around a projectile. We use circle
+     * equation with 2 unit basis vectors to get the circle in R3.
+     * The x basis vector is obtained by the cross product of the
+     * projectile vector with [0, 1, 0]. The y basis vector is then
+     * calculated by the cross product of the x basis vector with
+     * the projectile vector.
+     * 
+     * @param projectile
+     * @param particle
+     * @param dustOptions can be null
+     * @return the bukkittask that controls this trail
+     */
+    public static BukkitTask spiralTrail(Projectile projectile, Particle particle, Function<Projectile, DustOptions> dustOptions) {
+        final double r = projectile instanceof AbstractArrow ? 0.75 : 0.5;
+        final int period = 8;
+        final int amountPerTick = 3;
+        final double tau = 2 * Math.PI;
+        final double offset = Math.random() * tau;
+        return doUntilDead(projectile, t -> {
+            // Calculate particle position
+            Vector dir = projectile.getVelocity();
+            Vector vx = dir.clone().crossProduct(new Vector(0, 1, 0)).normalize();
+            Vector vy = vx.clone().crossProduct(dir).normalize();
+            Vector center = projectile.getLocation().toVector();
+            
+            // Spawn particles
+            int curPhase = (t % period) * amountPerTick;
+            int adjustedPeriod = period * amountPerTick;
+            DustOptions dust = dustOptions == null ? null : dustOptions.apply(projectile);
+            for (int i = 0; i < amountPerTick; i++) {
+                double angle = offset + tau - tau * (curPhase + i)  / adjustedPeriod;
+                Vector curCenter = center.clone().add(dir.clone().multiply(i / (double) amountPerTick));
+                Vector pos = curCenter
+                        .add(vx.clone().multiply(r * Math.cos(angle)))
+                        .add(vy.clone().multiply(r * Math.sin(angle)));
+                projectile.getWorld().spawnParticle(particle, pos.getX(), pos.getY(), pos.getZ(), 1, 0, 0, 0, 0, dust, true);
+            }
+        });
     }
 }

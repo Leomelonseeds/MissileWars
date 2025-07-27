@@ -10,8 +10,8 @@ public enum Ability {
     ENDER_SPLASH("lavasplash", Type.PASSIVE, DeckStorage.VANGUARD),
     
     // Sentinel
+    LONGSHOT("longshot", Type.ABILITY, DeckStorage.SENTINEL),
     IMPACT_TRIGGER("impacttrigger", Type.PASSIVE, DeckStorage.SENTINEL),
-    LONGSHOT("longshot", Type.PASSIVE, DeckStorage.SENTINEL),
     EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
@@ -88,7 +88,8 @@ public enum Ability {
 
     public enum Type {
         PASSIVE("passive"),
-        GPASSIVE("gpassive");
+        GPASSIVE("gpassive"),
+        ABILITY("ability");
         
         private String name;
         
