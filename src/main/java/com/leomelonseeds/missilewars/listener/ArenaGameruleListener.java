@@ -363,6 +363,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Consume the correct item with information we got from PlayerReadyArrowEvent
         Pair<Integer, Integer> consume = arrowInventoryItem.get(player);
         ItemStack consumedItem = event.getConsumable().clone();
         consumedItem.setAmount(consume.getLeft());
@@ -395,9 +396,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Longshot
         int longshot = plugin.getJSON().getLevel(uuid, Ability.LONGSHOT);
-        ItemStack offhand = player.getInventory().getItemInOffHand();
-        boolean hasOffhandCooldown = player.hasCooldown(offhand.getType());
-        if (longshot > 0 && proj.isCritical() && offhand.getType() == Material.ARROW && !hasOffhandCooldown) {
+        if (longshot > 0 && proj.isCritical() && consume.getRight() == 40) {
             longShots.put(proj, player.getLocation());
             
             // Add gradually increasing color particles and play sounds in the meantime
@@ -422,6 +421,10 @@ public class ArenaGameruleListener implements Listener {
             ConfigUtils.sendConfigSound("longshot-shoot", player.getLocation());
             return;
         }
+        
+        // Store offhand information for later. To be used with Hitchhiker's Bow
+        // ItemStack offhand = player.getInventory().getItemInOffHand();
+        // boolean hasOffhandCooldown = player.hasCooldown(offhand.getType());
     }
     
     // Handle crossbow load cooldowns

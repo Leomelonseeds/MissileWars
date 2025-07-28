@@ -8,8 +8,10 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -119,25 +122,75 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             if (args[1].equals("smoke")) {
-                final int steps_theta = 32;
-                final int steps_phi = steps_theta * 2;
+                Location loc = target.getLocation();
+
                 final int r = 3;
-                for (int i = 0; i < steps_theta; i++) {
-                    double theta = i * Math.PI / steps_theta;
-                    for (int j = 0; j < steps_phi; j++) {
-                        double phi = j * 2 * Math.PI / steps_phi;
-                        double x = r * Math.sin(theta) * Math.cos(phi);
-                        double z = r * Math.sin(theta) * Math.sin(phi); // minecraft flips y and z
-                        double y = r * Math.cos(theta);
-                        Location loc = target.getLocation();
-                        loc.getWorld().spawnParticle(
-                                Particle.CAMPFIRE_COSY_SMOKE, 
-                                x + loc.getX(),
-                                y + loc.getY(),
-                                z + loc.getZ(), 
-                                1, 0, 0, 0, 0, null);
+                final int steps_theta = (int) Math.ceil(r * Math.PI / 0.5);
+                final int steps_phi = steps_theta * 2;
+                
+                final double angle = Math.PI / 24;
+                final double k = Math.tan(angle);
+                final double r2 = r + 0.3;
+                new BukkitRunnable() {
+                    
+                    int i = 0;
+                    
+                    @Override
+                    public void run() {
+                        if (i > 100) {
+                            this.cancel();
+                            return;
+                        }
+                        
+                        if (i == 0 || i == 20) {
+                            // Generate sphere using cylindrical coords
+                            for (int i = 0; i < steps_theta; i++) {
+                                double theta = i * Math.PI / steps_theta;
+                                for (int j = 0; j < steps_phi; j++) {
+                                    double phi = j * 2 * Math.PI / steps_phi;
+                                    double x = r * Math.sin(theta) * Math.cos(phi);
+                                    double z = r * Math.sin(theta) * Math.sin(phi); // minecraft flips y and z
+                                    double y = r * Math.cos(theta);
+                                    loc.getWorld().spawnParticle(
+                                            Particle.CAMPFIRE_COSY_SMOKE, 
+                                            loc.getX() + x,
+                                            loc.getY() + y,
+                                            loc.getZ() + z, 
+                                            1, 0, 0, 0, 0, null, true);
+                                }
+                            }
+                        }
+                        
+                        if (i % 10 == 0) {
+                            // Smoke particle outline using rhumb lines
+                            // https://mathcurve.com/courbes3d.gb/loxodromie/sphereloxodromie.shtml
+                            DustOptions dustOptions = new DustOptions(Color.BLACK, 1.0F);
+                            for (double t = -15; t <= 15; t += 0.1) {
+                                double x = r2 * Math.cos(t) / Math.cosh(k * t);
+                                double z = r2 * Math.sin(t) / Math.cosh(k * t);
+                                double y = r2 * Math.tanh(k * t);
+                                loc.getWorld().spawnParticle(
+                                        Particle.DUST, 
+                                        loc.getX() + x,
+                                        loc.getY() + y,
+                                        loc.getZ() + z, 
+                                        1, 0, 0, 0, 0, 
+                                        dustOptions, true);
+                                loc.getWorld().spawnParticle(
+                                        Particle.DUST, 
+                                        loc.getX() - x,
+                                        loc.getY() + y,
+                                        loc.getZ() - z, 
+                                        1, 0, 0, 0, 0, 
+                                        dustOptions, true);
+                            } 
+                        }
+                        
+                        i++;
                     }
-                }
+                }.runTaskTimer(plugin, 0, 1);
+                
+                
                 
                 return true;
             }
