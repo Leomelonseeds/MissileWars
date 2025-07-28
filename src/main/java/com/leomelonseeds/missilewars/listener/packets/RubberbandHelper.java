@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -79,8 +80,12 @@ public class RubberbandHelper implements PacketListener, Listener {
             return;
         }
         
-        // Check if the toLocation is a missile
+        // Check if the toLocation is a missile. Cancel if canopy cobweb
         Location toLoc = new Location(player.getWorld(), posPacket.getX(), posPacket.getY(), posPacket.getZ());
+        if (toLoc.getBlock().getType() == Material.COBWEB) {
+            return;
+        }
+        
         boolean isMissile = false;
         for (Tracked t : playerArena.getTracker().getMissiles()) {
             if (!(t instanceof TrackedMissile)) {

@@ -186,6 +186,7 @@ public class CanopyManager {
             
         // Teleport and remove ender eye
         Location loc = spawnLoc.add(0, -0.5, 0);
+        loc.getBlock().setType(Material.COBWEB);
         loc.setYaw(player.getLocation().getYaw());
         loc.setPitch(player.getLocation().getPitch());
         player.teleport(loc);
@@ -193,7 +194,6 @@ public class CanopyManager {
         signal.remove();
 
         // Stop players from placing missiles or using utility for a second
-        loc.getBlock().setType(Material.COBWEB);
         canopy_freeze.add(player);
         ConfigUtils.schedule(10, () -> canopy_freeze.remove(player));
         

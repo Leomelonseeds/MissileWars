@@ -8,6 +8,8 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -116,6 +118,30 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
+            if (args[1].equals("smoke")) {
+                final int steps_theta = 32;
+                final int steps_phi = steps_theta * 2;
+                final int r = 3;
+                for (int i = 0; i < steps_theta; i++) {
+                    double theta = i * Math.PI / steps_theta;
+                    for (int j = 0; j < steps_phi; j++) {
+                        double phi = j * 2 * Math.PI / steps_phi;
+                        double x = r * Math.sin(theta) * Math.cos(phi);
+                        double z = r * Math.sin(theta) * Math.sin(phi); // minecraft flips y and z
+                        double y = r * Math.cos(theta);
+                        Location loc = target.getLocation();
+                        loc.getWorld().spawnParticle(
+                                Particle.CAMPFIRE_COSY_SMOKE, 
+                                x + loc.getX(),
+                                y + loc.getY(),
+                                z + loc.getZ(), 
+                                1, 0, 0, 0, 0, null);
+                    }
+                }
+                
+                return true;
+            }
+             
             return true;
         }
         
