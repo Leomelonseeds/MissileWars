@@ -12,6 +12,7 @@ public enum Ability {
     // Sentinel
     LONGSHOT("longshot", Type.ABILITY, DeckStorage.SENTINEL),
     IMPACT_TRIGGER("impacttrigger", Type.PASSIVE, DeckStorage.SENTINEL),
+    SMOKE_SHIELD("smokeshield", Type.PASSIVE, DeckStorage.SENTINEL),
     EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
@@ -72,7 +73,8 @@ public enum Ability {
         MULTIPLIER("multiplier"),
         PERCENTAGE("percentage"),
         UPERCENTAGE("upercentage"),
-        MPERCENTAGE("mpercentage");
+        MPERCENTAGE("mpercentage"),
+        RADIUS("radius");
         
         private String id;
         

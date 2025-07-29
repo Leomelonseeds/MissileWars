@@ -53,6 +53,7 @@ import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
+import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -554,17 +555,25 @@ public class CustomItemListener implements Listener {
         String sound;
         if (structure.contains("obsidianshield")) {
             sound = "spawn-obsidian-shield";
-            // Detect obsidian shield duration in seconds here
-            // Also clear obsidian shield after a while
-            int duration = (int) getItemStat(structure, "duration") * 2;
-            for (int i = duration; i > duration - 10; i--) {
+            
+            // Check for smokeshield
+            int duration = (int) getItemStat(structure, "duration");
+            int smokeshield = MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, Ability.SMOKE_SHIELD);
+            if (smokeshield > 0) {
+                double radius = ConfigUtils.getAbilityStat(Ability.SMOKE_SHIELD, smokeshield, Stat.RADIUS);
+                new SmokeShieldHandler(spawnLoc, duration * 20, radius);
+            }
+
+            // Clear obsidian shield after a while
+            int doubleDuration = duration * 2;
+            for (int i = doubleDuration; i > doubleDuration - 10; i--) {
                 int finalDuration = i;
-                Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+                ConfigUtils.schedule(i * 10, () -> {
                     if (!playerArena.isRunning()) {
                         return;
                     }
                     
-                    if (finalDuration == duration) {
+                    if (finalDuration == doubleDuration) {
                         SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, false, false);
                         ConfigUtils.sendConfigSound("break-obsidian-shield", spawnLoc);
                     } else if (finalDuration % 2 == 0) {
@@ -572,7 +581,7 @@ public class CustomItemListener implements Listener {
                     } else {
                         SchematicManager.spawnNBTStructure(null, "obsidianshield-1", spawnLoc, red, false, false);
                     }
-                }, i * 10L);
+                });
             }
         } else if (structure.contains("shield-") || structure.contains("platform")) {
             sound = "spawn-shield";

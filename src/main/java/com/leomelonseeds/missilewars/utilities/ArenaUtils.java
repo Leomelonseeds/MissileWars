@@ -205,4 +205,65 @@ public class ArenaUtils {
             }
         });
     }
+    
+    /**
+     * Use spherical coordinates to create a hollow ball using particles
+     * 
+     * @param center
+     * @param particle
+     * @param radius
+     * @param spacing the space between each particle
+     */
+    public static void createParticleSphere(Location center, Particle particle, double radius, double spacing) {
+        final double r = radius;
+        final int steps_theta = (int) Math.ceil(r * Math.PI / spacing);
+        final int steps_phi = steps_theta * 2;
+        for (int i = 0; i < steps_theta; i++) {
+            double theta = i * Math.PI / steps_theta;
+            for (int j = 0; j < steps_phi; j++) {
+                double phi = j * 2 * Math.PI / steps_phi;
+                double x = r * Math.sin(theta) * Math.cos(phi);
+                double z = r * Math.sin(theta) * Math.sin(phi); // minecraft flips y and z
+                double y = r * Math.cos(theta);
+                center.getWorld().spawnParticle(
+                        particle, 
+                        center.getX() + x,
+                        center.getY() + y,
+                        center.getZ() + z, 
+                        1, 0, 0, 0, 0, null, true);
+            }
+        }
+    }
+    
+    /**
+     * Get a point on the rhumb line for a sphere
+     * 
+     * @param radius
+     * @param angle the angle of the rhumb line to the horizontal
+     * @param t negative is lower, positive is higher
+     * @return a double[3] of coords xyz which can be added to a center 
+     * coord to get the location of the point in a world
+     */
+    public static double[] rhumbLine(double radius, double angle, double t) {
+        final double k = Math.tan(angle);
+        double x = radius * Math.cos(t) / Math.cosh(k * t);
+        double z = radius * Math.sin(t) / Math.cosh(k * t);
+        double y = radius * Math.tanh(k * t);
+        return new double[] {x, y, z};
+    }
+    
+    /**
+     * Check if a location is within the bounds of a sphere
+     * 
+     * @param toCheck
+     * @param center
+     * @param radius
+     * @return
+     */
+    public static boolean isInSphere(Location toCheck, Location center, double radius) {
+        double dx = toCheck.getX() - center.getX();
+        double dy = toCheck.getY() - center.getY();
+        double dz = toCheck.getZ() - center.getZ();
+        return dx * dx + dy * dy + dz * dz < radius * radius;
+    }
 }

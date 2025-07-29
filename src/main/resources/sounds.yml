@@ -186,3 +186,7 @@ longshot-travel:
   sound: "ENTITY_GHAST_SCREAM"
   volume: 0.15
   pitch: 2.0
+smokeshield:
+  sound: "BLOCK_LAVA_EXTINGUISH"
+  volume: 1.0
+  pitch: 0.1

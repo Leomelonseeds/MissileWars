@@ -1229,6 +1229,24 @@ Sentinel:
       3:
         spcost: 1
         duration: 1.5
+    smokeshield:
+      name: "&eSmoke Shield"
+      lore:
+      - ""
+      - "&7Your Obsidian Shield now releases a"
+      - "&7smoke bomb with radius %radius% &7around"
+      - "&7the shield. Any player inside the"
+      - "&7smoke will receive blindness."
+      cost: 800
+      1:
+        spcost: 1
+        radius: 3
+      2:
+        spcost: 1
+        radius: 3.5
+      3:
+        spcost: 1
+        radius: 4
     exoticarrows:
       name: "&eExotic Arrows"
       lore:
