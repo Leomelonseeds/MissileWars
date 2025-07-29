@@ -128,7 +128,7 @@ public class SmokeShieldHandler {
                 player.addPotionEffect(blindness);
                 tagPlayer(player);
             }
-        }, 3, 5));
+        }, 10, 5));
     }
     
     private void tagPlayer(Player player) {
