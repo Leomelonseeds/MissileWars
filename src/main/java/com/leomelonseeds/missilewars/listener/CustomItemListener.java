@@ -24,6 +24,7 @@ import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -238,7 +239,7 @@ public class CustomItemListener implements Listener {
         // Spawn a structure item
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
-            if (structureName.contains("shield-") || structureName.contains("platform-") || structureName.contains("torpedo-")) {
+            if (InventoryUtils.isThrowable(structureName)) {
                 return;
             }
             
@@ -458,15 +459,13 @@ public class CustomItemListener implements Listener {
 
         // More delay + particles for impact trigger
         String structure = structureName;
-        int delay = 20;
         int impactTrigger = plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER);
         if (impactTrigger > 0) {
-            delay = (int) (delay * ConfigUtils.getAbilityStat(Ability.IMPACT_TRIGGER, impactTrigger, Stat.DURATION));
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
-        ConfigUtils.schedule(delay, () -> {
+        ConfigUtils.schedule(20, () -> {
             if (spawnUtility(thrower, thrown, structure, playerArena, thrown.getLocation())) {
                 return;
             }
@@ -478,7 +477,7 @@ public class CustomItemListener implements Listener {
     }
     
     // Handle impact trigger passive (allow utilities to spawn when hitting a block)
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void impactTrigger(ProjectileHitEvent event) {
         EntityType type = event.getEntityType();
         if (!(type == EntityType.SNOWBALL || type == EntityType.EGG || type == EntityType.ENDER_PEARL)) {
@@ -491,12 +490,13 @@ public class CustomItemListener implements Listener {
         }
         
         // The all important line for this event
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.IMPACT_TRIGGER) <= 0) {
+        int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.IMPACT_TRIGGER);
+        if (level <= 0) {
             return;
         }
         
         Location spawnLoc;
-        if (event.getHitEntity() != null) {
+        if (event.getHitEntity() != null && level >= 2) {
             Vector back = thrown.getVelocity().normalize().multiply(-0.5);
             spawnLoc = thrown.getLocation().add(back);
         } else if (event.getHitBlock() != null && event.getHitBlockFace() != null) {

@@ -91,6 +91,7 @@ public class JSONManager {
                     updateVersion1(newJson);
                     updateVersion2(newJson);
                     updateVersion3(newJson);
+                    updateVersion4(newJson, player);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -346,6 +347,51 @@ public class JSONManager {
             
             passiveJson.put("selected", "None");
             passiveJson.put("level", 0);
+        }
+    }
+    
+    /**
+     * Version 4 
+     * - Change impact trigger to have 2 levels. This means:
+     * - If previously level 3, set to level 2
+     * - If previously level 2, set to level 1
+     * - If previously level 1, consume 1 extra sp if available or remove passive
+     */
+    private void updateVersion4(JSONObject json, Player player) {
+        if (json.getInt("version") >= 4) {
+            return;
+        }
+
+        json.put("version", 4);
+        
+        JSONObject sentinelJson = json.getJSONObject("Sentinel");
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!sentinelJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = sentinelJson.getJSONObject(preset);
+            JSONObject passiveJson = presetJson.getJSONObject("passive");
+            if (!passiveJson.getString("selected").equals("impacttrigger")) {
+                return;
+            }
+            
+            int level = passiveJson.getInt("level");
+            if (level >= 2) {
+                passiveJson.put("level", level - 1);
+                continue;
+            }
+            
+            int sp = presetJson.getInt("skillpoints");
+            if (sp >= 1) {
+                presetJson.put("skillpoints", sp - 1);
+            } else {
+                passiveJson.put("selected", "None");
+                passiveJson.put("level", 0);
+                String msg = "&c&l[!] &cThe passive Impact Trigger for Sentinel [" + preset + "] was unset because "
+                        + "the skillpoint requirement for level 1 was increased to 2, and you do not have enough skillpoints.";
+                player.sendMessage(ConfigUtils.toComponent(msg));
+            }
         }
     }
 

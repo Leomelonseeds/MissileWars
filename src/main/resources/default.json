@@ -49,9 +49,10 @@
 		"fire_protection": false,
 		"longshot": false,
 		"exoticarrows": false,
-        "smokeshield" : false,
+        "smokeshield": false,
+        "hitchhikersbow": false,
 		"defaultpreset": {
-			"skillpoints": 2,
+			"skillpoints": 1,
             "enchants": {
                 "fire_protection": 0,
                 "flame": 1,

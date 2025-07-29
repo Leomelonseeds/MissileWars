@@ -343,7 +343,7 @@ public class InventoryUtils {
      * @return
      */
     public static String getStringFromItem(ItemStack item, String id) {
-        if (item == null) {
+        if (item == null || item.getItemMeta() == null) {
             return null;
         }
         
@@ -372,5 +372,23 @@ public class InventoryUtils {
         }
         
         return true;
+    }
+    
+    /**
+     * Check if the given structure id is a throwable projectile
+     * 
+     * @param id
+     * @return
+     */
+    public static boolean isThrowable(String id) {
+        if (id == null) {
+            return false;
+        }
+        
+        if (id.contains("shield-") || id.contains("platform-") || id.contains("torpedo-")) {
+            return true;
+        }
+        
+        return false;
     }
 }

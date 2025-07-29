@@ -362,15 +362,52 @@ public class ArenaGameruleListener implements Listener {
             ConfigUtils.sendConfigSound("creepershot", player);
             return;
         }
-        
+
         // Consume the correct item with information we got from PlayerReadyArrowEvent
         Pair<Integer, Integer> consume = arrowInventoryItem.get(player);
         ItemStack consumedItem = event.getConsumable().clone();
         consumedItem.setAmount(consume.getLeft());
         InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
         
-        // Exotic arrows
+        
+        // Hitchhiker's bow
+        ItemStack consumed = event.getConsumable().clone();
         AbstractArrow proj = (AbstractArrow) eventProj;
+        int hhbow = plugin.getJSON().getLevel(uuid, Ability.HITCHHIKERS_BOW);
+        do {
+            if (hhbow <= 0) {
+                break;
+            }
+            
+            ItemStack offhand = player.getInventory().getItemInOffHand();
+            if (!InventoryUtils.isThrowable(InventoryUtils.getStringFromItem(offhand, "item-structure"))) {
+                break;
+            }
+            
+            if (player.hasCooldown(offhand.getType())) {
+                break;
+            }
+            
+            if (hhbow == 2) {
+                ItemStack toGive = consumed.clone();
+                toGive.setAmount(1);
+                InventoryUtils.regiveItem(player, toGive);
+            }
+            
+            EntityType thrownType = EntityType.valueOf(offhand.getType().toString());
+            ThrowableProjectile thrown  = (ThrowableProjectile) proj.getWorld().spawnEntity(proj.getLocation(), thrownType);
+            thrown.setVelocity(proj.getVelocity());
+            thrown.setShooter(player);
+            thrown.setItem(offhand);
+            event.setProjectile(thrown);
+            if (offhand.getAmount() > 1) {
+                offhand.setAmount(offhand.getAmount() - 1);
+            }
+            Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(thrown));
+            return;
+        } while (false);
+        
+        // Exotic arrows
         int exotic = plugin.getJSON().getLevel(uuid, Ability.EXOTIC_ARROWS);
         if (exotic > 0 && !proj.isCritical()) {
             SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);

@@ -11,6 +11,7 @@ public enum Ability {
     
     // Sentinel
     LONGSHOT("longshot", Type.ABILITY, DeckStorage.SENTINEL),
+    HITCHHIKERS_BOW("hitchhikersbow", Type.ABILITY, DeckStorage.SENTINEL),
     IMPACT_TRIGGER("impacttrigger", Type.PASSIVE, DeckStorage.SENTINEL),
     SMOKE_SHIELD("smokeshield", Type.PASSIVE, DeckStorage.SENTINEL),
     EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),

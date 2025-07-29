@@ -29,7 +29,6 @@ import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.deck.DeckInventory;
 import com.leomelonseeds.missilewars.invs.deck.OldPresetSelector;
-import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.cinematic.AbilitiesReplay;
@@ -114,17 +113,6 @@ public class MissileWarsCommand implements CommandExecutor {
                     }
                 }
                 cm.play(target);
-                return true;
-            }
-            
-            if (args[1].equals("smoke")) {
-                int dur = 100;
-                int r = 3;
-                if (args.length > 2) {
-                    dur = Integer.parseInt(args[2]);
-                    r = Integer.parseInt(args[3]);
-                }
-                new SmokeShieldHandler(target.getLocation(), dur, r);
                 return true;
             }
              

@@ -1210,6 +1210,21 @@ Sentinel:
         spcost: 1
         plus: 0.25
         percentage: 25
+    hitchhikersbow:
+      name: "&6Hitchhiker's Bow"
+      lore:
+      - ""
+      - "&7Hold a throwable projectile in your"
+      - "&7offhand and use your bow to fire the"
+      - "&7projectile at arrow speed. Both the"
+      - "&7projectile and an arrow are consumed."
+      - "&7At &fLevel 2&7, an arrow is no longer"
+      - "&7consumed."
+      cost: 1200
+      1:
+        spcost: 2
+      2:
+        spcost: 2
   passive:
     impacttrigger:
       name: "&eImpact Trigger"
@@ -1217,18 +1232,13 @@ Sentinel:
       - ""
       - "&7Projectile utilities now spawn"
       - "&7immediately when they impact a"
-      - "&7block, instead of breaking."
-      - "&7Otherwise, they spawn after"
-      - "%duration% &7seconds."
+      - "&7block, instead of breaking. At"
+      - "&fLevel 2&7, they will also spawn"
+      - "&7when colliding with any entity."
       1:
-        spcost: 1
-        duration: 1
+        spcost: 2
       2:
         spcost: 1
-        duration: 1.25
-      3:
-        spcost: 1
-        duration: 1.5
     smokeshield:
       name: "&eSmoke Shield"
       lore:
