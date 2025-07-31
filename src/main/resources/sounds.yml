@@ -169,6 +169,10 @@ intro-2:
 throw-projectile:
   sound: "ENTITY_EGG_THROW"
   volume: 1.0
+  pitch: 0.5
+shoot-bow:
+  sound: "ENTITY_EGG_THROW"
+  volume: 1.0
   pitch: 1.0
 deck-upgrade-tab:
   sound: "ITEM_BOOK_PAGE_TURN"
@@ -190,3 +194,15 @@ smokeshield:
   sound: "BLOCK_LAVA_EXTINGUISH"
   volume: 1.0
   pitch: 0.1
+astralturret-activate:
+  sound: "BLOCK_BEACON_POWER_SELECT"
+  volume: 1.0
+  pitch: 1.5
+astralturret-deactivate:
+  sound: "BLOCK_BEACON_DEACTIVATE"
+  volume: 1.0
+  pitch: 1.5
+astralturret-charge:
+  sound: "ENTITY_ELDER_GUARDIAN_CURSE"
+  volume: 1.0
+  pitch: 1.3

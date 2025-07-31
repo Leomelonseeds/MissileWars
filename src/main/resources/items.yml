@@ -863,8 +863,14 @@ obsidianshield:
     duration: 20
     spcost: 1
   
-obsidianshielddeplete:
-  file: 'obsidian_shield_deplete.nbt'
+obsidianshielddeplete1:
+  file: 'obsidian_shield_deplete_1.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
+obsidianshielddeplete2:
+  file: 'obsidian_shield_deplete_2.nbt'
   offset:
     x: -2
     y: -2

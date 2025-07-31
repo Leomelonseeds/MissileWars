@@ -51,6 +51,7 @@ import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.invs.MapVoting;
+import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
@@ -440,7 +441,7 @@ public class CustomItemListener implements Listener {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
         UUID uuid = thrower.getUniqueId();
-        boolean poke = plugin.getJSON().getLevel(thrower.getUniqueId(), Ability.POKEMISSILES) > 0;
+        boolean poke = plugin.getJSON().getLevel(uuid, Ability.POKEMISSILES) > 0;
         if (poke) {
             String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
             if (offName != null && !thrower.hasCooldown(offhand.getType()) && 
@@ -450,6 +451,14 @@ public class CustomItemListener implements Listener {
                 InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
             }
         }
+        
+        // Check for astral turret
+        if (structureName.contains("obsidianshield") && offhand.getType() == Material.ARROW && 
+                thrower.hasPermission("umw.admin")) {
+            thrown.customName(ConfigUtils.toComponent("astral"));
+            InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
+        }
+        
         projectileConsume(hand, thrower, playerArena);
         
         // Add particle effects for prickly
@@ -458,13 +467,12 @@ public class CustomItemListener implements Listener {
         }
 
         // More delay + particles for impact trigger
-        String structure = structureName;
-        int impactTrigger = plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER);
-        if (impactTrigger > 0) {
+        if (plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
+        String structure = structureName;
         ConfigUtils.schedule(20, () -> {
             if (spawnUtility(thrower, thrown, structure, playerArena, thrown.getLocation())) {
                 return;
@@ -477,7 +485,7 @@ public class CustomItemListener implements Listener {
     }
     
     // Handle impact trigger passive (allow utilities to spawn when hitting a block)
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void impactTrigger(ProjectileHitEvent event) {
         EntityType type = event.getEntityType();
         if (!(type == EntityType.SNOWBALL || type == EntityType.EGG || type == EntityType.ENDER_PEARL)) {
@@ -489,9 +497,20 @@ public class CustomItemListener implements Listener {
             return;
         }
         
+        Arena playerArena = ArenaUtils.getArena(thrower);
+        if (playerArena == null) {
+            return;
+        }
+        
         // The all important line for this event
         int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.IMPACT_TRIGGER);
         if (level <= 0) {
+            return;
+        }
+        
+        ItemStack hand = thrown.getItem();
+        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+        if (structureName == null) {
             return;
         }
         
@@ -504,17 +523,6 @@ public class CustomItemListener implements Listener {
             spawnLoc = block.getRelative(event.getHitBlockFace()).getLocation();
         } else {
           return;
-        }
-        
-        Arena playerArena = ArenaUtils.getArena(thrower);
-        if (playerArena == null) {
-            return;
-        }
-        
-        ItemStack hand = thrown.getItem();
-        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
-        if (structureName == null) {
-            return;
         }
         
         spawnUtility(thrower, thrown, structureName, playerArena, spawnLoc);
@@ -563,6 +571,12 @@ public class CustomItemListener implements Listener {
                 double radius = ConfigUtils.getAbilityStat(Ability.SMOKE_SHIELD, smokeshield, Stat.RADIUS);
                 new SmokeShieldHandler(spawnLoc, duration * 20, radius);
             }
+            
+            // Check for astral turret
+            if (thrown.customName() != null && ConfigUtils.toPlain(thrown.customName()).equals("astral") &&
+                    thrower.getInventory().getItemInOffHand().getType() == Material.ARROW) {
+                AstralTurretManager.getInstance().registerPlayer(thrower, spawnLoc, red);
+            }
 
             // Clear obsidian shield after a while
             int doubleDuration = duration * 2;
@@ -576,10 +590,11 @@ public class CustomItemListener implements Listener {
                     if (finalDuration == doubleDuration) {
                         SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, false, false);
                         ConfigUtils.sendConfigSound("break-obsidian-shield", spawnLoc);
+                        AstralTurretManager.getInstance().unregisterPlayer(thrower, spawnLoc);
                     } else if (finalDuration % 2 == 0) {
-                        SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete-1", spawnLoc, red, false, false);
+                        SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete1-1", spawnLoc, red, false, false);
                     } else {
-                        SchematicManager.spawnNBTStructure(null, "obsidianshield-1", spawnLoc, red, false, false);
+                        SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete2-1", spawnLoc, red, false, false);
                     }
                 });
             }
