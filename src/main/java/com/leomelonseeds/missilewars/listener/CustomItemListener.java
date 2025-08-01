@@ -574,9 +574,9 @@ public class CustomItemListener implements Listener {
             }
             
             // Check for astral turret
-            Material offhandMat = thrower.getInventory().getItemInOffHand().getType();
+            // Don't need to check for arrow cooldown because arrow was consumed on throw
             if (thrown.customName() != null && ConfigUtils.toPlain(thrown.customName()).equals("astral") &&
-                    offhandMat == Material.ARROW && !thrower.hasCooldown(offhandMat)) {
+                    thrower.getInventory().getItemInOffHand().getType() == Material.ARROW) {
                 AstralTurretManager.getInstance().registerPlayer(thrower, spawnLoc, red);
             }
 
