@@ -28,11 +28,12 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
-import com.leomelonseeds.missilewars.decks.Deck;
-import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.decks.Ability.Type;
+import com.leomelonseeds.missilewars.decks.Deck;
+import com.leomelonseeds.missilewars.decks.DeckItem;
+import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -296,6 +297,7 @@ public class MissileWarsTeam {
         mcPlayer.setExp(0F);
         mcPlayer.setGlowing(false);
         mcPlayer.setWorldBorder(null);
+        AstralTurretManager.getInstance().unregisterPlayer(mcPlayer, false);
         CanopyManager.getInstance().removePlayer(mcPlayer);
         EnderSplashManager.getInstance().removePlayer(mcPlayer);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){

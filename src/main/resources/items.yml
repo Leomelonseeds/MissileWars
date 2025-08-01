@@ -1201,6 +1201,8 @@ Sentinel:
       - "&7an additional %plus% &7damage per block."
       - "&7However, arrows travelling less than"
       - "&7%cutoff%m &7do %percentage%% &7less damage."
+      - ""
+      - "&7Difficulty: &a★☆☆"
       cost: 1500
       cutoff: 25
       max: 20
@@ -1221,16 +1223,45 @@ Sentinel:
       lore:
       - ""
       - "&7Hold a throwable projectile in your"
-      - "&7offhand and use your bow to fire the"
+      - "&foffhand &7and use your bow to fire the"
       - "&7projectile at arrow speed. Both the"
       - "&7projectile and an arrow are consumed."
       - "&7At &fLevel 2&7, an arrow is no longer"
       - "&7consumed."
+      - ""
+      - "&7Difficulty: &e★★☆"
       cost: 1200
       1:
         spcost: 2
       2:
         spcost: 2
+    astralturret:
+      name: "&6Astral Turret"
+      lore:
+      - ""
+      - "&7Hold an arrow in your &foffhand &7and"
+      - "&7throw your Obsidian Shield to spawn"
+      - "&7an &fAstral Turret&7. While active, any"
+      - "&7any projectiles you shoot or throw"
+      - "&7will spawn from the center of the"
+      - "&7turret. Dying or removing the arrow"
+      - "&7from your offhand will deactivate"
+      - "&7the turret."
+      - ""
+      - "&7The turret has 4 &fRespawn Anchors"
+      - "&7which indicate if you are holding a"
+      - "&7projectile, drawing your bow, or if"
+      - "&7the turret is active. &fRight-clicking"
+      - "&7any anchor will disrupt the turret"
+      - "&7and create a power &f6 &7explosion"
+      - "&7after &f3s&7, deactivating the turret."
+      - "&7These abilities only occur if the"
+      - "&7turret is still active."
+      - ""
+      - "&7Difficulty: &c★★★"
+      cost: 1800
+      1:
+        spcost: 4
   passive:
     impacttrigger:
       name: "&eImpact Trigger"

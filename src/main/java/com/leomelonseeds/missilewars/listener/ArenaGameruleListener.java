@@ -819,7 +819,8 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Must be TNT, minecarts, or creeper
-        if (!(entityType == EntityType.TNT || entityType == EntityType.TNT_MINECART || entityType == EntityType.CREEPER)) {
+        if (!(entityType == EntityType.TNT || entityType == EntityType.TNT_MINECART || 
+                entityType == EntityType.CREEPER || entityType == EntityType.PLAYER)) {
             return;
         }
         

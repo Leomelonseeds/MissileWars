@@ -440,12 +440,12 @@ public class CustomItemListener implements Listener {
         // Add meta for structure identification + pokemissiles
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
+        boolean hasOffhandCooldown = thrower.hasCooldown(offhand.getType());
         UUID uuid = thrower.getUniqueId();
         boolean poke = plugin.getJSON().getLevel(uuid, Ability.POKEMISSILES) > 0;
         if (poke) {
             String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
-            if (offName != null && !thrower.hasCooldown(offhand.getType()) && 
-                    offhand.getType().toString().contains("SPAWN_EGG")) {
+            if (offName != null && !hasOffhandCooldown && offhand.getType().toString().contains("SPAWN_EGG")) {
                 thrown.setItem(offhand);
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
                 InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
@@ -453,10 +453,11 @@ public class CustomItemListener implements Listener {
         }
         
         // Check for astral turret
-        if (structureName.contains("obsidianshield") && offhand.getType() == Material.ARROW && 
-                thrower.hasPermission("umw.admin")) {
+        if (structureName.contains("obsidianshield") && offhand.getType() == Material.ARROW && !hasOffhandCooldown &&
+                plugin.getJSON().getLevel(uuid, Ability.ASTRAL_TURRET) > 0) {
             thrown.customName(ConfigUtils.toComponent("astral"));
             InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
+            AstralTurretManager.getInstance();
         }
         
         projectileConsume(hand, thrower, playerArena);
@@ -573,8 +574,9 @@ public class CustomItemListener implements Listener {
             }
             
             // Check for astral turret
+            Material offhandMat = thrower.getInventory().getItemInOffHand().getType();
             if (thrown.customName() != null && ConfigUtils.toPlain(thrown.customName()).equals("astral") &&
-                    thrower.getInventory().getItemInOffHand().getType() == Material.ARROW) {
+                    offhandMat == Material.ARROW && !thrower.hasCooldown(offhandMat)) {
                 AstralTurretManager.getInstance().registerPlayer(thrower, spawnLoc, red);
             }
 
@@ -590,6 +592,7 @@ public class CustomItemListener implements Listener {
                     if (finalDuration == doubleDuration) {
                         SchematicManager.spawnNBTStructure(null, "obsidianshieldclear-1", spawnLoc, red, false, false);
                         ConfigUtils.sendConfigSound("break-obsidian-shield", spawnLoc);
+                        AstralTurretManager.getInstance().explode(thrower, spawnLoc);
                         AstralTurretManager.getInstance().unregisterPlayer(thrower, spawnLoc);
                     } else if (finalDuration % 2 == 0) {
                         SchematicManager.spawnNBTStructure(null, "obsidianshielddeplete1-1", spawnLoc, red, false, false);

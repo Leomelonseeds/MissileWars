@@ -51,6 +51,7 @@
 		"exoticarrows": false,
         "smokeshield": false,
         "hitchhikersbow": false,
+        "astralturret": false,
 		"defaultpreset": {
 			"skillpoints": 1,
             "enchants": {
