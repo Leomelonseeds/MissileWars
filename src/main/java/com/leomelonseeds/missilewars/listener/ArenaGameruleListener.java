@@ -75,6 +75,7 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
+import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -410,10 +411,15 @@ public class ArenaGameruleListener implements Listener {
         // Exotic arrows
         int exotic = plugin.getJSON().getLevel(uuid, Ability.EXOTIC_ARROWS);
         if (exotic > 0 && !proj.isCritical()) {
-            SpectralArrow arrow = (SpectralArrow) proj.getWorld().spawnEntity(proj.getLocation(), EntityType.SPECTRAL_ARROW);
+            SpectralArrow arrow = proj.getWorld().createEntity(proj.getLocation(), SpectralArrow.class);
+            arrow.setShooter(player);
+            
+            // Astral turret will teleport the entity if the player is connected
+            AstralTurretManager.getInstance().onProjectileLaunch(new ProjectileLaunchEvent(arrow));
+            
+            // The rest of the arrow setting stuff
             arrow.setRotation(proj.getYaw(), proj.getPitch());
             arrow.setVelocity(proj.getVelocity());
-            arrow.setShooter(player);
             arrow.setDamage(proj.getDamage());
             arrow.setCritical(false);
             arrow.setPickupStatus(proj.getPickupStatus());
@@ -427,7 +433,8 @@ public class ArenaGameruleListener implements Listener {
             arrow.setGlowingTicks(5 * exotic);
             event.setProjectile(arrow);
             proj = arrow;
-            Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(arrow));
+            
+            arrow.spawnAt(arrow.getLocation(), SpawnReason.CUSTOM);
             return;
         }
         

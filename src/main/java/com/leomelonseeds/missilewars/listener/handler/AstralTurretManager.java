@@ -25,6 +25,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -60,6 +61,10 @@ public class AstralTurretManager implements Listener {
         this.explosionQueue = new HashMap<>();
         this.drawingBow = new HashSet<>();
         Bukkit.getPluginManager().registerEvents(this, MissileWarsPlugin.getPlugin());
+    }
+    
+    public boolean isConnected(Player player) {
+        return locs.containsKey(player);
     }
     
     /**
@@ -320,9 +325,15 @@ public class AstralTurretManager implements Listener {
     }
     
     // Teleports launched projectiles to the astral turret
-    @EventHandler
-    private void onProjectileLaunch(ProjectileLaunchEvent event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        // This method is called manually for exotic arrows, we don't want it
+        // to be called again when the exotic arrow actually spawns in the world
         Projectile proj = event.getEntity();
+        if (proj.getEntitySpawnReason() == SpawnReason.CUSTOM) {
+            return;
+        }
+        
         ProjectileSource source = proj.getShooter();
         if (!locs.containsKey(source)) {
             return;
