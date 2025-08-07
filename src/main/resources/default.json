@@ -1,5 +1,5 @@
 {
-    "version": 2,
+    "version": 5,
     "Deck": "Sentinel",
     "Preset": "A",
 	"missilespec": false,
@@ -90,8 +90,9 @@
 		"blast_protection": false,
 		"multishot": false,
 		"quick_charge": false,
-		"boosterball": false,
+		"rocketeer": false,
 		"creepershot": false,
+        "compressedarrows": false,
 		"defaultpreset": {
 			"skillpoints": 5,
             "enchants": {
@@ -117,7 +118,7 @@
                 "level": 0
             },
 			"passive": {
-				"selected": "slownessarrows",
+				"selected": "spikedquiver",
 				"level": 3
 			},
 			"gpassive": {

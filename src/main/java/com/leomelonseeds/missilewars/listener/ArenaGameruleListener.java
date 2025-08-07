@@ -24,6 +24,8 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -35,7 +37,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.ThrowableProjectile;
-import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -62,6 +63,7 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -86,7 +88,10 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import net.ess3.api.events.AfkStatusChangeEvent;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
@@ -321,6 +326,60 @@ public class ArenaGameruleListener implements Listener {
         UUID uuid = player.getUniqueId();
         if (event.getBow().getType() == Material.CROSSBOW) {
             player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
+            
+            // Compressed arrows
+            if (eventProj instanceof AbstractArrow arrow && 
+                    ConfigUtils.toPlain(arrow.getItemStack().displayName()).contains("Compressed")) {
+                EntityType windCharge = isMultishotProjectile(player, arrow) ? 
+                        EntityType.WIND_CHARGE : EntityType.BREEZE_WIND_CHARGE;
+                arrow.setPickupStatus(PickupStatus.DISALLOWED);
+
+                int time = 20 + (int) (Math.random() * 20);
+                ConfigUtils.schedule(time, () -> {
+                    if (arrow.isDead()) {
+                        return;
+                    }
+                    AbstractWindCharge wind = (AbstractWindCharge) eventProj.getWorld().spawnEntity(eventProj.getLocation(), windCharge);
+                    arrow.remove();
+                    wind.explode();
+                });
+                
+                // SFX and VFX
+                ArenaUtils.spiralTrail(arrow, Particle.SMALL_GUST, null);
+                ConfigUtils.schedule(time - 20, () -> {
+                   if (arrow.isDead()) {
+                       return;
+                   }
+                   
+                   Sound chargeSound = Sound.sound(
+                           RegistryAccess.registryAccess().getRegistry(RegistryKey.SOUND_EVENT)
+                               .getKey(org.bukkit.Sound.BLOCK_TRIAL_SPAWNER_ABOUT_TO_SPAWN_ITEM), 
+                           Sound.Source.MASTER, 1F, 1.5F);
+                   arrow.getWorld().playSound(chargeSound, arrow);
+                });
+                
+                ConfigUtils.schedule(time - 5, () -> {
+                    if (!arrow.isDead()) {
+                        arrow.getWorld().spawnParticle(Particle.FLASH, arrow.getLocation(), 1, 0, 0, 0, 0, null, true);
+                    }
+                });
+                
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (arrow.isDead()) {
+                            this.cancel();
+                            return;
+                        }
+                        
+                        if (!arrow.isInBlock()) {
+                            return;
+                        }
+                        
+                        arrow.getWorld().spawnParticle(Particle.SMALL_GUST, arrow.getLocation(), 1, 0.2, 0.2, 0.2, 0);
+                    }
+                }.runTaskTimer(plugin, 5, 5);
+            }
 
             // Spiked Quiver
             int spiked = plugin.getJSON().getLevel(uuid, Ability.SPIKED_QUIVER);
@@ -334,34 +393,35 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            // Check for creepershot
-            if (event.getProjectile().getType() != EntityType.FIREWORK_ROCKET) {
+            // The following abilities all used loaded firework rockets
+            if (eventProj.getType() != EntityType.FIREWORK_ROCKET) {
                 return;
             }
             
+            // Check for creepershot
             Firework firework = (Firework) event.getProjectile();
             String itemName = ConfigUtils.toPlain(firework.getItem().displayName());
-            boolean charged = false;
-            if (!itemName.contains("Creeper")) {
+            if (itemName.contains("Creeper")) {
+                boolean charged = false;
+                if (itemName.contains("Charged")) {
+                    charged = true;
+                }
+                
+                Location spawnLoc = eventProj.getLocation();
+                Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
+                if (charged && !isMultishotProjectile(player, firework)) {
+                    creeper.setPowered(true);
+                }
+                creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
+                creeper.setCustomNameVisible(true);
+                creeper.setVelocity(eventProj.getVelocity().multiply(2.5));
+                Bukkit.getScheduler().runTask(plugin, () -> eventProj.remove());
+                
+                ConfigUtils.sendConfigSound("creepershot", player);
                 return;
             }
             
-            if (itemName.contains("Charged")) {
-                charged = true;
-            }
-            
-            Location spawnLoc = eventProj.getLocation();
-            Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
-            if (charged) {
-                creeper.setPowered(true);
-            }
-            creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
-            creeper.setCustomNameVisible(true);
-            creeper.setVelocity(eventProj.getVelocity().multiply(2.5));
-            Bukkit.getScheduler().runTask(plugin, () -> eventProj.remove());
-            
-            ConfigUtils.sendConfigSound("creepershot", player);
-            return;
+            // TODO: Check for small fireballs
         }
 
         // Consume the correct item with information we got from PlayerReadyArrowEvent
@@ -465,10 +525,12 @@ public class ArenaGameruleListener implements Listener {
             ConfigUtils.sendConfigSound("longshot-shoot", player.getLocation());
             return;
         }
-        
-        // Store offhand information for later. To be used with Hitchhiker's Bow
-        // ItemStack offhand = player.getInventory().getItemInOffHand();
-        // boolean hasOffhandCooldown = player.hasCooldown(offhand.getType());
+    }
+    
+    private boolean isMultishotProjectile(Player player, Projectile projectile) {
+        Vector eyeDir = player.getEyeLocation().getDirection().normalize();
+        Vector projDir = projectile.getVelocity().normalize();
+        return eyeDir.distanceSquared(projDir) > 0.001;
     }
     
     // Handle crossbow load cooldowns
@@ -522,19 +584,30 @@ public class ArenaGameruleListener implements Listener {
             
             // Load "creeper" into crossbow
             InventoryUtils.consumeItem(player, arena, offhand, -1);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                ItemStack crossbow = event.getCrossbow();
-                CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
-                List<ItemStack> newProjs = new ArrayList<>();
-                for (int i = 0; i < cmeta.getChargedProjectiles().size(); i++) {
-                    newProjs.add(new ItemStack(creeper));
-                }
-                cmeta.setChargedProjectiles(newProjs);
-                crossbow.setItemMeta(cmeta);
-            }, 1);
-            
+            replaceCrossbowItems(event.getCrossbow(), creeper);
             return;
         }
+        
+        // Compressed arrows
+        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.COMPRESSED_ARROWS) > 0 && slot == 40) {
+            ItemStack compressedArrow = new ItemStack(Material.ARROW);
+            ItemMeta meta = compressedArrow.getItemMeta();
+            meta.displayName(ConfigUtils.toComponent("&fCompressed Arrow"));
+            compressedArrow.setItemMeta(meta);
+            replaceCrossbowItems(event.getCrossbow(), compressedArrow);
+        }
+    }
+    
+    private void replaceCrossbowItems(ItemStack crossbow, ItemStack replacement) {
+        ConfigUtils.schedule(1, () -> {
+            CrossbowMeta cmeta = (CrossbowMeta) crossbow.getItemMeta();
+            List<ItemStack> newProjs = new ArrayList<>();
+            for (int i = 0; i < cmeta.getChargedProjectiles().size(); i++) {
+                newProjs.add(new ItemStack(replacement));
+            }
+            cmeta.setChargedProjectiles(newProjs);
+            crossbow.setItemMeta(cmeta);
+        });
     }
     
 
@@ -562,9 +635,7 @@ public class ArenaGameruleListener implements Listener {
         } else {
             // If the damager is explosive, handle right here. No need for
             // additional checks
-            if (eventDamager instanceof Explosive || 
-                eventDamager instanceof ExplosiveMinecart ||
-                eventDamager instanceof Creeper) {
+            if (eventDamager instanceof Explosive || eventDamager instanceof Creeper) {
                 // Check bers rocketeer
                 int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ROCKETEER);
                 if (rocketeer > 0) {

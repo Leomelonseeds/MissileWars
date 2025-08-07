@@ -280,7 +280,7 @@ public class ConfigUtils {
             return;
         }
 
-        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundId);
+        org.bukkit.Sound sound = org.bukkit.Sound.valueOf(soundId);
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 
@@ -303,7 +303,7 @@ public class ConfigUtils {
         	return;
         }
 
-        org.bukkit.Sound sound =  org.bukkit.Sound.valueOf(soundConfig.getString(path + ".sound"));
+        org.bukkit.Sound sound = org.bukkit.Sound.valueOf(soundConfig.getString(path + ".sound"));
         float volume = (float) soundConfig.getDouble(path + ".volume");
         float pitch = (float) soundConfig.getDouble(path + ".pitch");
 

@@ -1359,9 +1359,35 @@ Berserker:
       2: 
         level: 4
         spcost: 1
-  ability: {}
+  ability:
+    creepershot:
+      name: "&6Creepershot"
+      lore:
+      - ""
+      - "&7Holding your creeper in the offhand will"
+      - "&7load it as a shootable projectile from"
+      - "&7your crossbow."
+      cost: 1200
+      1:
+        spcost: 3
+    compressedarrows:
+      name: "&6Compressed Arrows"
+      lore:
+      - ""
+      - "&7Hold an arrows in your &foffhand &7and"
+      - "&7load your crossbow to prepare a"
+      - "&fCompressed Arrow&7. When shot, these"
+      - "&7arrows explode like a Breeze's Wind"
+      - "&7Charge after &f1-2 seconds&7, unless an"
+      - "&7entity was already hit. If the crossbow"
+      - "&7is enchanted with Multishot, the side"
+      - "&7arrows will explode with a less"
+      - "&7powerful regular Wind Charge."
+      cost: 600
+      1:
+        spcost: 3
   passive:
-    slownessarrows:
+    spikedquiver:
       name: "&eSpiked Quiver"
       lore:
       - ""
@@ -1380,7 +1406,7 @@ Berserker:
         spcost: 1
         amplifier: 2
         duration: 2
-    boosterball:
+    rocketeer:
       name: "&eRocketeer"
       lore:
       - ""
@@ -1398,16 +1424,6 @@ Berserker:
       3:
         spcost: 1
         multiplier: 1.5
-    creepershot:
-      name: "&eCreepershot"
-      lore:
-      - ""
-      - "&7Holding your creeper on the offhand will"
-      - "&7load it as a shootable projectile from"
-      - "&7your crossbow."
-      cost: 1200
-      1:
-        spcost: 3
 Architect:
   weapon:
     item: IRON_PICKAXE

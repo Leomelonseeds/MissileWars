@@ -92,6 +92,7 @@ public class JSONManager {
                     updateVersion2(newJson);
                     updateVersion3(newJson);
                     updateVersion4(newJson, player);
+                    updateVersion5(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -398,11 +399,10 @@ public class JSONManager {
     /**
      * Version 5 
      * - Rename "boosterball" to "rocketeer"
-     * - Rename "slownessarrows" to "spikedquiver" and move to abilities
-     * - Move spiked quiver to abilities
+     * - Rename "slownessarrows" to "spikedquiver"
      * - Move creepershot to abilities
      */
-    private void updateVersion5(JSONObject json, Player player) {
+    private void updateVersion5(JSONObject json) {
         if (json.getInt("version") >= 5) {
             return;
         }
@@ -410,35 +410,32 @@ public class JSONManager {
         json.put("version", 5);
         
         JSONObject bersJson = json.getJSONObject("Berserker");
+        bersJson.put("rocketeer", bersJson.getBoolean("boosterball"));
+        bersJson.remove("boosterball");
+        
         for (String preset : plugin.getDeckManager().getPresets()) {
             if (!bersJson.has(preset)) {
                 continue;
             }
             
-            // Make rocketeer
-            
             JSONObject presetJson = bersJson.getJSONObject(preset);
             JSONObject passiveJson = presetJson.getJSONObject("passive");
             JSONObject abilityJson = presetJson.getJSONObject("ability");
-            if (passiveJson.getString("selected").equals("impacttrigger")) {
-                return;
-            }
-            
-            int level = passiveJson.getInt("level");
-            if (level >= 2) {
-                passiveJson.put("level", level - 1);
+            if (passiveJson.getString("selected").equals("creepershot")) {
+                abilityJson.put("selected", "creepershot");
+                abilityJson.put("level", passiveJson.getInt("level"));
+                passiveJson.put("selected", "None");
+                passiveJson.put("level", 0);
                 continue;
             }
             
-            int sp = presetJson.getInt("skillpoints");
-            if (sp >= 1) {
-                presetJson.put("skillpoints", sp - 1);
-            } else {
-                passiveJson.put("selected", "None");
-                passiveJson.put("level", 0);
-                String msg = "&c&l[!] &cThe passive Impact Trigger for Sentinel [" + preset + "] was unset because "
-                        + "the skillpoint requirement for level 1 was increased to 2, and you do not have enough skillpoints.";
-                player.sendMessage(ConfigUtils.toComponent(msg));
+            if (passiveJson.getString("selected").equals("slownessarrows")) {
+                passiveJson.put("selected", "spikedquiver");
+                continue;
+            }
+            
+            if (passiveJson.getString("selected").equals("boosterball")) {
+                passiveJson.put("selected", "rocketeer");
             }
         }
     }

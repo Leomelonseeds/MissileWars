@@ -18,9 +18,10 @@ public enum Ability {
     EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
-    SPIKED_QUIVER("slownessarrows", Type.PASSIVE, DeckStorage.BERSERKER),
-    ROCKETEER("boosterball", Type.PASSIVE, DeckStorage.BERSERKER),
-    CREEPERSHOT("creepershot", Type.PASSIVE, DeckStorage.BERSERKER),
+    COMPRESSED_ARROWS("compressedarrows", Type.ABILITY, DeckStorage.BERSERKER),
+    CREEPERSHOT("creepershot", Type.ABILITY, DeckStorage.BERSERKER),
+    ROCKETEER("rocketeer", Type.PASSIVE, DeckStorage.BERSERKER),
+    SPIKED_QUIVER("spikedquiver", Type.PASSIVE, DeckStorage.BERSERKER),
     
     // Architect
     PRICKLY_PROJECTILES("prickly", Type.PASSIVE, DeckStorage.ARCHITECT),
