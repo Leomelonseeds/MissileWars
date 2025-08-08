@@ -93,6 +93,8 @@
 		"rocketeer": false,
 		"creepershot": false,
         "compressedarrows": false,
+        "gunslinger": false,
+        "blazeballs": false,
 		"defaultpreset": {
 			"skillpoints": 5,
             "enchants": {

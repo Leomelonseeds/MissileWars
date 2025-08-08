@@ -206,3 +206,11 @@ astralturret-charge:
   sound: "ENTITY_ELDER_GUARDIAN_CURSE"
   volume: 1.0
   pitch: 1.3
+blazeball-shoot:
+  sound: "ENTITY_GHAST_SHOOT"
+  volume: 1.0
+  pitch: 2.0
+blazeball-hit-player:
+  sound: "ENTITY_ARROW_HIT_PLAYER"
+  volume: 1.0
+  pitch: 0.5

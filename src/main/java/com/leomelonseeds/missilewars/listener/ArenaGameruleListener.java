@@ -31,10 +31,10 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Explosive;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SmallFireball;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
@@ -341,6 +341,7 @@ public class ArenaGameruleListener implements Listener {
                     }
                     AbstractWindCharge wind = (AbstractWindCharge) eventProj.getWorld().spawnEntity(eventProj.getLocation(), windCharge);
                     arrow.remove();
+                    wind.setShooter(player);
                     wind.explode();
                 });
                 
@@ -407,7 +408,7 @@ public class ArenaGameruleListener implements Listener {
                     charged = true;
                 }
                 
-                Location spawnLoc = eventProj.getLocation();
+                Location spawnLoc = firework.getLocation();
                 Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.CREEPER);
                 if (charged && !isMultishotProjectile(player, firework)) {
                     creeper.setPowered(true);
@@ -421,7 +422,17 @@ public class ArenaGameruleListener implements Listener {
                 return;
             }
             
-            // TODO: Check for small fireballs
+            // Blazeball
+            if (itemName.contains("Blazeball")) {
+                SmallFireball fb = firework.getWorld().createEntity(firework.getLocation(), SmallFireball.class);
+                fb.setShooter(player);
+                fb.setDirection(firework.getVelocity());
+                fb.setIsIncendiary(true);
+                firework.getWorld().addEntity(fb);
+                event.setProjectile(fb);
+                ConfigUtils.sendConfigSound("blazeball-shoot", player);
+                return;
+            }
         }
 
         // Consume the correct item with information we got from PlayerReadyArrowEvent
@@ -456,15 +467,15 @@ public class ArenaGameruleListener implements Listener {
             }
             
             EntityType thrownType = EntityType.valueOf(offhand.getType().toString());
-            ThrowableProjectile thrown  = (ThrowableProjectile) proj.getWorld().spawnEntity(proj.getLocation(), thrownType);
+            ThrowableProjectile thrown  = (ThrowableProjectile) proj.getWorld().createEntity(proj.getLocation(), thrownType.getEntityClass());
             thrown.setVelocity(proj.getVelocity());
             thrown.setShooter(player);
             thrown.setItem(offhand);
+            proj.getWorld().addEntity(thrown);
             event.setProjectile(thrown);
             if (offhand.getAmount() > 1) {
                 offhand.setAmount(offhand.getAmount() - 1);
             }
-            Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(thrown));
             return;
         } while (false);
         
@@ -588,6 +599,21 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Blazeballs
+        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.BLAZEBALLS) > 0) {
+            ItemStack offhand = inv.getItemInOffHand();
+            if (offhand.getType() != Material.FIRE_CHARGE || player.hasCooldown(offhand.getType())) {
+                return;
+            }
+            
+            ItemStack blazeBall = new ItemStack(Material.FIREWORK_ROCKET);
+            ItemMeta meta = blazeBall.getItemMeta();
+            meta.displayName(ConfigUtils.toComponent("&fBlazeball"));
+            blazeBall.setItemMeta(meta);
+            replaceCrossbowItems(event.getCrossbow(), blazeBall);
+            return;
+        }
+        
         // Compressed arrows
         if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.COMPRESSED_ARROWS) > 0 && slot == 40) {
             ItemStack compressedArrow = new ItemStack(Material.ARROW);
@@ -633,9 +659,10 @@ public class ArenaGameruleListener implements Listener {
         if (eventDamager.getType() == EntityType.PLAYER) {
             damager = (Player) event.getDamager();
         } else {
-            // If the damager is explosive, handle right here. No need for
-            // additional checks
-            if (eventDamager instanceof Explosive || eventDamager instanceof Creeper) {
+            // If the damager is explosive, handle right here. No need for additional checks
+            // Small fireballs are not realistically explosive so they don't belong in these checks...
+            if (eventDamager.getType() != EntityType.SMALL_FIREBALL && 
+                    (eventDamager instanceof Explosive || eventDamager instanceof Creeper)) {
                 // Check bers rocketeer
                 int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ROCKETEER);
                 if (rocketeer > 0) {
@@ -652,8 +679,8 @@ public class ArenaGameruleListener implements Listener {
                     multiplyKnockback(player, ConfigUtils.getAbilityStat(Ability.ROCKETEER, rocketeer, Stat.MULTIPLIER));
                 }
                 
-                // Fireballs should not do dmg to players
-                if (eventDamager instanceof Fireball) {
+                // Big fireballs should not do dmg to players
+                if (eventDamager.getType() == EntityType.FIREBALL) {
                     event.setDamage(0.0001);
                 }
                 
@@ -704,10 +731,6 @@ public class ArenaGameruleListener implements Listener {
 
         // Do arrowhealth/longshot calculations
         Projectile projectile = (Projectile) event.getDamager();
-        if (!(projectile.getShooter() instanceof Player)) {
-            return;
-        }
-
         EntityType type = projectile.getType();
         if (type.toString().contains("ARROW")) {
             // Do sentinel longshot checks. Otherwise, if its spectral arrow,
@@ -782,6 +805,11 @@ public class ArenaGameruleListener implements Listener {
             // Give item back on successful hit
             InventoryUtils.regiveItem(damager, item);
             return;
+        }
+        
+        // Ding sound for small fireballs
+        if (type == EntityType.SMALL_FIREBALL) {
+            ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
         }
     }
     

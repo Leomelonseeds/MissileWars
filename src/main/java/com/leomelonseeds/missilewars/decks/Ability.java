@@ -19,9 +19,11 @@ public enum Ability {
     
     // Berserker
     COMPRESSED_ARROWS("compressedarrows", Type.ABILITY, DeckStorage.BERSERKER),
+    BLAZEBALLS("blazeballs", Type.ABILITY, DeckStorage.BERSERKER),
     CREEPERSHOT("creepershot", Type.ABILITY, DeckStorage.BERSERKER),
-    ROCKETEER("rocketeer", Type.PASSIVE, DeckStorage.BERSERKER),
     SPIKED_QUIVER("spikedquiver", Type.PASSIVE, DeckStorage.BERSERKER),
+    GUNSLINGER("gunslinger", Type.PASSIVE, DeckStorage.BERSERKER),
+    ROCKETEER("rocketeer", Type.PASSIVE, DeckStorage.BERSERKER),
     
     // Architect
     PRICKLY_PROJECTILES("prickly", Type.PASSIVE, DeckStorage.ARCHITECT),

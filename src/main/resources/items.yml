@@ -1360,21 +1360,11 @@ Berserker:
         level: 4
         spcost: 1
   ability:
-    creepershot:
-      name: "&6Creepershot"
-      lore:
-      - ""
-      - "&7Holding your creeper in the offhand will"
-      - "&7load it as a shootable projectile from"
-      - "&7your crossbow."
-      cost: 1200
-      1:
-        spcost: 3
     compressedarrows:
       name: "&6Compressed Arrows"
       lore:
       - ""
-      - "&7Hold an arrows in your &foffhand &7and"
+      - "&7Hold an arrow in your &foffhand &7and"
       - "&7load your crossbow to prepare a"
       - "&fCompressed Arrow&7. When shot, these"
       - "&7arrows explode like a Breeze's Wind"
@@ -1383,7 +1373,40 @@ Berserker:
       - "&7is enchanted with Multishot, the side"
       - "&7arrows will explode with a less"
       - "&7powerful regular Wind Charge."
-      cost: 600
+      - ""
+      - "&7Difficulty: &a★☆☆"
+      cost: 800
+      1:
+        spcost: 3
+    blazeballs:
+      name: "&6Blazeballs"
+      lore:
+      - ""
+      - "&7Hold your fireball in the &foffhand &7and"
+      - "&7load your crossbow to prepare &fBlaze"
+      - "&fBalls&7. The next shot will shoot small"
+      - "&7Blaze fireball(s) that light blocks and"
+      - "&7players on fire, and ignite TNT. The"
+      - "&7fireball is not consumed, but must be"
+      - "&7off cooldown."
+      - ""
+      - "&7Difficulty: &a★☆☆"
+      cost: 500
+      1:
+        spcost: 3
+    creepershot:
+      name: "&6Creepershot"
+      lore:
+      - ""
+      - "&7Holding your creeper in the &foffhand &7will"
+      - "&7load it as a shootable projectile from"
+      - "&7your crossbow. Both the creeper and an"
+      - "&7arrow will be consumed. If the crossbow"
+      - "&7is enchanted with Multishot, only the"
+      - "&7middle creeper may be charged."
+      - ""
+      - "&7Difficulty: &c★★★"
+      cost: 1200
       1:
         spcost: 3
   passive:
@@ -1406,6 +1429,20 @@ Berserker:
         spcost: 1
         amplifier: 2
         duration: 2
+    gunslinger:
+      name: "&eGunslinger"
+      lore:
+      - ""
+      - "&7Receive a second crossbow."
+      - ""
+      - "&7The crossbow will be placed in the slot"
+      - "&7above the first hotbar slot in your"
+      - "&7inventory. Inventory items can be moved"
+      - "&7around by shift-clicking, hotkeying,"
+      - "&7or offhanding."
+      cost: 1500
+      1:
+        spcost: 3
     rocketeer:
       name: "&eRocketeer"
       lore:

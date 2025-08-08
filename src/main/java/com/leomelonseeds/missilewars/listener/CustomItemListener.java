@@ -336,8 +336,8 @@ public class CustomItemListener implements Listener {
         if (utility.contains("fireball") || utility.contains("lingering")) {
             event.setCancelled(true);
             Fireball fireball;
+            Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
             if (utility.contains("lingering")) {
-                Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
                 fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
                 int amplifier = (int) getItemStat(utility, "amplifier");
                 int duration = (int) getItemStat(utility, "duration");
@@ -345,8 +345,7 @@ public class CustomItemListener implements Listener {
                 fireball.setCustomNameVisible(false);
                 Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
             } else {
-                fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().clone().add(
-                        player.getEyeLocation().getDirection()), EntityType.FIREBALL);
+                fireball = (Fireball) player.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
                 fireball.setIsIncendiary(true);
                 float yield = (float) getItemStat(utility, "power");
                 fireball.setYield(yield);
@@ -688,7 +687,8 @@ public class CustomItemListener implements Listener {
         
         // Here, players must be on different teams
         // Allow collisions if arrow or fireball
-        if (event.getEntityType().toString().contains("ARROW") || event.getEntityType() == EntityType.FIREBALL) {
+        String typeString = event.getEntityType().toString();
+        if (typeString.contains("ARROW") || typeString.contains("FIREBALL")) {
             return;
         }
         

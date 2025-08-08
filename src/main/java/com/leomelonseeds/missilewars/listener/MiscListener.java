@@ -11,11 +11,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -191,7 +191,7 @@ public class MiscListener implements Listener {
 
     
     // ---------------------------------------------------------
-    // This section ignites tnt if b36 hit with flame arrow
+    // This section ignites tnt if b36 hit with flame arrow OR small fireball
     // Extend TNT event already handled above
     // ---------------------------------------------------------
     
@@ -233,12 +233,9 @@ public class MiscListener implements Listener {
     
     @EventHandler
     public void igniteTNT(ProjectileHitEvent e) {
-        if (!e.getEntityType().toString().contains("ARROW")) {
-            return;
-        }
-        
-        AbstractArrow arrow = (AbstractArrow) e.getEntity();
-        if (arrow.getFireTicks() <= 0) {
+        EntityType type = e.getEntityType();
+        boolean isArrow = type.toString().contains("ARROW") && e.getEntity().getFireTicks() > 0;
+        if (!isArrow && type != EntityType.SMALL_FIREBALL) {
             return;
         }
         
@@ -262,8 +259,9 @@ public class MiscListener implements Listener {
         primed.setFuseTicks(80);
         
         // Get source
-        if (arrow.getShooter() instanceof Player) {
-            primed.setSource((Player) arrow.getShooter());
+        Projectile proj = e.getEntity();
+        if (proj.getShooter() instanceof Player) {
+            primed.setSource((Player) proj.getShooter());
         }
     }
     

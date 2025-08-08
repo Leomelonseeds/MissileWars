@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.listener.packets.MissilePreview;
@@ -175,6 +176,12 @@ public class MissileWarsPlayer {
                 player.getInventory().setBoots(gearItem);
             } else {
                 player.getInventory().setItem(0, gearItem);
+            }
+            
+            // Check for gunslinger
+            if (gearItem.getType() == Material.CROSSBOW && 
+                    MissileWarsPlugin.getPlugin().getJSON().getLevel(playerId, Ability.GUNSLINGER) > 0) {
+                player.getInventory().setItem(27, gearItem.clone());
             }
         }
     }
