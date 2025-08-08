@@ -200,17 +200,16 @@ public class ArenaGameruleListener implements Listener {
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "brew " + player.getName() + " 0 10");
         
         // Check if player was killed in an Arena
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Arena playerArena = ArenaUtils.getArena(player);
         if (playerArena == null) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> player.teleport(ConfigUtils.getSpawnLocation()), 1);
+            ConfigUtils.schedule(1, () -> player.teleport(ConfigUtils.getSpawnLocation()));
             return;
         }
 
         Location spawn = playerArena.getPlayerSpawn(player);
         ItemStack canopy = CanopyManager.getInstance().removePlayer(player);
         EnderSplashManager.getInstance().removePlayer(player);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        ConfigUtils.schedule(1, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);
             player.setSaturation(5F);
@@ -220,7 +219,7 @@ public class ArenaGameruleListener implements Listener {
             if (canopy != null) {
                 InventoryUtils.regiveItem(player, canopy);
             }
-        }, 1);
+        });
         Component deathMessage = event.deathMessage();
         event.deathMessage(ConfigUtils.toComponent(""));
         if (playerArena.getTeam(player.getUniqueId()) == TeamName.NONE) {
@@ -732,7 +731,7 @@ public class ArenaGameruleListener implements Listener {
         // Do arrowhealth/longshot calculations
         Projectile projectile = (Projectile) event.getDamager();
         EntityType type = projectile.getType();
-        if (type.toString().contains("ARROW")) {
+        if (type.toString().contains("ARROW") || type == EntityType.SMALL_FIREBALL) {
             // Do sentinel longshot checks. Otherwise, if its spectral arrow,
             // multiply knockback by glowing ticks / 4
             double extradmg = 0;
@@ -752,6 +751,9 @@ public class ArenaGameruleListener implements Listener {
                 double plus = ConfigUtils.getAbilityStat(Ability.EXOTIC_ARROWS, level, Stat.PLUS);
                 double plusMultiplier = Math.max(0, 3 - projectile.getVelocity().length());
                 multiplyKnockback(player, multiplier + plus * plusMultiplier);
+            } else if (type == EntityType.SMALL_FIREBALL) {
+                // Ding sound for small fireballs
+                ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
             }
 
             // Arrowhealth message
@@ -805,11 +807,6 @@ public class ArenaGameruleListener implements Listener {
             // Give item back on successful hit
             InventoryUtils.regiveItem(damager, item);
             return;
-        }
-        
-        // Ding sound for small fireballs
-        if (type == EntityType.SMALL_FIREBALL) {
-            ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
         }
     }
     

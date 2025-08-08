@@ -176,6 +176,7 @@ public class MissileWarsTeam {
         Player mcPlayer = player.getMCPlayer();
         mcPlayer.teleport(spawn);
         mcPlayer.setHealth(20);
+        mcPlayer.setSaturation(5F);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
         player.setJoinTime(LocalDateTime.now());
