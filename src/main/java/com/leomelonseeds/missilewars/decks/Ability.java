@@ -5,9 +5,9 @@ package com.leomelonseeds.missilewars.decks;
  */
 public enum Ability {
     // Vanguard
+    ENDER_SPLASH("endersplash", Type.ABILITY, DeckStorage.VANGUARD),
     ADRENALINE("adrenaline", Type.PASSIVE, DeckStorage.VANGUARD),
     BUNNY("bunny", Type.PASSIVE, DeckStorage.VANGUARD),
-    ENDER_SPLASH("lavasplash", Type.PASSIVE, DeckStorage.VANGUARD),
     
     // Sentinel
     LONGSHOT("longshot", Type.ABILITY, DeckStorage.SENTINEL),

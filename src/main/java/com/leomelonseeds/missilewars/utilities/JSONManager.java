@@ -93,6 +93,7 @@ public class JSONManager {
                     updateVersion3(newJson);
                     updateVersion4(newJson, player);
                     updateVersion5(newJson);
+                    updateVersion6(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -221,6 +222,8 @@ public class JSONManager {
             } catch (JSONException e) {
                 e.printStackTrace();
                 Bukkit.getLogger().log(Level.SEVERE, "Couldn't update the JSON for a player");
+                player.sendMessage(ConfigUtils.toComponent("&c&l[!] &cThere was an issue updating your "
+                        + "presets and they have been reset. Please report to an admin."));
                 newJson = defaultJson;
             }
             
@@ -251,7 +254,9 @@ public class JSONManager {
     
     /**
      * Version 1 introduces the versioning system and 
-     * changes all enchants to be stored in their own object
+     * changes all enchants to be stored in their own object.
+     * It also adds the abilities key so future updates 
+     * are compatible.
      */
     private void updateVersion1(JSONObject json) {
         if (json.has("version")) {
@@ -270,6 +275,11 @@ public class JSONManager {
                 }
 
                 JSONObject presetJson = deckJson.getJSONObject(preset);
+                JSONObject abilityJson = new JSONObject();
+                abilityJson.put("selected", "None");
+                abilityJson.put("level", 0);
+                presetJson.put("ability", abilityJson);
+
                 JSONObject enchantJson = new JSONObject();
                 for (String key : new HashSet<>(presetJson.keySet())) {
                     if (all.contains(key)) {
@@ -437,6 +447,40 @@ public class JSONManager {
             if (passiveJson.getString("selected").equals("boosterball")) {
                 passiveJson.put("selected", "rocketeer");
             }
+        }
+    }
+    /**
+     * Version 6 
+     * - Rename "lavasplash" to "endersplash"
+     * - Move endersplash to abilities
+     */
+    private void updateVersion6(JSONObject json) {
+        if (json.getInt("version") >= 6) {
+            return;
+        }
+
+        json.put("version", 6);
+        
+        JSONObject vanJson = json.getJSONObject("Vanguard");
+        vanJson.put("endersplash", vanJson.getBoolean("lavasplash"));
+        vanJson.remove("lavasplash");
+        
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!vanJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = vanJson.getJSONObject(preset);
+            JSONObject passiveJson = presetJson.getJSONObject("passive");
+            if (!passiveJson.getString("selected").equals("endersplash")) {
+                return;
+            }
+
+            JSONObject abilityJson = presetJson.getJSONObject("ability");
+            passiveJson.put("selected", "None");
+            abilityJson.put("selected", "endersplash");
+            abilityJson.put("level", passiveJson.getInt("level"));
+            passiveJson.put("level", 0);
         }
     }
 

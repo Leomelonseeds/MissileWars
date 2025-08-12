@@ -179,7 +179,20 @@ public class ArenaUtils {
      * @return the bukkittask that controls this trail
      */
     public static BukkitTask spiralTrail(Projectile projectile, Particle particle, Function<Projectile, DustOptions> dustOptions) {
-        final double r = projectile instanceof AbstractArrow ? 0.75 : 0.5;
+        final double r;
+        switch (projectile.getType()) {
+            case ARROW:
+            case SPECTRAL_ARROW:
+                r = 0.75;
+                break;
+            case SPLASH_POTION:
+            case LINGERING_POTION:
+                r = 0.25;
+                break;
+            default:
+                r = 0.5;
+        }
+        
         final int period = 8;
         final int amountPerTick = 3;
         final double tau = 2 * Math.PI;

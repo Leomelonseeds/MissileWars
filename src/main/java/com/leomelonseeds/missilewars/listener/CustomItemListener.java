@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,9 +36,10 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -745,16 +747,44 @@ public class CustomItemListener implements Listener {
         
         EnderSplashManager esm = EnderSplashManager.getInstance();
         esm.addPlayer(thrower, thrown);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (thrown.isDead()) {
-                    esm.removeSplash(thrower, thrown);
-                    this.cancel();
-                }
-                playerArena.getWorld().spawnParticle(Particle.DRAGON_BREATH, thrown.getLocation(), 1, 0, 0, 0, 0);
-            }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
+        BukkitTask trail = ArenaUtils.spiralTrail(thrown, Particle.DRAGON_BREATH, null);
+        BukkitTask deathChecker = Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> {
+            if (thrown.isDead()) {
+                esm.removeSplash(thrower, thrown);
+            }  
+        }, 1, 1);
+        
+        // Despawn ender splash after effectiveness has run out
+        int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.ENDER_SPLASH);
+        if (level <= 0) {
+            level = 1;
+        }
+        
+        double expiry = ConfigUtils.getAbilityStat(Ability.ENDER_SPLASH, level, Stat.DURATION) * 20;
+        ConfigUtils.schedule((int) expiry, () -> {
+           if (thrown.isDead()) {
+               return;
+           }
+
+           if (!esm.removeSplash(thrower, thrown)) {
+               return;
+           }
+           
+           // Replace custom name so it doesn't teleport player in the next event
+           String curName = ConfigUtils.toPlain(thrown.customName());
+           thrown.customName(ConfigUtils.toComponent(curName.replace("ender", "")));
+           
+           // Remove trail and death check
+           trail.cancel();
+           deathChecker.cancel();
+           
+           // Set color back to blue and do some sfx
+           PotionMeta meta = thrown.getPotionMeta();
+           meta.setColor(Color.BLUE);
+           thrown.setPotionMeta(meta);
+           playerArena.getWorld().spawnParticle(Particle.DRAGON_BREATH, thrown.getLocation(), 10, 0, 0, 0, 0.05, null, true);
+           ConfigUtils.sendConfigSound("ender-splash-expire", thrown.getLocation());
+        });
     }
 
     // Handle splash hit block mechanics

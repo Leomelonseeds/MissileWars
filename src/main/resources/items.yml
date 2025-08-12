@@ -1114,7 +1114,24 @@ Vanguard:
       2: 
         level: 3
         spcost: 1
-  ability: {}
+  ability:
+    endersplash:
+      name: "&eEnder Splash"
+      lore:
+      - ""
+      - "&7If a splash lands on a block within"
+      - "&f%duration%s &7of being thrown, you will be"
+      - "&7teleported to the hit location."
+      cost: 1200
+      1:
+        spcost: 1
+        duration: 0.75
+      2:
+        spcost: 1
+        duration: 1.0
+      3:
+        spcost: 1
+        duration: 1.25
   passive:
     adrenaline:
       name: "&eAdrenaline"
@@ -1147,16 +1164,6 @@ Vanguard:
       3:
         spcost: 1
         amplifier: 2
-    lavasplash:
-      name: "&eEnder Splash"
-      lore:
-      - ""
-      - "&7Splahes teleport you to their hit"
-      - "&7location in addition to spawning"
-      - "&7water."
-      cost: 1200
-      1:
-        spcost: 3
 Sentinel:
   weapon:
     item: BOW

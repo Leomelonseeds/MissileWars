@@ -214,3 +214,7 @@ blazeball-hit-player:
   sound: "ENTITY_ARROW_HIT_PLAYER"
   volume: 1.0
   pitch: 0.5
+ender-splash-expire:
+  sound: "ENTITY_ENDER_DRAGON_HURT"
+  volume: 1.0
+  pitch: 1.5
