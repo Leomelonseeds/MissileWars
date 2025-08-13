@@ -620,14 +620,6 @@ public class ArenaGameruleListener implements Listener {
             replaceCrossbowItems(crossbow, compressedArrow);
             return;
         }
-        
-        // If nothing, then we replace crossbow items with normal arrows so the
-        // insanely long description doesnt show up
-        ItemStack normalArrow = new ItemStack(Material.ARROW);
-        ItemMeta meta = normalArrow.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent("&fArrows"));
-        normalArrow.setItemMeta(meta);
-        replaceCrossbowItems(crossbow, normalArrow);
     }
     
     private void replaceCrossbowItems(ItemStack crossbow, ItemStack replacement) {
