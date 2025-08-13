@@ -83,13 +83,13 @@ public abstract class DeckSubInventory {
         
         for (String type : new String[] {"ability", "passive", "gpassive"}) {
             String placeholder = "%" + type + "%";
-            String passive = presetJson.getJSONObject(type).getString("selected");
-            if (passive.equals("None")) {
+            String ability = presetJson.getJSONObject(type).getString("selected");
+            if (ability.equals("None")) {
                 line = line.replace(placeholder, "None");
             } else {
                 String path = type.equals("gpassive") ? 
-                    "gpassive." + passive + ".name" :
-                    deck + "." + type + "." + passive + ".name"; 
+                    "gpassive." + ability + ".name" :
+                    deck + "." + type + "." + ability + ".name"; 
                 line = line.replace(placeholder, itemConfig.getString(path));
             }
         }

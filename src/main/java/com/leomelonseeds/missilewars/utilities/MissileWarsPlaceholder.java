@@ -114,13 +114,13 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             
             FileConfiguration sec = ConfigUtils.getConfigFile("items.yml");
             String type = params.split("_")[1];
-            String passive = json.getJSONObject(deck.toString()).getJSONObject(preset).getJSONObject(type).getString("selected");
-            if (passive.equals("None")) {
+            String ability = json.getJSONObject(deck.toString()).getJSONObject(preset).getJSONObject(type).getString("selected");
+            if (ability.equals("None")) {
                 return "None";
             }
 
-            String path = type.equals("gpassive") ? "gpassive." + passive + ".name" :
-                deck + "." + type + "." + passive + ".name";
+            String path = type.equals("gpassive") ? "gpassive." + ability + ".name" :
+                deck + "." + type + "." + ability + ".name";
             return sec.getString(path);
         }
 

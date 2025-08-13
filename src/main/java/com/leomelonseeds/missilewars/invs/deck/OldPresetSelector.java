@@ -86,13 +86,13 @@ public class OldPresetSelector extends MWInventory {
                 } else {
                     for (String type : new String[] {"ability", "passive", "gpassive"}) {
                         String placeholder = "%" + type + "%";
-                        String passive = current.getJSONObject(type).getString("selected");
-                        if (passive.equals("None")) {
+                        String ability = current.getJSONObject(type).getString("selected");
+                        if (ability.equals("None")) {
                             l = l.replace(placeholder, "None");
                         } else {
                             String path = type.equals("gpassive") ? 
-                                "gpassive." + passive + ".name" :
-                                deck + "." + type + "." + passive + ".name"; 
+                                "gpassive." + ability + ".name" :
+                                deck + "." + type + "." + ability + ".name"; 
                             l = l.replace(placeholder, itemConfig.getString(path));
                         }
                     }

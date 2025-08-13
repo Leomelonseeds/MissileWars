@@ -1793,7 +1793,7 @@ preset:
       - "&7Piranha, Tomahawk"
       - ""
       - "&9Utility:"
-      - "&7Canopy, Splash, Lingering Harming"
+      - "&7Canopy, Splash, Dragon Fireball"
       - ""
       - "&cClick &7to use this deck."
     Sentinel:
@@ -1846,6 +1846,7 @@ preset:
     name: "&f&lEdit Preset %preset%"
     lore:
     - ""
+    - "&fAbility: &8%ability%"
     - "&fPassive: &8%passive%"
     - "&fGlobal Passive: &8%gpassive%"
     - ""
