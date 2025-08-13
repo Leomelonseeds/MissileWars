@@ -343,7 +343,8 @@ public class CustomItemListener implements Listener {
                 fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
                 int amplifier = (int) getItemStat(utility, "amplifier");
                 int duration = (int) getItemStat(utility, "duration");
-                fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration));
+                double radius = getItemStat(utility, "radius");
+                fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration + ":" + radius));
                 fireball.setCustomNameVisible(false);
                 Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
             } else {

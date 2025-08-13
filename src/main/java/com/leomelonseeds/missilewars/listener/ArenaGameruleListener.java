@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -79,6 +80,7 @@ import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
+import com.leomelonseeds.missilewars.listener.handler.DamageSphere;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -88,10 +90,7 @@ import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
 import net.ess3.api.events.AfkStatusChangeEvent;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 
 /** Class to listen for events relating to Arena game rules. */
@@ -232,9 +231,13 @@ public class ArenaGameruleListener implements Listener {
         
         // Find the player's killer
         Player killer = player.getKiller();
-        if (killer == null && player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) player.getLastDamageCause();
-            killer = ArenaUtils.getAssociatedPlayer(damageEvent.getDamager(), playerArena);
+        if (killer == null && player.getLastDamageCause() != null) {
+            EntityDamageEvent damageEvent = player.getLastDamageCause();
+            if (damageEvent instanceof EntityDamageByEntityEvent edee) {
+                killer = ArenaUtils.getAssociatedPlayer(edee.getDamager(), playerArena);
+            } else if (damageEvent.getCause() == DamageCause.MAGIC) {
+                killer = DamageSphere.getLastDamager(player);
+            }
         }
 
         // Find killer and increment kills
@@ -347,15 +350,9 @@ public class ArenaGameruleListener implements Listener {
                 // SFX and VFX
                 ArenaUtils.spiralTrail(arrow, Particle.SMALL_GUST, null);
                 ConfigUtils.schedule(time - 20, () -> {
-                   if (arrow.isDead()) {
-                       return;
+                   if (!arrow.isDead()) {
+                       ArenaUtils.playSoundFollowingEntity(Sound.BLOCK_TRIAL_SPAWNER_ABOUT_TO_SPAWN_ITEM, arrow, 1F, 1.5F);
                    }
-                   
-                   Sound chargeSound = Sound.sound(
-                           RegistryAccess.registryAccess().getRegistry(RegistryKey.SOUND_EVENT)
-                               .getKey(org.bukkit.Sound.BLOCK_TRIAL_SPAWNER_ABOUT_TO_SPAWN_ITEM), 
-                           Sound.Source.MASTER, 1F, 1.5F);
-                   arrow.getWorld().playSound(chargeSound, arrow);
                 });
                 
                 ConfigUtils.schedule(time - 5, () -> {
@@ -579,6 +576,7 @@ public class ArenaGameruleListener implements Listener {
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
         
         // Creepershot
+        ItemStack crossbow = event.getCrossbow();
         if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.CREEPERSHOT) > 0) {
             ItemStack offhand = inv.getItemInOffHand();
             if (offhand.getType() != Material.CREEPER_HEAD || player.hasCooldown(offhand.getType())) {
@@ -594,7 +592,7 @@ public class ArenaGameruleListener implements Listener {
             
             // Load "creeper" into crossbow
             InventoryUtils.consumeItem(player, arena, offhand, -1);
-            replaceCrossbowItems(event.getCrossbow(), creeper);
+            replaceCrossbowItems(crossbow, creeper);
             return;
         }
         
@@ -609,7 +607,7 @@ public class ArenaGameruleListener implements Listener {
             ItemMeta meta = blazeBall.getItemMeta();
             meta.displayName(ConfigUtils.toComponent("&fBlazeball"));
             blazeBall.setItemMeta(meta);
-            replaceCrossbowItems(event.getCrossbow(), blazeBall);
+            replaceCrossbowItems(crossbow, blazeBall);
             return;
         }
         
@@ -619,8 +617,17 @@ public class ArenaGameruleListener implements Listener {
             ItemMeta meta = compressedArrow.getItemMeta();
             meta.displayName(ConfigUtils.toComponent("&fCompressed Arrow"));
             compressedArrow.setItemMeta(meta);
-            replaceCrossbowItems(event.getCrossbow(), compressedArrow);
+            replaceCrossbowItems(crossbow, compressedArrow);
+            return;
         }
+        
+        // If nothing, then we replace crossbow items with normal arrows so the
+        // insanely long description doesnt show up
+        ItemStack normalArrow = new ItemStack(Material.ARROW);
+        ItemMeta meta = normalArrow.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent("&fArrows"));
+        normalArrow.setItemMeta(meta);
+        replaceCrossbowItems(crossbow, normalArrow);
     }
     
     private void replaceCrossbowItems(ItemStack crossbow, ItemStack replacement) {
@@ -752,7 +759,8 @@ public class ArenaGameruleListener implements Listener {
                 double plusMultiplier = Math.max(0, 3 - projectile.getVelocity().length());
                 multiplyKnockback(player, multiplier + plus * plusMultiplier);
             } else if (type == EntityType.SMALL_FIREBALL) {
-                // Ding sound for small fireballs
+                int blazeball = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.BLAZEBALLS);
+                event.setDamage(ConfigUtils.getAbilityStat(Ability.BLAZEBALLS, blazeball, Stat.DAMAGE));
                 ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
             }
 
@@ -924,6 +932,11 @@ public class ArenaGameruleListener implements Listener {
         // Must be TNT, minecarts, or creeper
         if (!(entityType == EntityType.TNT || entityType == EntityType.TNT_MINECART || 
                 entityType == EntityType.CREEPER || entityType == EntityType.PLAYER)) {
+            return;
+        }
+        
+        // Must not be from a canopy
+        if (entityType == EntityType.PLAYER && CanopyManager.getInstance().justExploded(entity)) {
             return;
         }
         

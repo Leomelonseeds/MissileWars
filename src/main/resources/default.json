@@ -1,5 +1,5 @@
 {
-    "version": 5,
+    "version": 6,
     "Deck": "Sentinel",
     "Preset": "A",
 	"missilespec": false,
@@ -10,7 +10,8 @@
 		"feather_falling": false,
 		"fire_aspect": false,
 		"bunny": false,
-		"lavasplash": false,
+		"endersplash": false,
+        "explosivecanopy": false,
 		"defaultpreset": {
 			"skillpoints": 2,
             "enchants": {

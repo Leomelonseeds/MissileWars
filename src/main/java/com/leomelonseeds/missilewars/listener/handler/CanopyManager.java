@@ -7,8 +7,12 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EnderSignal;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -22,6 +26,8 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
@@ -34,6 +40,7 @@ public class CanopyManager {
     private final int CANOPY_DELAY = 40;
     
     private Set<Player> canopy_freeze;
+    private Set<Player> canopy_explosion;
     private Map<Player, ItemStack> canopy_cooldown;
     private Map<Location, Integer> canopy_extensions;
     
@@ -47,6 +54,7 @@ public class CanopyManager {
     
     private CanopyManager() {
         canopy_freeze = new HashSet<>();
+        canopy_explosion = new HashSet<>();
         canopy_cooldown = new HashMap<>();
         canopy_extensions = new HashMap<>();
     }
@@ -88,6 +96,16 @@ public class CanopyManager {
         return canopy_freeze.contains(player);
     }
     
+    /**
+     * Check if player recently caused a canopy explosion.
+     * Use to disable portal breaking with canopy
+     * 
+     * @param player
+     * @return
+     */
+    public boolean justExploded(Entity player) {
+        return canopy_explosion.contains(player);
+    }
     
     /**
      * Set after player initially throws canopy
@@ -109,9 +127,43 @@ public class CanopyManager {
         ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
         signal.setDropItem(false);
         
-        // Add player to canopy cooldown list to give item back on death
+        // Check for explosive canopy
+        boolean explosive = false;
+        do {
+            // Replace with ability check later
+            int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.EXPLOSIVE_CANOPY);
+            if (level <= 0) {
+                break;
+            }
+            
+            ItemStack offhand = player.getInventory().getItemInOffHand();
+            if (offhand.getType() != Material.DRAGON_HEAD || player.hasCooldown(offhand.getType())) {
+                break;
+            }
+            
+            // Store explosion power and other stats in signal's custom name
+            double power = ConfigUtils.getAbilityStat(Ability.EXPLOSIVE_CANOPY, level, Ability.Stat.POWER);
+            String dragonFireball = InventoryUtils.getStringFromItem(offhand, "item-utility");
+            int amplifier = 0;
+            int duration = 0;
+            double radius = 0;
+            if (dragonFireball != null) {
+                String args[] = dragonFireball.split("-");
+                int fireballLevel = Integer.parseInt(args[1]);
+                amplifier = (int) ConfigUtils.getItemValue(args[0], fireballLevel, "amplifier");
+                duration = (int) ConfigUtils.getItemValue(args[0], fireballLevel, "duration");
+                radius = Double.parseDouble(ConfigUtils.getItemValue(args[0], fireballLevel, "radius") + "");
+            }
+            
+            // Store these stats in the ender signals' custom name for later access
+            signal.customName(ConfigUtils.toComponent(power + ":" + amplifier + ":" + duration + ":" + radius));
+            InventoryUtils.consumeItem(player, playerArena, offhand, -1);
+            explosive = true;
+        } while (false);
+
+        // Consume item and update canopy so it travels to correct location
+        // No clue why I need to do this but oh well
         InventoryUtils.consumeItem(player, playerArena, hand, -1);
-        canopy_cooldown.put(player, hand);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -119,12 +171,18 @@ public class CanopyManager {
                     this.cancel();
                     return;
                 }
-                
-                // Updates canopy so it travels to the correct location
-                // No clue why I need to do this but oh well
                 signal.setTargetLocation(target, false);
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), 0, 5);
+        
+        // Switch to explosion code if explosive
+        if (explosive) {
+            prepareCanopyExplosion(player, signal);
+            return;
+        }
+
+        // Add player to canopy cooldown to give item back on death
+        canopy_cooldown.put(player, hand);
         
         // Send sound 1 second before the tp
         ConfigUtils.schedule(CANOPY_DELAY - 20, () -> {
@@ -134,6 +192,65 @@ public class CanopyManager {
         });
 
         ConfigUtils.schedule(CANOPY_DELAY, () -> spawnCanopy(player, playerArena, signal));
+    }
+    
+    private void prepareCanopyExplosion(Player player, EnderSignal signal) {
+        World world = signal.getWorld();
+        ArenaUtils.playSoundFollowingEntity(Sound.ENTITY_WARDEN_ANGRY, signal, 1F, 1.2F);
+        ArenaUtils.doUntilDead(signal, t -> world.spawnParticle(Particle.DRAGON_BREATH, signal.getLocation(), 1, 0, 0, 0, 0.2, null, true));
+        
+        // Flashes to indicate about to explode. Same code as astral turret flashes
+        ItemStack signalItem = new ItemStack(Material.ENDER_EYE);
+        ItemStack signalExplodeItem = new ItemStack(Material.ENDER_PEARL);
+        ConfigUtils.schedule(40, () -> {
+            new BukkitRunnable() {
+                int t = 0;
+                @Override
+                public void run() {
+                    if (signal.isDead()) {
+                        this.cancel();
+                        return;
+                    }
+                    
+                    if (t < 20) {
+                        if (t % 10 == 0) {
+                            signal.setItem(signalExplodeItem);
+                        } else if ((t - 5) % 10 == 0) {
+                            signal.setItem(signalItem);
+                        }
+                    } else if (t < 40) {
+                        if (t % 5 == 0) {
+                            signal.setItem(signalExplodeItem);
+                        } else if ((t - 3) % 5 == 0) {
+                            signal.setItem(signalItem);
+                        }
+                    }
+                    
+                    t++;
+                }
+            }.runTaskTimer(MissileWarsPlugin.getPlugin(), 0, 1);
+        });
+        
+        // SFX and explosion
+        ConfigUtils.schedule(60, () -> ConfigUtils.sendConfigSound("canopy-activate", signal.getLocation()));
+        ConfigUtils.schedule(80, () -> {
+            canopy_explosion.add(player);
+            Location loc = signal.getLocation();
+            String args[] = ConfigUtils.toPlain(signal.customName()).split(":");
+            float power = Float.parseFloat(args[0]);
+            world.createExplosion(player, loc, power, false, true, false);
+            world.spawnParticle(Particle.DRAGON_BREATH, loc, 200, 0, 0, 0, 0.8, null, true);
+            ConfigUtils.sendConfigSound("canopy-explode", loc);
+            signal.setDespawnTimer(80);
+            ConfigUtils.schedule(1, () -> canopy_explosion.remove(player));
+            
+            // Create area effect sphere from dragon fireball
+            int amplifier = Integer.parseInt(args[1]);
+            int duration = Integer.parseInt(args[2]);
+            double radius = Double.parseDouble(args[3]);
+            PotionEffect effect = new PotionEffect(PotionEffectType.INSTANT_DAMAGE, duration, amplifier);
+            new DamageSphere(player, loc, radius, effect);
+        });
     }
     
     private void spawnCanopy(Player player, Arena playerArena, EnderSignal signal) {

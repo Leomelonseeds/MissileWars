@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -22,6 +23,9 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 
 public class ArenaUtils {
 
@@ -124,26 +128,26 @@ public class ArenaUtils {
     
     
     /**
-     * Perform an action every tick, typically adding a projectile trail,
-     * until the given projectile is dead (if its an arrow, if it hits a block)
+     * Perform an action asynchronously every tick, typically adding a trail,
+     * until the given entity is dead (if its an arrow, if it hits a block)
      * 
-     * @param projectile
+     * @param entity
      * @param consumer the action to run every tick, with parameter as the ticks this has run
      */
-    public static BukkitTask doUntilDead(Projectile projectile, Consumer<Integer> consumer) {
-        boolean isArrow = projectile instanceof AbstractArrow;
+    public static BukkitTask doUntilDead(Entity entity, Consumer<Integer> consumer) {
+        boolean isArrow = entity instanceof AbstractArrow;
         return new BukkitRunnable() {
             
             int timeAlive = 0;
             
             @Override
             public void run() {
-                if (isArrow && ((AbstractArrow) projectile).isInBlock()) {
+                if (isArrow && ((AbstractArrow) entity).isInBlock()) {
                     this.cancel();
                     return;
                 }
                 
-                if (projectile.isDead()) {
+                if (entity.isDead()) {
                     this.cancel();
                     return;
                 }
@@ -151,7 +155,7 @@ public class ArenaUtils {
                 consumer.accept(timeAlive);
                 timeAlive++;
             }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
+        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 1, 1);
     }
     
     /**
@@ -278,5 +282,21 @@ public class ArenaUtils {
         double dy = toCheck.getY() - center.getY();
         double dz = toCheck.getZ() - center.getZ();
         return dx * dx + dy * dy + dz * dz < radius * radius;
+    }
+    
+    /**
+     * Play a sound that is emitted by an entity (follows its location)
+     * 
+     * @param sound
+     * @param volume
+     * @param pitch
+     * @param entity
+     */
+    public static void playSoundFollowingEntity(Sound sound, Entity entity, float volume, float pitch) {
+        net.kyori.adventure.sound.Sound playSound = net.kyori.adventure.sound.Sound.sound(
+                RegistryAccess.registryAccess().getRegistry(RegistryKey.SOUND_EVENT).getKey(sound), 
+                net.kyori.adventure.sound.Sound.Source.MASTER, 
+                volume, pitch);
+        entity.getWorld().playSound(playSound, entity);
     }
 }

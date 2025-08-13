@@ -990,24 +990,31 @@ lingering_harming:
   name: "&5★ Dragon Fireball %level% ⚡"
   lore:
   - ""
-  - "&7How it feels to chew 5 gum. Note that"
-  - "&7contrary to vanilla Minecraft, these"
-  - "&7can be deflected too."
+  - "&7These deflectable death balls create"
+  - "&7an area effect sphere of instant"
+  - "&7damage. Our supplier told us they"
+  - "&7did it with essential oils and voodoo"
+  - "&7magic. And by supplier, I mean some"
+  - "&7guy from a trailer park in Florida."
   - ""
   - "&bAmplifier: %amplifier%"
-  - "&bDuration: %duration%"
+  - "&bDuration: %duration%s"
+  - "&bRadius: %radius%"
   1:
     # 0 = lvl 1
     amplifier: 0
     duration: 5
+    radius: 2
   2:
-    amplifier: 1
-    duration: 10
     spcost: 1
+    amplifier: 0
+    duration: 8
+    radius: 2.5
   3:
-    amplifier: 1
-    duration: 15
     spcost: 1
+    amplifier: 0
+    duration: 10
+    radius: 3
     
 arrows:
   index: 7
@@ -1115,8 +1122,30 @@ Vanguard:
         level: 3
         spcost: 1
   ability:
+    explosivecanopy:
+      name: "&6Explosive Canopy"
+      lore:
+      - ""
+      - "&7Hold your Dragon Fireball in the"
+      - "&foffhand &7and throw a canopy to launch"
+      - "&7an &fExplosive Canopy&7. After &f4 seconds&7,"
+      - "&7instead of teleporting you, the canopy"
+      - "&7will explode with power %power%&7, and leave"
+      - "&7behind the area effect sphere of the"
+      - "&7Dragon Fireball. These explosions"
+      - "&7cannot break portals."
+      cost: 800
+      1:
+        spcost: 1
+        power: 4
+      2:
+        spcost: 1
+        power: 5
+      3:
+        spcost: 1
+        power: 6
     endersplash:
-      name: "&eEnder Splash"
+      name: "&6Ender Splash"
       lore:
       - ""
       - "&7If a splash lands on a block within"
@@ -1392,15 +1421,22 @@ Berserker:
       - "&7Hold your fireball in the &foffhand &7and"
       - "&7load your crossbow to prepare &fBlaze"
       - "&fBalls&7. The next shot will shoot small"
-      - "&7Blaze fireball(s) that light blocks and"
-      - "&7players on fire, and ignite TNT. The"
-      - "&7fireball is not consumed, but must be"
-      - "&7off cooldown."
+      - "&7Blaze fireball(s) that ignite TNT and"
+      - "&7set blocks and players on fire, dealing"
+      - "%damage% &7damage. The fireball is not"
+      - "&7consumed, but must be off cooldown."
       - ""
       - "&7Difficulty: &a★☆☆"
       cost: 500
       1:
-        spcost: 3
+        spcost: 1
+        damage: 3
+      2:
+        spcost: 1
+        damage: 5
+      3:
+        spcost: 1
+        damage: 7
     creepershot:
       name: "&6Creepershot"
       lore:

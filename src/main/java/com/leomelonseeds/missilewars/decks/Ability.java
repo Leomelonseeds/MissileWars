@@ -6,6 +6,7 @@ package com.leomelonseeds.missilewars.decks;
 public enum Ability {
     // Vanguard
     ENDER_SPLASH("endersplash", Type.ABILITY, DeckStorage.VANGUARD),
+    EXPLOSIVE_CANOPY("explosivecanopy", Type.ABILITY, DeckStorage.VANGUARD),
     ADRENALINE("adrenaline", Type.PASSIVE, DeckStorage.VANGUARD),
     BUNNY("bunny", Type.PASSIVE, DeckStorage.VANGUARD),
     
@@ -79,7 +80,9 @@ public enum Ability {
         PERCENTAGE("percentage"),
         UPERCENTAGE("upercentage"),
         MPERCENTAGE("mpercentage"),
-        RADIUS("radius");
+        RADIUS("radius"),
+        DAMAGE("damage"),
+        POWER("power");
         
         private String id;
         

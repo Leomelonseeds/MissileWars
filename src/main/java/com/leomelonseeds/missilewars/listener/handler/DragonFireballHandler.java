@@ -127,11 +127,11 @@ public class DragonFireballHandler implements Listener {
         
         int amplifier = Integer.parseInt(args[1]);
         int duration = Integer.parseInt(args[2]);
+        double radius = Double.parseDouble(args[3]);
         AreaEffectCloud cloud = event.getAreaEffectCloud();
-        cloud.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, duration, amplifier), true);
-        cloud.setDuration(duration * 20);
-        cloud.setDurationOnUse(0);
-        cloud.setRadiusPerTick(0);
+        PotionEffect effect = new PotionEffect(PotionEffectType.INSTANT_DAMAGE, duration, amplifier);
+        new DamageSphere((Player) fireball.getShooter(), cloud.getLocation(), radius, effect);
+        cloud.remove();
         remove();
     }
     

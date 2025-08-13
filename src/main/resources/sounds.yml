@@ -92,7 +92,7 @@ spawn-torpedo:
   pitch: 0.5
 canopy-activate:
   sound: ENTITY_ZOMBIE_VILLAGER_CONVERTED
-  volume: 1.0
+  volume: 1.5
   pitch: 0.9
 spawn-canopy:
   sound: BLOCK_GRASS_PLACE
@@ -218,3 +218,7 @@ ender-splash-expire:
   sound: "ENTITY_ENDER_DRAGON_HURT"
   volume: 1.0
   pitch: 1.5
+canopy-explode:
+  sound: "ENTITY_WARDEN_SONIC_BOOM"
+  volume: 1.5
+  pitch: 2.0
