@@ -380,8 +380,7 @@ public class ArenaGameruleListener implements Listener {
 
             // Spiked Quiver
             int spiked = plugin.getJSON().getLevel(uuid, Ability.SPIKED_QUIVER);
-            if (spiked > 0) {
-                Arrow arrow = (Arrow) event.getProjectile();
+            if (spiked > 0 && eventProj instanceof Arrow arrow) {
                 int amplifier = (int) ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.AMPLIFIER);
                 int duration = (int) (ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.DURATION) * 20);
                 Random rand = new Random();
@@ -514,7 +513,6 @@ public class ArenaGameruleListener implements Listener {
             double max = ConfigUtils.getAbilityStat(Ability.LONGSHOT, longshot, Stat.MAX);
             BukkitTask particles = ArenaUtils.spiralTrail(proj, Particle.DUST, p -> {
                 Location projLoc = p.getLocation();
-                ConfigUtils.sendConfigSound("longshot-travel", projLoc);
                 double extradmg = getExtraLongshotDamage(p, longshot, projLoc);
                 double ratio = Math.min(1, 1.5 * extradmg / max); // 1.5x makes damage increase more apparent 
                 int g = (int) (255 * (1 - ratio));
@@ -522,8 +520,15 @@ public class ArenaGameruleListener implements Listener {
                 return new DustOptions(Color.fromRGB(r, g, 0), 1.0F);
             });
             
-            // 5 seconds should be enough for a bow shot, riiiight
+            // SFX following the arrow
             AbstractArrow finalArrow = proj;
+            ArenaUtils.doUntilDead(
+                finalArrow, 
+                t -> ConfigUtils.sendConfigSound("longshot-travel", finalArrow.getLocation()),
+                false
+            );
+            
+            // 5 seconds should be enough for a bow shot, riiiight
             ConfigUtils.schedule(100, () -> {
                 longShots.remove(finalArrow);
                 particles.cancel();

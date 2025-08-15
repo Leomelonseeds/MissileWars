@@ -125,8 +125,7 @@ public class ArenaUtils {
     public static Arena getArena(Player player) {
         return MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
     }
-    
-    
+
     /**
      * Perform an action asynchronously every tick, typically adding a trail,
      * until the given entity is dead (if its an arrow, if it hits a block)
@@ -135,6 +134,26 @@ public class ArenaUtils {
      * @param consumer the action to run every tick, with parameter as the ticks this has run
      */
     public static BukkitTask doUntilDead(Entity entity, Consumer<Integer> consumer) {
+        return doUntilDead(entity, consumer, true);
+    }
+    
+    /**
+     * Perform an action every tick until the given entity is dead 
+     * (if its an arrow, if it hits a block)
+     * 
+     * @param entity
+     * @param consumer the action to run every tick, with parameter as the ticks this has run
+     */
+    public static BukkitTask doUntilDead(Entity entity, Consumer<Integer> consumer, boolean async) {
+        BukkitRunnable runnable = getDoUntilDeadRunnable(entity, consumer);
+        if (async) {
+            return runnable.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 1, 1);
+        } else {
+            return runnable.runTaskTimer(MissileWarsPlugin.getPlugin(), 1, 1);
+        }
+    }
+    
+    private static BukkitRunnable getDoUntilDeadRunnable(Entity entity, Consumer<Integer> consumer) {
         boolean isArrow = entity instanceof AbstractArrow;
         return new BukkitRunnable() {
             
@@ -155,7 +174,7 @@ public class ArenaUtils {
                 consumer.accept(timeAlive);
                 timeAlive++;
             }
-        }.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 1, 1);
+        };
     }
     
     /**
