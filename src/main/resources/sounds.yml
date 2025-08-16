@@ -222,3 +222,19 @@ canopy-explode:
   sound: "ENTITY_WARDEN_SONIC_BOOM"
   volume: 1.5
   pitch: 2.0
+triton-activate:
+  sound: "BLOCK_CONDUIT_ACTIVATE"
+  volume: 1.0
+  pitch: 1.7
+triton-deactivate:
+  sound: "BLOCK_CONDUIT_DEACTIVATE"
+  volume: 0.4
+  pitch: 1.7
+trident-despawn:
+  sound: "BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE"
+  volume: 0.5
+  pitch: 1.3
+trident-hit:
+  sound: "ITEM_TRIDENT_RETURN"
+  volume: 1.0
+  pitch: 1.0

@@ -1047,6 +1047,16 @@ elytra:
   - "&7An extra-dimensional artifact of"
   - "&7bygone days, now imbued to the brim"
   - "&7with preservative arcana."
+  
+trident:
+  item: TRIDENT
+  name: "&6⚔ &6&lTrident &6⚡"
+  lore:
+  - ""
+  - "&7Once possessed by Poseidon, this"
+  - "&7mythical weapon has the fabled"
+  - "&7ability to pick up food from my"
+  - "&7dinner plate."
 
 # The victory structure that spawns when a team wins
 pegasus:
@@ -1134,6 +1144,8 @@ Vanguard:
       - "&7behind the area effect sphere of the"
       - "&7Dragon Fireball. These explosions"
       - "&7cannot break portals."
+      - ""
+      - "&7Difficulty: &a★☆☆"
       cost: 800
       1:
         spcost: 1
@@ -1151,6 +1163,8 @@ Vanguard:
       - "&7If a splash lands on a block within"
       - "&f%duration%s &7of being thrown, you will be"
       - "&7teleported to the hit location."
+      - ""
+      - "&7Difficulty: &e★★☆"
       cost: 1200
       1:
         spcost: 1
@@ -1161,6 +1175,30 @@ Vanguard:
       3:
         spcost: 1
         duration: 1.25
+    triton:
+      name: "&6Triton"
+      lore:
+      - ""
+      - "&7Throwing a splash on yourself imbues"
+      - "&7you with power of the seas, replacing"
+      - "&7your sword with a &fTrident&7. The trident"
+      - "&7keeps the same enchantments and"
+      - "&7damage attributes as your sword. When"
+      - "&7thrown, the trident will do %damage% &7damage"
+      - "&7to any hit entity, and your sword will"
+      - "&7be returned."
+      - ""
+      - "&7Difficulty: &e★★☆"
+      cost: 1500
+      1:
+        spcost: 1
+        damage: 8
+      2:
+        spcost: 1
+        damage: 10
+      3:
+        spcost: 1
+        damage: 12
   passive:
     adrenaline:
       name: "&eAdrenaline"

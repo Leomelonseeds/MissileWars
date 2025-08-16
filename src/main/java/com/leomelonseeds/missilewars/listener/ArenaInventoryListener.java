@@ -129,7 +129,7 @@ public class ArenaInventoryListener implements Listener {
         // Make sure we don't allow gear items to be dropped
         ItemStack dropped = event.getItemDrop().getItemStack();
         String item = dropped.getType().toString();
-        if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE")) {
+        if (item.contains("BOW") || item.contains("SWORD") || item.contains("PICKAXE") || item.equals("TRIDENT")) {
             event.setCancelled(true);
             return;
         }

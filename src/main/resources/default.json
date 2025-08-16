@@ -12,6 +12,7 @@
 		"bunny": false,
 		"endersplash": false,
         "explosivecanopy": false,
+        "triton": false,
 		"defaultpreset": {
 			"skillpoints": 2,
             "enchants": {

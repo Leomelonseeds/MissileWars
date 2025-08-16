@@ -1,8 +1,6 @@
 package com.leomelonseeds.missilewars.listener;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -58,6 +56,7 @@ import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
+import com.leomelonseeds.missilewars.listener.handler.TritonHandler;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -66,7 +65,11 @@ import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 /** Class to handle events for structure items. */
 public class CustomItemListener implements Listener {
     
-    public static Map<Location, Integer> leaves = new HashMap<>();
+    private TritonHandler tritonHandler;
+    
+    public CustomItemListener() {
+        this.tritonHandler = new TritonHandler();
+    }
 
     /**
      * Simply get level from name
@@ -813,17 +816,42 @@ public class CustomItemListener implements Listener {
         String[] args = customName.split(":");
         Player thrower = (Player) event.getEntity().getShooter();
         
-        // Defuse primed TNT
+        // Defuse primed TNT and trident
         if (hitEntity != null) {
-            if (hitEntity.getType() != EntityType.TNT) {
+            if (hitEntity.getType() == EntityType.TNT) {
+                Location loc = hitEntity.getLocation();
+                if (loc.getBlock().getType() != Material.NETHER_PORTAL) {
+                    hitEntity.remove();
+                    loc.getBlock().setType(Material.TNT, false);
+                }
+                
                 return;
             }
-            Location loc = hitEntity.getLocation();
-            if (loc.getBlock().getType() != Material.NETHER_PORTAL) {
-                hitEntity.remove();
-                loc.getBlock().setType(Material.TNT, false);
-                return; 
+            
+            // Triton give trident
+            if (hitEntity.getType() != EntityType.PLAYER) {
+                return;
             }
+            
+            Player hitPlayer = (Player) hitEntity;
+            if (MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) == 0) {
+                return;
+            }
+            
+            ItemStack[] invItems = hitPlayer.getInventory().getContents();
+            for (int i = 0; i < invItems.length; i++) {
+                ItemStack item = invItems[i];
+                if (item == null || item.getType() != Material.GOLDEN_SWORD) {
+                    continue;
+                }
+                
+                ItemStack trident = tritonHandler.addPlayer(hitPlayer, item);
+                hitPlayer.getInventory().setItem(i, trident);
+                ConfigUtils.sendConfigSound("triton-activate", hitPlayer.getLocation());
+                return;
+            }
+            
+            return;
         }
 
         // Handle hitting oak_wood to fully repair canopies

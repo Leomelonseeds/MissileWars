@@ -234,8 +234,9 @@ public class MiscListener implements Listener {
     @EventHandler
     public void igniteTNT(ProjectileHitEvent e) {
         EntityType type = e.getEntityType();
-        boolean isArrow = type.toString().contains("ARROW") && e.getEntity().getFireTicks() > 0;
-        if (!isArrow && type != EntityType.SMALL_FIREBALL) {
+        boolean isArrow = (type.toString().contains("ARROW") || type == EntityType.TRIDENT) && 
+                e.getEntity().getFireTicks() > 0;
+        if (!isArrow && type != EntityType.SMALL_FIREBALL ) {
             return;
         }
         

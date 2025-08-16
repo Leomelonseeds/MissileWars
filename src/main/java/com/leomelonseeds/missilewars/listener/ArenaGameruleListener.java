@@ -736,7 +736,7 @@ public class ArenaGameruleListener implements Listener {
         // Do arrowhealth/longshot calculations
         Projectile projectile = (Projectile) event.getDamager();
         EntityType type = projectile.getType();
-        if (type.toString().contains("ARROW") || type == EntityType.SMALL_FIREBALL) {
+        if (type.toString().contains("ARROW") || type == EntityType.SMALL_FIREBALL || type == EntityType.TRIDENT) {
             // Do sentinel longshot checks. Otherwise, if its spectral arrow,
             // multiply knockback by glowing ticks / 4
             double extradmg = 0;
@@ -759,6 +759,8 @@ public class ArenaGameruleListener implements Listener {
             } else if (type == EntityType.SMALL_FIREBALL) {
                 int blazeball = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.BLAZEBALLS);
                 event.setDamage(ConfigUtils.getAbilityStat(Ability.BLAZEBALLS, blazeball, Stat.DAMAGE));
+                ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
+            } else if (type == EntityType.TRIDENT) {
                 ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
             }
 
