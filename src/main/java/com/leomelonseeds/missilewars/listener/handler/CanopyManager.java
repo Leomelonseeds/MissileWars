@@ -120,11 +120,6 @@ public class CanopyManager {
         // Spawn ender eye
         Location eyeLoc = player.getEyeLocation();
         EnderSignal signal = (EnderSignal) playerArena.getWorld().spawnEntity(eyeLoc, EntityType.EYE_OF_ENDER);
-        
-        // Set target location
-        Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
-        Location target = eyeLoc.clone().add(distance).toCenterLocation();
-        ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
         signal.setDropItem(false);
         
         // Check for explosive canopy
@@ -160,6 +155,11 @@ public class CanopyManager {
             InventoryUtils.consumeItem(player, playerArena, offhand, -1);
             explosive = true;
         } while (false);
+        
+        // Set target location
+        Vector distance = eyeLoc.getDirection().multiply(canopy_distance);
+        Location target = eyeLoc.clone().add(distance).toCenterLocation();
+        ConfigUtils.sendConfigSound("launch-canopy", player.getLocation());
 
         // Consume item and update canopy so it travels to correct location
         // No clue why I need to do this but oh well

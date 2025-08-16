@@ -905,12 +905,12 @@ canopy:
     y: -2
     z: -3
   1:
-    distance: 6
+    distance: 8
   2: 
-    distance: 9
+    distance: 11
     spcost: 1
   3: 
-    distance: 12
+    distance: 14
     spcost: 1
 
 creeper:
@@ -1396,24 +1396,6 @@ Berserker:
         level: 4
         spcost: 1
   ability:
-    compressedarrows:
-      name: "&6Compressed Arrows"
-      lore:
-      - ""
-      - "&7Hold an arrow in your &foffhand &7and"
-      - "&7load your crossbow to prepare a"
-      - "&fCompressed Arrow&7. When shot, these"
-      - "&7arrows explode like a Breeze's Wind"
-      - "&7Charge after &f1-2 seconds&7, unless an"
-      - "&7entity was already hit. If the crossbow"
-      - "&7is enchanted with Multishot, the side"
-      - "&7arrows will explode with a less"
-      - "&7powerful regular Wind Charge."
-      - ""
-      - "&7Difficulty: &a★☆☆"
-      cost: 800
-      1:
-        spcost: 3
     blazeballs:
       name: "&6Blazeballs"
       lore:
@@ -1437,6 +1419,24 @@ Berserker:
       3:
         spcost: 1
         damage: 7
+    compressedarrows:
+      name: "&6Compressed Arrows"
+      lore:
+      - ""
+      - "&7Hold an arrow in your &foffhand &7and"
+      - "&7load your crossbow to prepare a"
+      - "&fCompressed Arrow&7. When shot, these"
+      - "&7arrows explode like a Breeze's Wind"
+      - "&7Charge after &f1-2 seconds&7, unless an"
+      - "&7entity was already hit. If the crossbow"
+      - "&7is enchanted with Multishot, the side"
+      - "&7arrows will explode with a less"
+      - "&7powerful regular Wind Charge."
+      - ""
+      - "&7Difficulty: &e★★☆"
+      cost: 800
+      1:
+        spcost: 3
     creepershot:
       name: "&6Creepershot"
       lore:

@@ -706,7 +706,8 @@ public class ArenaGameruleListener implements Listener {
         // Stop event if damager and damaged are on same team
         // But allow player to hit himself with whatever
         TeamName team = arena.getTeam(player.getUniqueId());
-        if (!player.equals(damager) && team.equals(arena.getTeam(damager.getUniqueId())) && team != TeamName.NONE) {
+        if (event.getCause() != DamageCause.ENTITY_EXPLOSION && !player.equals(damager) && 
+                team.equals(arena.getTeam(damager.getUniqueId())) && team != TeamName.NONE) {
             event.setCancelled(true);
             return;
         }
