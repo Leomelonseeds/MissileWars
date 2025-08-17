@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -317,5 +318,9 @@ public class ArenaUtils {
                 net.kyori.adventure.sound.Sound.Source.MASTER, 
                 volume, pitch);
         entity.getWorld().playSound(playSound, entity);
+    }
+    
+    public static double getMaxHealth(Player player) {
+        return player.getAttribute(Attribute.MAX_HEALTH).getBaseValue();
     }
 }

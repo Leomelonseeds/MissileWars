@@ -532,7 +532,7 @@ public abstract class Arena implements ConfigurationSerializable {
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
         discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
 
-        player.setHealth(20);
+        player.setHealth(ArenaUtils.getMaxHealth(player));
         player.setFoodLevel(20);
         players.put(player.getUniqueId(), new MissileWarsPlayer(player.getUniqueId()));
         player.setRespawnLocation(getPlayerSpawn(player), true);
@@ -655,7 +655,6 @@ public abstract class Arena implements ConfigurationSerializable {
             Player mcPlayer = toRemove.getMCPlayer();
         	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
         	mcPlayer.setGameMode(GameMode.ADVENTURE);
-        	mcPlayer.setHealth(20);
         	InventoryUtils.loadInventory(mcPlayer);
             ConfigUtils.sendConfigMessage("messages.leave-arena", mcPlayer, arena, null);
             RankUtils.setPlayerExpBar(mcPlayer);

@@ -10,6 +10,7 @@ public enum Ability {
     TRITON("triton", Type.ABILITY, DeckStorage.VANGUARD),
     ADRENALINE("adrenaline", Type.PASSIVE, DeckStorage.VANGUARD),
     BUNNY("bunny", Type.PASSIVE, DeckStorage.VANGUARD),
+    DWARFISM("dwarfism", Type.PASSIVE, DeckStorage.VANGUARD),
     
     // Sentinel
     LONGSHOT("longshot", Type.ABILITY, DeckStorage.SENTINEL),

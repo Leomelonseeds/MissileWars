@@ -1231,6 +1231,25 @@ Vanguard:
       3:
         spcost: 1
         amplifier: 2
+    dwarfism:
+      name: "&eDwarfism"
+      lore:
+      - ""
+      - "&7You are %percentage%% &7smaller, but"
+      - "&7have %mpercentage%% &7less max health."
+      cost: 2000
+      1:
+        spcost: 1
+        percentage: 10
+        mpercentage: 10
+      2:
+        spcost: 1
+        percentage: 20
+        mpercentage: 20
+      3:
+        spcost: 1
+        percentage: 30
+        mpercentage: 30
 Sentinel:
   weapon:
     item: BOW

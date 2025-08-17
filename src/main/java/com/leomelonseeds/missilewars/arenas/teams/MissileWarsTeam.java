@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -175,7 +176,7 @@ public class MissileWarsTeam {
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
         mcPlayer.teleport(spawn);
-        mcPlayer.setHealth(20);
+        mcPlayer.setHealth(ArenaUtils.getMaxHealth(mcPlayer));
         mcPlayer.setSaturation(5F);
         mcPlayer.setGameMode(GameMode.SURVIVAL);
         mcPlayer.setFireTicks(0);
@@ -210,7 +211,7 @@ public class MissileWarsTeam {
         arena.addCallback(player);
      
         // Architect Haste
-        int haste = plugin.getJSON().getEnchantLevel(mcPlayer.getUniqueId(), "haste");
+        int haste = plugin.getJSON().getEnchantLevel(player.getMCPlayerId(), "haste");
         if (haste > 0) {
             ItemStack item = mcPlayer.getInventory().getItemInMainHand();
             if (item == null || item.getType() != Material.IRON_PICKAXE) {
@@ -218,6 +219,15 @@ public class MissileWarsTeam {
             }
             
             mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, haste * 2 - 1));
+        }
+        
+        // Vanguard dwarfism
+        int dwarfism = plugin.getJSON().getLevel(player.getMCPlayerId(), Ability.DWARFISM);
+        if (dwarfism > 0) {
+            double scalePercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.PERCENTAGE) / 100;
+            double healthPercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.MPERCENTAGE) / 100;
+            mcPlayer.getAttribute(Attribute.SCALE).setBaseValue(1 - scalePercent);
+            mcPlayer.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20 * (1 - healthPercent));
         }
         
         // Potion effect passive activation
@@ -298,6 +308,9 @@ public class MissileWarsTeam {
         mcPlayer.setExp(0F);
         mcPlayer.setGlowing(false);
         mcPlayer.setWorldBorder(null);
+        mcPlayer.getAttribute(Attribute.SCALE).setBaseValue(1.0);
+        mcPlayer.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20.0);
+        mcPlayer.setHealth(20);
         AstralTurretManager.getInstance().unregisterPlayer(mcPlayer, false);
         CanopyManager.getInstance().removePlayer(mcPlayer);
         EnderSplashManager.getInstance().removePlayer(mcPlayer);

@@ -190,10 +190,10 @@ public class ArenaGameruleListener implements Listener {
     /** Handle player deaths. */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
         event.setCancelled(true);
         event.setShouldPlayDeathSound(true);
-        event.setReviveHealth(20);
-        Player player = event.getEntity();
+        event.setReviveHealth(ArenaUtils.getMaxHealth(player));
         
         // Make player undrunk
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "brew " + player.getName() + " 0 10");

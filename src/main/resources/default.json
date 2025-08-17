@@ -13,6 +13,7 @@
 		"endersplash": false,
         "explosivecanopy": false,
         "triton": false,
+        "dwarfism": false,
 		"defaultpreset": {
 			"skillpoints": 2,
             "enchants": {
