@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -198,8 +199,13 @@ public class MissileWarsTeam {
         }
         
         InventoryUtils.clearInventory(mcPlayer, true);
+        ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);
+        int swiftSneak = plugin.getJSON().getEnchantLevel(player.getMCPlayerId(), "swift_sneak");
+        if (swiftSneak > 0) {
+            leggings.addEnchantment(Enchantment.SWIFT_SNEAK, swiftSneak);
+        }
         inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        inv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS));
+        inv.setLeggings(leggings);
         
         // Create and register deck. Initdeck is in arena code!
         Deck deck = plugin.getDeckManager().getPlayerDeck(player);
@@ -209,17 +215,6 @@ public class MissileWarsTeam {
             di.registerTeam(this);
         }
         arena.addCallback(player);
-     
-        // Architect Haste
-        int haste = plugin.getJSON().getEnchantLevel(player.getMCPlayerId(), "haste");
-        if (haste > 0) {
-            ItemStack item = mcPlayer.getInventory().getItemInMainHand();
-            if (item == null || item.getType() != Material.IRON_PICKAXE) {
-                return;
-            }
-            
-            mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, haste * 2 - 1));
-        }
         
         // Vanguard dwarfism
         int dwarfism = plugin.getJSON().getLevel(player.getMCPlayerId(), Ability.DWARFISM);
@@ -250,6 +245,9 @@ public class MissileWarsTeam {
                 break;
             case ADRENALINE:
                 mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
+                break;
+            case HASTE:
+                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, amp));
                 break;
             default:
                 return;

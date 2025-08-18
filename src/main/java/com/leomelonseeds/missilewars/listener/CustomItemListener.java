@@ -30,13 +30,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -112,38 +109,6 @@ public class CustomItemListener implements Listener {
         } else {
             InventoryUtils.consumeItem(player, arena, inv.getItemInOffHand(), 40);
         }
-    }
-    
-    /** Give architect pickaxes the haste effect */
-    @EventHandler
-    public void giveHaste(PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        
-        if (ArenaUtils.getArena(player) == null) {
-            return;
-        }
-        
-        // Makes sure player is using architect
-        int haste = MissileWarsPlugin.getPlugin().getJSON().getEnchantLevel(player.getUniqueId(), "haste");
-        if (haste <= 0) {
-            return;
-        }
-        
-        // Clear haste if switching off from pickaxe
-        ItemStack prev = player.getInventory().getItem(event.getPreviousSlot());
-        if (prev != null && prev.getType() == Material.IRON_PICKAXE) {
-            if (player.hasPotionEffect(PotionEffectType.HASTE)) {
-                player.removePotionEffect(PotionEffectType.HASTE);
-            }
-            return;
-        }
-        
-        ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        if (item == null || item.getType() != Material.IRON_PICKAXE) {
-            return;
-        }
-        
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, haste * 2 - 1));
     }
 
     /** Handle right clicking missiles and utility items */
@@ -468,7 +433,7 @@ public class CustomItemListener implements Listener {
         projectileConsume(hand, thrower, playerArena);
         
         // Add particle effects for prickly
-        if (plugin.getJSON().getLevel(uuid, Ability.PRICKLY_PROJECTILES) > 0) {
+        if (plugin.getJSON().getLevel(uuid, Ability.KINGSMANS_BLUDGERS) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.INSTANT_EFFECT, null);
         }
 
@@ -706,7 +671,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Allow collisions if prickly projectiles
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.PRICKLY_PROJECTILES) > 0) {
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.KINGSMANS_BLUDGERS) > 0) {
             return;
         }
 

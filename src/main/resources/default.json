@@ -135,18 +135,19 @@
 	},
 	"Architect": {
         "last-preset": "A",
-		"haste": false,
+		"swift_sneak": false,
 		"efficiency": false,
 		"projectile_protection": false,
 		"poke": false,
-		"deconstructor": false,
+		"engineer": false,
+        "kingsmansbludgers": false,
 		"defaultpreset": {
-			"skillpoints": 2,
+			"skillpoints": 3,
             "enchants": {
                 "projectile_protection": 0,
                 "sharpness": 3,
                 "efficiency": 0,
-                "haste": 0
+                "swift_sneak": 0
             },
 			"utility": {
 				"platform": 2,
@@ -154,7 +155,7 @@
 				"leaves": 3
 			},
 			"missiles": {
-				"shipper": 2,
+				"incisor": 1,
 				"automaton": 1,
 				"lifter": 1,
 				"slingshot": 2,
@@ -165,7 +166,7 @@
                 "level": 0
             },
 			"passive": {
-				"selected": "prickly",
+				"selected": "haste",
 				"level": 2
 			},
 			"gpassive": {

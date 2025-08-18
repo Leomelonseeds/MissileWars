@@ -53,10 +53,12 @@ public enum DeckStorage {
         "&2",
         Map.of(
             "sharpness", Enchantment.SHARPNESS,
-            "efficiency", Enchantment.EFFICIENCY,
-            "haste", Enchantment.FORTUNE    // Dummy enchant to represent haste!!
+            "efficiency", Enchantment.EFFICIENCY
         ),
-        Map.of("projectile_protection", Enchantment.PROJECTILE_PROTECTION)
+        Map.of(
+            "projectile_protection", Enchantment.PROJECTILE_PROTECTION,
+            "swift_sneak", Enchantment.SWIFT_SNEAK
+        )
     );
     
     private String name;

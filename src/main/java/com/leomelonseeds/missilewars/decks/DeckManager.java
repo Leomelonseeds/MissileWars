@@ -173,6 +173,11 @@ public class DeckManager {
      * @param lvl
      */
     private void addEnch(ItemStack item, String enchID, Enchantment ench, String deck, JSONObject json) {
+        // Swift sneak is added later
+        if (ench == Enchantment.SWIFT_SNEAK) {
+            return;
+        }
+        
         int lvl = itemsConfig.getInt(deck + ".enchants." + enchID + "." + 
                 json.getJSONObject("enchants").getInt(enchID) + ".level");
         if (lvl <= 0) {
@@ -183,8 +188,6 @@ public class DeckManager {
         String custom = null;
         if (ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Ability.ROCKETEER) > 0) {
             custom = "Blast Protection";
-        } else if (ench == Enchantment.FORTUNE) {
-            custom = "Haste";
         } else if (ench == Enchantment.SHARPNESS && (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW)) {
             custom = "Sharpness";
             

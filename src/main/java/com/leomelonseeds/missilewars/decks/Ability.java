@@ -30,9 +30,10 @@ public enum Ability {
     ROCKETEER("rocketeer", Type.PASSIVE, DeckStorage.BERSERKER),
     
     // Architect
-    PRICKLY_PROJECTILES("prickly", Type.PASSIVE, DeckStorage.ARCHITECT),
-    POKEMISSILES("poke", Type.PASSIVE, DeckStorage.ARCHITECT),
-    DECONSTRUCTOR("deconstructor", Type.PASSIVE, DeckStorage.ARCHITECT),
+    KINGSMANS_BLUDGERS("kingsmansbludgers", Type.ABILITY, DeckStorage.ARCHITECT),
+    POKEMISSILES("poke", Type.ABILITY, DeckStorage.ARCHITECT),
+    ENGINEER("engineer", Type.ABILITY, DeckStorage.ARCHITECT),
+    HASTE("haste", Type.PASSIVE, DeckStorage.ARCHITECT),
     
     // Global
     HOARDER("hoarder", Type.GPASSIVE, null),

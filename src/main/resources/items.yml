@@ -526,39 +526,41 @@ shieldbuster:
 
 # Architect missiles
 
-shipper:
-  index: 0
+incisor:
+  index: 2
   1:
-    file: 'shipper.nbt'
-    item: HORSE_SPAWN_EGG
-    name: "&e☢ Shipper ⚒"
+    file: 'incisor.nbt'
+    item: BOGGED_SPAWN_EGG
+    name: "&2☢ Incisor ⚒"
     lore:
     - ""
-    - "&7This missile sure carries its crew well."
-    - "&7Unless, of course, it explodes, in which"
-    - "&7case it doesn't."
+    - "&7The incisor is a narrow-edged tooth"
+    - "&7at the front of the mouth, adapted"
+    - "&7for cutting. Wait, we're talking about"
+    - "&7a missile?"
     offset:
-      x: -1
-      y: -4
-      z: 3
-    speed: 2.0
-    tnt: 5
-  2:
-    file: 'slasher.nbt'
-    item: HORSE_SPAWN_EGG
-    name: "&e☢ &lSlasher &e⚒"
-    lore:
-    - ""
-    - "&7The TNT on this missile is tucked behind"
-    - "&7a solid layer of glass. Much like its"
-    - "&7emotions."
-    offset:
-      x: -1
+      x: 0
       y: -5
       z: 3
-    speed: 2.0
-    tnt: 6
-    spcost: 1
+    speed: 1.7
+    tnt: 11
+  2:
+    file: 'pincer.nbt'
+    item: BOGGED_SPAWN_EGG
+    name: "&2☢ &lPincer &2⚒"
+    lore:
+    - ""
+    - "&7This missile is long, thin, and drops"
+    - "&7a load of bombs when the TNT next to"
+    - "&7the front piston is broken. Just like"
+    - "&7my friend Henry."
+    offset:
+      x: 0
+      y: -5
+      z: 3
+    speed: 2.2
+    tnt: 19
+    spcost: 2
 
 slingshot:
   index: 3
@@ -660,7 +662,7 @@ pisces:
     spcost: 2
 
 lifter:
-  index: 2
+  index: 0
   1:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
@@ -694,6 +696,40 @@ lifter:
     speed: 2.0
     tnt: 8
     spcost: 2
+    
+# shipper:
+#   index: 0
+#   1:
+#     file: 'shipper.nbt'
+#     item: HORSE_SPAWN_EGG
+#     name: "&e☢ Shipper ⚒"
+#     lore:
+#     - ""
+#     - "&7This missile sure carries its crew well."
+#     - "&7Unless, of course, it explodes, in which"
+#     - "&7case it doesn't."
+#     offset:
+#       x: -1
+#       y: -4
+#       z: 3
+#     speed: 2.0
+#     tnt: 5
+#   2:
+#     file: 'slasher.nbt'
+#     item: HORSE_SPAWN_EGG
+#     name: "&e☢ &lSlasher &e⚒"
+#     lore:
+#     - ""
+#     - "&7The TNT on this missile is tucked behind"
+#     - "&7a solid layer of glass. Much like its"
+#     - "&7emotions."
+#     offset:
+#       x: -1
+#       y: -5
+#       z: 3
+#     speed: 2.0
+#     tnt: 6
+#     spcost: 1
 
 
 # Utility items
@@ -1601,13 +1637,16 @@ Architect:
       3: 
         level: 3
         spcost: 1
-    haste:
+    swift_sneak:
       cost: 1400
       1: 
-        level: 2
+        level: 1
         spcost: 1
       2: 
-        level: 4
+        level: 2
+        spcost: 1
+      3: 
+        level: 3
         spcost: 1
     projectile_protection:
       cost: 1200
@@ -1617,9 +1656,8 @@ Architect:
       2: 
         level: 6
         spcost: 1
-  ability: {}
-  passive:
-    prickly:
+  ability:
+    kingsmansbludgers:
       name: "&ePrickly Projectiles"
       lore:
       - ""
@@ -1629,6 +1667,7 @@ Architect:
       - "&7of the same projectile item. Knockback"
       - "&7is multiplied by the level of the utility,"
       - "&7up to %multiplier%x."
+      cost: 1800
       1:
         spcost: 1
         multiplier: 1
@@ -1649,7 +1688,7 @@ Architect:
       cost: 2000
       1: 
         spcost: 3
-    deconstructor:
+    engineer:
       name: "&eDeconstructor"
       lore:
       - ""
@@ -1669,6 +1708,22 @@ Architect:
       3:
         percentage: 100
         spcost: 1
+  passive:
+    haste:
+      name: "&eHaste"
+      lore:
+      - ""
+      - "&7Recieve permanent Haste with"
+      - "&7amplifier %amplifier%&7."
+      1:
+        spcost: 1
+        amplifier: 1
+      2:
+        spcost: 1
+        amplifier: 2
+      3:
+        spcost: 1
+        amplifier: 3
         
 # Held items 
 held:
@@ -1893,7 +1948,7 @@ preset:
       - "&7Diamond Boots"
       - ""
       - "&cMissiles"
-      - "&7Cruiser, Trifecta, Juggernaut, Breaker,"
+      - "&7Cuboid, Trifecta, Juggernaut, Breaker,"
       - "&7Shieldbuster"
       - ""
       - "&9Utility:"

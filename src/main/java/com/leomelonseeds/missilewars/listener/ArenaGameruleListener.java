@@ -781,14 +781,14 @@ public class ArenaGameruleListener implements Listener {
             }
             
             // Check for the passive
-            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.PRICKLY_PROJECTILES);
+            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.KINGSMANS_BLUDGERS);
             if (prickly == 0) {
                 return;
             }
 
             ThrowableProjectile proj = (ThrowableProjectile) projectile;
             ItemStack item = proj.getItem();
-            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Ability.PRICKLY_PROJECTILES, prickly, Stat.MULTIPLIER);
+            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, prickly, Stat.MULTIPLIER);
             
             // Make sure its custom item
             String itemString = InventoryUtils.getStringFromItem(item, "item-structure");
@@ -972,7 +972,7 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Ability.DECONSTRUCTOR);
+        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ENGINEER);
         if (deconstructor <= 0) {
             return;
         }
@@ -992,7 +992,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         Random random = new Random();
-        double percentage = ConfigUtils.getAbilityStat(Ability.DECONSTRUCTOR, deconstructor, Stat.PERCENTAGE) / 100;
+        double percentage = ConfigUtils.getAbilityStat(Ability.ENGINEER, deconstructor, Stat.PERCENTAGE) / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
             InventoryUtils.regiveItem(player, item);

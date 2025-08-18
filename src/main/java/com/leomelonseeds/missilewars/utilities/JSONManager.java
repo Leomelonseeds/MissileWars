@@ -61,9 +61,6 @@ public class JSONManager {
             Bukkit.getLogger().log(Level.SEVERE, "Something went wrong parsing the default JSON file!");
         }
     }
-    
-    // TODO: Consider moving enchantments to its own section so reading old code is not so damn confusing
-    // Use a versioning system to make this possible (move enchants, give back moken in future etc)
 
     /**
      * Call when a previously joined player joins.
@@ -94,6 +91,7 @@ public class JSONManager {
                     updateVersion4(newJson, player);
                     updateVersion5(newJson);
                     updateVersion6(newJson);
+                    updateVersion7(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -473,7 +471,7 @@ public class JSONManager {
             JSONObject presetJson = vanJson.getJSONObject(preset);
             JSONObject passiveJson = presetJson.getJSONObject("passive");
             if (!passiveJson.getString("selected").equals("endersplash")) {
-                return;
+                continue;
             }
 
             JSONObject abilityJson = presetJson.getJSONObject("ability");
@@ -481,6 +479,72 @@ public class JSONManager {
             abilityJson.put("selected", "endersplash");
             abilityJson.put("level", passiveJson.getInt("level"));
             passiveJson.put("level", 0);
+        }
+    }
+    
+    /**
+     * Version 7 
+     * - Rename "prickly" to "kingsmansbludgers"
+     * - Rename "deconstructor" to "engineer"
+     * - Unlock kingsmansbludgers for anyone who is already using prickly
+     * - Transfer haste level to a passive (effect amplifier = lvl)
+     * - Transfer haste purchase to swift sneak
+     * - Transfer pokemissiles to an ability
+     */
+    private void updateVersion7(JSONObject json) {
+        if (json.getInt("version") >= 7) {
+            return;
+        }
+
+        json.put("version", 7);
+        
+        JSONObject archiJson = json.getJSONObject("Architect");
+        archiJson.put("engineer", archiJson.getBoolean("deconstructor"));
+        archiJson.remove("deconstructor");
+        archiJson.put("swift_sneak", archiJson.getBoolean("haste"));
+        archiJson.remove("haste");
+        
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!archiJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = archiJson.getJSONObject(preset);
+            JSONObject passiveJson = presetJson.getJSONObject("passive");
+            JSONObject abilityJson = presetJson.getJSONObject("ability");
+            
+            boolean transfer = false;
+            if (passiveJson.getString("selected").equals("prickly")) {
+                abilityJson.put("selected", "kingsmansbludgers");
+                archiJson.put("kingsmansbludgers", true);
+                transfer = true;
+                continue;
+            }
+            
+            if (passiveJson.getString("selected").equals("poke")) {
+                abilityJson.put("selected", "poke");
+                transfer = true;
+                continue;
+            }
+            
+            if (passiveJson.getString("selected").equals("deconstructor")) {
+                abilityJson.put("selected", "engineer");
+                transfer = true;
+                continue;
+            }
+            
+            if (transfer) {
+                passiveJson.put("selected", "None");
+                abilityJson.put("level", passiveJson.getInt("level"));
+                passiveJson.put("level", 0);
+            }
+            
+            JSONObject enchantJson = presetJson.getJSONObject("enchants");
+            int haste = enchantJson.getInt("haste");
+            if (haste > 0) {
+                passiveJson.put("selected", "haste");
+                passiveJson.put("level", haste);
+            }
         }
     }
 
