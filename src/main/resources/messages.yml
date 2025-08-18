@@ -142,7 +142,7 @@ messages:
   stage-skip-fail-game: "&c&l[!] &7You must be in-game to skip this stage."
   wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
   map: "&7Current map: %map%"
-  structure-too-close: "&cYou cannot spawn structures this close to yourself!"
+  torpedo-too-close: "&cYou cannot spawn torpedos this close to yourself!"
     
 titles:
   # Should be sent to players who join in the middle of a game as well

@@ -86,6 +86,10 @@ public class ArenaUtils {
      * @return
      */
     public static boolean inShield(Arena arena, Location location, TeamName team, int bias) {
+        if (team == TeamName.NONE) {
+            return false;
+        }
+        
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();

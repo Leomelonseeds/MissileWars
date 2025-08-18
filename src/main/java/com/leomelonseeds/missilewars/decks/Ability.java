@@ -19,6 +19,7 @@ public enum Ability {
     IMPACT_TRIGGER("impacttrigger", Type.PASSIVE, DeckStorage.SENTINEL),
     SMOKE_SHIELD("smokeshield", Type.PASSIVE, DeckStorage.SENTINEL),
     EXOTIC_ARROWS("exoticarrows", Type.PASSIVE, DeckStorage.SENTINEL),
+    SHIELD_AFFINITY("shieldaffinity", Type.PASSIVE, DeckStorage.SENTINEL),
     
     // Berserker
     COMPRESSED_ARROWS("compressedarrows", Type.ABILITY, DeckStorage.BERSERKER),

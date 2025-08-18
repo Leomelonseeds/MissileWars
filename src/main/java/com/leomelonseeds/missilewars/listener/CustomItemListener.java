@@ -477,6 +477,11 @@ public class CustomItemListener implements Listener {
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
 
+        // More delay + particles for shield affinity
+        if (plugin.getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0) {
+            ArenaUtils.spiralTrail(thrown, Particle.WITCH, null);
+        }
+
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
         String structure = structureName;
         ConfigUtils.schedule(20, () -> {
@@ -553,8 +558,9 @@ public class CustomItemListener implements Listener {
         }
         
         // Do not allow structures to spawn too close to players
-        if (spawnLoc.distance(thrower.getLocation()) < 2) {
-            ConfigUtils.sendConfigMessage("structure-too-close", thrower);
+        boolean isTorpedo = structure.contains("torpedo");
+        if (isTorpedo && spawnLoc.distance(thrower.getLocation()) < 2) {
+            ConfigUtils.sendConfigMessage("torpedo-too-close", thrower);
             InventoryUtils.regiveItem(thrower, item);
             return false;
         }
@@ -608,7 +614,7 @@ public class CustomItemListener implements Listener {
             }
         } else if (structure.contains("shield-") || structure.contains("platform")) {
             sound = "spawn-shield";
-        } else if (structure.contains("torpedo")) {
+        } else if (isTorpedo) {
             sound = "spawn-torpedo";
             
             // Ignite level 2 torpedos if a player gets trapped inside

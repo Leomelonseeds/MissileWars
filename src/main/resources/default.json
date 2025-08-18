@@ -53,6 +53,7 @@
 		"longshot": false,
 		"exoticarrows": false,
         "smokeshield": false,
+        "shieldaffinity": false,
         "hitchhikersbow": false,
         "astralturret": false,
 		"defaultpreset": {

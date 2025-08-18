@@ -438,11 +438,9 @@ public class ArenaGameruleListener implements Listener {
         
         
         // Hitchhiker's bow
-        ItemStack consumed = event.getConsumable().clone();
         AbstractArrow proj = (AbstractArrow) eventProj;
-        int hhbow = plugin.getJSON().getLevel(uuid, Ability.HITCHHIKERS_BOW);
         do {
-            if (hhbow <= 0) {
+            if (plugin.getJSON().getLevel(uuid, Ability.HITCHHIKERS_BOW) <= 0) {
                 break;
             }
             
@@ -453,12 +451,6 @@ public class ArenaGameruleListener implements Listener {
             
             if (player.hasCooldown(offhand.getType())) {
                 break;
-            }
-            
-            if (hhbow == 2) {
-                ItemStack toGive = consumed.clone();
-                toGive.setAmount(1);
-                InventoryUtils.regiveItem(player, toGive);
             }
             
             EntityType thrownType = EntityType.valueOf(offhand.getType().toString());
@@ -884,6 +876,13 @@ public class ArenaGameruleListener implements Listener {
         // Ensure it was in an arena world
         Arena possibleArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(event.getPlayer().getWorld());
         if (possibleArena == null) {
+            return;
+        }
+        
+        // Shield affinity allows teleport in the base
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0 &&
+                ArenaUtils.inShield(possibleArena, event.getTo(), possibleArena.getTeam(uuid), 2)) {
             return;
         }
 

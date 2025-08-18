@@ -1319,15 +1319,11 @@ Sentinel:
       - "&foffhand &7and use your bow to fire the"
       - "&7projectile at arrow speed. Both the"
       - "&7projectile and an arrow are consumed."
-      - "&7At &fLevel 2&7, an arrow is no longer"
-      - "&7consumed."
       - ""
       - "&7Difficulty: &e★★☆"
       cost: 1200
       1:
-        spcost: 2
-      2:
-        spcost: 2
+        spcost: 3
     astralturret:
       name: "&6Astral Turret"
       lore:
@@ -1369,6 +1365,18 @@ Sentinel:
         spcost: 2
       2:
         spcost: 1
+    shieldaffinity:
+      name: "&eShield Affinity"
+      lore:
+      - ""
+      - "&7If a thrown obsidian shield lands"
+      - "&7on your base before it can spawn,"
+      - "&7instead of doing nothing, you will"
+      - "&7be teleported to the hit location"
+      - "&7like an ender pearl."
+      cost: 600
+      1:
+        spcost: 2
     smokeshield:
       name: "&eSmoke Shield"
       lore:
