@@ -1,10 +1,13 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
 /**
  * Util class for setting cooldowns that consider custom cooldown ids.
@@ -75,14 +78,18 @@ public class CooldownUtils {
     }
     
     /**
-     * Updates cooldowns for crossbow
+     * Updates cooldowns for crossbow. This runs in the next tick so that 
      * 
      * @param player
      */
     public static void updateCrossbowCooldowns(Player player) {
-        //ConfigUtils.schedule(1, () -> {
+        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
             for (ItemStack item : player.getInventory().getContents()) {
                 if (item == null || item.getType() != Material.CROSSBOW) {
+                    continue;
+                }
+                
+                if (((CrossbowMeta) item.getItemMeta()).hasChargedProjectiles()) {
                     continue;
                 }
                 
@@ -90,16 +97,10 @@ public class CooldownUtils {
                     continue;
                 }
                 
-                CrossbowMeta cmeta = (CrossbowMeta) item.getItemMeta();
-                int cooldown = cmeta.hasChargedProjectiles() ? 0 : 
-                    Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
-                if (cmeta.hasUseCooldown()) {
-                    player.setCooldown(cmeta.getUseCooldown().getCooldownGroup(), cooldown);
-                } else {
-                    player.setCooldown(item, cooldown);
-                }
+                int cooldown = Math.max(player.getCooldown(Material.ARROW), player.getCooldown(Material.TIPPED_ARROW));
+                setCooldown(player, item, cooldown);
             }
-        //});
+        });
     }
 
 }
