@@ -112,6 +112,7 @@ public class TritonHandler implements Listener {
         meta.lore(ConfigUtils.toComponent(lore));
         
         // Set meta and save
+        meta.setUnbreakable(true);
         trident.setItemMeta(meta);
         this.trident = trident;
     }

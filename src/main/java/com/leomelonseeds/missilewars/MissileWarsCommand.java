@@ -30,6 +30,7 @@ import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.deck.DeckInventory;
 import com.leomelonseeds.missilewars.invs.deck.OldPresetSelector;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.cinematic.AbilitiesReplay;
 import com.leomelonseeds.missilewars.utilities.cinematic.CinematicManager;
@@ -157,7 +158,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
-            InventoryUtils.resetCooldowns(player);
+            CooldownUtils.removeCooldowns(player);
         }
         
         // Make changes to map rotation

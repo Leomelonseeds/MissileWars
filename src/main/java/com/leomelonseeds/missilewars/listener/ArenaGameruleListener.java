@@ -84,6 +84,7 @@ import com.leomelonseeds.missilewars.listener.handler.DamageSphere;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -327,7 +328,7 @@ public class ArenaGameruleListener implements Listener {
         // Berserker user
         UUID uuid = player.getUniqueId();
         if (event.getBow().getType() == Material.CROSSBOW) {
-            player.setCooldown(Material.CROSSBOW, player.getCooldown(Material.ARROW));
+            CooldownUtils.updateCrossbowCooldowns(player);
             
             // Compressed arrows
             if (eventProj instanceof AbstractArrow arrow && 
@@ -571,6 +572,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         InventoryUtils.consumeItem(player, arena, toConsume, slot);
+        CooldownUtils.updateCrossbowCooldowns(player);
         
         // Creepershot
         ItemStack crossbow = event.getCrossbow();
@@ -1146,7 +1148,7 @@ public class ArenaGameruleListener implements Listener {
     @EventHandler
     public void onGamemode(PlayerGameModeChangeEvent event) {
         if (event.getNewGameMode() == GameMode.CREATIVE) {
-            InventoryUtils.resetCooldowns(event.getPlayer());
+            CooldownUtils.removeCooldowns(event.getPlayer());
         }
     }
 }

@@ -40,6 +40,7 @@ import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -211,7 +212,7 @@ public class MissileWarsTeam {
         Deck deck = plugin.getDeckManager().getPlayerDeck(player);
         player.setDeck(deck);
         for (DeckItem di : deck.getItems()) {
-            mcPlayer.setCooldown(di.getInstanceItem().getType(), 36000);
+            CooldownUtils.setCooldown(mcPlayer, di.getInstanceItem(), 36000);
             di.registerTeam(this);
         }
         arena.addCallback(player);

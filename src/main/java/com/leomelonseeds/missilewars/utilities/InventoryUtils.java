@@ -244,9 +244,9 @@ public class InventoryUtils {
         PlayerInventory pinv = player.getInventory();
         if (deplete && pinv.getItem(EquipmentSlot.HAND).equals(item)) {
             int cooldown = MissileWarsPlugin.getPlugin().getConfig().getInt("experimental.missile-cooldown");
-            Material off = pinv.getItem(EquipmentSlot.OFF_HAND).getType();
-            if (off != Material.AIR && !player.hasCooldown(off)) {
-                player.setCooldown(off, cooldown);
+            ItemStack off = pinv.getItem(EquipmentSlot.OFF_HAND);
+            if (!CooldownUtils.hasCooldown(player, off)) {
+                CooldownUtils.setCooldown(player, off, cooldown);
             }
         }
         
@@ -274,18 +274,6 @@ public class InventoryUtils {
         }
         
         di.consume(makeUnavailable);
-    }
-    
-    /**
-     * Reset the player's visual cooldowns for all items
-     * 
-     * @param player
-     */
-    public static void resetCooldowns(Player player) {
-        for (ItemStack i : player.getInventory().getContents()) {
-            if (i == null) continue;
-            player.setCooldown(i.getType(), 0);
-        }
     }
     
     /**

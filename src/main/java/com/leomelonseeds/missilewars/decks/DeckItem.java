@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitTask;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 
 public class DeckItem {
     
@@ -305,7 +306,7 @@ public class DeckItem {
         
         int cd = c * 20;
         unavailable = cd != 0;
-        player.setCooldown(item.getType(), cd);
+        CooldownUtils.setCooldown(player, item, cd);
         
         // Give item enchantment if 0 reached
         ItemStack actual = getItem(false);
@@ -320,9 +321,9 @@ public class DeckItem {
         // Due to the way crossbow loading and bow firing are handled,
         // setting the item cooldowns for them differs slightly
         if (item.getType().toString().contains("ARROW")) {
-            player.setCooldown(Material.BOW, cd);
+            CooldownUtils.setCooldown(player, Material.BOW, 0);
             if (cd == 0) {
-                player.setCooldown(Material.CROSSBOW, 0);
+                CooldownUtils.setCooldown(player, Material.CROSSBOW, 0);
             }
         }
         

@@ -11,9 +11,12 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.UseCooldownComponent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -25,6 +28,7 @@ import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.listener.packets.MissilePreview;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
@@ -174,15 +178,34 @@ public class MissileWarsPlayer {
         for (ItemStack gearItem : deck.getGear()) {
             if (gearItem.getType().toString().contains("BOOTS")) {
                 player.getInventory().setBoots(gearItem);
-            } else {
-                player.getInventory().setItem(0, gearItem);
+                continue;
             }
             
             // Check for gunslinger
             if (gearItem.getType() == Material.CROSSBOW && 
                     MissileWarsPlugin.getPlugin().getJSON().getLevel(playerId, Ability.GUNSLINGER) > 0) {
-                player.getInventory().setItem(27, gearItem.clone());
+                // Set meta for first crossbow
+                ItemMeta meta1 = gearItem.getItemMeta();
+                UseCooldownComponent cooldownComponent1 = meta1.getUseCooldown();
+                cooldownComponent1.setCooldownGroup(new NamespacedKey(MissileWarsPlugin.getPlugin(), "gunslinger-1"));
+                cooldownComponent1.setCooldownSeconds(0.0001F);
+                meta1.setUseCooldown(cooldownComponent1);
+                gearItem.setItemMeta(meta1);
+                
+                // Meta for second crossbow
+                ItemStack extraCrossbow = gearItem.clone();
+                ItemMeta meta2 = extraCrossbow.getItemMeta();
+                String customName = ConfigUtils.toPlain(meta2.customName());
+                meta2.customName(ConfigUtils.toComponent(customName.replace("Crossbow", "Crossbow 2")));
+                UseCooldownComponent cooldownComponent2 = meta2.getUseCooldown();
+                cooldownComponent2.setCooldownGroup(new NamespacedKey(MissileWarsPlugin.getPlugin(), "gunslinger-2"));
+                meta2.setUseCooldown(cooldownComponent2);
+                cooldownComponent1.setCooldownSeconds(0.0001F);
+                extraCrossbow.setItemMeta(meta2);
+                player.getInventory().setItem(27, extraCrossbow);
             }
+            
+            player.getInventory().setItem(0, gearItem);
         }
     }
     
@@ -203,14 +226,15 @@ public class MissileWarsPlayer {
         
         for (int i = 0; i < 8; i++) {
             DeckItem di = deck.getItems().get(i);
-            String name = di.getInstanceItem().getType().toString();
-            player.getInventory().setItem(i + 1, di.getInstanceItem());
+            ItemStack setItem = di.getInstanceItem();
+            String name = setItem.getType().toString();
+            player.getInventory().setItem(i + 1, setItem);
             
             // Add cooldown for crossbow, only at the start of the game
             // since cooldown only applied after shooting crossbow otherwise
             int maxcd = di.getCooldown();
             if (name.contains("ARROW")) {
-                player.setCooldown(Material.CROSSBOW, maxcd * 20);
+                CooldownUtils.setCooldown(player, setItem, maxcd * 20);
             }
             
             if (name.contains("SPAWN_EGG") && !joinedBefore) {
