@@ -1724,6 +1724,40 @@ Architect:
       3:
         spcost: 1
         amplifier: 3
+    naturesblessing:
+      name: "&eNature's blessing"
+      lore:
+      - ""
+      - "&7Placed leaves last %duration%s"
+      - "&7longer before decaying."
+      cost: 400
+      1:
+        spcost: 1
+        duration: 30
+      2:
+        spcost: 1
+        duration: 60
+      3:
+        spcost: 1
+        duration: 90
+    elastitect:
+      name: "&eElastitect"
+      lore:
+      - ""
+      - "&7Inherit some of Elastigirl's power,"
+      - "&7increasing the range at which you"
+      - "&7can interact with blocks and spawn"
+      - "&7missiles by %plus% blocks&7."
+      cost: 1200
+      1:
+        spcost: 1
+        plus: 0.5
+      2:
+        spcost: 1
+        plus: 1.0
+      3:
+        spcost: 1
+        plus: 1.5
         
 # Held items 
 held:

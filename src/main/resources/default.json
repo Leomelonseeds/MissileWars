@@ -141,6 +141,8 @@
 		"poke": false,
 		"engineer": false,
         "kingsmansbludgers": false,
+        "naturesblessing": false,
+        "elastitect": false,
 		"defaultpreset": {
 			"skillpoints": 3,
             "enchants": {

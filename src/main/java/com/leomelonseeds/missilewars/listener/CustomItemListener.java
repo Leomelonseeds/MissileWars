@@ -365,7 +365,13 @@ public class CustomItemListener implements Listener {
                     player.getInventory().getHeldItemSlot() : 40);
         
         // Remove leaves after 30 sec
-        ConfigUtils.schedule(30 * 20, () -> {
+        int decayAfter = 30;
+        int natures = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.NATURES_BLESSING);
+        if (natures > 0) {
+            decayAfter += (int) ConfigUtils.getAbilityStat(Ability.NATURES_BLESSING, natures, Stat.DURATION);
+        }
+        
+        ConfigUtils.schedule(decayAfter * 20, () -> {
             // Must still be leaves
             if (!loc.getBlock().getType().toString().contains("LEAVES")) {
                 return;

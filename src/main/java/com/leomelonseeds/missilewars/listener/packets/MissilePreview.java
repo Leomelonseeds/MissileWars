@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -67,6 +68,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
     private Map<Integer, String> entities;
     private SchematicLoadResult curResult;
     private Set<Integer> removalQueue;
+    private double range;
     
     // Packetlistener player position tracking
     private PacketListenerCommon listener;
@@ -96,6 +98,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         this.listener = PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.MONITOR);
         this.playerEyeLocation = player.getLocation();
         this.playerEyeDirection = new Vector(0, 0, 1);
+        this.range = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).getBaseValue();
         this.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 20, 1);
     }
 
@@ -210,7 +213,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         
         // Raytrace blocks from player direction
         // Moving pistons don't get detected by raytraces, so we need another check for those
-        RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, 4.5);
+        RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, range);
         for (int i = 1; i <= 9; i++) {
             double dist = i * 0.5;
             Location check = playerEyeLocation.clone().add(playerEyeDirection.clone().multiply(dist));

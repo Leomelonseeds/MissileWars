@@ -199,9 +199,10 @@ public class MissileWarsTeam {
             }
         }
         
+        UUID uuid = player.getMCPlayerId();
         InventoryUtils.clearInventory(mcPlayer, true);
         ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);
-        int swiftSneak = plugin.getJSON().getEnchantLevel(player.getMCPlayerId(), "swift_sneak");
+        int swiftSneak = plugin.getJSON().getEnchantLevel(uuid, "swift_sneak");
         if (swiftSneak > 0) {
             leggings.addEnchantment(Enchantment.SWIFT_SNEAK, swiftSneak);
         }
@@ -215,10 +216,9 @@ public class MissileWarsTeam {
             CooldownUtils.setCooldown(mcPlayer, di.getInstanceItem(), 36000);
             di.registerTeam(this);
         }
-        arena.addCallback(player);
         
         // Vanguard dwarfism
-        int dwarfism = plugin.getJSON().getLevel(player.getMCPlayerId(), Ability.DWARFISM);
+        int dwarfism = plugin.getJSON().getLevel(uuid, Ability.DWARFISM);
         if (dwarfism > 0) {
             double scalePercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.PERCENTAGE) / 100;
             double healthPercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.MPERCENTAGE) / 100;
@@ -226,33 +226,45 @@ public class MissileWarsTeam {
             mcPlayer.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20 * (1 - healthPercent));
         }
         
+        // Architect elastitect
+        int elastitect = plugin.getJSON().getLevel(uuid, Ability.ELASTITECT);
+        if (elastitect > 0) {
+            double addAmount = ConfigUtils.getAbilityStat(Ability.ELASTITECT, elastitect, Stat.PLUS);
+            mcPlayer.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).setBaseValue(4.5 + addAmount);
+        }
+        
         // Potion effect passive activation
-        Pair<Ability, Integer> jsonPassive = plugin.getJSON().getPassive(
-                plugin.getJSON().getPlayerPreset(player.getMCPlayerId()), Type.PASSIVE);
-        Ability passive = jsonPassive.getLeft();
-        int level = jsonPassive.getRight();
-        if (level <= 0) {
-            return;
-        }
+        do {
+            Pair<Ability, Integer> jsonPassive = plugin.getJSON().getPassive(
+                    plugin.getJSON().getPlayerPreset(uuid), Type.PASSIVE);
+            Ability passive = jsonPassive.getLeft();
+            int level = jsonPassive.getRight();
+            if (level <= 0) {
+                break;
+            }
+            
+            int amp = (int) ConfigUtils.getAbilityStat(passive, level, Stat.AMPLIFIER);
+            if (amp == 0) {
+                break;
+            }
+            
+            switch (passive) {
+                case BUNNY:
+                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 30 * 60 * 20, amp));
+                    break;
+                case ADRENALINE:
+                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
+                    break;
+                case HASTE:
+                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, amp));
+                    break;
+                default:
+                    break;
+            }
+        } while (false);
         
-        int amp = (int) ConfigUtils.getAbilityStat(passive, level, Stat.AMPLIFIER);
-        if (amp == 0) {
-            return;
-        }
-        
-        switch (passive) {
-            case BUNNY:
-                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 30 * 60 * 20, amp));
-                break;
-            case ADRENALINE:
-                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
-                break;
-            case HASTE:
-                mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, amp));
-                break;
-            default:
-                return;
-        }
+        // Callback when all setup is done, so that added attributes are instantly available to other classes
+        arena.addCallback(player);
     }
 
     /**
@@ -309,6 +321,7 @@ public class MissileWarsTeam {
         mcPlayer.setWorldBorder(null);
         mcPlayer.getAttribute(Attribute.SCALE).setBaseValue(1.0);
         mcPlayer.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20.0);
+        mcPlayer.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).setBaseValue(4.5);
         mcPlayer.setHealth(20);
         AstralTurretManager.getInstance().unregisterPlayer(mcPlayer, false);
         CanopyManager.getInstance().removePlayer(mcPlayer);

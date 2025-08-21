@@ -34,6 +34,8 @@ public enum Ability {
     POKEMISSILES("poke", Type.ABILITY, DeckStorage.ARCHITECT),
     ENGINEER("engineer", Type.ABILITY, DeckStorage.ARCHITECT),
     HASTE("haste", Type.PASSIVE, DeckStorage.ARCHITECT),
+    NATURES_BLESSING("naturesblessing", Type.PASSIVE, DeckStorage.ARCHITECT),
+    ELASTITECT("elastitect", Type.PASSIVE, DeckStorage.ARCHITECT),
     
     // Global
     HOARDER("hoarder", Type.GPASSIVE, null),
