@@ -92,7 +92,7 @@ public class ArenaInventoryListener implements Listener {
         }
         
         // Cancel shift-clicking creeper heads
-        if (event.getClick() == ClickType.SHIFT_LEFT) {
+        if (event.getClick() == ClickType.SHIFT_LEFT && event.getSlot() != 40) {
             if (item.getType() == Material.CREEPER_HEAD || item.getType() == Material.DRAGON_HEAD) {
                 event.setCancelled(true);
             }
