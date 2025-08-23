@@ -790,9 +790,6 @@ public class ArenaGameruleListener implements Listener {
 
             ThrowableProjectile proj = (ThrowableProjectile) projectile;
             ItemStack item = proj.getItem();
-            int maxmultiplier = (int) ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, prickly, Stat.MULTIPLIER);
-            
-            // Make sure its custom item
             String itemString = InventoryUtils.getStringFromItem(item, "item-structure");
             if (itemString == null) {
                 return;
@@ -800,7 +797,7 @@ public class ArenaGameruleListener implements Listener {
             
             // Get level of the item
             String[] args = itemString.split("-");
-            int multiplier = Math.min(Integer.parseInt(args[1]), maxmultiplier);
+            int multiplier = Integer.parseInt(args[1]);
             
             // Set custom damage and knockback
             event.setDamage(0.0001);

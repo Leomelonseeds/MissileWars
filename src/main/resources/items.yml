@@ -1658,25 +1658,30 @@ Architect:
         spcost: 1
   ability:
     kingsmansbludgers:
-      name: "&ePrickly Projectiles"
+      name: "&eKingsman's Bludgers"
       lore:
       - ""
-      - "&7Projectile utilities now do knockback"
-      - "&7enemy players instead of going through"
-      - "&7them. each successful hit grants another"
-      - "&7of the same projectile item. Knockback"
-      - "&7is multiplied by the level of the utility,"
-      - "&7up to %multiplier%x."
+      - "&fPerk 1: &7Projectile utilities now do"
+      - "&7knockback to enemy players. Knockback"
+      - "&7is multiplied by the level of the utility." 
+      - "&7Each successful hit grants another"
+      - "&7of the same projectile item."
+      - ""
+      - "&fPerk 2: &7While a projectile is flying,"
+      - "&fLeft-click &7the projectile's item to"
+      - "&7spawn it after %cutoff%s&7. Otherwise, it"
+      - "&7will spawn after %duration%s&7."
       cost: 1800
+      cutoff: 0.25
       1:
         spcost: 1
-        multiplier: 1
+        duration: 1.0
       2:
         spcost: 1
-        multiplier: 2
+        duration: 1.5
       3:
         spcost: 1
-        multiplier: 3
+        duration: 2.0
     poke:
       name: "&ePokémissiles"
       lore:

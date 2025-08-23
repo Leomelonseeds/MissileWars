@@ -238,3 +238,7 @@ trident-hit:
   sound: "ITEM_TRIDENT_RETURN"
   volume: 1.0
   pitch: 1.0
+bludger-activate:
+  sound: "BLOCK_NOTE_BLOCK_BELL"
+  volume: 1.0
+  pitch: 1.0

@@ -1,6 +1,8 @@
 package com.leomelonseeds.missilewars.listener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -63,9 +65,11 @@ import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 public class CustomItemListener implements Listener {
     
     private TritonHandler tritonHandler;
+    private Map<Player, ThrowableProjectile> bludgerStore;
     
     public CustomItemListener() {
         this.tritonHandler = new TritonHandler();
+        this.bludgerStore = new HashMap<>();
     }
 
     /**
@@ -116,7 +120,7 @@ public class CustomItemListener implements Listener {
     public void useItem(PlayerInteractEvent event) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         // Stop if not right-click
-        if (!event.getAction().toString().contains("RIGHT")) {
+        if (!event.getAction().isRightClick()) {
             return;
         }
         
@@ -452,10 +456,24 @@ public class CustomItemListener implements Listener {
         if (plugin.getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.WITCH, null);
         }
+        
+        // Increase delay if using kingsmans bludgers
+        int delay = 20;
+        int bludgers = plugin.getJSON().getLevel(uuid, Ability.KINGSMANS_BLUDGERS);
+        if (bludgers > 0) {
+            delay = (int) (ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, bludgers, Stat.DURATION) * 20);
+            bludgerStore.put(thrower, thrown);
+        }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
         String structure = structureName;
-        ConfigUtils.schedule(20, () -> {
+        ConfigUtils.schedule(delay, () -> {
+            // Bludgers should be removed as they can no longer be spawned
+            if (bludgers > 0 && bludgerStore.containsKey(thrower) && 
+                    bludgerStore.get(thrower).getUniqueId().equals(thrown.getUniqueId())) {
+                bludgerStore.remove(thrower);
+            }
+            
             if (spawnUtility(thrower, thrown, structure, playerArena, thrown.getLocation())) {
                 return;
             }
@@ -464,6 +482,51 @@ public class CustomItemListener implements Listener {
                 InventoryUtils.regiveItem(thrower, offhand);
             }
         });
+    }
+    
+    // Handle kingsmans bludgers left click manual spawn
+    @EventHandler
+    public void manualUtilitySpawn(PlayerInteractEvent event) {
+        if (!event.getAction().isLeftClick()) {
+            return;
+        }
+        
+        Player player = event.getPlayer();
+        ThrowableProjectile bludger = bludgerStore.get(player);
+        if (bludger == null || bludger.isDead()) {
+            bludgerStore.remove(player);
+            return;
+        }
+        
+        // Why the fuck do I need to do this? Why does the server think I left clicked
+        // when I throw the thing even though I clearly only right clicked?
+        if (bludger.getTicksLived() == 0) {
+            return;
+        }
+        
+        Arena arena = ArenaUtils.getArena(player);
+        if (arena == null) {
+            return;
+        }
+        
+        ItemStack item = event.getItem();
+        ItemStack bludgerItem = bludger.getItem();
+        if (item == null || item.getType() != bludgerItem.getType()) {
+            return;
+        }
+        
+        int bludgers = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.KINGSMANS_BLUDGERS);
+        if (bludgers <= 0) {
+            return;
+        }
+        
+        int delay = (int) (ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, bludgers, Stat.CUTOFF) * 20);
+        bludgerStore.remove(player);
+        bludger.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, bludger.getLocation(), 25, 0, 0, 0, 1, null, true);
+        ConfigUtils.sendConfigSound("bludger-activate", bludger.getLocation());
+        ConfigUtils.sendConfigSound("bludger-activate", player);
+        ConfigUtils.schedule(delay, () -> 
+            spawnUtility(player, bludger, InventoryUtils.getStringFromItem(bludgerItem, "item-structure"), arena, bludger.getLocation()));
     }
     
     // Handle impact trigger passive (allow utilities to spawn when hitting a block)
