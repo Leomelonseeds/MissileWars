@@ -878,13 +878,6 @@ public class ArenaGameruleListener implements Listener {
         if (possibleArena == null) {
             return;
         }
-        
-        // Shield affinity allows teleport in the base
-        UUID uuid = event.getPlayer().getUniqueId();
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0 &&
-                ArenaUtils.inShield(possibleArena, event.getTo(), possibleArena.getTeam(uuid), 2)) {
-            return;
-        }
 
         event.setCancelled(true);
     }

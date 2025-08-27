@@ -452,11 +452,6 @@ public class CustomItemListener implements Listener {
         if (plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
-
-        // More delay + particles for shield affinity
-        if (isObsidianShield && plugin.getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0) {
-            ArenaUtils.spiralTrail(thrown, Particle.WITCH, null);
-        }
         
         // Increase delay if using kingsmans bludgers
         int delay = 20;
