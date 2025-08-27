@@ -433,7 +433,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Check for astral turret
-        if (structureName.contains("obsidianshield") && offhand.getType() == Material.ARROW && !hasOffhandCooldown &&
+        boolean isObsidianShield = structureName.contains("obsidianshield");
+        if (isObsidianShield && offhand.getType() == Material.ARROW && !hasOffhandCooldown &&
                 plugin.getJSON().getLevel(uuid, Ability.ASTRAL_TURRET) > 0) {
             thrown.customName(ConfigUtils.toComponent("astral"));
             InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
@@ -453,7 +454,7 @@ public class CustomItemListener implements Listener {
         }
 
         // More delay + particles for shield affinity
-        if (plugin.getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0) {
+        if (isObsidianShield && plugin.getJSON().getLevel(uuid, Ability.SHIELD_AFFINITY) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.WITCH, null);
         }
         

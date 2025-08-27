@@ -76,6 +76,7 @@ import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
@@ -958,7 +959,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Fix dumb bug. No break obsidian
         String type = block.getType().toString();
-        if (type.contains("OBSIDIAN") || type.equals("NETHER_PORTAL")) {
+        if (type.contains("OBSIDIAN") || type.equals("NETHER_PORTAL") || type.equals("MOVING_PISTON")) {
             event.setCancelled(true);
             return;
         }
@@ -971,30 +972,30 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        int deconstructor = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ENGINEER);
-        if (deconstructor <= 0) {
+        int engineer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ENGINEER);
+        if (engineer <= 0) {
             return;
         }
         
         // Check if deconstructor can break block
         List<String> whitelist = plugin.getConfig().getStringList("deconstructor-blocks");
-        boolean proceed = false;
-        for (String b : whitelist) {
-            if (type.contains(b)) {
-                proceed = true;
-                break;
-            }
+        if (!whitelist.parallelStream().anyMatch(s -> type.contains(s))) {
+            return;
         }
         
-        if (!proceed) {
+        // Check if any tracked object from the other team contains this block
+        boolean isRed = possibleArena.getTeam(player.getUniqueId()) == TeamName.RED; 
+        Tracker tracker = possibleArena.getTracker();
+        Location loc = block.getLocation();
+        if (!tracker.getMissiles().parallelStream().anyMatch(t -> t.isRed() != isRed && t.contains(loc))) {
             return;
         }
         
         Random random = new Random();
-        double percentage = ConfigUtils.getAbilityStat(Ability.ENGINEER, deconstructor, Stat.PERCENTAGE) / 100;
+        double percentage = ConfigUtils.getAbilityStat(Ability.ENGINEER, engineer, Stat.PERCENTAGE) / 100;
         if (random.nextDouble() < percentage) {
             ItemStack item = new ItemStack(block.getType());
-            InventoryUtils.regiveItem(player, item);
+            loc.getWorld().dropItemNaturally(loc.toCenterLocation(), item, i -> i.setOwner(player.getUniqueId()));
         }
     }
 

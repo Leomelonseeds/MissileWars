@@ -228,6 +228,16 @@ public class DeckItem {
     }
     
     /**
+     * Very dangerous method, only use for passives like Engineer
+     * where an instance of the old item has been saved.
+     * 
+     * @param item
+     */
+    public void setInstanceItem(ItemStack item) {
+        this.item = item;
+    }
+    
+    /**
      * Stops the item from running. The item can be stored away
      * and re-used at a later state by calling updateItem()
      */

@@ -122,13 +122,20 @@ public class SchematicManager {
         }
         
         if (isRed) {
-            fileName = fileName.replaceAll(".nbt", "_red.nbt");
+            fileName = fileName.replace(".nbt", "_red.nbt");
+        }
+
+        // Check for custom engineer missile
+        String fileLocation = MissileWarsPlugin.getPlugin().getDataFolder() + File.separator + "structures";
+        if (args.length >= 3 && args[2].equals("e")) {
+            fileLocation += File.separator + "engineer";
+            fileName = args[3] + "_" + fileName;
         }
         
         Pair<File, Clipboard> structureInfo = structureCache.get(fileName);
         if (structureInfo == null) {
             // Load file and save into clipboard
-            File file = new File(MissileWarsPlugin.getPlugin().getDataFolder() + File.separator + "structures", fileName);
+            File file = new File(fileLocation, fileName);
             ClipboardFormat format = BuiltInClipboardFormat.MINECRAFT_STRUCTURE;
             Clipboard clipboard;
             try {
@@ -163,7 +170,7 @@ public class SchematicManager {
         
         // Check for pokemissile
         BlockVector3 size = structureInfo.getRight().getDimensions();
-        if (args.length == 3 && args[2].equals("p")) {
+        if (args.length >= 3 && args[args.length - 1].equals("p")) {
             isMissile = true;
             offset.setZ(-1 * size.getBlockZ() / 2);
             offset.setY(-1 * size.getBlockY() / 2);

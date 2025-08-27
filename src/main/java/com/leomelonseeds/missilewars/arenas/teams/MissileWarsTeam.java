@@ -38,6 +38,7 @@ import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
+import com.leomelonseeds.missilewars.listener.handler.EngineerManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
@@ -324,6 +325,7 @@ public class MissileWarsTeam {
         mcPlayer.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).setBaseValue(4.5);
         mcPlayer.setHealth(20);
         AstralTurretManager.getInstance().unregisterPlayer(mcPlayer, false);
+        EngineerManager.getInstance().endSession(mcPlayer);
         CanopyManager.getInstance().removePlayer(mcPlayer);
         EnderSplashManager.getInstance().removePlayer(mcPlayer);
         for (PotionEffect effect : mcPlayer.getActivePotionEffects()){

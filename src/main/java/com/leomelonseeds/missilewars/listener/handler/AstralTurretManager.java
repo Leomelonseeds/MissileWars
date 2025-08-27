@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -38,6 +37,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class AstralTurretManager implements Listener {
@@ -80,8 +80,7 @@ public class AstralTurretManager implements Listener {
         teams.put(player, isRed);
         
         // Particle task
-        Color color = isRed ? Color.fromRGB(0xff4040) : Color.fromRGB(0x4040ff);
-        Trail trailOptions = new Trail(center, color.setAlpha(128), 20);
+        Trail trailOptions = new Trail(center, ArenaUtils.getTeamParticleColor(isRed), 20);
         List<BukkitTask> tasksToAdd = new ArrayList<>();
         tasksToAdd.add(Bukkit.getScheduler().runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
             player.getWorld().spawnParticle(

@@ -157,6 +157,10 @@ public class SchematicLoadResult {
         return res;
     }
     
+    public BlockVector3 getSize() {
+        return clipboard.getDimensions();
+    }
+    
     public boolean isAllowSpawn() {
         return status == SchematicLoadStatus.SUCCESS;
     }

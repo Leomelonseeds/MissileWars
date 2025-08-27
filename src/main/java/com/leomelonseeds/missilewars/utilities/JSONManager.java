@@ -92,6 +92,7 @@ public class JSONManager {
                     updateVersion5(newJson);
                     updateVersion6(newJson);
                     updateVersion7(newJson);
+                    updateVersion8(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -306,11 +307,7 @@ public class JSONManager {
         json.put("version", 2);
         
         JSONObject sentinelJson = json.getJSONObject("Sentinel");
-        
-        boolean purchased = sentinelJson.getBoolean("spectral");
-        sentinelJson.remove("spectral");
-        sentinelJson.put("exoticarrows", purchased);
-        
+        renamePurchase(sentinelJson, "spectral", "exoticarrows");
         
         for (String preset : plugin.getDeckManager().getPresets()) {
             if (!sentinelJson.has(preset)) {
@@ -418,8 +415,7 @@ public class JSONManager {
         json.put("version", 5);
         
         JSONObject bersJson = json.getJSONObject("Berserker");
-        bersJson.put("rocketeer", bersJson.getBoolean("boosterball"));
-        bersJson.remove("boosterball");
+        renamePurchase(bersJson, "boosterball", "rocketeer");
         
         for (String preset : plugin.getDeckManager().getPresets()) {
             if (!bersJson.has(preset)) {
@@ -460,8 +456,7 @@ public class JSONManager {
         json.put("version", 6);
         
         JSONObject vanJson = json.getJSONObject("Vanguard");
-        vanJson.put("endersplash", vanJson.getBoolean("lavasplash"));
-        vanJson.remove("lavasplash");
+        renamePurchase(vanJson, "lavasplash", "endersplash");
         
         for (String preset : plugin.getDeckManager().getPresets()) {
             if (!vanJson.has(preset)) {
@@ -499,11 +494,8 @@ public class JSONManager {
         json.put("version", 7);
         
         JSONObject archiJson = json.getJSONObject("Architect");
-        archiJson.put("engineer", archiJson.getBoolean("deconstructor"));
-        archiJson.remove("deconstructor");
-        archiJson.put("swift_sneak", archiJson.getBoolean("haste"));
-        archiJson.remove("haste");
-        
+        renamePurchase(archiJson, "deconstructur", "engineer");
+        renamePurchase(archiJson, "haste", "swift_sneak");
         for (String preset : plugin.getDeckManager().getPresets()) {
             if (!archiJson.has(preset)) {
                 continue;
@@ -546,6 +538,58 @@ public class JSONManager {
                 passiveJson.put("level", haste);
             }
         }
+    }
+    
+    /**
+     * Version 8 
+     * - Reduce max Deconstructor level to 2
+     * - Reduce max Adrenaline level to 2
+     * - Increase skillpoints to 20
+     */
+    private void updateVersion8(JSONObject json) {
+        if (json.getInt("version") >= 8) {
+            return;
+        }
+
+        json.put("version", 8);
+        
+        JSONObject archiJson = json.getJSONObject("Architect");
+        JSONObject vanJson = json.getJSONObject("Vanguard");
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!archiJson.has(preset) && !vanJson.has(preset)) {
+                continue;
+            }
+            
+            for (JSONObject deckJson : new JSONObject[] {archiJson, vanJson}) {
+                JSONObject presetJson = deckJson.getJSONObject(preset);
+                JSONObject passiveJson = presetJson.getJSONObject("passive");
+                if (!passiveJson.getString("selected").equals("engineer") && !passiveJson.getString("selected").equals("adrenaline")) {
+                    continue;
+                }
+                
+                if (passiveJson.getInt("level") < 3) {
+                    continue;
+                }
+                
+                passiveJson.put("level", 2);
+            }
+        }
+    }
+    
+    /**
+     * Rename a purchase for version updates
+     * 
+     * @param json a deck json
+     * @param oldName
+     * @param newName
+     */
+    private void renamePurchase(JSONObject deckJson, String oldName, String newName) {
+        if (!deckJson.has(oldName)) {
+            return;
+        }
+        
+        deckJson.put(newName, deckJson.getBoolean(oldName));
+        deckJson.remove(oldName);
     }
 
     /**

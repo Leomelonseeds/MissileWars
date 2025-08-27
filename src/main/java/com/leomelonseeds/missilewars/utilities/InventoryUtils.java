@@ -135,7 +135,9 @@ public class InventoryUtils {
      * @param item
      */
     public static void regiveItem(Player player, ItemStack item) {
-        Item newitem = player.getWorld().dropItem(player.getLocation(), item);
+        // Items are 0.25 blocks tall spawn them slightly higher to account for that
+        // Otherwise they might glitch underneath a block and not be collected
+        Item newitem = player.getWorld().dropItem(player.getLocation().add(0, 0.13, 0), item);
         newitem.setOwner(player.getUniqueId());
         newitem.setPickupDelay(0);
         

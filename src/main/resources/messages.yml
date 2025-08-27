@@ -143,6 +143,15 @@ messages:
   wrong-tutorial-deck: "&c&l[!] &cYou must use &b&lSentinel &cor &2&lArchitect &cto complete this stage! Please &a/leave &cand switch your deck."
   map: "&7Current map: %map%"
   torpedo-too-close: "&cYou cannot spawn torpedos this close to yourself!"
+  engineer:
+    start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
+    cancel: "&7Structure session cancelled without saving."
+    reset: "&7Structure reset to default."
+    no-selection: "&cPlease target a block to select a region to save!"
+    selection-whitelist: "&cYour selection can only contain missile-related blocks and glass blocks!"
+    error: "&cThere was an error saving your selection, please try again."
+    saving: "&aSaving your custom structure..."
+    saved: "&aStructure successfully saved."
     
 titles:
   # Should be sent to players who join in the middle of a game as well

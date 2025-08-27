@@ -242,3 +242,19 @@ bludger-activate:
   sound: "BLOCK_NOTE_BLOCK_BELL"
   volume: 1.0
   pitch: 1.0
+engineer-start:
+  sound: "BLOCK_NOTE_BLOCK_PLING"
+  volume: 1.0
+  pitch: 2.0
+engineer-cancel:
+  sound: "BLOCK_NOTE_BLOCK_BASS"
+  volume: 1.0
+  pitch: 1.0
+engineer-saved:
+  sound: "ITEM_ARMOR_EQUIP_DIAMOND"
+  volume: 1.0
+  pitch: 1.0
+engineer-reset:
+  sound: "ITEM_ARMOR_UNEQUIP_WOLF"
+  volume: 1.0
+  pitch: 1.0

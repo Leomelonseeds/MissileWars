@@ -1,5 +1,5 @@
 {
-    "version": 6,
+    "version": 8,
     "Deck": "Sentinel",
     "Preset": "A",
 	"missilespec": false,
@@ -15,7 +15,7 @@
         "triton": false,
         "dwarfism": false,
 		"defaultpreset": {
-			"skillpoints": 2,
+			"skillpoints": 5,
             "enchants": {
                 "feather_falling": 0,
                 "sharpness": 3,
@@ -53,11 +53,10 @@
 		"longshot": false,
 		"exoticarrows": false,
         "smokeshield": false,
-        "shieldaffinity": false,
         "hitchhikersbow": false,
         "astralturret": false,
 		"defaultpreset": {
-			"skillpoints": 1,
+			"skillpoints": 5,
             "enchants": {
                 "fire_protection": 0,
                 "flame": 1,
@@ -100,7 +99,7 @@
         "gunslinger": false,
         "blazeballs": false,
 		"defaultpreset": {
-			"skillpoints": 5,
+			"skillpoints": 6,
             "enchants": {
                 "blast_protection": 0,
                 "multishot": 0,
@@ -117,7 +116,7 @@
 				"juggernaut": 1,
 				"breaker": 1,
 				"cuboid": 2,
-				"warhead": 1
+				"warhead": 2
 			},
             "ability": {
                 "selected": "None",
@@ -144,7 +143,7 @@
         "naturesblessing": false,
         "elastitect": false,
 		"defaultpreset": {
-			"skillpoints": 3,
+			"skillpoints": 6,
             "enchants": {
                 "projectile_protection": 0,
                 "sharpness": 3,
@@ -169,7 +168,7 @@
             },
 			"passive": {
 				"selected": "haste",
-				"level": 2
+				"level": 3
 			},
 			"gpassive": {
 				"selected": "None",

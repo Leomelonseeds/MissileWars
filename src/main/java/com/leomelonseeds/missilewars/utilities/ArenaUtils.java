@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
@@ -326,5 +327,10 @@ public class ArenaUtils {
     
     public static double getMaxHealth(Player player) {
         return player.getAttribute(Attribute.MAX_HEALTH).getBaseValue();
+    }
+    
+    public static Color getTeamParticleColor(boolean isRed) {
+        Color color = isRed ? Color.fromRGB(0xff4040) : Color.fromRGB(0x4040ff);
+        return color.setAlpha(128);
     }
 }
