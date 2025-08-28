@@ -649,7 +649,7 @@ public class CustomItemListener implements Listener {
             
             // Ignite level 2 torpedos if a player gets trapped inside
             boolean lvl2 = structure.contains("2");
-            Location tntLoc = lvl2 ? spawnLoc.clone() : spawnLoc.clone().add(0, -1, 0);
+            Location tntLoc = spawnLoc.clone();
             double yAdd = lvl2 ? 0.5 : 0;
             double yCheck = lvl2 ? 2 : 1.5;
             for (Entity e : spawnLoc.toCenterLocation().add(0, yAdd, 0).getNearbyEntities(0.5, yCheck, 0.5)) {
@@ -668,6 +668,8 @@ public class CustomItemListener implements Listener {
                     entTnt.setSource(thrower);
                     entTnt.setFuseTicks(80);
                 }
+                
+                break;
             }
             
             // Register all spawned TNT minecarts into the tracker
