@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,10 +22,12 @@ import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -332,5 +335,42 @@ public class ArenaUtils {
     public static Color getTeamParticleColor(boolean isRed) {
         Color color = isRed ? Color.fromRGB(0xff4040) : Color.fromRGB(0x4040ff);
         return color.setAlpha(128);
+    }
+
+    /**
+     * Set player boots based on the deck that he has selected.
+     * Does not check whether player is in arena or not
+     * 
+     * @param player
+     */
+    public static void updatePlayerBoots(Player player) {
+        updatePlayerBoots(player, false);
+    }
+    
+    
+    /**
+     * Set player boots based on the deck that he has selected
+     * 
+     * @param player
+     * @param checkForArena whether to verify if player is in arena
+     */
+    public static void updatePlayerBoots(Player player, boolean checkForArena) {
+        Arena arena = getArena(player);
+        if (arena == null) {
+            return;
+        }
+
+        UUID uuid = player.getUniqueId();
+        if (arena.getTeam(uuid) != TeamName.NONE) {
+            return;
+        }
+        
+        JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(uuid);
+        if (json == null) {
+            return;
+        }
+        
+        DeckStorage deck = DeckStorage.fromString(json.getString("Deck"));
+        player.getInventory().setBoots(deck.getBoots());
     }
 }

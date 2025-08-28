@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public abstract class DeckSubInventory {
@@ -107,6 +108,7 @@ public abstract class DeckSubInventory {
     protected void selectPreset(String preset, JSONObject playerJson, Player player) {
         playerJson.put("Deck", deck);
         playerJson.put("Preset", preset);
+        ArenaUtils.updatePlayerBoots(player, true);
         playerJson.getJSONObject(deck).put("last-preset", preset);
         
         ConfigUtils.sendConfigMessage("change-preset", player, Map.of("%deck%", deck, "%preset%", preset));

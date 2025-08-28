@@ -523,6 +523,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
         player.teleport(getPlayerSpawn(player));
         InventoryUtils.clearInventory(player, true);
+        ArenaUtils.updatePlayerBoots(player);
         ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
 
         for (MissileWarsPlayer mwPlayer : players.values()) {
@@ -634,7 +635,8 @@ public abstract class Arena implements ConfigurationSerializable {
         // Remove player from all teams and queues
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         players.remove(uuid);
-        voteManager.removePlayer(toRemove.getMCPlayer());
+        Player mcPlayer = toRemove.getMCPlayer();
+        voteManager.removePlayer(mcPlayer);
         calculateRankMedian();
 
         for (MissileWarsPlayer mwPlayer : players.values()) {
@@ -652,7 +654,6 @@ public abstract class Arena implements ConfigurationSerializable {
         // Run proper clearing commands on the player
         if (tolobby) {
             Arena arena = this;
-            Player mcPlayer = toRemove.getMCPlayer();
         	mcPlayer.teleport(ConfigUtils.getSpawnLocation());
         	mcPlayer.setGameMode(GameMode.ADVENTURE);
         	InventoryUtils.loadInventory(mcPlayer);
@@ -667,7 +668,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 ConfigUtils.sendConfigMessage("messages.leave-arena-lobby", player, null, mcPlayer);
             }
         }
-
+ 
         checkEmpty();
     }
 
@@ -702,9 +703,9 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         checkEmpty();
-
         player.teleport(getPlayerSpawn(player));
         player.setGameMode(GameMode.ADVENTURE);
+        ArenaUtils.updatePlayerBoots(player);
         giveHeldItems(player);
 
         return true;

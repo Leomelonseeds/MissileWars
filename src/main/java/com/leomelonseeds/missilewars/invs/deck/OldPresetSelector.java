@@ -22,6 +22,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -196,6 +197,7 @@ public class OldPresetSelector extends MWInventory {
             String preset = playerJson.getJSONObject(deck).getString("last-preset");
             playerJson.put("Deck", deck);
             playerJson.put("Preset", preset);
+            ArenaUtils.updatePlayerBoots(player, true);
             presetMessage(preset);
             updateInventory();
         }
@@ -224,6 +226,7 @@ public class OldPresetSelector extends MWInventory {
                 // Choose preset
                 playerJson.put("Deck", deck);
                 playerJson.put("Preset", p);
+                ArenaUtils.updatePlayerBoots(player, true);
                 playerJson.getJSONObject(deck).put("last-preset", p);
                 presetMessage(p);
                 updateInventory();
