@@ -98,6 +98,9 @@ public class EngineerManager implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
                 if (sessions.get(uuid).save()) {
                     sessions.remove(uuid);
+                } else {
+                    Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> 
+                        ConfigUtils.sendConfigSound("engineer.cancel", player));
                 }
             });
             return;

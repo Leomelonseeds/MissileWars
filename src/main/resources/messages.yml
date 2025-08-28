@@ -147,7 +147,7 @@ messages:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
     reset: "&7Structure reset to default."
-    no-selection: "&cPlease target a block to select a region to save!"
+    no-selection: "&cYou either don't have a region, or it is empty."
     selection-whitelist: "&cYour selection can only contain missile-related blocks and glass blocks!"
     error: "&cThere was an error saving your selection, please try again."
     saving: "&aSaving your custom structure..."

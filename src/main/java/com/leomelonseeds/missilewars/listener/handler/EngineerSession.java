@@ -3,9 +3,11 @@ package com.leomelonseeds.missilewars.listener.handler;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,12 +36,15 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class EngineerSession {
@@ -174,23 +179,41 @@ public class EngineerSession {
         World world = pos1.getWorld();
         com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
         CuboidRegion region = new CuboidRegion(weWorld, bpos1, bpos2);
+        List<Pair<Location, Material>> leaves = new ArrayList<>();
+        boolean containsBlocks = false;
         for (BlockVector3 point : region) {
             Location loc = new Location(world, point.getX(), point.getY(), point.getZ());
-            String blockType = loc.getBlock().getType().toString();
+            Material type = loc.getBlock().getType();
+            String blockType = type.toString();
             if (blockType.equals("AIR")) {
                 continue;
             }
             
+            if (blockType.contains("LEAVES")) {
+                leaves.add(Pair.of(loc, type));
+                continue;
+            }
+            
             if (!whitelist.parallelStream().anyMatch(s -> blockType.contains(s))) {
+                ConfigUtils.sendConfigMessage("engineer.selection-whitelist", player);
                 return false;
             }
+            
+            containsBlocks = true;
+        }
+        
+        if (!containsBlocks) {
+            ConfigUtils.sendConfigMessage("engineer.no-selection", player);
+            return false;
         }
 
         // Replace all air with structure blocks, make the copy, then undo the 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         String dashlessUUID = player.getUniqueId().toString().replace("-", "");
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            editSession.replaceBlocks(region, Set.of(new BaseBlock(BlockTypes.AIR.getDefaultState())), BlockTypes.STRUCTURE_VOID);
+            Set<BlockType> voidTypes = BlockCategories.LEAVES.getAll();
+            voidTypes.add(BlockTypes.AIR);
+            editSession.replaceBlocks(region, new BlockTypeMask(clipboard, voidTypes), BlockTypes.STRUCTURE_VOID);
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, bpos1, clipboard, bpos1);
             copy.setCopyingEntities(false);
             if (isRed) {
@@ -254,6 +277,8 @@ public class EngineerSession {
                 break;
             }
             
+            // Replace leaf blocks back with leaves
+            leaves.forEach(l -> l.getLeft().getBlock().setType(l.getRight()));
             end(false, true);
         });
         
