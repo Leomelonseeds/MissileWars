@@ -355,14 +355,16 @@ public class ArenaUtils {
      * @param checkForArena whether to verify if player is in arena
      */
     public static void updatePlayerBoots(Player player, boolean checkForArena) {
-        Arena arena = getArena(player);
-        if (arena == null) {
-            return;
-        }
-
         UUID uuid = player.getUniqueId();
-        if (arena.getTeam(uuid) != TeamName.NONE) {
-            return;
+        if (checkForArena) {
+            Arena arena = getArena(player);
+            if (arena == null) {
+                return;
+            }
+
+            if (arena.getTeam(uuid) != TeamName.NONE) {
+                return;
+            }
         }
         
         JSONObject json = MissileWarsPlugin.getPlugin().getJSON().getPlayer(uuid);
