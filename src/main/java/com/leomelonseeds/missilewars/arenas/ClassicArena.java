@@ -210,7 +210,7 @@ public class ClassicArena extends Arena {
             // Update player stats
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
 
-            sql.updateClassicStats(uuid, portals, won, 1, kills, missiles, utility, deaths);
+            sql.updateClassicStats(uuid, portals, Math.max(won, 0), 1, kills, missiles, utility, deaths);
             sql.updateWinstreak(uuid, gamemode, won);
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
 

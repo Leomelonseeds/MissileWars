@@ -196,7 +196,7 @@ public class JSONManager {
                             } else {
                                 int maxLevel = plugin.getDeckManager().getMaxLevel(path + "." + passive);
                                 if (passivelevel > maxLevel) {
-                                    currentpreset.getJSONObject(ptype).put("level", maxLevel);
+                                    passiveJson.put("level", maxLevel);
                                     passivelevel = maxLevel;
                                 }
                                 while (passivelevel > 0) {
