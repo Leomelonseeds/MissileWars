@@ -976,6 +976,12 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // Check if the block can drop an item
+        List<ItemStack> drops = new ArrayList<>(block.getDrops());
+        if (drops.size() != 1) {
+            return;
+        }
+        
         // Check if any tracked object from the other team contains this block
         boolean isRed = possibleArena.getTeam(player.getUniqueId()) == TeamName.RED; 
         Tracker tracker = possibleArena.getTracker();
@@ -987,8 +993,7 @@ public class ArenaGameruleListener implements Listener {
         Random random = new Random();
         double percentage = ConfigUtils.getAbilityStat(Ability.ENGINEER, engineer, Stat.PERCENTAGE) / 100;
         if (random.nextDouble() < percentage) {
-            ItemStack item = new ItemStack(block.getType());
-            loc.getWorld().dropItemNaturally(loc.toCenterLocation(), item, i -> i.setOwner(player.getUniqueId()));
+            loc.getWorld().dropItemNaturally(loc.toCenterLocation(), drops.get(0), i -> i.setOwner(player.getUniqueId()));
         }
     }
 

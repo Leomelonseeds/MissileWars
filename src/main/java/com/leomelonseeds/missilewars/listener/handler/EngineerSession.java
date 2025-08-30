@@ -44,6 +44,7 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -207,13 +208,15 @@ public class EngineerSession {
             return false;
         }
 
-        // Replace all air with structure blocks, make the copy, then undo the 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         String dashlessUUID = player.getUniqueId().toString().replace("-", "");
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            // Add structure voids, remove leaves, and flip rotateable blocks if on red
             Set<BlockType> voidTypes = BlockCategories.LEAVES.getAll();
             voidTypes.add(BlockTypes.AIR);
             editSession.replaceBlocks(region, new BlockTypeMask(clipboard, voidTypes), BlockTypes.STRUCTURE_VOID);
+            
+            // Create a copy to save all current blocks to the clipboard
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, bpos1, clipboard, bpos1);
             copy.setCopyingEntities(false);
             if (isRed) {
@@ -225,6 +228,12 @@ public class EngineerSession {
                 ));
             }
             Operations.complete(copy);
+            
+            if (isRed) {
+                rotateBlocks(clipboard);
+            }
+            
+            // Save schematic to file
             String newFileName = dashlessUUID + "_" + fileName;
             File schematicFile = new File(MissileWarsPlugin.getPlugin().getDataFolder() + 
                     File.separator + "structures" +
@@ -283,6 +292,32 @@ public class EngineerSession {
         });
         
         return true;
+    }
+    
+    /**
+     * Rotate all rotateable blocks 180 degrees to save a red side structure correctly
+     * 
+     * @param clipboard
+     * @param session
+     */
+    private void rotateBlocks(BlockArrayClipboard clipboard) {
+        for (BlockVector3 block : clipboard) {
+            String curState = clipboard.getBlock(block).toString();
+            String flippedState = curState
+                    .replace("east", "temp_e")
+                    .replace("west", "east")
+                    .replace("temp_e", "west")
+                    .replace("north", "temp_n")
+                    .replace("south", "north")
+                    .replace("temp_n", "south");
+            
+            if (curState.equals(flippedState)) {
+                continue;
+            }
+            
+            BlockState newState = BlockState.get(flippedState);
+            clipboard.setBlock(block, newState);
+        }
     }
     
     /**
