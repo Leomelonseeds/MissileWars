@@ -185,13 +185,14 @@ public class JSONManager {
                         
                         // Calculate sp spent on gpassives/passives, and delete if gpassive not exist
                         for (String ptype : new String[] {"gpassive", "passive", "ability"}) {
+                            JSONObject passiveJson = currentpreset.getJSONObject(ptype);
                             String path = ptype.equals("gpassive") ? ptype : deck + "." + ptype;
                             String passive = currentpreset.getJSONObject(ptype).getString("selected");
                             int passivelevel = currentpreset.getJSONObject(ptype).getInt("level");
                             Set<String> passives = itemConfig.getConfigurationSection(path).getKeys(false);
-                            if (!passives.contains(passive)) {
-                                currentpreset.getJSONObject(ptype).put("selected", "None");
-                                currentpreset.getJSONObject(ptype).put("level", 0);
+                            if (!passives.contains(passive) || passiveJson.getInt("level") <= 0) {
+                                passiveJson.put("selected", "None");
+                                passiveJson.put("level", 0);
                             } else {
                                 int maxLevel = plugin.getDeckManager().getMaxLevel(path + "." + passive);
                                 if (passivelevel > maxLevel) {
@@ -510,19 +511,12 @@ public class JSONManager {
                 abilityJson.put("selected", "kingsmansbludgers");
                 archiJson.put("kingsmansbludgers", true);
                 transfer = true;
-                continue;
-            }
-            
-            if (passiveJson.getString("selected").equals("poke")) {
+            } else if (passiveJson.getString("selected").equals("poke")) {
                 abilityJson.put("selected", "poke");
                 transfer = true;
-                continue;
-            }
-            
-            if (passiveJson.getString("selected").equals("deconstructor")) {
+            } else if (passiveJson.getString("selected").equals("deconstructor")) {
                 abilityJson.put("selected", "engineer");
                 transfer = true;
-                continue;
             }
             
             if (transfer) {

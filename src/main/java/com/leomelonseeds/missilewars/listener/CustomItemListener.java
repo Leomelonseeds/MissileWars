@@ -596,7 +596,8 @@ public class CustomItemListener implements Listener {
         }
         
         boolean red = isRedTeam(thrower);
-        if (!SchematicManager.spawnNBTStructure(thrower, structure, spawnLoc, red, false, true)) {
+        boolean isMissile = InventoryUtils.isMissile(structure);
+        if (!SchematicManager.spawnNBTStructure(thrower, structure, spawnLoc, red, isMissile, true)) {
             InventoryUtils.regiveItem(thrower, item);
             return false;
         }
