@@ -378,6 +378,7 @@ public class ArenaGameruleListener implements Listener {
                         arrow.getWorld().spawnParticle(Particle.SMALL_GUST, arrow.getLocation(), 1, 0.2, 0.2, 0.2, 0);
                     }
                 }.runTaskTimer(plugin, 5, 5);
+                return;
             }
 
             // Spiked Quiver
@@ -434,10 +435,11 @@ public class ArenaGameruleListener implements Listener {
 
         // Consume the correct item with information we got from PlayerReadyArrowEvent
         Pair<Integer, Integer> consume = arrowInventoryItem.get(player);
-        ItemStack consumedItem = event.getConsumable().clone();
-        consumedItem.setAmount(consume.getLeft());
-        InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
-        
+        if (consume != null) {
+            ItemStack consumedItem = event.getConsumable().clone();
+            consumedItem.setAmount(consume.getLeft());
+            InventoryUtils.consumeItem(player, arena, consumedItem, consume.getRight());
+        }
         
         // Hitchhiker's bow
         AbstractArrow proj = (AbstractArrow) eventProj;

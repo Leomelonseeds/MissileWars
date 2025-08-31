@@ -80,9 +80,10 @@ public class RubberbandHelper implements PacketListener, Listener {
             return;
         }
         
-        // Check if the toLocation is a missile. Cancel if canopy cobweb
+        // Check if the toLocation is a missile. Cancel if canopy cobweb or ender splash water
         Location toLoc = new Location(player.getWorld(), posPacket.getX(), posPacket.getY(), posPacket.getZ());
-        if (toLoc.getBlock().getType() == Material.COBWEB) {
+        Material blockType = toLoc.getBlock().getType();
+        if (blockType == Material.COBWEB || blockType == Material.WATER) {
             return;
         }
         
