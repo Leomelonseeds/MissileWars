@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,6 +38,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.mineacademy.chatcontrol.api.ChannelPreChatEvent;
 
@@ -300,6 +302,7 @@ public class MiscListener implements Listener {
     // --------------------------------------------------
     
     public static Set<UUID> notLeftClick = new HashSet<>();
+    public static Map<Fireball, Slime> fireballs = new HashMap<>();
     
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerAnimation(PlayerAnimationEvent event) {
@@ -312,9 +315,44 @@ public class MiscListener implements Listener {
         if (notLeftClick.contains(player.getUniqueId())) {
             return;
         }
+        
+        // Raytraces backwards so players with high ping can still deflect fireballs on their screen
+        // Add 2 to delay; idk why fireball locations are so delayed on people's screens...
+        Location eyeLoc = player.getEyeLocation();
+        Vector eyeDir = eyeLoc.getDirection();
+        double delay = player.getPing() / 50.0 + 2;
+        Entity target = null;
+        for (Fireball fb : fireballs.keySet()) {
+            if (fb.isDead() || !fb.getWorld().equals(player.getWorld())) {
+                continue;
+            }
+            
+            Location fbLoc = fb.getLocation();
+            if (fbLoc.distanceSquared(eyeLoc) > 3 * 3) {
+                continue;
+            }
 
-        // TODO: Raytrace according to player ping and where target was ping/2 time ago
-        Entity target = player.getTargetEntity(2); // 2 is enough for 3 block reach (for some reason)
+            Vector fbDir = fb.getVelocity();
+            double maxDist = fbDir.length() * delay + 3;
+            Vector screenFbCenter = fb.getBoundingBox().getCenter().subtract(fbDir.multiply(delay));
+            BoundingBox screenFbBox = BoundingBox.of(screenFbCenter, 0.5, 0.5, 0.5);
+            boolean success = false;
+            for (int i = 1; i <= (int) Math.ceil(maxDist); i++) {
+                Vector toCheck = eyeLoc.clone().add(eyeDir.clone().multiply(i)).toVector();
+                if (!screenFbBox.contains(toCheck)) {
+                    continue;
+                }
+                
+                target = ObjectUtils.defaultIfNull(fireballs.get(fb), fb);
+                success = true;
+                break;
+            }
+            
+            if (success) {
+                break;
+            }
+        }
+        
         if (target == null) {
             return;
         }

@@ -318,12 +318,14 @@ public class CustomItemListener implements Listener {
                 double radius = getItemStat(utility, "radius");
                 fireball.customName(ConfigUtils.toComponent("vdf:" + amplifier + ":" + duration + ":" + radius));
                 fireball.setCustomNameVisible(false);
-                Bukkit.getPluginManager().registerEvents(new DragonFireballHandler(fireball), plugin);
+                DragonFireballHandler dfbHandler = new DragonFireballHandler(fireball);
+                MiscListener.fireballs.put(fireball, dfbHandler.getSlime());
             } else {
                 fireball = (Fireball) player.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
                 fireball.setIsIncendiary(true);
                 float yield = (float) getItemStat(utility, "power");
                 fireball.setYield(yield);
+                MiscListener.fireballs.put(fireball, null);
             }
 
             fireball.setDirection(player.getEyeLocation().getDirection());
@@ -332,6 +334,9 @@ public class CustomItemListener implements Listener {
             ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
             mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
             Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(fireball));
+            
+            // Remove fireballs from deflection manager when they die
+            ArenaUtils.doUntilDead(fireball, null, true, () -> MiscListener.fireballs.remove(fireball));
             return;
         }
     }

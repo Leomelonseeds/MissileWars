@@ -154,7 +154,19 @@ public class ArenaUtils {
      * @param consumer the action to run every tick, with parameter as the ticks this has run
      */
     public static BukkitTask doUntilDead(Entity entity, Consumer<Integer> consumer, boolean async) {
-        BukkitRunnable runnable = getDoUntilDeadRunnable(entity, consumer);
+        return doUntilDead(entity, consumer, async, null);
+    }
+    
+    /**
+     * Perform an action every tick until the given entity is dead 
+     * (if its an arrow, if it hits a block)
+     * 
+     * @param entity
+     * @param consumer the action to run every tick, with parameter as the ticks this has run
+     * @param a function to run when the entity does die
+     */
+    public static BukkitTask doUntilDead(Entity entity, Consumer<Integer> consumer, boolean async, Runnable onDeath) {
+        BukkitRunnable runnable = getDoUntilDeadRunnable(entity, consumer, onDeath);
         if (async) {
             return runnable.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 1, 1);
         } else {
@@ -162,7 +174,7 @@ public class ArenaUtils {
         }
     }
     
-    private static BukkitRunnable getDoUntilDeadRunnable(Entity entity, Consumer<Integer> consumer) {
+    private static BukkitRunnable getDoUntilDeadRunnable(Entity entity, Consumer<Integer> consumer, Runnable onDeath) {
         boolean isArrow = entity instanceof AbstractArrow;
         return new BukkitRunnable() {
             
@@ -170,17 +182,17 @@ public class ArenaUtils {
             
             @Override
             public void run() {
-                if (isArrow && ((AbstractArrow) entity).isInBlock()) {
+                if (entity.isDead() || (isArrow && ((AbstractArrow) entity).isInBlock())) {
+                    if (onDeath != null) {
+                        onDeath.run();
+                    }
                     this.cancel();
                     return;
                 }
                 
-                if (entity.isDead()) {
-                    this.cancel();
-                    return;
+                if (consumer != null) {
+                    consumer.accept(timeAlive);
                 }
-                
-                consumer.accept(timeAlive);
                 timeAlive++;
             }
         };

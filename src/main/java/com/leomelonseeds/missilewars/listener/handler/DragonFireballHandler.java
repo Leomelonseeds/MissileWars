@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -26,9 +25,12 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class DragonFireballHandler implements Listener {
+    
+    
 
     private static final double VELMULT = 3;
     private static final int LIFETIME = 30 * 20;
+    
     private BukkitTask updateTask;
     private Slime slime;
     private DragonFireball fireball;
@@ -41,12 +43,19 @@ public class DragonFireballHandler implements Listener {
         this.timer = 0;
         
         // Spawn slime following the fireball so it can be deflected
-        slime = (Slime) fireball.getWorld().spawnEntity(fireball.getLocation(), EntityType.SLIME);
-        slime.setSize(2);
-        slime.setInvisible(true); // Set to false to debug
-        slime.setSilent(true);
-        slime.setAI(false);
-        updateTask = (Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1));
+        this.slime = fireball.getWorld().spawn(fireball.getLocation(), Slime.class, slime -> {
+            slime.setSize(2);
+            slime.setInvisible(true); // Set to false to debug
+            slime.setSilent(true);
+            slime.setAI(false);
+        });
+        
+        updateTask = Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> update(), 0, 1);
+        Bukkit.getPluginManager().registerEvents(this, MissileWarsPlugin.getPlugin());
+    }
+    
+    public Slime getSlime() {
+        return slime;
     }
     
     // Teleports the slime to in front of the fireball
@@ -60,6 +69,7 @@ public class DragonFireballHandler implements Listener {
         }
         
         slime.teleport(fireball.getLocation().clone().add(fireball.getVelocity().multiply(VELMULT)));
+        slime.setFireTicks(0);
         timer++;
     }
     
@@ -87,7 +97,6 @@ public class DragonFireballHandler implements Listener {
         
         // Don't want anything to happen to slime
         e.setDamage(0.001);
-        slime.setFireTicks(0);
         for (PotionEffect pe : slime.getActivePotionEffects()) {
             slime.removePotionEffect(pe.getType());
         }
