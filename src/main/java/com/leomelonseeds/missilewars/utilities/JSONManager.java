@@ -93,6 +93,7 @@ public class JSONManager {
                     updateVersion6(newJson);
                     updateVersion7(newJson);
                     updateVersion8(newJson);
+                    updateVersion9(newJson);
                 }
                 
                 FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
@@ -567,6 +568,37 @@ public class JSONManager {
                 
                 passiveJson.put("level", 2);
             }
+        }
+    }
+    
+    /**
+     * Version 9 
+     * - Replace supersonic missile with thunderbolt
+     * - Downgrade to level 1 if its level 2 and player doesn't have 2 extra sp
+     */
+    private void updateVersion9(JSONObject json) {
+        if (json.getInt("version") >= 9) {
+            return;
+        }
+
+        json.put("version", 9);
+        
+        JSONObject vanJson = json.getJSONObject("Vanguard");
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!vanJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = vanJson.getJSONObject(preset);
+            JSONObject missileJson = presetJson.getJSONObject("missiles");
+            int curLevel = missileJson.getInt("supersonic");
+            if (curLevel > 1 && presetJson.getInt("skillpoints") < 2) {
+                missileJson.put("thunderbolt", 1);
+            } else {
+                missileJson.put("thunderbolt", curLevel);
+            }
+            
+            missileJson.remove("supersonic");
         }
     }
     

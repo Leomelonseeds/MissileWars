@@ -1,5 +1,5 @@
 {
-    "version": 8,
+    "version": 9,
     "Deck": "Sentinel",
     "Preset": "A",
 	"missilespec": false,
@@ -30,7 +30,7 @@
 				"tomahawk": 2,
 				"piranha": 1,
 				"lightning": 1,
-				"supersonic": 1,
+				"thunderbolt": 1,
 				"cronullifier": 2
 			},
             "ability": {

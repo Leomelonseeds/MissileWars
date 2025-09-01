@@ -39,42 +39,41 @@ lightning:
     speed: 3.3
     tnt: 18
     spcost: 2
-
-supersonic:
+    
+thunderbolt:
   index: 3
-  1:
-    file: 'supersonic.nbt'
-    item: TURTLE_SPAWN_EGG
-    name: "&b☢ Supersonic ⚡"
+  1: 
+    file: 'thunderbolt.nbt'
+    item: VEX_SPAWN_EGG
+    name: "&b☢ Thunderbolt ⚡"
     lore:
     - ""
-    - "&74.4 meters per second is not, in technical"
-    - "&7terms, supersonic. However, this thing is"
-    - "&7still fast. Blazing fast. Don't even try to ride"
-    - "&7it. Really, don't. We can't afford another"
-    - "&7lawsuit."
+    - "&7'Let your plans be dark and inpenetrable"
+    - "&7as night, and when you move, fall like a"
+    - "&7thunderbolt' - Sun Tzu, The Art of Missile"
+    - "&7War"
     offset:
       x: -1
-      y: -5
+      y: -4
       z: 3
-    speed: 4.4
-    tnt: 4
+    speed: 3.3
+    tnt: 13
   2:
-    file: 'hypersonic.nbt'
-    item: TURTLE_SPAWN_EGG
-    name: "&b☢ &lHypersonic &b⚡"
+    file: 'flash.nbt'
+    item: VEX_SPAWN_EGG
+    name: "&b☢ &lFlash &b⚡"
     lore:
     - ""
-    - "&7This missile is the older, spoiled brother"
-    - "&7of the socially anxious Supersonic."
-    - ""
+    - "&7Blink, and you'll miss it. And instantly die."
+    - "&7Detonates on impact. Hopefully before"
+    - "&7anyone shoots its glaring weak spot."
     offset:
       x: -1
-      y: -5
+      y: -4
       z: 3
-    speed: 4.4
-    tnt: 6
-    spcost: 1
+    speed: 3.3
+    tnt: "9 + 4 TNT Minecarts"
+    spcost: 3
 
 tomahawk:
   index: 0
@@ -176,6 +175,42 @@ piranha:
     speed: 2.0
     tnt: 23
     spcost: 2
+
+#supersonic:
+#  index: 3
+#  1:
+#    file: 'supersonic.nbt'
+#    item: TURTLE_SPAWN_EGG
+#    name: "&b☢ Supersonic ⚡"
+#    lore:
+#    - ""
+#    - "&74.4 meters per second is not, in technical"
+#    - "&7terms, supersonic. However, this thing is"
+#    - "&7still fast. Blazing fast. Don't even try to ride"
+#    - "&7it. Really, don't. We can't afford another"
+#    - "&7lawsuit."
+#    offset:
+#      x: -1
+#      y: -5
+#      z: 3
+#    speed: 4.4
+#    tnt: 4
+#  2:
+#    file: 'hypersonic.nbt'
+#    item: TURTLE_SPAWN_EGG
+#    name: "&b☢ &lHypersonic &b⚡"
+#    lore:
+#    - ""
+#    - "&7This missile is the older, spoiled brother"
+#    - "&7of the socially anxious Supersonic."
+#    - ""
+#    offset:
+#      x: -1
+#      y: -5
+#      z: 3
+#    speed: 4.4
+#    tnt: 6
+#    spcost: 1
 
 
 # Sentinel missiles
@@ -1940,7 +1975,7 @@ preset:
       - "&7Golden Boots"
       - ""
       - "&cMissiles:"
-      - "&7Lightning, Chronullifier, Supersonic,"
+      - "&7Lightning, Chronullifier, Thunderbolt,"
       - "&7Piranha, Tomahawk"
       - ""
       - "&9Utility:"

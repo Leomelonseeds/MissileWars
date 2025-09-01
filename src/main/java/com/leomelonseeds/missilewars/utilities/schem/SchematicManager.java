@@ -229,15 +229,15 @@ public class SchematicManager {
         // Add structure to tracker list
         World world = loc.getWorld();
         Location[] corners = loadResult.getCorners();
-        corners[0].add(-1, -1, -1);
-        corners[1].add(1, 1, 1);
+        Location c1 = corners[0].clone().add(-1, -1, -1);
+        Location c2 = corners[1].clone().add(1, 1, 1);
         BlockFace direction = loadResult.getRotation() == StructureRotation.NONE ? BlockFace.SOUTH : BlockFace.NORTH;
         String[] args = structureName.split("-");
         int level = Integer.parseInt(args[1]);
         if (isMissile) {
-            new TrackedMissile(args[0], level, player, corners[0], corners[1], direction, redMissile);
+            new TrackedMissile(args[0], level, player, c1, c2, direction, redMissile);
         } else {
-            new TrackedUtility(args[0], level, player, corners[0], corners[1], direction, redMissile);
+            new TrackedUtility(args[0], level, player, c1, c2, direction, redMissile);
         }
         
         // Manually spawn TNT minecarts in torpedos
@@ -255,17 +255,33 @@ public class SchematicManager {
                     world.spawnEntity(minecartLoc, EntityType.TNT_MINECART);
                 }
             }
+            
+            return true;
+        }
+        
+        // Manually spawn TNT minecarts in flash missile
+        if (structureName.equals("thunderbolt-2")) {
+            final int minecarts = 4;
+            Location minecartLoc = redMissile ? 
+                    corners[0].clone().add(1, 1, 3) :
+                    corners[1].clone().add(-1, 0, -3);
+            minecartLoc = minecartLoc.toCenterLocation().add(0, -0.5, 0);
+            
+            // Also need to fix a rail bug
+            if (redMissile) {
+                fixRail(minecartLoc, Material.POWERED_RAIL, Shape.NORTH_SOUTH);
+            }
+            
+            for (int i = 0; i < minecarts; i++) {
+                world.spawnEntity(minecartLoc, EntityType.TNT_MINECART);
+            }
+            
+            return true;
         }
         
         // Temp hotfix for structure rail rotation bug
         if (redMissile && structureName.equals("lifter-2")) {
-            Location railLoc = spawnPos.add(-1, 2, -8);
-            Block block = railLoc.getBlock();
-            block.setType(Material.DETECTOR_RAIL);
-            RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
-            rail.setShape(Shape.EAST_WEST);
-            block.setBlockData(rail);
-            block.getState().update(true);
+            fixRail(spawnPos.clone().add(-1, 2, -8), Material.DETECTOR_RAIL, Shape.EAST_WEST);
         }
         
         /* Temp hotfix for structure rail rotation bug (unused missile)
@@ -279,6 +295,22 @@ public class SchematicManager {
             block.getState().update(true);
         }*/
         return true;
+    }
+    
+    /**
+     * Fix for dumb structure rotation bug L mojang
+     * 
+     * @param loc
+     * @param rail
+     * @param shape
+     */
+    private static void fixRail(Location loc, Material railType, Shape shape) {
+        Block block = loc.getBlock();
+        block.setType(railType);
+        RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
+        rail.setShape(shape);
+        block.setBlockData(rail);
+        block.getState().update(true);
     }
     
     private static void sendError(Player player, String message) {
