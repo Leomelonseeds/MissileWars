@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -11,6 +12,8 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -132,6 +135,10 @@ public class ArenaUtils {
      * @return null or arena
      */
     public static Arena getArena(Player player) {
+        if (player == null) {
+            return null;
+        }
+        
         return MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
     }
 
@@ -386,5 +393,28 @@ public class ArenaUtils {
         
         DeckStorage deck = DeckStorage.fromString(json.getString("Deck"));
         player.getInventory().setBoots(deck.getBoots());
+    }
+    
+    private static List<BlockFace> faces;
+    
+    /**
+     * Check if a block has any solid blocks on any of its 6 sides
+     * 
+     * @param block
+     * @return
+     */
+    public static boolean isBlockSupported(Block block) {
+        if (faces == null) {
+            faces = List.of(
+                BlockFace.DOWN,
+                BlockFace.NORTH,
+                BlockFace.SOUTH,
+                BlockFace.EAST,
+                BlockFace.WEST,     
+                BlockFace.UP
+            );
+        }
+        
+        return faces.stream().anyMatch(bf -> block.getRelative(bf).isSolid());
     }
 }

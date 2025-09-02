@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
@@ -36,6 +37,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -54,6 +56,7 @@ import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
 import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
+import com.leomelonseeds.missilewars.listener.handler.MovingTNTHandler;
 import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.listener.handler.TritonHandler;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -861,8 +864,15 @@ public class CustomItemListener implements Listener {
         Player thrower = (Player) event.getEntity().getShooter();
         
         // Defuse primed TNT and trident
+        boolean isMolotov = thrower.hasPermission("umw.admin");
         if (hitEntity != null) {
             if (hitEntity.getType() == EntityType.TNT) {
+                // Molotov splashes instantly explode tnt
+                if (isMolotov) {
+                    ((TNTPrimed) hitEntity).setFuseTicks(1);
+                    return;
+                }
+                
                 Location loc = hitEntity.getLocation();
                 if (loc.getBlock().getType() != Material.NETHER_PORTAL) {
                     hitEntity.remove();
@@ -878,28 +888,27 @@ public class CustomItemListener implements Listener {
             }
             
             Player hitPlayer = (Player) hitEntity;
-            if (MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) == 0) {
-                return;
-            }
-            
-            ItemStack[] invItems = hitPlayer.getInventory().getContents();
-            for (int i = 0; i < invItems.length; i++) {
-                ItemStack item = invItems[i];
-                if (item == null || item.getType() != Material.GOLDEN_SWORD) {
-                    continue;
+            if (MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) > 0) {
+                ItemStack[] invItems = hitPlayer.getInventory().getContents();
+                for (int i = 0; i < invItems.length; i++) {
+                    ItemStack item = invItems[i];
+                    if (item == null || item.getType() != Material.GOLDEN_SWORD) {
+                        continue;
+                    }
+                    
+                    ItemStack trident = tritonHandler.addPlayer(hitPlayer, item);
+                    hitPlayer.getInventory().setItem(i, trident);
+                    ConfigUtils.sendConfigSound("triton-activate", hitPlayer.getLocation());
+                    return;
                 }
-                
-                ItemStack trident = tritonHandler.addPlayer(hitPlayer, item);
-                hitPlayer.getInventory().setItem(i, trident);
-                ConfigUtils.sendConfigSound("triton-activate", hitPlayer.getLocation());
-                return;
             }
             
-            return;
+            // If no triton, then attempt to spawn splash at player feet
+            hitBlock = hitPlayer.getLocation().getBlock();
         }
 
         // Handle hitting oak_wood to fully repair canopies
-        if (hitBlock.getType() == Material.OAK_WOOD) {
+        if (!isMolotov && hitBlock.getType() == Material.OAK_WOOD) {
             int extraduration = Integer.parseInt(args[2]);
             Location key = hitBlock.getLocation();
             CanopyManager.getInstance().registerExtension(key, extraduration);
@@ -913,8 +922,11 @@ public class CustomItemListener implements Listener {
         }
         
         // Check for portal breaks / moving pistons
-        Location location = hitBlock.getRelative(event.getHitBlockFace()).getLocation();
-        Block spawnBlock = location.getBlock();// Check for splashes going through moving pistons
+        Material liquid = isMolotov ? Material.LAVA : Material.WATER;
+        Location location = hitEntity != null ? hitBlock.getLocation() : hitBlock.getRelative(event.getHitBlockFace()).getLocation();
+        Block spawnBlock = location.getBlock();
+        
+        // Check for splashes going through moving pistons
         boolean blockUpdates = true;
         if (spawnBlock.getType() != Material.AIR) {
             if (spawnBlock.getType() == Material.NETHER_PORTAL) {
@@ -924,35 +936,38 @@ public class CustomItemListener implements Listener {
                     carena.registerPortalBreak(location.clone(), thrower);
                 }
             } else if (spawnBlock.getType().toString().contains("PISTON")) {
-                Block upper = hitBlock.getRelative(BlockFace.UP);
-                if (upper.getType() != Material.AIR) {
-                    return;
-                }
-                location = upper.getLocation();
-            } else if (spawnBlock.getType() != Material.WATER) {
-                return;
+                location = hitBlock.getRelative(BlockFace.UP).getLocation();
             }
         }
-
-        // Normal splash manager
-        double duration = Double.parseDouble(args[1]);
-        Block actualBlock = location.getBlock();
-        actualBlock.setType(Material.WATER, blockUpdates);
-        if (!blockUpdates) {
-            // Since portals are broken with FAWE, wait a bit before
-            // sending out block update telling water to flow
+        
+        double radius = isMolotov ? 1.5 : 0;
+        int duration = (int) (Double.parseDouble(args[1])) * 20;
+        levelledSplash(location, liquid, isMolotov ? 3 : 0, duration, blockUpdates, thrower);
+        if (radius >= 1) {
+            List<Location> locs = List.of(
+                location.clone().add(1, 0, 0),
+                location.clone().add(-1, 0, 0),
+                location.clone().add(0, 0, 1),
+                location.clone().add(0, 0, -1)
+            );
+            
             ConfigUtils.schedule(5, () -> {
-                actualBlock.setType(Material.AIR);
-                actualBlock.setType(Material.WATER);
+                locs.forEach(loc -> levelledSplash(loc, liquid, 5, duration, true, thrower));
             });
         }
         
-        // Replace back with air after the set splash duration
-        ConfigUtils.schedule((int) (duration * 20), () -> {
-            if (actualBlock.getType() == Material.WATER) {
-                actualBlock.setType(Material.AIR);
-            }
-        });
+        if (radius >= 1.5) {
+            List<Location> locs = List.of(
+                location.clone().add(1, 0, 1),
+                location.clone().add(-1, 0, 1),
+                location.clone().add(1, 0, -1),
+                location.clone().add(-1, 0, -1)
+            );
+            
+            ConfigUtils.schedule(10, () -> {
+                locs.forEach(loc -> levelledSplash(loc, liquid, 7, duration, true, thrower));
+            });
+        }
         
         // Ender splash
         if (customName.contains("ender") && thrower.isOnline() && 
@@ -963,5 +978,66 @@ public class CustomItemListener implements Listener {
             thrower.teleport(tpLoc);
             ConfigUtils.sendConfigSound("ender-splash", location);
         }
+    }
+    
+    private void levelledSplash(Location center, Material liquid, int level, int duration, boolean blockUpdates, Player source) {
+        Block spawnBlock = center.getBlock();
+        boolean isLava = liquid == Material.LAVA;
+        MovingTNTHandler tntHandler = MovingTNTHandler.getInstance();
+        if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
+            return;
+        }
+        
+        // Attempt to spawn the splash 1 block lower
+        if (spawnBlock.getType() != Material.AIR || !ArenaUtils.isBlockSupported(spawnBlock)) {
+            spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
+            if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
+                return;
+            }
+            
+            if (spawnBlock.getType() != Material.AIR) {
+                return;
+            }
+        }
+        
+        if (!ArenaUtils.isBlockSupported(spawnBlock)) {
+            return;
+        }
+        
+        Levelled levelled = (Levelled) liquid.createBlockData();
+        levelled.setLevel(level);
+        spawnBlock.setBlockData(levelled, blockUpdates);
+        if (isLava) {
+            tntHandler.igniteTNT(spawnBlock.getRelative(BlockFace.DOWN), source, 10);
+        }
+        
+        new BukkitRunnable() {
+            
+            int timeAlive = 0;
+            
+            @Override
+            public void run() {
+                Block curBlock = center.getBlock();
+                boolean unchanged = curBlock.getType() == liquid;
+                if (!unchanged) {
+                    this.cancel();
+                    return;
+                }
+                
+                if (timeAlive == 0 && !blockUpdates) {
+                    curBlock.setBlockData(levelled);
+                }
+                
+                timeAlive += 5;
+                if (timeAlive >= duration) {
+                    if (unchanged) {
+                        curBlock.setType(Material.AIR);
+                    }
+                    
+                    this.cancel();
+                    return;
+                }
+            }
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 5, 5);
     }
 }

@@ -27,12 +27,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.structure.Structure;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
+import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.sk89q.worldedit.EditSession;
@@ -227,7 +231,6 @@ public class SchematicManager {
         structure.place(spawnPos, true, rotation, Mirror.NONE, 0, 1, new Random());
         
         // Add structure to tracker list
-        World world = loc.getWorld();
         Location[] corners = loadResult.getCorners();
         Location c1 = corners[0].clone().add(-1, -1, -1);
         Location c2 = corners[1].clone().add(1, 1, 1);
@@ -251,9 +254,7 @@ public class SchematicManager {
             }
             
             for (Location minecartLoc : minecartLocs) {
-                for (int i = 0; i < minecarts; i++) {
-                    world.spawnEntity(minecartLoc, EntityType.TNT_MINECART);
-                }
+                spawnTNTMinecart(minecartLoc, player, minecarts);
             }
             
             return true;
@@ -271,11 +272,8 @@ public class SchematicManager {
             if (redMissile) {
                 fixRail(minecartLoc, Material.POWERED_RAIL, Shape.NORTH_SOUTH);
             }
-            
-            for (int i = 0; i < minecarts; i++) {
-                world.spawnEntity(minecartLoc, EntityType.TNT_MINECART);
-            }
-            
+
+            spawnTNTMinecart(minecartLoc, player, minecarts);
             return true;
         }
         
@@ -284,16 +282,6 @@ public class SchematicManager {
             fixRail(spawnPos.clone().add(-1, 2, -8), Material.DETECTOR_RAIL, Shape.EAST_WEST);
         }
         
-        /* Temp hotfix for structure rail rotation bug (unused missile)
-        if (redMissile && structureName.contains("cruiser-2")) {
-            Location railLoc = spawnLoc.add(0, 1, -8);
-            Block block = railLoc.getBlock();
-            block.setType(Material.POWERED_RAIL);
-            RedstoneRail rail = (RedstoneRail) block.getBlockData(); 
-            rail.setShape(Shape.NORTH_SOUTH);
-            block.setBlockData(rail);
-            block.getState().update(true);
-        }*/
         return true;
     }
     
@@ -311,6 +299,25 @@ public class SchematicManager {
         rail.setShape(shape);
         block.setBlockData(rail);
         block.getState().update(true);
+    }
+    
+    /**
+     * Spawn TNT minecarts to be noted towards the arena's tracker
+     * 
+     * @param location
+     * @param player
+     * @param
+     */
+    private static void spawnTNTMinecart(Location location, Player player, int amount) {
+        World world = location.getWorld();
+        Arena arena = ArenaUtils.getArena(player);
+        Tracker tracker = arena == null ? null : arena.getTracker();
+        for (int i = 0; i < amount; i++) {
+            ExplosiveMinecart cart = world.spawn(location, ExplosiveMinecart.class);
+            if (tracker != null) {
+                tracker.registerTNTMinecart(cart, player);
+            }
+        }
     }
     
     private static void sendError(Player player, String message) {

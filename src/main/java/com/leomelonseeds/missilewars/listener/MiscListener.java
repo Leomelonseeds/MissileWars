@@ -11,25 +11,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -91,9 +84,6 @@ public class MiscListener implements Listener {
     
     @EventHandler
     public void pistonExtend(BlockPistonExtendEvent e) {
-        // Add to b36 flame arrow listener
-        e.getBlocks().forEach(b -> addToList(b, e));
-        
         // Get arena
         World world = e.getBlock().getWorld();
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
@@ -188,83 +178,6 @@ public class MiscListener implements Listener {
                     }
                 }
             }.runTaskTimer(plugin, 20, 20);
-        }
-    }
-
-    
-    // ---------------------------------------------------------
-    // This section ignites tnt if b36 hit with flame arrow OR small fireball
-    // Extend TNT event already handled above
-    // ---------------------------------------------------------
-    
-    private static Map<Location, Location> tnt = new HashMap<>();
-    
-    @EventHandler
-    public void retractTNT(BlockPistonRetractEvent e) {
-        e.getBlocks().forEach(b -> addToList(b, e));
-    }
-    
-    private void addToList(Block b, BlockPistonEvent e) {
-        if (b.getType() != Material.TNT) {
-            return;
-        }
-        
-        // Add location of where the block WILL BE to a list
-        Location loc = b.getLocation().toCenterLocation();
-        Vector direction = e.getDirection().getDirection().normalize();
-        final Location finalLoc = loc.clone().add(direction);
-        tnt.put(finalLoc, loc);
-        
-        // Update the spawning location of the tnt such that it spawns smoothly
-        for (int i = 1; i <= 3; i++) {
-            Vector toAdd = direction.clone().multiply(0.33 * i);
-            int index = i;
-            ConfigUtils.schedule(i, () -> {
-                if (!tnt.containsKey(finalLoc)) {
-                    return;
-                }
-                
-                if (index < 3) {
-                    tnt.get(finalLoc).add(toAdd);
-                } else {
-                    tnt.remove(finalLoc);
-                }
-            });
-        }
-    }
-    
-    @EventHandler
-    public void igniteTNT(ProjectileHitEvent e) {
-        EntityType type = e.getEntityType();
-        boolean isArrow = (type.toString().contains("ARROW") || type == EntityType.TRIDENT) && 
-                e.getEntity().getFireTicks() > 0;
-        if (!isArrow && type != EntityType.SMALL_FIREBALL ) {
-            return;
-        }
-        
-        if (e.getHitBlock() == null) {
-            return;
-        }
-        
-        Block b = e.getHitBlock();
-        if (b.getType() != Material.MOVING_PISTON) {
-            return;
-        }
-        
-        Location loc = b.getLocation().toCenterLocation();
-        if (!tnt.containsKey(loc)) {
-            return;
-        }
-        
-        b.setType(Material.AIR);
-        Location spawnLoc = tnt.remove(loc).subtract(0, 0.5, 0);
-        TNTPrimed primed = (TNTPrimed) b.getWorld().spawnEntity(spawnLoc, EntityType.TNT);
-        primed.setFuseTicks(80);
-        
-        // Get source
-        Projectile proj = e.getEntity();
-        if (proj.getShooter() instanceof Player) {
-            primed.setSource((Player) proj.getShooter());
         }
     }
     
