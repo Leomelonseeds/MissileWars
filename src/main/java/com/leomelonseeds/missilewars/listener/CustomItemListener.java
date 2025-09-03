@@ -55,6 +55,7 @@ import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
+import com.leomelonseeds.missilewars.listener.handler.LavaHandler;
 import com.leomelonseeds.missilewars.listener.handler.MovingTNTHandler;
 import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.listener.handler.TritonHandler;
@@ -850,7 +851,7 @@ public class CustomItemListener implements Listener {
     }
 
     // Handle splash hit block mechanics
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void handleSplash(ProjectileHitEvent event) {
         // Make sure we're getting the right potion here
         if ((event.getEntityType() != EntityType.SPLASH_POTION) || (event.getEntity().customName() == null)) {
@@ -1015,6 +1016,7 @@ public class CustomItemListener implements Listener {
         spawnBlock.setBlockData(levelled, blockUpdates);
         if (isLava) {
             tntHandler.igniteTNT(spawnBlock.getRelative(BlockFace.DOWN), source, 10);
+            LavaHandler.getInstance().addLavaSource(center, source);
         }
         
         // Delayed by 6 instead of 5 because lava and water spread in 5 and 30 ticks respectively and
@@ -1027,15 +1029,14 @@ public class CustomItemListener implements Listener {
             public void run() {
                 Block curBlock = center.getBlock();
                 boolean unchanged = curBlock.getType() == liquid || curBlock.getType() == Material.AIR;
-                if (!unchanged) {
-                    this.cancel();
-                    return;
-                }
-                
                 timeAlive += 5;
-                if (timeAlive >= duration) {
+                if (timeAlive >= duration || !unchanged) {
                     if (unchanged) {
                         curBlock.setType(Material.AIR);
+                    }
+                    
+                    if (isLava) {
+                        LavaHandler.getInstance().removeLavaSource(center);
                     }
                     
                     this.cancel();
