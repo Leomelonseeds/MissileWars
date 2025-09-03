@@ -82,6 +82,7 @@ import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DamageSphere;
+import com.leomelonseeds.missilewars.listener.handler.LavaHandler;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
@@ -237,6 +238,8 @@ public class ArenaGameruleListener implements Listener {
                 killer = ArenaUtils.getAssociatedPlayer(edee.getDamager(), playerArena);
             } else if (damageEvent.getCause() == DamageCause.MAGIC) {
                 killer = DamageSphere.getLastDamager(player);
+            } else if (damageEvent.getCause() == DamageCause.FIRE_TICK || damageEvent.getCause() == DamageCause.LAVA) {
+                killer = LavaHandler.getInstance().getLastDamageSource(player);
             }
         }
 
@@ -244,7 +247,7 @@ public class ArenaGameruleListener implements Listener {
         if (killer != null) {
             TeamName team1 = playerArena.getTeam(player.getUniqueId());
             TeamName team2 = playerArena.getTeam(killer.getUniqueId());
-            if (!(killer.equals(player) || team1.equals(team2))) {
+            if (!(player.equals(killer) || team1.equals(team2))) {
                 playerArena.getPlayerInArena(killer.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.KILLS);
                 ConfigUtils.sendConfigSound("player-kill", killer);
             }

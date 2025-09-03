@@ -25,8 +25,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class DragonFireballHandler implements Listener {
-    
-    
 
     private static final double VELMULT = 3;
     private static final int LIFETIME = 30 * 20;
