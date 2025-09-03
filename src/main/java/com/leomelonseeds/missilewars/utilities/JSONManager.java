@@ -94,11 +94,13 @@ public class JSONManager {
                     updateVersion7(newJson);
                     updateVersion8(newJson);
                     updateVersion9(newJson);
+                    updateVersion10(newJson);
                 }
-                
-                FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+
                 // Recursively update json file
+                FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
                 updateJson(newJson, defaultJson);
+                
                 // Unlock everything for noble rank
                 if (Bukkit.getPlayer(uuid).hasPermission("umw.unlockall")) {
                     for (String key : newJson.keySet()) {
@@ -599,6 +601,32 @@ public class JSONManager {
             }
             
             missileJson.remove("supersonic");
+        }
+    }
+    
+    /**
+     * Version 10 
+     * - Rename ender splash to molotov splash
+     */
+    private void updateVersion10(JSONObject json) {
+        if (json.getInt("version") >= 10) {
+            return;
+        }
+
+        json.put("version", 10);
+        
+        JSONObject vanJson = json.getJSONObject("Vanguard");
+        renamePurchase(vanJson, "endersplash", "molotovsplash");
+        for (String preset : plugin.getDeckManager().getPresets()) {
+            if (!vanJson.has(preset)) {
+                continue;
+            }
+            
+            JSONObject presetJson = vanJson.getJSONObject(preset);
+            JSONObject abilityJson = presetJson.getJSONObject("ability");
+            if (abilityJson.getString("selected").equals("endersplash")) {
+                abilityJson.put("selected", "molotovsplash");
+            }
         }
     }
     

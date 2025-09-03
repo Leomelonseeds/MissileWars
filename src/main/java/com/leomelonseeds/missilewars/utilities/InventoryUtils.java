@@ -381,4 +381,24 @@ public class InventoryUtils {
         
         return false;
     }
+    
+    /**
+     * Finds the instance item of the deck
+     * 
+     * @param mwp
+     * @param item
+     * @return
+     */
+    public static ItemStack findInstanceItem(MissileWarsPlayer mwp, ItemStack item) {
+        if (mwp == null) {
+            return null;
+        }
+        
+        DeckItem di = mwp.getDeck().getDeckItem(item);
+        if (di == null) {
+            return null;
+        }
+        
+        return di.getInstanceItem();
+    }
 }

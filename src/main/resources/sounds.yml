@@ -258,3 +258,7 @@ engineer-reset:
   sound: "ITEM_ARMOR_UNEQUIP_WOLF"
   volume: 1.0
   pitch: 1.0
+molotov-hit:
+  sound: "ENTITY_GHAST_SHOOT"
+  volume: 1.0
+  pitch: 0.6

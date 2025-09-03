@@ -1,5 +1,5 @@
 {
-    "version": 9,
+    "version": 10,
     "Deck": "Sentinel",
     "Preset": "A",
 	"missilespec": false,
@@ -10,7 +10,7 @@
 		"feather_falling": false,
 		"fire_aspect": false,
 		"bunny": false,
-		"endersplash": false,
+		"molotovsplash": false,
         "explosivecanopy": false,
         "triton": false,
         "dwarfism": false,

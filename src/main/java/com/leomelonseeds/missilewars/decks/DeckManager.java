@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -105,19 +104,6 @@ public class DeckManager {
                 int level = json.getJSONObject(s).getInt(key);
                 boolean isMissile = s.equals("missiles");
                 ItemStack i = createItem(key, level, isMissile);
-                
-                // Change color of lava splash
-                if (i.getType() == Material.SPLASH_POTION && plugin.getJSON().getLevel(uuid, Ability.ENDER_SPLASH) > 0) {
-                    PotionMeta pmeta = (PotionMeta) i.getItemMeta();
-                    String name = ConfigUtils.toPlain(pmeta.displayName());
-                    name = name.replaceFirst("9", "d");  // Make name pink
-                    name = name.replaceFirst("Splash", "Ender Splash");  // Add "ender"
-                    pmeta.displayName(ConfigUtils.toComponent(name));
-                    pmeta.setColor(Color.FUCHSIA);
-                    i.setItemMeta(pmeta);
-                }
-                
-                // Hide enchants (for cooldown completion)
                 i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 
                 // Finalize item

@@ -112,7 +112,7 @@ public class EngineerManager implements Listener {
         }
 
         MissileWarsPlayer mwp = arena.getPlayerInArena(uuid);
-        ItemStack instanceItem = findInstanceItem(mwp, item);
+        ItemStack instanceItem = InventoryUtils.findInstanceItem(mwp, item);
         sessions.put(uuid, new EngineerSession(player, instanceItem, structure, team));
     }
     
@@ -176,15 +176,6 @@ public class EngineerManager implements Listener {
         ConfigUtils.sendConfigMessage("engineer.reset", player);
         ConfigUtils.sendConfigSound("engineer-reset", player.getLocation());
         return true;
-    }
-    
-    private ItemStack findInstanceItem(MissileWarsPlayer mwp, ItemStack item) {
-        DeckItem di = mwp.getDeck().getDeckItem(item);
-        if (di == null) {
-            return null;
-        }
-        
-        return di.getInstanceItem();
     }
     
     

@@ -954,7 +954,7 @@ obsidianshieldclear:
 
 canopy:
   index: 7
-  cooldown: 75
+  cooldown: 70
   file: 'canopy.nbt'
   item: ENDER_EYE
   name: "&2★ Canopy %level% ⚡"
@@ -977,10 +977,10 @@ canopy:
   1:
     distance: 8
   2: 
-    distance: 11
+    distance: 10
     spcost: 1
   3: 
-    distance: 14
+    distance: 12
     spcost: 1
 
 creeper:
@@ -1073,15 +1073,15 @@ lingering_harming:
     # 0 = lvl 1
     amplifier: 0
     duration: 5
-    radius: 2
+    radius: 2.5
   2:
     spcost: 1
     amplifier: 0
     duration: 8
-    radius: 2.5
+    radius: 3
   3:
     spcost: 1
-    amplifier: 0
+    amplifier: 1
     duration: 10
     radius: 3
     
@@ -1225,25 +1225,30 @@ Vanguard:
       3:
         spcost: 1
         power: 6
-    endersplash:
-      name: "&6Ender Splash"
+    molotovsplash:
+      name: "&6Molotov Splash"
       lore:
       - ""
-      - "&7If a splash lands on a block within"
-      - "&f%duration%s &7of being thrown, you will be"
-      - "&7teleported to the hit location."
+      - "&7Use your offhand swap key on a"
+      - "&7Splash to convert it to a &fMolotov"
+      - "&fSplash&7. When thrown, they will"
+      - "&7spawn lava instead of water, with"
+      - "&7radius %radius%&7, igniting nearby TNT."
+      - "&7Molotov Splashes thrown directly"
+      - "&7on a primed TNT will cause it to"
+      - "&7explode instantly."
       - ""
       - "&7Difficulty: &e★★☆"
       cost: 1200
       1:
         spcost: 2
-        duration: 0.75
+        radius: 0
       2:
         spcost: 1
-        duration: 1.0
+        radius: 1
       3:
         spcost: 1
-        duration: 1.25
+        radius: 1.5
     triton:
       name: "&6Triton"
       lore:

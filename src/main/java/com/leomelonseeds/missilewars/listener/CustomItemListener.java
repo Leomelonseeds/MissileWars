@@ -33,12 +33,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -55,7 +55,6 @@ import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
-import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.listener.handler.MovingTNTHandler;
 import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.listener.handler.TritonHandler;
@@ -756,6 +755,54 @@ public class CustomItemListener implements Listener {
     }
     
     // The following section handles splash-specific mechanics
+    
+    // Handle splash conversion to molotov splash
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent event) {
+        Player player = event.getPlayer();
+        Arena playerArena = ArenaUtils.getArena(player);
+        if (playerArena == null) {
+            return;
+        }
+        
+        boolean swapOn = event.getOffHandItem().getType() == Material.SPLASH_POTION;
+        if (!swapOn && event.getMainHandItem().getType() != Material.SPLASH_POTION) {
+            return;
+        }
+        
+        ItemStack splashItem = swapOn ? event.getOffHandItem() : event.getMainHandItem();
+        ItemStack instanceItem = InventoryUtils.findInstanceItem(playerArena.getPlayerInArena(player.getUniqueId()), splashItem);
+        if (instanceItem == null) {
+            return;
+        }
+        
+        // Set instance item meta
+        PotionMeta meta = (PotionMeta) instanceItem.getItemMeta();
+        String name = ConfigUtils.toPlain(meta.customName());
+        if (swapOn) {
+            name = name
+                .replace("Splash", "Molotov Splash")
+                .replace("9", "6");
+            meta.setColor(Color.ORANGE);
+        } else {
+            name = name
+                .replace("Molotov ", "")
+                .replace("6", "9");
+            meta.setColor(null);
+        }
+        meta.customName(ConfigUtils.toComponent(name));
+        instanceItem.setItemMeta(meta);
+        
+        // Move instance item to inventory
+        ItemStack toGive = instanceItem.clone();
+        toGive.addUnsafeEnchantments(splashItem.getEnchantments());
+        toGive.setAmount(splashItem.getAmount());
+        if (swapOn) {
+            event.setOffHandItem(toGive);
+        } else {
+            event.setMainHandItem(toGive);
+        }
+    }
 
     // Handle splash throwing
     @EventHandler
@@ -786,57 +833,20 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
-        boolean ender = ConfigUtils.toPlain(hand.getItemMeta().displayName()).contains("Ender");
-        String name = (ender ? "ender" : "") + "splash:" + duration + ":" + extend;
+        int molotov = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.MOLOTOV_SPLASH);
+        String name = "splash:" + duration + ":" + extend;
+        
+        // Handle molotov details
+        if (ConfigUtils.toPlain(hand.displayName()).contains("Molotov")) {
+            // Add radius stat
+            double radius = ConfigUtils.getAbilityStat(Ability.MOLOTOV_SPLASH, molotov, Stat.RADIUS);
+            name = "molotov" + name + ":" + radius;
+            ArenaUtils.spiralTrail(thrown, Particle.FLAME, null);
+        }
+        
         thrown.customName(ConfigUtils.toComponent(name));
         playerArena.getPlayerInArena(thrower.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.UTILITY);
         projectileConsume(hand, thrower, playerArena);
-        
-        // Add particles if ender splash
-        if (!ender) {
-            return;
-        }
-        
-        EnderSplashManager esm = EnderSplashManager.getInstance();
-        esm.addPlayer(thrower, thrown);
-        BukkitTask trail = ArenaUtils.spiralTrail(thrown, Particle.DRAGON_BREATH, null);
-        BukkitTask deathChecker = Bukkit.getScheduler().runTaskTimer(MissileWarsPlugin.getPlugin(), () -> {
-            if (thrown.isDead()) {
-                esm.removeSplash(thrower, thrown);
-            }  
-        }, 1, 1);
-        
-        // Despawn ender splash after effectiveness has run out
-        int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.ENDER_SPLASH);
-        if (level <= 0) {
-            level = 1;
-        }
-        
-        double expiry = ConfigUtils.getAbilityStat(Ability.ENDER_SPLASH, level, Stat.DURATION) * 20;
-        ConfigUtils.schedule((int) expiry, () -> {
-           if (thrown.isDead()) {
-               return;
-           }
-
-           if (!esm.removeSplash(thrower, thrown)) {
-               return;
-           }
-           
-           // Replace custom name so it doesn't teleport player in the next event
-           String curName = ConfigUtils.toPlain(thrown.customName());
-           thrown.customName(ConfigUtils.toComponent(curName.replace("ender", "")));
-           
-           // Remove trail and death check
-           trail.cancel();
-           deathChecker.cancel();
-           
-           // Set color back to blue and do some sfx
-           PotionMeta meta = thrown.getPotionMeta();
-           meta.setColor(Color.BLUE);
-           thrown.setPotionMeta(meta);
-           playerArena.getWorld().spawnParticle(Particle.DRAGON_BREATH, thrown.getLocation(), 10, 0, 0, 0, 0.05, null, true);
-           ConfigUtils.sendConfigSound("ender-splash-expire", thrown.getLocation());
-        });
     }
 
     // Handle splash hit block mechanics
@@ -864,7 +874,7 @@ public class CustomItemListener implements Listener {
         Player thrower = (Player) event.getEntity().getShooter();
         
         // Defuse primed TNT and trident
-        boolean isMolotov = thrower.hasPermission("umw.admin");
+        boolean isMolotov = customName.startsWith("molotov");
         if (hitEntity != null) {
             if (hitEntity.getType() == EntityType.TNT) {
                 // Molotov splashes instantly explode tnt
@@ -928,7 +938,7 @@ public class CustomItemListener implements Listener {
         
         // Check for splashes going through moving pistons
         boolean blockUpdates = true;
-        if (spawnBlock.getType() != Material.AIR) {
+        if (!isSplashReplaceable(spawnBlock)) {
             if (spawnBlock.getType() == Material.NETHER_PORTAL) {
                 blockUpdates = false;
                 Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(thrower.getWorld());
@@ -940,9 +950,9 @@ public class CustomItemListener implements Listener {
             }
         }
         
-        double radius = isMolotov ? 1.5 : 0;
-        int duration = (int) (Double.parseDouble(args[1])) * 20;
-        levelledSplash(location, liquid, isMolotov ? 3 : 0, duration, blockUpdates, thrower);
+        double radius = isMolotov ? Double.parseDouble(args[3]) : 0;
+        int duration = (int) (Double.parseDouble(args[1]) * 20);
+        levelledSplash(location, liquid, isMolotov ? 5 : 0, duration, blockUpdates, thrower);
         if (radius >= 1) {
             List<Location> locs = List.of(
                 location.clone().add(1, 0, 0),
@@ -952,7 +962,7 @@ public class CustomItemListener implements Listener {
             );
             
             ConfigUtils.schedule(5, () -> {
-                locs.forEach(loc -> levelledSplash(loc, liquid, 5, duration, true, thrower));
+                locs.forEach(loc -> levelledSplash(loc, liquid, 7, duration, true, thrower));
             });
         }
         
@@ -969,14 +979,8 @@ public class CustomItemListener implements Listener {
             });
         }
         
-        // Ender splash
-        if (customName.contains("ender") && thrower.isOnline() && 
-                EnderSplashManager.getInstance().removeSplash(thrower, event.getEntity())) {
-            Location tpLoc = location.toCenterLocation().add(0, -0.5, 0);
-            tpLoc.setYaw(thrower.getYaw());
-            tpLoc.setPitch(thrower.getPitch());
-            thrower.teleport(tpLoc);
-            ConfigUtils.sendConfigSound("ender-splash", location);
+        if (isMolotov) {
+            ConfigUtils.sendConfigSound("molotov-hit", location);
         }
     }
     
@@ -984,24 +988,26 @@ public class CustomItemListener implements Listener {
         Block spawnBlock = center.getBlock();
         boolean isLava = liquid == Material.LAVA;
         MovingTNTHandler tntHandler = MovingTNTHandler.getInstance();
-        if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
-            return;
-        }
-        
-        // Attempt to spawn the splash 1 block lower
-        if (spawnBlock.getType() != Material.AIR || !ArenaUtils.isBlockSupported(spawnBlock)) {
-            spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
+        if (level > 5) {
             if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
                 return;
             }
             
-            if (spawnBlock.getType() != Material.AIR) {
+            // Attempt to spawn the splash 1 block lower
+            if (!isSplashReplaceable(spawnBlock) || !ArenaUtils.isBlockSupported(spawnBlock)) {
+                spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
+                if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
+                    return;
+                }
+                
+                if (!isSplashReplaceable(spawnBlock)) {
+                    return;
+                }
+            }
+            
+            if (!ArenaUtils.isBlockSupported(spawnBlock)) {
                 return;
             }
-        }
-        
-        if (!ArenaUtils.isBlockSupported(spawnBlock)) {
-            return;
         }
         
         Levelled levelled = (Levelled) liquid.createBlockData();
@@ -1011,6 +1017,8 @@ public class CustomItemListener implements Listener {
             tntHandler.igniteTNT(spawnBlock.getRelative(BlockFace.DOWN), source, 10);
         }
         
+        // Delayed by 6 instead of 5 because lava and water spread in 5 and 30 ticks respectively and
+        // if they disappear we replace them next tick (same tick doesn't work)
         new BukkitRunnable() {
             
             int timeAlive = 0;
@@ -1018,14 +1026,10 @@ public class CustomItemListener implements Listener {
             @Override
             public void run() {
                 Block curBlock = center.getBlock();
-                boolean unchanged = curBlock.getType() == liquid;
+                boolean unchanged = curBlock.getType() == liquid || curBlock.getType() == Material.AIR;
                 if (!unchanged) {
                     this.cancel();
                     return;
-                }
-                
-                if (timeAlive == 0 && !blockUpdates) {
-                    curBlock.setBlockData(levelled);
                 }
                 
                 timeAlive += 5;
@@ -1037,7 +1041,19 @@ public class CustomItemListener implements Listener {
                     this.cancel();
                     return;
                 }
+                
+                if (!blockUpdates && timeAlive == 5) {
+                    curBlock.setType(Material.AIR);
+                    curBlock.setBlockData(levelled);
+                } else if (level > 0) {
+                    curBlock.setBlockData(levelled, false);
+                }
             }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 5, 5);
+        }.runTaskTimer(MissileWarsPlugin.getPlugin(), 6, 5);
+    }
+    
+    private boolean isSplashReplaceable(Block block) {
+        Material type = block.getType();
+        return type.isAir() || type == Material.WATER || type == Material.LAVA;
     }
 }

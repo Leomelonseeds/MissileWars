@@ -82,7 +82,6 @@ import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DamageSphere;
-import com.leomelonseeds.missilewars.listener.handler.EnderSplashManager;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
@@ -209,7 +208,6 @@ public class ArenaGameruleListener implements Listener {
 
         Location spawn = playerArena.getPlayerSpawn(player);
         ItemStack canopy = CanopyManager.getInstance().removePlayer(player);
-        EnderSplashManager.getInstance().removePlayer(player);
         ConfigUtils.schedule(1, () -> {
             player.teleport(spawn);
             player.setFireTicks(0);

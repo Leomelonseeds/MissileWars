@@ -5,9 +5,9 @@ package com.leomelonseeds.missilewars.decks;
  */
 public enum Ability {
     // Vanguard
-    ENDER_SPLASH("endersplash", Type.ABILITY, DeckStorage.VANGUARD),
     EXPLOSIVE_CANOPY("explosivecanopy", Type.ABILITY, DeckStorage.VANGUARD),
     TRITON("triton", Type.ABILITY, DeckStorage.VANGUARD),
+    MOLOTOV_SPLASH("molotovsplash", Type.ABILITY, DeckStorage.VANGUARD),
     ADRENALINE("adrenaline", Type.PASSIVE, DeckStorage.VANGUARD),
     BUNNY("bunny", Type.PASSIVE, DeckStorage.VANGUARD),
     DWARFISM("dwarfism", Type.PASSIVE, DeckStorage.VANGUARD),
