@@ -61,6 +61,7 @@ import com.leomelonseeds.missilewars.listener.handler.SmokeShieldHandler;
 import com.leomelonseeds.missilewars.listener.handler.TritonHandler;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
@@ -131,7 +132,7 @@ public class CustomItemListener implements Listener {
         Player player = event.getPlayer();
         PlayerInventory inv = player.getInventory();
         ItemStack hand = inv.getItem(event.getHand());
-        if (player.hasCooldown(hand.getType())) {
+        if (CooldownUtils.hasCooldown(player, hand)) {
             return;
         }
         
@@ -207,14 +208,8 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Disable if player just died
-        MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
-        if (mwp.justSpawned() && !hand.getType().toString().contains("BOW")) {
-            event.setCancelled(true);
-            return;
-        }
-        
         // Spawn a structure item
+        MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
             if (InventoryUtils.isThrowable(structureName)) {

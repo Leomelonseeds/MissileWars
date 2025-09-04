@@ -17,15 +17,19 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 public class CooldownUtils {
     
     public static boolean hasCooldown(Player player, ItemStack item) {
+        return getCooldown(player, item) > 0;
+    }
+    
+    public static int getCooldown(Player player, ItemStack item) {
         if (item == null) {
-            return false;
+            return 0;
         }
         
         ItemMeta meta = item.getItemMeta();
         if (meta != null && meta.hasUseCooldown()) {
-            return player.getCooldown(meta.getUseCooldown().getCooldownGroup()) > 0;
+            return player.getCooldown(meta.getUseCooldown().getCooldownGroup());
         } else {
-            return player.hasCooldown(item.getType());
+            return player.getCooldown(item.getType());
         }
     }
     

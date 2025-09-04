@@ -271,6 +271,20 @@ public class ArenaGameruleListener implements Listener {
         
         mwp.setJustSpawned();
         player.setKiller(null);
+        
+        // Add cooldowns to player so they don't accidentally use items
+        int cooldown = MissileWarsPlugin.getPlugin().getConfig().getInt("experimental.missile-cooldown");
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType().toString().contains("BOW")) {
+                continue;
+            }
+            
+            if (CooldownUtils.getCooldown(player, item) >= cooldown) {
+                continue;
+            }
+            
+            CooldownUtils.setCooldown(player, item, cooldown);
+        }
 
         // Un-obstruct spawns
         Location spawn2 = spawn.clone().add(0, 1, 0);
