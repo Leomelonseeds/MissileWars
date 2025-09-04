@@ -499,14 +499,15 @@ public class MissileWarsCommand implements CommandExecutor {
                     sendSuccessMsg(sender, "Must specify a target.");
                     return true;
                 }
-            } else if (args.length == 2) {
+            } else if (args.length >= 2) {
                 Player target = getCommandTarget(args, sender);
                 if (target == null) {
                     sendErrorMsg(sender, "No target found!");
                     return true;
                 }
 
-                InventoryUtils.clearInventory(target);
+                boolean keepBoots = args.length == 3 && args[2].equals("waitinglobby");
+                InventoryUtils.clearInventory(target, false, !keepBoots);
                 return true;
             }
         }
@@ -832,7 +833,7 @@ public class MissileWarsCommand implements CommandExecutor {
      */
     private Player getCommandTarget(String[] args, CommandSender sender) {
         Player target = null;
-        if (args.length == 2) {
+        if (args.length >= 2) {
             Player possibleTarget = Bukkit.getPlayer(args[1]);
             if (possibleTarget != null) {
                 target = possibleTarget;

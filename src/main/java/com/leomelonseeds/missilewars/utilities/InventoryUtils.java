@@ -35,20 +35,20 @@ import io.github.a5h73y.parkour.Parkour;
 public class InventoryUtils {
     
     /**
+     * @param i
+     * @return if the item provided is not null and is a potion or milkbucket
+     */
+    public static boolean isPotion(ItemStack i) {
+        return i != null && (i.getType() == Material.POTION || i.getType() == Material.MILK_BUCKET);
+    }
+    
+    /**
      * clearInventory while clearCustom is false, keeping custom items
      * 
      * @param player
      */
     public static void clearInventory(Player player) {
         clearInventory(player, false);
-    }
-    
-    /**
-     * @param i
-     * @return if the item provided is not null and is a potion or milkbucket
-     */
-    public static boolean isPotion(ItemStack i) {
-        return i != null && (i.getType() == Material.POTION || i.getType() == Material.MILK_BUCKET);
     }
 
     /**
@@ -59,6 +59,18 @@ public class InventoryUtils {
      * @param clearCustom whether custom items should be cleared
      */
     public static void clearInventory(Player player, boolean clearCustom) {
+        clearInventory(player, clearCustom, true);
+    }
+
+    /**
+     * Clears everything except for helmet of player
+     * and alcoholic beverages, + ignores boots if needed
+     *
+     * @param player
+     * @param clearCustom whether custom items should be cleared
+     * @param clearBoots
+     */
+    public static void clearInventory(Player player, boolean clearCustom, boolean clearBoots) {
         Inventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack current = inventory.getItem(i);
@@ -68,6 +80,11 @@ public class InventoryUtils {
             
             // Don't clear custom items if clearCustom false
             if (!clearCustom && isHeldItem(current)) {
+                continue;
+            }
+            
+            // Don't clear boots if specified
+            if (i == 36 && !clearBoots) {
                 continue;
             }
             

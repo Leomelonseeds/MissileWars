@@ -106,8 +106,13 @@ public class DeckManager {
                 ItemStack i = createItem(key, level, isMissile);
                 i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 
-                // Finalize item
+                // Set item limit. When using Gunslinger, max arrows is reduced by 1
                 int max = (int) ((int) ConfigUtils.getItemValue(key, level, "max") * maxmult);
+                if (i.getType() == Material.ARROW && plugin.getJSON().getLevel(json, Ability.GUNSLINGER) > 0) {
+                    max = Math.max(max - 1, 1);
+                }
+                
+                // Finalize item
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
                 pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, mwp));
             }

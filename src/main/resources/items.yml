@@ -1600,7 +1600,8 @@ Berserker:
       name: "&eGunslinger"
       lore:
       - ""
-      - "&7Receive a second crossbow."
+      - "&7Receive a second crossbow. Your maximum"
+      - "&7arrow count is reduced by 1."
       - ""
       - "&7The crossbow will be placed in the slot"
       - "&7above the first hotbar slot in your"

@@ -292,7 +292,7 @@ public class ArenaManager {
         lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.DENY);
         lobbyRegion.setFlag(Flags.PVP, StateFlag.State.ALLOW);
         Set<String> leaveCommands = new HashSet<>();
-        leaveCommands.add("/umw clear %username%");
+        leaveCommands.add("/umw clear %username% waitinglobby");
         lobbyRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.CONSOLE_COMMAND_ON_EXIT, leaveCommands);
         try {
             lobbyRegion.setParent(parent);
