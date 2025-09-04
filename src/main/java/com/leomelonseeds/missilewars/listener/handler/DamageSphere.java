@@ -61,9 +61,9 @@ public class DamageSphere {
                     continue;
                 }
                 
-                player.addPotionEffect(effect);
                 damageImmune.add(player);
                 mostRecentDamageSphereSource.put(player, cause);
+                player.addPotionEffect(effect);
                 ConfigUtils.schedule(19, () -> {
                     damageImmune.remove(player);
                     mostRecentDamageSphereSource.remove(player);

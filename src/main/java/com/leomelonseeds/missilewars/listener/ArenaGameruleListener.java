@@ -173,6 +173,12 @@ public class ArenaGameruleListener implements Listener {
             event.setDamage(40.0);
         }
         
+        // Instant harming II should only do 9 damage instead of 12
+        if (event.getCause() == DamageCause.MAGIC && 
+                DamageSphere.getLastDamager(player) != null && event.getDamage() == 12) {
+            event.setDamage(8);
+        }
+        
         Arena playerArena = ArenaUtils.getArena(player);
         if (playerArena == null) {
             return;
