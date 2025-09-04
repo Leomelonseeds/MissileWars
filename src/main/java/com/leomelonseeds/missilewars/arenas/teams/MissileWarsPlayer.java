@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -222,7 +223,8 @@ public class MissileWarsPlayer {
         for (int i = 0; i <= 4; i++) {
             cooldowns.add(i);
         }
-        Collections.shuffle(cooldowns);
+        
+        Collections.shuffle(cooldowns, new Random(arena.getGameSeed()));
         
         for (int i = 0; i < 8; i++) {
             DeckItem di = deck.getItems().get(i);

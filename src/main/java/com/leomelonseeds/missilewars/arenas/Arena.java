@@ -320,6 +320,20 @@ public abstract class Arena implements ConfigurationSerializable {
     public MissileWarsPlayer getPlayerInArena(UUID uuid) {
         return players.get(uuid);
     }
+    
+    /**
+     * Get a unique number for this game session. If the game
+     * isn't started, returns 0
+     * 
+     * @return
+     */
+    public int getGameSeed() {
+        if (startTime == null) {
+            return 0;
+        }
+        
+        return startTime.getNano();
+    }
 
     /**
      * Get the team a player with a given UUID is on.
