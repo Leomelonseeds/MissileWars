@@ -39,12 +39,17 @@ public class ArenaInventoryListener implements Listener {
     @EventHandler
     public void stopItemMoving(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (event.getCurrentItem() == null) {
+        ItemStack item = event.getCurrentItem();
+        ItemStack hotbarItem = null;
+        if (event.getHotbarButton() != -1) {
+            hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+        }
+        
+        if (item == null && hotbarItem == null) {
             return;
         }
         
-        ItemStack item = event.getCurrentItem();
-        if (InventoryUtils.isHeldItem(item)) {
+        if (InventoryUtils.isHeldItem(item) || InventoryUtils.isHeldItem(hotbarItem)) {
             event.setCancelled(true);
             return;
         }
@@ -57,7 +62,8 @@ public class ArenaInventoryListener implements Listener {
                 return;
             }
             
-            if (item.getType() == Material.ELYTRA) {
+            if ((item != null && item.getType() == Material.ELYTRA) || 
+                (hotbarItem != null && hotbarItem.getType() == Material.ELYTRA)) {
                 event.setCancelled(true);
             }
             
@@ -71,7 +77,17 @@ public class ArenaInventoryListener implements Listener {
         }
         
         // Obtain player
-        if (!(event.getClickedInventory() instanceof PlayerInventory)) {
+        if (!(event.getClickedInventory() instanceof PlayerInventory pinv)) {
+            return;
+        }
+        
+        // Combine items so items like splashes don't unstack
+        if ((item != null && item.getMaxStackSize() == 1) || 
+            (hotbarItem != null && hotbarItem.getMaxStackSize() == 1)) {
+            Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> InventoryUtils.combineItems(pinv));
+        }
+        
+        if (item == null) {
             return;
         }
         
@@ -271,12 +287,12 @@ public class ArenaInventoryListener implements Listener {
             return;
         }
         
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), () -> {
+        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
             PlayerInventory inv = player.getInventory();
             Material mat = inv.getItem(event.getHand()).getType();
             if (mat == Material.GLASS_BOTTLE || mat == Material.BUCKET) {
                 player.getInventory().setItem(event.getHand(), null);
             }
-        }, 1L);
+        });
     }
 }

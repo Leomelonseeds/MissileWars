@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -106,6 +108,10 @@ public class InventoryUtils {
     }
     
     public static boolean isHeldItem(ItemStack item) {
+        if (item == null) {
+            return false;
+        }
+        
         return item.hasItemMeta() && item.getItemMeta().getPersistentDataContainer().has
                 (new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"), PersistentDataType.STRING);
     }
@@ -417,5 +423,49 @@ public class InventoryUtils {
         }
         
         return di.getInstanceItem();
+    }
+    
+    /**
+     * Combines all player items of the same type to the slot with
+     * the least index of the items of that type.
+     * 
+     * @param player
+     */
+    public static void combineItems(Inventory inv) {
+        ItemStack[] contents = inv.getContents();
+        Set<Integer> checked = new HashSet<>();
+        for (int i = 0; i < contents.length; i++) {
+            if (checked.contains(i)) {
+                continue;
+            }
+            
+            ItemStack cur = contents[i];
+            if (cur == null) {
+                continue;
+            }
+            
+            Material material = cur.getType();
+            int extra = 0;
+            for (int j = i + 1; j < contents.length; j++) {
+                if (checked.contains(j)) {
+                    continue;
+                }
+                
+                if (contents[j] == null) {
+                    checked.add(j);
+                    continue;
+                }
+                
+                if (contents[j].getType() == material) {
+                    extra++;
+                    inv.setItem(j, null);
+                    checked.add(j);
+                }
+            }
+            
+            if (extra > 0) {
+                cur.setAmount(cur.getAmount() + extra);
+            }
+        }
     }
 }

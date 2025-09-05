@@ -775,17 +775,20 @@ public class CustomItemListener implements Listener {
         // Set instance item meta
         PotionMeta meta = (PotionMeta) instanceItem.getItemMeta();
         String name = ConfigUtils.toPlain(meta.customName());
-        if (swapOn) {
+        if (swapOn && !name.contains("Molotov")) {
             name = name
                 .replace("Splash", "Molotov Splash")
                 .replace("9", "6");
             meta.setColor(Color.ORANGE);
-        } else {
+        } else if (!swapOn && name.contains("Molotov")) {
             name = name
                 .replace("Molotov ", "")
                 .replace("6", "9");
             meta.setColor(null);
+        } else {
+            return;
         }
+        
         meta.customName(ConfigUtils.toComponent(name));
         instanceItem.setItemMeta(meta);
         
