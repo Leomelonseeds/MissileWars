@@ -760,6 +760,10 @@ public class CustomItemListener implements Listener {
         if (playerArena == null) {
             return;
         }
+
+        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.MOLOTOV_SPLASH) == 0) {
+            return;
+        }
         
         boolean swapOn = event.getOffHandItem().getType() == Material.SPLASH_POTION;
         if (!swapOn && event.getMainHandItem().getType() != Material.SPLASH_POTION) {
@@ -897,7 +901,7 @@ public class CustomItemListener implements Listener {
             }
             
             Player hitPlayer = (Player) hitEntity;
-            if (MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) > 0) {
+            if (hitPlayer.equals(thrower) && MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) > 0) {
                 ItemStack[] invItems = hitPlayer.getInventory().getContents();
                 for (int i = 0; i < invItems.length; i++) {
                     ItemStack item = invItems[i];
