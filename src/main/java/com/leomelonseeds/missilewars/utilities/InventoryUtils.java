@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -441,6 +442,15 @@ public class InventoryUtils {
             
             ItemStack cur = contents[i];
             if (cur == null) {
+                continue;
+            }
+            
+            if (cur.getMaxStackSize() > 1) {
+                continue;
+            }
+            
+            // Don't stack weapon or gear
+            if (cur.hasItemMeta() && cur.getItemMeta() instanceof Damageable) {
                 continue;
             }
             
