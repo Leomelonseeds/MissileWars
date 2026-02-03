@@ -138,7 +138,7 @@ public class CustomItemListener implements Listener {
         
         // Check arena
         Arena playerArena = ArenaUtils.getArena(player);
-        String held = InventoryUtils.getStringFromItem(hand, "held");
+        String held = InventoryUtils.getStringFromItemKey(hand, InventoryUtils.HELD_KEY);
         if (playerArena == null) {
             // Player is using a held item
             if (held == null) {
@@ -202,8 +202,8 @@ public class CustomItemListener implements Listener {
         
         // Check if player used a structure or utility
         Block clicked = event.getClickedBlock();
-        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
-        String utility = InventoryUtils.getStringFromItem(hand, "item-utility");
+        String structureName = InventoryUtils.getStructureFromItem(hand);
+        String utility = InventoryUtils.getUtilityFromItem(hand);
         if (structureName == null && utility == null) {
             return;
         }
@@ -415,7 +415,7 @@ public class CustomItemListener implements Listener {
 
         // Check if the thrown entity is a structure item
         ItemStack hand = thrown.getItem();
-        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+        String structureName = InventoryUtils.getStructureFromItem(hand);
         if (structureName == null) {
             return;
         }
@@ -427,7 +427,7 @@ public class CustomItemListener implements Listener {
         UUID uuid = thrower.getUniqueId();
         boolean poke = plugin.getJSON().getLevel(uuid, Ability.POKEMISSILES) > 0;
         if (poke) {
-            String offName = InventoryUtils.getStringFromItem(offhand, "item-structure");
+            String offName = InventoryUtils.getStructureFromItem(offhand);
             if (offName != null && !hasOffhandCooldown && offhand.getType().toString().contains("SPAWN_EGG")) {
                 thrown.setItem(offhand);
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
@@ -525,7 +525,7 @@ public class CustomItemListener implements Listener {
         ConfigUtils.sendConfigSound("bludger-activate", bludger.getLocation());
         ConfigUtils.sendConfigSound("bludger-activate", player);
         ConfigUtils.schedule(delay, () -> 
-            spawnUtility(player, bludger, InventoryUtils.getStringFromItem(bludgerItem, "item-structure"), arena, bludger.getLocation()));
+            spawnUtility(player, bludger, InventoryUtils.getStructureFromItem(bludgerItem), arena, bludger.getLocation()));
     }
     
     // Handle impact trigger passive (allow utilities to spawn when hitting a block)
@@ -553,7 +553,7 @@ public class CustomItemListener implements Listener {
         }
         
         ItemStack hand = thrown.getItem();
-        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+        String structureName = InventoryUtils.getStructureFromItem(hand);
         if (structureName == null) {
             return;
         }
@@ -826,7 +826,7 @@ public class CustomItemListener implements Listener {
 
         // Check if player is holding a utility item
         ItemStack hand = thrown.getItem();
-        String utility = InventoryUtils.getStringFromItem(hand, "item-utility");
+        String utility = InventoryUtils.getUtilityFromItem(hand);
 
         // Make sure it's splash potion of water
         if (utility == null || !thrown.getEffects().isEmpty()) {

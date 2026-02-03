@@ -204,7 +204,7 @@ public class OldDeckCustomizer extends MWInventory {
         }
         
         // Ensure it's clickable :))
-        String storedName = InventoryUtils.getStringFromItem(item, "item-gui");
+        String storedName = InventoryUtils.getGUIFromItem(item);
         if (storedName == null) {
             return;
         }

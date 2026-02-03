@@ -470,7 +470,7 @@ public class ArenaGameruleListener implements Listener {
             }
             
             ItemStack offhand = player.getInventory().getItemInOffHand();
-            if (!InventoryUtils.isThrowable(InventoryUtils.getStringFromItem(offhand, "item-structure"))) {
+            if (!InventoryUtils.isThrowable(InventoryUtils.getStructureFromItem(offhand))) {
                 break;
             }
             
@@ -814,7 +814,7 @@ public class ArenaGameruleListener implements Listener {
 
             ThrowableProjectile proj = (ThrowableProjectile) projectile;
             ItemStack item = proj.getItem();
-            String itemString = InventoryUtils.getStringFromItem(item, "item-structure");
+            String itemString = InventoryUtils.getStructureFromItem(item);
             if (itemString == null) {
                 return;
             }
@@ -1099,7 +1099,6 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
-        @SuppressWarnings("deprecation")
         Player player = event.getAffected().getBase();
         Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {

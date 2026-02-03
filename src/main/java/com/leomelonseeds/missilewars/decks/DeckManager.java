@@ -392,14 +392,13 @@ public class DeckManager {
         }
         
         // Inject NBT data
-        String id = "structure";
+        NamespacedKey key = InventoryUtils.ITEM_STRUCTURE_KEY;
         if (deck != null) {
-            id = "gui";
+            key = InventoryUtils.ITEM_GUI_KEY;
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
-            id = "utility";
+            key = InventoryUtils.ITEM_UTILITY_KEY;
         }
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "item-" + id),
-                PersistentDataType.STRING, name + "-" + level);
+        itemMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, name + "-" + level);
         
         // Setup extra item attributes for specific things
         if (name.equals("splash")) {

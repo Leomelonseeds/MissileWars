@@ -138,7 +138,7 @@ public class CanopyManager {
             
             // Store explosion power and other stats in signal's custom name
             double power = ConfigUtils.getAbilityStat(Ability.EXPLOSIVE_CANOPY, level, Ability.Stat.POWER);
-            String dragonFireball = InventoryUtils.getStringFromItem(offhand, "item-utility");
+            String dragonFireball = InventoryUtils.getUtilityFromItem(offhand);
             int amplifier = 0;
             int duration = 0;
             double radius = 0;

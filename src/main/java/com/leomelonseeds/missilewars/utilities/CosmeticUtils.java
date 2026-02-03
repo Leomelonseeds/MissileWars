@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -64,8 +63,7 @@ public class CosmeticUtils {
             lore.addAll(messages.getStringList("inventories.cosmetics." + toUse));
             
             // Add meta to store name of cosmetic item
-            meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "name"),
-                    PersistentDataType.STRING, s);
+            meta.getPersistentDataContainer().set(InventoryUtils.COSMETIC_KEY, PersistentDataType.STRING, s);
             
             // Finally create item
             meta.lore(ConfigUtils.toComponent(lore));

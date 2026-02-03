@@ -246,7 +246,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         }
 
         // Item must be a missile
-        String structureName = InventoryUtils.getStringFromItem(hand, "item-structure");
+        String structureName = InventoryUtils.getStructureFromItem(hand);
         if (!InventoryUtils.isMissile(structureName)) {
             removeEntities();
             return;

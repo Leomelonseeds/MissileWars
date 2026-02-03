@@ -65,7 +65,7 @@ public class CosmeticMenu extends MWInventory {
             return;
         }
         
-        String name = InventoryUtils.getStringFromItem(item, "name");
+        String name = InventoryUtils.getStringFromItemKey(item, InventoryUtils.COSMETIC_KEY);
         if (name == null) {
             return;
         }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -21,8 +20,6 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class PresetSelector extends DeckSubInventory {
-    
-    private static final NamespacedKey presetKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset");
     
     private JSONObject deckJson;
     private ConfigurationSection itemSection;
@@ -77,7 +74,7 @@ public class PresetSelector extends DeckSubInventory {
             }
             
             // Add data for slot registration identification
-            meta.getPersistentDataContainer().set(presetKey, PersistentDataType.STRING, preset);
+            meta.getPersistentDataContainer().set(InventoryUtils.PRESET_KEY, PersistentDataType.STRING, preset);
             item.setItemMeta(meta);
             inv.setItem(firstSlot + i, item);
         }
@@ -85,7 +82,7 @@ public class PresetSelector extends DeckSubInventory {
 
     @Override
     public boolean registerClick(ItemStack item, int slot, ClickType type, Player player) {
-        String preset = InventoryUtils.getStringFromItem(item, "preset");
+        String preset = InventoryUtils.getStringFromItemKey(item, InventoryUtils.PRESET_KEY);
         if (preset == null) {
             return false;
         }

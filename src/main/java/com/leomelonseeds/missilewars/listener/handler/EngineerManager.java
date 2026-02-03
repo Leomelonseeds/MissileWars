@@ -106,7 +106,7 @@ public class EngineerManager implements Listener {
             return;
         }
         
-        String structure = InventoryUtils.getStringFromItem(item, "item-structure");
+        String structure = InventoryUtils.getStructureFromItem(item);
         if (structure == null) {
             return;
         }
@@ -154,7 +154,7 @@ public class EngineerManager implements Listener {
      * @return
      */
     private boolean resetItem(Player player, ItemStack item, Arena arena) {
-        String structure = InventoryUtils.getStringFromItem(item, "item-structure");
+        String structure = InventoryUtils.getStructureFromItem(item);
         if (structure == null || !oldItems.containsKey(structure)) {
             return false;
         }

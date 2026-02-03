@@ -56,7 +56,7 @@ public class AbilityUpgrades extends DeckSubInventory {
     @Override
     public boolean registerClick(ItemStack item, int slot, ClickType type, Player player) {
         // Ensure it's clickable :))
-        String storedName = InventoryUtils.getStringFromItem(item, "item-gui");
+        String storedName = InventoryUtils.getGUIFromItem(item);
         if (storedName == null) {
             return false;
         }

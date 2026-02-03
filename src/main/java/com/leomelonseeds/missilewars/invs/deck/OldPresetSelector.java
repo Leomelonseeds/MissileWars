@@ -123,8 +123,7 @@ public class OldPresetSelector extends MWInventory {
             
             sel = sel.withType(Material.valueOf(itemConfig.getString("preset.normal.item" + select)));
             selMeta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.normal.name" + select)));
-            selMeta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
-                    PersistentDataType.STRING, p);
+            selMeta.getPersistentDataContainer().set(InventoryUtils.PRESET_KEY, PersistentDataType.STRING, p);
             sel.setItemMeta(selMeta);
             inv.setItem(i * 2 + 29, sel);
         }
@@ -207,7 +206,7 @@ public class OldPresetSelector extends MWInventory {
         Material selection = Material.getMaterial(itemConfig.getString("preset.normal.item"));
         Material edit = Material.getMaterial(itemConfig.getString("preset.edit.item"));
         if (itemType == selection || itemType == edit) {
-            String p = InventoryUtils.getStringFromItem(item, "preset");
+            String p = InventoryUtils.getStringFromItemKey(item, InventoryUtils.PRESET_KEY);
             if (!player.hasPermission("umw.preset." + p.toLowerCase())) {
                 ConfigUtils.sendConfigMessage("preset-locked", player);
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);

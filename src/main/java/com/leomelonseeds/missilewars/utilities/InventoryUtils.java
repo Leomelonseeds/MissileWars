@@ -36,6 +36,15 @@ import io.github.a5h73y.parkour.Parkour;
 
 /** Utility class mw inventory management */
 public class InventoryUtils {
+
+    private static MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+    public static final NamespacedKey CUSTOM_OFFSET_KEY = new NamespacedKey(plugin, "custom-offset");
+    public static final NamespacedKey ITEM_STRUCTURE_KEY = new NamespacedKey(plugin, "item-structure");
+    public static final NamespacedKey ITEM_UTILITY_KEY = new NamespacedKey(plugin, "item-utility");
+    public static final NamespacedKey ITEM_GUI_KEY = new NamespacedKey(plugin, "item-gui");
+    public static final NamespacedKey HELD_KEY = new NamespacedKey(plugin, "held");
+    public static final NamespacedKey COSMETIC_KEY = new NamespacedKey(plugin, "name");
+    public static final NamespacedKey PRESET_KEY = new NamespacedKey(plugin, "preset");
     
     /**
      * @param i
@@ -348,20 +357,24 @@ public class InventoryUtils {
     public static ItemStack createItem(String path) {
         return MissileWarsPlugin.getPlugin().getDeckManager().createItem(path, 0, false);
     }
-
-    /**
-     * Get string data from custom item
-     * 
-     * @param item
-     * @param id
-     * @return
-     */
-    public static String getStringFromItem(ItemStack item, String id) {
+    
+    public static String getStructureFromItem(ItemStack item) {
+        return getStringFromItemKey(item, ITEM_STRUCTURE_KEY);
+    }
+    
+    public static String getUtilityFromItem(ItemStack item) {
+        return getStringFromItemKey(item, ITEM_UTILITY_KEY);
+    }
+    
+    public static String getGUIFromItem(ItemStack item) {
+        return getStringFromItemKey(item, ITEM_GUI_KEY);
+    }
+    
+    public static String getStringFromItemKey(ItemStack item, NamespacedKey key) {
         if (item == null || item.getItemMeta() == null) {
             return null;
         }
         
-        NamespacedKey key = new NamespacedKey(MissileWarsPlugin.getPlugin(), id);
         if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return null;
         }
