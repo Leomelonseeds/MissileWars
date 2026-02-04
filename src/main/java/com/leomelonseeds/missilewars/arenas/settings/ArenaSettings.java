@@ -1,9 +1,9 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -19,8 +19,8 @@ public class ArenaSettings implements ConfigurationSerializable {
     private int capacity;
     private int tieTimer;
     private boolean isPrivate;
-    private Set<UUID> playerBlacklist;
-    private Set<UUID> playerWhitelist;
+    private List<UUID> playerBlacklist;
+    private List<UUID> playerWhitelist;
     private boolean disableMissileCooldown;
     private boolean enableSidewaysMissiles;
     private boolean enableAirPlace;
@@ -33,8 +33,8 @@ public class ArenaSettings implements ConfigurationSerializable {
     
     public ArenaSettings() {
         this.randomItemDistributor = new RandomItemDistributor();
-        this.playerBlacklist = new HashSet<>();
-        this.playerWhitelist = new HashSet<>();
+        this.playerBlacklist = new ArrayList<>();
+        this.playerWhitelist = new ArrayList<>();
         this.forcedMap = "";
         this.capacity = DEFAULT_CAPACITY;
         this.tieTimer = DEFAULT_TIE_TIMER;
@@ -77,7 +77,6 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
 
     public ArenaSettings(Map<String, Object> settings) {
-        
     }
     
     private void loadSetting(String id, Object defaultValue, Map<String, Object> settings, Consumer<Object> setter) {
