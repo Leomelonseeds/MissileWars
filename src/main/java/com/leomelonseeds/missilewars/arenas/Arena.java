@@ -34,6 +34,8 @@ import org.bukkit.util.Vector;
 
 import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
@@ -62,7 +64,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected String name;
     protected String mapName;
     protected String gamemode;
-    protected int capacity;
+    protected ArenaSettings settings;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
     protected Set<MissileWarsPlayer> spectators;
@@ -94,8 +96,8 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public Arena(String name, int capacity) {
         this.plugin = MissileWarsPlugin.getPlugin();
+        this.settings = new ArenaSettings();
         this.name = name;
-        this.capacity = capacity;
         this.gamemode = "classic";
         npcs = new ArrayList<>();
         init();
@@ -110,8 +112,8 @@ public abstract class Arena implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
-        serializedArena.put("capacity", capacity);
         serializedArena.put("gamemode", gamemode);
+        serializedArena.put("settings", settings);
         List<String> npcStrings = new ArrayList<>();
         for (int i : npcs) {
             npcStrings.add(Integer.toString(i));
@@ -128,14 +130,26 @@ public abstract class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         plugin = MissileWarsPlugin.getPlugin();
         name = (String) serializedArena.get("name");
-        capacity = (int) serializedArena.get("capacity");
         gamemode = (String) serializedArena.get("gamemode");
+        settings = (ArenaSettings) serializedArena.get("settings");
         npcs = new ArrayList<>();
         String npcIDs = (String) serializedArena.get("npc");
         for (String s : npcIDs.split(",")) {
             npcs.add(Integer.parseInt(s));
         }
         init();
+    }
+    
+    public int getIntSetting(ArenaSetting setting) {
+        return (int) settings.getSetting(setting);
+    }
+    
+    public String getStringSetting(ArenaSetting setting) {
+        return (String) settings.getSetting(setting);
+    }
+    
+    public boolean getBooleanSetting(ArenaSetting setting) {
+        return (boolean) settings.getSetting(setting);
     }
     
     private void init() {
@@ -458,7 +472,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return the max number of allowed participants
      */
     public int getCapacity() {
-        return capacity;
+        return getIntSetting(ArenaSetting.CAPACITY);
     }
     
     /**
@@ -852,7 +866,7 @@ public abstract class Arena implements ConfigurationSerializable {
             
             if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !force) {
                 ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
-            } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= capacity / 2) {
+            } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= getCapacity() / 2) {
                 ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
             } else {
                 removeSpectator(player);
@@ -1118,8 +1132,8 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Assign queued players. If a queue is larger than a team size put remaining
         // players into the front of the queue to be assigned first into random teams
-        queueCount = Math.min(capacity, toAssign.size());
-        double maxTeamSize = capacity / 2;
+        queueCount = Math.min(getCapacity(), toAssign.size());
+        double maxTeamSize = getCapacity() / 2;
         double maxQueue = Math.ceil(toAssign.size() / 2.0);
         Collections.shuffle(toAssign);
         while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
@@ -1324,6 +1338,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /** Remove Players from the map */
     public void removePlayers() {
         int cap = plugin.getConfig().getInt("arena-cap");
+        int capacity = getCapacity();
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players.values())) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             // Also only requeue if capacity is 20

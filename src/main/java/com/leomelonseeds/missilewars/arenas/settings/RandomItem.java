@@ -43,7 +43,7 @@ public class RandomItem implements ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> settings = new HashMap<>();
         if (id == null) {
-            settings.put("item", item.serialize());
+            settings.put("item", item);
         } else {
             settings.put("id", id);
         }
@@ -60,10 +60,9 @@ public class RandomItem implements ConfigurationSerializable {
         return settings;
     }
     
-    @SuppressWarnings("unchecked")
     public RandomItem(Map<String, Object> settings) {
         if (settings.containsKey("item")) {
-            this.item = ItemStack.deserialize((Map<String, Object>) settings.get("item"));
+            this.item = (ItemStack) settings.get("item");
         } else {
             this.id = (String) settings.get("id");
             String[] args = id.split("-");
