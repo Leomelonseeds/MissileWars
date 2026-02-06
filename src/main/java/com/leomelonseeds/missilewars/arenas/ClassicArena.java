@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
@@ -300,7 +301,7 @@ public class ClassicArena extends Arena {
         } else {
             enemy.sendTitle("enemy-portals-destroyed");
             broketeam.sendTitle("own-portals-destroyed");
-            endGame(enemy, MissileWarsPlugin.getPlugin().getConfig().getInt("tie-wait-time") * 20);
+            endGame(enemy, getIntSetting(ArenaSetting.TIE_TIMER) * 20);
         }
     }
     
