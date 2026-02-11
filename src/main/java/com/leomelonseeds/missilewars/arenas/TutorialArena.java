@@ -66,7 +66,6 @@ public class TutorialArena extends ClassicArena {
         this.attackLocs = new HashMap<>();
         this.hasGlow = new HashSet<>();
         this.justReset = true;
-        voteManager.addVote("default-map", 64);
         ConfigUtils.schedule(1, () -> {
             start();
             
@@ -125,7 +124,7 @@ public class TutorialArena extends ClassicArena {
         if (!stage.containsKey(uuid)) {
             stage.put(uuid, 0);
         }
-        enqueue(uuid, "blue");
+        enqueue(uuid, TeamName.BLUE);
         initiateStage(player, stage.get(uuid));
         justReset = false;
         if (player.hasPermission("umw.new")) {
@@ -167,14 +166,14 @@ public class TutorialArena extends ClassicArena {
     }
     
     @Override
-    public void enqueue(UUID uuid, String team, boolean force) {
+    public void enqueue(UUID uuid, TeamName team, boolean force) {
         MissileWarsPlayer player = players.get(uuid);
         if (!running) {
             ConfigUtils.sendConfigMessage("messages.tutorial-not-available", player.getMCPlayer(), this, null); 
             return; 
         }
         
-        if (team.equals("red")) {
+        if (team == TeamName.RED) {
             ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
             return;
         }

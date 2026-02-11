@@ -141,15 +141,23 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     public int getIntSetting(ArenaSetting setting) {
-        return (int) settings.getSetting(setting);
+        return (int) settings.get(setting);
+    }
+    
+    public double getDoubleSetting(ArenaSetting setting) {
+        return (double) settings.get(setting);
     }
     
     public String getStringSetting(ArenaSetting setting) {
-        return (String) settings.getSetting(setting);
+        return (String) settings.get(setting);
     }
     
     public boolean getBooleanSetting(ArenaSetting setting) {
-        return (boolean) settings.getSetting(setting);
+        return (boolean) settings.get(setting);
+    }
+    
+    public ArenaSettings getArenaSettings() {
+        return settings;
     }
     
     private void init() {
@@ -598,9 +606,9 @@ public abstract class Arena implements ConfigurationSerializable {
             int redSize = getRedTeam().getSize();
             int blueSize = getBlueTeam().getSize();
             if (redSize == blueSize) {
-                enqueue(player.getUniqueId(), Math.random() > 0.5 ? "red" : "blue");
+                enqueue(player.getUniqueId(), Math.random() > 0.5 ? TeamName.RED : TeamName.BLUE);
             } else {
-                enqueue(player.getUniqueId(), blueSize > redSize ? "red" : "blue");
+                enqueue(player.getUniqueId(), blueSize > redSize ? TeamName.RED : TeamName.BLUE);
             }
         }
        
@@ -829,7 +837,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param team use "red" or "blue"
      * @param force whether to allow uneven team sizes
      */
-    public void enqueue(UUID uuid, String team, boolean force) {
+    public void enqueue(UUID uuid, TeamName team, boolean force) {
         // Make sure people can't break the game
         MissileWarsPlayer player = getPlayerInArena(uuid);
         Player mcPlayer = player.getMCPlayer();
@@ -841,9 +849,10 @@ public abstract class Arena implements ConfigurationSerializable {
             }
         }
 
+        boolean isRed = team == TeamName.RED;
         if (!running) {
-            Queue<MissileWarsPlayer> queue = team.equals("red") ? redQueue : blueQueue;
-            Queue<MissileWarsPlayer> otherQueue = team.equals("red") ? blueQueue : redQueue;
+            Queue<MissileWarsPlayer> queue = isRed ? redQueue : blueQueue;
+            Queue<MissileWarsPlayer> otherQueue = isRed ? blueQueue : redQueue;
             if (!queue.contains(player)) {
                 if (queue.size() >= getCapacity() / 2) {
                     ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
@@ -858,8 +867,8 @@ public abstract class Arena implements ConfigurationSerializable {
                 ConfigUtils.sendConfigMessage("messages.queue-leave-" + team, mcPlayer, this, null);
             }
         } else {
-            MissileWarsTeam joinTeam = team.equals("red") ? redTeam : blueTeam;
-            MissileWarsTeam otherTeam = team.equals("red") ? blueTeam : redTeam;
+            MissileWarsTeam joinTeam = isRed ? redTeam : blueTeam;
+            MissileWarsTeam otherTeam = isRed ? blueTeam : redTeam;
             if (joinTeam.containsPlayer(uuid)) {
                 return;
             }
@@ -886,7 +895,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid the Player's UUID
      * @param team use "red" or "blue"
      */
-    public void enqueue(UUID uuid, String team) {
+    public void enqueue(UUID uuid, TeamName team) {
         enqueue(uuid, team, false);
     }
 
@@ -984,7 +993,12 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         // Select Map
-        mapName = voteManager.getVotedMap(map -> isAvailable(map));
+        String forcedMap = getStringSetting(ArenaSetting.FORCED_MAP);
+        if (forcedMap.isEmpty()) {
+            mapName = voteManager.getVotedMap(map -> isAvailable(map));
+        } else {
+            mapName = forcedMap;
+        }
 
         // Generate map.
         announceMessage("messages.starting", null);

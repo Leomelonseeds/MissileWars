@@ -52,7 +52,6 @@ public class TrainingArena extends ClassicArena {
     private void init() {
         hasTurret = false;
         missiles = 0;
-        voteManager.addVote("default-map", 64);
     }
     
     // No need to track who left the arena here
@@ -60,9 +59,9 @@ public class TrainingArena extends ClassicArena {
     public void addLeft(UUID uuid) {}
 
     @Override
-    public void enqueue(UUID uuid, String team, boolean force) {
+    public void enqueue(UUID uuid, TeamName team, boolean force) {
         MissileWarsPlayer player = players.get(uuid);
-        if (team.equals("red")) {
+        if (team == TeamName.RED) {
             ConfigUtils.sendConfigMessage("messages.training-blue-only", player.getMCPlayer(), this, null); 
             return;
         }
@@ -100,7 +99,7 @@ public class TrainingArena extends ClassicArena {
         
         // Auto-join team if setting turned on
         if (!player.hasPermission("umw.disableautoteam") && running) {
-            enqueue(player.getUniqueId(), "blue");
+            enqueue(player.getUniqueId(), TeamName.BLUE);
         }
     }
     

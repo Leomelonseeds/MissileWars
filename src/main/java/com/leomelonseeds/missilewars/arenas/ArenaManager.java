@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -336,9 +337,11 @@ public class ArenaManager {
             break;
         case "training":
             arena = new TrainingArena();
+            arena.getArenaSettings().set(ArenaSetting.FORCED_MAP, "default-map");
             break;
         case "tutorial":
             arena = new TutorialArena();
+            arena.getArenaSettings().set(ArenaSetting.FORCED_MAP, "default-map");
             break;
         default:
             logger.log(Level.WARNING, "Invalid arena type!");

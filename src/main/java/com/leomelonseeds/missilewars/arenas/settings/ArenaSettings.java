@@ -45,7 +45,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
         
         // Item distributor
-        if ((boolean) getSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+        if ((boolean) get(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
             settings.put("random-item-distributor", randomItemDistributor);
         }
         
@@ -76,8 +76,16 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
     }
     
-    public Object getSetting(ArenaSetting setting) {
+    public Object get(ArenaSetting setting) {
         return currentSettings.getOrDefault(setting, setting.getDefaultValue());
+    }
+    
+    public void set(ArenaSetting setting, Object value) {
+        if (setting.getDefaultValue().equals(value)) {
+            currentSettings.remove(setting);
+        } else {
+            currentSettings.put(setting, value);
+        }
     }
     
     public void addToWhitelist(UUID uuid) {

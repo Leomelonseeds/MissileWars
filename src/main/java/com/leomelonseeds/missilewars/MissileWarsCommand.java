@@ -608,6 +608,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
             
+            TeamName teamName = TeamName.valueOf(team.toUpperCase());
             if (args.length == 1) {
                 Player player = (Player) sender;
                 // Check if player is in arena
@@ -627,7 +628,7 @@ public class MissileWarsCommand implements CommandExecutor {
                     return true;
                 }
                 
-                arena.enqueue(player.getUniqueId(), team);
+                arena.enqueue(player.getUniqueId(), teamName);
                 return true;
             }
             
@@ -651,7 +652,7 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
 
-            arena.enqueue(target.getUniqueId(), team, true);
+            arena.enqueue(target.getUniqueId(), teamName, true);
             return true;
         }
 
