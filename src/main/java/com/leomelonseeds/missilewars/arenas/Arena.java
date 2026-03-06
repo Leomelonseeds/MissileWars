@@ -64,6 +64,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected String name;
     protected String mapName;
     protected String gamemode;
+    protected boolean isCustom;
     protected ArenaSettings settings;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
@@ -144,14 +145,6 @@ public abstract class Arena implements ConfigurationSerializable {
         return (int) settings.get(setting);
     }
     
-    public double getDoubleSetting(ArenaSetting setting) {
-        return (double) settings.get(setting);
-    }
-    
-    public String getStringSetting(ArenaSetting setting) {
-        return (String) settings.get(setting);
-    }
-    
     public boolean getBooleanSetting(ArenaSetting setting) {
         return (boolean) settings.get(setting);
     }
@@ -168,7 +161,7 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(gamemode);
+        voteManager = new VoteManager(gamemode, settings.getSelectedMaps(), !isCustom);
         startSpectatorActionBarTask();
     }
     
@@ -993,12 +986,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         // Select Map
-        String forcedMap = getStringSetting(ArenaSetting.FORCED_MAP);
-        if (forcedMap.isEmpty()) {
-            mapName = voteManager.getVotedMap(map -> isAvailable(map));
-        } else {
-            mapName = forcedMap;
-        }
+        mapName = voteManager.getVotedMap(map -> isCustom || isAvailable(map));
 
         // Generate map.
         announceMessage("messages.starting", null);
@@ -1415,7 +1403,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }));
         
         startTime = null;
-        voteManager = new VoteManager(gamemode);
+        voteManager.resetVotes();
         startSpectatorActionBarTask();
     }
 

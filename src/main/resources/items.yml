@@ -2177,3 +2177,5 @@ gpassive:
       upercentage: 30
       mpercentage: 30
       spcost: 1
+      
+arena-settings: {}

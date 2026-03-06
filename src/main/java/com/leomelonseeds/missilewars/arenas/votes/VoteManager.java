@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.arenas.votes;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,18 +19,91 @@ public class VoteManager {
     
     private SortedMap<String, Integer> allVotes;
     private Set<VotePlayer> playerVotes;
+    private String gamemode;
+    private boolean respectRotation;
     
-    public VoteManager(String gamemode) {
+    public VoteManager(String gamemode, List<String> availableMaps, boolean respectRotation) {
         this.allVotes = new TreeMap<>();
         this.playerVotes = new HashSet<>();
+        this.gamemode = gamemode;
+        this.respectRotation = respectRotation;
         
-        // Add all arena maps to the list
-        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-        for (String m : mapConfig.getStringList(gamemode + ".rotation")) {
-            allVotes.put(m, 0);
+        // Only add a map if it's selected in the settings
+        for (String m : getVoteableMaps()) {
+            if (availableMaps.isEmpty() || availableMaps.contains(m)) {
+                allVotes.put(m, 0);
+            }
         }
     }
     
+    /**
+     * Get a list of maps available for voting, which doesn't take into account
+     * maps available from arena settings.
+     * 
+     * @param respectRotation
+     * @return
+     */
+    private Collection<String> getVoteableMaps() {
+        FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
+        if (respectRotation) {
+            return mapConfig.getStringList(gamemode + ".rotation");
+        }
+        
+        Set<String> allMaps = mapConfig.getConfigurationSection(gamemode).getKeys(false);
+        allMaps.remove("rotation");
+        return allMaps;
+    }
+    
+    /**
+     * Add a map to the rotation for this arena
+     * 
+     * @param map
+     */
+    public void addMap(String map) {
+        allVotes.putIfAbsent(map, 0);
+    }
+    
+    /**
+     * Remove a map from the rotation for this arena
+     * 
+     * @param map
+     */
+    public void removeMap(String map) {
+        allVotes.remove(map);
+    }
+    
+    /**
+     * Resets the available map list back to the default one determined
+     * by respectRotation, while retaining previous votes. This operation
+     * also refreshes the map list
+     * 
+     * @param map
+     */
+    public void resetAvailableMaps() {
+        Set<String> allMaps = new HashSet<>(getVoteableMaps());
+        Set<String> currentMaps = allVotes.keySet();
+        
+        // Remove all maps from current map selection that are not contained within the default selection
+        Set<String> toRemove = new HashSet<>(currentMaps);
+        toRemove.removeAll(allMaps);
+        currentMaps.removeAll(toRemove);
+        
+        // Add all maps from voteable maps that are not contained within the current selection
+        for (String map : allMaps) {
+            if (!currentMaps.contains(map)) {
+                allVotes.put(map, 0);
+            }
+        }
+    }
+    
+    /**
+     * Removes all votes from all maps
+     */
+    public void resetVotes() {
+        allVotes.replaceAll((s, i) -> i = 0);
+        playerVotes.clear();
+    }
+     
     /**
      * Manually adds admin votes to a specific map,
      * if that map exists.

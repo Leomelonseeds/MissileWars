@@ -15,12 +15,14 @@ public class ArenaSettings implements ConfigurationSerializable {
     private RandomItemDistributor randomItemDistributor;
     private List<UUID> playerBlacklist;
     private List<UUID> playerWhitelist;
+    private List<String> selectedMaps;
     
     public ArenaSettings() {
         this.currentSettings = new HashMap<>();
         this.randomItemDistributor = new RandomItemDistributor();
         this.playerBlacklist = new ArrayList<>();
         this.playerWhitelist = new ArrayList<>();
+        this.selectedMaps = new ArrayList<>();
     }
     
     @Override
@@ -44,6 +46,10 @@ public class ArenaSettings implements ConfigurationSerializable {
             settings.put("player-whitelist", String.join(",", playerWhitelist.stream().map(uuid -> uuid.toString()).toList()));
         }
         
+        if (!selectedMaps.isEmpty()) {
+            settings.put("selected-maps", selectedMaps);
+        }
+        
         // Item distributor
         if ((boolean) get(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
             settings.put("random-item-distributor", randomItemDistributor);
@@ -52,6 +58,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         return settings;
     }
 
+    @SuppressWarnings("unchecked")
     public ArenaSettings(Map<String, Object> settings) {
         this.currentSettings = new HashMap<>();
         for (ArenaSetting setting : ArenaSetting.values()) {
@@ -69,6 +76,10 @@ public class ArenaSettings implements ConfigurationSerializable {
             String uuids = (String) settings.get("player-whitelist");
             List<UUID> uuidList = Arrays.asList(uuids.split(",")).stream().map(str -> UUID.fromString(str)).toList();
             playerBlacklist = new ArrayList<>(uuidList);
+        }
+        
+        if (settings.containsKey("selected-maps")) {
+            selectedMaps = (ArrayList<String>) settings.get("selected-maps");
         }
         
         if (settings.containsKey("random-item-distributor")) {
@@ -110,5 +121,12 @@ public class ArenaSettings implements ConfigurationSerializable {
     
     public void clearBlacklist() {
         playerBlacklist.clear();
+    }
+    
+    /**
+     * @return a MUTABLE list of selected maps
+     */
+    public List<String> getSelectedMaps() {
+        return selectedMaps;
     }
 }

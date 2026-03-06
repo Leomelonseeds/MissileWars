@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class RandomItemDistributor implements ConfigurationSerializable {
     
-    private final int DEFAULT_TIMER = 12;
+    private final int DEFAULT_TIMER = (int) ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER.getDefaultValue();
     
     private int timer;
     private boolean isBagDistribution;

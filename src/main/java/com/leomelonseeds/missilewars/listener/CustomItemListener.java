@@ -45,7 +45,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
-import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
@@ -162,11 +161,7 @@ public class CustomItemListener implements Listener {
             event.setCancelled(true);
             switch(held) {
             case "votemap":
-                if (playerArena.getStringSetting(ArenaSetting.FORCED_MAP).isEmpty()) {
-                    ConfigUtils.sendConfigMessage("map-voting-disabled", player);
-                } else {
-                    new MapVoting(player, playerArena);
-                }
+                new MapVoting(player, playerArena);
                 break;
             case "to-lobby":
                 playerArena.removePlayer(uuid, true);
