@@ -17,7 +17,9 @@ public enum ArenaSetting {
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
-    IS_PRIVATE(false, "is-private"); // Private should always be the last setting because it isn't editable
+    IS_PRIVATE(false, "is-private"),
+    OWNER_NAME("", "owner-name"),
+    OWNER_UUID(null, "owner-uuid");
     
     private Object defaultValue;
     private String id;
