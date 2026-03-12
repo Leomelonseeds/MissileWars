@@ -18,10 +18,12 @@ public enum ArenaSetting {
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
+    END_IF_NO_PLAYERS(true, "end-if-no-players"),
+    ENABLE_AUTO_START(true, "enable-auto-start"),
     IS_PRIVATE(false, "is-private"),
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(null, "owner-uuid"),
-    PRIORITY(1, "priority"); // Sorting priority - higher numbers go first
+    PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;
     private String id;

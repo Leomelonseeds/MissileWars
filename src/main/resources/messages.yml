@@ -393,17 +393,48 @@ inventories:
       lore:
         - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
         - "&7Status: %umw_arena_status%"
-        - "&7Click to join, %player_name%!"
+        - "&aClick to join!"
   custom-game-selector:
     title: "&c&lCustom Areans"
     game-item:
       name: "&c%umw_arena%"
+      name-own: "&aYour Arena &7(&c%umw_arena%)"
       lore:
         - "&7Type: %type%"
         - "&7Gamemode: %gamemode%"
         - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
         - "&7Status: %umw_arena_status%"
-        - "&7Click to join, %player_name%!"
+      join-public: "&aClick to join!"
+      join-not-whitelisted: "&cYou are not whitelisted."
+      join-blacklisted: "&cYou are blacklisted from this arena."
+      join-whitelisted: "&aYou are whitelisted. Click to join!"
+    create-item:
+      item: EMERALD_BLOCK
+      name: "&a&lCreate Custom Arena"
+      lore:
+        - ""
+        - "&7Create your own arena that allows"
+        - "&7you to host private games and change"
+        - "&7settings such as item cooldowns,"
+        - "&7unfair teams, and even creating"
+        - "&7custom item distributions."
+        - ""
+        - "&7To create one, you must be:"
+        - "&7- Guest: &dColonel 6✌"
+        - "&7- &e&lESQUIRE: &3Lieutenant 5❁"
+        - "&7- &b&lKNIGHT: &bSergeant 4❂"
+        - "&7- &d&lNOBLE: &2Corporal 3❉"
+        - "&7- &5&lROYAL: &aBombardier 2♠"
+        - "&7- &6&lDIVINE&7: &fGunner 1✦"
+        - ""
+      can-create: "&aClick to create a custom arena!"
+      cannot-create: "&cYou don't meet the requirements yet."
+    edit-item:
+      item: REPEATER
+      name: "&cEdit Your Arena"
+      lore:
+        - "&7Click to edit the settings of your"
+        - "&7own custom arena."
   map-voting:
     title: "You have %amount% total vote(s)"
     name: "%umw_map%" # Unused, map name is taken directly from maps.yml

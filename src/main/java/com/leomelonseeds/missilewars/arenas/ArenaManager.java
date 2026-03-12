@@ -656,4 +656,17 @@ public class ArenaManager {
         sortedArenas.sort(Arena.byPriority.thenComparing(Arena.byName));
         return sortedArenas;
     }
+    
+    public Arena getCustomArena(Player player) {
+        UUID uuid = player.getUniqueId();
+        for (Arena arena : loadedArenas) {
+            if (!uuid.equals(arena.getArenaSettings().get(ArenaSetting.OWNER_UUID))) {
+                continue;
+            }
+            
+            return arena;
+        }
+        
+        return null;
+    }
 }
