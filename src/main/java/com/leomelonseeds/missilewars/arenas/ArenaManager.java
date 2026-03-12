@@ -36,6 +36,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -301,6 +303,26 @@ public class ArenaManager {
         }
         wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arena.getWorld())).addRegion(lobbyRegion);
     }
+    
+    /**
+     * CREATE CUSTOM ARENA
+     * 
+     * @param creator
+     * @return
+     */
+    public Arena createCustomArena(Player creator) {
+        String name = creator.getName();
+        Arena arena = createArena(name, "classic", 2);
+        if (arena == null) {
+            return null;
+        }
+        
+        ArenaSettings settings = arena.getArenaSettings();
+        settings.set(ArenaSetting.OWNER_NAME, name);
+        settings.set(ArenaSetting.OWNER_UUID, creator.getUniqueId());
+        settings.set(ArenaSetting.IS_PRIVATE, true);
+        return arena;
+    }
 
     /**
      * Create a new Arena given a name with default player capacity.
@@ -309,7 +331,7 @@ public class ArenaManager {
      * @param creator the creator of the world
      * @return true if the Arena was created, otherwise false
      */
-    public boolean createArena(String tempname, String gamemode, int capacity) {
+    public Arena createArena(String tempname, String gamemode, int capacity) {
 
     	Logger logger = Bukkit.getLogger();
     	
@@ -322,7 +344,7 @@ public class ArenaManager {
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
             logger.log(Level.WARNING, "An arena with the name " + name + " already exists!");
-            return false;
+            return null;
         }
 
         // Register arena
@@ -344,7 +366,7 @@ public class ArenaManager {
             break;
         default:
             logger.log(Level.WARNING, "Invalid arena type!");
-            return false;
+            return null;
         }
 
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
@@ -524,10 +546,10 @@ public class ArenaManager {
 
         })) {
             logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
-            return false;
+            return null;
         }
 
-        return true;
+        return arena;
     }
 
     /**
@@ -556,9 +578,15 @@ public class ArenaManager {
     public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
         List<Arena> sortedArenas = new ArrayList<>();
         for (Arena a : loadedArenas) {
-            if (a.getGamemode().equals(gamemode) && !specialArenas.contains(a.getName())) {
-                sortedArenas.add(a);
+            if (!a.getGamemode().equals(gamemode) || a.isCustom()) {
+                continue;
             }
+            
+            if (specialArenas.contains(a.getName())) {
+                continue;
+            }
+            
+            sortedArenas.add(a);
         }
         sortedArenas.sort(Collections.reverseOrder(sortingType).thenComparing(Arena.byName));
         return sortedArenas;
