@@ -8,6 +8,7 @@ public enum ArenaSetting {
     TIE_TIMER(5, "tie-timer", IntSettingModifier.create(0, 10, 1)),
     ITEM_MULTIPLIER(100, "item-multiplier", IntSettingModifier.create(50, 300, 10)), // As a percentage
     RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
+    START_TIMER(30, "start-timer", IntSettingModifier.create(10, 30, 1)),
     ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
     ENABLE_AIR_PLACE(false, "enable-air-place"),
@@ -19,7 +20,8 @@ public enum ArenaSetting {
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
     IS_PRIVATE(false, "is-private"),
     OWNER_NAME("", "owner-name"),
-    OWNER_UUID(null, "owner-uuid");
+    OWNER_UUID(null, "owner-uuid"),
+    PRIORITY(1, "priority"); // Sorting priority - higher numbers go first
     
     private Object defaultValue;
     private String id;

@@ -312,7 +312,7 @@ public class ArenaManager {
      */
     public Arena createCustomArena(Player creator) {
         String name = creator.getName();
-        Arena arena = createArena(name, "classic", 2);
+        Arena arena = createArena(name, "classic", 2, true);
         if (arena == null) {
             return null;
         }
@@ -325,21 +325,37 @@ public class ArenaManager {
     }
 
     /**
-     * Create a new Arena given a name with default player capacity.
-     *
-     * @param name the name of the Arena
-     * @param creator the creator of the world
-     * @return true if the Arena was created, otherwise false
+     * Create and save a new arena, accounting for custom arenas
+     * 
+     * @param tempname
+     * @param gamemode
+     * @param capacity
+     * @return
      */
     public Arena createArena(String tempname, String gamemode, int capacity) {
+        return createArena(tempname, gamemode, capacity, false);
+    }
+    
+    /**
+     * Create and save a new arena, accounting for custom arenas
+     * 
+     * @param tempname
+     * @param gamemode
+     * @param capacity
+     * @param isCustom
+     * @return
+     */
+    private Arena createArena(String tempname, String gamemode, int capacity, boolean isCustom) {
 
     	Logger logger = Bukkit.getLogger();
-    	
-    	String n = gamemode + "-" + tempname;
+    	String name;
     	if (specialArenas.contains(gamemode)) {
-    	    n = gamemode;
+    	    name = gamemode;
+    	} else if (isCustom) {
+    	    name = "custom-" + tempname;
+    	} else {
+    	    name = gamemode + "-" + tempname;
     	}
-    	String name = n;
 
         // Ensure arena world doesn't exist
         if (Bukkit.getWorld("mwarena_" + name) != null) {
@@ -576,18 +592,13 @@ public class ArenaManager {
      * @return The list of loaded arenas
      */
     public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
-        List<Arena> sortedArenas = new ArrayList<>();
-        for (Arena a : loadedArenas) {
-            if (!a.getGamemode().equals(gamemode) || a.isCustom()) {
-                continue;
-            }
-            
-            if (specialArenas.contains(a.getName())) {
-                continue;
-            }
-            
-            sortedArenas.add(a);
-        }
+        List<Arena> sortedArenas = loadedArenas
+                .stream()
+                .filter(a -> 
+                    a.getGamemode().equals(gamemode) && 
+                    !a.isCustom() && 
+                    !specialArenas.contains(a.getName()))
+                .toList();
         sortedArenas.sort(Collections.reverseOrder(sortingType).thenComparing(Arena.byName));
         return sortedArenas;
     }
@@ -633,6 +644,15 @@ public class ArenaManager {
     public List<Arena> getLoadedArenas() {
         List<Arena> sortedArenas = loadedArenas;
         sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity).thenComparing(Arena.byName));
+        return sortedArenas;
+    }
+    
+    /**
+     * @return list of custom arenas sorted by priority
+     */
+    public List<Arena> getCustomArenas() {
+        List<Arena> sortedArenas = loadedArenas.stream().filter(a -> a.isCustom()).toList(); // TODO: THIS LIST IS CURRENTLY UNSORTABLE PLEASE FIX
+        sortedArenas.sort(Arena.byPriority.thenComparing(Arena.byName));
         return sortedArenas;
     }
 }

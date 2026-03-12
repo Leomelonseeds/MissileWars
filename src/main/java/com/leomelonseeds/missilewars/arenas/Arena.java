@@ -59,6 +59,7 @@ public abstract class Arena implements ConfigurationSerializable {
     public static Comparator<Arena> byCapacity = Comparator.comparing(a -> a.getCapacity());
     public static Comparator<Arena> byName = Comparator.comparing(a -> a.getName());
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
+    public static Comparator<Arena> byPriority = Comparator.comparing(a -> a.getIntSetting(ArenaSetting.PRIORITY));
     
     protected MissileWarsPlugin plugin;
     protected String name;
