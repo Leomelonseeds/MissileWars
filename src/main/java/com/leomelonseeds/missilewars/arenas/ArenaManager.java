@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -598,7 +599,7 @@ public class ArenaManager {
                     a.getGamemode().equals(gamemode) && 
                     !a.isCustom() && 
                     !specialArenas.contains(a.getName()))
-                .toList();
+                .collect(Collectors.toList());
         sortedArenas.sort(Collections.reverseOrder(sortingType).thenComparing(Arena.byName));
         return sortedArenas;
     }
@@ -651,7 +652,7 @@ public class ArenaManager {
      * @return list of custom arenas sorted by priority
      */
     public List<Arena> getCustomArenas() {
-        List<Arena> sortedArenas = loadedArenas.stream().filter(a -> a.isCustom()).toList(); // TODO: THIS LIST IS CURRENTLY UNSORTABLE PLEASE FIX
+        List<Arena> sortedArenas = loadedArenas.stream().filter(a -> a.isCustom()).collect(Collectors.toList());
         sortedArenas.sort(Arena.byPriority.thenComparing(Arena.byName));
         return sortedArenas;
     }

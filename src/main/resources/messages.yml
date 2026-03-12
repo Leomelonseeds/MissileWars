@@ -394,6 +394,16 @@ inventories:
         - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
         - "&7Status: %umw_arena_status%"
         - "&7Click to join, %player_name%!"
+  custom-game-selector:
+    title: "&c&lCustom Areans"
+    game-item:
+      name: "&c%umw_arena%"
+      lore:
+        - "&7Type: %type%"
+        - "&7Gamemode: %gamemode%"
+        - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
+        - "&7Status: %umw_arena_status%"
+        - "&7Click to join, %player_name%!"
   map-voting:
     title: "You have %amount% total vote(s)"
     name: "%umw_map%" # Unused, map name is taken directly from maps.yml
