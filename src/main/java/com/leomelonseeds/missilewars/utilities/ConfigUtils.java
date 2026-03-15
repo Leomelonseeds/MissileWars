@@ -150,6 +150,18 @@ public class ConfigUtils {
         }
         return msg;
     }
+    
+
+    /**
+     * Get a parsed String from the messages.yml file. No placeholders lmao
+     *
+     * @param path the path to the String
+     * @return the parsed String
+     */
+    public static String getConfigText(String path) {
+        FileConfiguration messagesConfig = getConfigFile("messages.yml");
+        return messagesConfig.getString(path);
+    }
 
     /**
      * Get a parsed String from the messages.yml file.

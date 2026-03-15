@@ -23,7 +23,7 @@ public class ArenaSelector extends MWInventory {
     private String gamemode;
     
     public ArenaSelector(Player player, String gamemode) {
-        super(player, 27, ConfigUtils.getConfigText("inventories.game-selector.title", null, null, null));
+        super(player, 27, ConfigUtils.getConfigText("inventories.game-selector.title"));
         this.gamemode = gamemode;
         autoRefresh(20);
     }

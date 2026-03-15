@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -72,11 +74,11 @@ public class ArenaManager {
     private final static List<String> specialArenas = List.of("tutorial", "training");
 
     private final MissileWarsPlugin plugin;
-    private List<Arena> loadedArenas;
+    private Map<String, Arena> loadedArenas;
 
     public ArenaManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
-        this.loadedArenas = new ArrayList<>();
+        this.loadedArenas = new HashMap<>();
     }
 
     /** Load arenas from data file */
@@ -90,7 +92,9 @@ public class ArenaManager {
             try {
                 arenaConfig.load(arenaFile);
                 if (arenaConfig.contains("arenas")) {
-                    loadedArenas = (List<Arena>) arenaConfig.get("arenas");
+                    for (Arena arena : (List<Arena>) arenaConfig.get("arenas")) {
+                        
+                    }
                 }
             } catch (IOException | InvalidConfigurationException e) {
                 e.printStackTrace();
