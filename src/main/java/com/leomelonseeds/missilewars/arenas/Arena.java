@@ -153,6 +153,15 @@ public abstract class Arena implements ConfigurationSerializable {
         return settings;
     }
     
+    /**
+     * This may change a lot of things. Use with caution.
+     * 
+     * @param arenaSettings
+     */
+    public void setArenaSettings(ArenaSettings arenaSettings) {
+        this.settings = arenaSettings;
+    }
+    
     private void init() {
         players = new HashMap<>();
         spectators = new HashSet<>();

@@ -38,6 +38,14 @@ public class RandomItem implements ConfigurationSerializable {
         this.amount = 1;
         this.uuid = UUID.randomUUID();
     }
+    
+    @Override
+    public RandomItem clone() {
+        RandomItem clone = this.clone();
+        clone.uuid = UUID.randomUUID();
+        clone.item = this.item.clone();
+        return clone;
+    }
 
     @Override
     public @NotNull Map<String, Object> serialize() {

@@ -25,6 +25,19 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.selectedMaps = new ArrayList<>();
     }
     
+    /**
+     * Creates a full copy of the arena settings
+     * 
+     * @param other
+     */
+    public ArenaSettings(ArenaSettings other) {
+        this.currentSettings = new HashMap<>(other.currentSettings);
+        this.playerBlacklist = new ArrayList<>(other.playerBlacklist);
+        this.playerWhitelist = new ArrayList<>(other.playerWhitelist);
+        this.selectedMaps = new ArrayList<>(other.selectedMaps);
+        this.randomItemDistributor = other.randomItemDistributor.clone();
+    }
+    
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> settings = new HashMap<>();
@@ -128,5 +141,9 @@ public class ArenaSettings implements ConfigurationSerializable {
      */
     public List<String> getSelectedMaps() {
         return selectedMaps;
+    }
+    
+    public RandomItemDistributor getRandomItemDistributor() {
+        return randomItemDistributor;
     }
 }

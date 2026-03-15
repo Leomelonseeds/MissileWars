@@ -24,7 +24,16 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.items = new ArrayList<>();
         this.curItems = new ArrayList<>();
     }
-
+    
+    @Override
+    public RandomItemDistributor clone() {
+        RandomItemDistributor clone = this.clone();
+        clone.curItems = new ArrayList<>();
+        clone.items = new ArrayList<>();
+        items.forEach(ri -> clone.items.add(ri.clone()));
+        return clone;
+    }
+ 
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> distributor = new HashMap<>();

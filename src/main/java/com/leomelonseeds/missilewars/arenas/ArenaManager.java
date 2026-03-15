@@ -74,7 +74,7 @@ public class ArenaManager {
     private final static List<String> specialArenas = List.of("tutorial", "training");
 
     private final MissileWarsPlugin plugin;
-    private Map<String, Arena> loadedArenas;
+    private Map<String, Arena> loadedArenas; // Use map to fetch arenas easily
 
     public ArenaManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
@@ -85,31 +85,27 @@ public class ArenaManager {
     @SuppressWarnings("unchecked")
     public void loadArenas() {
         File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
-
-        // Acquire arenas from data file
-        if (arenaFile.exists()) {
-            FileConfiguration arenaConfig = new YamlConfiguration();
-            try {
-                arenaConfig.load(arenaFile);
-                if (arenaConfig.contains("arenas")) {
-                    for (Arena arena : (List<Arena>) arenaConfig.get("arenas")) {
-                        
-                    }
-                }
-            } catch (IOException | InvalidConfigurationException e) {
-                e.printStackTrace();
+        FileConfiguration arenaConfig = new YamlConfiguration();
+        try {
+            arenaConfig.load(arenaFile);
+            for (Arena arena : (List<Arena>) arenaConfig.get("arenas", Collections.EMPTY_LIST)) {
+                loadedArenas.put(arena.getName(), arena);
             }
+        } catch (IOException | InvalidConfigurationException e) {
+            Bukkit.getLogger().severe("Could not load arenas from file!");
+            e.printStackTrace();
+            return;
         }
 
         // Load worlds for arenas
-        if (loadedArenas == null) return;
-        for (Arena arena : loadedArenas) {
+        for (Arena arena : loadedArenas.values()) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
             WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
             arenaCreator.type(WorldType.FLAT);
             arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
         }
 
+        // Reload citizens to make sure NPCs are there
         Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
                 () -> ConfigUtils.reloadCitizens(), 10);
     }
@@ -123,7 +119,7 @@ public class ArenaManager {
         }
 
         // Unload each Arena
-        for (Arena arena : loadedArenas) {
+        for (Arena arena : loadedArenas.values()) {
             arena.cancelTasks();
             Bukkit.unloadWorld(arena.getWorld(), false);
         }
@@ -138,12 +134,7 @@ public class ArenaManager {
      * @return the Arena, or null if it doesn't exist
      */
     public Arena getArena(String name) {
-        for (Arena arena : loadedArenas) {
-            if (arena.getName().equalsIgnoreCase(name)) {
-                return arena;
-            }
-        }
-        return null;
+        return loadedArenas.get(name);
     }
 
     /**
@@ -181,7 +172,7 @@ public class ArenaManager {
         } catch (IOException e) {
             logger.warning("The world file couldn't be removed! Please remove manually.");
         }
-        loadedArenas.remove(arena);
+        loadedArenas.remove(arena.getName());
         saveArenasToFile();
         return true;
     }
@@ -198,12 +189,19 @@ public class ArenaManager {
         }
         logger.log(Level.INFO, "Performing arena upgrades. This might take a while!");
         for (Arena arena : new ArrayList<>(getLoadedArenas())) {
-            String[] args = arena.getName().split("-");
+            String name = arena.getName();
+            String[] args = name.split("-");
             String rawname = args[args.length - 1];
+            boolean isCustom = args[0].equals("custom");
             int capacity = arena.getCapacity();
             String gamemode = arena.getGamemode();
             removeArena(arena);
-            createArena(rawname, specialArenas.contains(rawname) ? rawname : gamemode, capacity);
+            if (isCustom) {
+                Arena newArena = createArena(args[1], "classic", 2, true);
+                newArena.setArenaSettings(new ArenaSettings(arena.getArenaSettings()));
+            } else {
+                createArena(rawname, specialArenas.contains(rawname) ? rawname : gamemode, capacity);
+            }
         }
     }
     
@@ -238,12 +236,13 @@ public class ArenaManager {
 
     /**
      * Get the Arena that a player with a given UUID is in.
+     * Use lightly, scales with amount of arenas
      *
      * @param id the UUID of the player
      * @return the Arena that the player is in, or null
      */
     public Arena getArena(UUID id) {
-        for (Arena arena : loadedArenas) {
+        for (Arena arena : loadedArenas.values()) {
             if (arena.isInArena(id)) {
                 return arena;
             }
@@ -258,16 +257,13 @@ public class ArenaManager {
      * @return
      */
     public Arena getArena(World world) {
-        for (Arena arena : loadedArenas) {
-            if (arena.getWorld() == null) {
-                continue;
-            }
-            
-            if (arena.getWorld().equals(world)) {
-                return arena;
-            }
+        String worldName = world.getName();
+        if (!worldName.contains("mwarena_")) {
+            return null;
         }
-        return null;
+        
+        // Safely assume no world is just called "mwarena_"
+        return getArena(worldName.substring(8));
     }
 
     /**
@@ -316,7 +312,10 @@ public class ArenaManager {
      * @return
      */
     public Arena createCustomArena(Player creator) {
-        String name = creator.getName();
+        return createCustomArena(creator.getName(), creator.getUniqueId());
+    }
+    
+    public Arena createCustomArena(String name, UUID uuid) {
         Arena arena = createArena(name, "classic", 2, true);
         if (arena == null) {
             return null;
@@ -324,7 +323,7 @@ public class ArenaManager {
         
         ArenaSettings settings = arena.getArenaSettings();
         settings.set(ArenaSetting.OWNER_NAME, name);
-        settings.set(ArenaSetting.OWNER_UUID, creator.getUniqueId());
+        settings.set(ArenaSetting.OWNER_UUID, uuid);
         settings.set(ArenaSetting.IS_PRIVATE, true);
         return arena;
     }
@@ -527,7 +526,7 @@ public class ArenaManager {
                 }
             }
 
-            loadedArenas.add(arena);
+            loadedArenas.put(name, arena);
             
             // Setup regions
             WorldGuard wg = WorldGuard.getInstance();
@@ -581,10 +580,11 @@ public class ArenaManager {
      */
     public MissileWarsPlayer getPlayer(UUID id) {
         Arena arena = getArena(id);
-        if (arena != null) {
-            return arena.getPlayerInArena(id);
+        if (arena == null) {
+            return null;
         }
-        return null;
+        
+        return arena.getPlayerInArena(id);
     }
     
     public List<Arena> getLoadedArenas(String gamemode) {
@@ -598,6 +598,7 @@ public class ArenaManager {
      */
     public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
         List<Arena> sortedArenas = loadedArenas
+                .values()
                 .stream()
                 .filter(a -> 
                     a.getGamemode().equals(gamemode) && 
@@ -610,6 +611,7 @@ public class ArenaManager {
     
     /**
      * Get total number of players playing a gamemode
+     * TODO: Possibly store different types of arenas in different lists
      * 
      * @param gamemode
      * @return
@@ -617,7 +619,7 @@ public class ArenaManager {
     public int getPlayers(String gamemode) {
         int count = 0;
         if (gamemode.equals("training")) {
-            for (Arena arena : loadedArenas) {
+            for (Arena arena : loadedArenas.values()) {
                 if (arena instanceof TrainingArena) {
                     return arena.getTotalPlayers();
                 }
@@ -626,7 +628,7 @@ public class ArenaManager {
         }
 
         if (gamemode.equals("tutorial")) {
-            for (Arena arena : loadedArenas) {
+            for (Arena arena : loadedArenas.values()) {
                 if (arena instanceof TutorialArena) {
                     return arena.getTotalPlayers();
                 }
@@ -647,7 +649,7 @@ public class ArenaManager {
      * @return The list of loaded arenas
      */
     public List<Arena> getLoadedArenas() {
-        List<Arena> sortedArenas = loadedArenas;
+        List<Arena> sortedArenas = new ArrayList<>(loadedArenas.values());
         sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity).thenComparing(Arena.byName));
         return sortedArenas;
     }
@@ -656,14 +658,14 @@ public class ArenaManager {
      * @return list of custom arenas sorted by priority
      */
     public List<Arena> getCustomArenas() {
-        List<Arena> sortedArenas = loadedArenas.stream().filter(a -> a.isCustom()).collect(Collectors.toList());
+        List<Arena> sortedArenas = loadedArenas.values().stream().filter(a -> a.isCustom()).collect(Collectors.toList());
         sortedArenas.sort(Arena.byPriority.thenComparing(Arena.byName));
         return sortedArenas;
     }
     
     public Arena getCustomArena(Player player) {
         UUID uuid = player.getUniqueId();
-        for (Arena arena : loadedArenas) {
+        for (Arena arena : loadedArenas.values()) {
             if (!uuid.equals(arena.getArenaSettings().get(ArenaSetting.OWNER_UUID))) {
                 continue;
             }
