@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -74,7 +73,7 @@ public class PresetSelector extends DeckSubInventory {
             }
             
             // Add data for slot registration identification
-            meta.getPersistentDataContainer().set(InventoryUtils.PRESET_KEY, PersistentDataType.STRING, preset);
+            InventoryUtils.setMetaString(meta, InventoryUtils.PRESET_KEY, preset);
             item.setItemMeta(meta);
             inv.setItem(firstSlot + i, item);
         }

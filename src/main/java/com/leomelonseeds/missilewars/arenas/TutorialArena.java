@@ -49,7 +49,7 @@ public class TutorialArena extends ClassicArena {
     private boolean justReset;
     
     public TutorialArena() {
-        super("tutorial", 100);
+        super("tutorial", 100, false);
         init();
     }
 
@@ -434,7 +434,7 @@ public class TutorialArena extends ClassicArena {
         }
         
         // Reset map after 5 sec
-        ConfigUtils.schedule(100, () -> SchematicManager.spawnFAWESchematic("default-map", getWorld(), gamemode, null));
+        ConfigUtils.schedule(100, () -> SchematicManager.spawnFAWESchematic("default-map", getWorld(), getGamemode(), null));
         ConfigUtils.schedule(140, () -> {
             redTeam.destroyPortalGlow(true);
             hasGlow.forEach(uid -> redTeam.setPortalGlow(getPlayerInArena(uid), true));

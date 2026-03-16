@@ -227,8 +227,7 @@ public class InventoryUtils {
                 // Add menu item
                 ItemStack menu = plugin.getDeckManager().createItem("held.main-menu", 0, false);
                 ItemMeta meta = menu.getItemMeta();
-                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "held"),
-                        PersistentDataType.STRING, "main-menu");
+                setMetaString(meta, HELD_KEY, "main-menu");
                 menu.setItemMeta(meta);
                 inventory.setItem(4, menu);
             } catch (final Exception e) {
@@ -345,6 +344,14 @@ public class InventoryUtils {
         meta.displayName(ConfigUtils.toComponent(""));
         item.setItemMeta(meta);
         return item;
+    }
+    
+    public static void setMetaString(ItemMeta meta, NamespacedKey key, String data) {
+        if (meta == null) {
+            return;
+        }
+        
+        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, data);
     }
     
     /**

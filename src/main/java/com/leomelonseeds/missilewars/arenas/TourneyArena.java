@@ -21,8 +21,8 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 public class TourneyArena extends ClassicArena {
 
     public TourneyArena(String name, int capacity) {
-        super(name, capacity);
-        gamemode = "tourney";
+        super(name, capacity, false);
+        gamemode = ArenaGamemode.CLASSIC;
     }
 
     /**

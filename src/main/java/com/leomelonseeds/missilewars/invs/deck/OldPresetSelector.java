@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -14,7 +13,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -102,8 +100,7 @@ public class OldPresetSelector extends MWInventory {
             }
             
             // Add data for slot registration identification
-            meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "preset"),
-                    PersistentDataType.STRING, p);
+            InventoryUtils.setMetaString(meta, InventoryUtils.PRESET_KEY, p);
             meta.lore(ConfigUtils.toComponent(lore));
             item.setItemMeta(meta);
             // Slots 20, 22, 24
@@ -123,7 +120,7 @@ public class OldPresetSelector extends MWInventory {
             
             sel = sel.withType(Material.valueOf(itemConfig.getString("preset.normal.item" + select)));
             selMeta.displayName(ConfigUtils.toComponent(itemConfig.getString("preset.normal.name" + select)));
-            selMeta.getPersistentDataContainer().set(InventoryUtils.PRESET_KEY, PersistentDataType.STRING, p);
+            InventoryUtils.setMetaString(selMeta, InventoryUtils.PRESET_KEY, p);
             sel.setItemMeta(selMeta);
             inv.setItem(i * 2 + 29, sel);
         }

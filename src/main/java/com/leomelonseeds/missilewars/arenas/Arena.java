@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -17,7 +18,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,7 +25,6 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -60,11 +59,13 @@ public abstract class Arena implements ConfigurationSerializable {
     public static Comparator<Arena> byName = Comparator.comparing(a -> a.getName());
     public static Comparator<Arena> byPlayers = Comparator.comparing(a -> a.getNumPlayers());
     public static Comparator<Arena> byPriority = Comparator.comparing(a -> a.getIntSetting(ArenaSetting.PRIORITY));
+
+    private final ArenaType type;
     
     protected MissileWarsPlugin plugin;
-    protected String name;
+    protected String name; // This is the arena's identifier
     protected String mapName;
-    protected String gamemode;
+    protected ArenaGamemode gamemode;
     protected ArenaSettings settings;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
@@ -95,11 +96,12 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param name the name
      * @param capacity the max capacity
      */
-    public Arena(String name, int capacity) {
+    public Arena(String name, int capacity, ArenaType type) {
         this.plugin = MissileWarsPlugin.getPlugin();
         this.settings = new ArenaSettings();
         this.name = name;
-        this.gamemode = "classic";
+        this.type = type;
+        this.gamemode = ArenaGamemode.CLASSIC;
         npcs = new ArrayList<>();
         init();
     }
@@ -113,7 +115,8 @@ public abstract class Arena implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
-        serializedArena.put("gamemode", gamemode);
+        serializedArena.put("gamemode", getGamemode());
+        serializedArena.put("type", type);
         serializedArena.put("settings", settings);
         List<String> npcStrings = new ArrayList<>();
         for (int i : npcs) {
@@ -131,8 +134,16 @@ public abstract class Arena implements ConfigurationSerializable {
     public Arena(Map<String, Object> serializedArena) {
         plugin = MissileWarsPlugin.getPlugin();
         name = (String) serializedArena.get("name");
-        gamemode = (String) serializedArena.get("gamemode");
-        settings = (ArenaSettings) serializedArena.get("settings");
+        gamemode = ArenaGamemode.valueOf(((String) serializedArena.get("gamemode")).toUpperCase());
+        type = ArenaType.valueOf((String) serializedArena.get("type"));
+        
+        // Legacy code for if arenas don't have settings yet
+        if (serializedArena.containsKey("settings")) {
+            settings = (ArenaSettings) serializedArena.get("settings");
+        } else {
+            settings = new ArenaSettings();
+        }
+        
         npcs = new ArrayList<>();
         String npcIDs = (String) serializedArena.get("npc");
         for (String s : npcIDs.split(",")) {
@@ -153,6 +164,10 @@ public abstract class Arena implements ConfigurationSerializable {
         return settings;
     }
     
+    public ArenaType getType() {
+        return type;
+    }
+    
     /**
      * This may change a lot of things. Use with caution.
      * 
@@ -170,7 +185,7 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(gamemode, settings.getSelectedMaps(), !isCustom());
+        voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), !isCustom());
         startSpectatorActionBarTask();
     }
     
@@ -256,12 +271,12 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the gamemode for this arena.
+     * Get the gamemode for this arena as a string.
      *
      * @return the current map type for this arena
      */
     public String getGamemode() {
-        return gamemode;
+        return gamemode.toString();
     }
 
     /**
@@ -497,7 +512,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return
      */
     public boolean isAvailable(String map) {
-        return rankMedian >= ArenaUtils.getRankRequirement(gamemode, map);
+        return rankMedian >= ArenaUtils.getRankRequirement(getGamemode(), map);
     }
     
     /**
@@ -631,8 +646,7 @@ public abstract class Arena implements ConfigurationSerializable {
             String path = "held." + i;
             ItemStack item = InventoryUtils.createItem(path);
             ItemMeta meta = item.getItemMeta();
-            meta.getPersistentDataContainer().set(new NamespacedKey(MissileWarsPlugin.getPlugin(), "held"),
-                    PersistentDataType.STRING, i);
+            InventoryUtils.setMetaString(meta, InventoryUtils.HELD_KEY, i);
             item.setItemMeta(meta);
             player.getInventory().setItem(itemConfig.getInt(path + ".slot"), item);
         }
@@ -1003,14 +1017,14 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Generate map.
         announceMessage("messages.starting", null);
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), gamemode, result -> {
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), getGamemode(), result -> {
             // Result will only run if map loading is a success
             // Acquire red and blue spawns
             FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
-            Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", gamemode, mapName);
+            Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", getGamemode(), mapName);
             World world = getWorld();
             Location blueSpawn = new Location(world, blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
-            Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", gamemode, mapName);
+            Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", getGamemode(), mapName);
             Location redSpawn = new Location(world, redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
             redSpawn.setYaw(180);
 
@@ -1350,14 +1364,18 @@ public abstract class Arena implements ConfigurationSerializable {
     // Calculate and store all player stats from the game
     protected abstract void calculateStats(MissileWarsTeam winningTeam);
     
-    /** Remove Players from the map */
+    /**
+     * Sends all players back to the waiting lobby. This function used to 
+     * send players to another arena, but this is no longer necessary because
+     * world resets are noww handled by FAWE
+     */
     public void removePlayers() {
         int cap = plugin.getConfig().getInt("arena-cap");
         int capacity = getCapacity();
+        List<Arena> togo = plugin.getArenaManager().getLoadedArenas(type);
         for (MissileWarsPlayer mwPlayer : new HashSet<>(players.values())) {
             // If DOES NOT HAVE the permission, then we DO REQUEUE the player
             // Also only requeue if capacity is 20
-            List<Arena> togo = plugin.getArenaManager().getLoadedArenas(gamemode);
             Player player = mwPlayer.getMCPlayer();
             if (!player.hasPermission("umw.disablerequeue") && capacity == cap) {
                 Boolean success = false;
@@ -1470,5 +1488,22 @@ public abstract class Arena implements ConfigurationSerializable {
         } else {
             blueTeam.registerShieldBlockUpdate(location, place);
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Arena other = (Arena) obj;
+        return Objects.equals(name, other.name);
     }
 }

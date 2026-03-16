@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
@@ -201,8 +202,16 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
         
+        // umw_count_[type]
         if (params.contains("count")) {
-            return Integer.toString(manager.getPlayers(params.split("_")[1]));
+            ArenaType type;
+            try {
+                type = ArenaType.valueOf(params.split("_")[1].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return "0";
+            }
+            
+            return Integer.toString(manager.getPlayers(type));
         }
 
         if (params.equals("arena")) {

@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -39,14 +38,14 @@ public abstract class PaginatedMWIInventory extends MWInventory {
             lastPageItem = new ItemStack(Material.ARROW);
             ItemMeta lastPageMeta = lastPageItem.getItemMeta();
             lastPageMeta.displayName(ConfigUtils.toComponent("&fLast Page"));
-            lastPageMeta.getPersistentDataContainer().set(InventoryUtils.ITEM_GUI_KEY, PersistentDataType.STRING, "last-page");
+            InventoryUtils.setMetaString(lastPageMeta, InventoryUtils.ITEM_GUI_KEY, "last-page");
             lastPageItem.setItemMeta(lastPageMeta);
 
             nextPageItem = new ItemStack(Material.ARROW);
             ItemMeta nextPageMeta = nextPageItem.getItemMeta();
             nextPageMeta.displayName(ConfigUtils.toComponent("&fNext Page"));
-            nextPageMeta.getPersistentDataContainer().set(InventoryUtils.ITEM_GUI_KEY, PersistentDataType.STRING, "next-page");
-            nextPageItem.setItemMeta(lastPageMeta);
+            InventoryUtils.setMetaString(nextPageMeta, InventoryUtils.ITEM_GUI_KEY, "next-page");
+            nextPageItem.setItemMeta(nextPageMeta);
         }
         
         this.page = 0;

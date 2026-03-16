@@ -39,9 +39,9 @@ public class ClassicArena extends Arena {
     /** LEFT = RED, RIGHT = BLUE */
     private Map<MissileWarsPlayer, MutablePair<BukkitTask, BukkitTask>> glowTasks;
     
-    public ClassicArena(String name, int capacity) {
-        super(name, capacity);
-        gamemode = "classic";
+    public ClassicArena(String name, int capacity, boolean isCustom) {
+        super(name, capacity, isCustom ? ArenaType.CUSTOM : ArenaType.CLASSIC);
+        gamemode = ArenaGamemode.CLASSIC;
         this.glowTasks = new HashMap<>();
     }
 
@@ -212,7 +212,7 @@ public class ClassicArena extends Arena {
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
 
             sql.updateClassicStats(uuid, portals, Math.max(won, 0), 1, kills, missiles, utility, deaths);
-            sql.updateWinstreak(uuid, gamemode, won);
+            sql.updateWinstreak(uuid, getGamemode(), won);
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
 
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));

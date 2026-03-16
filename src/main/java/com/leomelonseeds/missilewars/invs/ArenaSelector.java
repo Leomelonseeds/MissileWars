@@ -14,17 +14,19 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
 public class ArenaSelector extends MWInventory {
 
-    private String gamemode;
+    private ArenaType type;
     
-    public ArenaSelector(Player player, String gamemode) {
+    public ArenaSelector(Player player, ArenaType type) {
         super(player, 27, ConfigUtils.getConfigText("inventories.game-selector.title"));
-        this.gamemode = gamemode;
+        this.type = type;
         autoRefresh(20);
     }
     
@@ -32,7 +34,7 @@ public class ArenaSelector extends MWInventory {
     @Override
     public void updateInventory() {
         inv.clear();
-        for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(gamemode)) {
+        for (Arena arena : MissileWarsPlugin.getPlugin().getArenaManager().getLoadedArenas(type)) {
             int playerCount = arena.getNumPlayers();
             ItemStack arenaItem = new ItemStack(Material.TNT, Math.max(1, playerCount));
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
@@ -42,6 +44,7 @@ public class ArenaSelector extends MWInventory {
                 lore.add(ConfigUtils.toComponent(s));
             }
             arenaItemMeta.displayName(ConfigUtils.toComponent(display));
+            InventoryUtils.setMetaString(arenaItemMeta, InventoryUtils.ITEM_GUI_KEY, arena.getName());
             arenaItemMeta.lore(lore);
             
             // Add glowing effect if people are inside
@@ -58,13 +61,12 @@ public class ArenaSelector extends MWInventory {
     @Override
     public void registerClick(int slot, ClickType type) {
         ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena selectedArena = manager.getArena(slot, gamemode);
-        if (selectedArena == null) {
+        String arena = InventoryUtils.getGUIFromItem(inv.getItem(slot));
+        if (arena == null) {
             return;
         }
-
-        // Attempt to send player to arena
-        if (selectedArena.joinPlayer(player)) {
+        
+        if (manager.getArena(arena).joinPlayer(player)) {
             player.closeInventory();
         }
     }

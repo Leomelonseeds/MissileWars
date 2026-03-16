@@ -11,7 +11,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.RayTraceResult;
 
@@ -28,6 +26,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicLoadResult;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 import com.sk89q.worldedit.EditSession;
@@ -263,11 +262,7 @@ public class EngineerSession {
         String missileName = (args[1].startsWith("§") ? args[1].substring(0, 2) : "") + playerName + " " + args[1];
         String finalName = String.join(" ", args[0], missileName, args[2]);
         meta.customName(ConfigUtils.toComponent(finalName));
-        meta.getPersistentDataContainer().set(
-            new NamespacedKey(MissileWarsPlugin.getPlugin(), "item-structure"), 
-            PersistentDataType.STRING,
-            customName
-        );
+        InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_STRUCTURE_KEY, customName);
         item.setItemMeta(meta);
         
         // Give the item to the player

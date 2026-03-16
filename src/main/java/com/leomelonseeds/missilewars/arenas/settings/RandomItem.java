@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -79,11 +78,7 @@ public class RandomItem implements ConfigurationSerializable {
             
             if (settings.containsKey("custom-offset")) {
                 ItemMeta meta = item.getItemMeta();
-                meta.getPersistentDataContainer().set(
-                    InventoryUtils.CUSTOM_OFFSET_KEY, 
-                    PersistentDataType.STRING, 
-                    (String) settings.get("custom-offset")
-                );
+                InventoryUtils.setMetaString(meta, InventoryUtils.CUSTOM_OFFSET_KEY, (String) settings.get("custom-offset"));
                 item.setItemMeta(meta);
             }
         }

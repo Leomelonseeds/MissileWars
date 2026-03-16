@@ -23,7 +23,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionType;
 import org.json.JSONObject;
 
@@ -398,7 +397,7 @@ public class DeckManager {
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             key = InventoryUtils.ITEM_UTILITY_KEY;
         }
-        itemMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, name + "-" + level);
+        InventoryUtils.setMetaString(itemMeta, key, name + "-" + level);
         
         // Setup extra item attributes for specific things
         if (name.equals("splash")) {

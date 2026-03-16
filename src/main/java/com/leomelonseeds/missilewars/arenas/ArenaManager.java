@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -70,15 +70,22 @@ import net.citizensnpcs.trait.VillagerProfession;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
-    
-    private final static List<String> specialArenas = List.of("tutorial", "training");
 
     private final MissileWarsPlugin plugin;
-    private Map<String, Arena> loadedArenas; // Use map to fetch arenas easily
+    private Map<String, Arena> loadedArenas; // Use maps to fetch arenas easily
+    private Map<UUID, Arena> customArenas;
+    private Map<ArenaType, TreeSet<Arena>> gamemodeArenas;
 
     public ArenaManager(MissileWarsPlugin plugin) {
         this.plugin = plugin;
         this.loadedArenas = new HashMap<>();
+        this.customArenas = new HashMap<>();
+        this.gamemodeArenas = new HashMap<>();
+        for (ArenaType type : ArenaType.values()) {
+            Comparator<Arena> firstComparator = type == ArenaType.CUSTOM ? Arena.byPriority : Arena.byCapacity;
+            Comparator<Arena> fullComparator = Collections.reverseOrder(firstComparator).thenComparing(Arena.byName);
+            gamemodeArenas.put(type, new TreeSet<>(fullComparator));
+        }
     }
 
     /** Load arenas from data file */
@@ -90,6 +97,10 @@ public class ArenaManager {
             arenaConfig.load(arenaFile);
             for (Arena arena : (List<Arena>) arenaConfig.get("arenas", Collections.EMPTY_LIST)) {
                 loadedArenas.put(arena.getName(), arena);
+                gamemodeArenas.get(arena.getType()).add(arena);
+                if (arena.isCustom()) {
+                    customArenas.put((UUID) arena.getArenaSettings().get(ArenaSetting.OWNER_UUID), arena);
+                }
             }
         } catch (IOException | InvalidConfigurationException e) {
             Bukkit.getLogger().severe("Could not load arenas from file!");
@@ -172,7 +183,12 @@ public class ArenaManager {
         } catch (IOException e) {
             logger.warning("The world file couldn't be removed! Please remove manually.");
         }
+        
+        // Remove references to the arena
         loadedArenas.remove(arena.getName());
+        gamemodeArenas.get(arena.getType()).remove(arena);
+        customArenas.remove(arena.getArenaSettings().get(ArenaSetting.OWNER_UUID));
+        
         saveArenasToFile();
         return true;
     }
@@ -184,24 +200,16 @@ public class ArenaManager {
         Logger logger = Bukkit.getLogger();
         // If players are in arenas, don't do it
         if (Bukkit.getOnlinePlayers().size() != Bukkit.getWorld("world").getPlayerCount()) {
-            logger.log(Level.WARNING, "Some players are in arenas!");
+            logger.warning("Some players are in arenas!");
             return;
         }
-        logger.log(Level.INFO, "Performing arena upgrades. This might take a while!");
-        for (Arena arena : new ArrayList<>(getLoadedArenas())) {
-            String name = arena.getName();
-            String[] args = name.split("-");
+        logger.info("Performing arena upgrades. This might take a while!");
+        for (Arena arena : new ArrayList<>(loadedArenas.values())) {
+            String[] args = arena.getName().split("-");
             String rawname = args[args.length - 1];
-            boolean isCustom = args[0].equals("custom");
-            int capacity = arena.getCapacity();
-            String gamemode = arena.getGamemode();
             removeArena(arena);
-            if (isCustom) {
-                Arena newArena = createArena(args[1], "classic", 2, true);
-                newArena.setArenaSettings(new ArenaSettings(arena.getArenaSettings()));
-            } else {
-                createArena(rawname, specialArenas.contains(rawname) ? rawname : gamemode, capacity);
-            }
+            Arena newArena = createArena(rawname, arena.getType(), arena.getCapacity());
+            newArena.setArenaSettings(new ArenaSettings(arena.getArenaSettings()));
         }
     }
     
@@ -220,23 +228,9 @@ public class ArenaManager {
         }
     }
 
-
-    /**
-     * Get an Arena by index.
-     *
-     * @param index the index of the Arena
-     * @return the Arena, or null if it doesn't exist
-     */
-    public Arena getArena(int index, String gamemode) {
-        if (index < 0 || index >= getLoadedArenas(gamemode).size()) {
-            return null;
-        }
-        return getLoadedArenas(gamemode).get(index);
-    }
-
     /**
      * Get the Arena that a player with a given UUID is in.
-     * Use lightly, scales with amount of arenas
+     * Use lightly, scales with amount of arenas.
      *
      * @param id the UUID of the player
      * @return the Arena that the player is in, or null
@@ -316,7 +310,7 @@ public class ArenaManager {
     }
     
     public Arena createCustomArena(String name, UUID uuid) {
-        Arena arena = createArena(name, "classic", 2, true);
+        Arena arena = createArena(name, ArenaType.CUSTOM, 2);
         if (arena == null) {
             return null;
         }
@@ -325,35 +319,24 @@ public class ArenaManager {
         settings.set(ArenaSetting.OWNER_NAME, name);
         settings.set(ArenaSetting.OWNER_UUID, uuid);
         settings.set(ArenaSetting.IS_PRIVATE, true);
+        customArenas.put(uuid, arena);
         return arena;
-    }
-
-    /**
-     * Create and save a new arena, accounting for custom arenas
-     * 
-     * @param tempname
-     * @param gamemode
-     * @param capacity
-     * @return
-     */
-    public Arena createArena(String tempname, String gamemode, int capacity) {
-        return createArena(tempname, gamemode, capacity, false);
     }
     
     /**
-     * Create and save a new arena, accounting for custom arenas
+     * Create and save a new arena
      * 
      * @param tempname
      * @param gamemode
      * @param capacity
-     * @param isCustom
      * @return
      */
-    private Arena createArena(String tempname, String gamemode, int capacity, boolean isCustom) {
-
+    public Arena createArena(String tempname, ArenaType type, int capacity) {
     	Logger logger = Bukkit.getLogger();
+    	String gamemode = type.toString().toLowerCase();
+    	boolean isCustom = type == ArenaType.CUSTOM;
     	String name;
-    	if (specialArenas.contains(gamemode)) {
+    	if (type.isSpecial()) {
     	    name = gamemode;
     	} else if (isCustom) {
     	    name = "custom-" + tempname;
@@ -362,30 +345,30 @@ public class ArenaManager {
     	}
 
         // Ensure arena world doesn't exist
-        if (Bukkit.getWorld("mwarena_" + name) != null) {
-            logger.log(Level.WARNING, "An arena with the name " + name + " already exists!");
+        if (loadedArenas.containsKey(name)) {
+            logger.warning("An arena with the name " + name + " already exists!");
             return null;
         }
 
         // Register arena
         Arena arena;
-        switch (gamemode) {
-        case "classic":
-            arena = new ClassicArena(name, capacity);
+        switch (type) {
+        case CLASSIC:
+        case CUSTOM:
+            arena = new ClassicArena(name, capacity, isCustom);
             break;
-        case "tourney":
+        case TOURNEY:
             arena = new TourneyArena(name, capacity);
             break;
-        case "training":
+        case TRAINING:
             arena = new TrainingArena();
             arena.getArenaSettings().getSelectedMaps().add("default-map");
             break;
-        case "tutorial":
+        case TUTORIAL:
             arena = new TutorialArena();
             arena.getArenaSettings().getSelectedMaps().add("default-map");
-            break;
         default:
-            logger.log(Level.WARNING, "Invalid arena type!");
+            logger.warning("Arena type not accounted for? That simply isn't possible wtf");
             return null;
         }
 
@@ -407,7 +390,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         arenaWorld.setGameRule(GameRule.DO_ENTITY_DROPS, false);
         arenaWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
-        arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, gamemode.equals("tutorial"));
+        arenaWorld.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, type == ArenaType.TUTORIAL);
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
@@ -525,8 +508,6 @@ public class ArenaManager {
                     arenaWorld.getBlockAt(x, y, z).setType(Material.BARRIER);
                 }
             }
-
-            loadedArenas.put(name, arena);
             
             // Setup regions
             WorldGuard wg = WorldGuard.getInstance();
@@ -553,6 +534,10 @@ public class ArenaManager {
             manager.addRegion(lobbyRegion);
             createWaitingLobby("red", arena, lobbyRegion);
             createWaitingLobby("blue", arena, lobbyRegion);
+            
+            // Save arenas in loaded arenas list
+            loadedArenas.put(name, arena);
+            gamemodeArenas.get(arena.getType()).add(arena);
 
             logger.log(Level.INFO, "Arena " + name + " generated. World will save in 5 seconds.");
 
@@ -587,92 +572,40 @@ public class ArenaManager {
         return arena.getPlayerInArena(id);
     }
     
-    public List<Arena> getLoadedArenas(String gamemode) {
-        return getLoadedArenas(gamemode, Arena.byCapacity);
+    /**
+     * Get the loaded arenas of a specific arena type. Arenas are sorted
+     * by default by capacity in descending order, then by name
+     * 
+     * @param type
+     * @return
+     */
+    public List<Arena> getLoadedArenas(ArenaType type) {
+        return new ArrayList<>(gamemodeArenas.get(type));
     }
 
     /**
-     * Gets a list of the loaded arenas, by gamemode
+     * Gets a list of the loaded arenas by type with a supplied comparator.
+     * The comparator is by default in ascending order.
      *
      * @return The list of loaded arenas
      */
-    public List<Arena> getLoadedArenas(String gamemode, Comparator<Arena> sortingType) {
-        List<Arena> sortedArenas = loadedArenas
-                .values()
-                .stream()
-                .filter(a -> 
-                    a.getGamemode().equals(gamemode) && 
-                    !a.isCustom() && 
-                    !specialArenas.contains(a.getName()))
-                .collect(Collectors.toList());
-        sortedArenas.sort(Collections.reverseOrder(sortingType).thenComparing(Arena.byName));
-        return sortedArenas;
+    public List<Arena> getLoadedArenas(ArenaType type, Comparator<Arena> sortingType) {
+        List<Arena> arenas = new ArrayList<>(gamemodeArenas.get(type));
+        arenas.sort(sortingType.thenComparing(Arena.byName));
+        return arenas;
     }
     
     /**
      * Get total number of players playing a gamemode
-     * TODO: Possibly store different types of arenas in different lists
      * 
      * @param gamemode
      * @return
      */
-    public int getPlayers(String gamemode) {
-        int count = 0;
-        if (gamemode.equals("training")) {
-            for (Arena arena : loadedArenas.values()) {
-                if (arena instanceof TrainingArena) {
-                    return arena.getTotalPlayers();
-                }
-            }
-            return 0;
-        }
-
-        if (gamemode.equals("tutorial")) {
-            for (Arena arena : loadedArenas.values()) {
-                if (arena instanceof TutorialArena) {
-                    return arena.getTotalPlayers();
-                }
-            }
-            return 0;
-        }
-        
-        for (Arena a : getLoadedArenas(gamemode)) {
-            count += a.getTotalPlayers();
-        }
-        return count;
-    }
-
-
-    /**
-     * Gets a list of the loaded arenas, sorted by highest capacity then by name
-     *
-     * @return The list of loaded arenas
-     */
-    public List<Arena> getLoadedArenas() {
-        List<Arena> sortedArenas = new ArrayList<>(loadedArenas.values());
-        sortedArenas.sort(Collections.reverseOrder(Arena.byCapacity).thenComparing(Arena.byName));
-        return sortedArenas;
-    }
-    
-    /**
-     * @return list of custom arenas sorted by priority
-     */
-    public List<Arena> getCustomArenas() {
-        List<Arena> sortedArenas = loadedArenas.values().stream().filter(a -> a.isCustom()).collect(Collectors.toList());
-        sortedArenas.sort(Arena.byPriority.thenComparing(Arena.byName));
-        return sortedArenas;
+    public int getPlayers(ArenaType type) {
+        return gamemodeArenas.get(type).stream().mapToInt(a -> a.getTotalPlayers()).sum();
     }
     
     public Arena getCustomArena(Player player) {
-        UUID uuid = player.getUniqueId();
-        for (Arena arena : loadedArenas.values()) {
-            if (!uuid.equals(arena.getArenaSettings().get(ArenaSetting.OWNER_UUID))) {
-                continue;
-            }
-            
-            return arena;
-        }
-        
-        return null;
+        return customArenas.get(player.getUniqueId());
     }
 }

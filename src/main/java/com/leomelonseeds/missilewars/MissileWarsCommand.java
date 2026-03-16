@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.TourneyArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
@@ -451,7 +452,13 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             int arenaCapacity = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-            String arenaType = args[2];
+            ArenaType type;
+            try {
+                type = ArenaType.valueOf(args[2]);
+            } catch (IllegalArgumentException e) {
+                sendErrorMsg(sender, "Invalid arena type!");
+                return true;
+            }
 
             if (args.length > 3) {
                 try {
@@ -463,7 +470,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Create new arena
-            if (arenaManager.createArena(arenaName, arenaType, arenaCapacity) != null) {
+            if (arenaManager.createArena(arenaName, type, arenaCapacity) != null) {
                 sendSuccessMsg(sender, "New arena created!");
                 return true;
             } else {
@@ -532,9 +539,16 @@ public class MissileWarsCommand implements CommandExecutor {
                 sendErrorMsg(sender, "No target found!");
                 return true;
             }
+
+            ArenaType type;
+            try {
+                type = ArenaType.valueOf(args[2].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                sendErrorMsg(sender, "Invalid gamemode type!");
+                return true;
+            }
             
-            String gamemode = args[2];
-            new ArenaSelector(target, gamemode);
+            new ArenaSelector(target, type);
             return true;
         }
 
@@ -578,18 +592,17 @@ public class MissileWarsCommand implements CommandExecutor {
                 
                 // Otherwise join fullest arena
                 int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-                for (Arena arena : arenaManager.getLoadedArenas("classic", Arena.byPlayers)) {
+                for (Arena arena : arenaManager.getLoadedArenas(ArenaType.CLASSIC, Arena.byPlayers)) {
                     if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && !arena.isResetting()) {
                         arena.joinPlayer(player);
                         return true;
                     }
                 }
             } else if (args.length >= 2) {
-                for (Arena arena : arenaManager.getLoadedArenas()) {
-                    if (arena.getName().equalsIgnoreCase(args[1])) {
-                        arena.joinPlayer(player);
-                        return true;
-                    }
+                Arena arena = arenaManager.getArena(args[1]);
+                if (arena != null) {
+                    arena.joinPlayer(player);
+                    return true;
                 }
 
                 sendErrorMsg(sender, "Please specify a valid arena name!");

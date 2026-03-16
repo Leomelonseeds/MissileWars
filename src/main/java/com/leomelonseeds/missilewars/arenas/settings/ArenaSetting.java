@@ -2,6 +2,8 @@ package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.Map;
 
+import org.bukkit.Difficulty;
+
 public enum ArenaSetting {
     
     CAPACITY(20, "capacity", IntSettingModifier.create(2, 20, 2)),
@@ -22,8 +24,10 @@ public enum ArenaSetting {
     ENABLE_AUTO_START(true, "enable-auto-start"),
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     IS_PRIVATE(false, "is-private"),
+    IS_ALWAYS_ONLINE(true, "always-online"),
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(null, "owner-uuid"),
+    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty"),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;

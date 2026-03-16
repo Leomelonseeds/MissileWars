@@ -40,7 +40,7 @@ public class TrainingArena extends ClassicArena {
     private int missiles;
     
     public TrainingArena() {
-        super("training", 100);
+        super("training", 100, false);
         init();
     }
 
@@ -247,11 +247,12 @@ public class TrainingArena extends ClassicArena {
         }
 
         // Get shield coordinates
-        int x1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x1");
-        int x2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.x2");
-        int y1 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y1");
-        int y2 = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.y2");
-        int z = (int) ConfigUtils.getMapNumber(gamemode, mapName, "red-shield.z1");
+        String gamemodeStr = getGamemode();
+        int x1 = (int) ConfigUtils.getMapNumber(gamemodeStr, mapName, "red-shield.x1");
+        int x2 = (int) ConfigUtils.getMapNumber(gamemodeStr, mapName, "red-shield.x2");
+        int y1 = (int) ConfigUtils.getMapNumber(gamemodeStr, mapName, "red-shield.y1");
+        int y2 = (int) ConfigUtils.getMapNumber(gamemodeStr, mapName, "red-shield.y2");
+        int z = (int) ConfigUtils.getMapNumber(gamemodeStr, mapName, "red-shield.z1");
         
         // Find random missile
         Random random = new Random();
@@ -389,8 +390,8 @@ public class TrainingArena extends ClassicArena {
             if (loc == null) {
                 // If portals destroyed, target the other portal
                 FileConfiguration maps = ConfigUtils.getConfigFile("maps.yml");
-                Location p1 = SchematicManager.getVector(maps, "portals.1", gamemode, mapName).toLocation(world);
-                Location p2 = SchematicManager.getVector(maps, "portals.2", gamemode, mapName).toLocation(world);
+                Location p1 = SchematicManager.getVector(maps, "portals.1", gamemodeStr, mapName).toLocation(world);
+                Location p2 = SchematicManager.getVector(maps, "portals.2", gamemodeStr, mapName).toLocation(world);
                 if (p1.getBlock().getType() != Material.NETHER_PORTAL) {
                     x1 += 15; // p1 is negative x portal, so target positive X by increasing X
                 } else if (p2.getBlock().getType() != Material.NETHER_PORTAL) {

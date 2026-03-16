@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -63,7 +62,7 @@ public class CosmeticUtils {
             lore.addAll(messages.getStringList("inventories.cosmetics." + toUse));
             
             // Add meta to store name of cosmetic item
-            meta.getPersistentDataContainer().set(InventoryUtils.COSMETIC_KEY, PersistentDataType.STRING, s);
+            InventoryUtils.setMetaString(meta, InventoryUtils.COSMETIC_KEY, s);
             
             // Finally create item
             meta.lore(ConfigUtils.toComponent(lore));
