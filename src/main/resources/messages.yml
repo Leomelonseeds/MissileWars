@@ -145,6 +145,7 @@ messages:
   torpedo-too-close: "&cYou cannot spawn torpedos this close to yourself!"
   map-voting-disabled: "&c&l[!] &7Map voting is disabled on this arena."
   arena-resetting: "&7Resetting arena..."
+  arena-reset-complete: "&7Finished resetting arena."
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."

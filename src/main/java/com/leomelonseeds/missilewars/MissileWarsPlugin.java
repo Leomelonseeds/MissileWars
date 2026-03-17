@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -13,6 +14,9 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
+import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
+import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.arenas.teams.ClassicPortal;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.DeckManager;
@@ -41,6 +45,7 @@ public final class MissileWarsPlugin extends JavaPlugin {
     /** Whether it is currently safe to spawn a glow entity */
     public static boolean glow_safe = false;
     public static int seconds_until_glow = 10;
+    public static UUID zeroUUID = new UUID(0, 0); // idk where else to put this man
 
     private static MissileWarsPlugin plugin;
     private ArenaManager arenaManager;
@@ -60,6 +65,9 @@ public final class MissileWarsPlugin extends JavaPlugin {
 
         // Register serializable data
         ConfigurationSerialization.registerClass(Arena.class);
+        ConfigurationSerialization.registerClass(ArenaSettings.class);
+        ConfigurationSerialization.registerClass(RandomItemDistributor.class);
+        ConfigurationSerialization.registerClass(RandomItem.class);
         ClassicPortal.onEnable();
 
         // Save data files

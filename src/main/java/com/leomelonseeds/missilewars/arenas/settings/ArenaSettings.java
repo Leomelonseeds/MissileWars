@@ -43,7 +43,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         Map<String, Object> settings = new HashMap<>();
         
         for (ArenaSetting setting : ArenaSetting.values()) {
-            if (currentSettings.containsKey(setting)) {
+            if (!currentSettings.containsKey(setting)) {
                 continue;
             }
             
@@ -82,6 +82,8 @@ public class ArenaSettings implements ConfigurationSerializable {
             String uuids = (String) settings.get("player-blacklist");
             List<UUID> uuidList = Arrays.asList(uuids.split(",")).stream().map(str -> UUID.fromString(str)).toList();
             playerWhitelist = new ArrayList<>(uuidList);
+        } else {
+            playerWhitelist = new ArrayList<>();
         }
         
         // Duplicated code is okay actually
@@ -89,10 +91,14 @@ public class ArenaSettings implements ConfigurationSerializable {
             String uuids = (String) settings.get("player-whitelist");
             List<UUID> uuidList = Arrays.asList(uuids.split(",")).stream().map(str -> UUID.fromString(str)).toList();
             playerBlacklist = new ArrayList<>(uuidList);
+        } else {
+            playerBlacklist = new ArrayList<>();
         }
         
         if (settings.containsKey("selected-maps")) {
-            selectedMaps = (ArrayList<String>) settings.get("selected-maps");
+            selectedMaps = (List<String>) settings.get("selected-maps");
+        } else {
+            selectedMaps = new ArrayList<>();
         }
         
         if (settings.containsKey("random-item-distributor")) {

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.bukkit.Difficulty;
 
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
+
 public enum ArenaSetting {
     
     CAPACITY(20, "capacity", IntSettingModifier.create(2, 20, 2)),
@@ -26,7 +28,7 @@ public enum ArenaSetting {
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online"),
     OWNER_NAME("", "owner-name"),
-    OWNER_UUID(null, "owner-uuid"),
+    OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid"),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty"),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     

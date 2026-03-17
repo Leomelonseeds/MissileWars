@@ -116,7 +116,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Map<String, Object> serializedArena = new HashMap<>();
         serializedArena.put("name", name);
         serializedArena.put("gamemode", getGamemode());
-        serializedArena.put("type", type);
+        serializedArena.put("type", type.toString());
         serializedArena.put("settings", settings);
         List<String> npcStrings = new ArrayList<>();
         for (int i : npcs) {
@@ -351,7 +351,7 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     public boolean isCustom() {
-        return settings.get(ArenaSetting.OWNER_UUID) != null;
+        return !settings.get(ArenaSetting.OWNER_UUID).equals(MissileWarsPlugin.zeroUUID);
     }
 
     /**
@@ -560,13 +560,6 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return true if the player joined the Arena, otherwise false
      */
     public boolean joinPlayer(Player player, boolean asSpectator) {
-
-        // Ensure world isn't resetting
-        if (resetting) {
-            ConfigUtils.sendConfigMessage("messages.arena-full", player, this, null);
-            return false;
-        }
-
         // Make sure player not in parkour
         if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
             ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
@@ -734,24 +727,37 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid the UUID of player
      */
     public boolean leaveGame(UUID uuid) {
+        return leaveGame(uuid, true);
+    }
 
+    /**
+     * Warp player back to the waiting lobby
+     *
+     * @param uuid the UUID of player
+     * @param announce whether to announce the leave message
+     */
+    private boolean leaveGame(UUID uuid, boolean announce) {
         MissileWarsPlayer toRemove = getPlayerInArena(uuid);
         Player player = Bukkit.getPlayer(uuid);
 
-        if (!isRunning() || redTeam == null || blueTeam == null) {
+        if (redTeam == null || blueTeam == null) {
             removePlayer(uuid, true);
             return true;
         }
 
         if (redTeam.containsPlayer(uuid)) {
             redTeam.removePlayer(toRemove);
-            for (MissileWarsPlayer mwPlayer : players.values()) {
-                ConfigUtils.sendConfigMessage("messages.leave-team-red", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+            if (announce) {
+                for (MissileWarsPlayer mwPlayer : players.values()) {
+                    ConfigUtils.sendConfigMessage("messages.leave-team-red", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+                }
             }
         } else if (blueTeam.containsPlayer(uuid)) {
             blueTeam.removePlayer(toRemove);
-            for (MissileWarsPlayer mwPlayer : players.values()) {
-                ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+            if (announce) {
+                for (MissileWarsPlayer mwPlayer : players.values()) {
+                    ConfigUtils.sendConfigMessage("messages.leave-team-blue", mwPlayer.getMCPlayer(), null, toRemove.getMCPlayer());
+                }
             }
         } else {
             removePlayer(uuid, true);
@@ -918,13 +924,23 @@ public abstract class Arena implements ConfigurationSerializable {
     public void enqueue(UUID uuid, TeamName team) {
         enqueue(uuid, team, false);
     }
-
+    
     /**
      * Remove the given player from the spectators list.
      *
      * @param player the player
      */
     public void removeSpectator(MissileWarsPlayer player) {
+        removeSpectator(player, true);
+    }
+
+    /**
+     * Remove the given player from the spectators list.
+     *
+     * @param player the player
+     * @announce whether the spectator leave message should be announced
+     */
+    private void removeSpectator(MissileWarsPlayer player, boolean announce) {
         if (!spectators.remove(player)) {
             return;
         }
@@ -1355,10 +1371,10 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Remove all players after a short time, then reset the world a bit after
         int waitTime = plugin.getConfig().getInt("victory-wait-time") * 20;
-        if (players.size() > 0) {
-            ConfigUtils.schedule(waitTime, () -> removePlayers());
-        }
-        ConfigUtils.schedule(waitTime + 40, () -> resetWorld());
+        ConfigUtils.schedule(waitTime, () -> {
+            removePlayers();
+            resetWorld();
+        });
     }
     
     // Calculate and store all player stats from the game
@@ -1367,49 +1383,32 @@ public abstract class Arena implements ConfigurationSerializable {
     /**
      * Sends all players back to the waiting lobby. This function used to 
      * send players to another arena, but this is no longer necessary because
-     * world resets are noww handled by FAWE
+     * world resets are noww handled by FAWE.
+     * 
+     * Additionally, any spectator that does not have umw.continuespectating
+     * will be removed from being in spectator mode.
      */
     public void removePlayers() {
-        int cap = plugin.getConfig().getInt("arena-cap");
-        int capacity = getCapacity();
-        List<Arena> togo = plugin.getArenaManager().getLoadedArenas(type);
-        for (MissileWarsPlayer mwPlayer : new HashSet<>(players.values())) {
-            // If DOES NOT HAVE the permission, then we DO REQUEUE the player
-            // Also only requeue if capacity is 20
-            Player player = mwPlayer.getMCPlayer();
-            if (!player.hasPermission("umw.disablerequeue") && capacity == cap) {
-                Boolean success = false;
-                for (Arena arena : togo) {
-                    if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && 
-                            (!arena.isRunning() && !arena.isResetting())) {
-                        // Switch player arenas
-                        boolean spectate = spectators.contains(mwPlayer) && player.hasPermission("umw.continuespectating");
-                        removePlayer(player.getUniqueId(), false);
-                        arena.joinPlayer(player, spectate);
-                        success = true;
-                        break;
-                    }
-                }
-                if (!success) {
-                    ConfigUtils.sendConfigMessage("messages.requeue-failed", player, null, null);
-                    removePlayer(player.getUniqueId(), true);
-                }
-            } else {
-                removePlayer(player.getUniqueId(), true);
-            }
+        for (MissileWarsPlayer mwPlayer : blueTeam.getMembers()) {
+            leaveGame(mwPlayer.getMCPlayerId(), false);
         }
         
-        // Just in case there are stragglers somehow
-        ConfigUtils.schedule(1, () -> {
-            for (Player player : getWorld().getPlayers()) {
-                player.teleport(ConfigUtils.getSpawnLocation());
+        for (MissileWarsPlayer mwPlayer : redTeam.getMembers()) {
+            leaveGame(mwPlayer.getMCPlayerId(), false);
+        }
+        
+        for (MissileWarsPlayer mwPlayer : spectators) {
+            if (!mwPlayer.getMCPlayer().hasPermission("umw.continuespectating")) {
+                removeSpectator(mwPlayer, false);
             }
-        });
+        }
     }
 
-    /** Reset the arena world */
+    /**
+     * Reset the arena world, checking for an auto-start once its done
+     */
     protected void resetWorld() {
-        resetWorld(null);
+        resetWorld(t -> checkForStart());
     }
     
     /**
@@ -1419,6 +1418,7 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     protected void resetWorld(DBCallback callback) {
         plugin.log("Resetting arena " + name + "...");
+        announceMessage("messages.arena-resetting", null);
         int maxHeight = plugin.getConfig().getInt("max-height");
         int maxX = plugin.getConfig().getInt("barrier.center.x") - 1;
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -1427,6 +1427,7 @@ public abstract class Arena implements ConfigurationSerializable {
             SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld(), false);
             resetting = false;
             plugin.log("Reset completed");
+            announceMessage("messages.arena-reset-complete", null);
             
             if (callback != null) {
                 Bukkit.getScheduler().runTask(plugin, () -> callback.onQueryDone(null));
@@ -1435,7 +1436,6 @@ public abstract class Arena implements ConfigurationSerializable {
         
         startTime = null;
         voteManager.resetVotes();
-        startSpectatorActionBarTask();
     }
 
     /**

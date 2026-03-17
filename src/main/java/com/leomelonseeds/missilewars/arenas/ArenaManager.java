@@ -27,6 +27,7 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -89,13 +90,14 @@ public class ArenaManager {
     }
 
     /** Load arenas from data file */
-    @SuppressWarnings("unchecked")
     public void loadArenas() {
         File arenaFile = new File(plugin.getDataFolder(), "arenas.yml");
         FileConfiguration arenaConfig = new YamlConfiguration();
         try {
             arenaConfig.load(arenaFile);
-            for (Arena arena : (List<Arena>) arenaConfig.get("arenas", Collections.EMPTY_LIST)) {
+            ConfigurationSection arenas = arenaConfig.getConfigurationSection("arenas");
+            for (String key : arenas.getKeys(false)) {
+                Arena arena = (Arena) arenas.get(key);
                 loadedArenas.put(arena.getName(), arena);
                 gamemodeArenas.get(arena.getType()).add(arena);
                 if (arena.isCustom()) {

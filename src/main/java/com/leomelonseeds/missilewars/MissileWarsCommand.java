@@ -454,7 +454,7 @@ public class MissileWarsCommand implements CommandExecutor {
             int arenaCapacity = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
             ArenaType type;
             try {
-                type = ArenaType.valueOf(args[2]);
+                type = ArenaType.valueOf(args[2].toUpperCase());
             } catch (IllegalArgumentException e) {
                 sendErrorMsg(sender, "Invalid arena type!");
                 return true;
