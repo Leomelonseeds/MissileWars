@@ -20,9 +20,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
@@ -66,6 +69,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected String name; // This is the arena's identifier
     protected String mapName;
     protected ArenaGamemode gamemode;
+    protected World world;
     protected ArenaSettings settings;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
@@ -150,6 +154,59 @@ public abstract class Arena implements ConfigurationSerializable {
             npcs.add(Integer.parseInt(s));
         }
         init();
+    }
+    
+    /**
+     * Loads the arena world. This function MUST be called for
+     * the arena to work. Do not allow players to join or run
+     * any other function if the world has not been loaded. If
+     * the world has already loaded, this does nothing.
+     * 
+     * @return whether the world was loaded successfully
+     */
+    public boolean loadWorld() {
+        if (world != null) {
+            return true;
+        }
+
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aLoading arena world " + name + "..."));
+        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        arenaCreator.type(WorldType.FLAT);
+        world = arenaCreator.generator(new ChunkGenerator() {}).createWorld();
+        if (world == null) {
+            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong loading " + name + "!."));
+            return false;
+        }
+        
+        world.setAutoSave(false);
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + "was loaded."));
+        return true;
+    }
+    
+    /**
+     * Unloads the world. Only works if player count is 0
+     * 
+     * @return whether the world was loaded successfully
+     */
+    public boolean unloadWorld() {
+        if (getWorld().getPlayerCount() > 0) {
+            return false;
+        }
+        
+        if (world == null) {
+            return false;
+        }
+
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Unloading arena world: " + name + "..."));
+        if (!Bukkit.unloadWorld(world, false)) {
+            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong unloading " + name + "!"));
+            return false;
+        }
+        
+        Bukkit.getWorlds().remove(world);
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + "was unloaded."));
+        world = null;
+        return true;
     }
     
     public int getIntSetting(ArenaSetting setting) {
@@ -258,7 +315,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return the world this Arena lies in
      */
     public World getWorld() {
-        return Bukkit.getWorld("mwarena_" + name);
+        return world;
     }
 
     /**
@@ -322,7 +379,7 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public String getStatus() {
         String status = "&eIn Lobby";
-        if (getWorld() == null) {
+        if (world == null) {
             status = "&cOffline";
         } else if (running) {
             status = "&aIn Game";

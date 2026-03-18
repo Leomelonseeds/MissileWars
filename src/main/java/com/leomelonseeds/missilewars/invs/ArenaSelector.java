@@ -128,6 +128,15 @@ public class ArenaSelector extends PaginatedMWIInventory {
             inv.setItem(SIZE - 4, ownedArena);
         } else {
             ConfigurationSection createSection = messagesConfig.getConfigurationSection("inventories.custom-game-selector.create-item");
+            ItemStack createItem = new ItemStack(Material.valueOf(createSection.getString("item")));
+            ItemMeta createMeta = createItem.getItemMeta();
+            createMeta.displayName(ConfigUtils.toComponent(createSection.getString("name")));
+            
+            // TODO: Check if meet rank requirement (RankUtils function % 10 == 0), then find the rank requirement number in the lines (find " 5") etc
+            List<String> createLore = createSection.getStringList("lore");
+            for (String line : createLore) {
+                
+            }
             
         }
     }

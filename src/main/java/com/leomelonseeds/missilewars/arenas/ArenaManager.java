@@ -103,19 +103,14 @@ public class ArenaManager {
                 if (arena.isCustom()) {
                     customArenas.put((UUID) arena.getArenaSettings().get(ArenaSetting.OWNER_UUID), arena);
                 }
+                
+                arena.loadWorld();
+                
             }
         } catch (IOException | InvalidConfigurationException e) {
             Bukkit.getLogger().severe("Could not load arenas from file!");
             e.printStackTrace();
             return;
-        }
-
-        // Load worlds for arenas
-        for (Arena arena : loadedArenas.values()) {
-            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("§aLoading arena: " + arena.getName() + "..."));
-            WorldCreator arenaCreator = new WorldCreator("mwarena_" + arena.getName());
-            arenaCreator.type(WorldType.FLAT);
-            arenaCreator.generator(new ChunkGenerator() {}).createWorld().setAutoSave(false);
         }
 
         // Reload citizens to make sure NPCs are there
@@ -177,8 +172,7 @@ public class ArenaManager {
         }
         
         CitizensAPI.getNPCRegistry().saveToStore();
-        Bukkit.unloadWorld(arenaWorld, false);
-        Bukkit.getWorlds().remove(arenaWorld);
+        arena.unloadWorld();
         File worldFolder = new File("mwarena_" + arena.getName());
         try {
             FileUtils.deleteDirectory(worldFolder);

@@ -228,4 +228,28 @@ public class RankUtils {
 
         plugin.getSQL().updateExp(player.getUniqueId(), exp);
     }
+    
+    /**
+     * Check if a player can create a custom arena, according to their permissions and mw rank
+     * 
+     * @param player
+     * @return mw rank they have to be to create one, multiplied by 10 if they CAN (insane strat)
+     */
+    public static int canCreateCustomArena(Player player) {
+        int levelRequired = 0;
+        for (int i = 1; i <= 6; i++) {
+            if (player.hasPermission("umw.customarena.creationrequirement." + i)) {
+                levelRequired = i;
+                break;
+            }
+        }
+
+        int currentExp = MissileWarsPlugin.getPlugin().getSQL().getExpSync(player.getUniqueId());
+        int currentLevel = getRankLevel(currentExp);
+        if (currentLevel >= levelRequired) {
+            return 0;
+        } else {
+            return levelRequired;
+        }
+    }
 }

@@ -147,7 +147,8 @@ messages:
   arena-resetting: "&7Resetting arena..."
   arena-reset-complete: "&7Finished resetting arena."
   arena-not-exist: "&c&l[!] &7That arena doesn't exist anymore, unfortunately :("
-  cannot-create-custom: "&cYou don't the requirements to create a custom arena yet! Your server rank is %rank%&c, so you must be %mwrank% &cor higher to create a custom arena."
+  cannot-create-custom: "&cYou don't meet the requirements to create a custom arena yet!"
+  cannot-edit-cusstom: "&cYou don't own a custom arena!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
