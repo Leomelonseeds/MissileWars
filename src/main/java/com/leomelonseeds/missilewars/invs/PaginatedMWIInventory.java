@@ -13,8 +13,8 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public abstract class PaginatedMWIInventory extends MWInventory {
     
-    protected static ItemStack lastPageItem;
-    protected static ItemStack nextPageItem;
+    private static ItemStack lastPageItem;
+    private static ItemStack nextPageItem;
     
     private int page;
     private int lastPageSlot; // Also happens to be the size of the paginated part of the inventory
@@ -64,6 +64,9 @@ public abstract class PaginatedMWIInventory extends MWInventory {
      */
     @Override
     public void updateInventory() {
+        inv.clear();
+        updateNonPaginatedSlots();
+        
         List<ItemStack> paginatedItems = getPaginatedItems();
         int keySize = paginatedItems.size();
         double maxPages = Math.ceil((double) keySize / lastPageSlot);
@@ -77,12 +80,10 @@ public abstract class PaginatedMWIInventory extends MWInventory {
             inv.setItem(nextPageSlot, nextPageItem);
         }
         
-        // Finally set all the hat items
+        // Finally set all the paginated items
         for (int i = page * lastPageSlot; i < Math.min(keySize, page * lastPageSlot + lastPageSlot); i++) {
             inv.setItem(i % lastPageSlot, paginatedItems.get(i));
         }
-        
-        updateNonPaginatedSlots();
     }
     
     @Override
@@ -111,7 +112,10 @@ public abstract class PaginatedMWIInventory extends MWInventory {
     protected abstract List<ItemStack> getPaginatedItems();
     
     /**
-     * Update bottom row items (does not include arrows)
+     * Update bottom row items (does not include arrows). This method
+     * runs before adding paginated items. Any items added here that
+     * are in the same slots as paginated items (such as arrows) will
+     * be overridden.
      */
     protected abstract void updateNonPaginatedSlots();
     

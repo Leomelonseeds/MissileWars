@@ -118,6 +118,14 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
     }
     
+    public boolean isWhitelisted(UUID uuid) {
+        return playerWhitelist.contains(uuid);
+    }
+    
+    public boolean isBlacklisted(UUID uuid) {
+        return playerBlacklist.contains(uuid);
+    }
+    
     public void addToWhitelist(UUID uuid) {
         playerWhitelist.add(uuid);
     }

@@ -146,6 +146,8 @@ messages:
   map-voting-disabled: "&c&l[!] &7Map voting is disabled on this arena."
   arena-resetting: "&7Resetting arena..."
   arena-reset-complete: "&7Finished resetting arena."
+  arena-not-exist: "&c&l[!] &7That arena doesn't exist anymore, unfortunately :("
+  cannot-create-custom: "&cYou don't the requirements to create a custom arena yet! Your server rank is %rank%&c, so you must be %mwrank% &cor higher to create a custom arena."
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
@@ -402,8 +404,8 @@ inventories:
       name: "&c%umw_arena%"
       name-own: "&aYour Arena &7(&c%umw_arena%)"
       lore:
-        - "&7Type: %type%"
-        - "&7Gamemode: %gamemode%"
+        - "&7Visibility: %umw_arena_visibility%"
+        - "&7Gamemode: %umw_arena_gamemode%"
         - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
         - "&7Status: %umw_arena_status%"
       join-public: "&aClick to join!"
@@ -411,7 +413,7 @@ inventories:
       join-blacklisted: "&cYou are blacklisted from this arena."
       join-whitelisted: "&aYou are whitelisted. Click to join!"
     create-item:
-      item: EMERALD_BLOCK
+      item: EMERALD
       name: "&a&lCreate Custom Arena"
       lore:
         - ""

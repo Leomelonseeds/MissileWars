@@ -269,6 +269,15 @@ public abstract class Arena implements ConfigurationSerializable {
     public String getMapName() {
         return mapName;
     }
+    
+    /**
+     * Get the display string for this arena for placeholders
+     * 
+     * @return
+     */
+    public String getDisplayGamemode() {
+        return gamemode.getDisplayName();
+    }
 
     /**
      * Get the gamemode for this arena as a string.
@@ -304,6 +313,24 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public boolean isWaitingForTie() {
         return waitingForTie;
+    }
+    
+    /**
+     * Get a color-coded message of the status of the arena
+     * 
+     * @return
+     */
+    public String getStatus() {
+        String status = "&eIn Lobby";
+        if (getWorld() == null) {
+            status = "&cOffline";
+        } else if (running) {
+            status = "&aIn Game";
+        } else if (resetting) {
+            status = "&6Resetting";
+        }
+        
+        return status;
     }
 
     /**
@@ -1453,7 +1480,7 @@ public abstract class Arena implements ConfigurationSerializable {
          else {
         	FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
             Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
-            Location spawnLoc = new Location(Bukkit.getWorld("mwarena_" + name), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            Location spawnLoc = new Location(getWorld(), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
             spawnLoc.setYaw(90);
             return spawnLoc;
         }

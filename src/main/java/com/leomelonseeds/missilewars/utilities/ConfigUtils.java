@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
@@ -115,39 +116,32 @@ public class ConfigUtils {
     private static String setPlaceholders(String msg, Player player, Arena arena, Player focus) {
         // Set umw arena placeholders
         if (arena != null) {
-            msg = msg.replaceAll("%umw_arena%", StringUtils.capitalize(arena.getName()));
-            msg = msg.replaceAll("%umw_arena_players%", "" + arena.getTotalPlayers());
-            msg = msg.replaceAll("%umw_arena_active%", "" + arena.getNumPlayers());
-            msg = msg.replaceAll("%umw_arena_cap%", "" + arena.getCapacity());
-            msg = msg.replaceAll("%umw_time%", "" + arena.getSecondsUntilStart());
-            msg = msg.replaceAll("%umw_time_remaining%", "" + arena.getTimeRemaining());
-            String status = "§6In Lobby";
-            if (arena.isRunning()) {
-                status = "§aIn Game";
-            } else if (arena.isResetting()) {
-                status = "§cResetting";
-            }
-            msg = msg.replaceAll("%umw_arena_status%", status);
+            msg = msg.replace("%umw_arena%", StringUtils.capitalize(arena.getName()));
+            msg = msg.replace("%umw_arena_players%", "" + arena.getTotalPlayers());
+            msg = msg.replace("%umw_arena_active%", "" + arena.getNumPlayers());
+            msg = msg.replace("%umw_arena_cap%", "" + arena.getCapacity());
+            msg = msg.replace("%umw_time%", "" + arena.getSecondsUntilStart());
+            msg = msg.replace("%umw_time_remaining%", "" + arena.getTimeRemaining());
+            msg = msg.replace("%umw_arena_status%", arena.getStatus());
+            msg = msg.replace("%umw_arena_visibility%", arena.getBooleanSetting(ArenaSetting.IS_PRIVATE) ? "&4Private" : "&2Public");
+            msg = msg.replace("%umw_arena_gamemode%", arena.getDisplayGamemode());
+            
+            // Player specific arena placeholders
             if (player != null) {
-                msg = msg.replaceAll("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
-                if (msg.contains("%umw_team%")) {
-                    TeamName team = arena.getTeam(player.getUniqueId());
-                    if (team != TeamName.NONE) {
-                        msg = msg.replaceAll("%umw_team%", team.getColor() + team + "§r");
-                    }
-                }
+                msg = msg.replace("%umw_position%", "" + arena.getPositionInQueue(player.getUniqueId()));
             }
         }
 
         // Set umw arena-less placeholders
         if (focus != null) {
-            msg = msg.replaceAll("%umw_focus%", getFocusName(focus));
+            msg = msg.replace("%umw_focus%", getFocusName(focus));
         }
 
         // Set PAPI placeholders and color
         if (player != null) {
             msg = PlaceholderAPI.setPlaceholders(player, msg);
         }
+        
         return msg;
     }
     
