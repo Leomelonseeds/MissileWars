@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Difficulty;
 
@@ -28,13 +29,14 @@ public enum ArenaSetting {
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online"),
     OWNER_NAME("", "owner-name"),
-    OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid"),
-    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty"),
+    OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", true),
+    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", true),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;
     private String id;
     private IntSettingModifier intModifier;
+    private boolean storeAsString;
     
     /**
      * ArenaSetting enum for primitive setting types like boolean and String
@@ -52,6 +54,12 @@ public enum ArenaSetting {
         this.id = id;
         this.intModifier = intModifier;
     }
+
+    private ArenaSetting(Object defaultValue, String id, boolean storeAsString) {
+        this.defaultValue = defaultValue;
+        this.id = id;
+        this.storeAsString = storeAsString;
+    }
     
     /**
      * Adds a setting to the given map if it's not the default value
@@ -63,15 +71,27 @@ public enum ArenaSetting {
             return;
         }
         
+        if (storeAsString) {
+            value = value.toString();
+        }
+        
         settings.put(id, value);
     }
     
-    public void deserialize(Map<String, Object> storedSettings, Map<ArenaSetting, Object> settings, ArenaSetting setting) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void deserialize(Map<String, Object> storedSettings, Map<ArenaSetting, Object> settings) {
         if (!storedSettings.containsKey(id)) {
             return;
         }
         
-        settings.put(setting, storedSettings.get(id));
+        Object value = storedSettings.get(id);
+        if (defaultValue instanceof UUID) {
+            value = UUID.fromString((String) value);
+        } else if (defaultValue.getClass().isEnum()) {
+            value = Enum.valueOf((Class) defaultValue.getClass(), (String) value); // WTF
+        }
+        
+        settings.put(this, value);
     }
     
     public Object getDefaultValue() {

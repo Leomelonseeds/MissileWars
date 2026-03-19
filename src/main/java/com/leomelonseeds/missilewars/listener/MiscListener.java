@@ -67,7 +67,6 @@ public class MiscListener implements Listener {
     }
     
     // TRACKER LISTENER
-    
     @EventHandler
     public void tntPrimed(TNTPrimeEvent e) {
         // Get arena

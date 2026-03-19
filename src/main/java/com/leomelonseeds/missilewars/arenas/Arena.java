@@ -157,6 +157,17 @@ public abstract class Arena implements ConfigurationSerializable {
         init();
     }
     
+    private void init() {
+        players = new HashMap<>();
+        spectators = new HashSet<>();
+        redQueue = new LinkedList<>();
+        blueQueue = new LinkedList<>();
+        tasks = new LinkedList<>();
+        tracker = new Tracker();
+        leftPlayers = new HashMap<>();
+        voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), !isCustom());
+    }
+    
     /**
      * Loads the arena world. This function MUST be called for
      * the arena to work. Do not allow players to join or run
@@ -173,6 +184,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aLoading arena world " + name + "..."));
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
+        arenaCreator.generatorSettings("{\"layers\": [{\"block\": \"air\", \"height\": 1}], \"biome\":\"plains\"}");
         world = arenaCreator.generator(new VoidChunkGenerator()).createWorld();
         if (world == null) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong loading " + name + "!."));
@@ -180,6 +192,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         world.setAutoSave(false);
+        startSpectatorActionBarTask();
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + " was loaded."));
         return world;
     }
@@ -207,6 +220,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.getWorlds().remove(world);
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         world = null;
+        cancelTasks();
         return true;
     }
     
@@ -233,18 +247,6 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void setArenaSettings(ArenaSettings arenaSettings) {
         this.settings = arenaSettings;
-    }
-    
-    private void init() {
-        players = new HashMap<>();
-        spectators = new HashSet<>();
-        redQueue = new LinkedList<>();
-        blueQueue = new LinkedList<>();
-        tasks = new LinkedList<>();
-        tracker = new Tracker();
-        leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), !isCustom());
-        startSpectatorActionBarTask();
     }
     
     /**

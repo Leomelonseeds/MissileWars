@@ -75,7 +75,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     public ArenaSettings(Map<String, Object> settings) {
         this.currentSettings = new HashMap<>();
         for (ArenaSetting setting : ArenaSetting.values()) {
-            setting.deserialize(settings, currentSettings, setting);
+            setting.deserialize(settings, currentSettings);
         }
         
         if (settings.containsKey("player-blacklist")) {

@@ -22,7 +22,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.configuration.ConfigurationSection;
@@ -45,6 +44,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -492,42 +492,40 @@ public class ArenaManager {
 
             CitizensAPI.getNPCRegistry().saveToStore();
 
-            // Spawn barrier wall
-            FileConfiguration settings = plugin.getConfig();
-            int length = settings.getInt("barrier.length");
-            int x = settings.getInt("barrier.center.x");
-            int zCenter = settings.getInt("barrier.center.z");
-            for (int y = 0; y <= 320; ++y) {
-                for (int z = zCenter - length / 2; z < zCenter + length / 2; z++) {
-                    arenaWorld.getBlockAt(x, y, z).setType(Material.BARRIER);
-                }
-            }
-            
-            // Setup regions
-            WorldGuard wg = WorldGuard.getInstance();
-            RegionManager manager = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld));
-            
-            GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("__global__");
-            globalRegion.setFlag(Flags.CHEST_ACCESS, State.DENY);
-            Set<PotionEffect> effects = new HashSet<>();
-            effects.add(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0, true, false, false));
-            globalRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
-            globalRegion.setPriority(10);
-            manager.addRegion(globalRegion);
-            
-            Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min");
-            Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max");
-            ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
-                    minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(), maxLobby.getY(), maxLobby.getZ()));
-            lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);
-            lobbyRegion.setFlag(Flags.PVP, StateFlag.State.DENY);
-            lobbyRegion.setFlag(Flags.TNT, StateFlag.State.DENY);
-            lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
-            lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
-            lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
-            manager.addRegion(lobbyRegion);
-            createWaitingLobby("red", arena, lobbyRegion);
-            createWaitingLobby("blue", arena, lobbyRegion);
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                // Spawn barrier wall
+                FileConfiguration settings = plugin.getConfig();
+                int length = settings.getInt("barrier.length");
+                int x = settings.getInt("barrier.center.x");
+                int zCenter = settings.getInt("barrier.center.z");
+                SchematicManager.setBlock(x, 0, zCenter - length / 2, x, 320, zCenter + length / 2, arenaWorld, BlockTypes.BARRIER, false);
+                
+                // Setup regions
+                WorldGuard wg = WorldGuard.getInstance();
+                RegionManager manager = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(arenaWorld));
+                
+                GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("__global__");
+                globalRegion.setFlag(Flags.CHEST_ACCESS, State.DENY);
+                Set<PotionEffect> effects = new HashSet<>();
+                effects.add(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0, true, false, false));
+                globalRegion.setFlag(net.goldtreeservers.worldguardextraflags.flags.Flags.GIVE_EFFECTS, effects);
+                globalRegion.setPriority(10);
+                manager.addRegion(globalRegion);
+                
+                Vector minLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.min");
+                Vector maxLobby = SchematicManager.getVector(schematicConfig, "lobby.main-region.max");
+                ProtectedRegion lobbyRegion = new ProtectedCuboidRegion(name + "-lobby", BlockVector3.at(minLobby.getX(),
+                        minLobby.getY(), minLobby.getZ()), BlockVector3.at(maxLobby.getX(), maxLobby.getY(), maxLobby.getZ()));
+                lobbyRegion.setFlag(Flags.INVINCIBILITY, StateFlag.State.ALLOW);
+                lobbyRegion.setFlag(Flags.PVP, StateFlag.State.DENY);
+                lobbyRegion.setFlag(Flags.TNT, StateFlag.State.DENY);
+                lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
+                lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
+                lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
+                manager.addRegion(lobbyRegion);
+                createWaitingLobby("red", arena, lobbyRegion);
+                createWaitingLobby("blue", arena, lobbyRegion);
+            });
             
             // Save arenas in loaded arenas list
             loadedArenas.put(name, arena);
