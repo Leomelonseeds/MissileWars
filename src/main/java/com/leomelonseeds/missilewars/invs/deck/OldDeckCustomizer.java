@@ -158,10 +158,11 @@ public class OldDeckCustomizer extends MWInventory {
         
         // Reset to default config
         if (slot == itemConfig.getInt("indicators.reset.slot-old")) {
-            new ConfirmAction("Reset Preset", player, this, (confirm) -> {
+            new ConfirmAction("Reset Preset", player, this, confirm -> {
                 if (!confirm) {
                     return;
                 }
+                
                 JSONObject def = jsonManager.getDefaultPreset(deck);
                 init.getJSONObject(deck).put(preset, def);
                 updateInventory();

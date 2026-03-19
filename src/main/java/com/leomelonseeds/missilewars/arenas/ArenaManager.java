@@ -25,8 +25,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -34,7 +32,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -371,11 +368,12 @@ public class ArenaManager {
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
 
         // Create Arena world
-        logger.log(Level.INFO, "Generating arena world for " + name);
-        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
-        arenaCreator.type(WorldType.FLAT);
-        arenaCreator.generator(new ChunkGenerator() {});
-        World arenaWorld = arenaCreator.createWorld();
+        World arenaWorld = arena.loadWorld();
+        if (arenaWorld == null) {
+            logger.warning("Something went wrong generating the world for new arena " + name);
+            return null;
+        }
+        
         arenaWorld.setAutoSave(false);
         arenaWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);

@@ -148,7 +148,8 @@ messages:
   arena-reset-complete: "&7Finished resetting arena."
   arena-not-exist: "&c&l[!] &7That arena doesn't exist anymore, unfortunately :("
   cannot-create-custom: "&cYou don't meet the requirements to create a custom arena yet!"
-  cannot-edit-cusstom: "&cYou don't own a custom arena!"
+  cannot-edit-custom: "&cYou don't own a custom arena!"
+  custom-arena-creating: "&7Creating your custom arena, please wait..."
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
@@ -158,6 +159,12 @@ messages:
     error: "&cThere was an error saving your selection, please try again."
     saving: "&aSaving your custom structure..."
     saved: "&aStructure successfully saved."
+  custom-arena-confirmation:
+    c1: "&6&l[!] &r&eYou are creating a custom arena. It is important that you read the following messages carefully, or you could be punished. Type 'yes' to continue."
+    c2: "&6You understand that you are &6&nnot allowed &r&6to use the features of custom arenas to create excessive lag or use up excessive server storage/memory, as it could impact the performance for other players. Type 'yes' to continue."
+    c3: "&eYou understand that some settings are locked behind rank paywalls, and that the server rank required for these settings may change in the future. Type 'yes' to continue."
+    c4: "&6You understand that all server rules still apply in custom arenas, including respecting players (especially strangers!) and not using blacklisted modifications such as hacked clients. Type 'yes' to continue."
+    c5: "&eYou understand that breaking any of these rules may result in deletion of your custom arena, revoking your ability to create custom arenas, and/or mutes and bans. Type 'yes' to agree and to create your custom arena."
     
 titles:
   # Should be sent to players who join in the middle of a game as well
@@ -403,7 +410,7 @@ inventories:
     title: "&c&lCustom Areans"
     game-item:
       name: "&c%umw_arena%"
-      name-own: "&aYour Arena &7(&c%umw_arena%)"
+      name-own: "&aYour Arena &7(&c%umw_arena%&7)"
       lore:
         - "&7Visibility: %umw_arena_visibility%"
         - "&7Gamemode: %umw_arena_gamemode%"
@@ -419,10 +426,8 @@ inventories:
       lore:
         - ""
         - "&7Create your own arena that allows"
-        - "&7you to host private games and change"
-        - "&7settings such as item cooldowns,"
-        - "&7unfair teams, and even creating"
-        - "&7custom item distributions."
+        - "&7you to host private games and"
+        - "&7customize its settings."
         - ""
         - "&7To create one, you must be:"
         - "&7- Guest: &dColonel 6✌"
@@ -432,7 +437,9 @@ inventories:
         - "&7- &5&lROYAL: &aBombardier 2♠"
         - "&7- &6&lDIVINE&7: &fGunner 1✦"
         - ""
-      can-create: "&aClick to create a custom arena!"
+      can-create:
+        - "&aYou meet the requirements. Click"
+        - "&ato create a custom arena!"
       cannot-create: "&cYou don't meet the requirements yet."
     edit-item:
       item: REPEATER

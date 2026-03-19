@@ -25,7 +25,6 @@ import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
@@ -47,6 +46,7 @@ import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
+import com.leomelonseeds.missilewars.utilities.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
@@ -103,6 +103,7 @@ public abstract class Arena implements ConfigurationSerializable {
     public Arena(String name, int capacity, ArenaType type) {
         this.plugin = MissileWarsPlugin.getPlugin();
         this.settings = new ArenaSettings();
+        settings.set(ArenaSetting.CAPACITY, capacity);
         this.name = name;
         this.type = type;
         this.gamemode = ArenaGamemode.CLASSIC;
@@ -162,25 +163,25 @@ public abstract class Arena implements ConfigurationSerializable {
      * any other function if the world has not been loaded. If
      * the world has already loaded, this does nothing.
      * 
-     * @return whether the world was loaded successfully
+     * @return The world that was loaded
      */
-    public boolean loadWorld() {
+    public World loadWorld() {
         if (world != null) {
-            return true;
+            return world;
         }
 
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aLoading arena world " + name + "..."));
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
-        world = arenaCreator.generator(new ChunkGenerator() {}).createWorld();
+        world = arenaCreator.generator(new VoidChunkGenerator()).createWorld();
         if (world == null) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong loading " + name + "!."));
-            return false;
+            return null;
         }
         
         world.setAutoSave(false);
-        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + "was loaded."));
-        return true;
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + " was loaded."));
+        return world;
     }
     
     /**
@@ -204,7 +205,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         Bukkit.getWorlds().remove(world);
-        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + "was unloaded."));
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         world = null;
         return true;
     }

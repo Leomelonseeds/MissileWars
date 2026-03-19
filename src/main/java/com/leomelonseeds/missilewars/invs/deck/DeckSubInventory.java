@@ -138,15 +138,17 @@ public abstract class DeckSubInventory {
             return true;
         }
         
-        new ConfirmAction("Purchase '" + realname + "'", player, mwinv, (confirm) -> {
+        new ConfirmAction("Purchase '" + realname + "'", player, mwinv, confirm -> {
             if (!confirm) {
                 return;
             }
+            
             if (playerJson.has(realname)) {
                 playerJson.put(realname, true);
             } else if (playerJson.getJSONObject(deck).has(realname)) {
                 playerJson.getJSONObject(deck).put(realname, true);
             }
+            
             MissileWarsPlugin.getPlugin().getEconomy().withdrawPlayer(player, cost);
             fillItems();
         });

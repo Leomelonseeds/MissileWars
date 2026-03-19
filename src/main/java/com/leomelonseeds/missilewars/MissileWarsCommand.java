@@ -3,6 +3,7 @@ package com.leomelonseeds.missilewars;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -592,8 +593,8 @@ public class MissileWarsCommand implements CommandExecutor {
                 
                 // Otherwise join fullest arena
                 int cap = MissileWarsPlugin.getPlugin().getConfig().getInt("arena-cap");
-                for (Arena arena : arenaManager.getLoadedArenas(ArenaType.CLASSIC, Arena.byPlayers)) {
-                    if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity() && !arena.isResetting()) {
+                for (Arena arena : arenaManager.getLoadedArenas(ArenaType.CLASSIC, Collections.reverseOrder(Arena.byPlayers))) {
+                    if (arena.getCapacity() == cap && arena.getNumPlayers() < arena.getCapacity()) {
                         arena.joinPlayer(player);
                         return true;
                     }

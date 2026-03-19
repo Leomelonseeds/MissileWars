@@ -19,12 +19,12 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ArenaType;
+import com.leomelonseeds.missilewars.arenas.CustomArenaCreationSession;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
-
-import net.kyori.adventure.text.Component;
+import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 public class ArenaSelector extends PaginatedMWIInventory {
     
@@ -45,6 +45,7 @@ public class ArenaSelector extends PaginatedMWIInventory {
         this.arenaManager = MissileWarsPlugin.getPlugin().getArenaManager();
         this.isCustom = type == ArenaType.CUSTOM;
         this.itemConfig = "inventories." + (isCustom ? "custom-" : "") + "game-selector.game-item.";
+        this.type = type;
         autoRefresh(20);
     }
 
@@ -60,34 +61,30 @@ public class ArenaSelector extends PaginatedMWIInventory {
             ItemMeta arenaItemMeta = arenaItem.getItemMeta();
             
             // Display name
-            String display = ConfigUtils.getConfigText(itemConfig + (isOwner ? "name" : "name-own"), player, arena, null);
+            String display = ConfigUtils.getConfigText(itemConfig + (isOwner ? "name-own" : "name"), player, arena, null);
             arenaItemMeta.displayName(ConfigUtils.toComponent(display));
             
             // Lore, with the last line determined by whether the player is whitelisted + type of arena
-            List<Component> lore = new ArrayList<>();
-            for (String s : ConfigUtils.getConfigTextList(itemConfig + "lore", player, arena, null)) {
-                lore.add(ConfigUtils.toComponent(s));
-            }
-            
+            List<String> lore = ConfigUtils.getConfigTextList(itemConfig + "lore", player, arena, null);
             if (isCustom) {
                 if (arena.getBooleanSetting(ArenaSetting.IS_PRIVATE)) {
                     if (isOwner) {
-                        lore.add(ConfigUtils.toComponent(itemConfig + "join-public"));
+                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-public"));
                     } else if (arenaSettings.isWhitelisted(playerUUID)) {
-                        lore.add(ConfigUtils.toComponent(itemConfig + "join-whitelisted"));
+                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-whitelisted"));
                     } else {
-                        lore.add(ConfigUtils.toComponent(itemConfig + "join-not-whitelisted"));
+                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-not-whitelisted"));
                     }
                 } else {
                     if (arenaSettings.isBlacklisted(playerUUID)) {
-                        lore.add(ConfigUtils.toComponent(itemConfig + "join-blacklisted"));
+                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-blacklisted"));
                     } else {
-                        lore.add(ConfigUtils.toComponent(itemConfig + "join-public"));
+                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-public"));
                     }
                 }
             }
             
-            arenaItemMeta.lore(lore);
+            arenaItemMeta.lore(ConfigUtils.toComponent(lore));
             InventoryUtils.setMetaString(arenaItemMeta, InventoryUtils.ITEM_GUI_KEY, arena.getName());
             
             // Add glowing effect if people are inside
@@ -126,18 +123,43 @@ public class ArenaSelector extends PaginatedMWIInventory {
         FileConfiguration messagesConfig = ConfigUtils.getConfigFile("messages.yml");
         if (ownedArena != null) {
             inv.setItem(SIZE - 4, ownedArena);
+            ConfigurationSection editSection = messagesConfig.getConfigurationSection("inventories.custom-game-selector.edit-item");
+            ItemStack editItem = new ItemStack(Material.valueOf(editSection.getString("item")));
+            ItemMeta editMeta = editItem.getItemMeta();
+            editMeta.displayName(ConfigUtils.toComponent(editSection.getString("name")));
+            editMeta.lore(ConfigUtils.toComponent(editSection.getStringList("lore")));
+            InventoryUtils.setMetaString(editMeta, InventoryUtils.ITEM_GUI_KEY, "edit-arena");
+            editItem.setItemMeta(editMeta);
+            inv.setItem(SIZE - 6, editItem);
         } else {
             ConfigurationSection createSection = messagesConfig.getConfigurationSection("inventories.custom-game-selector.create-item");
             ItemStack createItem = new ItemStack(Material.valueOf(createSection.getString("item")));
             ItemMeta createMeta = createItem.getItemMeta();
             createMeta.displayName(ConfigUtils.toComponent(createSection.getString("name")));
             
-            // TODO: Check if meet rank requirement (RankUtils function % 10 == 0), then find the rank requirement number in the lines (find " 5") etc
+            // Check if meet rank requirement (RankUtils function % 10 == 0), then find the rank requirement number in the lines (find " 5") etc
             List<String> createLore = createSection.getStringList("lore");
-            for (String line : createLore) {
-                
+            int requirement = RankUtils.canCreateCustomArena(player);
+            if (requirement % 10 == 0) {
+                requirement /= 10;
+                createLore.addAll(createSection.getStringList("can-create"));
+                InventoryUtils.setMetaString(createMeta, InventoryUtils.ITEM_GUI_KEY, "can-create");
+            } else {
+                createLore.add(createSection.getString("cannot-create"));
+                InventoryUtils.setMetaString(createMeta, InventoryUtils.ITEM_GUI_KEY, "cannot-create");
             }
             
+            for (int i = 0; i < createLore.size(); i++) {
+                String cur = createLore.get(i);
+                if (cur.contains(" " + requirement)) {
+                    createLore.set(i, cur + " &7(You)");
+                    break;
+                }
+            }
+            
+            createMeta.lore(ConfigUtils.toComponent(createLore));
+            createItem.setItemMeta(createMeta);
+            inv.setItem(SIZE - 4, createItem);
         }
     }
 
@@ -151,6 +173,39 @@ public class ArenaSelector extends PaginatedMWIInventory {
         
         String id = InventoryUtils.getGUIFromItem(item);
         if (id == null) {
+            return;
+        }
+        
+        if (id.equals("can-create")) {
+            new ConfirmAction("Create custom arena", player, this, t -> {
+                if (!t) {
+                    return;
+                }
+                
+                new CustomArenaCreationSession(player);
+                ConfigUtils.schedule(1, () -> player.closeInventory());
+            });
+            
+            return;
+        }
+        
+        if (id.equals("cannot-create")) {
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            ConfigUtils.sendConfigMessage("cannot-create-custom", player);
+            return;
+        }
+        
+        if (id.equals("edit-arena")) {
+            Arena owned = arenaManager.getCustomArena(player);
+            
+            // This shouldn't even happen
+            if (owned == null) {
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                ConfigUtils.sendConfigMessage("cannot-edit-custom", player);
+                return;
+            } 
+            
+            // TODO
             return;
         }
         
