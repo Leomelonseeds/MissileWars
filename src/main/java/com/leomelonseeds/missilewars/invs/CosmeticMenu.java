@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -31,20 +30,10 @@ public class CosmeticMenu extends MWInventory {
         
         // Add bottom panes
         for (int i = 27; i < 36; i++) {
-            ItemStack item;
-            if (i != 31) {
-                item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent(""));
-                item.setItemMeta(meta);
-            } else {
-                item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(ConfigUtils.toComponent("&cBack"));
-                item.setItemMeta(meta);
-            }
-            inv.setItem(i, item);
+            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
         }
+        
+        inv.setItem(31, InventoryUtils.getBackItem());
     }
 
     @Override

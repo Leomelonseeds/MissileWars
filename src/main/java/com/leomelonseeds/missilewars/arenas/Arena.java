@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -85,6 +84,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected boolean resetting;
     /** Task for automatically ending the game if no players are present */
     protected BukkitTask autoEnd;
+    protected BukkitTask spectatorActionBar;
     protected Tracker tracker;
     protected VoteManager voteManager;
     /** Set of players who have played but have since left */
@@ -174,6 +174,9 @@ public abstract class Arena implements ConfigurationSerializable {
      * any other function if the world has not been loaded. If
      * the world has already loaded, this does nothing.
      * 
+     * This function also starts the spectator action bar task
+     * that reminds people to use /spectate to stop spectating
+     * 
      * @return The world that was loaded
      */
     public World loadWorld() {
@@ -192,13 +195,19 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         world.setAutoSave(false);
-        startSpectatorActionBarTask();
+        spectatorActionBar = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            for (MissileWarsPlayer mwp : spectators) {
+                Player player = mwp.getMCPlayer();
+                player.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
+            }
+        }, 20, 2);
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + " was loaded."));
         return world;
     }
     
     /**
-     * Unloads the world. Only works if player count is 0
+     * Unloads the world. Only works if player count is 0.
+     * Also cancels all tasks, including spectator action bar.
      * 
      * @return whether the world was loaded successfully
      */
@@ -218,9 +227,10 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         Bukkit.getWorlds().remove(world);
-        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         world = null;
         cancelTasks();
+        spectatorActionBar.cancel();
+        Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         return true;
     }
     
@@ -247,18 +257,6 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void setArenaSettings(ArenaSettings arenaSettings) {
         this.settings = arenaSettings;
-    }
-    
-    /**
-     * Simple task to remind players how to exit spectator mode
-     */
-    private void startSpectatorActionBarTask() {
-        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (MissileWarsPlayer mwp : spectators) {
-                Player player = mwp.getMCPlayer();
-                player.sendActionBar(ConfigUtils.toComponent("Type /spectate to stop spectating"));
-            }
-        }, 20, 2));
     }
      
     /**
@@ -720,7 +718,17 @@ public abstract class Arena implements ConfigurationSerializable {
     
     // Give player necessary items
     protected void giveHeldItems(Player player) {
-        String[] items = {"votemap", "to-lobby", "red", "blue", "deck", "spectate"};
+        List<String> items = new ArrayList<>(List.of("votemap", "to-lobby", "red", "blue", "deck", "spectate"));
+        if (player.hasPermission("umw.staff")) {
+            items.add("arena-settings");
+        } else if (isCustom()) {
+            if (player.getUniqueId().equals(settings.get(ArenaSetting.OWNER_UUID))) {
+                items.add("arena-settings");
+            } else {
+                items.add("arena-settings-view-only");
+            }
+        }
+        
         FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
         for (String i : items) {
             String path = "held." + i;
@@ -912,24 +920,18 @@ public abstract class Arena implements ConfigurationSerializable {
             endGame(null);
         } else if (redTeam.getSize() <= 0) {
             announceMessage("messages.red-team-empty", null);
-            autoEnd = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (running && redTeam.getSize() <= 0) {
-                        endGame(blueTeam);
-                    }
+            autoEnd = ConfigUtils.schedule(60 * 20, () -> {
+                if (running && redTeam.getSize() <= 0) {
+                    endGame(blueTeam);
                 }
-            }.runTaskLater(plugin, 60 * 20L);
+            });
         } else if (blueTeam.getSize() <= 0) {
             announceMessage("messages.blue-team-empty", null);
-            autoEnd = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (running && blueTeam.getSize() <= 0) {
-                        endGame(redTeam);
-                    }
+            autoEnd = ConfigUtils.schedule(60 * 20, () -> {
+                if (running && blueTeam.getSize() <= 0) {
+                    endGame(redTeam);
                 }
-            }.runTaskLater(plugin, 60 * 20L);
+            });
         }
     }
  
@@ -1485,7 +1487,10 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         for (MissileWarsPlayer mwPlayer : spectators) {
-            if (!mwPlayer.getMCPlayer().hasPermission("umw.continuespectating")) {
+            Player player = mwPlayer.getMCPlayer();
+            if (player.hasPermission("umw.continuespectating")) {
+                player.teleport(getPlayerSpawn(player));
+            } else {
                 removeSpectator(mwPlayer, false);
             }
         }

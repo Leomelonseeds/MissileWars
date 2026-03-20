@@ -38,6 +38,7 @@ import io.github.a5h73y.parkour.Parkour;
 public class InventoryUtils {
 
     private static MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+    private static ItemStack backItem;
     public static final NamespacedKey CUSTOM_OFFSET_KEY = new NamespacedKey(plugin, "custom-offset");
     public static final NamespacedKey ITEM_STRUCTURE_KEY = new NamespacedKey(plugin, "item-structure");
     public static final NamespacedKey ITEM_UTILITY_KEY = new NamespacedKey(plugin, "item-utility");
@@ -341,8 +342,26 @@ public class InventoryUtils {
     public static ItemStack createBlankItem(Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(""));
+        meta.setHideTooltip(true);
         item.setItemMeta(meta);
+        return item;
+    }
+    
+    /**
+     * Creates a back button with red stained glass pane
+     * 
+     * @return
+     */
+    public static ItemStack getBackItem() {
+        if (backItem != null) {
+            return backItem.clone();
+        }
+        
+        ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent("&cBack"));
+        item.setItemMeta(meta);
+        backItem = item;
         return item;
     }
     

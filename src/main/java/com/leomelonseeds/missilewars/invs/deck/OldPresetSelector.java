@@ -165,11 +165,7 @@ public class OldPresetSelector extends MWInventory {
                 continue;
             } 
             
-            ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-            ItemMeta meta = item.getItemMeta();
-            meta.displayName(ConfigUtils.toComponent("&cBack"));
-            item.setItemMeta(meta);
-            inv.setItem(i, item);
+            inv.setItem(i, InventoryUtils.getBackItem());
         }
     }
 

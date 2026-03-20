@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Difficulty;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 public enum ArenaSetting {
     
@@ -28,9 +29,11 @@ public enum ArenaSetting {
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online"),
+    ENABLE_FORCE_DECK(false, "force-deck"),
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", true),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", true),
+    FORCE_DECK(DeckStorage.SENTINEL, "force-deck", true),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;

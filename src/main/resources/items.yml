@@ -1834,6 +1834,14 @@ held:
     item: ENDER_EYE
     name: "&8Spectate"
     slot: 7
+  arena-settings:
+    item: COMPARATOR
+    name: "&cArena Settings"
+    slot: 1
+  arena-settings-view-only:
+    item: REPEATER
+    name: "&cArena Settings &7(View-only)"
+    slot: 1
    
 
 # Stuff relating to Deck GUI
@@ -2178,4 +2186,76 @@ gpassive:
       mpercentage: 30
       spcost: 1
       
-arena-settings: {}
+arena-settings:
+  main-menu:
+    visibility-settings:
+      item: ENDER_EYE
+      name: "&3Visibility Settings"
+      slot: 10
+      lore:
+        - "&7Options related to who can join your"
+        - "&7arena and when, including white-"
+        - "&7listing and blacklisting players."
+    item-settings:
+      item: CREEPER_SPAWN_EGG
+      name: "&aItem and Ability Settings"
+      slot: 12
+      lore:
+        - "&7Change item cooldowns or create"
+        - "&7your own random item distribution,"
+        - "&7where abilities and passives can"
+        - "&7be enabled or disabled."
+    map-selector:
+      item: MAP
+      name: "&eMap Settings"
+      slot: 14
+      lore:
+        - "&7Select which maps are available"
+        - "&7to play on and for players to"
+        - "&7vote on. Some maps are exclusive"
+        - "&7to custom arenas!"
+    other-settings:
+      item: WRITABLE_BOOK
+      name: "&fOther Settings"
+      slot: 16
+      lore:
+        - "&7Team options, queueing options,"
+        - "&7fun options, stock options, and"
+        - "&7more - we have all the options."
+        - "&7(Except stock options. We don't"
+        - "&7have those, yet)"
+    start-game:
+      item: GOAT_HORN
+      name: "&bStart Game"
+      slot: 41
+      lore:
+        - ""
+        - "&cClick &7to initiate the countdown"
+        - "&7(specified by the 'Start Timer'"
+        - "&7setting) to start a game."
+    end-game:
+      item: STONE_AXE
+      name: "&cEnd Game"
+      slot: 42
+      lore:
+        - ""
+        - "&cClick &7to immediately end any"
+        - "&7game in this arena in a tie."
+    creative-mode:
+      item: FEATHER
+      name: "&fToggle Creative Mode"
+      slot: 39
+      lore:
+        - ""
+        - "&cClick &7to toggle creative mode."
+        - "&4Be warned that creating excessive"
+        - "&4lag may result in punishment!"
+    kick-all:
+      item: NETHERITE_BOOTS
+      name: "&4Kick All"
+      slot: 38
+      lore:
+        - ""
+        - "&cClick &7to kick all players from"
+        - "&7your arena. To kick one player,"
+        - "&7add them to the blacklist."

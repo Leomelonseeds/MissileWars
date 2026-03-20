@@ -65,11 +65,11 @@ public abstract class PaginatedMWIInventory extends MWInventory {
     @Override
     public void updateInventory() {
         inv.clear();
-        updateNonPaginatedSlots();
-        
         List<ItemStack> paginatedItems = getPaginatedItems();
         int keySize = paginatedItems.size();
         double maxPages = Math.ceil((double) keySize / lastPageSlot);
+
+        updateNonPaginatedSlots();
         
         // Epic pagination
         if (page > 0) {
@@ -107,6 +107,10 @@ public abstract class PaginatedMWIInventory extends MWInventory {
 
     
     /**
+     * This function will run first in updateInventory(), in case
+     * a class variable needs info from the paginated items
+     * in order to fill a non-paginated slot.
+     * 
      * @return a list of items to put in the paginated slots
      */
     protected abstract List<ItemStack> getPaginatedItems();

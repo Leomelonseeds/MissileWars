@@ -22,6 +22,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.CustomArenaCreationSession;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
+import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMenu;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -110,11 +111,7 @@ public class ArenaSelector extends PaginatedMWIInventory {
             inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
         }
         
-        ItemStack backItem = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-        ItemMeta backMeta = backItem.getItemMeta();
-        backMeta.displayName(ConfigUtils.toComponent("&cBack"));
-        backItem.setItemMeta(backMeta);
-        inv.setItem(SIZE - 5, backItem);
+        inv.setItem(SIZE - 5, InventoryUtils.getBackItem());
         
         if (!isCustom) {
             return;
@@ -205,7 +202,7 @@ public class ArenaSelector extends PaginatedMWIInventory {
                 return;
             } 
             
-            // TODO
+            new ArenaSettingsMenu(player, owned, false, this);
             return;
         }
         
