@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.arenas.teams;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -125,8 +126,11 @@ public class MissileWarsTeam {
         return name;
     }
     
+    /**
+     * @return an unmodifiable view of  the current members of the team
+     */
     public Set<MissileWarsPlayer> getMembers() {
-        return members;
+        return Collections.unmodifiableSet(members);
     }
 
     /**

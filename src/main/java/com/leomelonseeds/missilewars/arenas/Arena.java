@@ -1340,13 +1340,10 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         applyMultipliers();
-        for (MissileWarsPlayer mwp : redTeam.getMembers()) {
+        for (MissileWarsPlayer mwp : getInGamePlayers()) {
             mwp.initDeck(false, this, true);
         }
         
-        for (MissileWarsPlayer mwp : blueTeam.getMembers()) {
-            mwp.initDeck(false, this, false);
-        }
         running = true;
     }
     
@@ -1478,11 +1475,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * will be removed from being in spectator mode.
      */
     public void removePlayers() {
-        for (MissileWarsPlayer mwPlayer : blueTeam.getMembers()) {
-            leaveGame(mwPlayer.getMCPlayerId(), false);
-        }
-        
-        for (MissileWarsPlayer mwPlayer : redTeam.getMembers()) {
+        for (MissileWarsPlayer mwPlayer : getInGamePlayers()) {
             leaveGame(mwPlayer.getMCPlayerId(), false);
         }
         
@@ -1580,6 +1573,19 @@ public abstract class Arena implements ConfigurationSerializable {
         } else {
             blueTeam.registerShieldBlockUpdate(location, place);
         }
+    }
+    
+    /**
+     * @return a list of players who are in red and blue teams
+     */
+    protected Set<MissileWarsPlayer> getInGamePlayers() {
+        if (redTeam == null || blueTeam == null) {
+            return Collections.emptySet();
+        }
+        
+        Set<MissileWarsPlayer> ret = new HashSet<>(redTeam.getMembers());
+        ret.addAll(blueTeam.getMembers());
+        return ret;
     }
 
     @Override
