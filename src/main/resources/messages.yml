@@ -477,3 +477,5 @@ inventories:
       - "&aSelected!"
     death-messages:
       title: "Kill/Death Messages"
+      
+settings: {}

@@ -30,6 +30,7 @@ public enum ArenaSetting {
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online"),
     ENABLE_FORCE_DECK(false, "force-deck"),
+    ENABLE_POISON(true, "enable-poison"),
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", true),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", true),
