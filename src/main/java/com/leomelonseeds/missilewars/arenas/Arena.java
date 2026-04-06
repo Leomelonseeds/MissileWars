@@ -188,13 +188,13 @@ public abstract class Arena implements ConfigurationSerializable {
         WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
         arenaCreator.type(WorldType.FLAT);
         arenaCreator.generatorSettings("{\"layers\": [{\"block\": \"air\", \"height\": 1}], \"biome\":\"plains\"}");
-        world = arenaCreator.generator(new VoidChunkGenerator()).createWorld();
-        if (world == null) {
+        World nworld = arenaCreator.generator(new VoidChunkGenerator()).createWorld();
+        if (nworld == null) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong loading " + name + "!."));
             return null;
         }
         
-        world.setAutoSave(false);
+        nworld.setAutoSave(false);
         spectatorActionBar = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (MissileWarsPlayer mwp : spectators) {
                 Player player = mwp.getMCPlayer();
@@ -202,6 +202,7 @@ public abstract class Arena implements ConfigurationSerializable {
             }
         }, 20, 2);
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aArena world " + name + " was loaded."));
+        world = nworld;
         return world;
     }
     
@@ -212,22 +213,24 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return whether the world was loaded successfully
      */
     public boolean unloadWorld() {
-        if (getWorld().getPlayerCount() > 0) {
+        if (world == null) {
             return false;
         }
         
-        if (world == null) {
+        World _world = world;
+        world = null;
+        
+        if (_world.getPlayerCount() > 0) {
             return false;
         }
 
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Unloading arena world: " + name + "..."));
-        if (!Bukkit.unloadWorld(world, false)) {
+        if (!Bukkit.unloadWorld(_world, false)) {
             Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong unloading " + name + "!"));
             return false;
         }
         
-        Bukkit.getWorlds().remove(world);
-        world = null;
+        Bukkit.getWorlds().remove(_world);
         cancelTasks();
         spectatorActionBar.cancel();
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
@@ -647,7 +650,13 @@ public abstract class Arena implements ConfigurationSerializable {
     public boolean joinPlayer(Player player, boolean asSpectator) {
         // Make sure player not in parkour
         if (Parkour.getInstance().getParkourSessionManager().isPlayingParkourCourse(player)) {
-            ConfigUtils.sendConfigMessage("messages.leave-parkour", player, this, null);
+            ConfigUtils.sendConfigMessage("leave-parkour", player);
+            return false;
+        }
+        
+        // Make sure world is loaded
+        if (world == null) {
+            ConfigUtils.sendConfigMessage("arena-offline", player);
             return false;
         }
         
