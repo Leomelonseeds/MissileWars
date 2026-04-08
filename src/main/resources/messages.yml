@@ -478,5 +478,48 @@ inventories:
       - "&aSelected!"
     death-messages:
       title: "Kill/Death Messages"
-      
-settings: {}
+
+# type: boolean/int/enum
+settings:
+  CAPACITY:
+    type: "int"
+    description:
+      - "&7The maximum amount of players"
+      - "&7that can be in-game at once."
+  TIE_TIMER:
+    type: "int"
+    description:
+      - "&7Seconds to wait after a team's"
+      - "&7portal(s) are broken for a tie."
+  ITEM_MULTIPLIER:
+    type: "int"
+    description:
+      - "&7For decks mode, a percentage"
+      - "&7multiplier to apply to item"
+      - "&7cooldowns. For example, a"
+      - "&7200% multiplier means you"
+      - "&7receive items twice as fast."
+      - "&7&oDoes not affect random item"
+      - "&7&odistribution mode."
+  RANDOM_ITEM_DISTRIBUTION_TIMER:
+    type: "int"
+    description:
+      - "&7For random item distribution mode,"
+      - "&7how fast between receiving each"
+      - "&7item. Does not affect decks mode."
+  START_TIMER:
+    type: "int"
+    description:
+      - "&7When the arena is started manually"
+      - "&7or enough players join, how long"
+      - "&7shuold the count down be."
+  ENABLE_MISSILE_COOLDOWN:
+    type: "boolean"
+    description:
+      - "&7A 0.4 second timer between placing"
+      - "&7successive missiles to prevent"
+      - "&7placing 2 at the same time."
+  ENABLE_SIDEWAYS_MISSILES:
+    type: "boolean"
+    description:
+      - "&7Allows placing missiles sideways"
