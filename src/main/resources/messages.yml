@@ -522,4 +522,38 @@ settings:
   ENABLE_SIDEWAYS_MISSILES:
     type: "boolean"
     description:
-      - "&7Allows placing missiles sideways"
+      - "&7Allows placing missiles sideways."
+  ENABLE_AIR_PLACE:
+    type: "boolean"
+    description:
+      - "&7Allows placing missiles mid-air."
+      - "&7Missiles placed in mid-air spawn"
+      - "&7closer to players and do not have"
+      - "&7a preview."
+  IS_INFINITE_TIME:
+    type: "boolean"
+    description:
+      - "&7Disables the game timer. The game"
+      - "&7only ends if there aren't enough"
+      - "&7players, or a team wins."
+  ENABLE_DECREASING_ITEM_TIMERS:
+    type: "boolean"
+    description:
+      - "&7Item cooldowns reduce by 25% after"
+      - "&710 minutes have passed, and reduce"
+      - "&7by 50% after 20 minutes. Works in"
+      - "&7both deck and random item modes."
+  ENABLE_RANDOM_ITEM_DISTRIBUTION:
+    type: "boolean"
+    description:
+      - "&7Instead of decks, a random item"
+      - "&7will be distributed to each player"
+      - "&7every few seconds, like in classic"
+      - "&7Missile Wars gamemodes. You can"
+      - "&7customize the random items using"
+      - "&7the item to the right."
+  ENABLE_MULTIPLE_PORTALS:
+    type: "boolean"
+    description:
+      - "&7When disabled, breaking any enemy"
+      - "&7portal will end the game."
