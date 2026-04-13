@@ -34,7 +34,7 @@ public enum ArenaSetting {
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", true),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", true),
-    FORCE_DECK(DeckStorage.SENTINEL, "force-deck", true),
+    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", true),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;

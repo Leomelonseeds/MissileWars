@@ -512,7 +512,7 @@ settings:
     description:
       - "&7When the arena is started manually"
       - "&7or enough players join, how long"
-      - "&7shuold the count down be."
+      - "&7should the count down be."
   ENABLE_MISSILE_COOLDOWN:
     type: "boolean"
     description:
@@ -557,3 +557,76 @@ settings:
     description:
       - "&7When disabled, breaking any enemy"
       - "&7portal will end the game."
+  ENABLE_TEAM_BALANCING:
+    type: "boolean"
+    description:
+      - "&7When the ratio of team sizes is"
+      - "&7greater than 3:2, the team with"
+      - "&7fewer players will get faster"
+      - "&7cooldowns or extra items depending"
+      - "&7on the item distribution mode."
+  ENABLE_UNFAIR_TEAMS:
+    type: "boolean"
+    description:
+      - "&7Allows unfair team sizes using"
+      - "&7team queueing."
+  END_IF_NO_PLAYERS:
+    type: "boolean"
+    description:
+      - "&7When disabled, the game will no"
+      - "&7longer automatically end when"
+      - "&7not enough players are playing."
+  ENABLE_AUTO_START:
+    type: "boolean"
+    description:
+      - "&7Automatically countdown for game"
+      - "&7start when at least 2 players are"
+      - "&7in the arena. If disabled, start"
+      - "&7the game manually in the Arena"
+      - "&7Settings menu."
+  ONLY_JOIN_QUEUED_PLAYERS:
+    type: "boolean"
+    description:
+      - "&7When the game starts, only"
+      - "&7players who have queued will"
+      - "&7be added to the game."
+  IS_PRIVATE:
+    type: "boolean"
+    description:
+      - "&7If enabled, only players added to"
+      - "&7the &aWhitelist &7can join the arena."
+      - "&7Otherwise, the &cBlacklist &7can be"
+      - "&7used to prevent certain players"
+      - "&7from joining."
+  IS_ALWAYS_ONLINE:
+    type: "boolean"
+    description:
+      - "&7Normally, the owner of an arena"
+      - "&7must be online for the arena to"
+      - "&7be joinable. Enable to keep the"
+      - "&7arena online even when the owner"
+      - "&7is offline."
+  ENABLE_FORCE_DECK:
+    type: "boolean"
+    description:
+      - "&7Force all players to use the same"
+      - "&7deck. If the player doesn't have"
+      - "&7that deck selected, they will be"
+      - "&7defaulted to preset A. Has no"
+      - "&7effect in random item mode"
+  ENABLE_POISON:
+    type: "boolean"
+    description:
+      - "&7Players will receive Poison if"
+      - "&7are too high on the map."
+  WORLD_DIFFICULTY:
+    type: "enum"
+    description:
+      - "&7Change the difficulty of the world."
+      - "&7The greater the difficulty, the more"
+      - "&7damage players take from explosions."
+  FORCED_DECK:
+    tyoe: "enum"
+    description:         
+      - "&7If Force Deck is enabled, select"
+      - "&7the deck to force."
