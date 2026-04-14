@@ -52,7 +52,7 @@ import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.invs.MapVoting;
-import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMenu;
+import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMainMenu;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
 import com.leomelonseeds.missilewars.listener.handler.CanopyManager;
 import com.leomelonseeds.missilewars.listener.handler.DragonFireballHandler;
@@ -183,7 +183,7 @@ public class CustomItemListener implements Listener {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "bossshop open decks " + player.getName());
             case "arena-settings":
             case "arena-settings-view-only":
-                new ArenaSettingsMenu(player, playerArena, held.contains("view-only"), null);
+                new ArenaSettingsMainMenu(player, playerArena, held.contains("view-only"), null);
             }
             return;
         }

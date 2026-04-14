@@ -480,153 +480,189 @@ inventories:
       title: "Kill/Death Messages"
 
 # type: boolean/int/enum
+# format:
 settings:
-  CAPACITY:
-    type: "int"
-    description:
-      - "&7The maximum amount of players"
-      - "&7that can be in-game at once."
-  TIE_TIMER:
-    type: "int"
-    description:
-      - "&7Seconds to wait after a team's"
-      - "&7portal(s) are broken for a tie."
-  ITEM_MULTIPLIER:
-    type: "int"
-    description:
-      - "&7For decks mode, a percentage"
-      - "&7multiplier to apply to item"
-      - "&7cooldowns. For example, a"
-      - "&7200% multiplier means you"
-      - "&7receive items twice as fast."
-      - "&7&oDoes not affect random item"
-      - "&7&odistribution mode."
-  RANDOM_ITEM_DISTRIBUTION_TIMER:
-    type: "int"
-    description:
-      - "&7For random item distribution mode,"
-      - "&7how fast between receiving each"
-      - "&7item. Does not affect decks mode."
-  START_TIMER:
-    type: "int"
-    description:
-      - "&7When the arena is started manually"
-      - "&7or enough players join, how long"
-      - "&7should the count down be."
-  ENABLE_MISSILE_COOLDOWN:
-    type: "boolean"
-    description:
-      - "&7A 0.4 second timer between placing"
-      - "&7successive missiles to prevent"
-      - "&7placing 2 at the same time."
-  ENABLE_SIDEWAYS_MISSILES:
-    type: "boolean"
-    description:
-      - "&7Allows placing missiles sideways."
-  ENABLE_AIR_PLACE:
-    type: "boolean"
-    description:
-      - "&7Allows placing missiles mid-air."
-      - "&7Missiles placed in mid-air spawn"
-      - "&7closer to players and do not have"
-      - "&7a preview."
-  IS_INFINITE_TIME:
-    type: "boolean"
-    description:
-      - "&7Disables the game timer. The game"
-      - "&7only ends if there aren't enough"
-      - "&7players, or a team wins."
-  ENABLE_DECREASING_ITEM_TIMERS:
-    type: "boolean"
-    description:
-      - "&7Item cooldowns reduce by 25% after"
-      - "&710 minutes have passed, and reduce"
-      - "&7by 50% after 20 minutes. Works in"
-      - "&7both deck and random item modes."
-  ENABLE_RANDOM_ITEM_DISTRIBUTION:
-    type: "boolean"
-    description:
-      - "&7Instead of decks, a random item"
-      - "&7will be distributed to each player"
-      - "&7every few seconds, like in classic"
-      - "&7Missile Wars gamemodes. You can"
-      - "&7customize the random items using"
-      - "&7the item to the right."
-  ENABLE_MULTIPLE_PORTALS:
-    type: "boolean"
-    description:
-      - "&7When disabled, breaking any enemy"
-      - "&7portal will end the game."
-  ENABLE_TEAM_BALANCING:
-    type: "boolean"
-    description:
-      - "&7When the ratio of team sizes is"
-      - "&7greater than 3:2, the team with"
-      - "&7fewer players will get faster"
-      - "&7cooldowns or extra items depending"
-      - "&7on the item distribution mode."
-  ENABLE_UNFAIR_TEAMS:
-    type: "boolean"
-    description:
-      - "&7Allows unfair team sizes using"
-      - "&7team queueing."
-  END_IF_NO_PLAYERS:
-    type: "boolean"
-    description:
-      - "&7When disabled, the game will no"
-      - "&7longer automatically end when"
-      - "&7not enough players are playing."
-  ENABLE_AUTO_START:
-    type: "boolean"
-    description:
-      - "&7Automatically countdown for game"
-      - "&7start when at least 2 players are"
-      - "&7in the arena. If disabled, start"
-      - "&7the game manually in the Arena"
-      - "&7Settings menu."
-  ONLY_JOIN_QUEUED_PLAYERS:
-    type: "boolean"
-    description:
-      - "&7When the game starts, only"
-      - "&7players who have queued will"
-      - "&7be added to the game."
-  IS_PRIVATE:
-    type: "boolean"
-    description:
-      - "&7If enabled, only players added to"
-      - "&7the &aWhitelist &7can join the arena."
-      - "&7Otherwise, the &cBlacklist &7can be"
-      - "&7used to prevent certain players"
-      - "&7from joining."
-  IS_ALWAYS_ONLINE:
-    type: "boolean"
-    description:
-      - "&7Normally, the owner of an arena"
-      - "&7must be online for the arena to"
-      - "&7be joinable. Enable to keep the"
-      - "&7arena online even when the owner"
-      - "&7is offline."
-  ENABLE_FORCE_DECK:
-    type: "boolean"
-    description:
-      - "&7Force all players to use the same"
-      - "&7deck. If the player doesn't have"
-      - "&7that deck selected, they will be"
-      - "&7defaulted to preset A. Has no"
-      - "&7effect in random item mode"
-  ENABLE_POISON:
-    type: "boolean"
-    description:
-      - "&7Players will receive Poison if"
-      - "&7are too high on the map."
-  WORLD_DIFFICULTY:
-    type: "enum"
-    description:
-      - "&7Change the difficulty of the world."
-      - "&7The greater the difficulty, the more"
-      - "&7damage players take from explosions."
-  FORCED_DECK:
-    tyoe: "enum"
-    description:         
-      - "&7If Force Deck is enabled, select"
-      - "&7the deck to force."
+  format:
+    boolean:
+      item-enabled: LIME_WOOL
+      item-disabled: RED_WOOL
+      lore:
+        - ""
+        - "&7Enabled: %enabled%"
+        - "&7Default: %default%"
+        - ""
+        - "&cClick &7to toggle"
+    int:
+      item: LIGHT_BLUE_WOOL
+      left-arrow: " <  "
+      right-arrow: "  > "
+      lore-increasable: "&cLeft-click &7to increase &a▲"
+      lore-decreasable: "&cRight-click &7to decrease &c▼"
+      lore:
+        - ""
+        - "&8%left-value%&7%left-arrow%&b%value%%unit%&7%right-arrow%&8%right-value%"
+        - "&7Default: &b%default%"
+        - ""
+    enum:
+      item: YELLOW_WOOL
+      lore:
+        - ""
+        - "&7Current: &e%value%"
+        - "&7Default: &e%default%"
+        - ""
+        - "&cClick &7to change"
+  settings:
+    CAPACITY:
+      type: "int"
+      unit: ""
+      description:
+        - "&7The maximum amount of players"
+        - "&7that can be in-game at once."
+    TIE_TIMER:
+      type: "int"
+      unit: "s"
+      description:
+        - "&7Seconds to wait after a team's"
+        - "&7portal(s) are broken for a tie."
+    ITEM_MULTIPLIER:
+      type: "int"
+      unit: "%"
+      description:
+        - "&7For decks mode, a percentage"
+        - "&7multiplier to apply to item"
+        - "&7cooldowns. For example, a"
+        - "&7200% multiplier means you"
+        - "&7receive items twice as fast."
+        - "&7&oDoes not affect random item"
+        - "&7&odistribution mode."
+    RANDOM_ITEM_DISTRIBUTION_TIMER:
+      type: "int"
+      unit: "s"
+      description:
+        - "&7For random item distribution mode,"
+        - "&7how fast between receiving each"
+        - "&7item. Does not affect decks mode."
+    START_TIMER:
+      type: "int"
+      unit: "s"
+      description:
+        - "&7When the arena is started manually"
+        - "&7or enough players join, how long"
+        - "&7should the count down be."
+    ENABLE_MISSILE_COOLDOWN:
+      type: "boolean"
+      description:
+        - "&7A 0.4 second timer between placing"
+        - "&7successive missiles to prevent"
+        - "&7placing 2 at the same time."
+    ENABLE_SIDEWAYS_MISSILES:
+      type: "boolean"
+      description:
+        - "&7Allows placing missiles sideways."
+    ENABLE_AIR_PLACE:
+      type: "boolean"
+      description:
+        - "&7Allows placing missiles mid-air."
+        - "&7Missiles placed in mid-air spawn"
+        - "&7closer to players and do not have"
+        - "&7a preview."
+    IS_INFINITE_TIME:
+      type: "boolean"
+      description:
+        - "&7Disables the game timer. The game"
+        - "&7only ends if there aren't enough"
+        - "&7players, or a team wins."
+    ENABLE_DECREASING_ITEM_TIMERS:
+      type: "boolean"
+      description:
+        - "&7Item cooldowns reduce by 25% after"
+        - "&710 minutes have passed, and reduce"
+        - "&7by 50% after 20 minutes. Works in"
+        - "&7both deck and random item modes."
+    ENABLE_RANDOM_ITEM_DISTRIBUTION:
+      type: "boolean"
+      description:
+        - "&7Instead of decks, a random item"
+        - "&7will be distributed to each player"
+        - "&7every few seconds, like in classic"
+        - "&7Missile Wars gamemodes. You can"
+        - "&7customize the random items using"
+        - "&7the item to the right."
+    ENABLE_MULTIPLE_PORTALS:
+      type: "boolean"
+      description:
+        - "&7When disabled, breaking any enemy"
+        - "&7portal will end the game."
+    ENABLE_TEAM_BALANCING:
+      type: "boolean"
+      description:
+        - "&7When the ratio of team sizes is"
+        - "&7greater than 3:2, the team with"
+        - "&7fewer players will get faster"
+        - "&7cooldowns or extra items depending"
+        - "&7on the item distribution mode."
+    ENABLE_UNFAIR_TEAMS:
+      type: "boolean"
+      description:
+        - "&7Allows unfair team sizes using"
+        - "&7team queueing."
+    END_IF_NO_PLAYERS:
+      type: "boolean"
+      description:
+        - "&7When disabled, the game will no"
+        - "&7longer automatically end when"
+        - "&7not enough players are playing."
+    ENABLE_AUTO_START:
+      type: "boolean"
+      description:
+        - "&7Automatically countdown for game"
+        - "&7start when at least 2 players are"
+        - "&7in the arena. If disabled, start"
+        - "&7the game manually in the Arena"
+        - "&7Settings menu."
+    ONLY_JOIN_QUEUED_PLAYERS:
+      type: "boolean"
+      description:
+        - "&7When the game starts, only"
+        - "&7players who have queued will"
+        - "&7be added to the game."
+    IS_PRIVATE:
+      type: "boolean"
+      description:
+        - "&7If enabled, only players added to"
+        - "&7the &aWhitelist &7can join the arena."
+        - "&7Otherwise, the &cBlacklist &7can be"
+        - "&7used to prevent certain players"
+        - "&7from joining."
+    IS_ALWAYS_ONLINE:
+      type: "boolean"
+      description:
+        - "&7Normally, the owner of an arena"
+        - "&7must be online for the arena to"
+        - "&7be joinable. Enable to keep the"
+        - "&7arena online even when the owner"
+        - "&7is offline."
+    ENABLE_FORCE_DECK:
+      type: "boolean"
+      description:
+        - "&7Force all players to use the same"
+        - "&7deck. If the player doesn't have"
+        - "&7that deck selected, they will be"
+        - "&7defaulted to preset A. Has no"
+        - "&7effect in random item mode"
+    ENABLE_POISON:
+      type: "boolean"
+      description:
+        - "&7Players will receive Poison if"
+        - "&7are too high on the map."
+    WORLD_DIFFICULTY:
+      type: "enum"
+      description:
+        - "&7Change the difficulty of the world."
+        - "&7The greater the difficulty, the more"
+        - "&7damage players take from explosions."
+    FORCED_DECK:
+      tyoe: "enum"
+      description:         
+        - "&7If Force Deck is enabled, select"
+        - "&7the deck to force."

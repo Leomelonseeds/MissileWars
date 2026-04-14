@@ -13,7 +13,7 @@ import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
-public class ArenaSettingsMenu extends MWInventory {
+public class ArenaSettingsMainMenu extends MWInventory {
     
     private boolean viewOnly;
     private Player player;
@@ -21,7 +21,7 @@ public class ArenaSettingsMenu extends MWInventory {
     private FileConfiguration itemConfig;
     private MWInventory fromInv;
 
-    public ArenaSettingsMenu(Player player, Arena arena, boolean viewOnly, MWInventory fromInv) {
+    public ArenaSettingsMainMenu(Player player, Arena arena, boolean viewOnly, MWInventory fromInv) {
         super(
             player,
             viewOnly ? 36 : 45,

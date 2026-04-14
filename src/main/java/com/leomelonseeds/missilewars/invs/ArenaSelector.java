@@ -22,7 +22,7 @@ import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.CustomArenaCreationSession;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
-import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMenu;
+import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMainMenu;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -202,7 +202,7 @@ public class ArenaSelector extends PaginatedMWIInventory {
                 return;
             } 
             
-            new ArenaSettingsMenu(player, owned, false, this);
+            new ArenaSettingsMainMenu(player, owned, false, this);
             return;
         }
         
