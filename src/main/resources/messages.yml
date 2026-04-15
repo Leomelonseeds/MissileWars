@@ -486,14 +486,16 @@ settings:
     boolean:
       item-enabled: LIME_WOOL
       item-disabled: RED_WOOL
+      color: "&e"
       lore:
         - ""
-        - "&7Enabled: %enabled%"
+        - "&fEnabled: %enabled%"
         - "&7Default: %default%"
         - ""
         - "&cClick &7to toggle"
     int:
       item: LIGHT_BLUE_WOOL
+      color: "&b"
       left-arrow: " <  "
       right-arrow: "  > "
       lore-increasable: "&cLeft-click &7to increase &a▲"
@@ -501,14 +503,15 @@ settings:
       lore:
         - ""
         - "&8%left-value%&7%left-arrow%&b%value%%unit%&7%right-arrow%&8%right-value%"
-        - "&7Default: &b%default%"
+        - "&7Default: &3%default%"
         - ""
     enum:
-      item: YELLOW_WOOL
+      item: PINK_WOOL
+      color: "&d"
       lore:
         - ""
-        - "&7Current: &e%value%"
-        - "&7Default: &e%default%"
+        - "&fCurrent: &d%value%"
+        - "&7Default: &5%default%"
         - ""
         - "&cClick &7to change"
   settings:

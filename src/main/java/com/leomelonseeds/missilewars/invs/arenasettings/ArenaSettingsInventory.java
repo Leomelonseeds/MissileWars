@@ -96,7 +96,41 @@ public abstract class ArenaSettingsInventory extends MWInventory {
      * @return
      */
     protected ItemStack createSettingsItem(ArenaSetting setting) {
+        String type = settingConfig.getString("settings." + setting.toString() + ".type");
+        switch (type) {
+            case "int": return createIntSettingItem(setting);
+            case "boolean": return createBooleanSettingItem(setting);
+            case "enum": return createEnumSettingItem(setting);
+        }
         
         return null;
+    }
+    
+    private ItemStack createIntSettingItem(ArenaSetting setting) {
+        ConfigurationSection sec = settingConfig.getConfigurationSection("format.int");
+        ItemStack item = new ItemStack(Material.valueOf(sec.getString("item")));
+        return null;
+    }
+    
+    private ItemStack createBooleanSettingItem(ArenaSetting setting) {
+        
+        return null;
+    }
+    
+    private ItemStack createEnumSettingItem(ArenaSetting setting) {
+        
+        return null;
+    }
+    
+    private String getSettingDisplayName(String setting) {
+        StringBuilder ret = new StringBuilder();
+        for (String s : setting.split("_")) {
+            ret.append(s.substring(0, 1).toUpperCase());
+            ret.append(s.substring(1).toLowerCase());
+            ret.append(" ");
+        }
+        
+        ret.deleteCharAt(ret.length() - 1);
+        return ret.toString();
     }
 }
