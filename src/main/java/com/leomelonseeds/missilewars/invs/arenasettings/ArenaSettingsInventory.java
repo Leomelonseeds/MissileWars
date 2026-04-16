@@ -1,11 +1,15 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
@@ -17,7 +21,8 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 public abstract class ArenaSettingsInventory extends MWInventory {
     
     private static NamespacedKey SETTING_KEY;
-    
+
+    private Map<Integer, ArenaSetting> settingSlots;
     private boolean viewOnly;
     private ArenaSettings arenaSettings;
     private MWInventory fromInv;
@@ -40,10 +45,13 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         this.fromInv = fromInv;
         this.size = size;
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
+        this.settingSlots = getSettingSlots();
         if (SETTING_KEY == null) {
             SETTING_KEY = new NamespacedKey(MissileWarsPlugin.getPlugin(), "arena-setting");
         }
     }
+    
+    public abstract Map<Integer, ArenaSetting> getSettingSlots();
     
     @Override
     public void updateInventory() {
@@ -52,6 +60,10 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         }
         
         inv.setItem(size - 5, InventoryUtils.getBackItem());
+        
+        for (Entry<Integer, ArenaSetting> s : settingSlots.entrySet()) {
+            inv.setItem(s.getKey(), createSettingsItem(s.getValue()));
+        }
         
         updateSettingsInventory();
     }
@@ -70,8 +82,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             return;
         }
         
-        String settingString = InventoryUtils.getStringFromItemKey(item, SETTING_KEY);
-        if (settingString == null) {
+        ArenaSetting setting = settingSlots.get(slot);
+        if (setting == null) {
             registerClick(slot, type, item);
             return;
         }
@@ -95,8 +107,17 @@ public abstract class ArenaSettingsInventory extends MWInventory {
      * @param setting
      * @return
      */
-    protected ItemStack createSettingsItem(ArenaSetting setting) {
-        String type = settingConfig.getString("settings." + setting.toString() + ".type");
+    private ItemStack createSettingsItem(ArenaSetting setting) {
+        // Get section info
+        String settingString = setting.toString();
+        String type = settingConfig.getString("settings." + settingString + ".type");
+        ConfigurationSection sec = settingConfig.getConfigurationSection("format." + type);
+        
+        // Create item and set name
+        ItemStack item = new ItemStack(Material.valueOf(sec.getString("item")));
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(settingString)));
+        
         switch (type) {
             case "int": return createIntSettingItem(setting);
             case "boolean": return createBooleanSettingItem(setting);
@@ -109,6 +130,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private ItemStack createIntSettingItem(ArenaSetting setting) {
         ConfigurationSection sec = settingConfig.getConfigurationSection("format.int");
         ItemStack item = new ItemStack(Material.valueOf(sec.getString("item")));
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(setting.toString())));
         return null;
     }
     
