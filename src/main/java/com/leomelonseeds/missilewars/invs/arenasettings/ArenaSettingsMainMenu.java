@@ -77,5 +77,15 @@ public class ArenaSettingsMainMenu extends MWInventory {
             
             return;
         }
+        
+        String key = InventoryUtils.getGUIFromItem(item);
+        if (key == null) {
+            return;
+        }
+        
+        if (key.equals("visibility-settings")) {
+            new VisibilitySettings(player, viewOnly, arena, this);
+            return;
+        }
     }
 }

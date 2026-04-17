@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,13 +16,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
+import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public abstract class ArenaSettingsInventory extends MWInventory {
     
-    private static NamespacedKey SETTING_KEY;
+    // To store the value that clicking this setting will give
+    // boolean: true/false
+    // int: "l-r" split on "-"
+    // enum: string value of the next enum to uppercase
+    private static NamespacedKey SETTING_VALUE;
 
     private Map<Integer, ArenaSetting> settingSlots;
     private boolean viewOnly;
@@ -36,18 +43,18 @@ public abstract class ArenaSettingsInventory extends MWInventory {
      * 
      * @param player
      * @param size
-     * @param title
+     * @param title does not have to be adjusted for view only
      */
     public ArenaSettingsInventory(Player player, int size, String title, boolean viewOnly, ArenaSettings arenaSettings, MWInventory fromInv) {
-        super(player, size, title);
+        super(player, size, viewOnly ? title + " (View Only)" : title);
         this.viewOnly = viewOnly;
         this.arenaSettings = arenaSettings;
         this.fromInv = fromInv;
         this.size = size;
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
         this.settingSlots = getSettingSlots();
-        if (SETTING_KEY == null) {
-            SETTING_KEY = new NamespacedKey(MissileWarsPlugin.getPlugin(), "arena-setting");
+        if (SETTING_VALUE == null) {
+            SETTING_VALUE = new NamespacedKey(MissileWarsPlugin.getPlugin(), "arena-setting");
         }
     }
     
@@ -70,6 +77,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     
     public abstract void updateSettingsInventory();
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void registerClick(int slot, ClickType type) {
         ItemStack item = inv.getItem(slot);
@@ -89,7 +97,47 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         }
         
         // Process settings
+        if (viewOnly) {
+            ConfigUtils.sendConfigMessage("settings.view-only", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
         
+        String value = InventoryUtils.getStringFromItemKey(item, SETTING_VALUE);
+        if (value == null) {
+            return;
+        }
+        
+        String settingType = settingConfig.getString("settings." + setting.toString() + ".type");
+        if (settingType.equals("int")) {
+            String[] values = value.split("-");
+            if (type.isRightClick()) {
+                if (values[1].equals("null")) {
+                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+
+                arenaSettings.set(setting, Integer.parseInt(values[1]));
+            } else if (type.isLeftClick()) {
+                if (values[0].equals("null")) {
+                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+                
+                arenaSettings.set(setting, Integer.parseInt(values[0]));
+            } else {
+                return;
+            }
+        } else if (settingType.equals("enum")) {
+            arenaSettings.set(setting, Enum.valueOf((Class) setting.getDefaultValue().getClass(), value));
+        } else {
+            arenaSettings.set(setting, Boolean.valueOf(value));
+        }
+        
+        ConfigUtils.sendConfigSound("use-skillpoint", player);
+        inv.setItem(slot, createSettingsItem(setting));
     }
     
     /**
@@ -114,35 +162,123 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         ConfigurationSection sec = settingConfig.getConfigurationSection("format." + type);
         
         // Create item and set name
-        ItemStack item = new ItemStack(Material.valueOf(sec.getString("item")));
-        ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(settingString)));
-        
-        switch (type) {
-            case "int": return createIntSettingItem(setting);
-            case "boolean": return createBooleanSettingItem(setting);
-            case "enum": return createEnumSettingItem(setting);
+        String material;
+        if (type.equals("boolean")) {
+            material = (boolean) arenaSettings.get(setting) ? sec.getString("item-enabled") : sec.getString("item-disabled");
+        } else {
+            material = sec.getString("item");
         }
         
-        return null;
-    }
-    
-    private ItemStack createIntSettingItem(ArenaSetting setting) {
-        ConfigurationSection sec = settingConfig.getConfigurationSection("format.int");
-        ItemStack item = new ItemStack(Material.valueOf(sec.getString("item")));
+        ItemStack item = new ItemStack(Material.valueOf(material));
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(setting.toString())));
-        return null;
+        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(settingString)));
+        List<String> lore = new ArrayList<>();
+        lore.add("");
+        lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
+        
+        // Add specific lores and metadata for each item
+        if (type.equals("int")) {
+            lore.addAll(getIntSettingLore(setting, sec, meta));
+        } else if (type.equals("enum")) {
+            lore.addAll(getEnumSettingLore(setting, sec, meta));
+        } else {
+            lore.addAll(getBooleanSettingLore(setting, sec, meta));
+        }
+
+        meta.lore(ConfigUtils.toComponent(lore));
+        item.setItemMeta(meta);
+        return item;
     }
     
-    private ItemStack createBooleanSettingItem(ArenaSetting setting) {
+    /**
+     * Get int setting lore, while also adding the values to the persistent data container
+     * 
+     * @param setting
+     * @param sec
+     * @param meta
+     * @return
+     */
+    private List<String> getIntSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
+        List<String> res = new ArrayList<>();
+        IntSettingModifier intModifier = setting.getIntModifier();
+        int cur = (int) arenaSettings.get(setting);
+        Integer left = cur <= intModifier.getMin() ? null : cur - intModifier.getChange();
+        Integer right = cur >= intModifier.getMax() ? null : cur + intModifier.getChange();
+        String unit = settingConfig.getString("settings." + setting.toString() + ".unit");
+        for (String line : sec.getStringList("lore")) {
+            if (line.isEmpty()) {
+                res.add(line);
+                continue;
+            }
+            
+            line = line.replace("%left-value%", left == null ? "" : left + "");
+            line = line.replace("%left-arrow%", left == null ? "" : sec.getString("left-arrow"));
+            line = line.replace("%right-value%", right == null ? "" : right + "");
+            line = line.replace("%right-arrow%", right == null ? "" : sec.getString("right-arrow"));
+            line = line.replace("%value%", cur + "");
+            line = line.replace("%unit%", unit);
+            line = line.replace("%default%", setting.getDefaultValue() + "");
+            res.add(line);
+        }
         
-        return null;
+        if (left != null) {
+            res.add(sec.getString("lore-decreasable"));
+        }
+        
+        if (right != null) {
+            res.add(sec.getString("lore-increasable"));
+        }
+        
+        // This right here is bad coding practice in multiple ways
+        InventoryUtils.setMetaString(meta, SETTING_VALUE, left + "-" + right);
+        return res;
     }
-    
-    private ItemStack createEnumSettingItem(ArenaSetting setting) {
+
+    private List<String> getEnumSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
+        List<String> res = new ArrayList<>();
+        Object val = arenaSettings.get(setting);
+        for (String line : sec.getStringList("lore")) {
+            if (line.isEmpty()) {
+                res.add(line);
+                continue;
+            }
+            
+            line = line.replace("%value%", val.toString());
+            line = line.replace("%default%", setting.getDefaultValue().toString());
+            res.add(line);
+        }
         
-        return null;
+        // Get the next in line
+        Object[] vals = val.getClass().getEnumConstants();
+        int i = 0;
+        while (i < vals.length) {
+            if (vals[i].equals(arenaSettings.get(setting))) {
+                break;
+            }
+            
+            i++;
+        }
+        
+        InventoryUtils.setMetaString(meta, SETTING_VALUE, vals[(i + 1) % vals.length].toString().toUpperCase());
+        return res;
+    }
+
+    private List<String> getBooleanSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
+        List<String> res = new ArrayList<>();
+        boolean enabled = (boolean) arenaSettings.get(setting);
+        for (String line : sec.getStringList("lore")) {
+            if (line.isEmpty()) {
+                res.add(line);
+                continue;
+            }
+            
+            line = line.replace("%enabled%", enabled ? "&aTrue" : "&cFalse");
+            line = line.replace("%default%", (boolean) setting.getDefaultValue() ? "&2True" : "&4False");
+            res.add(line);
+        }
+
+        InventoryUtils.setMetaString(meta, SETTING_VALUE, enabled ? "false" : "true");
+        return res;
     }
     
     private String getSettingDisplayName(String setting) {
