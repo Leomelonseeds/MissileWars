@@ -70,7 +70,6 @@ public abstract class Arena implements ConfigurationSerializable {
     protected ArenaGamemode gamemode;
     protected World world;
     protected ArenaSettings settings;
-    protected Map<ArenaSetting, String> settingCache;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
     protected Set<MissileWarsPlayer> spectators;
@@ -252,41 +251,6 @@ public abstract class Arena implements ConfigurationSerializable {
     
     public ArenaType getType() {
         return type;
-    }
-    
-    public boolean setSetting(ArenaSetting setting, String value) {
-        FileConfiguration messageConfig = ConfigUtils.getConfigFile("messages.yml");
-        String settingType = messageConfig.getString("settings.settings." + setting.toString() + ".type");
-        return setSetting(setting, value, settingType);
-    }
-    
-    /**
-     * Set a setting to a value. Obviously, the value has
-     * to be acceptable for the setting type. If a game is
-     * running, the setting value is cached until the world
-     * resets.
-     * 
-     * @param setting
-     * @param value
-     * @param type the type of the setting, int/enum/boolean
-     * @return if the value was successfully set
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public boolean setSetting(ArenaSetting setting, String value, String type) {
-        try {
-            if (type.equals("int")) {
-                settings.set(setting, Integer.parseInt(value));
-            } else if (type.equals("enum")) {
-                settings.set(setting, Enum.valueOf((Class) setting.getDefaultValue().getClass(), value));
-            } else {
-                settings.set(setting, Boolean.valueOf(value));
-            }
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().warning("Failed to set setting " + setting.toString() + " to: " + value);
-            return false;
-        }
-        
-        return true;
     }
     
     /**

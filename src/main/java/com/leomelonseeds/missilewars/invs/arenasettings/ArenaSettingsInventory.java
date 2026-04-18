@@ -77,7 +77,6 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     
     public abstract void updateSettingsInventory();
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void registerClick(int slot, ClickType type) {
         ItemStack item = inv.getItem(slot);
@@ -109,31 +108,10 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         }
         
         String settingType = settingConfig.getString("settings." + setting.toString() + ".type");
-        if (settingType.equals("int")) {
-            String[] values = value.split("-");
-            if (type.isRightClick()) {
-                if (values[1].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
-                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                    return;
-                }
-
-                arenaSettings.set(setting, Integer.parseInt(values[1]));
-            } else if (type.isLeftClick()) {
-                if (values[0].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
-                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                    return;
-                }
-                
-                arenaSettings.set(setting, Integer.parseInt(values[0]));
-            } else {
-                return;
-            }
-        } else if (settingType.equals("enum")) {
-            arenaSettings.set(setting, Enum.valueOf((Class) setting.getDefaultValue().getClass(), value));
-        } else {
-            arenaSettings.set(setting, Boolean.valueOf(value));
+        // TODO: If type is int we need to parse the value
+        if (!arenaSettings.set(setting, value, settingType, true)) {
+            ConfigUtils.sendConfigMessage("settings.error", player);
+            return;
         }
         
         ConfigUtils.sendConfigSound("use-skillpoint", player);
@@ -175,6 +153,9 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         List<String> lore = new ArrayList<>();
         lore.add("");
         lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
+        if (arenaSettings.isQueued(setting)) {
+            lore.addAll(settingConfig.getStringList("settings.format.queued"));
+        }
         
         // Add specific lores and metadata for each item
         if (type.equals("int")) {

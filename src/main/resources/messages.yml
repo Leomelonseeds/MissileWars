@@ -155,6 +155,7 @@ messages:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"
     int-maximum: "&cYou cannot increase this setting further!"
+    error: "&cSomething went wrong changing this setting. Please contact an admin!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
@@ -487,6 +488,9 @@ inventories:
 # format:
 settings:
   format:
+    queued:
+      - "&d» &d&oThis setting is queued to change"
+      - "&d&othe next time this arena resets"
     boolean:
       item-enabled: LIME_WOOL
       item-disabled: RED_WOOL
