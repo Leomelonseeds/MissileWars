@@ -154,7 +154,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         lore.add("");
         lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
         if (arenaSettings.isQueued(setting)) {
-            lore.addAll(settingConfig.getStringList("settings.format.queued"));
+            lore.addAll(settingConfig.getStringList("format.queued"));
         }
         
         // Add specific lores and metadata for each item
