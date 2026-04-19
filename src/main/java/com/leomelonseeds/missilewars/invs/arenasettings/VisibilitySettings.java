@@ -13,7 +13,7 @@ import com.leomelonseeds.missilewars.invs.MWInventory;
 public class VisibilitySettings extends ArenaSettingsInventory {
 
     public VisibilitySettings(Player player, boolean viewOnly, Arena arena, MWInventory fromInv) {
-        super(player, 18, "Visibility Settings", viewOnly, arena.getArenaSettings(), fromInv);
+        super(player, 18, "Visibility Settings", viewOnly, arena, fromInv);
         // Nothing here yet...
     }
 

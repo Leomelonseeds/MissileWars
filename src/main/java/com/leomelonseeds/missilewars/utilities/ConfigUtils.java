@@ -560,4 +560,16 @@ public class ConfigUtils {
     public static boolean isBedrockPlayer(OfflinePlayer player) {
         return player.getName().startsWith("~");
     }
+    
+    public static String getEnumDisplayString(String str) {
+        StringBuilder ret = new StringBuilder();
+        for (String s : str.split("_")) {
+            ret.append(s.substring(0, 1).toUpperCase());
+            ret.append(s.substring(1).toLowerCase());
+            ret.append(" ");
+        }
+        
+        ret.deleteCharAt(ret.length() - 1);
+        return ret.toString();
+    }
 }

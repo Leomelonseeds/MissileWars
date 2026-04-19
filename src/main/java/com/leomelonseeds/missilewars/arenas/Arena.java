@@ -249,8 +249,73 @@ public abstract class Arena implements ConfigurationSerializable {
         return settings;
     }
     
-    public ArenaType getType() {
-        return type;
+    /**
+     * Safely set a setting. If the arena is running, the setting will be
+     * queued to be set once the arena resets. Otherwise, the setting
+     * change will be broadcasted to the arena.
+     * 
+     * @param setting
+     * @param value
+     * @param type
+     * @return
+     */
+    public boolean setSetting(ArenaSetting setting, String value, String type) {
+        boolean queue = running;
+        String curValue = settings.get(setting) + "";
+        if (!settings.set(setting, value, type, queue)) {
+            return false;
+        }
+        
+        if (!queue) {
+            announceSettingChange(setting, curValue, value);
+        }
+        return true;
+    }
+    
+    /**
+     * Announce to the arena that a setting has changed
+     * 
+     * @param setting
+     * @param oldValue
+     * @param newValue
+     */
+    public void announceSettingChange(ArenaSetting setting, String oldValue, String newValue) {
+        // Add formatting
+        do {
+            try {
+                Integer.parseInt(oldValue);
+                oldValue += "&b";
+                newValue += "&b";
+                break;
+            } catch (NumberFormatException e) {
+                // Do nothing, continue
+            }
+            
+            if (oldValue.equalsIgnoreCase("true")) {
+                oldValue = "&aTrue";
+                newValue = "&cFalse";
+                break;
+            }
+            
+            if (oldValue.equalsIgnoreCase("false")) {
+                newValue = "&aTrue";
+                oldValue = "&cFalse";
+                break;
+            }
+            
+            oldValue += "&d";
+            newValue += "&d";
+        } while (false);
+        
+        Map<String, String> placeholders = Map.of(
+            "%setting%", ConfigUtils.getEnumDisplayString(setting.toString()),
+            "%oldvalue%", oldValue,
+            "%newvalue%", newValue
+        );
+                
+        for (MissileWarsPlayer mwPlayer : players.values()) {
+            ConfigUtils.sendConfigMessage("settings.change", mwPlayer.getMCPlayer(), placeholders);
+        }
     }
     
     /**
@@ -260,6 +325,10 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void setArenaSettings(ArenaSettings arenaSettings) {
         this.settings = arenaSettings;
+    }
+    
+    public ArenaType getType() {
+        return type;
     }
      
     /**

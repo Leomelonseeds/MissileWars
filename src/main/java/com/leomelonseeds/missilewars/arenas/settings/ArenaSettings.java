@@ -9,10 +9,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-
-import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class ArenaSettings implements ConfigurationSerializable {
     
@@ -127,25 +124,12 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
     
     /**
-     * Queue a setting to be set.
-     * 
-     * @param setting
-     * @param value
-     * @return
-     */
-    public boolean set(ArenaSetting setting, String value) {
-        FileConfiguration messageConfig = ConfigUtils.getConfigFile("messages.yml");
-        String settingType = messageConfig.getString("settings.settings." + setting.toString() + ".type");
-        return set(setting, value, settingType, true);
-    }
-    
-    /**
      * Parse a string to set arena setting to value.
      * 
      * @param setting
      * @param value
      * @param type either boolean/int/enum (make sure it's right)
-     * @boolean queue whether the setting should be queue and applied by using flush()
+     * @param queue whether the setting should be queue and applied by using flush()
      * @return if the value is valid for the setting
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })

@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
@@ -32,6 +33,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private Map<Integer, ArenaSetting> settingSlots;
     private boolean viewOnly;
     private ArenaSettings arenaSettings;
+    private Arena arena;
     private MWInventory fromInv;
     private int size;
     private ConfigurationSection settingConfig;
@@ -45,10 +47,11 @@ public abstract class ArenaSettingsInventory extends MWInventory {
      * @param size
      * @param title does not have to be adjusted for view only
      */
-    public ArenaSettingsInventory(Player player, int size, String title, boolean viewOnly, ArenaSettings arenaSettings, MWInventory fromInv) {
+    public ArenaSettingsInventory(Player player, int size, String title, boolean viewOnly, Arena arena, MWInventory fromInv) {
         super(player, size, viewOnly ? title + " (View Only)" : title);
         this.viewOnly = viewOnly;
-        this.arenaSettings = arenaSettings;
+        this.arena = arena;
+        this.arenaSettings = arena.getArenaSettings();
         this.fromInv = fromInv;
         this.size = size;
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
@@ -107,9 +110,32 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             return;
         }
         
+        // Parse value if int
         String settingType = settingConfig.getString("settings." + setting.toString() + ".type");
-        // TODO: If type is int we need to parse the value
-        if (!arenaSettings.set(setting, value, settingType, true)) {
+        if (settingType.equals("int")) {
+            String[] values = value.split("-");
+            if (type.isRightClick()) {
+                if (values[1].equals("null")) {
+                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+
+                value = values[1];
+            } else if (type.isLeftClick()) {
+                if (values[0].equals("null")) {
+                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+                
+                value = values[0];
+            } else {
+                return;
+            }
+        }
+        
+        if (!arena.setSetting(setting, value, settingType)) {
             ConfigUtils.sendConfigMessage("settings.error", player);
             return;
         }
@@ -149,7 +175,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         
         ItemStack item = new ItemStack(Material.valueOf(material));
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + getSettingDisplayName(settingString)));
+        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + ConfigUtils.getEnumDisplayString(settingString)));
         List<String> lore = new ArrayList<>();
         lore.add("");
         lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
@@ -260,17 +286,5 @@ public abstract class ArenaSettingsInventory extends MWInventory {
 
         InventoryUtils.setMetaString(meta, SETTING_VALUE, enabled ? "false" : "true");
         return res;
-    }
-    
-    private String getSettingDisplayName(String setting) {
-        StringBuilder ret = new StringBuilder();
-        for (String s : setting.split("_")) {
-            ret.append(s.substring(0, 1).toUpperCase());
-            ret.append(s.substring(1).toLowerCase());
-            ret.append(" ");
-        }
-        
-        ret.deleteCharAt(ret.length() - 1);
-        return ret.toString();
     }
 }
