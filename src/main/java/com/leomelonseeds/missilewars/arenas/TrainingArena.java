@@ -40,7 +40,7 @@ public class TrainingArena extends ClassicArena {
     private int missiles;
     
     public TrainingArena() {
-        super("training", 100, false);
+        super("training", 100, ArenaType.TRAINING);
         init();
     }
 

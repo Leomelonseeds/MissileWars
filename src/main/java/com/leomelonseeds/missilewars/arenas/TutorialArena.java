@@ -49,7 +49,7 @@ public class TutorialArena extends ClassicArena {
     private boolean justReset;
     
     public TutorialArena() {
-        super("tutorial", 100, false);
+        super("tutorial", 100, ArenaType.TUTORIAL);
         init();
     }
 

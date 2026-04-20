@@ -68,6 +68,43 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // Load and unload world
+        if (action.equalsIgnoreCase("unload")) {
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Arena arena = arenaManager.getArena(args[1]);
+            if (arena == null) {
+                return true;
+            }
+            
+            if (arena.unloadWorld()) {
+                sendSuccessMsg(sender, "Arena world successfully unloaded.");
+            } else {
+                sendErrorMsg(sender, "Failed to unload the world! Players still inside?");
+            }
+            return true;
+        }
+        
+        // Load and unload world
+        if (action.equalsIgnoreCase("load")) {
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Arena arena = arenaManager.getArena(args[1]);
+            if (arena == null) {
+                return true;
+            }
+            
+            arena.loadWorld();
+            sendSuccessMsg(sender, "Attempting to load world...");
+            return true;
+        }
+        
         // Test commands
         if (action.equalsIgnoreCase("test")) {
             if (!sender.hasPermission("umw.admin")) {

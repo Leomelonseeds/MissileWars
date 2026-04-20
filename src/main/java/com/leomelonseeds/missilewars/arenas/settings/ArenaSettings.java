@@ -40,7 +40,9 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.playerBlacklist = new ArrayList<>(other.playerBlacklist);
         this.playerWhitelist = new ArrayList<>(other.playerWhitelist);
         this.selectedMaps = new ArrayList<>(other.selectedMaps);
-        this.randomItemDistributor = other.randomItemDistributor.clone();
+        if (other.randomItemDistributor != null) {
+            this.randomItemDistributor = other.randomItemDistributor.clone();
+        }
     }
     
     @Override

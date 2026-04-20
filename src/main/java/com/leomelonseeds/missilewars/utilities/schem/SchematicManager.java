@@ -513,35 +513,7 @@ public class SchematicManager {
      * @param removeEntities whether non-player entities within the region should be removed
      */
     public static void setAir(int x1, int y1, int z1, int x2, int y2, int z2, World world, boolean removeEntities) {
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
-        BlockVector3 pos1 = BlockVector3.at(x1, y1, z1);
-        BlockVector3 pos2 = BlockVector3.at(x2, y2, z2);
-        Region region = new CuboidRegion(weWorld, pos1, pos2);
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            editSession.setBlocks(region, BlockTypes.AIR);
-        }
-        
-        if (!removeEntities) {
-            return;
-        }
-        
-        int xmin = Math.min(x1, x2), xmax = Math.max(x1, x2);
-        int ymin = Math.min(y1, y2), ymax = Math.max(y1, y2);
-        int zmin = Math.min(z1, z2), zmax = Math.max(z1, z2);
-        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
-            for (Entity e : world.getEntities()) {
-                if (e.getType() == EntityType.PLAYER) {
-                    continue;
-                }
-                
-                Location l = e.getLocation();
-                if (xmin < l.getX() && l.getX() < xmax &&
-                    ymin < l.getY() && l.getY() < ymax &&
-                    zmin < l.getZ() && l.getZ() < zmax) {
-                    e.remove();
-                }
-            }
-        });
+        setBlock(x1, y1, z1, x2, y2, z2, world, BlockTypes.AIR, removeEntities);
     }
     
     /**
@@ -560,23 +532,30 @@ public class SchematicManager {
             return;
         }
         
+        if (Bukkit.isPrimaryThread()) {
+            removeEntities(x1, y1, z1, x2, y2, z2, world);
+        } else {
+            Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), 
+                    () -> removeEntities(x1, y1, z1, x2, y2, z2, world));
+        }
+    }
+    
+    public static void removeEntities(int x1, int y1, int z1, int x2, int y2, int z2, World world) {
         int xmin = Math.min(x1, x2), xmax = Math.max(x1, x2);
         int ymin = Math.min(y1, y2), ymax = Math.max(y1, y2);
         int zmin = Math.min(z1, z2), zmax = Math.max(z1, z2);
-        Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
-            for (Entity e : world.getEntities()) {
-                if (e.getType() == EntityType.PLAYER) {
-                    continue;
-                }
-                
-                Location l = e.getLocation();
-                if (xmin < l.getX() && l.getX() < xmax &&
-                    ymin < l.getY() && l.getY() < ymax &&
-                    zmin < l.getZ() && l.getZ() < zmax) {
-                    e.remove();
-                }
+        for (Entity e : world.getEntities()) {
+            if (e.getType() == EntityType.PLAYER) {
+                continue;
             }
-        });
+            
+            Location l = e.getLocation();
+            if (xmin < l.getX() && l.getX() < xmax &&
+                ymin < l.getY() && l.getY() < ymax &&
+                zmin < l.getZ() && l.getZ() < zmax) {
+                e.remove();
+            }
+        }
     }
 
 }

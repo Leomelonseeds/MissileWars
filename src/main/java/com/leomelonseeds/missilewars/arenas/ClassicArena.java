@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -39,8 +40,8 @@ public class ClassicArena extends Arena {
     /** LEFT = RED, RIGHT = BLUE */
     private Map<MissileWarsPlayer, MutablePair<BukkitTask, BukkitTask>> glowTasks;
     
-    public ClassicArena(String name, int capacity, boolean isCustom) {
-        super(name, capacity, isCustom ? ArenaType.CUSTOM : ArenaType.CLASSIC);
+    public ClassicArena(String name, int capacity, ArenaType type) {
+        super(name, capacity, Objects.requireNonNullElse(type, ArenaType.CLASSIC));
         gamemode = ArenaGamemode.CLASSIC;
         this.glowTasks = new HashMap<>();
     }

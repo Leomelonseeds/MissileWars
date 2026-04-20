@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.arenas;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +17,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -69,6 +73,7 @@ public abstract class Arena implements ConfigurationSerializable {
     protected String mapName;
     protected ArenaGamemode gamemode;
     protected World world;
+    protected WorldBorder virtualBorder;
     protected ArenaSettings settings;
     protected List<Integer> npcs;
     protected Map<UUID, MissileWarsPlayer> players;
@@ -185,16 +190,34 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&aLoading arena world " + name + "..."));
-        WorldCreator arenaCreator = new WorldCreator("mwarena_" + name);
+        
+        // Copy world folder from plugin directory to main directory (if exists)
+        String worldName = "mwarena_" + name;
+        File worldFolder = new File(worldName);
+        if (!worldFolder.exists()) {
+            File stored = new File(ArenaManager.storageDirectory, worldName);
+            if (stored.exists()) {
+                try {
+                    FileUtils.copyDirectory(stored, worldFolder);
+                } catch (IOException e) {
+                    Bukkit.getLogger().warning("Something went wrong copying " + worldName + "!");
+                    return null;
+                }
+            }
+        }
+        
+        // Load or create world
+        WorldCreator arenaCreator = new WorldCreator(worldName);
         arenaCreator.type(WorldType.FLAT);
         arenaCreator.generatorSettings("{\"layers\": [{\"block\": \"air\", \"height\": 1}], \"biome\":\"plains\"}");
         World nworld = arenaCreator.generator(new VoidChunkGenerator()).createWorld();
         if (nworld == null) {
-            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong loading " + name + "!."));
+            Bukkit.getLogger().warning("Something went wrong loading " + name + "!");
             return null;
         }
+        nworld.setDifficulty((Difficulty) settings.get(ArenaSetting.WORLD_DIFFICULTY));
         
-        nworld.setAutoSave(false);
+        // Start spectator action bar task
         spectatorActionBar = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (MissileWarsPlayer mwp : spectators) {
                 Player player = mwp.getMCPlayer();
@@ -209,7 +232,9 @@ public abstract class Arena implements ConfigurationSerializable {
     /**
      * Unloads the world. Only works if player count is 0.
      * Also cancels all tasks, including spectator action bar.
+     * Also resets the arena if needed, and applies queued settings.
      * 
+     * @param resetSync whether to synchronously reset the arena for shutdown
      * @return whether the world was loaded successfully
      */
     public boolean unloadWorld() {
@@ -217,22 +242,37 @@ public abstract class Arena implements ConfigurationSerializable {
             return false;
         }
         
-        World _world = world;
-        world = null;
-        
-        if (_world.getPlayerCount() > 0) {
+        if (world.getPlayerCount() > 0) {
             return false;
         }
 
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Unloading arena world: " + name + "..."));
+        settings.flush();
+        
+        // Unload world
+        World _world = world;
+        world = null;
         if (!Bukkit.unloadWorld(_world, false)) {
-            Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&cSomething went wrong unloading " + name + "!"));
+            Bukkit.getLogger().warning("Something went wrong unloading " + name + "!");
             return false;
         }
         
+        // Cancel all tasks
         Bukkit.getWorlds().remove(_world);
         cancelTasks();
         spectatorActionBar.cancel();
+        if (autoEnd != null) {
+            autoEnd.cancel();
+        }
+        
+        // Delete world file
+        File worldFolder = new File("mwarena_" + name);
+        try {
+            FileUtils.deleteDirectory(worldFolder);
+        } catch (IOException | IllegalArgumentException e) {
+            Bukkit.getLogger().warning("The stored world file couldn't be removed! Please remove manually.");
+        }
+        
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         return true;
     }
@@ -280,6 +320,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param newValue
      */
     public void announceSettingChange(ArenaSetting setting, String oldValue, String newValue) {
+        // Actually change the difficulty if world difficulty changes
+        if (setting == ArenaSetting.WORLD_DIFFICULTY) {
+            world.setDifficulty(Difficulty.valueOf(newValue));
+        }
+        
         // Add formatting
         do {
             try {
@@ -358,6 +403,7 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void cancelTasks() {
         tasks.forEach(t -> t.cancel());
+        tasks.clear();
         tracker.stopAll();
     }
 
@@ -1238,10 +1284,13 @@ public abstract class Arena implements ConfigurationSerializable {
             }, 5L));
             
             // Tint task if any player is in the other team's base
-            WorldBorder virtualBorder = Bukkit.createWorldBorder();
-            virtualBorder.setSize(world.getWorldBorder().getSize());
-            virtualBorder.setCenter(world.getWorldBorder().getCenter());
-            virtualBorder.setWarningDistance(2048);
+            if (virtualBorder == null) {
+                virtualBorder = Bukkit.createWorldBorder();
+                virtualBorder.setSize(world.getWorldBorder().getSize());
+                virtualBorder.setCenter(world.getWorldBorder().getCenter());
+                virtualBorder.setWarningDistance(2048);
+            }
+            
             tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
                 if (!running) {
                     return;
@@ -1481,6 +1530,7 @@ public abstract class Arena implements ConfigurationSerializable {
             Player p = player.getMCPlayer();
             p.setGameMode(GameMode.SPECTATOR);
             p.removePotionEffect(PotionEffectType.GLOWING);
+            p.setWorldBorder(null);
         }
         
         // Schedule tie wait. If endGame gets called from somewhere else,
@@ -1535,10 +1585,10 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Remove all players after a short time, then reset the world a bit after
         int waitTime = plugin.getConfig().getInt("victory-wait-time") * 20;
-        ConfigUtils.schedule(waitTime, () -> {
+        tasks.add(ConfigUtils.schedule(waitTime, () -> {
             removePlayers();
             resetWorld();
-        });
+        }));
     }
     
     // Calculate and store all player stats from the game
@@ -1574,14 +1624,16 @@ public abstract class Arena implements ConfigurationSerializable {
         resetWorld(t -> checkForStart());
     }
     
-    /**
-     * Reset the arena world
-     * 
-     * @param callback to run when reset completes
-     */
     protected void resetWorld(DBCallback callback) {
         plugin.log("Resetting arena " + name + "...");
         announceMessage("messages.arena-resetting", null);
+        
+        // Flush arena settings
+        settings.flush().forEach((setting, values) -> {
+            announceSettingChange(setting, values.getLeft() + "", values.getRight() + "");
+        });
+        
+        // Fill area with air
         int maxHeight = plugin.getConfig().getInt("max-height");
         int maxX = plugin.getConfig().getInt("barrier.center.x") - 1;
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -1596,7 +1648,6 @@ public abstract class Arena implements ConfigurationSerializable {
                 Bukkit.getScheduler().runTask(plugin, () -> callback.onQueryDone(null));
             }
         }));
-        
         
         startTime = null;
         voteManager.resetVotes();

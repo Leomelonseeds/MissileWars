@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.arenas;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,12 +13,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -68,6 +68,8 @@ import net.citizensnpcs.trait.VillagerProfession;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
+    
+    public static String storageDirectory;
 
     private final MissileWarsPlugin plugin;
     private Map<String, Arena> loadedArenas; // Use maps to fetch arenas easily
@@ -84,6 +86,8 @@ public class ArenaManager {
             Comparator<Arena> fullComparator = Collections.reverseOrder(firstComparator).thenComparing(Arena.byName);
             gamemodeArenas.put(type, new TreeSet<>(fullComparator));
         }
+        
+        storageDirectory = plugin.getDataFolder().toString() + "/arenaworlds";
     }
 
     /** Load arenas from data file */
@@ -95,14 +99,15 @@ public class ArenaManager {
             ConfigurationSection arenas = arenaConfig.getConfigurationSection("arenas");
             for (String key : arenas.getKeys(false)) {
                 Arena arena = (Arena) arenas.get(key);
+                if (arena.loadWorld() == null) {
+                    continue;
+                }
+                
                 loadedArenas.put(arena.getName(), arena);
                 gamemodeArenas.get(arena.getType()).add(arena);
                 if (arena.isCustom()) {
                     customArenas.put((UUID) arena.getArenaSettings().get(ArenaSetting.OWNER_UUID), arena);
                 }
-                
-                arena.loadWorld();
-                
             }
         } catch (IOException | InvalidConfigurationException e) {
             Bukkit.getLogger().severe("Could not load arenas from file!");
@@ -125,8 +130,7 @@ public class ArenaManager {
 
         // Unload each Arena
         for (Arena arena : loadedArenas.values()) {
-            arena.cancelTasks();
-            Bukkit.unloadWorld(arena.getWorld(), false);
+            arena.unloadWorld();
         }
 
         saveArenasToFile();
@@ -170,11 +174,11 @@ public class ArenaManager {
         
         CitizensAPI.getNPCRegistry().saveToStore();
         arena.unloadWorld();
-        File worldFolder = new File("mwarena_" + arena.getName());
+        File storedFolder = new File(storageDirectory, "mwarena_" + arena.getName());
         try {
-            FileUtils.deleteDirectory(worldFolder);
-        } catch (IOException e) {
-            logger.warning("The world file couldn't be removed! Please remove manually.");
+            FileUtils.deleteDirectory(storedFolder);
+        } catch (IOException | IllegalArgumentException e) {
+            logger.warning("The stored world file couldn't be removed! Please remove manually.");
         }
         
         // Remove references to the arena
@@ -348,7 +352,7 @@ public class ArenaManager {
         switch (type) {
         case CLASSIC:
         case CUSTOM:
-            arena = new ClassicArena(name, capacity, isCustom);
+            arena = new ClassicArena(name, capacity, type);
             break;
         case TOURNEY:
             arena = new TourneyArena(name, capacity);
@@ -360,6 +364,7 @@ public class ArenaManager {
         case TUTORIAL:
             arena = new TutorialArena();
             arena.getArenaSettings().getSelectedMaps().add("default-map");
+            break;
         default:
             logger.warning("Arena type not accounted for? That simply isn't possible wtf");
             return null;
@@ -374,7 +379,6 @@ public class ArenaManager {
             return null;
         }
         
-        arenaWorld.setAutoSave(false);
         arenaWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         arenaWorld.setGameRule(GameRule.DO_TILE_DROPS, false);
@@ -388,19 +392,17 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
-        arenaWorld.setDifficulty(Difficulty.EASY);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
         border.setSize(plugin.getConfig().getInt("worldborder.radius") * 2);
         arenaWorld.setTime(6000);
-        logger.log(Level.INFO, "Arena world generated!");
+        logger.info("Arena world generated!");
 
         // Create Arena lobby
-        logger.log(Level.INFO, "Generating lobby...");
+        logger.info("Generating lobby...");
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, result -> {
-
-            logger.log(Level.INFO, "Lobby generated!");
+            logger.info("Lobby generated!");
             Gravity gravity = new Gravity();
             gravity.setHasGravity(false);
 
@@ -432,7 +434,7 @@ public class ArenaManager {
                 teamNPC.addTrait(gravity);
                 teamNPC.spawn(teamLoc);
                 arena.addNPC(teamNPC.getId());
-                logger.log(Level.INFO, upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
+                logger.info(upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
             }
 
             // Spawn bar NPC
@@ -453,7 +455,7 @@ public class ArenaManager {
             arenaWorld.getChunkAt(barLoc);
             bartender.spawn(barLoc);
             arena.addNPC(bartender.getId());
-            logger.log(Level.INFO, "Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
+            logger.info("Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
 
             //Spawn 4 deck selection NPCs
             for (DeckStorage deck : DeckStorage.values()) {
@@ -487,7 +489,7 @@ public class ArenaManager {
                 deckNPC.addTrait(gravity);
                 deckNPC.spawn(deckLoc);
                 arena.addNPC(deckNPC.getId());
-                logger.log(Level.INFO, deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");
+                logger.info(deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");
             }
 
             CitizensAPI.getNPCRegistry().saveToStore();
@@ -531,18 +533,27 @@ public class ArenaManager {
             loadedArenas.put(name, arena);
             gamemodeArenas.get(arena.getType()).add(arena);
 
-            logger.log(Level.INFO, "Arena " + name + " generated. World will save in 5 seconds.");
+            logger.info("Arena " + name + " generated. World will save in 5 seconds.");
 
             // Wait to ensure schematic is spawned
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                logger.info("Saving new arena " + name);
                 arenaWorld.save();
-                logger.log(Level.INFO, "Saving new arena " + name);
-                logger.log(Level.INFO, "Arena " + name + " locked and loaded.");
+                String worldName = "mwarena_" + name;
+                File worldFolder = new File(worldName);
+                File stored = new File(storageDirectory, worldName);
+                FileFilter filter = FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("session.lock"));
+                try {
+                    FileUtils.copyDirectory(worldFolder, stored, filter);
+                } catch (IOException e) {
+                    logger.warning("Couldn't copy world directory for " + worldName + ". Do it manually?");
+                }
                 saveArenasToFile();
+                logger.info("Arena " + name + " locked and loaded.");
             }, 100);
 
         })) {
-            logger.log(Level.SEVERE, "Couldn't generate lobby! Schematic files present?");
+            logger.severe("Couldn't generate lobby! Schematic files present?");
             return null;
         }
 
