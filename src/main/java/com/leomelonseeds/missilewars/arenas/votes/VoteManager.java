@@ -19,10 +19,11 @@ public class VoteManager {
     
     private SortedMap<String, Integer> allVotes;
     private Set<VotePlayer> playerVotes;
+    private Set<String> selectedMaps; // The same set as in arena settings!
     private String gamemode;
     private boolean respectRotation;
     
-    public VoteManager(String gamemode, List<String> availableMaps, boolean respectRotation) {
+    public VoteManager(String gamemode, Set<String> selectedMaps, boolean respectRotation) {
         this.allVotes = new TreeMap<>();
         this.playerVotes = new HashSet<>();
         this.gamemode = gamemode;
@@ -30,7 +31,7 @@ public class VoteManager {
         
         // Only add a map if it's selected in the settings
         for (String m : getVoteableMaps()) {
-            if (availableMaps.isEmpty() || availableMaps.contains(m)) {
+            if (selectedMaps.isEmpty() || selectedMaps.contains(m)) {
                 allVotes.put(m, 0);
             }
         }
@@ -55,21 +56,38 @@ public class VoteManager {
     }
     
     /**
-     * Add a map to the rotation for this arena
+     * Add a map to the rotation for this arena. If no
+     * maps are specifically selected in the arena settings,
+     * then this will become the only map available for
+     * voting.
      * 
      * @param map
      */
     public void addMap(String map) {
-        allVotes.putIfAbsent(map, 0);
+        int amt = 0;
+        if (selectedMaps.isEmpty()) {
+            amt = allVotes.getOrDefault(map, 0);
+            allVotes.clear();
+        }
+        
+        if (selectedMaps.add(map)) {
+            allVotes.putIfAbsent(map, amt);
+        }
     }
     
     /**
-     * Remove a map from the rotation for this arena
+     * Remove a map from the rotation for this arena.
+     * If there are no more maps, the rotation will be
+     * reset to the default one.
      * 
      * @param map
      */
     public void removeMap(String map) {
+        selectedMaps.remove(map);
         allVotes.remove(map);
+        if (selectedMaps.isEmpty()) {
+            resetAvailableMaps();
+        }
     }
     
     /**

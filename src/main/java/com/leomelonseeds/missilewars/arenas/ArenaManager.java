@@ -359,14 +359,14 @@ public class ArenaManager {
             break;
         case TRAINING:
             arena = new TrainingArena();
-            arena.getArenaSettings().getSelectedMaps().add("default-map");
+            arena.getVoteManager().addMap("default-map");
             break;
         case TUTORIAL:
             arena = new TutorialArena();
-            arena.getArenaSettings().getSelectedMaps().add("default-map");
+            arena.getVoteManager().addMap("default-map");
             break;
         default:
-            logger.warning("Arena type not accounted for? That simply isn't possible wtf");
+            logger.warning("Arena type is null or not accounted for?");
             return null;
         }
 

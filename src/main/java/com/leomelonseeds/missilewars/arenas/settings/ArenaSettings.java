@@ -3,8 +3,10 @@ package com.leomelonseeds.missilewars.arenas.settings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,7 +20,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     private RandomItemDistributor randomItemDistributor;
     private List<UUID> playerBlacklist;
     private List<UUID> playerWhitelist;
-    private List<String> selectedMaps;
+    private Set<String> selectedMaps;
     
     public ArenaSettings() {
         this.currentSettings = new HashMap<>();
@@ -26,7 +28,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.randomItemDistributor = new RandomItemDistributor();
         this.playerBlacklist = new ArrayList<>();
         this.playerWhitelist = new ArrayList<>();
-        this.selectedMaps = new ArrayList<>();
+        this.selectedMaps = new HashSet<>();
     }
     
     /**
@@ -39,7 +41,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.queue = new HashMap<>();
         this.playerBlacklist = new ArrayList<>(other.playerBlacklist);
         this.playerWhitelist = new ArrayList<>(other.playerWhitelist);
-        this.selectedMaps = new ArrayList<>(other.selectedMaps);
+        this.selectedMaps = new HashSet<>(other.selectedMaps);
         if (other.randomItemDistributor != null) {
             this.randomItemDistributor = other.randomItemDistributor.clone();
         }
@@ -67,7 +69,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
         
         if (!selectedMaps.isEmpty()) {
-            settings.put("selected-maps", selectedMaps);
+            settings.put("selected-maps", new ArrayList<>(selectedMaps));
         }
         
         // Item distributor
@@ -103,9 +105,9 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
         
         if (settings.containsKey("selected-maps")) {
-            selectedMaps = (List<String>) settings.get("selected-maps");
+            selectedMaps = new HashSet<>((List<String>) settings.get("selected-maps"));
         } else {
-            selectedMaps = new ArrayList<>();
+            selectedMaps = new HashSet<>();
         }
         
         if (settings.containsKey("random-item-distributor")) {
@@ -240,7 +242,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     /**
      * @return a MUTABLE list of selected maps
      */
-    public List<String> getSelectedMaps() {
+    public Set<String> getSelectedMaps() {
         return selectedMaps;
     }
     
