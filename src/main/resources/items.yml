@@ -2187,6 +2187,28 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  visibility-settings:
+    whitelist:
+      item: EMERALD_BLOCK
+      name: "&aWhitelist"
+      slot: 14
+      lore:
+        - "&7Whitelist players to allow them to"
+        - "&7access this arena, if the arena is"
+        - "&7set to private."
+        - ""
+        - "&cClick &7to edit the whitelist."
+    blacklist:
+      item: BARRIER
+      name: "&cBlacklist"
+      slot: 12
+      lore:
+        - "&7Blacklist players to ban them from"
+        - "&7this arena. If a player is both white-"
+        - "&7listed and blacklisted, the blacklist"
+        - "&7takes precedent (they can't join)."
+        - ""
+        - "&cClick &7to edit the blacklist."
   main-menu:
     visibility-settings:
       item: ENDER_EYE

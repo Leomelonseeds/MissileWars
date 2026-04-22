@@ -27,7 +27,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
-public class ArenaSelector extends PaginatedMWIInventory {
+public class ArenaSelector extends PaginatedInventory {
     
     private final static int SIZE = 36;
 

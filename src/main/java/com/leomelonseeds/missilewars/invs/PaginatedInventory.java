@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
-public abstract class PaginatedMWIInventory extends MWInventory {
+public abstract class PaginatedInventory extends MWInventory {
     
     private static ItemStack lastPageItem;
     private static ItemStack nextPageItem;
@@ -30,7 +30,7 @@ public abstract class PaginatedMWIInventory extends MWInventory {
      * @param size the size of the entire inventory
      * @param title
      */
-    public PaginatedMWIInventory(Player player, int size, String title) {
+    public PaginatedInventory(Player player, int size, String title) {
         super(player, size, title);
         
         // Initialize next and last page items if not

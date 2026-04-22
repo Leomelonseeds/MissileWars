@@ -19,7 +19,7 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 @SuppressWarnings("deprecation")
 public class ChatConfirm implements Listener {
     
-    public static Map<Player, ChatConfirm> instances = new HashMap<>();
+    private static Map<Player, ChatConfirm> instances = new HashMap<>();
     private ConfirmCallback callback;
     private BukkitTask timeout;
     private Player player;
@@ -67,7 +67,7 @@ public class ChatConfirm implements Listener {
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onChat(AsyncPlayerChatEvent e) {
+    private void onChat(AsyncPlayerChatEvent e) {
         Player sender = e.getPlayer();
         if (!sender.equals(player)) {
             return;
@@ -80,13 +80,8 @@ public class ChatConfirm implements Listener {
             return;
         }
         
-        this.timeout.cancel();
         stop();
         Bukkit.getScheduler().runTask(plugin, () -> callback(success));
-    }
-    
-    public String getReq() {
-        return req;
     }
     
     private void callback(boolean success) {
@@ -102,7 +97,8 @@ public class ChatConfirm implements Listener {
         return supplied.equalsIgnoreCase(answer) || supplied.equalsIgnoreCase(plural);
     }
     
-    public void stop() {
+    private void stop() {
+        this.timeout.cancel();
         HandlerList.unregisterAll(this);
         instances.remove(player);
     }

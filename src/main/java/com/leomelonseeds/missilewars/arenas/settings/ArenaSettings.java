@@ -1,7 +1,6 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -207,45 +206,27 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
     
     // Whitelist operations
+    /**
+     * @return a MUTABLE set of whitelist players
+     */
     public Set<UUID> getWhitelist() {
-        return Collections.unmodifiableSet(playerWhitelist);
+        return playerWhitelist;
     }
     
     public boolean isWhitelisted(UUID uuid) {
         return playerWhitelist.contains(uuid);
     }
     
-    public void addToWhitelist(UUID uuid) {
-        playerWhitelist.add(uuid);
-    }
-    
-    public void removeFromWhitelist(UUID uuid) {
-        playerWhitelist.remove(uuid);
-    }
-    
-    public void clearWhitelist() {
-        playerWhitelist.clear();
-    }
-    
     // Blacklist operations
+    /**
+     * @return a MUTABLE set of blacklist players
+     */
     public Set<UUID> getBlacklist() {
-        return Collections.unmodifiableSet(playerBlacklist);
+        return playerBlacklist;
     }
     
     public boolean isBlacklisted(UUID uuid) {
         return playerBlacklist.contains(uuid);
-    }
-    
-    public void addToBlacklist(UUID uuid) {
-        playerBlacklist.add(uuid);
-    }
-    
-    public void removeFromBlacklist(UUID uuid) {
-        playerBlacklist.remove(uuid);
-    }
-    
-    public void clearBlacklist() {
-        playerBlacklist.clear();
     }
     
     /**
