@@ -1,12 +1,13 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,16 +19,16 @@ public class ArenaSettings implements ConfigurationSerializable {
     private Map<ArenaSetting, Object> currentSettings;
     private Map<ArenaSetting, Object> queue;
     private RandomItemDistributor randomItemDistributor;
-    private List<UUID> playerBlacklist;
-    private List<UUID> playerWhitelist;
+    private Set<UUID> playerBlacklist;
+    private Set<UUID> playerWhitelist;
     private Set<String> selectedMaps;
     
     public ArenaSettings() {
         this.currentSettings = new HashMap<>();
         this.queue = new HashMap<>();
         this.randomItemDistributor = new RandomItemDistributor();
-        this.playerBlacklist = new ArrayList<>();
-        this.playerWhitelist = new ArrayList<>();
+        this.playerBlacklist = new TreeSet<>();
+        this.playerWhitelist = new TreeSet<>();
         this.selectedMaps = new HashSet<>();
     }
     
@@ -39,8 +40,8 @@ public class ArenaSettings implements ConfigurationSerializable {
     public ArenaSettings(ArenaSettings other) {
         this.currentSettings = new HashMap<>(other.currentSettings);
         this.queue = new HashMap<>();
-        this.playerBlacklist = new ArrayList<>(other.playerBlacklist);
-        this.playerWhitelist = new ArrayList<>(other.playerWhitelist);
+        this.playerBlacklist = new TreeSet<>(other.playerBlacklist);
+        this.playerWhitelist = new TreeSet<>(other.playerWhitelist);
         this.selectedMaps = new HashSet<>(other.selectedMaps);
         if (other.randomItemDistributor != null) {
             this.randomItemDistributor = other.randomItemDistributor.clone();
@@ -61,11 +62,11 @@ public class ArenaSettings implements ConfigurationSerializable {
         
         // List settings
         if (!playerBlacklist.isEmpty()) {
-            settings.put("player-blacklist", String.join(",", playerBlacklist.stream().map(uuid -> uuid.toString()).toList()));
+            settings.put("player-blacklist", playerBlacklist.stream().map(uuid -> uuid.toString()).toList());
         }
         
         if (!playerWhitelist.isEmpty()) {
-            settings.put("player-whitelist", String.join(",", playerWhitelist.stream().map(uuid -> uuid.toString()).toList()));
+            settings.put("player-whitelist", playerWhitelist.stream().map(uuid -> uuid.toString()).toList());
         }
         
         if (!selectedMaps.isEmpty()) {
@@ -87,21 +88,19 @@ public class ArenaSettings implements ConfigurationSerializable {
             setting.deserialize(settings, currentSettings);
         }
         
-        if (settings.containsKey("player-blacklist")) {
-            String uuids = (String) settings.get("player-blacklist");
-            List<UUID> uuidList = Arrays.asList(uuids.split(",")).stream().map(str -> UUID.fromString(str)).toList();
-            playerWhitelist = new ArrayList<>(uuidList);
+        if (settings.containsKey("player-whitelist")) {
+            List<String> uuids = (List<String>) settings.get("player-whitelist");
+            playerWhitelist = new TreeSet<>(uuids.stream().map(str -> UUID.fromString(str)).toList());
         } else {
-            playerWhitelist = new ArrayList<>();
+            playerWhitelist = new TreeSet<>();
         }
         
         // Duplicated code is okay actually
-        if (settings.containsKey("player-whitelist")) {
-            String uuids = (String) settings.get("player-whitelist");
-            List<UUID> uuidList = Arrays.asList(uuids.split(",")).stream().map(str -> UUID.fromString(str)).toList();
-            playerBlacklist = new ArrayList<>(uuidList);
+        if (settings.containsKey("player-blacklist")) {
+            List<String> uuids = (List<String>) settings.get("player-blacklist");
+            playerBlacklist = new TreeSet<>(uuids.stream().map(str -> UUID.fromString(str)).toList());
         } else {
-            playerBlacklist = new ArrayList<>();
+            playerBlacklist = new TreeSet<>();
         }
         
         if (settings.containsKey("selected-maps")) {
@@ -207,12 +206,13 @@ public class ArenaSettings implements ConfigurationSerializable {
         return res;
     }
     
-    public boolean isWhitelisted(UUID uuid) {
-        return playerWhitelist.contains(uuid);
+    // Whitelist operations
+    public Set<UUID> getWhitelist() {
+        return Collections.unmodifiableSet(playerWhitelist);
     }
     
-    public boolean isBlacklisted(UUID uuid) {
-        return playerBlacklist.contains(uuid);
+    public boolean isWhitelisted(UUID uuid) {
+        return playerWhitelist.contains(uuid);
     }
     
     public void addToWhitelist(UUID uuid) {
@@ -225,6 +225,15 @@ public class ArenaSettings implements ConfigurationSerializable {
     
     public void clearWhitelist() {
         playerWhitelist.clear();
+    }
+    
+    // Blacklist operations
+    public Set<UUID> getBlacklist() {
+        return Collections.unmodifiableSet(playerBlacklist);
+    }
+    
+    public boolean isBlacklisted(UUID uuid) {
+        return playerBlacklist.contains(uuid);
     }
     
     public void addToBlacklist(UUID uuid) {

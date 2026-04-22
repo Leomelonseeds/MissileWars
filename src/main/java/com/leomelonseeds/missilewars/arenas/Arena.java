@@ -90,6 +90,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /** Task for automatically ending the game if no players are present */
     protected BukkitTask autoEnd;
     protected BukkitTask spectatorActionBar;
+    protected BukkitTask autoUnload;
     protected Tracker tracker;
     protected VoteManager voteManager;
     /** Set of players who have played but have since left */
@@ -260,10 +261,8 @@ public abstract class Arena implements ConfigurationSerializable {
         // Cancel all tasks
         Bukkit.getWorlds().remove(_world);
         cancelTasks();
-        spectatorActionBar.cancel();
-        if (autoEnd != null) {
-            autoEnd.cancel();
-        }
+        List.of(spectatorActionBar, autoUnload, autoEnd)
+            .forEach(t -> ConfigUtils.cancelTask(t));
         
         // Delete world file
         File worldFolder = new File("mwarena_" + name);
@@ -307,19 +306,20 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         if (!queue) {
-            announceSettingChange(setting, curValue, value);
+            applySettingChange(setting, curValue, value);
         }
         return true;
     }
     
     /**
-     * Announce to the arena that a setting has changed
+     * Announce to the arena that a setting has changed, and
+     * apply settings that need to be applied
      * 
      * @param setting
      * @param oldValue
      * @param newValue
      */
-    public void announceSettingChange(ArenaSetting setting, String oldValue, String newValue) {
+    public void applySettingChange(ArenaSetting setting, String oldValue, String newValue) {
         // Actually change the difficulty if world difficulty changes
         if (setting == ArenaSetting.WORLD_DIFFICULTY) {
             world.setDifficulty(Difficulty.valueOf(newValue));
@@ -405,10 +405,6 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks.forEach(t -> t.cancel());
         tasks.clear();
         tracker.stopAll();
-    }
-
-    public void addNPC(int id) {
-        npcs.add(id);
     }
 
     public List<Integer> getNPCs() {
@@ -769,11 +765,32 @@ public abstract class Arena implements ConfigurationSerializable {
             return false;
         }
         
-        // Make sure world is loaded
-        if (world == null) {
-            ConfigUtils.sendConfigMessage("arena-offline", player);
+        // Check for whitelist and blacklist
+        UUID uuid = player.getUniqueId();
+        if (getBooleanSetting(ArenaSetting.IS_PRIVATE) && !settings.isWhitelisted(uuid)) {
+            ConfigUtils.sendConfigMessage("join-not-whitelisted", player);
             return false;
         }
+        
+        if (settings.isBlacklisted(uuid)) {
+            ConfigUtils.sendConfigMessage("join-blacklisted", player);
+            return false;
+        }
+        
+        // Make sure world is loaded. If it's not and the owner is attempting to join, load the world
+        if (world == null) {
+            if (uuid.equals(settings.get(ArenaSetting.OWNER_UUID))) {
+                ConfigUtils.sendConfigMessage("loading-world", player);
+                if (loadWorld() == null) {
+                    ConfigUtils.sendConfigMessage("world-load-failed", player);
+                    return false;
+                }
+            } else {
+                ConfigUtils.sendConfigMessage("arena-offline", player);
+                return false;
+            }
+        }
+        ConfigUtils.cancelTask(autoEnd);
         
         // Save inventory if player in world
         if (player.getWorld().getName().equals("world")) {
@@ -794,7 +811,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
         player.setHealth(ArenaUtils.getMaxHealth(player));
         player.setFoodLevel(20);
-        players.put(player.getUniqueId(), new MissileWarsPlayer(player.getUniqueId()));
+        players.put(uuid, new MissileWarsPlayer(uuid));
         player.setRespawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
 
@@ -1008,21 +1025,13 @@ public abstract class Arena implements ConfigurationSerializable {
             return;
         }
         
-        if (autoEnd == null) {
-            return;
-        }
-        
-        autoEnd.cancel();
+        ConfigUtils.cancelTask(autoEnd);
     }
 
     /**
      * Checks if the game is empty, and ends game/cancels tasks if so
      */
     private void checkEmpty() {
-        if (!plugin.isEnabled()) {
-            return;
-        }
-        
         // Cancel if not running and there's enough time left
         // Don't cancel game if its in the process of starting
         if (!running && startTime != null && getSecondsUntilStart() >= 0 && 
@@ -1037,6 +1046,11 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         autoEnd();
+        
+        // If the arena is custom, start a 5 minute timer to unload it
+        if (!getBooleanSetting(ArenaSetting.IS_ALWAYS_ONLINE) && world.getPlayerCount() == 0) {
+            autoUnload = ConfigUtils.schedule(20 * 60 * 5, () -> unloadWorld());
+        }
     }
     
     protected void autoEnd() {
@@ -1630,7 +1644,7 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Flush arena settings
         settings.flush().forEach((setting, values) -> {
-            announceSettingChange(setting, values.getLeft() + "", values.getRight() + "");
+            applySettingChange(setting, values.getLeft() + "", values.getRight() + "");
         });
         
         // Fill area with air

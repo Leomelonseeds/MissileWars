@@ -21,8 +21,8 @@ public class VisibilitySettings extends ArenaSettingsInventory {
     public Map<Integer, ArenaSetting> getSettingSlots() {
         return Map.of(
             0, ArenaSetting.CAPACITY,
-            1, ArenaSetting.ENABLE_POISON,
-            2, ArenaSetting.WORLD_DIFFICULTY
+            1, ArenaSetting.IS_PRIVATE,
+            2, ArenaSetting.IS_ALWAYS_ONLINE
         );
     }
 

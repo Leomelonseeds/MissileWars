@@ -151,6 +151,10 @@ messages:
   cannot-create-custom: "&cYou don't meet the requirements to create a custom arena yet!"
   cannot-edit-custom: "&cYou don't own a custom arena!"
   custom-arena-creating: "&7Creating your custom arena, please wait..."
+  join-not-whitelisted: "&cYou are not whitelisted in this arena!"
+  join-blacklisted: "&cYou are blacklisted from this arena!"
+  loading-world: "&7Loading world..."
+  world-load-failed: "&cSomething went wrong loading the arena world! Please contact an admin."
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"

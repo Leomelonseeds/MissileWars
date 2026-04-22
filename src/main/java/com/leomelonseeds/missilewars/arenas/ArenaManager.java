@@ -316,6 +316,7 @@ public class ArenaManager {
         settings.set(ArenaSetting.OWNER_NAME, name);
         settings.set(ArenaSetting.OWNER_UUID, uuid);
         settings.set(ArenaSetting.IS_PRIVATE, true);
+        settings.set(ArenaSetting.IS_ALWAYS_ONLINE, false);
         customArenas.put(uuid, arena);
         return arena;
     }
@@ -433,7 +434,7 @@ public class ArenaManager {
                 teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
                 teamNPC.addTrait(gravity);
                 teamNPC.spawn(teamLoc);
-                arena.addNPC(teamNPC.getId());
+                arena.getNPCs().add(teamNPC.getId());
                 logger.info(upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
             }
 
@@ -454,7 +455,7 @@ public class ArenaManager {
             bartender.addTrait(gravity); 
             arenaWorld.getChunkAt(barLoc);
             bartender.spawn(barLoc);
-            arena.addNPC(bartender.getId());
+            arena.getNPCs().add(bartender.getId());
             logger.info("Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
 
             //Spawn 4 deck selection NPCs
@@ -488,7 +489,7 @@ public class ArenaManager {
                 deckNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
                 deckNPC.addTrait(gravity);
                 deckNPC.spawn(deckLoc);
-                arena.addNPC(deckNPC.getId());
+                arena.getNPCs().add(deckNPC.getId());
                 logger.info(deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");
             }
 

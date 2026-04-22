@@ -572,4 +572,15 @@ public class ConfigUtils {
         ret.deleteCharAt(ret.length() - 1);
         return ret.toString();
     }
+    
+    /**
+     * Utility to cancel a task if non null
+     * 
+     * @param task
+     */
+    public static void cancelTask(BukkitTask task) {
+        if (task != null) {
+            task.cancel();
+        }
+    }
 }
