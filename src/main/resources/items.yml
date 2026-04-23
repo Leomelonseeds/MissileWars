@@ -2187,6 +2187,31 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  playerlist:
+    player:
+      item: PLAYER_HEAD
+      name: "%listtype-color%%name%"
+      lore:
+        - "&7%listtype-capital%listed"
+        - ""
+        - "&cShift + Click &7to remove."
+    add:
+      item: PLAYER_HEAD
+      name: "%listtype-color%Add a player"
+      lore:
+        - ""
+        - "&cClick &7to add a player to the %listtype%-"
+        - "&7list. The player must have played"
+        - "&7on this server before. You will"
+        - "&7be prompted to enter their name"
+        - "&7in chat."
+    clear:
+      item: PAPER
+      name: "&fClear %listtype%list"
+      lore:
+        - ""
+        - "&cClick &7to remove all players from"
+        - "&7the %listtype%list."
   visibility-settings:
     whitelist:
       item: EMERALD_BLOCK

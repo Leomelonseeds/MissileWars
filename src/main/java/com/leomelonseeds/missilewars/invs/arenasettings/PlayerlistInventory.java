@@ -9,13 +9,23 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.invs.PaginatedInventory;
 
-public abstract class PlayerlistInventory extends PaginatedInventory {
+public class PlayerlistInventory extends PaginatedInventory {
+    
+    private String listType;
+    private String listTypeCapital;
+    private String listColor;
+    private Set<UUID> players;
 
-    public PlayerlistInventory(Player player, String title, Set<UUID> players, Arena arena) {
-        super(player, 36, title);
-        // TODO Auto-generated constructor stub
+    public PlayerlistInventory(Player player, Arena arena, boolean isBlack) {
+        super(player, 36, isBlack ? "&cBlacklist" : "&aWhitelist");
+        this.listType = isBlack ? "black" : "white";
+        this.listTypeCapital = isBlack ? "Black" : "White";
+        this.listColor = isBlack ? "&c" : "&a";
+        ArenaSettings settings = arena.getArenaSettings();
+        this.players = isBlack ? settings.getBlacklist() : settings.getWhitelist();
     }
 
     @Override
@@ -32,8 +42,7 @@ public abstract class PlayerlistInventory extends PaginatedInventory {
 
     @Override
     protected void registerPaginatedClick(int slot, ClickType type, ItemStack item) {
-        // TODO Auto-generated method stub
-
+        
     }
 
 }
