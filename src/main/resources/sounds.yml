@@ -262,3 +262,7 @@ molotov-hit:
   sound: "ENTITY_GHAST_SHOOT"
   volume: 1.0
   pitch: 0.6
+playerlist-modify:
+  sound: "ENTITY_VILLAGER_WORK_CARTOGRAPHER"
+  volume: 1.0
+  pitch: 1.0

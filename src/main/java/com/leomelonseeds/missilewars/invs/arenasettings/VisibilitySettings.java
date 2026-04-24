@@ -2,19 +2,29 @@ package com.leomelonseeds.missilewars.invs.arenasettings;
 
 import java.util.Map;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class VisibilitySettings extends ArenaSettingsInventory {
+    
+    private final static String configSec = "arena-settings.visibility-settings";
+    
+    private ConfigurationSection itemSection;
+    private Arena arena;
 
     public VisibilitySettings(Player player, boolean viewOnly, Arena arena, MWInventory fromInv) {
         super(player, 18, "Visibility Settings", viewOnly, arena, fromInv);
-        // Nothing here yet...
+        this.itemSection = ConfigUtils.getConfigFile("items.yml").getConfigurationSection(configSec);
+        this.arena = arena;
     }
 
     @Override
@@ -28,12 +38,28 @@ public class VisibilitySettings extends ArenaSettingsInventory {
 
     @Override
     public void updateSettingsInventory() {
-        // Nothing here...
+        for (String key : itemSection.getKeys(false)) {
+            String sec = configSec + "." + key;
+            ItemStack item = InventoryUtils.createItem(sec);
+            ItemMeta meta = item.getItemMeta();
+            InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, key);
+            item.setItemMeta(meta);
+            inv.setItem(itemSection.getInt(key + ".slot"), item);
+        }
     }
 
     @Override
     public void registerClick(int slot, ClickType type, ItemStack item) {
-        // Also nothing yet...
+        String id = InventoryUtils.getGUIFromItem(item);
+        if (id == null) {
+            return;
+        }
+        
+        if (id.equals("whitelist")) {
+            new PlayerlistInventory(player, arena, false, this);
+        } else if (id.equals("blacklist")) {
+            new PlayerlistInventory(player, arena, true, this);
+        }
     }
 
 }

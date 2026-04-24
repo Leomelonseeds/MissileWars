@@ -2198,6 +2198,7 @@ arena-settings:
     add:
       item: PLAYER_HEAD
       name: "%listtype-color%Add a player"
+      slot: 32
       lore:
         - ""
         - "&cClick &7to add a player to the %listtype%-"
@@ -2208,6 +2209,7 @@ arena-settings:
     clear:
       item: PAPER
       name: "&fClear %listtype%list"
+      slot: 30
       lore:
         - ""
         - "&cClick &7to remove all players from"

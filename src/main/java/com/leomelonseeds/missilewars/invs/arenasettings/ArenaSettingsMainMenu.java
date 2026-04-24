@@ -15,6 +15,8 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class ArenaSettingsMainMenu extends MWInventory {
     
+    private final static String mainSec = "arena-settings.main-menu";
+    
     private boolean viewOnly;
     private Player player;
     private Arena arena;
@@ -38,7 +40,6 @@ public class ArenaSettingsMainMenu extends MWInventory {
     @SuppressWarnings("deprecation")
     @Override
     public void updateInventory() {
-        String mainSec = "arena-settings.main-menu";
         for (String key : itemConfig.getConfigurationSection(mainSec).getKeys(false)) {
             String sec = mainSec + "." + key;
             int slot = itemConfig.getInt(sec + ".slot");

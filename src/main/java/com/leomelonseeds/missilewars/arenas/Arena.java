@@ -261,8 +261,9 @@ public abstract class Arena implements ConfigurationSerializable {
         // Cancel all tasks
         Bukkit.getWorlds().remove(_world);
         cancelTasks();
-        List.of(spectatorActionBar, autoUnload, autoEnd)
-            .forEach(t -> ConfigUtils.cancelTask(t));
+        ConfigUtils.cancelTask(spectatorActionBar);
+        ConfigUtils.cancelTask(autoUnload);
+        ConfigUtils.cancelTask(autoEnd);
         
         // Delete world file
         File worldFolder = new File("mwarena_" + name);
@@ -767,19 +768,22 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Check for whitelist and blacklist
         UUID uuid = player.getUniqueId();
-        if (getBooleanSetting(ArenaSetting.IS_PRIVATE) && !settings.isWhitelisted(uuid)) {
-            ConfigUtils.sendConfigMessage("join-not-whitelisted", player);
-            return false;
-        }
-        
-        if (settings.isBlacklisted(uuid)) {
-            ConfigUtils.sendConfigMessage("join-blacklisted", player);
-            return false;
+        boolean isOwner = uuid.equals(settings.get(ArenaSetting.OWNER_UUID));
+        if (!isOwner && !player.hasPermission("umw.admin")) {
+            if (getBooleanSetting(ArenaSetting.IS_PRIVATE) && !settings.isWhitelisted(uuid)) {
+                ConfigUtils.sendConfigMessage("join-not-whitelisted", player);
+                return false;
+            }
+            
+            if (settings.isBlacklisted(uuid)) {
+                ConfigUtils.sendConfigMessage("join-blacklisted", player);
+                return false;
+            }
         }
         
         // Make sure world is loaded. If it's not and the owner is attempting to join, load the world
         if (world == null) {
-            if (uuid.equals(settings.get(ArenaSetting.OWNER_UUID))) {
+            if (isOwner) {
                 ConfigUtils.sendConfigMessage("loading-world", player);
                 if (loadWorld() == null) {
                     ConfigUtils.sendConfigMessage("world-load-failed", player);
