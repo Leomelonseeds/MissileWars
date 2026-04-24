@@ -161,18 +161,6 @@ public class ArenaManager {
             return false;
         }
         
-        // Remove citizens
-        for (int id : arena.getNPCs()) {
-            if (CitizensAPI.getNPCRegistry().getById(id) != null) {
-                CitizensAPI.getNPCRegistry().getById(id).destroy();
-                logger.info("Citizen with ID " + id + " deleted.");
-            }
-            
-            // Delete the hologram associated with the id
-            DHAPI.removeHologram("" + id);
-        }
-        
-        CitizensAPI.getNPCRegistry().saveToStore();
         arena.unloadWorld();
         File storedFolder = new File(storageDirectory, "mwarena_" + arena.getName());
         try {

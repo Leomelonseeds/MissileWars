@@ -99,9 +99,8 @@ public class TutorialArena extends ClassicArena {
                 }
                 
                 plugin.log("Resetting tutorial arena...");
-                running = false;
                 resetting = true;
-                cancelTasks();
+                cancelGame();
                 resetWorld(r -> init());
                 this.cancel();
             }

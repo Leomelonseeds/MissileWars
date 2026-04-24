@@ -53,9 +53,11 @@ import com.leomelonseeds.missilewars.utilities.VoidChunkGenerator;
 import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
+import eu.decentsoftware.holograms.api.DHAPI;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.a5h73y.parkour.Parkour;
+import net.citizensnpcs.api.CitizensAPI;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -218,6 +220,8 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         nworld.setDifficulty((Difficulty) settings.get(ArenaSetting.WORLD_DIFFICULTY));
         
+        // TODO: Create all NPCs
+        
         // Start spectator action bar task
         spectatorActionBar = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (MissileWarsPlayer mwp : spectators) {
@@ -260,10 +264,19 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Cancel all tasks
         Bukkit.getWorlds().remove(_world);
-        cancelTasks();
+        cancelGame();
         ConfigUtils.cancelTask(spectatorActionBar);
         ConfigUtils.cancelTask(autoUnload);
-        ConfigUtils.cancelTask(autoEnd);
+        
+        // Remove NPCs and holograms
+        for (int id : npcs) {
+            if (CitizensAPI.getNPCRegistry().getById(id) != null) {
+                CitizensAPI.getNPCRegistry().getById(id).destroy();
+            }
+            
+            // Delete the hologram associated with the id
+            DHAPI.removeHologram("" + id);
+        }
         
         // Delete world file
         File worldFolder = new File("mwarena_" + name);
@@ -400,16 +413,15 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Stops all async tasks from trackers
+     * Stops all async tasks from trackers and sets running to false
      */
-    public void cancelTasks() {
+    public void cancelGame() {
         tasks.forEach(t -> t.cancel());
         tasks.clear();
         tracker.stopAll();
-    }
-
-    public List<Integer> getNPCs() {
-        return npcs;
+        leftPlayers.clear();
+        running = false;
+        waitingForTie = false;
     }
     
     public VoteManager getVoteManager() {
@@ -1036,11 +1048,16 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is empty, and ends game/cancels tasks if so
      */
     private void checkEmpty() {
+        // If the arena is custom, start a 5 minute timer to unload it
+        if (!getBooleanSetting(ArenaSetting.IS_ALWAYS_ONLINE) && world.getPlayerCount() == 0) {
+            autoUnload = ConfigUtils.schedule(20 * 60 * 5, () -> unloadWorld());
+        }
+        
         // Cancel if not running and there's enough time left
         // Don't cancel game if its in the process of starting
         if (!running && startTime != null && getSecondsUntilStart() >= 0 && 
                 getNumPlayers() < plugin.getConfig().getInt("minimum-players")) {
-            cancelTasks();
+            cancelGame();
             startTime = null;
             return;
         }
@@ -1050,11 +1067,6 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         autoEnd();
-        
-        // If the arena is custom, start a 5 minute timer to unload it
-        if (!getBooleanSetting(ArenaSetting.IS_ALWAYS_ONLINE) && world.getPlayerCount() == 0) {
-            autoUnload = ConfigUtils.schedule(20 * 60 * 5, () -> unloadWorld());
-        }
     }
     
     protected void autoEnd() {
@@ -1067,6 +1079,7 @@ public abstract class Arena implements ConfigurationSerializable {
                     endGame(blueTeam);
                 }
             });
+            tasks.add(autoEnd);
         } else if (blueTeam.getSize() <= 0) {
             announceMessage("messages.blue-team-empty", null);
             autoEnd = ConfigUtils.schedule(60 * 20, () -> {
@@ -1074,6 +1087,7 @@ public abstract class Arena implements ConfigurationSerializable {
                     endGame(redTeam);
                 }
             });
+            tasks.add(autoEnd);
         }
     }
  
@@ -1560,7 +1574,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }             
 
         // Cancel all tasks
-        cancelTasks();
+        cancelGame();
         leftPlayers.clear();
         running = false;
         resetting = true;
@@ -1666,9 +1680,9 @@ public abstract class Arena implements ConfigurationSerializable {
                 Bukkit.getScheduler().runTask(plugin, () -> callback.onQueryDone(null));
             }
         }));
-        
-        startTime = null;
+
         voteManager.resetVotes();
+        startTime = null;
     }
 
     /**
