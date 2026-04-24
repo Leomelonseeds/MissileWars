@@ -151,9 +151,9 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
         
         if (queue) {
-            set(setting, valueObject);
-        } else {
             queue(setting, valueObject);
+        } else {
+            set(setting, valueObject);
         }
         return true;
     }
