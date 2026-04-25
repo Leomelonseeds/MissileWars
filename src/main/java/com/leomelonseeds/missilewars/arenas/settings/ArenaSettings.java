@@ -116,9 +116,11 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
     
     public Object get(ArenaSetting setting) {
-        // What a funny statement
-        return queue.getOrDefault(setting,
-            currentSettings.getOrDefault(setting, setting.getDefaultValue()));
+        return queue.getOrDefault(setting, getUnqueued(setting));
+    }
+    
+    private Object getUnqueued(ArenaSetting setting) {
+        return currentSettings.getOrDefault(setting, setting.getDefaultValue());
     }
     
     public boolean isQueued(ArenaSetting setting) {
@@ -180,7 +182,7 @@ public class ArenaSettings implements ConfigurationSerializable {
      * @param value
      */
     public void queue(ArenaSetting setting, Object value) {
-        if (get(setting).equals(value)) {
+        if (getUnqueued(setting).equals(value)) {
             queue.remove(setting);
             return;
         }

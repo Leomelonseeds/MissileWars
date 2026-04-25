@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +37,6 @@ import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.citizensnpcs.Citizens;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.exception.NPCLoadException;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -92,17 +88,6 @@ public class ConfigUtils {
         plugin.reloadConfig();
         plugin.getDeckManager().reload();
         plugin.getCinematicManager().init();
-    }
-    
-    /**
-     * Reload all NPCs to make them appear again
-     */
-    public static void reloadCitizens() {
-        try {
-            ((Citizens) CitizensAPI.getPlugin()).reload();
-        } catch (NPCLoadException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Citizens couldn't be reloaded.");
-        }
     }
 
     /**
