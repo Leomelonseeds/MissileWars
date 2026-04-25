@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,7 +29,9 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
@@ -45,6 +48,7 @@ import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
+import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -58,6 +62,15 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import io.github.a5h73y.parkour.Parkour;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.trait.Equipment;
+import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
+import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.Gravity;
+import net.citizensnpcs.trait.LookClose;
+import net.citizensnpcs.trait.SheepTrait;
+import net.citizensnpcs.trait.SkinTrait;
+import net.citizensnpcs.trait.VillagerProfession;
 
 /** Represents a MissileWarsArena where the game will be played. */
 public abstract class Arena implements ConfigurationSerializable {
@@ -115,7 +128,6 @@ public abstract class Arena implements ConfigurationSerializable {
         this.name = name;
         this.type = type;
         this.gamemode = ArenaGamemode.CLASSIC;
-        npcs = new ArrayList<>();
         init();
     }
 
@@ -131,11 +143,6 @@ public abstract class Arena implements ConfigurationSerializable {
         serializedArena.put("gamemode", getGamemode());
         serializedArena.put("type", type.toString());
         serializedArena.put("settings", settings);
-        List<String> npcStrings = new ArrayList<>();
-        for (int i : npcs) {
-            npcStrings.add(Integer.toString(i));
-        }
-        serializedArena.put("npc", String.join(",", npcStrings));
         return serializedArena;
     }
 
@@ -149,23 +156,12 @@ public abstract class Arena implements ConfigurationSerializable {
         name = (String) serializedArena.get("name");
         gamemode = ArenaGamemode.valueOf(((String) serializedArena.get("gamemode")).toUpperCase());
         type = ArenaType.valueOf((String) serializedArena.get("type"));
-        
-        // Legacy code for if arenas don't have settings yet
-        if (serializedArena.containsKey("settings")) {
-            settings = (ArenaSettings) serializedArena.get("settings");
-        } else {
-            settings = new ArenaSettings();
-        }
-        
-        npcs = new ArrayList<>();
-        String npcIDs = (String) serializedArena.get("npc");
-        for (String s : npcIDs.split(",")) {
-            npcs.add(Integer.parseInt(s));
-        }
+        settings = (ArenaSettings) serializedArena.get("settings");
         init();
     }
     
     private void init() {
+        npcs = new ArrayList<>();
         players = new HashMap<>();
         spectators = new HashSet<>();
         redQueue = new LinkedList<>();
@@ -220,7 +216,8 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         nworld.setDifficulty((Difficulty) settings.get(ArenaSetting.WORLD_DIFFICULTY));
         
-        // TODO: Create all NPCs
+        // Create all NPCs
+        ConfigUtils.schedule(20, () -> createNPCs());
         
         // Start spectator action bar task
         spectatorActionBar = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
@@ -277,6 +274,7 @@ public abstract class Arena implements ConfigurationSerializable {
             // Delete the hologram associated with the id
             DHAPI.removeHologram("" + id);
         }
+        npcs.clear();
         
         // Delete world file
         File worldFolder = new File("mwarena_" + name);
@@ -288,6 +286,98 @@ public abstract class Arena implements ConfigurationSerializable {
         
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Arena world " + name + " was unloaded."));
         return true;
+    }
+    
+    /**
+     * Creates all 7 NPCs in the lobby and their hologram names.s
+     */
+    private void createNPCs() {
+        FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
+        Gravity gravity = new Gravity();
+        gravity.setHasGravity(false);
+
+        // Spawn team selection NPCs
+        for (String team : new String[] {"red", "blue"}) {
+            String upper = team.toUpperCase();
+            String teamName = (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team";
+            Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team);
+            Location teamLoc = new Location(world, teamVec.getX(), teamVec.getY(), teamVec.getZ(), 90, 0);
+            NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, teamName);
+            
+            // Team queuing command
+            CommandTrait enqueue = teamNPC.getOrAddTrait(CommandTrait.class);
+            enqueue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueue" + team,
+                    CommandTrait.Hand.BOTH).player(true));
+            
+            // Make sheep the same color as the team
+            SheepTrait sheepTrait = teamNPC.getOrAddTrait(SheepTrait.class);
+            sheepTrait.setColor(DyeColor.valueOf(upper));
+            
+            // Hologram to get queued placeholder
+            Location holoLoc = teamLoc.clone().add(0, 1.8, 0);
+            DHAPI.createHologram(teamNPC.getId() + "", holoLoc, true, List.of(teamName + " (%umw_" + team + "_queue%)"));
+            
+            // Add misc traits and spawn in
+            teamNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
+            teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
+            teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
+            teamNPC.addTrait(gravity);
+            teamNPC.spawn(teamLoc);
+            npcs.add(teamNPC.getId());
+        }
+
+        // Spawn bar NPC
+        Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
+        Location barLoc = new Location(world, barVec.getX(), barVec.getY(), barVec.getZ(), -90, 0);
+        NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "§2§lBartender");
+        CommandTrait openBar = new CommandTrait();
+        openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
+                CommandTrait.Hand.BOTH));
+        bartender.addTrait(openBar);
+        LookClose lookPlayerTrait = bartender.getOrAddTrait(LookClose.class);
+        lookPlayerTrait.lookClose(true);
+        VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
+        profession.setProfession(Villager.Profession.NITWIT);
+        bartender.data().setPersistent(NPC.Metadata.SILENT, true);
+        bartender.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
+        bartender.addTrait(gravity); 
+        world.getChunkAt(barLoc);
+        bartender.spawn(barLoc);
+        npcs.add(bartender.getId());
+
+        //Spawn 4 deck selection NPCs
+        for (DeckStorage deck : DeckStorage.values()) {
+            String id = deck.toString().toLowerCase();
+            Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id);
+            Location deckLoc = new Location(world, deckVec.getX(), deckVec.getY(), deckVec.getZ(), -90, 0);
+            NPC deckNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, deck.getNPCName());
+            
+            // Add skin
+            SkinTrait deckSkin = deckNPC.getOrAddTrait(SkinTrait.class);
+            deckSkin.setSkinPersistent(id, schematicConfig.getString("lobby.npc-pos." + id + ".signature"),
+                                           schematicConfig.getString("lobby.npc-pos." + id + ".value"));
+            
+            // Deck info command
+            CommandTrait deckCommand = deckNPC.getOrAddTrait(CommandTrait.class);
+            deckCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck " + id, CommandTrait.Hand.BOTH).player(true));
+            
+            // Hologram name, to be able to use placeholders
+            Location holoLoc = deckLoc.clone().add(0, 2.2, 0);
+            DHAPI.createHologram(deckNPC.getId() + "", holoLoc, true, List.of("%umw_deck_npcname_" + id + "%"));
+            
+            // Add deck-specific equipment
+            Equipment deckEquip = new Equipment();
+            deckNPC.addTrait(deckEquip);
+            deckEquip.set(EquipmentSlot.HAND, deck.getWeapon());
+            deckEquip.set(EquipmentSlot.BOOTS, deck.getBoots());
+            
+            // Add misc traits, spawn
+            deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
+            deckNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
+            deckNPC.addTrait(gravity);
+            deckNPC.spawn(deckLoc);
+            npcs.add(deckNPC.getId());
+        }
     }
     
     public int getIntSetting(ArenaSetting setting) {

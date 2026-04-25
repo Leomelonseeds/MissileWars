@@ -77,6 +77,7 @@ public class MissileWarsCommand implements CommandExecutor {
             
             Arena arena = arenaManager.getArena(args[1]);
             if (arena == null) {
+                sendErrorMsg(sender, "Unknown arena...");
                 return true;
             }
             

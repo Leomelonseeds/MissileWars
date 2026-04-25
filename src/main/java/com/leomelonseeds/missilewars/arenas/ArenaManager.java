@@ -18,19 +18,15 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -39,7 +35,6 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
-import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -53,18 +48,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
-import eu.decentsoftware.holograms.api.DHAPI;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.trait.trait.Equipment;
-import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
-import net.citizensnpcs.trait.CommandTrait;
-import net.citizensnpcs.trait.Gravity;
-import net.citizensnpcs.trait.LookClose;
-import net.citizensnpcs.trait.SheepTrait;
-import net.citizensnpcs.trait.SkinTrait;
-import net.citizensnpcs.trait.VillagerProfession;
 
 /** Class to manager all Missile Wars arenas. */
 public class ArenaManager {
@@ -99,8 +82,8 @@ public class ArenaManager {
             ConfigurationSection arenas = arenaConfig.getConfigurationSection("arenas");
             for (String key : arenas.getKeys(false)) {
                 Arena arena = (Arena) arenas.get(key);
-                if (arena.loadWorld() == null) {
-                    continue;
+                if (arena.getBooleanSetting(ArenaSetting.IS_ALWAYS_ONLINE)) {
+                    arena.loadWorld();
                 }
                 
                 loadedArenas.put(arena.getName(), arena);
@@ -114,10 +97,6 @@ public class ArenaManager {
             e.printStackTrace();
             return;
         }
-
-        // Reload citizens to make sure NPCs are there
-        Bukkit.getScheduler().runTaskLater(MissileWarsPlugin.getPlugin(), 
-                () -> ConfigUtils.reloadCitizens(), 10);
     }
 
     /** Clean up and save arenas on server shutdown */
@@ -317,6 +296,7 @@ public class ArenaManager {
      * @param capacity
      * @return
      */
+    @SuppressWarnings("deprecation")
     public Arena createArena(String tempname, ArenaType type, int capacity) {
     	Logger logger = Bukkit.getLogger();
     	String gamemode = type.toString().toLowerCase();
@@ -392,96 +372,6 @@ public class ArenaManager {
         logger.info("Generating lobby...");
         if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, result -> {
             logger.info("Lobby generated!");
-            Gravity gravity = new Gravity();
-            gravity.setHasGravity(false);
-
-            // Spawn team selection NPCs
-            for (String team : new String[] {"red", "blue"}) {
-                String upper = team.toUpperCase();
-                String teamName = (team.equals("red") ? "§c§lRed" : "§9§lBlue") + " Team";
-                Vector teamVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + team);
-                Location teamLoc = new Location(arenaWorld, teamVec.getX(), teamVec.getY(), teamVec.getZ(), 90, 0);
-                NPC teamNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.SHEEP, teamName);
-                
-                // Team queuing command
-                CommandTrait enqueue = teamNPC.getOrAddTrait(CommandTrait.class);
-                enqueue.addCommand(new CommandTrait.NPCCommandBuilder("umw enqueue" + team,
-                        CommandTrait.Hand.BOTH).player(true));
-                
-                // Make sheep the same color as the team
-                SheepTrait sheepTrait = teamNPC.getOrAddTrait(SheepTrait.class);
-                sheepTrait.setColor(DyeColor.valueOf(upper));
-                
-                // Hologram to get queued placeholder
-                Location holoLoc = teamLoc.clone().add(0, 1.8, 0);
-                DHAPI.createHologram(teamNPC.getId() + "", holoLoc, true, List.of(teamName + " (%umw_" + team + "_queue%)"));
-                
-                // Add misc traits and spawn in
-                teamNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
-                teamNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
-                teamNPC.data().setPersistent(NPC.Metadata.SILENT, true);
-                teamNPC.addTrait(gravity);
-                teamNPC.spawn(teamLoc);
-                arena.getNPCs().add(teamNPC.getId());
-                logger.info(upper + " NPC with UUID " + teamNPC.getUniqueId() + " spawned.");
-            }
-
-            // Spawn bar NPC
-            Vector barVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos.bar");
-            Location barLoc = new Location(arenaWorld, barVec.getX(), barVec.getY(), barVec.getZ(), -90, 0);
-            NPC bartender = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "§2§lBartender");
-            CommandTrait openBar = new CommandTrait();
-            openBar.addCommand(new CommandTrait.NPCCommandBuilder("bossshop open bar %player%",
-                    CommandTrait.Hand.BOTH));
-            bartender.addTrait(openBar);
-            LookClose lookPlayerTrait = bartender.getOrAddTrait(LookClose.class);
-            lookPlayerTrait.lookClose(true);
-            VillagerProfession profession = bartender.getOrAddTrait(VillagerProfession.class);
-            profession.setProfession(Villager.Profession.NITWIT);
-            bartender.data().setPersistent(NPC.Metadata.SILENT, true);
-            bartender.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
-            bartender.addTrait(gravity); 
-            arenaWorld.getChunkAt(barLoc);
-            bartender.spawn(barLoc);
-            arena.getNPCs().add(bartender.getId());
-            logger.info("Bartender NPC with UUID " + bartender.getUniqueId() + " spawned.");
-
-            //Spawn 4 deck selection NPCs
-            for (DeckStorage deck : DeckStorage.values()) {
-                String id = deck.toString().toLowerCase();
-                Vector deckVec = SchematicManager.getVector(schematicConfig, "lobby.npc-pos." + id);
-                Location deckLoc = new Location(arenaWorld, deckVec.getX(), deckVec.getY(), deckVec.getZ(), -90, 0);
-                NPC deckNPC = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, deck.getNPCName());
-                
-                // Add skin
-                SkinTrait deckSkin = deckNPC.getOrAddTrait(SkinTrait.class);
-                deckSkin.setSkinPersistent(id, schematicConfig.getString("lobby.npc-pos." + id + ".signature"),
-                                               schematicConfig.getString("lobby.npc-pos." + id + ".value"));
-                
-                // Deck info command
-                CommandTrait deckCommand = deckNPC.getOrAddTrait(CommandTrait.class);
-                deckCommand.addCommand(new CommandTrait.NPCCommandBuilder("mw deck " + id, CommandTrait.Hand.BOTH).player(true));
-                
-                // Hologram name, to be able to use placeholders
-                Location holoLoc = deckLoc.clone().add(0, 2.2, 0);
-                DHAPI.createHologram(deckNPC.getId() + "", holoLoc, true, List.of("%umw_deck_npcname_" + id + "%"));
-                
-                // Add deck-specific equipment
-                Equipment deckEquip = new Equipment();
-                deckNPC.addTrait(deckEquip);
-                deckEquip.set(EquipmentSlot.HAND, deck.getWeapon());
-                deckEquip.set(EquipmentSlot.BOOTS, deck.getBoots());
-                
-                // Add misc traits, spawn
-                deckNPC.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, false);
-                deckNPC.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, true);
-                deckNPC.addTrait(gravity);
-                deckNPC.spawn(deckLoc);
-                arena.getNPCs().add(deckNPC.getId());
-                logger.info(deck.toString() + " NPC with UUID " + deckNPC.getUniqueId() + " spawned.");
-            }
-
-            CitizensAPI.getNPCRegistry().saveToStore();
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 // Spawn barrier wall
@@ -525,7 +415,7 @@ public class ArenaManager {
             logger.info("Arena " + name + " generated. World will save in 5 seconds.");
 
             // Wait to ensure schematic is spawned
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            ConfigUtils.schedule(100, () -> {
                 logger.info("Saving new arena " + name);
                 arenaWorld.save();
                 String worldName = "mwarena_" + name;
@@ -539,7 +429,7 @@ public class ArenaManager {
                 }
                 saveArenasToFile();
                 logger.info("Arena " + name + " locked and loaded.");
-            }, 100);
+            });
 
         })) {
             logger.severe("Couldn't generate lobby! Schematic files present?");
