@@ -215,7 +215,7 @@ public class PlayerlistInventory extends PaginatedInventory {
                     if (listType.equals("black") && arena.getPlayerInArena(uuid) != null) {
                         Player kicked = Bukkit.getPlayer(uuid);
                         arena.removePlayer(uuid, true);
-                        ConfigUtils.sendConfigMessage("arena-blacklisted", kicked, arena, null);
+                        ConfigUtils.sendConfigMessage("messages.arena-blacklisted", kicked, arena, null);
                     }
                 } else {
                     ConfigUtils.sendConfigMessage("player-already-listed", player, placeholdersWithName(name));

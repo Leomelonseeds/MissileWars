@@ -513,7 +513,7 @@ settings:
       lore:
         - ""
         - "&fEnabled: %enabled%"
-        - "&7Default: %default%"
+        - "&7&o(&7&oDefault: %default%)"
         - ""
         - "&cClick &7to toggle"
     int:
@@ -526,7 +526,7 @@ settings:
       lore:
         - ""
         - "&8%left-value%&7%left-arrow%&b%value%%unit%&7%right-arrow%&8%right-value%"
-        - "&7Default: &3%default%"
+        - "&7&o(&7&oDefault: %default%)"
         - ""
     enum:
       item: PINK_WOOL
@@ -534,7 +534,7 @@ settings:
       lore:
         - ""
         - "&fCurrent: &d%value%"
-        - "&7Default: &5%default%"
+        - "&7&o(&7&oDefault: %default%)"
         - ""
         - "&cClick &7to change"
   settings:
@@ -683,6 +683,13 @@ settings:
         - "&7that deck selected, they will be"
         - "&7defaulted to preset A. Has no"
         - "&7effect in random item mode"
+    ENABLE_AFK_KICK:
+      type: "boolean"
+      description:
+        - "&7Players will be kicked if they AFK"
+        - "&7for more than 2 minutes. This will"
+        - "&7only happen if they are in-game, or"
+        - "&7the game hasn't started yet."
     ENABLE_POISON:
       type: "boolean"
       description:

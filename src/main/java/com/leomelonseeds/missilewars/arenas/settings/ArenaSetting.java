@@ -26,6 +26,7 @@ public enum ArenaSetting {
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
     END_IF_NO_PLAYERS(true, "end-if-no-players"),
     ENABLE_AUTO_START(true, "enable-auto-start"),
+    ENABLE_AFK_KICK(true, "enable-afk-kick"),
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online"),

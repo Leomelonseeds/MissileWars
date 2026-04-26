@@ -168,7 +168,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         // Create item and set name
         String material;
         if (type.equals("boolean")) {
-            material = (boolean) arenaSettings.get(setting) ? sec.getString("item-enabled") : sec.getString("item-disabled");
+            material = (boolean) arenaSettings.getWithQueue(setting) ? sec.getString("item-enabled") : sec.getString("item-disabled");
         } else {
             material = sec.getString("item");
         }
@@ -208,7 +208,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private List<String> getIntSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
         List<String> res = new ArrayList<>();
         IntSettingModifier intModifier = setting.getIntModifier();
-        int cur = (int) arenaSettings.get(setting);
+        int cur = (int) arenaSettings.getWithQueue(setting);
         Integer left = cur <= intModifier.getMin() ? null : cur - intModifier.getChange();
         Integer right = cur >= intModifier.getMax() ? null : cur + intModifier.getChange();
         String unit = settingConfig.getString("settings." + setting.toString() + ".unit");
@@ -218,14 +218,13 @@ public abstract class ArenaSettingsInventory extends MWInventory {
                 continue;
             }
             
-            line = line.replace("%left-value%", left == null ? "" : left + "");
-            line = line.replace("%left-arrow%", left == null ? "" : sec.getString("left-arrow"));
-            line = line.replace("%right-value%", right == null ? "" : right + "");
-            line = line.replace("%right-arrow%", right == null ? "" : sec.getString("right-arrow"));
-            line = line.replace("%value%", cur + "");
-            line = line.replace("%unit%", unit);
-            line = line.replace("%default%", setting.getDefaultValue() + "");
-            res.add(line);
+            res.add(line.replace("%left-value%", left == null ? "" : left + "")
+                        .replace("%left-arrow%", left == null ? "" : sec.getString("left-arrow"))
+                        .replace("%right-value%", right == null ? "" : right + "")
+                        .replace("%right-arrow%", right == null ? "" : sec.getString("right-arrow"))
+                        .replace("%value%", cur + "")
+                        .replace("%unit%", unit)
+                        .replace("%default%", setting.getDefaultValue() + ""));
         }
         
         if (left != null) {
@@ -243,23 +242,22 @@ public abstract class ArenaSettingsInventory extends MWInventory {
 
     private List<String> getEnumSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
         List<String> res = new ArrayList<>();
-        Object val = arenaSettings.get(setting);
+        Object val = arenaSettings.getWithQueue(setting);
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
                 res.add(line);
                 continue;
             }
             
-            line = line.replace("%value%", val.toString());
-            line = line.replace("%default%", setting.getDefaultValue().toString());
-            res.add(line);
+            res.add(line.replace("%value%", val.toString())
+                        .replace("%default%", setting.getDefaultValue().toString()));
         }
         
         // Get the next in line
         Object[] vals = val.getClass().getEnumConstants();
         int i = 0;
         while (i < vals.length) {
-            if (vals[i].equals(arenaSettings.get(setting))) {
+            if (vals[i].equals(val)) {
                 break;
             }
             
@@ -272,16 +270,15 @@ public abstract class ArenaSettingsInventory extends MWInventory {
 
     private List<String> getBooleanSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
         List<String> res = new ArrayList<>();
-        boolean enabled = (boolean) arenaSettings.get(setting);
+        boolean enabled = (boolean) arenaSettings.getWithQueue(setting);
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
                 res.add(line);
                 continue;
             }
             
-            line = line.replace("%enabled%", enabled ? "&aTrue" : "&cFalse");
-            line = line.replace("%default%", (boolean) setting.getDefaultValue() ? "&2True" : "&4False");
-            res.add(line);
+            res.add(line.replace("%enabled%", enabled ? "&aTrue" : "&cFalse")
+                        .replace("%default%", (boolean) setting.getDefaultValue() ? "True" : "False"));
         }
 
         InventoryUtils.setMetaString(meta, SETTING_VALUE, enabled ? "false" : "true");

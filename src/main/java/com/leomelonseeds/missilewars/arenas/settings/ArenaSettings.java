@@ -1,10 +1,12 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -14,6 +16,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ArenaSettings implements ConfigurationSerializable {
+    
+    private static Comparator<UUID> comp = Comparator.comparing(uuid -> 
+        Objects.requireNonNullElse(Bukkit.getOfflinePlayer(uuid).getName(), ""));
     
     private Map<ArenaSetting, Object> currentSettings;
     private Map<ArenaSetting, Object> queue;
@@ -26,9 +31,9 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.currentSettings = new HashMap<>();
         this.queue = new HashMap<>();
         this.randomItemDistributor = new RandomItemDistributor();
-        this.playerBlacklist = new TreeSet<>();
-        this.playerWhitelist = new TreeSet<>();
         this.selectedMaps = new HashSet<>();
+        this.playerBlacklist = new TreeSet<>(comp);
+        this.playerWhitelist = new TreeSet<>(comp);
     }
     
     /**
@@ -116,11 +121,11 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
     
     public Object get(ArenaSetting setting) {
-        return queue.getOrDefault(setting, getUnqueued(setting));
+        return currentSettings.getOrDefault(setting, setting.getDefaultValue());
     }
     
-    private Object getUnqueued(ArenaSetting setting) {
-        return currentSettings.getOrDefault(setting, setting.getDefaultValue());
+    public Object getWithQueue(ArenaSetting setting) {
+        return queue.getOrDefault(setting, get(setting));
     }
     
     public boolean isQueued(ArenaSetting setting) {
@@ -182,7 +187,7 @@ public class ArenaSettings implements ConfigurationSerializable {
      * @param value
      */
     public void queue(ArenaSetting setting, Object value) {
-        if (getUnqueued(setting).equals(value)) {
+        if (get(setting).equals(value)) {
             queue.remove(setting);
             return;
         }

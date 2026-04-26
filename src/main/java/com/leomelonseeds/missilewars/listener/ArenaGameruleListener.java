@@ -74,6 +74,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
@@ -1102,6 +1103,15 @@ public class ArenaGameruleListener implements Listener {
         Player player = event.getAffected().getBase();
         Arena arena = ArenaUtils.getArena(player);
         if (arena == null) {
+            return;
+        }
+        
+        if (!arena.getBooleanSetting(ArenaSetting.ENABLE_AFK_KICK)) {
+            return;
+        }
+        
+        // Don't kick the owner, or check the setting
+        if (player.getUniqueId().equals(arena.getArenaSettings().get(ArenaSetting.OWNER_UUID))) {
             return;
         }
         
