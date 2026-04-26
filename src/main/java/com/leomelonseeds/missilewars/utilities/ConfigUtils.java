@@ -101,15 +101,15 @@ public class ConfigUtils {
     private static String setPlaceholders(String msg, Player player, Arena arena, Player focus) {
         // Set umw arena placeholders
         if (arena != null) {
-            msg = msg.replace("%umw_arena%", StringUtils.capitalize(arena.getName()));
-            msg = msg.replace("%umw_arena_players%", "" + arena.getTotalPlayers());
-            msg = msg.replace("%umw_arena_active%", "" + arena.getNumPlayers());
-            msg = msg.replace("%umw_arena_cap%", "" + arena.getCapacity());
-            msg = msg.replace("%umw_time%", "" + arena.getSecondsUntilStart());
-            msg = msg.replace("%umw_time_remaining%", "" + arena.getTimeRemaining());
-            msg = msg.replace("%umw_arena_status%", arena.getStatus());
-            msg = msg.replace("%umw_arena_visibility%", arena.getBooleanSetting(ArenaSetting.IS_PRIVATE) ? "&4Private" : "&2Public");
-            msg = msg.replace("%umw_arena_gamemode%", arena.getDisplayGamemode());
+            msg = msg.replace("%umw_arena%", StringUtils.capitalize(arena.getName()))
+                     .replace("%umw_arena_players%", "" + arena.getTotalPlayers())
+                     .replace("%umw_arena_active%", "" + arena.getNumPlayers())
+                     .replace("%umw_arena_cap%", "" + arena.getCapacity())
+                     .replace("%umw_time%", "" + arena.getSecondsUntilStart())
+                     .replace("%umw_time_remaining%", "" + arena.getTimeRemaining())
+                     .replace("%umw_arena_status%", arena.getStatus())
+                     .replace("%umw_arena_visibility%", arena.getBooleanSetting(ArenaSetting.IS_PRIVATE) ? "&4Private" : "&2Public")
+                     .replace("%umw_arena_gamemode%", arena.getDisplayGamemode());
             
             // Player specific arena placeholders
             if (player != null) {
