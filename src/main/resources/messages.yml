@@ -171,6 +171,7 @@ messages:
     int-maximum: "&cYou cannot increase this setting further!"
     error: "&cSomething went wrong changing this setting. Please contact an admin!"
     change: "&a&l[!] &r&7Setting &e%setting% &7was changed from %oldvalue% &7to %newvalue%"
+    rank: "&cYou need to purchase server rank %rank% &cto use this setting!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
@@ -669,6 +670,7 @@ settings:
         - "&7from joining."
     IS_ALWAYS_ONLINE:
       type: "boolean"
+      rank: "&5&lROYAL"
       description:
         - "&7Normally, the owner of an arena"
         - "&7must be online for the arena to"

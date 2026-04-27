@@ -55,6 +55,12 @@ public class VisibilitySettings extends ArenaSettingsInventory {
             return;
         }
         
+        if (viewOnly) {
+            ConfigUtils.sendConfigMessage("settings.view-only", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+        
         if (id.equals("whitelist")) {
             new PlayerlistInventory(player, arena, false, this);
         } else if (id.equals("blacklist")) {

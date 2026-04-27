@@ -31,7 +31,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private static NamespacedKey SETTING_VALUE;
 
     private Map<Integer, ArenaSetting> settingSlots;
-    private boolean viewOnly;
+    protected boolean viewOnly;
     private ArenaSettings arenaSettings;
     private Arena arena;
     private MWInventory fromInv;
@@ -105,6 +105,14 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             return;
         }
         
+        // Make sure player has permission to use this setting
+        if (!setting.hasPermission(player)) {
+            String rank = settingConfig.getString("settings." + setting.toString() + ".rank");
+            ConfigUtils.sendConfigMessage("settings.rank", player, Map.of("%rank%", rank));
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+        
         String value = InventoryUtils.getStringFromItemKey(item, SETTING_VALUE);
         if (value == null) {
             return;
@@ -115,21 +123,21 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         if (settingType.equals("int")) {
             String[] values = value.split("-");
             if (type.isRightClick()) {
-                if (values[1].equals("null")) {
+                if (values[0].equals("null")) {
                     ConfigUtils.sendConfigMessage("settings.int-maximum", player);
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
 
-                value = values[1];
+                value = values[0];
             } else if (type.isLeftClick()) {
-                if (values[0].equals("null")) {
+                if (values[1].equals("null")) {
                     ConfigUtils.sendConfigMessage("settings.int-minimum", player);
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
                 
-                value = values[0];
+                value = values[1];
             } else {
                 return;
             }
@@ -175,7 +183,13 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         
         ItemStack item = new ItemStack(Material.valueOf(material));
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(ConfigUtils.toComponent(sec.getString("color") + ConfigUtils.getEnumDisplayString(settingString)));
+        String name = sec.getString("color") + ConfigUtils.getEnumDisplayString(settingString);
+        if (setting.needsPermission()) {
+            String rank = settingConfig.getString("settings." + settingString + ".rank");
+            name = name + " &8(requires " + rank + "&8)";
+        }
+        meta.displayName(ConfigUtils.toComponent(name));
+        
         List<String> lore = new ArrayList<>();
         lore.add("");
         lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Difficulty;
+import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
@@ -29,19 +30,20 @@ public enum ArenaSetting {
     ENABLE_AFK_KICK(true, "enable-afk-kick"),
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     IS_PRIVATE(false, "is-private"),
-    IS_ALWAYS_ONLINE(true, "always-online"),
+    IS_ALWAYS_ONLINE(true, "always-online", true),
     ENABLE_FORCE_DECK(false, "force-deck"),
     ENABLE_POISON(true, "enable-poison"),
     OWNER_NAME("", "owner-name"),
-    OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", true),
-    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", true),
-    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", true),
+    OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", false, true),
+    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
+    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;
     private String id;
     private IntSettingModifier intModifier;
     private boolean storeAsString;
+    private boolean needsPermission;
     
     /**
      * ArenaSetting enum for primitive setting types like boolean and String
@@ -50,19 +52,27 @@ public enum ArenaSetting {
      * @param id
      */
     private ArenaSetting(Object defaultValue, String id) {
-        this.defaultValue = defaultValue;
-        this.id = id;
+        this(defaultValue, id, false, false, null);
     }
 
     private ArenaSetting(Object defaultValue, String id, IntSettingModifier intModifier) {
-        this.defaultValue = defaultValue;
-        this.id = id;
-        this.intModifier = intModifier;
+        this(defaultValue, id, false, false, intModifier);
+    }
+    
+    private ArenaSetting(Object defaultValue, String id, boolean needsPermission) {
+        this(defaultValue, id, needsPermission, false, null);
     }
 
-    private ArenaSetting(Object defaultValue, String id, boolean storeAsString) {
+    private ArenaSetting(Object defaultValue, String id, boolean needsPermission, boolean storeAsString) {
+        this(defaultValue, id, needsPermission, storeAsString, null);
+    }
+
+    
+    private ArenaSetting(Object defaultValue, String id, boolean needsPermission, boolean storeAsString, IntSettingModifier intModifier) {
         this.defaultValue = defaultValue;
         this.id = id;
+        this.needsPermission = needsPermission;
+        this.intModifier = intModifier;
         this.storeAsString = storeAsString;
     }
     
@@ -109,5 +119,17 @@ public enum ArenaSetting {
     
     public IntSettingModifier getIntModifier() {
         return intModifier;
+    }
+    
+    public boolean hasPermission(Player player) {
+        if (!needsPermission) {
+            return true;
+        }
+        
+        return player.hasPermission("umw.customarena.setting." + toString().toLowerCase());
+    }
+    
+    public boolean needsPermission() {
+        return needsPermission;
     }
 }
