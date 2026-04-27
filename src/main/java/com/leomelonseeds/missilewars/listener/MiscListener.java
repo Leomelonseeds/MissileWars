@@ -38,6 +38,7 @@ import org.mineacademy.chatcontrol.api.ChannelPreChatEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -141,6 +142,17 @@ public class MiscListener implements Listener {
             InventoryUtils.loadInventory(player);
             RankUtils.setPlayerExpBar(player);
         });
+        
+        // Update arena priority if they have one
+        Arena customArena = plugin.getArenaManager().getCustomArena(player);
+        if (customArena != null) {
+            for (int i = 10; i >= 0; i--) {
+                if (player.hasPermission("umw.customarena.priority." + i)) {
+                    customArena.getArenaSettings().set(ArenaSetting.PRIORITY, i);
+                    break;
+                }
+            }
+        }
         
         // Make people who are new but didn't do the tutorial yet do the tutorial
         // Bedrock players shouldn't get the cinematic as its fucked
