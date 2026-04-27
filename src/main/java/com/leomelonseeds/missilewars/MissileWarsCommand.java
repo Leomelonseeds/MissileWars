@@ -517,6 +517,34 @@ public class MissileWarsCommand implements CommandExecutor {
                 return true;
             }
         }
+        
+        // Create a new arena that is a copy of an existing arena, with a different name
+        if (action.equalsIgnoreCase("CopyArena")) {
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+
+            if (args.length < 3) {
+                sendErrorMsg(sender, "Usage: /umw CopyArena <old-name> <new-name>");
+                return true;
+            }
+            
+            Arena arena = arenaManager.getArena(args[1]);
+            if (arena == null) {
+                sendErrorMsg(sender, "Old arena doesn't exist!");
+                return true;
+            }
+            
+            Arena newArena = arenaManager.copyArena(arena, args[2]);
+            if (newArena == null) {
+                sendErrorMsg(sender, "Failed to create new arena, check console.");
+            } else {
+                sendSuccessMsg(sender, "New arena was created with name " + newArena.getName());
+            }
+            
+            return true;
+        }
 
         // Update all arenas. Might take a while
         if (action.equalsIgnoreCase("PerformArenaUpgrade")) {

@@ -156,6 +156,24 @@ public class ArenaManager {
         saveArenasToFile();
         return true;
     }
+    
+    /**
+     * Copies one arena to a new arena of a different name.
+     * The new arena will be named "type-[name]".
+     * 
+     * @param arena
+     * @param name cannot be the same as an existing arena
+     * @return the newly created arena
+     */
+    public Arena copyArena(Arena arena, String name) {
+        Arena newArena = createArena(name, arena.getType(), arena.getCapacity());
+        if (newArena == null) {
+            return null;
+        }
+        
+        newArena.setArenaSettings(new ArenaSettings(arena.getArenaSettings()));
+        return newArena;
+    }
 
     /**
      * Deletes and re-creates all arenas to implement new settings/schematics
