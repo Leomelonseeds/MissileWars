@@ -2254,6 +2254,7 @@ arena-settings:
         - "&7your own random item distribution,"
         - "&7where abilities and passives can"
         - "&7be enabled or disabled."
+        - "&d» &d&oWork in progress, coming soon!"
     map-selector:
       item: MAP
       name: "&eMap Settings"
@@ -2263,6 +2264,7 @@ arena-settings:
         - "&7to play on and for players to"
         - "&7vote on. Some maps are exclusive"
         - "&7to custom arenas!"
+        - "&d» &d&oWork in progress, coming soon!"
     other-settings:
       item: WRITABLE_BOOK
       name: "&fOther Settings"
@@ -2273,6 +2275,7 @@ arena-settings:
         - "&7more - we have all the options."
         - "&7(Except stock options. We don't"
         - "&7have those, yet)"
+        - "&d» &d&oWork in progress, coming soon!"
     start-game:
       item: GOAT_HORN
       name: "&bStart Game"
@@ -2282,6 +2285,7 @@ arena-settings:
         - "&cClick &7to initiate the countdown"
         - "&7(specified by the 'Start Timer'"
         - "&7setting) to start a game."
+        - "&d» &d&oWork in progress, coming soon!"
     end-game:
       item: STONE_AXE
       name: "&cEnd Game"
@@ -2290,15 +2294,17 @@ arena-settings:
         - ""
         - "&cClick &7to immediately end any"
         - "&7game in this arena in a tie."
+        - "&d» &d&oWork in progress, coming soon!"
     creative-mode:
       item: FEATHER
-      name: "&fToggle Creative Mode"
+      name: "&fToggle Creative Mode &8(requires &6&lDIVINE&8)"
       slot: 39
       lore:
         - ""
         - "&cClick &7to toggle creative mode."
         - "&4Be warned that creating excessive"
         - "&4lag may result in punishment!"
+        - "&d» &d&oWork in progress, coming soon!"
     kick-all:
       item: NETHERITE_BOOTS
       name: "&4Kick All"
@@ -2308,3 +2314,4 @@ arena-settings:
         - "&cClick &7to kick all players from"
         - "&7your arena. To kick one player,"
         - "&7add them to the blacklist."
+        - "&d» &d&oWork in progress, coming soon!"
