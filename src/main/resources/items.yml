@@ -2187,6 +2187,32 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  map-selector:
+    map:
+      item: EMPTY_MAP
+      name: "%umw_map%"
+      lore-enabled:
+        - "&a✔️ &7Enabled"
+        - ""
+        - "&cClick &7to disable."
+      lore-disabled:
+        - "&c❌ &7Disabled"
+        - ""
+        - "&cClick &7to enable."
+    enable-all:
+      item: WATER_BUCKET
+      name: "&aEnable All"
+      lore:
+        - ""
+        - "&cClick &7to enable all maps."
+    disable-all:
+      item: BUCKET
+      name: "&cDisable All"
+      lore:
+        - ""
+        - "&cClick &7to disable all maps. If all"
+        - "&7maps are disabled, then the default"
+        - "&7map (Standoff) will be used."
   playerlist:
     player:
       item: PLAYER_HEAD

@@ -30,7 +30,7 @@ public class MapVoting extends MWInventory {
     
     public MapVoting(Player player, Arena arena) {
         super(player, 
-            (int) Math.ceil(arena.getVoteManager().getVotes().size() / 9.0) * 9,
+            (int) Math.max(Math.ceil(arena.getVoteManager().getVotes().size() / 9.0) * 9, 9),
             ConfigUtils.getConfigText("inventories.map-voting.title", null, null, null)
                 .replace("%amount%", VotePlayer.getMaxVotes(player) + "")
         );
