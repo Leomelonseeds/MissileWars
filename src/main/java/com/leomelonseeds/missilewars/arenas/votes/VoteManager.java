@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.arenas.votes;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,15 +24,15 @@ public class VoteManager {
     private String gamemode;
     private boolean respectRotation;
     
-    public VoteManager(String gamemode, Set<String> selectedMaps, boolean respectRotation) {
+    public VoteManager(String gamemode, Set<String> selectedMaps, boolean respectRotation, boolean treatEmptyListAsFull) {
         this.allVotes = new TreeMap<>();
         this.playerVotes = new HashSet<>();
         this.gamemode = gamemode;
         this.respectRotation = respectRotation;
         
         // Only add a map if it's selected in the settings
-        for (String m : getVoteableMaps()) {
-            if (selectedMaps.isEmpty() || selectedMaps.contains(m)) {
+        for (String m : getVoteableMaps(respectRotation)) {
+            if ((treatEmptyListAsFull && selectedMaps.isEmpty()) || selectedMaps.contains(m)) {
                 allVotes.put(m, 0);
             }
         }
@@ -41,10 +42,10 @@ public class VoteManager {
      * Get a list of maps available for voting, which doesn't take into account
      * maps available from arena settings.
      * 
-     * @param respectRotation
+     * @param respectRotation can be used to override this votemanagers setting
      * @return
      */
-    private Collection<String> getVoteableMaps() {
+    public Collection<String> getVoteableMaps(boolean respectRotation) {
         FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
         if (respectRotation) {
             return mapConfig.getStringList(gamemode + ".rotation");
@@ -98,7 +99,7 @@ public class VoteManager {
      * @param map
      */
     public void resetAvailableMaps() {
-        Set<String> allMaps = new HashSet<>(getVoteableMaps());
+        Set<String> allMaps = new HashSet<>(getVoteableMaps(respectRotation));
         Set<String> currentMaps = allVotes.keySet();
         
         // Remove all maps from current map selection that are not contained within the default selection
@@ -236,7 +237,10 @@ public class VoteManager {
         return mapName;
     }
     
+    /**
+     * @return an unmodifiable view of the current votes
+     */
     public SortedMap<String, Integer> getVotes() {
-        return allVotes;
+        return Collections.unmodifiableSortedMap(allVotes);
     }
 }

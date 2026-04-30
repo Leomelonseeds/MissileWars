@@ -169,7 +169,8 @@ public abstract class Arena implements ConfigurationSerializable {
         tasks = new LinkedList<>();
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
-        voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), !isCustom());
+        voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), 
+                !isCustom(), !getBooleanSetting(ArenaSetting.MAPS_EDITED));
     }
     
     /**

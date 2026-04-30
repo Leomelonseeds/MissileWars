@@ -37,6 +37,9 @@ public enum ArenaSetting {
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", false, true),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
     FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
+    
+    // Below are internal settings
+    MAPS_EDITED(false, "maps-edited"), // If false, display every map available in the map selector
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     
     private Object defaultValue;
