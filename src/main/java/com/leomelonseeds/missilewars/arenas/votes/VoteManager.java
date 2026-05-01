@@ -59,14 +59,16 @@ public class VoteManager {
     /**
      * Add a map to the rotation for this arena. If no
      * maps are specifically selected in the arena settings,
-     * then this will become the only map available for
-     * voting.
+     * and the map rotation isn't respected (i.e. the arena
+     * is custom), then this will become the only map available
+     * for voting. Otherwise, this map will be added to the
+     * selected maps for voting.
      * 
      * @param map
      */
     public void addMap(String map) {
         int amt = 0;
-        if (selectedMaps.isEmpty()) {
+        if (selectedMaps.isEmpty() && !respectRotation) {
             amt = allVotes.getOrDefault(map, 0);
             allVotes.clear();
         }
@@ -86,9 +88,6 @@ public class VoteManager {
     public void removeMap(String map) {
         selectedMaps.remove(map);
         allVotes.remove(map);
-        if (selectedMaps.isEmpty()) {
-            resetAvailableMaps();
-        }
     }
     
     /**

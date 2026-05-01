@@ -2202,12 +2202,14 @@ arena-settings:
     enable-all:
       item: WATER_BUCKET
       name: "&aEnable All"
+      slot: 32
       lore:
         - ""
         - "&cClick &7to enable all maps."
     disable-all:
       item: BUCKET
       name: "&cDisable All"
+      slot: 30
       lore:
         - ""
         - "&cClick &7to disable all maps. If all"
