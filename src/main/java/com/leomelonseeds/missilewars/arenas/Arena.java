@@ -170,7 +170,7 @@ public abstract class Arena implements ConfigurationSerializable {
         tracker = new Tracker();
         leftPlayers = new HashMap<>();
         voteManager = new VoteManager(getGamemode(), settings.getSelectedMaps(), 
-                !isCustom(), !getBooleanSetting(ArenaSetting.MAPS_EDITED));
+            !getBooleanSetting(ArenaSetting.MAPS_EDITED));
     }
     
     /**
@@ -259,9 +259,9 @@ public abstract class Arena implements ConfigurationSerializable {
             Bukkit.getLogger().warning("Something went wrong unloading " + name + "!");
             return false;
         }
+        Bukkit.getWorlds().remove(_world);
         
         // Cancel all tasks
-        Bukkit.getWorlds().remove(_world);
         cancelGame();
         ConfigUtils.cancelTask(spectatorActionBar);
         ConfigUtils.cancelTask(autoUnload);
@@ -276,6 +276,11 @@ public abstract class Arena implements ConfigurationSerializable {
             DHAPI.removeHologram("" + id);
         }
         npcs.clear();
+        
+        // Save voted maps to the arena settings
+        if (isCustom() && getBooleanSetting(ArenaSetting.MAPS_EDITED)) {
+            settings.setSelectedMaps(voteManager.getVotes().keySet());
+        }
         
         // Delete world file
         File worldFolder = new File("mwarena_" + name);

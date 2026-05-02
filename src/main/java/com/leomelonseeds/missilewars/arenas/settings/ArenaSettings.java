@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -237,10 +238,21 @@ public class ArenaSettings implements ConfigurationSerializable {
     }
     
     /**
-     * @return a MUTABLE list of selected maps
+     * @return an IMMUTABLE list of selected maps
      */
     public Set<String> getSelectedMaps() {
-        return selectedMaps;
+        return Collections.unmodifiableSet(selectedMaps);
+    }
+    
+    /**
+     * Set the selected maps for this arena to the ones
+     * given by the list
+     * 
+     * @param maps
+     */
+    public void setSelectedMaps(Set<String> maps) {
+        selectedMaps.clear();
+        selectedMaps.addAll(maps);
     }
     
     public RandomItemDistributor getRandomItemDistributor() {

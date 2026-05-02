@@ -20,18 +20,15 @@ public class VoteManager {
     
     private SortedMap<String, Integer> allVotes;
     private Set<VotePlayer> playerVotes;
-    private Set<String> selectedMaps; // The same set as in arena settings!
     private String gamemode;
-    private boolean respectRotation;
     
-    public VoteManager(String gamemode, Set<String> selectedMaps, boolean respectRotation, boolean treatEmptyListAsFull) {
+    public VoteManager(String gamemode, Set<String> selectedMaps, boolean treatEmptyListAsFull) {
         this.allVotes = new TreeMap<>();
         this.playerVotes = new HashSet<>();
         this.gamemode = gamemode;
-        this.respectRotation = respectRotation;
         
         // Only add a map if it's selected in the settings
-        for (String m : getVoteableMaps(respectRotation)) {
+        for (String m : getVoteableMaps(true)) {
             if ((treatEmptyListAsFull && selectedMaps.isEmpty()) || selectedMaps.contains(m)) {
                 allVotes.put(m, 0);
             }
@@ -42,7 +39,7 @@ public class VoteManager {
      * Get a list of maps available for voting, which doesn't take into account
      * maps available from arena settings.
      * 
-     * @param respectRotation can be used to override this votemanagers setting
+     * @param respectRotation if false, then select all maps
      * @return
      */
     public Collection<String> getVoteableMaps(boolean respectRotation) {
@@ -51,54 +48,48 @@ public class VoteManager {
             return mapConfig.getStringList(gamemode + ".rotation");
         }
         
+        // Unused code at the moment? Will we ever see non-rotation maps hmm...
         Set<String> allMaps = mapConfig.getConfigurationSection(gamemode).getKeys(false);
         allMaps.remove("rotation");
         return allMaps;
     }
     
     /**
-     * Add a map to the rotation for this arena. If no
-     * maps are specifically selected in the arena settings,
-     * and the map rotation isn't respected (i.e. the arena
-     * is custom), then this will become the only map available
-     * for voting. Otherwise, this map will be added to the
-     * selected maps for voting.
+     * Add a map to the rotation for this arena.
      * 
      * @param map
      */
     public void addMap(String map) {
-        int amt = 0;
-        if (selectedMaps.isEmpty() && !respectRotation) {
-            amt = allVotes.getOrDefault(map, 0);
-            allVotes.clear();
-        }
-        
-        if (selectedMaps.add(map)) {
-            allVotes.putIfAbsent(map, amt);
-        }
+        allVotes.put(map, 0);
     }
     
     /**
      * Remove a map from the rotation for this arena.
-     * If there are no more maps, the rotation will be
-     * reset to the default one.
      * 
      * @param map
      */
     public void removeMap(String map) {
-        selectedMaps.remove(map);
         allVotes.remove(map);
+    }
+    
+    /**
+     * Removes all maps from the vote manager. This causes
+     * getVotedMap to always return the default map
+     */
+    public void removeAll() {
+        allVotes.clear();
     }
     
     /**
      * Resets the available map list back to the default one determined
      * by respectRotation, while retaining previous votes. This operation
-     * also refreshes the map list
+     * also refreshes the map list. Basically this is the "select all"
+     * operation...
      * 
      * @param map
      */
     public void resetAvailableMaps() {
-        Set<String> allMaps = new HashSet<>(getVoteableMaps(respectRotation));
+        Set<String> allMaps = new HashSet<>(getVoteableMaps(true));
         Set<String> currentMaps = allVotes.keySet();
         
         // Remove all maps from current map selection that are not contained within the default selection
