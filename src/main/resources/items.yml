@@ -1836,7 +1836,7 @@ held:
     slot: 7
   arena-settings:
     item: COMPARATOR
-    name: "&cArena Settings"
+    name: "&c&lArena Settings"
     slot: 1
   arena-settings-view-only:
     item: REPEATER
@@ -2189,10 +2189,10 @@ gpassive:
 arena-settings:
   map-selector:
     map:
-      item: EMPTY_MAP
+      item: PAPER
       name: "&f%umw_map%"
       lore-enabled:
-        - "&a✔️ &7Enabled"
+        - "&a✔ &7Enabled"
         - ""
         - "&cClick &7to disable."
       lore-disabled:
@@ -2212,9 +2212,10 @@ arena-settings:
       slot: 30
       lore:
         - ""
-        - "&cClick &7to disable all maps. If all"
-        - "&7maps are disabled, then the default"
-        - "&7map (Standoff) will be used."
+        - "&cClick &7to disable all maps. If"
+        - "&7all maps are disabled, then"
+        - "&7the default map &f(Standoff)"
+        - "&7will be used."
   playerlist:
     player:
       item: PLAYER_HEAD
@@ -2290,9 +2291,7 @@ arena-settings:
       lore:
         - "&7Select which maps are available"
         - "&7to play on and for players to"
-        - "&7vote on. Some maps are exclusive"
-        - "&7to custom arenas!"
-        - "&d» &d&oWork in progress, coming soon!"
+        - "&7vote on."
     other-settings:
       item: WRITABLE_BOOK
       name: "&fOther Settings"

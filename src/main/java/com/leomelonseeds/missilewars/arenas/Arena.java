@@ -987,6 +987,9 @@ public abstract class Arena implements ConfigurationSerializable {
             String path = "held." + i;
             ItemStack item = InventoryUtils.createItem(path);
             ItemMeta meta = item.getItemMeta();
+            if (i.equals("arena-settings")) {
+                InventoryUtils.addGlow(meta);
+            }
             InventoryUtils.setMetaString(meta, InventoryUtils.HELD_KEY, i);
             item.setItemMeta(meta);
             player.getInventory().setItem(itemConfig.getInt(path + ".slot"), item);

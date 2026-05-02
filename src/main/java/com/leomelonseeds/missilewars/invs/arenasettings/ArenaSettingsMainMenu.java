@@ -88,5 +88,10 @@ public class ArenaSettingsMainMenu extends MWInventory {
             new VisibilitySettings(player, viewOnly, arena, this);
             return;
         }
+        
+        if (key.equals("map-selector")) {
+            new MapSelector(player, viewOnly, arena, this);
+            return;
+        }
     }
 }
