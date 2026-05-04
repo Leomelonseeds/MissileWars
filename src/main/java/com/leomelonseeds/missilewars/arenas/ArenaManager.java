@@ -388,7 +388,7 @@ public class ArenaManager {
 
         // Create Arena lobby
         logger.info("Generating lobby...");
-        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, result -> {
+        if (!SchematicManager.spawnFAWESchematic("lobby", arenaWorld, null, () -> {
             logger.info("Lobby generated!");
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {

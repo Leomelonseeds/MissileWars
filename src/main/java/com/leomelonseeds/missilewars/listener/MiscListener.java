@@ -137,7 +137,7 @@ public class MiscListener implements Listener {
 
         // Load player data, making sure for new players that it happens after an entry for them is created.
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        plugin.getSQL().createPlayer(player.getUniqueId(), result -> {
+        plugin.getSQL().createPlayer(player.getUniqueId(), () -> {
             MissileWarsPlugin.getPlugin().getJSON().loadPlayer(player.getUniqueId());
             InventoryUtils.loadInventory(player);
             RankUtils.setPlayerExpBar(player);

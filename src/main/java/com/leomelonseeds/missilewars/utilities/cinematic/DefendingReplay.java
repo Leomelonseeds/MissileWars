@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 public class DefendingReplay extends TutorialReplay {
@@ -46,8 +45,8 @@ public class DefendingReplay extends TutorialReplay {
     }
 
     @Override
-    protected void reset(DBCallback onFinish) {
-        SchematicManager.setAirAsync(132, 3, 28, 129, 14, 7, tutorialWorld, o -> onFinish.onQueryDone(null));
+    protected void reset(Runnable onFinish) {
+        SchematicManager.setAirAsync(132, 3, 28, 129, 14, 7, tutorialWorld, () -> onFinish.run());
     }
 
 }

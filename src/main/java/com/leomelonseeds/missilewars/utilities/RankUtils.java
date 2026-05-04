@@ -161,8 +161,7 @@ public class RankUtils {
      * @param exp
      */
     public static void setPlayerExpBar(Player player) {
-        MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId(), result -> {
-            int exp = (int) result;
+        MissileWarsPlugin.getPlugin().getSQL().getExp(player.getUniqueId(), exp -> {
             int rank = getRankLevel(exp);
             double progress = getExpProgress(exp);
             player.setLevel(rank);

@@ -54,7 +54,6 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 import com.leomelonseeds.missilewars.utilities.VoidChunkGenerator;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import eu.decentsoftware.holograms.api.DHAPI;
@@ -525,8 +524,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the name of the Arena.
-     *
      * @return the name of the Arena
      */
     public String getName() {
@@ -534,8 +531,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the World for this Arena.
-     *
      * @return the world this Arena lies in
      */
     public World getWorld() {
@@ -543,8 +538,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Get the current map for this Arena.
-     *
      * @return the selected map name for this Arena
      */
     public String getMapName() {
@@ -552,26 +545,27 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Get the display string for this arena for placeholders
-     * 
-     * @return
+     * @return Get the display string for this arena for placeholders
      */
     public String getDisplayGamemode() {
         return gamemode.getDisplayName();
     }
 
     /**
-     * Get the gamemode for this arena as a string.
-     *
      * @return the current map type for this arena
      */
     public String getGamemode() {
         return gamemode.toString();
     }
+    
+    /**
+     * @return if a countdown has started or the arena is already running
+     */
+    public boolean isStarted() {
+        return startTime != null;
+    }
 
     /**
-     * Check if the game is currently running.
-     *
      * @return whether a game is currently running
      */
     public boolean isRunning() {
@@ -579,8 +573,6 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Check if the arena is resetting.
-     *
      * @return whether the arena world is resetting
      */
     public boolean isResetting() {
@@ -588,18 +580,28 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     /**
-     * Check if game is waiting for a tie
-     * 
-     * @return
+     * @return if game is waiting for a tie
      */
     public boolean isWaitingForTie() {
         return waitingForTie;
     }
     
     /**
-     * Get a color-coded message of the status of the arena
-     * 
-     * @return
+     * @return if the arena world is loaded
+     */
+    public boolean isOnline() {
+        return world != null;
+    }
+    
+    /**
+     * @return an unmodifiable set of UUIDs of players in this arena
+     */
+    public Set<UUID> getPlayers() {
+        return Collections.unmodifiableSet(players.keySet());
+    }
+    
+    /**
+     * @return A color-coded message of the status of the arena
      */
     public String getStatus() {
         String status = "&eIn Lobby";
@@ -1390,7 +1392,7 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Generate map.
         announceMessage("messages.starting", null);
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), getGamemode(), result -> {
+        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), getGamemode(), () -> {
             // Result will only run if map loading is a success
             // Acquire red and blue spawns
             FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
@@ -1765,10 +1767,10 @@ public abstract class Arena implements ConfigurationSerializable {
      * Reset the arena world, checking for an auto-start once its done
      */
     protected void resetWorld() {
-        resetWorld(t -> checkForStart());
+        resetWorld(() -> checkForStart());
     }
     
-    protected void resetWorld(DBCallback callback) {
+    protected void resetWorld(Runnable callback) {
         plugin.log("Resetting arena " + name + "...");
         announceMessage("messages.arena-resetting", null);
         
@@ -1789,7 +1791,7 @@ public abstract class Arena implements ConfigurationSerializable {
             announceMessage("messages.arena-reset-complete", null);
             
             if (callback != null) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.onQueryDone(null));
+                Bukkit.getScheduler().runTask(plugin, () -> callback.run());
             }
         }));
 

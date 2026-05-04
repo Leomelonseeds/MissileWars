@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 public class PortalReplay extends TutorialReplay {
@@ -42,9 +41,9 @@ public class PortalReplay extends TutorialReplay {
     }
 
     @Override
-    protected void reset(DBCallback onFinish) {
-        SchematicManager.spawnFAWESchematic("tutorial-replay", tutorialWorld, null, o -> {
-            SchematicManager.setAirAsync(168, 13, 50, 165, 12, 28, tutorialWorld, o1 -> onFinish.onQueryDone(null));
+    protected void reset(Runnable onFinish) {
+        SchematicManager.spawnFAWESchematic("tutorial-replay", tutorialWorld, null, () -> {
+            SchematicManager.setAirAsync(168, 13, 50, 165, 12, 28, tutorialWorld, () -> onFinish.run());
         });
     }
 

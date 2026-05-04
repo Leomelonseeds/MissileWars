@@ -101,7 +101,7 @@ public class TutorialArena extends ClassicArena {
                 plugin.log("Resetting tutorial arena...");
                 resetting = true;
                 cancelGameTasks();
-                resetWorld(r -> init());
+                resetWorld(() -> init());
                 this.cancel();
             }
         }.runTaskTimer(plugin, minute, minute);
@@ -406,11 +406,10 @@ public class TutorialArena extends ClassicArena {
         // Clear the lane and then spawn a missile
         Location spawnLoc = loc1.clone().add(2, 0, 0);
         SchematicManager.setAirAsync(
-                loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), 
-                loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ(),
-                world, o -> {
-            SchematicManager.spawnNBTStructure(null, "warhead-2", spawnLoc, true, true, false);
-        });
+            loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), 
+            loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ(),
+            world, () -> SchematicManager.spawnNBTStructure(null, "warhead-2", spawnLoc, true, true, false)
+        );
     }
     
     /**

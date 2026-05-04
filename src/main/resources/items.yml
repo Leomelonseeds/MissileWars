@@ -2271,37 +2271,47 @@ arena-settings:
       name: "&3Visibility Settings"
       slot: 10
       lore:
+        - ""
         - "&7Options related to who can join your"
         - "&7arena and when, including white-"
         - "&7listing and blacklisting players."
+        - ""
+        - "&cClick &7to edit."
     item-settings:
       item: CREEPER_SPAWN_EGG
       name: "&aItem and Ability Settings"
       slot: 12
       lore:
+        - ""
         - "&7Change item cooldowns or create"
         - "&7your own random item distribution,"
         - "&7where abilities and passives can"
         - "&7be enabled or disabled."
+        - ""
         - "&d» &d&oWork in progress, coming soon!"
     map-selector:
       item: MAP
       name: "&eMap Settings"
       slot: 14
       lore:
+        - ""
         - "&7Select which maps are available"
         - "&7to play on and for players to"
         - "&7vote on."
+        - ""
+        - "&cClick &7to edit."
     other-settings:
       item: WRITABLE_BOOK
       name: "&fOther Settings"
       slot: 16
       lore:
+        - ""
         - "&7Team options, queueing options,"
         - "&7fun options, stock options, and"
         - "&7more - we have all the options."
         - "&7(Except stock options. We don't"
         - "&7have those, yet)"
+        - ""
         - "&d» &d&oWork in progress, coming soon!"
     start-game:
       item: GOAT_HORN
@@ -2340,4 +2350,3 @@ arena-settings:
         - "&cClick &7to kick all players from"
         - "&7your arena. To kick one player,"
         - "&7add them to the blacklist."
-        - "&d» &d&oWork in progress, coming soon!"

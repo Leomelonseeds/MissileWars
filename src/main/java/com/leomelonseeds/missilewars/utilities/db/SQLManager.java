@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,14 +160,14 @@ public class SQLManager {
      *
      * @param uuid
      */
-    public void createPlayer(UUID uuid, DBCallback callback) {
+    public void createPlayer(UUID uuid, Runnable callback) {
         scheduler.runTaskAsynchronously(plugin, () -> {
             try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                     "INSERT IGNORE INTO umw_players(uuid) VALUE(?);"
             )) {
                 stmt.setString(1, uuid.toString());
                 stmt.execute();
-                scheduler.runTask(plugin, () -> callback.onQueryDone(null));
+                scheduler.runTask(plugin, () -> callback.run());
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Failed to create a new entry for " + Bukkit.getPlayer(uuid).getName());
             }
@@ -212,7 +213,7 @@ public class SQLManager {
      * @param uuid
      * @param callback
      */
-    public void getInventory(UUID uuid, DBCallback callback) {
+    public void getInventory(UUID uuid, Consumer<String> callback) {
         scheduler.runTaskAsynchronously(plugin, () -> {
             try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                     "SELECT inventory FROM umw_players WHERE uuid = ?;"
@@ -224,7 +225,7 @@ public class SQLManager {
                     inv = resultSet.getString("inventory");
                 }
                 final String result = inv;
-                scheduler.runTask(plugin, () -> callback.onQueryDone(result));
+                scheduler.runTask(plugin, () -> callback.accept(result));
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Failed to get inventory for " + Bukkit.getPlayer(uuid).getName());
             }
@@ -698,7 +699,7 @@ public class SQLManager {
      * @param uuid
      * @param callback
      */
-    public void getExp(UUID uuid, DBCallback callback) {
+    public void getExp(UUID uuid, Consumer<Integer> callback) {
         scheduler.runTaskAsynchronously(plugin, () -> {
             try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                     "SELECT exp FROM umw_players WHERE uuid = ?;"
@@ -710,7 +711,7 @@ public class SQLManager {
                     exp = resultSet.getInt("exp");
                 }
                 int finalExp = exp;
-                scheduler.runTask(plugin, () -> callback.onQueryDone(finalExp));
+                scheduler.runTask(plugin, () -> callback.accept(finalExp));
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Failed to get exp for " + Bukkit.getPlayer(uuid).getName());
             }
@@ -760,7 +761,7 @@ public class SQLManager {
      *
      * @param uuid
      */
-    public void getPlayerDeck(UUID uuid, DBCallback callback) {
+    public void getPlayerDeck(UUID uuid, Consumer<String> callback) {
         scheduler.runTaskAsynchronously(plugin, () -> {
             try (Connection c = conn.getConnection(); PreparedStatement stmt = c.prepareStatement(
                     "SELECT deck FROM umw_players WHERE uuid = ?;"
@@ -772,7 +773,7 @@ public class SQLManager {
                     deck = resultSet.getString("deck");
                 }
                 final String result = deck;
-                callback.onQueryDone(result);
+                callback.accept(result);
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Failed to get deck for " + Bukkit.getPlayer(uuid).getName());
             }

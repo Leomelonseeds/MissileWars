@@ -38,7 +38,6 @@ import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -350,7 +349,7 @@ public class SchematicManager {
      * @param callback sync stuff to run after the map is generated
      * @return true if the schematic was generated successfully, otherwise false
      */
-    public static boolean spawnFAWESchematic(String schematicName, World world, String mapType, DBCallback callback) {
+    public static boolean spawnFAWESchematic(String schematicName, World world, String mapType, Runnable callback) {
         // Find schematic data from file
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
@@ -430,7 +429,7 @@ public class SchematicManager {
                     }
                     
                     // Start doing everything else
-                    callback.onQueryDone(null);
+                    callback.run();
                 });
             }
         });
@@ -446,7 +445,7 @@ public class SchematicManager {
      * @param x
      * @param world
      */
-    public static void clearTutorialLane(final int x, World world, DBCallback callback) {
+    public static void clearTutorialLane(final int x, World world, Runnable callback) {
         final int y = 12;
         final int zneg = -50;
         final int zpos = 50;
@@ -455,7 +454,7 @@ public class SchematicManager {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
                 Region region = new CuboidRegion(weWorld, BlockVector3.at(x - 2, y - 1, zneg), BlockVector3.at(x + 2, y + 1, zpos));
                 editSession.setBlocks(region, new BaseBlock(BukkitAdapter.adapt(Material.AIR.createBlockData())));
-                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.onQueryDone(null));
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.run());
             } 
         });
     }
@@ -473,11 +472,11 @@ public class SchematicManager {
      * @param world
      * @param callback code to run when finished. This is called using a BukkitTask. Can be null
      */
-    public static void setAirAsync(int x1, int y1, int z1, int x2, int y2, int z2, World world, DBCallback callback) {
+    public static void setAirAsync(int x1, int y1, int z1, int x2, int y2, int z2, World world, Runnable callback) {
         Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> {
             setAir(x1, y1, z1, x2, y2, z2, world);
             if (callback != null) {
-                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.onQueryDone(null));
+                Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> callback.run());
             }
         });
     }

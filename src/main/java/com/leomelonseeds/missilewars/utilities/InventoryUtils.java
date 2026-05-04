@@ -196,9 +196,8 @@ public class InventoryUtils {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Inventory inventory = player.getInventory();
         UUID uuid = player.getUniqueId();
-        plugin.getSQL().getInventory(uuid, result -> {
+        plugin.getSQL().getInventory(uuid, encodedString -> {
             try {
-                String encodedString = (String) result;
                 if (encodedString == null) {
                     return;
                 }

@@ -166,6 +166,10 @@ messages:
   list-unknown-player: "&c&l[!] &r&7That player hasn't played on this server before!"
   list-cannot-add-owner: "&c&l[!] &r&7You cannot add yourself or the arena owner to the %listtype%list!" 
   arena-blacklisted: "&c&l[!] &7You were &cblacklisted &7from %umw_arena%."
+  arena-already-started: "&c&l[!] &7The game has already started."
+  arena-action-offline: "&c&l[!] &7Cannot do this while the arena is offline!"
+  arena-no-game-to-end: "&c&l[!] &7There is no game to end."
+  arena-kick-all: "&7Kicking all players from the arena..."
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"

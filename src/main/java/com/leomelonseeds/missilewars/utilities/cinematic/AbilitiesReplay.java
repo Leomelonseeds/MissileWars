@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -85,8 +84,8 @@ public class AbilitiesReplay extends TutorialReplay {
     }
 
     @Override
-    protected void reset(DBCallback onFinish) {
-        SchematicManager.setAirAsync(136, 13, -4, 134, 11, -30, tutorialWorld, o -> onFinish.onQueryDone(null));
+    protected void reset(Runnable onFinish) {
+        SchematicManager.setAirAsync(136, 13, -4, 134, 11, -30, tutorialWorld, () -> onFinish.run());
     }
 
 }

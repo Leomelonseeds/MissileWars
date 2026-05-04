@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.listener.handler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,13 +15,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 
 @SuppressWarnings("deprecation")
 public class ChatPrompt implements Listener {
     
     private static Map<Player, ChatPrompt> instances = new HashMap<>();
-    private DBCallback callback;
+    private Consumer<String> callback;
     private BukkitTask timeout;
     private Player player;
     private MissileWarsPlugin plugin;
@@ -33,7 +33,7 @@ public class ChatPrompt implements Listener {
      * @param cancelmsg
      * @param callback
      */
-    public ChatPrompt(Player player, int time, DBCallback callback) {
+    public ChatPrompt(Player player, int time, Consumer<String> callback) {
         this.callback = callback;
         this.player = player;
         
@@ -64,7 +64,7 @@ public class ChatPrompt implements Listener {
     }
     
     private void callback(String name) {
-        callback.onQueryDone(name);
+        callback.accept(name);
     }
     
     private void stop() {

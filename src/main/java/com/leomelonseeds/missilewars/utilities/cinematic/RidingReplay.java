@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 public class RidingReplay extends TutorialReplay {
@@ -46,8 +45,8 @@ public class RidingReplay extends TutorialReplay {
     }
 
     @Override
-    protected void reset(DBCallback onFinish) {
-        SchematicManager.setAirAsync(165, 12, -49, 167, 13, -24, tutorialWorld, o -> onFinish.onQueryDone(null));
+    protected void reset(Runnable onFinish) {
+        SchematicManager.setAirAsync(165, 12, -49, 167, 13, -24, tutorialWorld, () -> onFinish.run());
     }
 
 }

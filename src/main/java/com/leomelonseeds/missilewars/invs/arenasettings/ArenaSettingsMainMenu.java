@@ -1,5 +1,10 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -9,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -16,6 +22,7 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 public class ArenaSettingsMainMenu extends MWInventory {
     
     private final static String mainSec = "arena-settings.main-menu";
+    private static Map<String, Consumer<MWInventory>> actions; // argument for consumer is THIS
     
     private boolean viewOnly;
     private Player player;
@@ -35,6 +42,7 @@ public class ArenaSettingsMainMenu extends MWInventory {
         this.viewOnly = viewOnly;
         this.itemConfig = ConfigUtils.getConfigFile("items.yml");
         this.fromInv = fromInv;
+        loadActions();
     }
 
     @SuppressWarnings("deprecation")
@@ -80,33 +88,63 @@ public class ArenaSettingsMainMenu extends MWInventory {
         }
         
         String key = InventoryUtils.getGUIFromItem(item);
-        if (key == null) {
+        if (key == null || !actions.containsKey(key)) {
             return;
         }
         
-        if (key.equals("visibility-settings")) {
+        if (!arena.isOnline() && Set.of("start-game", "end-game", "creative-mode", "kick-all").contains(key)) {
+            ConfigUtils.sendConfigMessage("arena-action-offline", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+        
+        
+        actions.get(key).accept(this);
+    }
+    
+    private void loadActions() {
+        if (actions != null) {
+            return;
+        }
+        
+        actions = new HashMap<>();
+        
+        actions.put("visibility-settings", t -> {
             new VisibilitySettings(player, viewOnly, arena, this);
-            return;
-        }
+        });
         
-        if (key.equals("map-selector")) {
+        actions.put("map-selector", t -> {
             new MapSelector(player, viewOnly, arena, this);
-            return;
-        }
+        });
         
-        if (key.equals("start-game")) {
-            arena.scheduleStart();
-            return;
-        }
+        actions.put("start-game", t -> {
+            if (arena.isStarted()) {
+                ConfigUtils.sendConfigMessage("arena-already-started", player);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            } else {
+                arena.scheduleStart();
+            }
+        });
         
-        if (key.equals("end-game")) {
-            if (arena.isRunning()) {
+        actions.put("end-game", t -> {
+            if (!arena.isStarted()) {
+                ConfigUtils.sendConfigMessage("arena-no-game-to-end", player);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            } else if (arena.isRunning()) {
                 arena.endGame(null);
             } else {
                 arena.cancelStart();
             }
-            
-            return;
-        }
+        });
+        
+        actions.put("kick-all", t -> {
+            new ConfirmAction("Kick All", player, t, res -> {
+                if (!res) {
+                    return;
+                }
+                
+                arena.getPlayers().forEach(uuid -> arena.removePlayer(uuid, true));
+            });
+        });
     }
 }

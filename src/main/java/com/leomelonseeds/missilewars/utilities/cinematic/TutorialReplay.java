@@ -16,7 +16,6 @@ import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
-import com.leomelonseeds.missilewars.utilities.db.DBCallback;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -84,7 +83,7 @@ public abstract class TutorialReplay {
      * 
      * @param onFinish call when reset is done
      */
-    protected abstract void reset(DBCallback onFinish);
+    protected abstract void reset(Runnable onFinish);
     
     /**
      * Start the replay in the world
@@ -114,7 +113,7 @@ public abstract class TutorialReplay {
                 MissileWarsPlugin.getPlugin(), () -> refreshEntity(), 0, 1);
         
         // Play the actions, then reset after things are done
-        ConfigUtils.schedule(play(), () -> reset(o -> {
+        ConfigUtils.schedule(play(), () -> reset(() -> {
             assign.cancel();
             bot.destroy();
             playing = false;

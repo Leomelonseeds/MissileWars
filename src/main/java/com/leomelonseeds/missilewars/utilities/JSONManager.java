@@ -69,13 +69,12 @@ public class JSONManager {
      * @param uuid
      */
     public void loadPlayer(UUID uuid) {
-        plugin.getSQL().getPlayerDeck(uuid, result -> {
+        plugin.getSQL().getPlayerDeck(uuid, jsonString -> {
             if (Bukkit.getPlayer(uuid) == null) {
                 return;
             }
             
             Player player = Bukkit.getPlayer(uuid);
-            String jsonString = (String) result;
             JSONObject newJson = new JSONObject();
             if (jsonString != null) {
                 newJson = new JSONObject(jsonString);

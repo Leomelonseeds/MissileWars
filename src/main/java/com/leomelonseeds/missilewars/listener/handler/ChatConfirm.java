@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.listener.handler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,14 +14,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
-import com.leomelonseeds.missilewars.invs.ConfirmCallback;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 @SuppressWarnings("deprecation")
 public class ChatConfirm implements Listener {
     
     private static Map<Player, ChatConfirm> instances = new HashMap<>();
-    private ConfirmCallback callback;
+    private Consumer<Boolean> callback;
     private BukkitTask timeout;
     private Player player;
     private String req;
@@ -28,7 +28,7 @@ public class ChatConfirm implements Listener {
     private MissileWarsPlugin plugin;
     private String cancelmsg;
     
-    public ChatConfirm(Player player, String req, int time, String cancelmsg, ConfirmCallback callback) {
+    public ChatConfirm(Player player, String req, int time, String cancelmsg, Consumer<Boolean> callback) {
         this(player, req, null, time, cancelmsg, callback);
     }
     
@@ -40,7 +40,7 @@ public class ChatConfirm implements Listener {
      * @param cancelmsg
      * @param callback
      */
-    public ChatConfirm(Player player, String req, String deny, int time, String cancelmsg, ConfirmCallback callback) {
+    public ChatConfirm(Player player, String req, String deny, int time, String cancelmsg, Consumer<Boolean> callback) {
         this.callback = callback;
         this.req = req;
         this.player = player;
@@ -53,7 +53,7 @@ public class ChatConfirm implements Listener {
         // Return if player already is in a chat window
         if (instances.containsKey(player)) {
             player.sendMessage(ConfigUtils.toComponent("&cYou already have an existing chat dialogue!"));
-            callback.onConfirm(false);
+            callback.accept(false);
             return;
         }
         
@@ -89,7 +89,7 @@ public class ChatConfirm implements Listener {
             player.sendMessage(ConfigUtils.toComponent("&c" + cancelmsg));
         }
         
-        callback.onConfirm(success);
+        callback.accept(success);
     }
     
     private boolean isCorrect(String supplied, String answer) {

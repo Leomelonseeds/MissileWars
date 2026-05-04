@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.invs;
 
+import java.util.function.Consumer;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -10,10 +12,10 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class ConfirmAction extends MWInventory {
     
-    private ConfirmCallback callback;
+    private Consumer<Boolean> callback;
     private MWInventory mwinv;
     
-    public ConfirmAction(String action, Player player, MWInventory mwinv, ConfirmCallback callback) {
+    public ConfirmAction(String action, Player player, MWInventory mwinv, Consumer<Boolean> callback) {
         super(player, 27, "Confirm - " + action);
         this.callback = callback;
         this.mwinv = mwinv;
@@ -55,9 +57,9 @@ public class ConfirmAction extends MWInventory {
         
         if (material == Material.EMERALD_BLOCK) {
             ConfigUtils.sendConfigSound("purchase-item", player);
-            callback.onConfirm(true);
+            callback.accept(true);
         } else if (material == Material.REDSTONE_BLOCK) {
-            callback.onConfirm(false);
+            callback.accept(false);
         }
     }
 }
