@@ -93,5 +93,20 @@ public class ArenaSettingsMainMenu extends MWInventory {
             new MapSelector(player, viewOnly, arena, this);
             return;
         }
+        
+        if (key.equals("start-game")) {
+            arena.scheduleStart();
+            return;
+        }
+        
+        if (key.equals("end-game")) {
+            if (arena.isRunning()) {
+                arena.endGame(null);
+            } else {
+                arena.cancelStart();
+            }
+            
+            return;
+        }
     }
 }

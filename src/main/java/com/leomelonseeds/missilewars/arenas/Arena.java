@@ -262,7 +262,7 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.getWorlds().remove(_world);
         
         // Cancel all tasks
-        cancelGame();
+        cancelGameTasks();
         ConfigUtils.cancelTask(spectatorActionBar);
         ConfigUtils.cancelTask(autoUnload);
         
@@ -511,7 +511,7 @@ public abstract class Arena implements ConfigurationSerializable {
     /**
      * Stops all async tasks from trackers and sets running to false
      */
-    public void cancelGame() {
+    public void cancelGameTasks() {
         tasks.forEach(t -> t.cancel());
         tasks.clear();
         tracker.stopAll();
@@ -1013,7 +1013,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * Equivalent to starting with the default timer
      */
     public void scheduleStart() {
-        scheduleStart(plugin.getConfig().getInt("lobby-wait-time"));
+        scheduleStart(getIntSetting(ArenaSetting.START_TIMER));
     }
     
     /**
@@ -1152,12 +1152,8 @@ public abstract class Arena implements ConfigurationSerializable {
             autoUnload = ConfigUtils.schedule(20 * 60 * 5, () -> unloadWorld());
         }
         
-        // Cancel if not running and there's enough time left
-        // Don't cancel game if its in the process of starting
-        if (!running && startTime != null && getSecondsUntilStart() >= 0 && 
-                getNumPlayers() < plugin.getConfig().getInt("minimum-players")) {
-            cancelGame();
-            startTime = null;
+        // Check if we can cancel a game that's about to start
+        if (getNumPlayers() < plugin.getConfig().getInt("minimum-players") && cancelStart()) {
             return;
         }
         
@@ -1166,6 +1162,23 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         autoEnd();
+    }
+    
+    /**
+     * Cancels the start of the game
+     * 
+     * @return if the game was about to start
+     */
+    public boolean cancelStart() {
+        // If the arena is already running, or no start time has been set, then do nothing
+        if (running || startTime == null) {
+            return false;
+        }
+        
+        cancelGameTasks();
+        startTime = null;
+        announceMessage("messages.lobby-countdown-cancelled", null);
+        return true;
     }
     
     protected void autoEnd() {
@@ -1673,7 +1686,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }             
 
         // Cancel all tasks
-        cancelGame();
+        cancelGameTasks();
         leftPlayers.clear();
         running = false;
         resetting = true;

@@ -2312,16 +2312,15 @@ arena-settings:
         - "&cClick &7to initiate the countdown"
         - "&7(specified by the 'Start Timer'"
         - "&7setting) to start a game."
-        - "&d» &d&oWork in progress, coming soon!"
     end-game:
       item: STONE_AXE
       name: "&cEnd Game"
       slot: 42
       lore:
         - ""
-        - "&cClick &7to immediately end any"
-        - "&7game in this arena in a tie."
-        - "&d» &d&oWork in progress, coming soon!"
+        - "&cClick &7to cancel a game start, or"
+        - "&7to immadiately end any game in"
+        - "&7this arena in a tie."
     creative-mode:
       item: FEATHER
       name: "&fToggle Creative Mode &8(requires &6&lDIVINE&8)"
