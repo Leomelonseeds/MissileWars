@@ -144,7 +144,8 @@ public class ArenaSettingsMainMenu extends MWInventory {
                 if (!res) {
                     return;
                 }
-                
+
+                ConfigUtils.sendConfigMessage("arena-kick-all", player);
                 for (UUID uuid : new ArrayList<>(arena.getPlayers())) {
                     if (!uuid.equals(player.getUniqueId())) {
                         arena.removePlayer(uuid, true);
