@@ -2187,6 +2187,19 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  other-settings:
+    game-mgmt:
+      item: CLOCK
+      name: "&eGame Management &f&l➡"
+      slot: 0
+    player-mgmt:
+      item: CLOCK
+      name: "&6Player/Team Management &f&l➡"
+      slot: 9
+    game-rule:
+      item: CLOCK
+      name: "&aGame Rules and Modifiers &f&l➡"
+      slot: 18
   map-selector:
     map:
       item: PAPER

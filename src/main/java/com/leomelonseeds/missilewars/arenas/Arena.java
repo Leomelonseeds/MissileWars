@@ -99,8 +99,8 @@ public abstract class Arena implements ConfigurationSerializable {
     protected LocalDateTime startTime;
     protected boolean running;
     protected boolean waitingForTie;
-    protected List<BukkitTask> tasks;
     protected boolean resetting;
+    protected List<BukkitTask> tasks;
     /** Task for automatically ending the game if no players are present */
     protected BukkitTask autoEnd;
     protected BukkitTask spectatorActionBar;
@@ -249,7 +249,6 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         Bukkit.getConsoleSender().sendMessage(ConfigUtils.toComponent("&2Unloading arena world: " + name + "..."));
-        settings.flush();
         
         // Unload world
         World _world = world;
@@ -261,9 +260,12 @@ public abstract class Arena implements ConfigurationSerializable {
         Bukkit.getWorlds().remove(_world);
         
         // Cancel all tasks
+        settings.flush();
         cancelGameTasks();
         ConfigUtils.cancelTask(spectatorActionBar);
         ConfigUtils.cancelTask(autoUnload);
+        startTime = null;
+        resetting = false;
         
         // Remove NPCs and holograms
         for (int id : npcs) {

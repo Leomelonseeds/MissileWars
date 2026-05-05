@@ -1,8 +1,10 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.bukkit.Material;
@@ -143,7 +145,11 @@ public class ArenaSettingsMainMenu extends MWInventory {
                     return;
                 }
                 
-                arena.getPlayers().forEach(uuid -> arena.removePlayer(uuid, true));
+                for (UUID uuid : new ArrayList<>(arena.getPlayers())) {
+                    if (!uuid.equals(player.getUniqueId())) {
+                        arena.removePlayer(uuid, true);
+                    }
+                }
             });
         });
     }
