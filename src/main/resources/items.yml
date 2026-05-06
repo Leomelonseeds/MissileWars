@@ -2193,11 +2193,11 @@ arena-settings:
       name: "&eGame Management &f&l➡"
       slot: 0
     player-mgmt:
-      item: CLOCK
+      item: PLAYER_HEAD
       name: "&6Player/Team Management &f&l➡"
       slot: 9
     game-rule:
-      item: CLOCK
+      item: CREEPER_SPAWN_EGG
       name: "&aGame Rules and Modifiers &f&l➡"
       slot: 18
   map-selector:
@@ -2325,7 +2325,7 @@ arena-settings:
         - "&7(Except stock options. We don't"
         - "&7have those, yet)"
         - ""
-        - "&d» &d&oWork in progress, coming soon!"
+        - "&cClick &7to edit."
     start-game:
       item: GOAT_HORN
       name: "&bStart Game"

@@ -119,6 +119,10 @@ public class ArenaSettingsMainMenu extends MWInventory {
             new MapSelector(player, viewOnly, arena, this);
         });
         
+        actions.put("other-settings", t -> {
+            new OtherSettings(player, viewOnly, arena, this);
+        });
+        
         actions.put("start-game", t -> {
             if (arena.isStarted()) {
                 ConfigUtils.sendConfigMessage("arena-already-started", player);

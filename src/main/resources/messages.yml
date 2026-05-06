@@ -25,7 +25,7 @@ messages:
   queue-join-red: "%umw_focus% &7has joined &cred&7!"
   queue-join-blue: "%umw_focus% &7has joined &9blue&7!"
   queue-join-error: "&cYou cannot join this team as the teams would be unbalanced."
-  queue-join-full: "&cSorry, this team is full! Use /spectate to spectate the game."
+  queue-join-full: "&cSorry, this game is full! Use /spectate to spectate the game."
   queue-join-time: "&cYou cannot queue at this time!"
   queue-deny-tourney: "&c&l[!] &7Only staff members may queue players in this arena."
   lobby-countdown-start: "The game will start in &c%umw_time% &7seconds."
@@ -108,7 +108,7 @@ messages:
   afk-removal: "&7%umw_focus% &7was removed from the arena for being AFK."
   afk-spectator: "&a&l[!] &7Since you were AFK, you have been automatically set to spectate."
   gg-exp: "&d+1 EXP"
-  start-failed: "&c&l[!] &cThe map failed to load! If you are in a private arena, select a different map. Otherwise, please contact an admin."
+  start-failed: "&c&l[!] &cThe map failed to load! If you are in a custom arena, select a different map. Otherwise, please contact an admin."
   portal-broke: "&5&l[!] &7A %team% &7portal was broken."
   cosmetic-locked: "&c&l[!] &cYou do not own this cosmetic."
   cosmetic-selected: "&a&l[!] &aCosmetic successfully selected."
@@ -170,6 +170,8 @@ messages:
   arena-action-offline: "&c&l[!] &7Cannot do this while the arena is offline!"
   arena-no-game-to-end: "&c&l[!] &7There is no game to end."
   arena-kick-all: "&7Kicking all players from the arena..."
+  joined-custom: "&a&l[!] &7You joined a custom arena. No stats will be affected."
+  only-join-queued-players: "&a&l[!] &7Only queued players will be joined to the game in this arena."
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"
@@ -567,7 +569,6 @@ settings:
         - "&7receive items twice as fast."
         - "&7&oDoes not affect random item"
         - "&7&odistribution mode."
-        - "&c[!] &7&oOnly changes on arena reset"
     RANDOM_ITEM_DISTRIBUTION_TIMER:
       type: "int"
       unit: "s"
@@ -575,7 +576,6 @@ settings:
         - "&7For random item distribution mode,"
         - "&7how fast between receiving each"
         - "&7item. Does not affect decks mode."
-        - "&c[!] &7&oOnly changes on arena reset"
     START_TIMER:
       type: "int"
       unit: "s"
@@ -593,7 +593,6 @@ settings:
       type: "boolean"
       description:
         - "&7Allows placing missiles sideways."
-        - "&c[!] &7&oOnly changes on arena reset"
     ENABLE_AIR_PLACE:
       type: "boolean"
       description:
@@ -601,14 +600,12 @@ settings:
         - "&7Missiles placed in mid-air spawn"
         - "&7closer to players and do not have"
         - "&7a preview."
-        - "&c[!] &7&oOnly changes on arena reset"
     IS_INFINITE_TIME:
       type: "boolean"
       description:
         - "&7Disables the game timer. The game"
         - "&7only ends if there aren't enough"
         - "&7players, or a team wins."
-        - "&c[!] &7&oOnly changes on arena reset"
     ENABLE_DECREASING_ITEM_TIMERS:
       type: "boolean"
       description:
@@ -616,7 +613,6 @@ settings:
         - "&710 minutes have passed, and reduce"
         - "&7by 50% after 20 minutes. Works in"
         - "&7both deck and random item modes."
-        - "&c[!] &7&oOnly changes on arena reset"
     ENABLE_RANDOM_ITEM_DISTRIBUTION:
       type: "boolean"
       description:
@@ -626,7 +622,6 @@ settings:
         - "&7Missile Wars gamemodes. You can"
         - "&7customize the random items using"
         - "&7the item to the right."
-        - "&c[!] &7&oOnly changes on arena reset"
     ENABLE_MULTIPLE_PORTALS:
       type: "boolean"
       description:
@@ -697,7 +692,7 @@ settings:
         - "&7for more than 2 minutes. This will"
         - "&7only happen if they are in-game, or"
         - "&7the game hasn't started yet."
-    ENABLE_POISON:
+    ENABLE_ALTITUDE_SICKNESS:
       type: "boolean"
       description:
         - "&7Players will receive Poison if"

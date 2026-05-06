@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
@@ -56,9 +55,13 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
 
-        ArenaManager manager = plugin.getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
+        Arena playerArena = null;
+        if (player.isOnline()) {
+            playerArena = plugin.getArenaManager().getArena(player.getLocation().getWorld());
+        }
         DecimalFormat df = new DecimalFormat("##.##");
+        String args[] = params.split("_");
+        String typeArg = args[0];
 
         // General purpose placeholders
         if (params.equals("focus")) {
@@ -70,7 +73,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return plugin.getCinematicManager().isWatching(target) ? "true" : "false";
         }
 
-        if (params.contains("team")) {
+        if (typeArg.equals("team")) {
             TeamName team = playerArena == null ? TeamName.NONE : playerArena.getTeam(player.getUniqueId());
             if (params.equals("team")) {
                 return team.toString();
@@ -80,7 +83,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             }
         }
         
-        if (params.contains("deck")) {
+        if (typeArg.equals("deck")) {
             // If the json hasn't finished loading yet what are ya gonna do
             JSONObject json = plugin.getJSON().getPlayer(player.getUniqueId());
             if (json == null) {
@@ -91,11 +94,16 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             if (params.equals("deck_plain")) {
                 return deck.toString();
             }
+
+            String preset = json.getString("Preset");
+            if (args.length == 1) {
+                return deck.getColor() + deck + "§7 [" + preset + "]";
+            }
             
             // umw_deck_npcname_[deck]
             // Changes based on player's selected deck
-            if (params.contains("npcname")) {
-                DeckStorage plDeck = DeckStorage.fromString(params.split("_")[2]);
+            if (args[1].equals("npcname")) {
+                DeckStorage plDeck = DeckStorage.fromString(args[2]);
                 String res = plDeck.getNPCName();
                 if (plDeck == deck) {
                     String stripped = ConfigUtils.removeColors(res);
@@ -107,14 +115,9 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 
                 return res;
             }
-
-            String preset = json.getString("Preset");
-            if (params.equals("deck")) {
-                return deck.getColor() + deck + "§7 [" + preset + "]";
-            }
             
             FileConfiguration sec = ConfigUtils.getConfigFile("items.yml");
-            String type = params.split("_")[1];
+            String type = args[1];
             String ability = json.getJSONObject(deck.toString()).getJSONObject(preset).getJSONObject(type).getString("selected");
             if (ability.equals("None")) {
                 return "None";
@@ -126,7 +129,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         // Rank placeholders
-        if (params.contains("rank_")) {
+        if (typeArg.equals("rank")) {
 
             int exp = plugin.getSQL().getExpSync(player.getUniqueId());
             int level = RankUtils.getRankLevel(exp);
@@ -160,7 +163,6 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             }
 
             if (params.contains("rank_progress_bar")) {
-                String[] args = params.split("_");
                 int size = Integer.parseInt(args[3]);
                 return RankUtils.getProgressBar(exp, size);
             }
@@ -169,10 +171,9 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         // Stats placeholders. Includes top 10 placeholders, which includes top 10 exp values.
-        if (params.contains("stats")) {
+        if (typeArg.equals("stats")) {
 
             SQLManager sql = plugin.getSQL();
-            String[] args = params.split("_");
             String gamemode = args[1];
             String stat = args[2];
 
@@ -203,15 +204,15 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         // umw_count_[type]
-        if (params.contains("count")) {
+        if (typeArg.equals("count")) {
             ArenaType type;
             try {
-                type = ArenaType.valueOf(params.split("_")[1].toUpperCase());
+                type = ArenaType.valueOf(args[1].toUpperCase());
             } catch (IllegalArgumentException e) {
                 return "0";
             }
             
-            return Integer.toString(manager.getPlayers(type));
+            return Integer.toString(plugin.getArenaManager().getPlayers(type));
         }
 
         if (params.equals("arena")) {
@@ -227,13 +228,12 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         // Arena specific placeholders
-        
-        if (params.contains("tutorial")) {
+        if (typeArg.equals("tutorial")) {
             if (!(playerArena instanceof TutorialArena)) {
                 return null;
             }
 
-            String arg = params.split("_")[1];
+            String arg = args[1];
             if (arg.equals("maxstages")) {
                 return TutorialArena.MAX_STAGES + "";
             }
@@ -243,7 +243,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return stage + "";
             }
             
-            int line = Integer.parseInt(params.split("_")[1]);
+            int line = Integer.parseInt(args[1]);
             if (stage == null) {
                 return "";
             }

@@ -14,11 +14,11 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;
@@ -343,8 +343,7 @@ public class OldDeckCustomizer extends MWInventory {
             return;
         }
         
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena instanceof TutorialArena &&
             presetjson.getJSONObject("missiles").getInt("warhead") == 2) {
             ((TutorialArena) arena).registerStageCompletion(player, 6);

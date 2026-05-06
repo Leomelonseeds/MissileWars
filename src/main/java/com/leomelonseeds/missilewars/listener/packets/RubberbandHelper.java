@@ -25,10 +25,10 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 
@@ -64,8 +64,7 @@ public class RubberbandHelper implements PacketListener, Listener {
         
         // Make sure player is in an arena
         Player player = event.getPlayer();
-        ArenaManager manager = plugin.getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
+        Arena playerArena = ArenaUtils.getArena(player);
         if (playerArena == null) {
             return;
         }

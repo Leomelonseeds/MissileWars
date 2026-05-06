@@ -39,6 +39,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -104,8 +105,7 @@ public class MiscListener implements Listener {
         MissileWarsPlugin.getPlugin().getJSON().savePlayer(player.getUniqueId());
         
         // Get Arena player is in and remove them
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena playerArena = manager.getArena(player.getUniqueId());
+        Arena playerArena = ArenaUtils.getArena(player);
         if (playerArena == null) {
             InventoryUtils.saveInventory(player, true);
             return;

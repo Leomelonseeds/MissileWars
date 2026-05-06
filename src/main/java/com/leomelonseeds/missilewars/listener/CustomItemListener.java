@@ -45,6 +45,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
@@ -242,9 +243,8 @@ public class CustomItemListener implements Listener {
 
             // Place structure
             if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), true, true)) {
-                ConfigUtils.sendConfigSound("spawn-missile", player);
                 // Missile cooldown
-                if (player.getGameMode() != GameMode.CREATIVE) {
+                if (playerArena.getBooleanSetting(ArenaSetting.ENABLE_MISSILE_COOLDOWN)) {
                     for (ItemStack i : player.getInventory().getContents()) {
                         if (i == null) continue;
                         Material material = i.getType();
@@ -254,10 +254,11 @@ public class CustomItemListener implements Listener {
                         }
                     }
                 }
+                ConfigUtils.sendConfigSound("spawn-missile", player);
                 InventoryUtils.consumeItem(player, playerArena, hand, -1);
                 mwp.incrementStat(MissileWarsPlayer.Stat.MISSILES);
                 
-                // Training arena things
+                // Tutorial arena things
                 if (playerArena instanceof TutorialArena tutorialArena) {
                     tutorialArena.registerStageCompletion(player, 1);
                     if (structureName.equals("warhead-2")) {

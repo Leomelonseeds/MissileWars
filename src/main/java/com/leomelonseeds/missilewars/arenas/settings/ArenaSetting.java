@@ -12,7 +12,7 @@ import com.leomelonseeds.missilewars.decks.DeckStorage;
 public enum ArenaSetting {
     
     // VISIBILITY SETTINGS
-    CAPACITY(20, "capacity", IntSettingModifier.create(2, 20, 2)),
+    CAPACITY(20, "capacity", IntSettingModifier.create(2, 20, 1)),
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online", true),
     
@@ -37,10 +37,10 @@ public enum ArenaSetting {
     ENABLE_AFK_KICK(true, "enable-afk-kick"),
     
     // Game rules and modifiers
-    ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
     ENABLE_AIR_PLACE(false, "enable-air-place"),
-    ENABLE_POISON(true, "enable-poison"),
+    ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),
+    ENABLE_ALTITUDE_SICKNESS(true, "enable-altitude-sickness"),
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
     ENABLE_FORCE_DECK(false, "force-deck"),

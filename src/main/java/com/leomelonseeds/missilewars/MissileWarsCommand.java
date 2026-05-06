@@ -31,6 +31,7 @@ import com.leomelonseeds.missilewars.invs.CosmeticMenu;
 import com.leomelonseeds.missilewars.invs.MapVoting;
 import com.leomelonseeds.missilewars.invs.deck.DeckInventory;
 import com.leomelonseeds.missilewars.invs.deck.OldPresetSelector;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -167,7 +168,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             Player player = (Player) sender;
-            Arena arena = arenaManager.getArena(player.getUniqueId());
+            Arena arena = ArenaUtils.getArena(player);
             if (arena == null) {
                 player.teleport(ConfigUtils.getSpawnLocation());
             } else {
@@ -182,7 +183,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
             
             Player player = (Player) sender;
-            Arena arena = arenaManager.getArena(player.getUniqueId());
+            Arena arena = ArenaUtils.getArena(player);
             if (arena == null || !(arena instanceof TutorialArena)) {
                 sendErrorMsg(player, "This command can only be used in the tutorial arena");
                 return true;
@@ -293,7 +294,7 @@ public class MissileWarsCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             // Ensure player is in an arena that is not running
-            Arena playerArena = arenaManager.getArena(player.getUniqueId());
+            Arena playerArena = ArenaUtils.getArena(player);
             if (playerArena == null) {
                 sendErrorMsg(player, "You are not in an arena!");
                 return true;
@@ -325,7 +326,7 @@ public class MissileWarsCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             // Try to find Arena
-            Arena arena = arenaManager.getArena(player.getUniqueId());
+            Arena arena = ArenaUtils.getArena(player);
             if (arena == null) {
                 sendErrorMsg(player, "You are not in an arena!");
                 return true;
@@ -623,7 +624,7 @@ public class MissileWarsCommand implements CommandExecutor {
         if (action.equalsIgnoreCase("Leave") && sender instanceof Player) {
 
             Player player = (Player) sender;
-            Arena arena = arenaManager.getArena(player.getUniqueId());
+            Arena arena = ArenaUtils.getArena(player);
             if (arena == null) {
                 sendErrorMsg(sender, "You must be in a game to do this!");
                 return true;
@@ -692,7 +693,7 @@ public class MissileWarsCommand implements CommandExecutor {
             if (args.length == 1) {
                 Player player = (Player) sender;
                 // Check if player is in arena
-                Arena arena = arenaManager.getArena(player.getUniqueId());
+                Arena arena = ArenaUtils.getArena(player);
                 if (arena == null) {
                     sendErrorMsg(sender, "You are not in an arena!");
                     return true;
@@ -726,7 +727,7 @@ public class MissileWarsCommand implements CommandExecutor {
             }
 
             // Check if player is in arena
-            Arena arena = arenaManager.getArena(target.getUniqueId());
+            Arena arena = ArenaUtils.getArena(target);
             if (arena == null) {
                 sendErrorMsg(sender, "Target is not in an arena");
                 return true;
@@ -812,7 +813,7 @@ public class MissileWarsCommand implements CommandExecutor {
         if (action.equalsIgnoreCase("Deck")) {
 
             Player player = (Player) sender;
-            Arena arena = arenaManager.getArena(player.getUniqueId());
+            Arena arena = ArenaUtils.getArena(player);
 
             if (!(arena == null || arena.getTeam(player.getUniqueId()) == TeamName.NONE)) {
                 sendErrorMsg(sender, "You cannot change decks while playing.");

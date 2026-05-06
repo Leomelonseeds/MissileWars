@@ -139,7 +139,7 @@ public class ArenaUtils {
             return null;
         }
         
-        return MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        return MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getWorld());
     }
 
     /**

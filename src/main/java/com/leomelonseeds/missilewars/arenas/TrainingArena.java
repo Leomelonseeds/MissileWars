@@ -93,9 +93,8 @@ public class TrainingArena extends ClassicArena {
     
     // Post-join actions that may differ by arena
     @Override
-    protected void postJoin(Player player, boolean asSpectator) { 
-        // Check for AFK
-        ConfigUtils.sendConfigMessage("messages.joined-training", player, null, null);
+    protected void postJoin(Player player, boolean asSpectator) {
+        ConfigUtils.sendConfigMessage("joined-training", player);
         
         // Auto-join team if setting turned on
         if (!player.hasPermission("umw.disableautoteam") && running) {
@@ -153,11 +152,6 @@ public class TrainingArena extends ClassicArena {
     public void resetWorld() {
         super.resetWorld();
         init();
-    }
-    
-    @Override
-    public String getTimeRemaining() {
-        return "§7Game ends in: §a∞";
     }
     
     @Override

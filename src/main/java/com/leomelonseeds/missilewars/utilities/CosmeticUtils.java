@@ -181,10 +181,10 @@ public class CosmeticUtils {
 
         // Portal count if flex
         if (format.equals("flex")) {
-            UUID killerID = killer.getUniqueId();
-            Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(killerID);
+            Arena arena = ArenaUtils.getArena(killer);
             SQLManager sql = MissileWarsPlugin.getPlugin().getSQL();
             if (arena != null) {
+                UUID killerID = killer.getUniqueId();
                 TeamName teamKiller = arena.getTeam(killerID);
                 if (teamKiller != brokeTeam) {
                     int portals = sql.getStatSync(killerID, "portals", "classic") + 

@@ -234,7 +234,7 @@ public class ArenaManager {
      */
     public Arena getArena(World world) {
         String worldName = world.getName();
-        if (!worldName.contains("mwarena_")) {
+        if (!worldName.startsWith("mwarena_")) {
             return null;
         }
         
@@ -347,6 +347,7 @@ public class ArenaManager {
         case TRAINING:
             arena = new TrainingArena();
             arena.getVoteManager().addMap("default-map");
+            arena.getArenaSettings().set(ArenaSetting.IS_INFINITE_TIME, true);
             break;
         case TUTORIAL:
             arena = new TutorialArena();

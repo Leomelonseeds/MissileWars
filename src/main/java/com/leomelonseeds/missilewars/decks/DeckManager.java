@@ -38,6 +38,8 @@ import net.kyori.adventure.text.Component;
 /** A class to manage Deck generation and selection. */
 public class DeckManager {
     
+    private static final Pattern placeholderPattern = Pattern.compile("%[^% ]+%");
+    
     private MissileWarsPlugin plugin;
     private final List<String> presets;
     private FileConfiguration itemsConfig;
@@ -322,13 +324,13 @@ public class DeckManager {
             }
             
             // Compile lore into single line
-            String line = "";
+            StringBuilder line = new StringBuilder();
             for (String s : lore) {
-                line = line + " " + s;
+                line.append(" ").append(s);
             }
             
-            // Match all instances of placeholders 
-            Matcher matcher = Pattern.compile("%[^% ]+%").matcher(line);
+            // Match all instances of placeholders
+            Matcher matcher = placeholderPattern.matcher(line);
             Set<String> matches = new HashSet<>();
             while (matcher.find()) {
                 matches.add(matcher.group());

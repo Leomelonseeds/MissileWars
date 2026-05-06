@@ -1067,7 +1067,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Experimental poison 
-        if (plugin.getConfig().getBoolean("experimental.poison")) {
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_ALTITUDE_SICKNESS)) {
             double toohigh = ConfigUtils.getMapNumber(arena.getGamemode(), arena.getMapName(), "too-high");
             if (from.getBlockY() <= toohigh - 1 && to.getBlockY() >= toohigh) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {

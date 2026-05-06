@@ -302,7 +302,7 @@ public class ConfigUtils {
     }
     
     /**
-     * Send the team a title at a given path. Path should not include "messages." or "titles."
+     * Send a player a title. Path should not include "messages." or "titles."
      *
      * @param path the path
      */
@@ -325,7 +325,7 @@ public class ConfigUtils {
         }
         
         // Janky way of including team-based placeholders
-        Arena a = MissileWarsPlugin.getPlugin().getArenaManager().getArena(player.getUniqueId());
+        Arena a = ArenaUtils.getArena(player);
         if (a != null) {
             if (a.getTeam(player.getUniqueId()) == TeamName.RED) {
                 if (subtitle.contains("umw_red")) {
@@ -379,8 +379,12 @@ public class ConfigUtils {
      */
     public static String getFocusName(OfflinePlayer player) {
         UUID uuid = player.getUniqueId();
-        Arena playerArena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(uuid);
-        String displayName = player.isOnline() ? toPlain(Bukkit.getPlayer(uuid).displayName()) : player.getName();
+        Player onlinePlayer = player.isOnline() ? Bukkit.getPlayer(uuid) : null;
+        Arena playerArena = null;
+        if (onlinePlayer != null) {
+            playerArena = ArenaUtils.getArena(onlinePlayer);
+        }
+        String displayName = onlinePlayer != null ? toPlain(onlinePlayer.displayName()) : player.getName();
         if (playerArena != null) {
             TeamName team = playerArena.getTeam(uuid);
             if (team != TeamName.NONE) {

@@ -416,7 +416,7 @@ public abstract class Arena implements ConfigurationSerializable {
             return false;
         }
         
-        if (!queue) {
+        if (!queue && world != null) {
             applySettingChange(setting, curValue, value);
         }
         return true;
@@ -440,8 +440,8 @@ public abstract class Arena implements ConfigurationSerializable {
         do {
             try {
                 Integer.parseInt(oldValue);
-                oldValue += "&b";
-                newValue += "&b";
+                oldValue = "&b" + oldValue;
+                newValue = "&b" + newValue;
                 break;
             } catch (NumberFormatException e) {
                 // Do nothing, continue
@@ -459,8 +459,8 @@ public abstract class Arena implements ConfigurationSerializable {
                 break;
             }
             
-            oldValue += "&d";
-            newValue += "&d";
+            oldValue = "&d" + oldValue;
+            newValue = "&d" + newValue;
         } while (false);
         
         Map<String, String> placeholders = Map.of(
@@ -771,6 +771,10 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return a formatted time with mm:ss
      */
     public String getTimeRemaining() {
+        if (getBooleanSetting(ArenaSetting.IS_INFINITE_TIME)) {
+            return "§7Game ends in: §a∞";
+        }
+        
         // Adjust for correct timings
         int seconds = Math.max((int) getSecondsRemaining(), 0);
         int untilNextStage;
@@ -796,7 +800,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return the number of player currently in the game
      */
     public int getNumPlayers() {
-        if (blueTeam == null || blueTeam.getSize() == 0) {
+        if (!running) {
             return players.size() - spectators.size();
         }
         return redTeam.getSize() + blueTeam.getSize();
@@ -913,29 +917,38 @@ public abstract class Arena implements ConfigurationSerializable {
             InventoryUtils.saveInventory(player, true);
         }
 
+        // Do stuff to the player
         player.teleport(getPlayerSpawn(player));
         InventoryUtils.clearInventory(player, true);
         ArenaUtils.updatePlayerBoots(player);
-        ConfigUtils.sendConfigMessage("messages.join-arena", player, this, null);
+        player.setHealth(ArenaUtils.getMaxHealth(player));
+        player.setFoodLevel(20);
+        player.setRespawnLocation(getPlayerSpawn(player), true);
+        player.setGameMode(GameMode.ADVENTURE);
+        players.put(uuid, new MissileWarsPlayer(uuid));
+        giveHeldItems(player);
 
+        // Send notification messages
+        ConfigUtils.sendConfigMessage("join-arena", player);
         for (MissileWarsPlayer mwPlayer : players.values()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-others", mwPlayer.getMCPlayer(), null, player);
         }
-
-        TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
-        discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
-
-        player.setHealth(ArenaUtils.getMaxHealth(player));
-        player.setFoodLevel(20);
-        players.put(uuid, new MissileWarsPlayer(uuid));
-        player.setRespawnLocation(getPlayerSpawn(player), true);
-        player.setGameMode(GameMode.ADVENTURE);
 
         for (Player worldPlayer : Bukkit.getWorld("world").getPlayers()) {
             ConfigUtils.sendConfigMessage("messages.joined-arena-lobby", worldPlayer, this, player);
         }
         
-        giveHeldItems(player);
+        if (isCustom()) {
+            ConfigUtils.sendConfigMessage("joined-custom", player);
+        }
+        
+        if (!running & getBooleanSetting(ArenaSetting.ONLY_JOIN_QUEUED_PLAYERS)) {
+            ConfigUtils.sendConfigMessage("only-join-queued-players", player);
+        }
+        
+        // Discord
+        TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();
+        discordChannel.sendMessage(":arrow_backward: " + player.getName() + " left and joined arena " + this.getName()).queue();
 
         // Check for game start
         postJoin(player, asSpectator);
@@ -945,32 +958,28 @@ public abstract class Arena implements ConfigurationSerializable {
     
     // Post-join actions that may differ by arena
     protected void postJoin(Player player, boolean asSpectator) { 
-        // Check for AFK
+        // Check for AFK or spectator to set as spectator
         Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-        if (ess.getUser(player).isAfk()) {
+        boolean isAfk = ess.getUser(player).isAfk();
+        if (isAfk || asSpectator) {
             addSpectator(player.getUniqueId());
-            ConfigUtils.sendConfigMessage("messages.afk-spectator", player, null, null);
-        }
-        
-        // Auto spectate if asSpectator
-        else if (asSpectator) {
-            addSpectator(player.getUniqueId());
+            if (isAfk) {
+                ConfigUtils.sendConfigMessage("afk-spectator", player);
+            }
+            return;
         }
         
         // Auto-join team if setting turned on
-        else if (!player.hasPermission("umw.disableautoteam") && running) {
-            int redSize = getRedTeam().getSize();
-            int blueSize = getBlueTeam().getSize();
-            if (redSize == blueSize) {
-                enqueue(player.getUniqueId(), Math.random() > 0.5 ? TeamName.RED : TeamName.BLUE);
-            } else {
-                enqueue(player.getUniqueId(), blueSize > redSize ? TeamName.RED : TeamName.BLUE);
-            }
+        if (running && !player.hasPermission("umw.disableautoteam")) {
+            int redSize = redTeam.getSize();
+            int blueSize = blueTeam.getSize();
+            boolean red = redSize == blueSize ? Math.random() > 0.5 : blueSize > redSize;
+            enqueue(player.getUniqueId(), red ? TeamName.RED : TeamName.BLUE);
+            return;
         }
        
-        else {
-            calculateRankMedian();
-        }
+        // Recalculate rank median if none of the above conditions apply
+        calculateRankMedian();
     }
     
     // Give player necessary items
@@ -1004,10 +1013,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is ready to auto-start
      */
     public void checkForStart() {
-        if (running || resetting) {
+        if (running || resetting || !getBooleanSetting(ArenaSetting.ENABLE_AUTO_START)) {
             return;
         }
-        int minPlayers = plugin.getConfig().getInt("minimum-players");
+        
+        int minPlayers = 2; // Maybe make this configurable?
         if (getNumPlayers() >= minPlayers) {
             scheduleStart();
         }
@@ -1124,7 +1134,6 @@ public abstract class Arena implements ConfigurationSerializable {
         player.setGameMode(GameMode.ADVENTURE);
         ArenaUtils.updatePlayerBoots(player);
         giveHeldItems(player);
-
         return true;
     }
     
@@ -1132,15 +1141,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is not empty, and cancels game end task if so
      */
     public void checkNotEmpty() {
-        if (!plugin.isEnabled()) {
+        if (!running) {
             return;
         }
         
-        if (!running || redTeam == null || blueTeam == null) {
-            return;
-        }
-        
-        if (redTeam.getSize() <= 0 || blueTeam.getSize() <= 0) {
+        if (redTeam.getSize() == 0 || blueTeam.getSize() == 0) {
             return;
         }
         
@@ -1157,15 +1162,14 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Check if we can cancel a game that's about to start
-        if (getNumPlayers() < plugin.getConfig().getInt("minimum-players") && cancelStart()) {
+        if (getNumPlayers() < 2 && cancelStart()) {
             return;
         }
         
-        if (!running || redTeam == null || blueTeam == null) {
-            return;
+        // Check if we can automatically end a game
+        if (running) {
+            autoEnd();
         }
-        
-        autoEnd();
     }
     
     /**
@@ -1186,20 +1190,27 @@ public abstract class Arena implements ConfigurationSerializable {
     }
     
     protected void autoEnd() {
-        if (redTeam.getSize() <= 0 && blueTeam.getSize() <= 0) {
+        // Don't auto end if the setting is false
+        // This check is here so that this setting could be overriden 
+        // by other arenas
+        if (!getBooleanSetting(ArenaSetting.END_IF_NO_PLAYERS)) {
+            return;
+        }
+        
+        if (redTeam.getSize() <= 0 && blueTeam.getSize() == 0) {
             endGame(null);
-        } else if (redTeam.getSize() <= 0) {
+        } else if (redTeam.getSize() == 0) {
             announceMessage("messages.red-team-empty", null);
             autoEnd = ConfigUtils.schedule(60 * 20, () -> {
-                if (running && redTeam.getSize() <= 0) {
+                if (running && redTeam.getSize() == 0) {
                     endGame(blueTeam);
                 }
             });
             tasks.add(autoEnd);
-        } else if (blueTeam.getSize() <= 0) {
+        } else if (blueTeam.getSize() == 0) {
             announceMessage("messages.blue-team-empty", null);
             autoEnd = ConfigUtils.schedule(60 * 20, () -> {
-                if (running && blueTeam.getSize() <= 0) {
+                if (running && blueTeam.getSize() == 0) {
                     endGame(redTeam);
                 }
             });
@@ -1221,7 +1232,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * Enqueue a player with a given UUID to a team
      *
      * @param uuid the Player's UUID
-     * @param team use "red" or "blue"
+     * @param team use RED or BLUE
      * @param force whether to allow uneven team sizes
      */
     public void enqueue(UUID uuid, TeamName team, boolean force) {
@@ -1241,37 +1252,41 @@ public abstract class Arena implements ConfigurationSerializable {
             Queue<MissileWarsPlayer> queue = isRed ? redQueue : blueQueue;
             Queue<MissileWarsPlayer> otherQueue = isRed ? blueQueue : redQueue;
             if (!queue.contains(player)) {
-                if (queue.size() >= getCapacity() / 2) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
-                } else {
-                    otherQueue.remove(player);
-                    queue.add(player);
-                    ConfigUtils.sendConfigMessage("messages.queue-waiting-" + team, mcPlayer, this, null);
-                    removeSpectator(player);
-                }
+                otherQueue.remove(player);
+                queue.add(player);
+                ConfigUtils.sendConfigMessage("messages.queue-waiting-" + team, mcPlayer, this, null);
+                removeSpectator(player);
             } else {
                 queue.remove(player);
                 ConfigUtils.sendConfigMessage("messages.queue-leave-" + team, mcPlayer, this, null);
             }
-        } else {
-            MissileWarsTeam joinTeam = isRed ? redTeam : blueTeam;
-            MissileWarsTeam otherTeam = isRed ? blueTeam : redTeam;
-            if (joinTeam.containsPlayer(uuid)) {
+            
+            return;
+        }
+        
+        MissileWarsTeam joinTeam = isRed ? redTeam : blueTeam;
+        MissileWarsTeam otherTeam = isRed ? blueTeam : redTeam;
+        if (joinTeam.containsPlayer(uuid)) {
+            return;
+        }
+        
+        if (!force) {
+            if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !getBooleanSetting(ArenaSetting.ENABLE_UNFAIR_TEAMS)) {
+                ConfigUtils.sendConfigMessage("queue-join-error", mcPlayer);
                 return;
             }
             
-            if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !force) {
-                ConfigUtils.sendConfigMessage("messages.queue-join-error", mcPlayer, this, null);
-            } else if (!mcPlayer.hasPermission("umw.joinfull") && joinTeam.getSize() >= getCapacity() / 2) {
+            if (joinTeam.getSize() + otherTeam.getSize() >= getCapacity()) {
                 ConfigUtils.sendConfigMessage("messages.queue-join-full", mcPlayer, this, null);
-            } else {
-                removeSpectator(player);
-                otherTeam.removePlayer(player);
-                joinTeam.addPlayer(player);
-                checkNotEmpty();
-                announceMessage("messages.queue-join-" + team, player);
+                return;
             }
         }
+
+        removeSpectator(player);
+        otherTeam.removePlayer(player);
+        joinTeam.addPlayer(player);
+        checkNotEmpty();
+        announceMessage("messages.queue-join-" + team, player);
     }
     
     /**
@@ -1282,7 +1297,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param uuid the Player's UUID
      * @param team use "red" or "blue"
      */
-    public void enqueue(UUID uuid, TeamName team) {
+    public final void enqueue(UUID uuid, TeamName team) {
         enqueue(uuid, team, false);
     }
     
@@ -1358,7 +1373,6 @@ public abstract class Arena implements ConfigurationSerializable {
         }, secCountdown * 20));
 
         // Schedule 30-second countdown
-        int cdNear = plugin.getConfig().getInt("lobby-countdown-near");
         for (int secInCd = secCountdown; secInCd > 0; secInCd--) {
             int finalSecInCd = secInCd;
             tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -1366,7 +1380,7 @@ public abstract class Arena implements ConfigurationSerializable {
                     return;
                 }
                 
-                if (finalSecInCd <= cdNear) {
+                if (finalSecInCd <= 5) {
                     announceMessage("messages.lobby-countdown-near", null);
                 }
                 
@@ -1380,11 +1394,12 @@ public abstract class Arena implements ConfigurationSerializable {
     }
 
     /**
-     * Starts a game in the arena with the classic arena. Different gamemodes and maps coming soon.
+     * Starts a game in the arena
      *
      * @return true if the game started. Otherwise false
      */
     public boolean start() {
+        // Don't start if already started
         if (running) {
             return false;
         }
@@ -1394,12 +1409,11 @@ public abstract class Arena implements ConfigurationSerializable {
 
         // Generate map.
         announceMessage("messages.starting", null);
-        return SchematicManager.spawnFAWESchematic(mapName, getWorld(), getGamemode(), () -> {
+        return SchematicManager.spawnFAWESchematic(mapName, world, getGamemode(), () -> {
             // Result will only run if map loading is a success
             // Acquire red and blue spawns
             FileConfiguration mapConfig = ConfigUtils.getConfigFile("maps.yml");
             Vector blueSpawnVec = SchematicManager.getVector(mapConfig, "blue-spawn", getGamemode(), mapName);
-            World world = getWorld();
             Location blueSpawn = new Location(world, blueSpawnVec.getX(), blueSpawnVec.getY(), blueSpawnVec.getZ());
             Vector redSpawnVec = SchematicManager.getVector(mapConfig, "red-spawn", getGamemode(), mapName);
             Location redSpawn = new Location(world, redSpawnVec.getX(), redSpawnVec.getY(), redSpawnVec.getZ());
@@ -1417,19 +1431,22 @@ public abstract class Arena implements ConfigurationSerializable {
             
             // Teleport all players to center to remove lobby minigame items/dismount
             for (MissileWarsPlayer player : players.values()) {
-                player.getMCPlayer().teleport(getPlayerSpawn(player.getMCPlayer()));
-                player.getMCPlayer().closeInventory();
+                Player mcPlayer = player.getMCPlayer();
+                mcPlayer.teleport(getPlayerSpawn(mcPlayer));
+                mcPlayer.closeInventory();
             }
             
             // Register teams and set running state to true
-            tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                // Checks if all players are spectating (and if there are no players)
-                if (spectators.size() == players.size()) {
-                    running = true;
-                    return;
-                }
+            tasks.add(ConfigUtils.schedule(5, () -> {
                 startTeams();
-            }, 5L));
+                
+                // If nobody is on any team for some reason (game was manually started or
+                // Only Join Queued Players is enabled and nobody queued), just set running
+                // to true with nobody we don't care
+                if (blueTeam.getSize() + redTeam.getSize() == 0) {
+                    running = true;
+                }
+            }));
             
             // Tint task if any player is in the other team's base
             if (virtualBorder == null) {
@@ -1485,41 +1502,47 @@ public abstract class Arena implements ConfigurationSerializable {
     protected void performTimeSetup() {
         BukkitScheduler scheduler = Bukkit.getScheduler();
         
-        // Stage 1 chaos
-        tasks.add(scheduler.runTaskLater(plugin, () -> {
-            blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
-            redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
-            announceMessage("messages.chaos1", null);
-        }, 600 * 20));
-        
-        // Stage 2 chaos
-        tasks.add(scheduler.runTaskLater(plugin, () -> {
-            blueTeam.setMultiplier(blueTeam.getMultiplier() * 2 / 3);
-            redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
-            announceMessage("messages.chaos2", null);
-        }, 1200 * 20));
-        
-        // Stage 3 chaos
-        tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 1500 * 20));
-
-        // Reminders 1 minute before the game ends
-        int[] reminderTimes = {1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
-        for (int i : reminderTimes) {
-            tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.game-end-reminder", null), i * 20));
+        // Chaos timers
+        if (getBooleanSetting(ArenaSetting.ENABLE_DECREASING_ITEM_TIMERS)) {
+            // Stage 1 chaos
+            tasks.add(scheduler.runTaskLater(plugin, () -> {
+                blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
+                redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
+                announceMessage("messages.chaos1", null);
+            }, 600 * 20));
+            
+            // Stage 2 chaos
+            tasks.add(scheduler.runTaskLater(plugin, () -> {
+                blueTeam.setMultiplier(blueTeam.getMultiplier() * 2 / 3);
+                redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
+                announceMessage("messages.chaos2", null);
+            }, 1200 * 20));
+            
+            // Stage 3 chaos
+            tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 1500 * 20));
         }
         
-        // Setup a tie
-        tasks.add(scheduler.runTaskLater(plugin, () -> {
-            int blue = blueTeam.getRemainingPortals();
-            int red = redTeam.getRemainingPortals();
-            if (blue > red) {
-                endGame(blueTeam);
-            } else if (red > blue) {
-                endGame(redTeam);
-            } else {
-                endGame(null);
+        // Auto end game
+        if (!getBooleanSetting(ArenaSetting.IS_INFINITE_TIME)) {
+            // Reminders 1 minute before the game ends
+            int[] reminderTimes = {1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
+            for (int i : reminderTimes) {
+                tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.game-end-reminder", null), i * 20));
             }
-        }, getSecondsRemaining() * 20));
+            
+            // Setup a tie
+            tasks.add(scheduler.runTaskLater(plugin, () -> {
+                int blue = blueTeam.getRemainingPortals();
+                int red = redTeam.getRemainingPortals();
+                if (blue > red) {
+                    endGame(blueTeam);
+                } else if (red > blue) {
+                    endGame(redTeam);
+                } else {
+                    endGame(null);
+                }
+            }, getSecondsRemaining() * 20));
+        }
     }
     
     /**
@@ -1531,8 +1554,8 @@ public abstract class Arena implements ConfigurationSerializable {
      * Assigns players and starts the teams
      */
     protected void startTeams() {
-        // Assign players to teams based on queue (which removes their items)
-        List<MissileWarsPlayer> toAssign = new ArrayList<>();
+        // Add all players except spectators to be assigned
+        Set<MissileWarsPlayer> toAssign = new HashSet<>();
         for (MissileWarsPlayer player : players.values()) {
             if (!spectators.contains(player)) {
                 toAssign.add(player);
@@ -1540,11 +1563,21 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Assign queued players. If a queue is larger than a team size put remaining
-        // players into the front of the queue to be assigned first into random teams
-        queueCount = Math.min(getCapacity(), toAssign.size());
-        double maxTeamSize = getCapacity() / 2;
-        double maxQueue = Math.ceil(toAssign.size() / 2.0);
-        Collections.shuffle(toAssign);
+        // players into the front of the queue to be assigned first into random teams.
+        // If unfair teams is enabled, set max queue size to be unreasonably large
+        int capacity = getCapacity();
+        int maxRedTeamSize = capacity / 2;
+        int maxBlueTeamSize = maxRedTeamSize;
+        if (capacity % 2 == 1) {
+            maxBlueTeamSize++;
+        }
+        double maxQueue = getBooleanSetting(ArenaSetting.ENABLE_UNFAIR_TEAMS) ?
+                Double.MAX_VALUE : 
+                Math.ceil(toAssign.size() / 2.0);
+        this.queueCount = getBooleanSetting(ArenaSetting.ONLY_JOIN_QUEUED_PLAYERS) ? 
+                redQueue.size() + blueQueue.size() : 
+                Math.min(capacity, toAssign.size());
+        List<MissileWarsPlayer> queueExtra = new ArrayList<>();
         while (!blueQueue.isEmpty() || !redQueue.isEmpty()) {
             if (!redQueue.isEmpty()) {
                 MissileWarsPlayer toAdd = redQueue.remove();
@@ -1552,7 +1585,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 if (redTeam.getSize() < maxQueue) {
                     redTeam.addPlayer(toAdd);
                 } else {
-                    toAssign.add(0, toAdd);
+                    queueExtra.add(toAdd);
                 }
             }
             if (!blueQueue.isEmpty()) {
@@ -1561,26 +1594,40 @@ public abstract class Arena implements ConfigurationSerializable {
                 if (blueTeam.getSize() < maxQueue) {
                     blueTeam.addPlayer(toAdd);
                 } else {
-                    toAssign.add(0, toAdd);
+                    queueExtra.add(toAdd);
                 }
+            }
+            
+            if (redTeam.getSize() + blueTeam.getSize() >= capacity) {
+                break;
             }
         }
 
-        // Assign remaining players
-        for (MissileWarsPlayer player : toAssign) {
-            if (blueTeam.getSize() <= redTeam.getSize()) {
-                if (blueTeam.getSize() >= maxTeamSize) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
+        // If non-queued players are allowed to join, add everyone else
+        if (!getBooleanSetting(ArenaSetting.ONLY_JOIN_QUEUED_PLAYERS)) {
+            List<MissileWarsPlayer> rest = new ArrayList<>(toAssign);
+            Collections.shuffle(rest);
+            queueExtra.addAll(rest);
+            for (MissileWarsPlayer player : queueExtra) {
+                if (blueTeam.getSize() <= redTeam.getSize()) {
+                    if (blueTeam.getSize() >= maxBlueTeamSize) {
+                        ConfigUtils.sendConfigMessage("queue-join-full", player.getMCPlayer());
+                    } else {
+                        blueTeam.addPlayer(player);
+                    }
                 } else {
-                    blueTeam.addPlayer(player);
-                }
-            } else {
-                if (redTeam.getSize() >= maxTeamSize) {
-                    ConfigUtils.sendConfigMessage("messages.queue-join-full", player.getMCPlayer(), null, null);
-                } else {
-                    redTeam.addPlayer(player);
+                    if (redTeam.getSize() >= maxRedTeamSize) {
+                        ConfigUtils.sendConfigMessage("queue-join-full", player.getMCPlayer());
+                    } else {
+                        redTeam.addPlayer(player);
+                    }
                 }
             }
+        } else {
+            List<MissileWarsPlayer> unqueued = new ArrayList<>();
+            unqueued.addAll(redQueue);
+            unqueued.addAll(blueQueue);
+            unqueued.forEach(player -> ConfigUtils.sendConfigMessage("queue-join-full", player.getMCPlayer()));
         }
 
         // Send messages
@@ -1727,9 +1774,13 @@ public abstract class Arena implements ConfigurationSerializable {
             SchematicManager.spawnNBTStructure(null, "pegasus-0", winningTeam.getSpawn(), isRed, false, false);
         }
 
-        // Send messages, calculate winning stats
+        // Send messages
         discordChannel.sendMessage(discordMessage).queue();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
+        
+        // Calculate stats for players
+        if (!isCustom()) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
+        }
 
         // Remove all players after a short time, then reset the world a bit after
         int waitTime = plugin.getConfig().getInt("victory-wait-time") * 20;
@@ -1785,9 +1836,9 @@ public abstract class Arena implements ConfigurationSerializable {
         int maxHeight = plugin.getConfig().getInt("max-height");
         int maxX = plugin.getConfig().getInt("barrier.center.x") - 1;
         tasks.add(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld());
+            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, world);
             plugin.log("First arena clear finished");
-            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, getWorld(), false);
+            SchematicManager.setAir(-250, -64, -250, maxX, maxHeight, 250, world, false);
             resetting = false;
             plugin.log("Reset completed");
             announceMessage("messages.arena-reset-complete", null);
@@ -1816,7 +1867,7 @@ public abstract class Arena implements ConfigurationSerializable {
          else {
         	FileConfiguration schematicConfig = ConfigUtils.getConfigFile("maps.yml");
             Vector spawnVec = SchematicManager.getVector(schematicConfig, "lobby.spawn");
-            Location spawnLoc = new Location(getWorld(), spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            Location spawnLoc = new Location(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
             spawnLoc.setYaw(90);
             return spawnLoc;
         }
@@ -1856,12 +1907,12 @@ public abstract class Arena implements ConfigurationSerializable {
     /**
      * @return a list of players who are in red and blue teams
      */
-    protected Set<MissileWarsPlayer> getInGamePlayers() {
+    protected List<MissileWarsPlayer> getInGamePlayers() {
         if (redTeam == null || blueTeam == null) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         
-        Set<MissileWarsPlayer> ret = new HashSet<>(redTeam.getMembers());
+        List<MissileWarsPlayer> ret = new ArrayList<>(redTeam.getMembers());
         ret.addAll(blueTeam.getMembers());
         return ret;
     }

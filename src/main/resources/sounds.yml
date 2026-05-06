@@ -270,3 +270,7 @@ lobby-countdown-cancelled:
   sound: "BLOCK_NOTE_BLOCK_BASS"
   volume: 1.0
   pitch: 1.0
+start-failed:
+  sound: "BLOCK_NOTE_BLOCK_BASS"
+  volume: 1.0
+  pitch: 1.0

@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
-import com.leomelonseeds.missilewars.arenas.ArenaManager;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -46,8 +45,7 @@ public class OldPresetSelector extends MWInventory {
     @Override
     public void updateInventory() {
         // Register stage completion if player selects non-sentinel kit
-        ArenaManager manager = MissileWarsPlugin.getPlugin().getArenaManager();
-        Arena arena = manager.getArena(player.getUniqueId());
+        Arena arena = ArenaUtils.getArena(player);
         if (arena instanceof TutorialArena && playerJson.getString("Deck").equals("Berserker")) {
             ((TutorialArena) arena).registerStageCompletion(player, 5);
         }

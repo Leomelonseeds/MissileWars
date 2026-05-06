@@ -1,11 +1,10 @@
 package com.leomelonseeds.missilewars.arenas.teams;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,8 +60,8 @@ public class MissileWarsTeam {
 
     private TeamName name;
     private Arena arena;
-    private Set<MissileWarsPlayer> members;
     private Location spawn;
+    private Map<UUID, MissileWarsPlayer> members;
     private Map<Location, ClassicPortal> portals;
     private int shieldBlocksBroken;
     private int shieldVolume;
@@ -77,7 +76,7 @@ public class MissileWarsTeam {
      */
     public MissileWarsTeam(TeamName name, Arena arena, Location spawn) {
         this.name = name;
-        this.members = new HashSet<>();
+        this.members = new HashMap<>();
         this.portals = new HashMap<>();
         this.spawn = spawn;
         this.arena = arena;
@@ -129,8 +128,8 @@ public class MissileWarsTeam {
     /**
      * @return an unmodifiable view of  the current members of the team
      */
-    public Set<MissileWarsPlayer> getMembers() {
-        return Collections.unmodifiableSet(members);
+    public Collection<MissileWarsPlayer> getMembers() {
+        return Collections.unmodifiableCollection(members.values());
     }
 
     /**
@@ -167,7 +166,7 @@ public class MissileWarsTeam {
      * @return true if the player is on this team
      */
     public boolean containsPlayer(UUID uuid) {
-        return members.stream().anyMatch(p -> p.getMCPlayerId().equals(uuid));
+        return members.containsKey(uuid);
     }
 
     /**
@@ -177,7 +176,7 @@ public class MissileWarsTeam {
      */
     public void addPlayer(MissileWarsPlayer player) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        members.add(player);
+        members.put(player.getMCPlayerId(), player);
 
         // TP to team spawn and give armor
         Player mcPlayer = player.getMCPlayer();
@@ -279,11 +278,11 @@ public class MissileWarsTeam {
      */
     public void broadcastConfigMsg(String path, MissileWarsPlayer focus) {
         if (focus != null) {
-            for (MissileWarsPlayer player : members) {
+            for (MissileWarsPlayer player : members.values()) {
                 ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus.getMCPlayer());
             }
         } else {
-            for (MissileWarsPlayer player : members) {
+            for (MissileWarsPlayer player : members.values()) {
                 ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, null);
             }
         }
@@ -310,12 +309,13 @@ public class MissileWarsTeam {
      * @param player the player to remove
      */
     public void removePlayer(MissileWarsPlayer player) {
-        if (!members.contains(player)) {
+        UUID uuid = player.getMCPlayerId();
+        if (containsPlayer(uuid)) {
             return;
         }
         
     	Player mcPlayer = player.getMCPlayer();
-        members.remove(player);
+        members.remove(uuid);
         InventoryUtils.clearInventory(mcPlayer);
         player.stopDeck();
         player.resetPlayer();
@@ -335,7 +335,7 @@ public class MissileWarsTeam {
         }
         
         if (arena.isRunning()) {
-            arena.addLeft(player.getMCPlayerId());
+            arena.addLeft(uuid);
             arena.applyMultipliers(); // Check for cooldowns
         }
     }
@@ -480,7 +480,7 @@ public class MissileWarsTeam {
      */
     public void sendTitle(String path) {
         // Send titles to players
-        for (MissileWarsPlayer member : members) {
+        for (MissileWarsPlayer member : members.values()) {
         	Player player = member.getMCPlayer();
             ConfigUtils.sendTitle(path, player);
         }
@@ -492,7 +492,7 @@ public class MissileWarsTeam {
      * @param path the path
      */
     public void sendSound(String path) {
-    	for (MissileWarsPlayer member : members) {
+    	for (MissileWarsPlayer member : members.values()) {
     		Player player = member.getMCPlayer();
     		ConfigUtils.sendConfigSound(path, player);
     	}
