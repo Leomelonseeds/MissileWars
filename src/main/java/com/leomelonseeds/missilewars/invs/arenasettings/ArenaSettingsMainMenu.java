@@ -112,15 +112,15 @@ public class ArenaSettingsMainMenu extends MWInventory {
         actions = new HashMap<>();
         
         actions.put("visibility-settings", t -> {
-            new VisibilitySettings(player, viewOnly, arena, this);
+            new VisibilitySettings(player, viewOnly, arena, t);
         });
         
         actions.put("map-selector", t -> {
-            new MapSelector(player, viewOnly, arena, this);
+            new MapSelector(player, viewOnly, arena, t);
         });
         
         actions.put("other-settings", t -> {
-            new OtherSettings(player, viewOnly, arena, this);
+            new OtherSettings(player, viewOnly, arena, t);
         });
         
         actions.put("start-game", t -> {
