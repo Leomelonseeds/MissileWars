@@ -1,11 +1,8 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,7 +21,7 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 public class ArenaSettingsMainMenu extends MWInventory {
     
     private final static String mainSec = "arena-settings.main-menu";
-    private static Map<String, Consumer<MWInventory>> actions; // argument for consumer is THIS
+    private final static Set<String> requireOnline = Set.of("start-game", "end-game", "creative-mode", "kick-all");
     
     private boolean viewOnly;
     private Player player;
@@ -44,7 +41,6 @@ public class ArenaSettingsMainMenu extends MWInventory {
         this.viewOnly = viewOnly;
         this.itemConfig = ConfigUtils.getConfigFile("items.yml");
         this.fromInv = fromInv;
-        loadActions();
     }
 
     @SuppressWarnings("deprecation")
@@ -90,49 +86,43 @@ public class ArenaSettingsMainMenu extends MWInventory {
         }
         
         String key = InventoryUtils.getGUIFromItem(item);
-        if (key == null || !actions.containsKey(key)) {
+        if (key == null) {
             return;
         }
         
-        if (!arena.isOnline() && Set.of("start-game", "end-game", "creative-mode", "kick-all").contains(key)) {
+        if (!arena.isOnline() && requireOnline.contains(key)) {
             ConfigUtils.sendConfigMessage("arena-action-offline", player);
             ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             return;
         }
         
-        
-        actions.get(key).accept(this);
-    }
-    
-    private void loadActions() {
-        if (actions != null) {
+        if (key.equals("visibility-settings")) {
+            new VisibilitySettings(player, viewOnly, arena, this);
+            return;
+        }
+
+        if (key.equals("map-selector")) {
+            new MapSelector(player, viewOnly, arena, this);
             return;
         }
         
-        actions = new HashMap<>();
+        if (key.equals("other-settings")) {
+            new OtherSettings(player, viewOnly, arena, this);
+            return;
+        }
         
-        actions.put("visibility-settings", t -> {
-            new VisibilitySettings(player, viewOnly, arena, t);
-        });
-        
-        actions.put("map-selector", t -> {
-            new MapSelector(player, viewOnly, arena, t);
-        });
-        
-        actions.put("other-settings", t -> {
-            new OtherSettings(player, viewOnly, arena, t);
-        });
-        
-        actions.put("start-game", t -> {
+        if (key.equals("start-game")) {
             if (arena.isStarted()) {
                 ConfigUtils.sendConfigMessage("arena-already-started", player);
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             } else {
                 arena.scheduleStart();
             }
-        });
+            
+            return;
+        }
         
-        actions.put("end-game", t -> {
+        if (key.equals("end-game")) {
             if (!arena.isStarted()) {
                 ConfigUtils.sendConfigMessage("arena-no-game-to-end", player);
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
@@ -141,10 +131,12 @@ public class ArenaSettingsMainMenu extends MWInventory {
             } else {
                 arena.cancelStart();
             }
-        });
+            
+            return;
+        }
         
-        actions.put("kick-all", t -> {
-            new ConfirmAction("Kick All", player, t, res -> {
+        if (key.equals("kick-all")) {
+            new ConfirmAction("Kick All", player, this, res -> {
                 if (!res) {
                     return;
                 }
@@ -156,6 +148,8 @@ public class ArenaSettingsMainMenu extends MWInventory {
                     }
                 }
             });
-        });
+            
+            return;
+        }
     }
 }
