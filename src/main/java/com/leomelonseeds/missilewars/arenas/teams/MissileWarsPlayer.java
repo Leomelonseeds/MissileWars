@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -43,6 +42,7 @@ public class MissileWarsPlayer {
     }
 
     private UUID playerId;
+    private Player player;
     private Deck deck;
     private Map<Stat, Integer> stats;
     private List<BukkitTask> tasks;
@@ -60,8 +60,9 @@ public class MissileWarsPlayer {
      *
      * @player the Minecraft player
      */
-    public MissileWarsPlayer(UUID playerID) {
-        this.playerId = playerID;
+    public MissileWarsPlayer(Player player) {
+        this.playerId = player.getUniqueId();
+        this.player = player;
         this.stats = new HashMap<>();
         this.tasks = new ArrayList<>();
         resetPlayer();
@@ -94,7 +95,6 @@ public class MissileWarsPlayer {
 
     // EXP bar cooldown preview + out of bounds handling
     private void cooldownPreview(Arena arena) {
-        Player player = getMCPlayer();
         tasks.add(new BukkitRunnable() {
             
             ItemStack lastItem = null;
@@ -171,8 +171,7 @@ public class MissileWarsPlayer {
      */
     public void setDeck(Deck deck) {
         this.deck = deck;
-        Player player = getMCPlayer();
-        if (player == null) {
+        if (!player.isOnline()) {
             return;
         }
         
@@ -216,8 +215,6 @@ public class MissileWarsPlayer {
      * @param joinedBefore
      */
     public void initDeck(boolean joinedBefore, Arena arena, boolean isRed) {
-        Player player = getMCPlayer(); // Not null due to check in arena
-
         // Game start randomizer
         List<Integer> cooldowns = new ArrayList<>();
         for (int i = 0; i <= 4; i++) {
@@ -255,8 +252,6 @@ public class MissileWarsPlayer {
     }
  
     /**
-     * Get the user's currently selected {@link Deck}.
-     *
      * @return the user's currently selected {@link Deck}
      */
     public Deck getDeck() {
@@ -264,8 +259,6 @@ public class MissileWarsPlayer {
     }
 
     /**
-     * Obtain the UUID of the Minecraft player associated with the MissileWarsPlayer.
-     *
      * @return the UUID of the Minecraft player associated with the MissileWarsPlayer
      */
     public UUID getMCPlayerId() {
@@ -273,12 +266,10 @@ public class MissileWarsPlayer {
     }
 
     /**
-     * Return the MC player this MissileWarsPlayer represents.
-     *
      * @return the MC player this MissileWarsPlayer represents
      */
     public Player getMCPlayer() {
-        return Bukkit.getPlayer(playerId);
+        return player;
     }
     
     /**
@@ -316,8 +307,8 @@ public class MissileWarsPlayer {
      */
     public void stopDeck() {
         tasks.forEach(t -> t.cancel());
-        if (getMCPlayer() != null) {
-            getMCPlayer().sendActionBar(ConfigUtils.toComponent(""));
+        if (player.isOnline()) {
+            player.sendActionBar(ConfigUtils.toComponent(""));
         }
         tasks.clear();
         
@@ -343,8 +334,7 @@ public class MissileWarsPlayer {
     /** Resets missile preview and deck actionbar for {@link MissileWarsPlayer} */
     public void resetTasks() {
         tasks.forEach(t -> t.cancel());
-        Player player = getMCPlayer();
-        if (player != null) {
+        if (player.isOnline()) {
             player.sendActionBar(ConfigUtils.toComponent(""));
         }
         tasks.clear();

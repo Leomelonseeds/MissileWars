@@ -38,12 +38,13 @@ public class RandomItem implements ConfigurationSerializable {
         this.uuid = UUID.randomUUID();
     }
     
-    @Override
-    public RandomItem clone() {
-        RandomItem clone = this.clone();
-        clone.uuid = UUID.randomUUID();
-        clone.item = this.item.clone();
-        return clone;
+    public RandomItem(RandomItem other) {
+        this.id = other.id;
+        this.item = other.item.clone();
+        this.weight = other.weight;
+        this.max = other.max;
+        this.amount = other.amount;
+        this.uuid = UUID.randomUUID();
     }
 
     @Override

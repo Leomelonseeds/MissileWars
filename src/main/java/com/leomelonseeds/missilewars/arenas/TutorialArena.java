@@ -138,7 +138,7 @@ public class TutorialArena extends ClassicArena {
      * @param player
      */
     public void softJoin(Player player) {
-        players.put(player.getUniqueId(), new MissileWarsPlayer(player.getUniqueId()));
+        players.put(player.getUniqueId(), new MissileWarsPlayer(player));
     }
     
     @Override

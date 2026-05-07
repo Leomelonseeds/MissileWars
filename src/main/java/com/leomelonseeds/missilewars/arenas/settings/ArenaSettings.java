@@ -31,7 +31,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     public ArenaSettings() {
         this.currentSettings = new HashMap<>();
         this.queue = new HashMap<>();
-        this.randomItemDistributor = new RandomItemDistributor();
+        this.randomItemDistributor = new RandomItemDistributor(this);
         this.selectedMaps = new HashSet<>();
         this.playerBlacklist = new TreeSet<>(comp);
         this.playerWhitelist = new TreeSet<>(comp);
@@ -49,7 +49,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.playerWhitelist = new TreeSet<>(other.playerWhitelist);
         this.selectedMaps = new HashSet<>(other.selectedMaps);
         if (other.randomItemDistributor != null) {
-            this.randomItemDistributor = other.randomItemDistributor.clone();
+            this.randomItemDistributor = new RandomItemDistributor(other.randomItemDistributor, this);
         }
     }
     
@@ -116,6 +116,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         
         if (settings.containsKey("random-item-distributor")) {
             randomItemDistributor = (RandomItemDistributor) settings.get("random-item-distributor");
+            randomItemDistributor.setArenaSettings(this);
         }
         
         this.queue = new HashMap<>();

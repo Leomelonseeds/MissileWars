@@ -925,7 +925,7 @@ public abstract class Arena implements ConfigurationSerializable {
         player.setFoodLevel(20);
         player.setRespawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
-        players.put(uuid, new MissileWarsPlayer(uuid));
+        players.put(uuid, new MissileWarsPlayer(player));
         giveHeldItems(player);
 
         // Send notification messages
@@ -1385,9 +1385,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 }
                 
                 for (MissileWarsPlayer player : players.values()) {
-                    if (player.getMCPlayer() != null) {
-                        player.getMCPlayer().setLevel(finalSecInCd);
-                    }
+                    player.getMCPlayer().setLevel(finalSecInCd);
                 }
             }, (secCountdown - secInCd) * 20));
         }

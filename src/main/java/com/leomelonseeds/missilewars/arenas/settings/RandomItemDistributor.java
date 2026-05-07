@@ -6,49 +6,43 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+
+import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 
 public class RandomItemDistributor implements ConfigurationSerializable {
     
-    private final int DEFAULT_TIMER = (int) ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER.getDefaultValue();
-    
-    private int timer;
-    private boolean isBagDistribution;
-    private boolean disableXpTimer;
+    // Unfortunately we do need to reference these settings
+    private ArenaSettings settings;
     private List<RandomItem> items;
     private List<RandomItem> curItems;
     private int totalWeight;
     
-    public RandomItemDistributor() {
-        this.timer = DEFAULT_TIMER;
+    public RandomItemDistributor(ArenaSettings settings) {
+        this.settings = settings;
         this.items = new ArrayList<>();
         this.curItems = new ArrayList<>();
     }
     
-    @Override
-    public RandomItemDistributor clone() {
-        RandomItemDistributor clone = this.clone();
-        clone.curItems = new ArrayList<>();
-        clone.items = new ArrayList<>();
-        items.forEach(ri -> clone.items.add(ri.clone()));
-        return clone;
+    public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
+        this.settings = settings;
+        this.curItems = new ArrayList<>();
+        this.items = new ArrayList<>();
+        other.items.forEach(ri -> this.items.add(new RandomItem(ri)));
     }
  
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> distributor = new HashMap<>();
-        distributor.put("timer", timer);
-        distributor.put("is-bag-distribution", isBagDistribution);
-        distributor.put("disable-xp-timer", disableXpTimer);
         distributor.put("items", items);
         return distributor;
     }
     
     @SuppressWarnings("unchecked")
     public RandomItemDistributor(Map<String, Object> distributor) {
-        this.timer = (int) distributor.get("timer");
-        this.isBagDistribution = (boolean) distributor.get("is-bag-distribution");
-        this.disableXpTimer = (boolean) distributor.get("disableXpTimer");
         this.items = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
     }
@@ -78,7 +72,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             }
         }
         
-        if (isBagDistribution) {
+        if (useBagDistribution()) {
             RandomItem toGive = curItems.remove(i);
             totalWeight -= toGive.getWeight();
             return toGive;
@@ -86,25 +80,31 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             
         return curItems.get(i);
     }
-
-    public int getTimer() {
-        return timer;
+    
+    public void giveNextItem(List<MissileWarsPlayer> players) {
+        RandomItem nextItem = getNextItem();
+        ItemStack toGive = nextItem.getItem();
+        ItemMeta meta = toGive.getItemMeta();
+        for (MissileWarsPlayer mwp : players) {
+            PlayerInventory inv = mwp.getMCPlayer().getInventory();
+            if (inv.containsAtLeast(toGive, nextItem.getMax())) {
+                continue;
+            }
+            
+            
+        }
     }
 
-    public void setTimer(int timer) {
-        this.timer = timer;
+    private int getTimer() {
+        return (int) settings.get(ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER);
     }
 
-    public void setBagDistribution(boolean isBagDistribution) {
-        this.isBagDistribution = isBagDistribution;
+    private boolean useBagDistribution() {
+        return (boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION);
     }
 
-    public boolean isDisableXpTimer() {
-        return disableXpTimer;
-    }
-
-    public void setDisableXpTimer(boolean disableXpTimer) {
-        this.disableXpTimer = disableXpTimer;
+    private boolean useXPTimer() {
+        return (boolean) settings.get(ArenaSetting.RANDOM_ITEM_XP_TIMER);
     }
     
     public void addItem(RandomItem item) {
@@ -117,5 +117,9 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     public void clearItems() {
         this.items.clear();
+    }
+    
+    public void setArenaSettings(ArenaSettings settings) {
+        this.settings = settings;
     }
 }

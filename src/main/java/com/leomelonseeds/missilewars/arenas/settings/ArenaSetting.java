@@ -17,11 +17,19 @@ public enum ArenaSetting {
     IS_ALWAYS_ONLINE(true, "always-online", true),
     
     // ITEM SETTINGS
-    ITEM_MULTIPLIER(100, "item-multiplier", IntSettingModifier.create(50, 300, 10)), // As a percentage
-    RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
+    // Global
     ENABLE_DECREASING_ITEM_TIMERS(true, "enable-decreasing-item-timers"),
     ENABLE_RANDOM_ITEM_DISTRIBUTION(false, "enable-random-item-distribution"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
+    
+    // Deck
+    DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(50, 300, 10)), // As a percentage
+    
+    // Random
+    RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
+    RANDOM_ITEM_BAG_DISTRIBUTION(true, "random-item-bag-distribution"),
+    RANDOM_ITEM_INVENTORY_LIMIT(true, "random-item-inventory-limit"),
+    RANDOM_ITEM_XP_TIMER(true, "random-item-xp-timer"),
     
     // MISC SETTINGS:
     // Game management
