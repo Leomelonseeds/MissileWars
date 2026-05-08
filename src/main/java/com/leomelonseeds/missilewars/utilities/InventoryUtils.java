@@ -46,6 +46,7 @@ public class InventoryUtils {
     public static final NamespacedKey HELD_KEY = new NamespacedKey(plugin, "held");
     public static final NamespacedKey COSMETIC_KEY = new NamespacedKey(plugin, "name");
     public static final NamespacedKey PRESET_KEY = new NamespacedKey(plugin, "preset");
+    public static final NamespacedKey UUID_KEY = new NamespacedKey(plugin, "random-item-uuid");
     
     /**
      * @param i
@@ -362,6 +363,12 @@ public class InventoryUtils {
         item.setItemMeta(meta);
         backItem = item;
         return item;
+    }
+    
+    public static void setMetaString(ItemStack item, NamespacedKey key, String data) {
+        ItemMeta meta = item.getItemMeta();
+        setMetaString(meta, key, data);
+        item.setItemMeta(meta);
     }
     
     public static void setMetaString(ItemMeta meta, NamespacedKey key, String data) {

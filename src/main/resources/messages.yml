@@ -172,6 +172,8 @@ messages:
   arena-kick-all: "&7Kicking all players from the arena..."
   joined-custom: "&a&l[!] &7You joined a custom arena. No stats will be affected."
   only-join-queued-players: "&a&l[!] &7Only queued players will be joined to the game in this arena."
+  random-item-global-limit: "&cYou didn't get %item% &csince you have too many items!"
+  random-item-limit: "&cYou already have the maximum amount of %item%&c!"
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"

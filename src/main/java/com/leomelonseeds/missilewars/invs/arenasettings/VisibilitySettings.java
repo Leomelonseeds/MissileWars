@@ -6,7 +6,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
@@ -41,9 +40,7 @@ public class VisibilitySettings extends ArenaSettingsInventory {
         for (String key : itemSection.getKeys(false)) {
             String sec = configSec + "." + key;
             ItemStack item = InventoryUtils.createItem(sec);
-            ItemMeta meta = item.getItemMeta();
-            InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, key);
-            item.setItemMeta(meta);
+            InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);
             inv.setItem(itemSection.getInt(key + ".slot"), item);
         }
     }

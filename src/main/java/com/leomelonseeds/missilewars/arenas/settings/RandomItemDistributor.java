@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     // Unfortunately we do need to reference these settings
     private ArenaSettings settings;
+    private Map<UUID, RandomItem> itemMap;
     private List<RandomItem> items;
     private List<RandomItem> curItems;
     private int totalWeight;
@@ -25,6 +27,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.settings = settings;
         this.items = new ArrayList<>();
         this.curItems = new ArrayList<>();
+        this.itemMap = new HashMap<>();
     }
     
     public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
@@ -45,6 +48,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public RandomItemDistributor(Map<String, Object> distributor) {
         this.items = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
+        items.forEach(ri -> itemMap.put(ri.getID(), ri));
     }
     
     /**
@@ -72,7 +76,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             }
         }
         
-        if (useBagDistribution()) {
+        if ((boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION)) {
             RandomItem toGive = curItems.remove(i);
             totalWeight -= toGive.getWeight();
             return toGive;
@@ -87,36 +91,22 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         ItemMeta meta = toGive.getItemMeta();
         for (MissileWarsPlayer mwp : players) {
             PlayerInventory inv = mwp.getMCPlayer().getInventory();
-            if (inv.containsAtLeast(toGive, nextItem.getMax())) {
-                continue;
-            }
-            
-            
         }
-    }
-
-    private int getTimer() {
-        return (int) settings.get(ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER);
-    }
-
-    private boolean useBagDistribution() {
-        return (boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION);
-    }
-
-    private boolean useXPTimer() {
-        return (boolean) settings.get(ArenaSetting.RANDOM_ITEM_XP_TIMER);
     }
     
     public void addItem(RandomItem item) {
         this.items.add(item);
+        this.itemMap.put(item.getID(), item);
     }
     
     public void removeItem(RandomItem item) {
         this.items.remove(item);
+        this.itemMap.remove(item.getID());
     }
     
     public void clearItems() {
         this.items.clear();
+        this.itemMap.clear();
     }
     
     public void setArenaSettings(ArenaSettings settings) {

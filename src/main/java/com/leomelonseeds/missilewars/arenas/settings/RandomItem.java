@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -25,17 +24,26 @@ public class RandomItem implements ConfigurationSerializable {
     private int amount;
     private UUID uuid; // Use for checking equality
     
-    /**
-     * @param id nullable
-     * @param item must be provided cannot be null
-     */
-    public RandomItem(String id, ItemStack item) {
+    public RandomItem(String id) {
+        this(id, null);
+    }
+    
+    public RandomItem(ItemStack item) {
+        this(null, item);
+    }
+    
+    private RandomItem(String id, ItemStack item) {
         this.id = id;
-        this.item = item.clone();
+        if (id != null) {
+            this.item = getItemFromID(id);
+        } else {
+            this.item = item.clone();
+        }
         this.weight = 1;
         this.max = 1;
         this.amount = 1;
         this.uuid = UUID.randomUUID();
+        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
     }
     
     public RandomItem(RandomItem other) {
@@ -45,6 +53,7 @@ public class RandomItem implements ConfigurationSerializable {
         this.max = other.max;
         this.amount = other.amount;
         this.uuid = UUID.randomUUID();
+        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
     }
 
     @Override
@@ -73,14 +82,10 @@ public class RandomItem implements ConfigurationSerializable {
             this.item = (ItemStack) settings.get("item");
         } else {
             this.id = (String) settings.get("id");
-            String[] args = id.split("-");
-            int level = Integer.parseInt(args[1]);
-            this.item = MissileWarsPlugin.getPlugin().getDeckManager().createItem(args[0], level, false);
+            this.item = getItemFromID(id);
             
             if (settings.containsKey("custom-offset")) {
-                ItemMeta meta = item.getItemMeta();
-                InventoryUtils.setMetaString(meta, InventoryUtils.CUSTOM_OFFSET_KEY, (String) settings.get("custom-offset"));
-                item.setItemMeta(meta);
+                InventoryUtils.setMetaString(item, InventoryUtils.CUSTOM_OFFSET_KEY, (String) settings.get("custom-offset"));
             }
         }
 
@@ -88,6 +93,13 @@ public class RandomItem implements ConfigurationSerializable {
         this.max = (int) settings.get("max");
         this.amount = (int) settings.get("amount");
         this.uuid = UUID.randomUUID();
+        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
+    }
+    
+    private ItemStack getItemFromID(String id) {
+        String[] args = id.split("-");
+        int level = Integer.parseInt(args[1]);
+        return MissileWarsPlugin.getPlugin().getDeckManager().createItem(args[0], level, false);
     }
 
     /**
@@ -126,6 +138,10 @@ public class RandomItem implements ConfigurationSerializable {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+    
+    public UUID getID() {
+        return uuid;
     }
 
     @Override

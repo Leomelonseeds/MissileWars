@@ -84,9 +84,7 @@ public class MapSelector extends PaginatedInventory {
             }
             
             ItemStack item = InventoryUtils.createItem("arena-settings.map-selector." + key);
-            ItemMeta meta = item.getItemMeta();
-            InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, key);
-            item.setItemMeta(meta);
+            InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);
             inv.setItem(itemsSection.getInt(key + ".slot"), item);
         }
         
