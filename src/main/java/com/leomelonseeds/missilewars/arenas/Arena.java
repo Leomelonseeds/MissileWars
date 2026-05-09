@@ -1501,7 +1501,7 @@ public abstract class Arena implements ConfigurationSerializable {
         BukkitScheduler scheduler = Bukkit.getScheduler();
         
         // Chaos timers
-        if (getBooleanSetting(ArenaSetting.ENABLE_DECREASING_ITEM_TIMERS)) {
+        if (getBooleanSetting(ArenaSetting.ENABLE_DECREASING_COOLDOWNS)) {
             // Stage 1 chaos
             tasks.add(scheduler.runTaskLater(plugin, () -> {
                 blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);

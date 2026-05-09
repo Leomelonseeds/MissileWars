@@ -608,7 +608,7 @@ settings:
         - "&7Disables the game timer. The game"
         - "&7only ends if there aren't enough"
         - "&7players, or a team wins."
-    ENABLE_DECREASING_ITEM_TIMERS:
+    ENABLE_DECREASING_COOLDOWNS:
       type: "boolean"
       description:
         - "&7Item cooldowns reduce by 25% after"

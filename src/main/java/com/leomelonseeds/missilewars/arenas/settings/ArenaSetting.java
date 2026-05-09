@@ -18,12 +18,14 @@ public enum ArenaSetting {
     
     // ITEM SETTINGS
     // Global
-    ENABLE_DECREASING_ITEM_TIMERS(true, "enable-decreasing-item-timers"),
+    ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_RANDOM_ITEM_DISTRIBUTION(false, "enable-random-item-distribution"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     
     // Deck
     DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(50, 300, 10)), // As a percentage
+    ENABLE_FORCE_DECK(false, "force-deck"),
+    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
     
     // Random
     RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
@@ -51,8 +53,6 @@ public enum ArenaSetting {
     ENABLE_ALTITUDE_SICKNESS(true, "enable-altitude-sickness"),
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
-    ENABLE_FORCE_DECK(false, "force-deck"),
-    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
     
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),
