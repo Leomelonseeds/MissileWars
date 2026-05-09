@@ -82,6 +82,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             return;
         }
         
+        // Make sure we can actually give the next item
         RandomItem nextItem = getNextItem();
         if (nextItem == null) {
             Bukkit.getLogger().warning("Stopping random item distributor because "
@@ -89,31 +90,42 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             return;
         }
         
+        // Figure out team balancing
         int globalLimit = (int) settings.get(ArenaSetting.RANDOM_ITEM_INVENTORY_LIMIT);
-        if ((boolean) settings.get(ArenaSetting.ENABLE_TEAM_BALANCING)) {
+        boolean uneven = false;
+        do {
+            if (!((boolean) settings.get(ArenaSetting.ENABLE_TEAM_BALANCING))) {
+                break;
+            }
+
             // Figure out if larger team size / smaller team size >= 3/2
             boolean redLarger = redTeam.size() > blueTeam.size();
             Set<MissileWarsPlayer> less = redLarger ? blueTeam : redTeam;
             Set<MissileWarsPlayer> more = redLarger ? redTeam : blueTeam;
             if ((double) less.size() * 3 / 2 > more.size()) {
-                // A shuffled list of players in the lesser team
-                // Give extra items to the first `remainder` players
-                List<MissileWarsPlayer> giveExtra = new ArrayList<>(less);
-                int lessAmount = 1 + (more.size() / less.size());
-                int remainder = more.size() % less.size();
-                Collections.shuffle(giveExtra);
-                for (int i = 0; i < giveExtra.size(); i++) {
-                    int amount = lessAmount;
-                    if (i < remainder) {
-                        amount++;
-                    }
-                    giveItemToPlayer(giveExtra.get(i).getMCPlayer(), nextItem, amount, globalLimit);
-                }
-                
-                // Give the team with more players their share too
-                more.forEach(mwp -> giveItemToPlayer(mwp.getMCPlayer(), nextItem, 1, globalLimit));
+                break;
             }
-        } else {
+
+            // A shuffled list of players in the lesser team
+            // Give extra items to the first `remainder` players
+            uneven = true;
+            List<MissileWarsPlayer> giveExtra = new ArrayList<>(less);
+            int lessAmount = 1 + (more.size() / less.size());
+            int remainder = more.size() % less.size();
+            Collections.shuffle(giveExtra);
+            for (int i = 0; i < giveExtra.size(); i++) {
+                int amount = lessAmount;
+                if (i < remainder) {
+                    amount++;
+                }
+                giveItemToPlayer(giveExtra.get(i).getMCPlayer(), nextItem, amount, globalLimit);
+            }
+            
+            // Give the team with more players their share too
+            more.forEach(mwp -> giveItemToPlayer(mwp.getMCPlayer(), nextItem, 1, globalLimit));
+        } while (false);
+        
+        if (!uneven) {
             redTeam.forEach(mwp -> giveItemToPlayer(mwp.getMCPlayer(), nextItem, 1, globalLimit));
             blueTeam.forEach(mwp -> giveItemToPlayer(mwp.getMCPlayer(), nextItem, 1, globalLimit));
         }
@@ -121,6 +133,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         ConfigUtils.schedule(timerTicks, () -> giveNextItem(redTeam, blueTeam));
     }
     
+    // TODO
     private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
         
     }
