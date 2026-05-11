@@ -5,16 +5,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class RandomItemDistributor implements ConfigurationSerializable {
     
@@ -71,7 +74,6 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * the ratio of one team to another is greater than or equal to 3:2, the
      * smaller team will receive floor(g / l) items per player, and the
      * remaining g % l items will be randomly distributed to g % l players.
-     * 
      * 
      * @param redTeam
      * @param blueTeam
@@ -130,12 +132,131 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             blueTeam.forEach(mwp -> giveItemToPlayer(mwp.getMCPlayer(), nextItem, 1, globalLimit));
         }
         
+        // Set XP bars if available
+        if ((boolean) settings.get(ArenaSetting.RANDOM_ITEM_XP_TIMER)) {
+            int timer = timerTicks / 20;
+            setXPBars(timer, timer, redTeam, blueTeam);
+        }
+        
         ConfigUtils.schedule(timerTicks, () -> giveNextItem(redTeam, blueTeam));
     }
     
-    // TODO
-    private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
+    /**
+     * Sets players XP bar according to the timer. The XP is set
+     * until the timer reaches 0, at which point this function
+     * will need to be called again.
+     * 
+     * @param timer the whole timer
+     * @param cur the current value of the timer
+     * @param redTeam
+     * @param blueTeam
+     */
+    private void setXPBars(int timer, int cur, Set<MissileWarsPlayer> redTeam, Set<MissileWarsPlayer> blueTeam) {
+        if (timerTicks == 0) {
+            return;
+        }
         
+        float exp = cur / (float) timer;
+        
+        for (MissileWarsPlayer mwp : redTeam) {
+            mwp.getMCPlayer().setExp(exp);
+            mwp.getMCPlayer().setLevel(cur);
+        }
+        
+        for (MissileWarsPlayer mwp : blueTeam) {
+            mwp.getMCPlayer().setExp(exp);
+            mwp.getMCPlayer().setLevel(cur);
+        }
+        
+        ConfigUtils.schedule(20, () -> setXPBars(timer, cur - 1, redTeam, blueTeam));
+    }
+    
+    
+    /**
+     * Give an item to a player. If the amount in the player's
+     * inventory exceeds the max amount for the random item, the
+     * item will not be given. Additionally, if all the items added
+     * up (with 1 item == 1 * item.amount) exceeds the global
+     * limit, the item will also not be given. 
+     * 
+     * @param player
+     * @param randomItem
+     * @param amount
+     * @param globalLimit
+     */
+    private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
+        int maxAmount = randomItem.getMax() * randomItem.getAmount();
+        if (maxAmount == 0 && globalLimit == 0) {
+            player.give(getRandomItem(randomItem, amount));
+        }
+
+        // Compute amounts of each registered item
+        Map<UUID, Integer> amounts = new HashMap<>();
+        for (ItemStack item : player.getInventory().getContents()) {
+            String uuidString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.UUID_KEY);
+            if (uuidString == null) {
+                continue;
+            }
+            
+            UUID uuid = UUID.fromString(uuidString);
+            amounts.put(uuid, amounts.getOrDefault(amounts, 0) + item.getAmount());
+        }
+        
+        // Check item limit first
+        if (maxAmount > 0 && amounts.containsKey(randomItem.getID())) {
+            int curAmount = amounts.get(randomItem.getID());
+            if (curAmount >= maxAmount) {
+                String msg = ConfigUtils.getConfigText("messages.random-item-limit");
+                player.sendActionBar(ConfigUtils.toComponent(msg));
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                return;
+            }
+            
+            ItemStack item = getRandomItem(randomItem, amount);
+            if (curAmount + item.getAmount() > maxAmount) {
+                item.setAmount(maxAmount - curAmount);
+            }
+        }
+        
+        // Check global limit next
+        if (globalLimit > 0) {
+            int curGroups = 0;
+            for (Entry<UUID, Integer> e : amounts.entrySet()) {
+                RandomItem ri = itemMap.get(e.getKey());
+                if (ri == null) {
+                    continue;
+                }
+                
+                int curGroup = e.getValue() / ri.getAmount();
+                int remainder = e.getValue() % ri.getAmount();
+                if (remainder * 2 > ri.getAmount()) {
+                    curGroup++;
+                }
+                
+                curGroups += curGroup;
+                if (curGroups >= globalLimit) {
+                    String msg = ConfigUtils.getConfigText("messages.random-item-global-limit");
+                    player.sendActionBar(ConfigUtils.toComponent(msg));
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+            }
+            
+            
+        }
+    }
+    
+    /**
+     * Gets the itemstack associated with the random item
+     * 
+     * @param randomItem
+     * @param amount
+     * @return
+     */
+    private ItemStack getRandomItem(RandomItem randomItem, int amount) {
+        ItemStack item = randomItem.getItem();
+        item.setAmount(randomItem.getAmount() * amount);
+        return item;
     }
     
     /**
