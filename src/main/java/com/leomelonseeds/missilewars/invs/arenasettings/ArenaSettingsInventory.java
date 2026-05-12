@@ -32,8 +32,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
 
     private Map<Integer, ArenaSetting> settingSlots;
     protected boolean viewOnly;
-    private ArenaSettings arenaSettings;
-    private Arena arena;
+    protected Arena arena;
+    protected ArenaSettings arenaSettings;
     private MWInventory fromInv;
     private int size;
     private ConfigurationSection settingConfig;
@@ -100,8 +100,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         
         // Process settings
         if (viewOnly) {
-            ConfigUtils.sendConfigMessage("settings.view-only", player);
-            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            viewOnlyDeny();
             return;
         }
         
@@ -241,12 +240,12 @@ public abstract class ArenaSettingsInventory extends MWInventory {
                         .replace("%default%", setting.getDefaultValue() + ""));
         }
         
-        if (left != null) {
-            res.add(sec.getString("lore-decreasable"));
-        }
-        
         if (right != null) {
             res.add(sec.getString("lore-increasable"));
+        }
+        
+        if (left != null) {
+            res.add(sec.getString("lore-decreasable"));
         }
         
         // This right here is bad coding practice in multiple ways
@@ -297,5 +296,10 @@ public abstract class ArenaSettingsInventory extends MWInventory {
 
         InventoryUtils.setMetaString(meta, SETTING_VALUE, enabled ? "false" : "true");
         return res;
+    }
+    
+    protected void viewOnlyDeny() {
+        ConfigUtils.sendConfigMessage("settings.view-only", player);
+        ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
     }
 }

@@ -1,5 +1,7 @@
 package com.leomelonseeds.missilewars.invs.arenasettings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -7,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
@@ -39,13 +42,92 @@ public class ItemSettings extends ArenaSettingsInventory {
         }
         
         // Deck vs random items
+        boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
+        setSelectionItem("deck-item-distribution", !randomItems);
+        setSelectionItem("random-item-distribution", randomItems);
+    }
+    
+    private void setSelectionItem(String key, boolean enabled) {
+        // Create item
+        ItemStack item = new ItemStack(Material.valueOf(itemsSection.getString(key + ".item")));
+        String enabledString = enabled ? "enabled" : "disabled";
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(ConfigUtils.toComponent(itemsSection.getString(key + ".name-" + enabledString)));
+        List<String> lore = new ArrayList<>(itemsSection.getStringList(key + ".lore"));
+        lore.addAll(itemsSection.getStringList(key + ".lore-" + enabledString));
+        meta.lore(ConfigUtils.toComponent(lore));
+        InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, key);
+        item.setItemMeta(meta);
         
+        // Set slot
+        int slot = itemsSection.getInt(key + ".slot");
+        inv.setItem(slot, item);
+        
+        // Get glass panes
+        Material pane = enabled ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+        int upper = slot - 9;
+        int lower = slot + 9;
+        for (int s : new int[] {upper - 1, upper, upper + 1, slot - 1, slot + 1, lower - 1, lower, lower + 1}) {
+            inv.setItem(s, InventoryUtils.createBlankItem(pane));
+        }
     }
 
     @Override
     public void registerClick(int slot, ClickType type, ItemStack item) {
-        // TODO Auto-generated method stub
+        String key = InventoryUtils.getGUIFromItem(item);
+        if (key == null) {
+            return;
+        }
 
+        boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
+        if (key.equals("deck-item-distribution")) {
+            if (!randomItems) {
+                new DeckDistributionSettings(player, randomItems, arena, this);
+                return;
+            }
+            
+            if (viewOnly) {
+                viewOnlyDeny();
+                return;
+            }
+            
+            if (type.isLeftClick()) {
+                arenaSettings.set(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, false);
+                ConfigUtils.sendConfigSound("use-skillpoint", player);
+                updateInventory();
+            } else if (type.isRightClick()) {
+                new DeckDistributionSettings(player, randomItems, arena, this);
+            }
+            
+            return;
+        }
+        
+        if (key.equals("random-item-distribution")) {
+            // TEMP
+            if (!player.hasPermission("umw.admin")) {
+                return;
+            }
+            
+            if (randomItems) {
+                // TODO
+                return;
+            }
+            
+            if (viewOnly) {
+                viewOnlyDeny();
+                return;
+            }
+            
+            if (type.isLeftClick()) {
+                arenaSettings.set(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, true);
+                ConfigUtils.sendConfigSound("use-skillpoint", player);
+                updateInventory();
+            } else if (type.isRightClick()) {
+                // TODO
+            }
+            
+            return;
+        }
     }
 
 }

@@ -2190,6 +2190,7 @@ arena-settings:
   item-settings:
     deck-item-distribution:
       item: BOOKSHELF
+      slot: 11
       name-disabled: "&e&lDeck &f&lItem Distribution &7- &cDisabled"
       name-enabled: "&e&lDeck &f&lItem Distribution &7- &aEnabled"
       lore:
@@ -2206,6 +2207,7 @@ arena-settings:
         - "&cRight-click &7to configure."
     random-item-distribution:
       item: COMMAND_BLOCK
+      slot: 15
       name-disabled: "&6&lRandom &f&lItem Distribution &7- &cDisabled"
       name-enabled: "&6&lRandom &f&lItem Distribution &7- &aEnabled"
       lore:
@@ -2218,6 +2220,8 @@ arena-settings:
         - ""
         - "&7When enabled, all passives and"
         - "&7abilities will be disabled."
+        - ""
+        - "&d» &d&oWork in progress, coming soon!"
         - ""
       lore-enabled:
         - "&cClick &7to configure."
@@ -2338,7 +2342,7 @@ arena-settings:
         - "&7where abilities and passives can"
         - "&7be enabled or disabled."
         - ""
-        - "&d» &d&oWork in progress, coming soon!"
+        - "&cClick &7to edit."
     map-selector:
       item: MAP
       name: "&eMap Settings"

@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.invs.arenasettings;
 
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -18,25 +19,27 @@ public class VisibilitySettings extends ArenaSettingsInventory {
     private final static String configSec = "arena-settings.visibility-settings";
     
     private ConfigurationSection itemSection;
-    private Arena arena;
 
     public VisibilitySettings(Player player, boolean viewOnly, Arena arena, MWInventory fromInv) {
-        super(player, 18, "Visibility Settings", viewOnly, arena, fromInv);
+        super(player, 27, "Visibility Settings", viewOnly, arena, fromInv);
         this.itemSection = ConfigUtils.getConfigFile("items.yml").getConfigurationSection(configSec);
-        this.arena = arena;
     }
 
     @Override
     public Map<Integer, ArenaSetting> getSettingSlots() {
         return Map.of(
-            0, ArenaSetting.CAPACITY,
-            1, ArenaSetting.IS_PRIVATE,
-            2, ArenaSetting.IS_ALWAYS_ONLINE
+            9, ArenaSetting.CAPACITY,
+            10, ArenaSetting.IS_PRIVATE,
+            11, ArenaSetting.IS_ALWAYS_ONLINE
         );
     }
 
     @Override
     public void updateSettingsInventory() {
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
+        }
+        
         for (String key : itemSection.getKeys(false)) {
             String sec = configSec + "." + key;
             ItemStack item = InventoryUtils.createItem(sec);
@@ -53,8 +56,7 @@ public class VisibilitySettings extends ArenaSettingsInventory {
         }
         
         if (viewOnly) {
-            ConfigUtils.sendConfigMessage("settings.view-only", player);
-            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            viewOnlyDeny();
             return;
         }
         
