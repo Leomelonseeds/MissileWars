@@ -29,13 +29,31 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 
 public class ArenaUtils {
+    
+    /**
+     * Get the level of an ability for a player
+     * 
+     * @param uuid
+     * @param arena
+     * @return
+     */
+    public static int getAbility(UUID uuid, Ability ability, Arena arena) {
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+            // TODO: replace after allowing abilities to be manually selected
+            return 0;
+        }
+        
+        return MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, ability);
+    }
 
     /**
      * Determine if a player is out of bounds

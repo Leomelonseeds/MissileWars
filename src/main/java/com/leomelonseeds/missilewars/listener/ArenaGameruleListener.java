@@ -404,7 +404,7 @@ public class ArenaGameruleListener implements Listener {
             }
 
             // Spiked Quiver
-            int spiked = plugin.getJSON().getLevel(uuid, Ability.SPIKED_QUIVER);
+            int spiked = ArenaUtils.getAbility(uuid, Ability.SPIKED_QUIVER, arena);
             if (spiked > 0 && eventProj instanceof Arrow arrow) {
                 int amplifier = (int) ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.AMPLIFIER);
                 int duration = (int) (ConfigUtils.getAbilityStat(Ability.SPIKED_QUIVER, spiked, Stat.DURATION) * 20);
@@ -466,7 +466,7 @@ public class ArenaGameruleListener implements Listener {
         // Hitchhiker's bow
         AbstractArrow proj = (AbstractArrow) eventProj;
         do {
-            if (plugin.getJSON().getLevel(uuid, Ability.HITCHHIKERS_BOW) <= 0) {
+            if (ArenaUtils.getAbility(uuid, Ability.HITCHHIKERS_BOW, arena) == 0) {
                 break;
             }
             
@@ -493,7 +493,7 @@ public class ArenaGameruleListener implements Listener {
         } while (false);
         
         // Exotic arrows
-        int exotic = plugin.getJSON().getLevel(uuid, Ability.EXOTIC_ARROWS);
+        int exotic = ArenaUtils.getAbility(uuid, Ability.EXOTIC_ARROWS, arena);
         if (exotic > 0 && !proj.isCritical()) {
             SpectralArrow arrow = proj.getWorld().createEntity(proj.getLocation(), SpectralArrow.class);
             arrow.setShooter(player);
@@ -523,7 +523,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Longshot
-        int longshot = plugin.getJSON().getLevel(uuid, Ability.LONGSHOT);
+        int longshot = ArenaUtils.getAbility(uuid, Ability.LONGSHOT, arena);
         if (longshot > 0 && proj.isCritical() && consume.getRight() == 40) {
             longShots.put(proj, player.getLocation());
             
@@ -601,7 +601,7 @@ public class ArenaGameruleListener implements Listener {
         
         // Creepershot
         ItemStack crossbow = event.getCrossbow();
-        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.CREEPERSHOT) > 0) {
+        if (ArenaUtils.getAbility(player.getUniqueId(), Ability.CREEPERSHOT, arena) > 0) {
             ItemStack offhand = inv.getItemInOffHand();
             if (offhand.getType() != Material.CREEPER_HEAD || player.hasCooldown(offhand.getType())) {
                 return;
@@ -621,7 +621,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Blazeballs
-        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.BLAZEBALLS) > 0) {
+        if (ArenaUtils.getAbility(player.getUniqueId(), Ability.BLAZEBALLS, arena) > 0) {
             ItemStack offhand = inv.getItemInOffHand();
             if (offhand.getType() != Material.FIRE_CHARGE || player.hasCooldown(offhand.getType())) {
                 return;
@@ -636,7 +636,7 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Compressed arrows
-        if (plugin.getJSON().getLevel(player.getUniqueId(), Ability.COMPRESSED_ARROWS) > 0 && slot == 40) {
+        if (ArenaUtils.getAbility(player.getUniqueId(), Ability.COMPRESSED_ARROWS, arena) > 0 && slot == 40) {
             ItemStack compressedArrow = new ItemStack(Material.ARROW);
             ItemMeta meta = compressedArrow.getItemMeta();
             meta.displayName(ConfigUtils.toComponent("&fCompressed Arrow"));
@@ -686,7 +686,7 @@ public class ArenaGameruleListener implements Listener {
             if (eventDamager.getType() != EntityType.SMALL_FIREBALL && 
                     (eventDamager instanceof Explosive || eventDamager instanceof Creeper)) {
                 // Check bers rocketeer
-                int rocketeer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ROCKETEER);
+                int rocketeer = ArenaUtils.getAbility(player.getUniqueId(), Ability.ROCKETEER, arena);
                 if (rocketeer > 0) {
                     // If boots have UNBREAKING, it means the custom blastprot is set (see DeckManager)
                     // In this case, the level of unbreaking corresponds to the level of blastprot
@@ -760,7 +760,7 @@ public class ArenaGameruleListener implements Listener {
             // multiply knockback by glowing ticks / 4
             double extradmg = 0;
             if (type == EntityType.ARROW) {
-                int longshot = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.LONGSHOT);
+                int longshot = ArenaUtils.getAbility(damager.getUniqueId(), Ability.LONGSHOT, arena);
                 extradmg = getExtraLongshotDamage(projectile, longshot, player.getLocation());
                 if (extradmg > 0) {
                     event.setDamage(event.getDamage() + extradmg);
@@ -776,7 +776,7 @@ public class ArenaGameruleListener implements Listener {
                 double plusMultiplier = Math.max(0, 3 - projectile.getVelocity().length());
                 multiplyKnockback(player, multiplier + plus * plusMultiplier);
             } else if (type == EntityType.SMALL_FIREBALL) {
-                int blazeball = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.BLAZEBALLS);
+                int blazeball = ArenaUtils.getAbility(damager.getUniqueId(), Ability.BLAZEBALLS, arena);
                 event.setDamage(ConfigUtils.getAbilityStat(Ability.BLAZEBALLS, blazeball, Stat.DAMAGE));
                 ConfigUtils.sendConfigSound("blazeball-hit-player", damager);
             } else if (type == EntityType.TRIDENT) {
@@ -808,7 +808,7 @@ public class ArenaGameruleListener implements Listener {
             }
             
             // Check for the passive
-            int prickly = plugin.getJSON().getLevel(damager.getUniqueId(), Ability.KINGSMANS_BLUDGERS);
+            int prickly = ArenaUtils.getAbility(damager.getUniqueId(), Ability.KINGSMANS_BLUDGERS, arena);
             if (prickly == 0) {
                 return;
             }
@@ -969,8 +969,8 @@ public class ArenaGameruleListener implements Listener {
         Block block = event.getBlock();
         Player player = event.getPlayer();
         // Ensure it was in an arena world
-        Arena possibleArena = plugin.getArenaManager().getArena(block.getWorld());
-        if (possibleArena == null) {
+        Arena arena = plugin.getArenaManager().getArena(block.getWorld());
+        if (arena == null) {
             return;
         }
         
@@ -982,15 +982,15 @@ public class ArenaGameruleListener implements Listener {
         }
 
         // Register block break
-        possibleArena.registerShieldBlockEdit(block.getLocation(), false);
+        arena.registerShieldBlockEdit(block.getLocation(), false);
         
         // Check for deconstructor
         if (player.getInventory().getItemInMainHand().getType() != Material.IRON_PICKAXE) {
             return;
         }
         
-        int engineer = plugin.getJSON().getLevel(player.getUniqueId(), Ability.ENGINEER);
-        if (engineer <= 0) {
+        int engineer = ArenaUtils.getAbility(player.getUniqueId(), Ability.ENGINEER, arena);
+        if (engineer == 0) {
             return;
         }
         
@@ -1007,8 +1007,8 @@ public class ArenaGameruleListener implements Listener {
         }
         
         // Check if any tracked object from the other team contains this block
-        boolean isRed = possibleArena.getTeam(player.getUniqueId()) == TeamName.RED; 
-        Tracker tracker = possibleArena.getTracker();
+        boolean isRed = arena.getTeam(player.getUniqueId()) == TeamName.RED; 
+        Tracker tracker = arena.getTracker();
         Location loc = block.getLocation();
         if (!tracker.getMissiles().parallelStream().anyMatch(t -> t.isRed() != isRed && t.contains(loc))) {
             return;

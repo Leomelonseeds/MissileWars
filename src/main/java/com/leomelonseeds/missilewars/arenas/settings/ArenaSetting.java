@@ -36,7 +36,7 @@ public enum ArenaSetting {
     // MISC SETTINGS:
     // Game management
     ENABLE_AUTO_START(true, "enable-auto-start"),
-    START_TIMER(30, "start-timer", IntSettingModifier.create(10, 30, 1)),
+    START_TIMER(30, "start-timer", IntSettingModifier.create(5, 30, 1)),
     TIE_TIMER(5, "tie-timer", IntSettingModifier.create(0, 10, 1)),
     IS_INFINITE_TIME(false, "is-infinite-time"),
     END_IF_NO_PLAYERS(true, "end-if-no-players"),

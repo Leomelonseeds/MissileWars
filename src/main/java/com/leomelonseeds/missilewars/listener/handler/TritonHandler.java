@@ -33,6 +33,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -129,7 +130,8 @@ public class TritonHandler implements Listener {
         }
         
         Player player = (Player) shooter;
-        if (ArenaUtils.getArena(player) == null) {
+        Arena arena = ArenaUtils.getArena(player);
+        if (arena == null) {
             return;
         }
         
@@ -138,7 +140,7 @@ public class TritonHandler implements Listener {
             return;
         }
         
-        int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.TRITON);
+        int level = ArenaUtils.getAbility(player.getUniqueId(), Ability.TRITON, arena);
         if (level <= 0) {
             return;
         }

@@ -2187,6 +2187,13 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  random-item-distribution:
+    main-menu:
+      edit-items:
+        item: CREEPER_SPAWN_EGG
+        slot: 10
+        name: ""
+        lore: []
   item-settings:
     deck-item-distribution:
       item: BOOKSHELF

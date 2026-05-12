@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -33,7 +32,6 @@ import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
-import com.leomelonseeds.missilewars.decks.Ability.Type;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.listener.handler.AstralTurretManager;
@@ -58,6 +56,12 @@ import com.sk89q.worldedit.world.block.BlockTypes;
  *
  */
 public class MissileWarsTeam {
+    
+    private static Map<Ability, PotionEffectType> staticPassives = Map.of(
+        Ability.BUNNY, PotionEffectType.JUMP_BOOST,
+        Ability.ADRENALINE, PotionEffectType.SPEED,
+        Ability.HASTE, PotionEffectType.HASTE
+    );
 
     private TeamName name;
     private Arena arena;
@@ -222,7 +226,7 @@ public class MissileWarsTeam {
         }
         
         // Vanguard dwarfism
-        int dwarfism = plugin.getJSON().getLevel(uuid, Ability.DWARFISM);
+        int dwarfism = ArenaUtils.getAbility(uuid, Ability.DWARFISM, arena);
         if (dwarfism > 0) {
             double scalePercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.PERCENTAGE) / 100;
             double healthPercent = ConfigUtils.getAbilityStat(Ability.DWARFISM, dwarfism, Stat.MPERCENTAGE) / 100;
@@ -231,41 +235,26 @@ public class MissileWarsTeam {
         }
         
         // Architect elastitect
-        int elastitect = plugin.getJSON().getLevel(uuid, Ability.ELASTITECT);
+        int elastitect = ArenaUtils.getAbility(uuid, Ability.ELASTITECT, arena);
         if (elastitect > 0) {
             double addAmount = ConfigUtils.getAbilityStat(Ability.ELASTITECT, elastitect, Stat.PLUS);
             mcPlayer.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).setBaseValue(4.5 + addAmount);
         }
         
         // Potion effect passive activation
-        do {
-            Pair<Ability, Integer> jsonPassive = plugin.getJSON().getPassive(
-                    plugin.getJSON().getPlayerPreset(uuid), Type.PASSIVE);
-            Ability passive = jsonPassive.getLeft();
-            int level = jsonPassive.getRight();
-            if (level <= 0) {
-                break;
+        for (Map.Entry<Ability, PotionEffectType> e : staticPassives.entrySet()) {
+            int level = ArenaUtils.getAbility(uuid, e.getKey(), arena);
+            if (level == 0) {
+                continue;
             }
             
-            int amp = (int) ConfigUtils.getAbilityStat(passive, level, Stat.AMPLIFIER);
+            int amp = (int) ConfigUtils.getAbilityStat(e.getKey(), level, Stat.AMPLIFIER);
             if (amp == 0) {
-                break;
+                continue;
             }
-            
-            switch (passive) {
-                case BUNNY:
-                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 30 * 60 * 20, amp));
-                    break;
-                case ADRENALINE:
-                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 60 * 20, amp));
-                    break;
-                case HASTE:
-                    mcPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 30 * 60 * 20, amp));
-                    break;
-                default:
-                    break;
-            }
-        } while (false);
+
+            mcPlayer.addPotionEffect(new PotionEffect(e.getValue(), 30 * 60 * 20, amp));
+        }
         
         // Callback when all setup is done, so that added attributes are instantly available to other classes
         arena.addCallback(player);

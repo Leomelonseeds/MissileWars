@@ -56,7 +56,7 @@ public class EngineerManager implements Listener {
             return;
         }
         
-        int engineer = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.ENGINEER);
+        int engineer = ArenaUtils.getAbility(player.getUniqueId(), Ability.ENGINEER, arena);
         if (engineer <= 0) {
             return;
         }

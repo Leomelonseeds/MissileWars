@@ -741,7 +741,12 @@ public class JSONManager {
      */
     public Pair<Ability, Integer> getPassive(JSONObject json, Ability.Type type) {
         JSONObject typeJSON = json.getJSONObject(type.toString());
-        Ability passive = Ability.fromString(typeJSON.getString("selected"));
+        String selected = typeJSON.getString("selected");
+        if (selected.equals("None")) {
+            return Pair.of(null, 0);
+        }
+        
+        Ability passive = Ability.fromString(selected);
         return Pair.of(passive, passive == null ? 0 : typeJSON.getInt("level"));
     }
     
@@ -766,8 +771,8 @@ public class JSONManager {
      * @return
      */
     public int getLevel(JSONObject json, Ability ability) {
-        Pair<Ability, Integer> res = getPassive(json, ability.getType());
-        return res.getLeft() == ability ? res.getRight() : 0;
+        JSONObject typeJSON = json.getJSONObject(ability.getType().toString());
+        return typeJSON.getString("selected").equals(ability.toString()) ? typeJSON.getInt("level") : 0;
     }
     
     /**

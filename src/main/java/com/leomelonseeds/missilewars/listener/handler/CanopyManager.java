@@ -126,7 +126,7 @@ public class CanopyManager {
         boolean explosive = false;
         do {
             // Replace with ability check later
-            int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.EXPLOSIVE_CANOPY);
+            int level = ArenaUtils.getAbility(player.getUniqueId(), Ability.EXPLOSIVE_CANOPY, playerArena);
             if (level <= 0) {
                 break;
             }

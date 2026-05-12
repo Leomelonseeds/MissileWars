@@ -349,9 +349,9 @@ public class CustomItemListener implements Listener {
     public void architectLeaves(BlockPlaceEvent event) {
         MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Player player = event.getPlayer();
-        Arena playerArena = ArenaUtils.getArena(player);
+        Arena arena = ArenaUtils.getArena(player);
         ItemStack item = event.getItemInHand();
-        if ((playerArena == null) || !item.getType().toString().contains("LEAVES")) {
+        if ((arena == null) || !item.getType().toString().contains("LEAVES")) {
             return;
         }
         
@@ -364,8 +364,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Stop spawngriefing
-        Location s1 = playerArena.getBlueTeam().getSpawn().getBlock().getLocation();
-        Location s2 = playerArena.getRedTeam().getSpawn().getBlock().getLocation();
+        Location s1 = arena.getBlueTeam().getSpawn().getBlock().getLocation();
+        Location s2 = arena.getRedTeam().getSpawn().getBlock().getLocation();
         if (loc.equals(s1) || loc.equals(s2)) {
             event.setCancelled(true);
             ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
@@ -373,12 +373,12 @@ public class CustomItemListener implements Listener {
         }
 
         // Register block place.
-        InventoryUtils.consumeItem(player, playerArena, item, event.getHand() == EquipmentSlot.HAND ? 
+        InventoryUtils.consumeItem(player, arena, item, event.getHand() == EquipmentSlot.HAND ? 
                     player.getInventory().getHeldItemSlot() : 40);
         
         // Remove leaves after 30 sec
         int decayAfter = 30;
-        int natures = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.NATURES_BLESSING);
+        int natures = ArenaUtils.getAbility(player.getUniqueId(), Ability.NATURES_BLESSING, arena);
         if (natures > 0) {
             decayAfter += (int) ConfigUtils.getAbilityStat(Ability.NATURES_BLESSING, natures, Stat.DURATION);
         }
@@ -413,8 +413,8 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Arena playerArena = ArenaUtils.getArena(thrower);
-        if (playerArena == null) {
+        Arena arena = ArenaUtils.getArena(thrower);
+        if (arena == null) {
             return;
         }
 
@@ -426,44 +426,43 @@ public class CustomItemListener implements Listener {
         }
 
         // Add meta for structure identification + pokemissiles
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         ItemStack offhand = thrower.getInventory().getItemInOffHand();
         boolean hasOffhandCooldown = thrower.hasCooldown(offhand.getType());
         UUID uuid = thrower.getUniqueId();
-        boolean poke = plugin.getJSON().getLevel(uuid, Ability.POKEMISSILES) > 0;
+        boolean poke = ArenaUtils.getAbility(uuid, Ability.POKEMISSILES, arena) > 0;
         if (poke) {
             String offName = InventoryUtils.getStructureFromItem(offhand);
             if (offName != null && !hasOffhandCooldown && offhand.getType().toString().contains("SPAWN_EGG")) {
                 thrown.setItem(offhand);
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
-                InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
+                InventoryUtils.consumeItem(thrower, arena, offhand, -1);
             }
         }
         
         // Check for astral turret
         boolean isObsidianShield = structureName.contains("obsidianshield");
         if (isObsidianShield && offhand.getType() == Material.ARROW && !hasOffhandCooldown &&
-                plugin.getJSON().getLevel(uuid, Ability.ASTRAL_TURRET) > 0) {
+                ArenaUtils.getAbility(uuid, Ability.ASTRAL_TURRET, arena) > 0) {
             thrown.customName(ConfigUtils.toComponent("astral"));
-            InventoryUtils.consumeItem(thrower, playerArena, offhand, -1);
+            InventoryUtils.consumeItem(thrower, arena, offhand, -1);
             AstralTurretManager.getInstance();
         }
         
-        projectileConsume(hand, thrower, playerArena);
+        projectileConsume(hand, thrower, arena);
         
         // Add particle effects for prickly
-        if (plugin.getJSON().getLevel(uuid, Ability.KINGSMANS_BLUDGERS) > 0) {
+        if (ArenaUtils.getAbility(uuid, Ability.KINGSMANS_BLUDGERS, arena) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.INSTANT_EFFECT, null);
         }
 
         // More delay + particles for impact trigger
-        if (plugin.getJSON().getLevel(uuid, Ability.IMPACT_TRIGGER) > 0) {
+        if (ArenaUtils.getAbility(uuid, Ability.IMPACT_TRIGGER, arena) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
         
         // Increase delay if using kingsmans bludgers
         int delay = 20;
-        int bludgers = plugin.getJSON().getLevel(uuid, Ability.KINGSMANS_BLUDGERS);
+        int bludgers = ArenaUtils.getAbility(uuid, Ability.KINGSMANS_BLUDGERS, arena);
         if (bludgers > 0) {
             delay = (int) (ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, bludgers, Stat.DURATION) * 20);
             bludgerStore.put(thrower, thrown);
@@ -478,7 +477,7 @@ public class CustomItemListener implements Listener {
                 bludgerStore.remove(thrower);
             }
             
-            if (spawnUtility(thrower, thrown, structure, playerArena, thrown.getLocation())) {
+            if (spawnUtility(thrower, thrown, structure, arena, thrown.getLocation())) {
                 return;
             }
             
@@ -519,7 +518,7 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        int bludgers = MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.KINGSMANS_BLUDGERS);
+        int bludgers = ArenaUtils.getAbility(player.getUniqueId(), Ability.KINGSMANS_BLUDGERS, arena);
         if (bludgers <= 0) {
             return;
         }
@@ -546,13 +545,13 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        Arena playerArena = ArenaUtils.getArena(thrower);
-        if (playerArena == null) {
+        Arena arena = ArenaUtils.getArena(thrower);
+        if (arena == null) {
             return;
         }
         
         // The all important line for this event
-        int level = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.IMPACT_TRIGGER);
+        int level = ArenaUtils.getAbility(thrower.getUniqueId(), Ability.IMPACT_TRIGGER, arena);
         if (level <= 0) {
             return;
         }
@@ -574,7 +573,7 @@ public class CustomItemListener implements Listener {
           return;
         }
         
-        spawnUtility(thrower, thrown, structureName, playerArena, spawnLoc);
+        spawnUtility(thrower, thrown, structureName, arena, spawnLoc);
     }
     
     // Returns false ONLY IF the utility spawn failed due to the schematic manager returned false
@@ -617,7 +616,7 @@ public class CustomItemListener implements Listener {
             
             // Check for smokeshield
             int duration = (int) getItemStat(structure, "duration");
-            int smokeshield = MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, Ability.SMOKE_SHIELD);
+            int smokeshield = ArenaUtils.getAbility(uuid, Ability.SMOKE_SHIELD, playerArena);
             if (smokeshield > 0) {
                 double radius = ConfigUtils.getAbilityStat(Ability.SMOKE_SHIELD, smokeshield, Stat.RADIUS);
                 new SmokeShieldHandler(spawnLoc, duration * 20, radius);
@@ -714,8 +713,8 @@ public class CustomItemListener implements Listener {
 
         // Make sure it's in an arena
         Player thrower = (Player) thrown.getShooter();
-        Arena playerArena = ArenaUtils.getArena(thrower);
-        if (playerArena == null) {
+        Arena arena = ArenaUtils.getArena(thrower);
+        if (arena == null) {
             return;
         }
         
@@ -731,8 +730,8 @@ public class CustomItemListener implements Listener {
         }
         
         // Otherwise always disallow projectiles to collide with players of same team
-        TeamName team1 = playerArena.getTeam(thrower.getUniqueId());
-        TeamName team2 = playerArena.getTeam(hit.getUniqueId());
+        TeamName team1 = arena.getTeam(thrower.getUniqueId());
+        TeamName team2 = arena.getTeam(hit.getUniqueId());
         if (team1 != TeamName.NONE && team1 == team2) {
             event.setCancelled(true);
             return;
@@ -747,7 +746,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Allow collisions if prickly projectiles
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.KINGSMANS_BLUDGERS) > 0) {
+        if (ArenaUtils.getAbility(thrower.getUniqueId(), Ability.KINGSMANS_BLUDGERS, arena) > 0) {
             return;
         }
 
@@ -761,12 +760,12 @@ public class CustomItemListener implements Listener {
     @EventHandler
     public void onSwap(PlayerSwapHandItemsEvent event) {
         Player player = event.getPlayer();
-        Arena playerArena = ArenaUtils.getArena(player);
-        if (playerArena == null) {
+        Arena arena = ArenaUtils.getArena(player);
+        if (arena == null) {
             return;
         }
 
-        if (MissileWarsPlugin.getPlugin().getJSON().getLevel(player.getUniqueId(), Ability.MOLOTOV_SPLASH) == 0) {
+        if (ArenaUtils.getAbility(player.getUniqueId(), Ability.MOLOTOV_SPLASH, arena) == 0) {
             return;
         }
         
@@ -776,7 +775,7 @@ public class CustomItemListener implements Listener {
         }
         
         ItemStack splashItem = swapOn ? event.getOffHandItem() : event.getMainHandItem();
-        ItemStack instanceItem = InventoryUtils.findInstanceItem(playerArena.getPlayerInArena(player.getUniqueId()), splashItem);
+        ItemStack instanceItem = InventoryUtils.findInstanceItem(arena.getPlayerInArena(player.getUniqueId()), splashItem);
         if (instanceItem == null) {
             return;
         }
@@ -824,8 +823,8 @@ public class CustomItemListener implements Listener {
             return;
         }
         Player thrower = (Player) thrown.getShooter();
-        Arena playerArena = ArenaUtils.getArena(thrower);
-        if (playerArena == null) {
+        Arena arena = ArenaUtils.getArena(thrower);
+        if (arena == null) {
             return;
         }
 
@@ -841,7 +840,7 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
-        int molotov = MissileWarsPlugin.getPlugin().getJSON().getLevel(thrower.getUniqueId(), Ability.MOLOTOV_SPLASH);
+        int molotov = ArenaUtils.getAbility(thrower.getUniqueId(), Ability.MOLOTOV_SPLASH, arena);
         String name = "splash:" + duration + ":" + extend;
         
         // Handle molotov details
@@ -853,8 +852,8 @@ public class CustomItemListener implements Listener {
         }
         
         thrown.customName(ConfigUtils.toComponent(name));
-        playerArena.getPlayerInArena(thrower.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.UTILITY);
-        projectileConsume(hand, thrower, playerArena);
+        arena.getPlayerInArena(thrower.getUniqueId()).incrementStat(MissileWarsPlayer.Stat.UTILITY);
+        projectileConsume(hand, thrower, arena);
     }
 
     // Handle splash hit block mechanics
@@ -906,7 +905,8 @@ public class CustomItemListener implements Listener {
             }
             
             Player hitPlayer = (Player) hitEntity;
-            if (hitPlayer.equals(thrower) && MissileWarsPlugin.getPlugin().getJSON().getLevel(hitPlayer.getUniqueId(), Ability.TRITON) > 0) {
+            int triton = ArenaUtils.getAbility(hitPlayer.getUniqueId(), Ability.TRITON, ArenaUtils.getArena(hitPlayer));
+            if (hitPlayer.equals(thrower) && triton > 0) {
                 ItemStack[] invItems = hitPlayer.getInventory().getContents();
                 for (int i = 0; i < invItems.length; i++) {
                     ItemStack item = invItems[i];
