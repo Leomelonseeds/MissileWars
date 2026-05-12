@@ -111,7 +111,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             boolean redLarger = redTeam.size() > blueTeam.size();
             Set<MissileWarsPlayer> less = redLarger ? blueTeam : redTeam;
             Set<MissileWarsPlayer> more = redLarger ? redTeam : blueTeam;
-            if ((double) less.size() * 3 / 2 > more.size()) {
+            if ((double) less.size() * 3 > more.size() * 2) {
                 break;
             }
 

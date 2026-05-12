@@ -560,24 +560,45 @@ settings:
       description:
         - "&7Seconds to wait after a team's"
         - "&7portal(s) are broken for a tie."
-    ITEM_MULTIPLIER:
+    DECK_ITEM_MULTIPLIER:
       type: "int"
       unit: "%"
       description:
         - "&7For decks mode, a percentage"
         - "&7multiplier to apply to item"
-        - "&7cooldowns. For example, a"
-        - "&7200% multiplier means you"
-        - "&7receive items twice as fast."
-        - "&7&oDoes not affect random item"
-        - "&7&odistribution mode."
+        - "&7cooldowns. For example, a 50%"
+        - "&7multiplier means you receive"
+        - "&7items twice as fast."
     RANDOM_ITEM_DISTRIBUTION_TIMER:
       type: "int"
       unit: "s"
       description:
-        - "&7For random item distribution mode,"
-        - "&7how fast between receiving each"
-        - "&7item. Does not affect decks mode."
+        - "&7The time between receiving each"
+        - "&7random item."
+    RANDOM_ITEM_BAG_DISTRIBUTION:
+      type: "boolean"
+      description:
+        - "&7When enabled, items will be given"
+        - "&7as if chosen randomly from a bag,"
+        - "&7which refills once empty. This"
+        - "&7prevents receiving the same item"
+        - "&7many times in a row."
+    RANDOM_ITEM_INVENTORY_LIMIT:
+      type: "int"
+      unit: ""
+      description:
+        - "&7The maximum amount of 'items' that"
+        - "&7a player can have. The number is"
+        - "&7based on the amount of the random"
+        - "&7item given at once - for example,"
+        - "&7if Arrows are configured to give"
+        - "&73 at once, then having 12 arrows"
+        - "&7will count as having 4 'items'."
+    RANDOM_ITEM_XP_TIMER:
+      type: "boolean"
+      description:
+        - "&7Show the time before recieving"
+        - "&7the next item on the XP bar."
     START_TIMER:
       type: "int"
       unit: "s"

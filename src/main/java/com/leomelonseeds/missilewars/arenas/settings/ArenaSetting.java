@@ -18,20 +18,20 @@ public enum ArenaSetting {
     
     // ITEM SETTINGS
     // Global
-    ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_RANDOM_ITEM_DISTRIBUTION(false, "enable-random-item-distribution"),
+    ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     
     // Deck
-    DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(50, 300, 10)), // As a percentage
+    DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(20, 200, 10)), // As a percentage
     ENABLE_FORCE_DECK(false, "force-deck"),
     FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
     
     // Random
     RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
     RANDOM_ITEM_BAG_DISTRIBUTION(true, "random-item-bag-distribution"),
-    RANDOM_ITEM_INVENTORY_LIMIT(true, "random-item-inventory-limit"),
     RANDOM_ITEM_XP_TIMER(true, "random-item-xp-timer"),
+    RANDOM_ITEM_INVENTORY_LIMIT(0, "random-item-inventory-limit", IntSettingModifier.create(0, 20, 1)),
     
     // MISC SETTINGS:
     // Game management

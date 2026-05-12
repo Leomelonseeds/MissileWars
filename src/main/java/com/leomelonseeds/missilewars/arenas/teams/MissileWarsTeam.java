@@ -30,6 +30,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.decks.Ability.Type;
@@ -81,7 +82,7 @@ public class MissileWarsTeam {
         this.spawn = spawn;
         this.arena = arena;
         this.shieldBlocksBroken = 0;
-        this.multiplier = 1;
+        this.multiplier = (double) arena.getIntSetting(ArenaSetting.DECK_ITEM_MULTIPLIER) / 100;
         
         // Temp value while async calculations run
         shieldVolume = 23850;

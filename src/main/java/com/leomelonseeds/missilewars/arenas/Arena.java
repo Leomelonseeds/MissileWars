@@ -1671,29 +1671,37 @@ public abstract class Arena implements ConfigurationSerializable {
      * Apply multipliers for team balancing
      */
     public void applyMultipliers() {
-        MissileWarsTeam one = blueTeam; // Team with less players
-        MissileWarsTeam two = redTeam; // Team with more players
+        if (!getBooleanSetting(ArenaSetting.ENABLE_TEAM_BALANCING)) {
+            return;
+        }
+        
+        MissileWarsTeam less = blueTeam; // Team with less players
+        MissileWarsTeam more = redTeam; // Team with more players
         if (blueTeam.getSize() > redTeam.getSize()) {
-            one = redTeam;
-            two = blueTeam;
+            less = redTeam;
+            more = blueTeam;
         } else if (blueTeam.getSize() == redTeam.getSize() || blueTeam.getSize() == 0 || redTeam.getSize() == 0) {
-            one.setMultiplier(1);
-            two.setMultiplier(1);
+            // In this case set the multiplier to the maximum of both teams
+            double maxMult = Math.max(redTeam.getMultiplier(), blueTeam.getMultiplier());
+            redTeam.setMultiplier(maxMult);
+            blueTeam.setMultiplier(maxMult);
             return;
         }
         
-        // No need to balance if two / one > 3 / 2
-        double oneSize = one.getSize();
-        double twoSize = two.getSize();
-        if (oneSize * 3 / 2 > twoSize) {
-            one.setMultiplier(1);
-            two.setMultiplier(1);
+        // No need to balance if more / less > 3 / 2
+        // In this case both team should use the multiplier
+        // already set by the team with more players
+        double lessSize = less.getSize();
+        double moreSize = more.getSize();
+        if (lessSize * 3 > moreSize * 2) {
+            less.setMultiplier(more.getMultiplier());
             return;
         }
         
-        one.setMultiplier(oneSize / twoSize);
-        one.broadcastConfigMsg("messages.team-balancing", null);
-        two.setMultiplier(1);
+        // Otherwise the team with less players gets a fraction
+        // of the multiplier of more players team
+        less.setMultiplier(more.getMultiplier() * lessSize / moreSize);
+        less.broadcastConfigMsg("messages.team-balancing", null);
     }
     
     /**

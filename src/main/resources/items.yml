@@ -2187,6 +2187,43 @@ gpassive:
       spcost: 1
       
 arena-settings:
+  item-settings:
+    deck-item-distribution:
+      item: BOOKSHELF
+      name-disabled: "&e&lDeck &f&lItem Distribution &7- &cDisabled"
+      name-enabled: "&e&lDeck &f&lItem Distribution &7- &aEnabled"
+      lore:
+        - ""
+        - "&7Ultima's own deck system that allows"
+        - "&7each player to choose from a deck"
+        - "&7containing specific items, and use"
+        - "&7various passives and abilities."
+        - ""
+      lore-enabled:
+        - "&cClick &7to configure."
+      lore-disabled:
+        - "&cLeft-click &7to use."
+        - "&cRight-click &7to configure."
+    random-item-distribution:
+      item: COMMAND_BLOCK
+      name-disabled: "&6&lRandom &f&lItem Distribution &7- &cDisabled"
+      name-enabled: "&6&lRandom &f&lItem Distribution &7- &aEnabled"
+      lore:
+        - ""
+        - "&7Instead of using decks, distributes"
+        - "&7a random item from a configurable set"
+        - "&7of items to all players on a timer."
+        - "&7Just like how classic Missile Wars"
+        - "&7does it."
+        - ""
+        - "&7When enabled, all passives and"
+        - "&7abilities will be disabled."
+        - ""
+      lore-enabled:
+        - "&cClick &7to configure."
+      lore-disabled:
+        - "&cLeft-click &7to use."
+        - "&cRight-click &7to configure."
   other-settings:
     game-mgmt:
       item: CLOCK
