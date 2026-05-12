@@ -14,6 +14,7 @@ import org.bukkit.block.structure.StructureRotation;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -67,6 +68,7 @@ public class SchematicLoadResult {
         boolean missileInBase = isMissile && ArenaUtils.inShield(arena, spawnPos, redMissile ? TeamName.RED : TeamName.BLUE);
         boolean missileInOtherBase = isMissile && ArenaUtils.inShield(arena, spawnPos, redMissile ? TeamName.BLUE : TeamName.RED, 4);
         boolean allowSpawn = true;
+        boolean checkTeamGrief = arena.getBooleanSetting(ArenaSetting.ENABLE_TEAMGRIEF_PREVENTION);
         int teamGrief = spawnPos.getBlockZ() + (redMissile ? -1 : 1);
         blockList.clear();
         for (BlockVector3 locVec : clipboard) {
@@ -105,7 +107,7 @@ public class SchematicLoadResult {
             } 
             
             // Check for teamgriefing
-            if (missileInBase && l.getBlockZ() == teamGrief) {
+            if (checkTeamGrief && missileInBase && l.getBlockZ() == teamGrief) {
                 status = SchematicLoadStatus.IN_OWN_BASE;
                 allowSpawn = false;
                 continue;

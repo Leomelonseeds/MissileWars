@@ -727,7 +727,13 @@ settings:
         - "&7The greater the difficulty, the more"
         - "&7damage players take from explosions."
     FORCED_DECK:
-      tyoe: "enum"
+      type: "enum"
       description:         
         - "&7If Force Deck is enabled, select"
         - "&7the deck to force."
+    ENABLE_TEAMGRIEF_PREVENTION:
+      type: "boolean"
+      description:
+        - "&7Adds a rudimentary check to prevent"
+        - "&7players from spawning missiles in"
+        - "&7their own base."

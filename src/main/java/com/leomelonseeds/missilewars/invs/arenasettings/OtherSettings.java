@@ -43,7 +43,8 @@ public class OtherSettings extends ArenaSettingsInventory {
         // Game rules
         settingSlots.put(19, ArenaSetting.ENABLE_MISSILE_COOLDOWN);
         settingSlots.put(20, ArenaSetting.ENABLE_ALTITUDE_SICKNESS);
-        settingSlots.put(21, ArenaSetting.WORLD_DIFFICULTY);
+        settingSlots.put(21, ArenaSetting.ENABLE_TEAMGRIEF_PREVENTION);
+        settingSlots.put(22, ArenaSetting.WORLD_DIFFICULTY);
         return settingSlots;
     }
 

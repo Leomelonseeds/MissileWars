@@ -53,6 +53,7 @@ public enum ArenaSetting {
     ENABLE_ALTITUDE_SICKNESS(true, "enable-altitude-sickness"),
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
     WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
+    ENABLE_TEAMGRIEF_PREVENTION(true, "enable-teamgrief-prevention"),
     
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),
