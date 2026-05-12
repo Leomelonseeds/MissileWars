@@ -2201,10 +2201,10 @@ arena-settings:
         - "&7various passives and abilities."
         - ""
       lore-enabled:
-        - "&cClick &7to configure."
+        - "&cClick &7to configure"
       lore-disabled:
-        - "&cLeft-click &7to use."
-        - "&cRight-click &7to configure."
+        - "&cLeft-click &7to use"
+        - "&cRight-click &7to configure"
     random-item-distribution:
       item: COMMAND_BLOCK
       slot: 15
@@ -2213,10 +2213,10 @@ arena-settings:
       lore:
         - ""
         - "&7Instead of using decks, distributes"
-        - "&7a random item from a configurable set"
-        - "&7of items to all players on a timer."
-        - "&7Just like how classic Missile Wars"
-        - "&7does it."
+        - "&7random items from a configurable"
+        - "&7set of items to all players on a"
+        - "&7timer. Just like how classic Missile"
+        - "&7Wars does it."
         - ""
         - "&7When enabled, all passives and"
         - "&7abilities will be disabled."
@@ -2224,10 +2224,10 @@ arena-settings:
         - "&d» &d&oWork in progress, coming soon!"
         - ""
       lore-enabled:
-        - "&cClick &7to configure."
+        - "&cClick &7to configure"
       lore-disabled:
-        - "&cLeft-click &7to use."
-        - "&cRight-click &7to configure."
+        - "&cLeft-click &7to use"
+        - "&cRight-click &7to configure"
   other-settings:
     game-mgmt:
       item: CLOCK
@@ -2301,7 +2301,7 @@ arena-settings:
     whitelist:
       item: EMERALD_BLOCK
       name: "&aWhitelist"
-      slot: 14
+      slot: 23
       lore:
         - "&7Whitelist players to allow them to"
         - "&7access this arena, if the arena is"
@@ -2311,7 +2311,7 @@ arena-settings:
     blacklist:
       item: BARRIER
       name: "&cBlacklist"
-      slot: 12
+      slot: 21
       lore:
         - "&7Blacklist players to ban them from"
         - "&7this arena. If a player is both white-"

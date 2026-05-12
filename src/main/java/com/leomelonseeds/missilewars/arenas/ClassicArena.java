@@ -141,6 +141,13 @@ public class ClassicArena extends Arena {
             actualWinMessages.add(s);
         }
         
+        // Send win messages
+        for (MissileWarsPlayer player : players.values()) {
+            for (String s : actualWinMessages) {
+                player.getMCPlayer().sendMessage(ConfigUtils.toComponent(s));
+            }
+        }
+        
         // No stats if custom arena
         if (isCustom()) {
             return;
@@ -163,11 +170,6 @@ public class ClassicArena extends Arena {
         LocalDateTime endTime = LocalDateTime.now();
         long gameTime = Duration.between(startTime, endTime).toSeconds();
         for (MissileWarsPlayer player : players.values()) {
-            // Send win message
-            for (String s : actualWinMessages) {
-                player.getMCPlayer().sendMessage(ConfigUtils.toComponent(s));
-            }
-
             // -1 = TIE, 0 = LOST, 1 = WIN
             int won = winningTeam == null ? -1 : 0;
 
