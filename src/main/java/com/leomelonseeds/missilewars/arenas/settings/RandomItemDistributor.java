@@ -159,7 +159,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param blueTeam
      */
     private void setXPBars(int timer, int cur, Set<MissileWarsPlayer> redTeam, Set<MissileWarsPlayer> blueTeam) {
-        if (timerTicks == 0) {
+        if (timerTicks == 0 || cur == 0) {
             return;
         }
         

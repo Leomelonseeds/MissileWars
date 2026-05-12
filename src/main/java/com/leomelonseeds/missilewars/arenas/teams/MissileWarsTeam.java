@@ -310,7 +310,7 @@ public class MissileWarsTeam {
      */
     public void removePlayer(MissileWarsPlayer player) {
         UUID uuid = player.getMCPlayerId();
-        if (containsPlayer(uuid)) {
+        if (!containsPlayer(uuid)) {
             return;
         }
         
