@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.decks;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class DeckItem {
     
@@ -27,6 +29,7 @@ public class DeckItem {
     private boolean unavailable;
     private boolean isDisabled;
     private MissileWarsTeam team; // Where to fetch the cooldown multiplier
+    private UUID uuid;
     
     /**
      * @param item should correspond directly the player inventory's item (but its fine if it doesn't I guess)
@@ -39,6 +42,8 @@ public class DeckItem {
         this.max = max;
         this.curCooldown = 0;
         this.mwp = mwp;
+        this.uuid = UUID.randomUUID();
+        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
     }
     
     public void registerTeam(MissileWarsTeam team) {
@@ -46,7 +51,7 @@ public class DeckItem {
     }
     
     /**
-     * Checks if given itemstack is the deckitem
+     * Checks if given itemstack matches this deckitem
      * 
      * @param i
      * @return
@@ -59,6 +64,21 @@ public class DeckItem {
         ItemStack toMatch = i.clone();
         toMatch.removeEnchantment(Enchantment.UNBREAKING);
         return item.isSimilar(toMatch);
+    }
+    
+    /**
+     * Checks if given itemstack is a deckitem exactly
+     * 
+     * @param i
+     * @return
+     */
+    public boolean matchesID(ItemStack i) {
+        if (i == null) {
+            return false;
+        }
+        
+        String uuidString = InventoryUtils.getUUIDFromItem(i);
+        return uuid.equals(UUID.fromString(uuidString));
     }
     
     /**
@@ -337,5 +357,9 @@ public class DeckItem {
             }
         }
         
+    }
+    
+    public UUID getID() {
+        return uuid;
     }
 }

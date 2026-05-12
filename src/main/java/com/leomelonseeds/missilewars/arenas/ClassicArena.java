@@ -121,8 +121,32 @@ public class ClassicArena extends Arena {
     
     @Override
     protected void calculateStats(MissileWarsTeam winningTeam) {
-        // Setup player variables
+        // Find players with mvp, most deaths, and kills
+        Pair<Integer, String> mostPortals = getTopStat(Stat.PORTALS);
+        Pair<Integer, String> mostKills = getTopStat(Stat.KILLS);
+        Pair<Integer, String> mostDeaths = getTopStat(Stat.DEATHS);
+        
+        // Calculate win message
         List<String> winningMessages = ConfigUtils.getConfigTextList("messages." + gamemode + "-end", null, null, null);
+        List<String> actualWinMessages = new ArrayList<>();
+        String winner = winningTeam == null ? "&e&lNONE" : winningTeam == blueTeam ? "&9&lBLUE" : "&c&lRED";
+        for (String s : winningMessages) {
+            s = s.replace("%umw_winning_team%", winner)
+                 .replace("%umw_most_mvp_amount%", mostPortals.getLeft() + "")
+                 .replace("%umw_most_kills_amount%", mostKills.getLeft() + "")
+                 .replace("%umw_most_deaths_amount%", mostDeaths.getLeft() + "")
+                 .replace("%umw_most_mvp%", mostPortals.getRight())
+                 .replace("%umw_most_kills%", mostKills.getRight())
+                 .replace("%umw_most_deaths%", mostDeaths.getRight());
+            actualWinMessages.add(s);
+        }
+        
+        // No stats if custom arena
+        if (isCustom()) {
+            return;
+        }
+
+        // Update stats for each player
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
         FileConfiguration ranksConfig = ConfigUtils.getConfigFile("ranks.yml");
         int spawn_missile = ranksConfig.getInt("experience.spawn_missile");
@@ -135,30 +159,9 @@ public class ClassicArena extends Arena {
         int red_shield_health_amount = ((int) ((100 - blueTeam.getShieldHealth())) / 10) * shield_health;
         int blue_shield_health_amount = ((int) ((100 - redTeam.getShieldHealth())) / 10) * shield_health;
 
-        // Find players with mvp, most deaths, and kills
-        Pair<Integer, String> mostPortals = getTopStat(Stat.PORTALS);
-        Pair<Integer, String> mostKills = getTopStat(Stat.KILLS);
-        Pair<Integer, String> mostDeaths = getTopStat(Stat.DEATHS);
-
         Economy econ = MissileWarsPlugin.getPlugin().getEconomy();
         LocalDateTime endTime = LocalDateTime.now();
         long gameTime = Duration.between(startTime, endTime).toSeconds();
-        
-        // Calculate win message
-        List<String> actualWinMessages = new ArrayList<>();
-        String winner = winningTeam == null ? "&e&lNONE" : winningTeam == blueTeam ? "&9&lBLUE" : "&c&lRED";
-        for (String s : winningMessages) {
-            s = s.replaceAll("%umw_winning_team%", winner);
-            s = s.replaceAll("%umw_most_mvp_amount%", mostPortals.getLeft() + "");
-            s = s.replaceAll("%umw_most_kills_amount%", mostKills.getLeft() + "");
-            s = s.replaceAll("%umw_most_deaths_amount%", mostDeaths.getLeft() + "");
-            s = s.replaceAll("%umw_most_mvp%", mostPortals.getRight());
-            s = s.replaceAll("%umw_most_kills%", mostKills.getRight());
-            s = s.replaceAll("%umw_most_deaths%", mostDeaths.getRight());
-            actualWinMessages.add(s);
-        }
-
-        // Update stats for each player
         for (MissileWarsPlayer player : players.values()) {
             // Send win message
             for (String s : actualWinMessages) {

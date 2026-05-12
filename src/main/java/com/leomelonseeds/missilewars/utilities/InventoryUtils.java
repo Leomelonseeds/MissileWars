@@ -28,6 +28,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
@@ -275,15 +276,29 @@ public class InventoryUtils {
         boolean deplete = slot == -1;
         
         // Add cooldown to offhand item if item is manually depleted, to prevent offhand items
-        // from being used in the same tick without warning
+        // from being used in the same tick without warning.
+        // Exception: If missile cooldown is disabled, and player is holding missiles in both
+        // hands, then do nothing
         PlayerInventory pinv = player.getInventory();
-        if (deplete && pinv.getItem(EquipmentSlot.HAND).equals(item)) {
-            int cooldown = MissileWarsPlugin.getPlugin().getConfig().getInt("experimental.missile-cooldown");
-            ItemStack off = pinv.getItem(EquipmentSlot.OFF_HAND);
-            if (!CooldownUtils.hasCooldown(player, off)) {
-                CooldownUtils.setCooldown(player, off, cooldown);
+        do {
+            if (!deplete || !pinv.getItem(EquipmentSlot.HAND).equals(item)) {
+                break;
             }
-        }
+            
+            ItemStack off = pinv.getItem(EquipmentSlot.OFF_HAND);
+            if (!arena.getBooleanSetting(ArenaSetting.ENABLE_MISSILE_COOLDOWN) && 
+                    item.getType().toString().endsWith("SPAWN_EGG") &&
+                    off.getType().toString().endsWith("SPAWN_EGG")) {
+                break;
+            }
+
+            if (CooldownUtils.hasCooldown(player, off)) {
+                break;
+            }
+            
+            int cooldown = MissileWarsPlugin.getPlugin().getConfig().getInt("experimental.missile-cooldown");
+            CooldownUtils.setCooldown(player, off, cooldown);
+        } while (false);
         
         if (di == null) {
             if (deplete) {
@@ -400,6 +415,10 @@ public class InventoryUtils {
     
     public static String getGUIFromItem(ItemStack item) {
         return getStringFromItemKey(item, ITEM_GUI_KEY);
+    }
+    
+    public static String getUUIDFromItem(ItemStack item) {
+        return getStringFromItemKey(item, UUID_KEY);
     }
     
     public static String getStringFromItemKey(ItemStack item, NamespacedKey key) {

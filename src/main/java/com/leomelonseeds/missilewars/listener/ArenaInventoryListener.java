@@ -152,7 +152,7 @@ public class ArenaInventoryListener implements Listener {
 
         // Handle dropping of deck items
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        DeckItem di = mwp.getDeck().getDeckItem(dropped);
+        DeckItem di = mwp.getDeck().getMatchingDeckItem(dropped);
         if (di == null) {
             return;
         }
@@ -233,7 +233,6 @@ public class ArenaInventoryListener implements Listener {
     }
    
     /** Manage arrow pickups. */
-    @SuppressWarnings("deprecation")
     @EventHandler
     public void onArrowPickup(PlayerPickupArrowEvent event) {
         // Check if player is in Arena

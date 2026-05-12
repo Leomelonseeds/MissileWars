@@ -203,7 +203,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         // Compute amounts of each registered item
         Map<UUID, Integer> amounts = new HashMap<>();
         for (ItemStack item : player.getInventory().getContents()) {
-            String uuidString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.UUID_KEY);
+            String uuidString = InventoryUtils.getUUIDFromItem(item);
             if (uuidString == null) {
                 continue;
             }

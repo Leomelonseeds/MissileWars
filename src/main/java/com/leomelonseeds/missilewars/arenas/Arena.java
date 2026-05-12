@@ -1515,13 +1515,13 @@ public abstract class Arena implements ConfigurationSerializable {
                 redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
                 announceMessage("messages.chaos2", null);
             }, 1200 * 20));
-            
-            // Stage 3 chaos
-            tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 1500 * 20));
         }
         
         // Auto end game
         if (!getBooleanSetting(ArenaSetting.IS_INFINITE_TIME)) {
+            // 5 minute game end reminder
+            tasks.add(scheduler.runTaskLater(plugin, () -> announceMessage("messages.chaos3", null), 1500 * 20));
+            
             // Reminders 1 minute before the game ends
             int[] reminderTimes = {1740, 1770, 1790, 1795, 1796, 1797, 1798, 1799};
             for (int i : reminderTimes) {
@@ -1776,9 +1776,7 @@ public abstract class Arena implements ConfigurationSerializable {
         discordChannel.sendMessage(discordMessage).queue();
         
         // Calculate stats for players
-        if (!isCustom()) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> calculateStats(winningTeam));
 
         // Remove all players after a short time, then reset the world a bit after
         int waitTime = plugin.getConfig().getInt("victory-wait-time") * 20;
