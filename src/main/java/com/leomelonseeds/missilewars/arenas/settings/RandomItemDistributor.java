@@ -70,6 +70,13 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     /**
+     * Stops item distribution, if any is currently ongoing
+     */
+    public void stopDistribution() {
+        timerTicks = 0;
+    }
+    
+    /**
      * Give the next item to both teams. If team balancing is enabled, and
      * the ratio of one team to another is greater than or equal to 3:2, the
      * smaller team will receive floor(g / l) items per player, and the
@@ -186,8 +193,11 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
         int maxAmount = randomItem.getMax() * randomItem.getAmount();
+        int giveAmount = amount * randomItem.getAmount();
         if (maxAmount == 0 && globalLimit == 0) {
-            player.give(getRandomItem(randomItem, amount));
+            ItemStack item = randomItem.getItem();
+            item.setAmount(giveAmount);
+            player.give(item);
         }
 
         // Compute amounts of each registered item
@@ -202,25 +212,35 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             amounts.put(uuid, amounts.getOrDefault(amounts, 0) + item.getAmount());
         }
         
+        // If the item amount is less than the max amount but the next give
+        // would make it exceed either the global limit or the current item
+        // limit, we only add amount to make it to the limit.
+        // There are 2 ways this could happen: 
+        // 1. Item amount is less than max amount but more than max - give amount
+        // 2. Inventory amount >= max amount && item amount % give amount > 0
+        int itemAmount = 0;
+        if (amounts.containsKey(randomItem.getID())) {
+            itemAmount = amounts.get(randomItem.getID());
+        }
+        
         // Check item limit first
-        if (maxAmount > 0 && amounts.containsKey(randomItem.getID())) {
-            int curAmount = amounts.get(randomItem.getID());
-            if (curAmount >= maxAmount) {
+        if (maxAmount > 0) {
+            if (itemAmount >= maxAmount) {
                 String msg = ConfigUtils.getConfigText("messages.random-item-limit");
                 player.sendActionBar(ConfigUtils.toComponent(msg));
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
             }
             
-            ItemStack item = getRandomItem(randomItem, amount);
-            if (curAmount + item.getAmount() > maxAmount) {
-                item.setAmount(maxAmount - curAmount);
+            if (itemAmount + giveAmount > maxAmount) {
+                giveAmount = maxAmount - itemAmount;
             }
         }
         
         // Check global limit next
         if (globalLimit > 0) {
             int curGroups = 0;
+            boolean exceeds = false;
             for (Entry<UUID, Integer> e : amounts.entrySet()) {
                 RandomItem ri = itemMap.get(e.getKey());
                 if (ri == null) {
@@ -235,28 +255,33 @@ public class RandomItemDistributor implements ConfigurationSerializable {
                 
                 curGroups += curGroup;
                 if (curGroups >= globalLimit) {
+                    exceeds = true;
+                    break;
+                }
+            }
+            
+            if (exceeds) {
+                int remainder = itemAmount % randomItem.getAmount();
+                if (remainder > 0) {
+                    giveAmount = Math.min(giveAmount, randomItem.getAmount() - remainder);
+                } else {
                     String msg = ConfigUtils.getConfigText("messages.random-item-global-limit");
                     player.sendActionBar(ConfigUtils.toComponent(msg));
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
+            } else if (amount + curGroups > globalLimit) {
+                int curMaxAmount = (globalLimit - curGroups) * randomItem.getAmount();
+                giveAmount = Math.min(giveAmount, curMaxAmount - itemAmount);
             }
-            
-            
         }
-    }
-    
-    /**
-     * Gets the itemstack associated with the random item
-     * 
-     * @param randomItem
-     * @param amount
-     * @return
-     */
-    private ItemStack getRandomItem(RandomItem randomItem, int amount) {
-        ItemStack item = randomItem.getItem();
-        item.setAmount(randomItem.getAmount() * amount);
-        return item;
+        
+        // Finally give the item if we're sure that we can actually give some
+        if (giveAmount > 0) {
+            ItemStack item = randomItem.getItem();
+            item.setAmount(giveAmount);
+            player.give(item);
+        }
     }
     
     /**
