@@ -1726,7 +1726,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         // Players shouldn't be able to play anymore
-        for (MissileWarsPlayer player : players.values()) {
+        for (MissileWarsPlayer player : getInGamePlayers()) {
             player.stopDeck();
             Player p = player.getMCPlayer();
             p.setGameMode(GameMode.SPECTATOR);
