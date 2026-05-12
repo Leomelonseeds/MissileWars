@@ -206,8 +206,8 @@ public class ArenaSettings implements ConfigurationSerializable {
         Map<ArenaSetting, Pair<Object, Object>> res = new HashMap<>();
         for (ArenaSetting setting : queue.keySet()) {
             Object value = queue.get(setting);
-            set(setting, value);
             res.put(setting, Pair.of(get(setting), value));
+            set(setting, value);
         }
         
         queue.clear();
