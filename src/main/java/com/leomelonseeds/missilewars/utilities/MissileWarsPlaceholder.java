@@ -15,6 +15,7 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaType;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer.Stat;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
@@ -55,9 +56,9 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             return null;
         }
 
-        Arena playerArena = null;
+        Arena arena = null;
         if (player.isOnline()) {
-            playerArena = plugin.getArenaManager().getArena(player.getLocation().getWorld());
+            arena = plugin.getArenaManager().getArena(player.getLocation().getWorld());
         }
         DecimalFormat df = new DecimalFormat("##.##");
         String args[] = params.split("_");
@@ -74,7 +75,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (typeArg.equals("team")) {
-            TeamName team = playerArena == null ? TeamName.NONE : playerArena.getTeam(player.getUniqueId());
+            TeamName team = arena == null ? TeamName.NONE : arena.getTeam(player.getUniqueId());
             if (params.equals("team")) {
                 return team.toString();
             }
@@ -95,9 +96,14 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return deck.toString();
             }
 
+            boolean randomItems = arena != null && arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
             String preset = json.getString("Preset");
             if (args.length == 1) {
-                return deck.getColor() + deck + "§7 [" + preset + "]";
+                if (randomItems) {
+                    return "&6Random &7Items";
+                } else {
+                    return deck.getColor() + deck + "§7 [" + preset + "]";
+                }
             }
             
             // umw_deck_npcname_[deck]
@@ -105,7 +111,9 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
             if (args[1].equals("npcname")) {
                 DeckStorage plDeck = DeckStorage.fromString(args[2]);
                 String res = plDeck.getNPCName();
-                if (plDeck == deck) {
+                if (randomItems) {
+                    res = res.replace("§", "&").replace(plDeck.getColor(), "&7");
+                } else if (plDeck == deck) {
                     String stripped = ConfigUtils.removeColors(res);
                     String[] parts = stripped.split(" ");
                     String symbold = res.contains("§r") ? "" : "&l";
@@ -114,6 +122,11 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 }
                 
                 return res;
+            }
+            
+            // Assume now it's umw_deck_[passive/ability/gpassive]
+            if (randomItems) {
+                return "N/A";
             }
             
             FileConfiguration sec = ConfigUtils.getConfigFile("items.yml");
@@ -216,20 +229,20 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equals("arena")) {
-            return playerArena == null ? "Lobby" : StringUtils.capitalize(playerArena.getName());
+            return arena == null ? "Lobby" : StringUtils.capitalize(arena.getName());
         }
 
         if (params.equals("ingame")) {
-            return playerArena == null ? "false" : Boolean.toString(playerArena.isRunning() || playerArena.isResetting());
+            return arena == null ? "false" : Boolean.toString(arena.isRunning() || arena.isResetting());
         }
 
-        if (playerArena == null) {
+        if (arena == null) {
             return null;
         }
 
         // Arena specific placeholders
         if (typeArg.equals("tutorial")) {
-            if (!(playerArena instanceof TutorialArena)) {
+            if (!(arena instanceof TutorialArena)) {
                 return null;
             }
 
@@ -238,7 +251,7 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
                 return TutorialArena.MAX_STAGES + "";
             }
             
-            Integer stage = ((TutorialArena) playerArena).getStage(player.getUniqueId());
+            Integer stage = ((TutorialArena) arena).getStage(player.getUniqueId());
             if (arg.equals("stage")) {
                 return stage + "";
             }
@@ -267,16 +280,16 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equals("red_queue")) {
-            return Integer.toString(playerArena.getRedQueue());
+            return Integer.toString(arena.getRedQueue());
         }
 
         if (params.equals("blue_queue")) {
-            return Integer.toString(playerArena.getBlueQueue());
+            return Integer.toString(arena.getBlueQueue());
         }
 
         // In-Game placeholders
-        MissileWarsTeam redTeam = playerArena.getRedTeam();
-        MissileWarsTeam blueTeam = playerArena.getBlueTeam();
+        MissileWarsTeam redTeam = arena.getRedTeam();
+        MissileWarsTeam blueTeam = arena.getBlueTeam();
 
         if (params.equals("red_team")) {
             if (redTeam == null) {
@@ -293,11 +306,15 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equals("map")) {
-            return ConfigUtils.getMapText(playerArena.getGamemode(), playerArena.getMapName(), "name");
+            return ConfigUtils.getMapText(arena.getGamemode(), arena.getMapName(), "name");
+        }
+        
+        if (params.equals("seconds_until_start")) {
+            return arena.getSecondsUntilStart() + "";
         }
 
         if (params.equals("time_remaining")) {
-            return playerArena.getTimeRemaining();
+            return arena.getTimeRemaining();
         }
 
         if (params.equals("red_shield_health")) {
@@ -355,9 +372,13 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         if (params.equals("kills")) {
-            return playerArena.getPlayerInArena(player.getUniqueId()).getStat(Stat.KILLS) + "";
+            return arena.getPlayerInArena(player.getUniqueId()).getStat(Stat.KILLS) + "";
         }
 
         return null; // Placeholder is unknown by the Expansion
+    }
+    
+    private boolean isRandomItems(Arena arena) {
+        return arena != null && arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
     }
 }

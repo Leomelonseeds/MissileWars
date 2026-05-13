@@ -82,7 +82,7 @@ public class ItemSettings extends ArenaSettingsInventory {
         boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         if (key.equals("deck-item-distribution")) {
             if (!randomItems) {
-                new DeckDistributionSettings(player, randomItems, arena, this);
+                new DeckDistributionSettings(player, viewOnly, arena, this);
                 return;
             }
             
@@ -96,7 +96,7 @@ public class ItemSettings extends ArenaSettingsInventory {
                 ConfigUtils.sendConfigSound("use-skillpoint", player);
                 updateInventory();
             } else if (type.isRightClick()) {
-                new DeckDistributionSettings(player, randomItems, arena, this);
+                new DeckDistributionSettings(player, viewOnly, arena, this);
             }
             
             return;
