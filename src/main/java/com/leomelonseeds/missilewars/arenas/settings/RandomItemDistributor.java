@@ -138,7 +138,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             // Give extra items to the first `remainder` players
             uneven = true;
             List<MissileWarsPlayer> giveExtra = new ArrayList<>(less);
-            int lessAmount = 1 + (more.size() / less.size());
+            int lessAmount = more.size() / less.size();
+            int limitMultiplier = (int) Math.ceil(more.size() / (double) less.size());
             int remainder = more.size() % less.size();
             Collections.shuffle(giveExtra);
             for (int i = 0; i < giveExtra.size(); i++) {
@@ -146,7 +147,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
                 if (i < remainder) {
                     amount++;
                 }
-                giveItemToPlayer(giveExtra.get(i).getMCPlayer(), nextItem, amount, globalLimit);
+                giveItemToPlayer(giveExtra.get(i).getMCPlayer(), nextItem, amount, globalLimit, limitMultiplier);
             }
             
             // Give the team with more players their share too
@@ -196,7 +197,10 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         
         ConfigUtils.schedule(20, () -> setXPBars(timer, cur - 1, redTeam, blueTeam));
     }
-    
+
+    private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
+        giveItemToPlayer(player, randomItem, amount, globalLimit, 1);
+    }
     
     /**
      * Give an item to a player. If the amount in the player's
@@ -209,9 +213,11 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param randomItem
      * @param amount
      * @param globalLimit
+     * @param limitMultiplier multiplies both random item limit and global limit
      */
-    private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit) {
-        int maxAmount = randomItem.getMax() * randomItem.getAmount();
+    private void giveItemToPlayer(Player player, RandomItem randomItem, int amount, int globalLimit, int limitMultiplier) {
+        globalLimit *= limitMultiplier;
+        int maxAmount = randomItem.getMax() * randomItem.getAmount() * limitMultiplier;
         int giveAmount = amount * randomItem.getAmount();
         if (maxAmount == 0 && globalLimit == 0) {
             ItemStack item = randomItem.getItem();

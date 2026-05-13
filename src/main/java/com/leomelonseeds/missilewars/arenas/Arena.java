@@ -1718,7 +1718,8 @@ public abstract class Arena implements ConfigurationSerializable {
         // Otherwise the team with less players gets a fraction
         // of the multiplier of more players team
         less.setMultiplier(more.getMultiplier() * lessSize / moreSize);
-        less.broadcastConfigMsg("messages.team-balancing", null);
+        String type = getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION) ? "random" : "deck";
+        less.broadcastConfigMsg("messages.team-balancing-" + type, null);
     }
     
     /**
