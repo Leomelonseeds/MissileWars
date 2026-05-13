@@ -38,6 +38,7 @@ import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -79,7 +80,7 @@ public class TritonHandler implements Listener {
     }
     
     private void initTrident() {
-        ItemStack trident = MissileWarsPlugin.getPlugin().getDeckManager().createItem("trident", 0, false);
+        ItemStack trident = InventoryUtils.createItem("trident");
         ItemMeta meta = trident.getItemMeta();
         
         // Set modified attack damage

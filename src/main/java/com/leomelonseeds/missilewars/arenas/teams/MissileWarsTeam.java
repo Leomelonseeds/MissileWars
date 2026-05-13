@@ -209,20 +209,25 @@ public class MissileWarsTeam {
         
         UUID uuid = player.getMCPlayerId();
         InventoryUtils.clearInventory(mcPlayer, true);
-        ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);
-        int swiftSneak = plugin.getJSON().getEnchantLevel(uuid, "swift_sneak");
-        if (swiftSneak > 0) {
-            leggings.addEnchantment(Enchantment.SWIFT_SNEAK, swiftSneak);
-        }
-        inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
-        inv.setLeggings(leggings);
         
-        // Create and register deck. Initdeck is in arena code!
-        Deck deck = plugin.getDeckManager().getPlayerDeck(player);
-        player.setDeck(deck);
-        for (DeckItem di : deck.getItems()) {
-            CooldownUtils.setCooldown(mcPlayer, di.getInstanceItem(), 36000);
-            di.registerTeam(this);
+        // Setup based on item distribution type
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+            arena.getArenaSettings().getRandomItemDistributor().equipGear(mcPlayer, name);
+        } else {
+            ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);
+            int swiftSneak = plugin.getJSON().getEnchantLevel(uuid, "swift_sneak");
+            if (swiftSneak > 0) {
+                leggings.addEnchantment(Enchantment.SWIFT_SNEAK, swiftSneak);
+            }
+            
+            inv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE));
+            inv.setLeggings(leggings);
+            Deck deck = plugin.getDeckManager().getPlayerDeck(player);
+            player.setDeck(deck);
+            for (DeckItem di : deck.getItems()) {
+                CooldownUtils.setCooldown(mcPlayer, di.getInstanceItem(), 36000);
+                di.registerTeam(this);
+            }
         }
         
         // Vanguard dwarfism
@@ -257,6 +262,8 @@ public class MissileWarsTeam {
         }
         
         // Callback when all setup is done, so that added attributes are instantly available to other classes
+        // Start player missile preview
+        player.startMissilePreview(name == TeamName.RED);
         arena.addCallback(player);
     }
 
@@ -307,7 +314,7 @@ public class MissileWarsTeam {
     	Player mcPlayer = player.getMCPlayer();
         members.remove(uuid);
         InventoryUtils.clearInventory(mcPlayer);
-        player.stopDeck();
+        player.stopTasks();
         player.resetPlayer();
         mcPlayer.setLevel(0);
         mcPlayer.setExp(0F);

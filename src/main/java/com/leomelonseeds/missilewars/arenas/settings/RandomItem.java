@@ -1,16 +1,23 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
+
+import net.kyori.adventure.text.Component;
 
 /**
  * 
@@ -34,16 +41,16 @@ public class RandomItem implements ConfigurationSerializable {
     
     private RandomItem(String id, ItemStack item) {
         this.id = id;
+        this.uuid = UUID.randomUUID();
         if (id != null) {
             this.item = getItemFromID(id);
         } else {
             this.item = item.clone();
         }
+        addInfoLore();
         this.weight = 1;
         this.max = 1;
         this.amount = 1;
-        this.uuid = UUID.randomUUID();
-        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
     }
     
     public RandomItem(RandomItem other) {
@@ -78,6 +85,7 @@ public class RandomItem implements ConfigurationSerializable {
     }
     
     public RandomItem(Map<String, Object> settings) {
+        this.uuid = UUID.randomUUID();
         if (settings.containsKey("item")) {
             this.item = (ItemStack) settings.get("item");
         } else {
@@ -89,17 +97,51 @@ public class RandomItem implements ConfigurationSerializable {
             }
         }
 
+        addInfoLore();
         this.weight = (int) settings.get("weight");
         this.max = (int) settings.get("max");
         this.amount = (int) settings.get("amount");
-        this.uuid = UUID.randomUUID();
-        InventoryUtils.setMetaString(item, InventoryUtils.UUID_KEY, uuid.toString());
     }
     
     private ItemStack getItemFromID(String id) {
         String[] args = id.split("-");
         int level = Integer.parseInt(args[1]);
-        return MissileWarsPlugin.getPlugin().getDeckManager().createItem(args[0], level, false);
+        return MissileWarsPlugin.getPlugin().getDeckManager().createRandomItem(args[0], level);
+    }
+    
+    /**
+     * Call when max or amount is updated
+     */
+    private void updateInfoLore() {
+        ItemMeta meta = item.getItemMeta();
+        List<Component> lore = meta.lore();
+        lore.remove(lore.size() - 1);
+        lore.remove(lore.size() - 1);
+        lore.addAll(getLoreLines());
+        item.setItemMeta(meta);
+    }
+    
+    /**
+     * Adds lore to item, setting max, amount, and UUID
+     */
+    private void addInfoLore() {
+        ItemMeta meta = item.getItemMeta();
+        List<Component> lore = meta.lore();
+        lore.addAll(getLoreLines());
+        meta.lore(lore);
+        InventoryUtils.setMetaString(meta, InventoryUtils.UUID_KEY, uuid.toString());
+        item.setItemMeta(meta);
+    }
+    
+    private List<Component> getLoreLines() {
+        List<Component> res = new ArrayList<>();
+        FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+        List<String> toAdd = itemConfig.getStringList("text.itemstats-random");
+        for (String s : toAdd) {
+            s = s.replace("%amount%", amount + "").replace("%max%", max == 0 ? "∞" : max + "");
+            res.add(ConfigUtils.toComponent(s));
+        }
+        return res;
     }
 
     /**
@@ -130,6 +172,7 @@ public class RandomItem implements ConfigurationSerializable {
 
     public void setMax(int max) {
         this.max = max;
+        updateInfoLore();
     }
 
     public int getAmount() {
@@ -138,6 +181,7 @@ public class RandomItem implements ConfigurationSerializable {
 
     public void setAmount(int amount) {
         this.amount = amount;
+        updateInfoLore();
     }
     
     public UUID getID() {

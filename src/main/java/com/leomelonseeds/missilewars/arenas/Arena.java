@@ -1502,17 +1502,27 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Chaos timers
         if (getBooleanSetting(ArenaSetting.ENABLE_DECREASING_COOLDOWNS)) {
+            boolean randomItems = getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
             // Stage 1 chaos
             tasks.add(scheduler.runTaskLater(plugin, () -> {
-                blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
-                redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
+                if (randomItems) {
+                    settings.getRandomItemDistributor().setTimerMultiplier(0.75);
+                } else {
+                    blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
+                    redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
+                }
                 announceMessage("messages.chaos1", null);
             }, 600 * 20));
             
             // Stage 2 chaos
             tasks.add(scheduler.runTaskLater(plugin, () -> {
-                blueTeam.setMultiplier(blueTeam.getMultiplier() * 2 / 3);
-                redTeam.setMultiplier(redTeam.getMultiplier() * 2 / 3);
+                double twothirds = 2.0 / 3.0;
+                if (randomItems) {
+                    settings.getRandomItemDistributor().setTimerMultiplier(twothirds);
+                } else {
+                    blueTeam.setMultiplier(blueTeam.getMultiplier() * twothirds);
+                    redTeam.setMultiplier(redTeam.getMultiplier() * twothirds);
+                }
                 announceMessage("messages.chaos2", null);
             }, 1200 * 20));
         }
@@ -1642,10 +1652,13 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void addCallback(MissileWarsPlayer player) {
         // If game is running, no null/queuecount checks are needed
+        boolean randomItems = getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         if (running) {
             applyMultipliers();
-            UUID uuid = player.getMCPlayerId();
-            player.initDeck(leftPlayers.getOrDefault(uuid, 0) >= 3, this, redTeam.containsPlayer(uuid));
+            if (!randomItems) {
+                UUID uuid = player.getMCPlayerId();
+                player.initDeck(leftPlayers.getOrDefault(uuid, 0) >= 3, this, redTeam.containsPlayer(uuid));
+            }
             return;
         }
         
@@ -1660,8 +1673,12 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         applyMultipliers();
-        for (MissileWarsPlayer mwp : getInGamePlayers()) {
-            mwp.initDeck(false, this, redTeam.containsPlayer(mwp.getMCPlayerId()));
+        if (randomItems) {
+            settings.getRandomItemDistributor().startDistribution(redTeam.getMembers(), blueTeam.getMembers());
+        } else {
+            for (MissileWarsPlayer mwp : getInGamePlayers()) {
+                mwp.initDeck(false, this, redTeam.containsPlayer(mwp.getMCPlayerId()));
+            }
         }
         
         running = true;
@@ -1727,7 +1744,7 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Players shouldn't be able to play anymore
         for (MissileWarsPlayer player : getInGamePlayers()) {
-            player.stopDeck();
+            player.stopTasks();
             Player p = player.getMCPlayer();
             p.setGameMode(GameMode.SPECTATOR);
             p.removePotionEffect(PotionEffectType.GLOWING);

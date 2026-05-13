@@ -350,7 +350,7 @@ public class DeckItem {
             
         // Due to the way crossbow loading and bow firing are handled,
         // setting the item cooldowns for them differs slightly
-        if (item.getType().toString().contains("ARROW")) {
+        if (item.getType().toString().endsWith("ARROW")) {
             CooldownUtils.setCooldown(player, Material.BOW, cd);
             if (cd == 0) {
                 CooldownUtils.setCooldown(player, Material.CROSSBOW, 0);

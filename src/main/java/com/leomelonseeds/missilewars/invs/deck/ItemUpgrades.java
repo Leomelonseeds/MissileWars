@@ -47,8 +47,7 @@ public class ItemUpgrades extends DeckSubInventory {
         for (String itemString : items) {
             ItemStack item = MissileWarsPlugin.getPlugin().getDeckManager().createItem(
                     isEnchants ? deck + ".enchants." + itemString : itemString,
-                    typeJson.getInt(itemString), 
-                    type.equals("missiles"), 
+                    typeJson.getInt(itemString),
                     playerJson, deck, isEnchants, preset);
             int slotAdd;
             if (isEnchants) {

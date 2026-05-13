@@ -120,6 +120,9 @@ public class ItemSettings extends ArenaSettingsInventory {
             
             if (type.isLeftClick()) {
                 arenaSettings.set(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, true);
+                if (arenaSettings.getRandomItemDistributor() == null) {
+                    arenaSettings.setDefaultRandomItemDistributor();
+                }
                 ConfigUtils.sendConfigSound("use-skillpoint", player);
                 updateInventory();
             } else if (type.isRightClick()) {

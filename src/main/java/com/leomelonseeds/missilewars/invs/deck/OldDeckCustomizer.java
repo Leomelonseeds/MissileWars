@@ -98,8 +98,7 @@ public class OldDeckCustomizer extends MWInventory {
         for (String s : items) {
             int index = getIndex(s);
             for (String u : presetjson.getJSONObject(s).keySet()) {
-                ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), 
-                        s.equals("missiles"), init, deck, false, preset);
+                ItemStack item = deckManager.createItem(u, presetjson.getJSONObject(s).getInt(u), init, deck, false, preset);
                 int add = itemConfig.getInt(u + ".index");
                 if (s.equals("utility")) {
                     add -= 5;
@@ -112,7 +111,7 @@ public class OldDeckCustomizer extends MWInventory {
         int index_e = getIndex("enchants");
         for (String key : itemConfig.getConfigurationSection(deck + ".enchants").getKeys(false)) {
             ItemStack item = deckManager.createItem(deck + ".enchants." + key, 
-                    presetjson.getJSONObject("enchants").getInt(key), false, init, deck, true, preset);
+                    presetjson.getJSONObject("enchants").getInt(key), init, deck, true, preset);
             inv.setItem(index_e, item);
             index_e++;
         }
@@ -125,8 +124,7 @@ public class OldDeckCustomizer extends MWInventory {
             if (gpassivejson.getString("selected").equals(key)) {
                 level = gpassivejson.getInt("level");
             }
-            ItemStack item = deckManager.createItem("gpassive." + key, level, 
-                        false, init, deck, true, preset);
+            ItemStack item = deckManager.createItem("gpassive." + key, level, init, deck, true, preset);
             inv.setItem(index_g, item);
             index_g++;
         }
@@ -140,8 +138,7 @@ public class OldDeckCustomizer extends MWInventory {
                 if (currentjson.getString("selected").equals(key)) {
                     level = currentjson.getInt("level");
                 }
-                ItemStack item = deckManager.createItem(deck + "." + p + "." + key, level, 
-                            false, init, deck, true, preset);
+                ItemStack item = deckManager.createItem(deck + "." + p + "." + key, level, init, deck, true, preset);
                 inv.setItem(index, item);
                 index++;
             }

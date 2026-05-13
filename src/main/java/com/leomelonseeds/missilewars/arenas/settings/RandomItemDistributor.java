@@ -1,21 +1,30 @@
 package com.leomelonseeds.missilewars.arenas.settings;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.jetbrains.annotations.NotNull;
 
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
+import com.leomelonseeds.missilewars.arenas.teams.TeamName;
+import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -40,7 +49,12 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.settings = settings;
         this.curItems = new ArrayList<>();
         this.items = new ArrayList<>();
-        other.items.forEach(ri -> this.items.add(new RandomItem(ri)));
+        this.itemMap = new HashMap<>();
+        other.items.forEach(ri -> {
+            RandomItem randomItem = new RandomItem(ri);
+            this.items.add(randomItem);
+            this.itemMap.put(randomItem.getID(), randomItem);
+        });
     }
  
     @Override
@@ -54,6 +68,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public RandomItemDistributor(Map<String, Object> distributor) {
         this.items = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
+        this.itemMap = new HashMap<>();
         items.forEach(ri -> itemMap.put(ri.getID(), ri));
     }
     
@@ -64,7 +79,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param redTeam A live view of the red team players
      * @param blueTeam A live view of the blue team players
      */
-    public void startDistribution(Set<MissileWarsPlayer> redTeam, Set<MissileWarsPlayer> blueTeam) {
+    public void startDistribution(Collection<MissileWarsPlayer> redTeam, Collection<MissileWarsPlayer> blueTeam) {
         timerTicks = ((int) settings.get(ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER)) * 20;
         giveNextItem(redTeam, blueTeam);
     }
@@ -85,7 +100,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param redTeam
      * @param blueTeam
      */
-    private void giveNextItem(Set<MissileWarsPlayer> redTeam, Set<MissileWarsPlayer> blueTeam) {
+    private void giveNextItem(Collection<MissileWarsPlayer> redTeam, Collection<MissileWarsPlayer> blueTeam) {
         // If timer is 0, stop the distributor
         if (timerTicks == 0) {
             return;
@@ -106,11 +121,15 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             if (!((boolean) settings.get(ArenaSetting.ENABLE_TEAM_BALANCING))) {
                 break;
             }
+            
+            if (redTeam.size() == 0 || blueTeam.size() == 0) {
+                break;
+            }
 
             // Figure out if larger team size / smaller team size >= 3/2
             boolean redLarger = redTeam.size() > blueTeam.size();
-            Set<MissileWarsPlayer> less = redLarger ? blueTeam : redTeam;
-            Set<MissileWarsPlayer> more = redLarger ? redTeam : blueTeam;
+            Collection<MissileWarsPlayer> less = redLarger ? blueTeam : redTeam;
+            Collection<MissileWarsPlayer> more = redLarger ? redTeam : blueTeam;
             if ((double) less.size() * 3 > more.size() * 2) {
                 break;
             }
@@ -158,7 +177,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param redTeam
      * @param blueTeam
      */
-    private void setXPBars(int timer, int cur, Set<MissileWarsPlayer> redTeam, Set<MissileWarsPlayer> blueTeam) {
+    private void setXPBars(int timer, int cur, Collection<MissileWarsPlayer> redTeam, Collection<MissileWarsPlayer> blueTeam) {
         if (timerTicks == 0 || cur == 0) {
             return;
         }
@@ -226,7 +245,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         // Check item limit first
         if (maxAmount > 0) {
             if (itemAmount >= maxAmount) {
-                String msg = ConfigUtils.getConfigText("messages.random-item-limit");
+                String msg = ConfigUtils.getConfigText("messages.random-item-limit")
+                    .replace("%item%", ConfigUtils.toPlain(randomItem.getModifiableItem().getItemMeta().displayName()));
                 player.sendActionBar(ConfigUtils.toComponent(msg));
                 ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                 return;
@@ -265,7 +285,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
                 if (remainder > 0) {
                     giveAmount = Math.min(giveAmount, randomItem.getAmount() - remainder);
                 } else {
-                    String msg = ConfigUtils.getConfigText("messages.random-item-global-limit");
+                    String msg = ConfigUtils.getConfigText("messages.random-item-global-limit")
+                        .replace("%item%", ConfigUtils.toPlain(randomItem.getModifiableItem().getItemMeta().displayName()));
                     player.sendActionBar(ConfigUtils.toComponent(msg));
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
@@ -319,9 +340,41 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     /**
+     * Equips player with the gear determined by item distributor
+     * 
+     * @param player
+     * @param team
+     */
+    public void equipGear(Player player, TeamName team) {
+        PlayerInventory pinv = player.getInventory();
+        pinv.setChestplate(createColoredArmor(Material.LEATHER_CHESTPLATE, team));
+        pinv.setLeggings(createColoredArmor(Material.LEATHER_LEGGINGS, team));
+        pinv.setBoots(createColoredArmor(Material.LEATHER_BOOTS, team));
+        
+        // Bow
+        DeckManager dm = MissileWarsPlugin.getPlugin().getDeckManager();
+        ItemStack weapon = dm.createItem("Sentinel.weapon", 0);
+        dm.addEnch(weapon, Enchantment.SHARPNESS, 4);
+        dm.addEnch(weapon, Enchantment.FLAME, 1);
+        weapon.removeEnchantment(Enchantment.UNBREAKING);
+        ItemMeta weaponMeta = weapon.getItemMeta();
+        weaponMeta.setUnbreakable(true);
+        weapon.setItemMeta(weaponMeta);
+        pinv.setItem(0, weapon);
+    }
+    
+    private ItemStack createColoredArmor(Material type, TeamName team) {
+        ItemStack item = new ItemStack(type);
+        LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+        meta.setColor(DyeColor.valueOf(team.toString().toUpperCase()).getColor());
+        meta.setUnbreakable(true);
+        item.setItemMeta(meta);
+        return item;
+    }
+    
+    /**
      * If random item distribution is currently in progress, multiplies
-     * the default timer set by the settings by the given multiplier.
-     * The resulting timer is rounded to the nearest tick.
+     * the CURRENT timer by the given multiplier
      * 
      * Genuinely does nothing if distributor isn't running
      * 
@@ -354,5 +407,27 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     public void setArenaSettings(ArenaSettings settings) {
         this.settings = settings;
+    }
+    
+    /**
+     * Get a random item distributor that correponds to the
+     * classic Missile Wars items
+     * 
+     * @param settings
+     * @return
+     */
+    public static RandomItemDistributor getDefaultRandomItemDistributor(ArenaSettings settings) {
+        RandomItemDistributor dist = new RandomItemDistributor(settings);
+        dist.addItem(new RandomItem("tomahawk-1"));
+        dist.addItem(new RandomItem("shieldbuster-1"));
+        dist.addItem(new RandomItem("guardian-1"));
+        dist.addItem(new RandomItem("juggernaut-1"));
+        dist.addItem(new RandomItem("lightning-1"));
+        dist.addItem(new RandomItem("fireball-1"));
+        dist.addItem(new RandomItem("shield-2"));
+        RandomItem arrows = new RandomItem("arrows-1");
+        arrows.setAmount(3);
+        dist.addItem(arrows);
+        return dist;
     }
 }

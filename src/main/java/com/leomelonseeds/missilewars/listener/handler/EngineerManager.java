@@ -18,6 +18,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Ability;
+import com.leomelonseeds.missilewars.decks.Deck;
 import com.leomelonseeds.missilewars.decks.DeckItem;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -160,7 +161,12 @@ public class EngineerManager implements Listener {
         }
         
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        DeckItem di = mwp.getDeck().getDeckItem(item);
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            return false;
+        }
+        
+        DeckItem di = deck.getDeckItem(item);
         if (di == null) {
             return false;
         }

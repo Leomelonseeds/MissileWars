@@ -79,7 +79,7 @@ tomahawk:
   index: 0
   1:
     file: 'tomahawk.nbt'
-    item: ZOMBIE_SPAWN_EGG
+    item: CREEPER_SPAWN_EGG
     name: "&a☢ Tomahawk ⚡"
     lore:
     - ""
@@ -93,7 +93,7 @@ tomahawk:
     tnt: 14
   2:
     file: 'tomatwo.nbt'
-    item: ZOMBIE_SPAWN_EGG
+    item: CREEPER_SPAWN_EGG
     name: "&a☢ &lTomatwo &a⚡"
     lore:
     - ""
@@ -1950,7 +1950,10 @@ text:
   - "&bSpeed: %speed%m/s"
   - "&bTNT: %tnt%"
   itemstats:
-  - "&bCooldown: %cooldown%&fs"
+  - "&bBase Cooldown: %cooldown%&fs"
+  - "&bLimit: %max% &fitems"
+  itemstats-random:
+  - "&bAmount: %amount% &fitems"
   - "&bLimit: %max% &fitems"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"

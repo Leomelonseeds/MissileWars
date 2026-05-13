@@ -259,4 +259,8 @@ public class ArenaSettings implements ConfigurationSerializable {
     public RandomItemDistributor getRandomItemDistributor() {
         return randomItemDistributor;
     }
+    
+    public void setDefaultRandomItemDistributor() {
+        randomItemDistributor = RandomItemDistributor.getDefaultRandomItemDistributor(this);
+    }
 }

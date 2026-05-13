@@ -227,7 +227,7 @@ public class InventoryUtils {
                 }
                 
                 // Add menu item
-                ItemStack menu = plugin.getDeckManager().createItem("held.main-menu", 0, false);
+                ItemStack menu = plugin.getDeckManager().createItem("held.main-menu", 0);
                 ItemMeta meta = menu.getItemMeta();
                 setMetaString(meta, HELD_KEY, "main-menu");
                 menu.setItemMeta(meta);
@@ -267,13 +267,16 @@ public class InventoryUtils {
         }
         
         Deck deck = mwp.getDeck();
+        boolean deplete = slot == -1;
         if (deck == null) {
+            if (deplete) {
+                item.setAmount(item.getAmount() - 1);
+            }
             return;
         }
 
         DeckItem di = deck.getDeckItem(item);
         int amt = isBowShot ? item.getAmount() + 1: item.getAmount();
-        boolean deplete = slot == -1;
         
         // Add cooldown to offhand item if item is manually depleted, to prevent offhand items
         // from being used in the same tick without warning.
@@ -402,7 +405,7 @@ public class InventoryUtils {
      * @return
      */
     public static ItemStack createItem(String path) {
-        return MissileWarsPlugin.getPlugin().getDeckManager().createItem(path, 0, false);
+        return MissileWarsPlugin.getPlugin().getDeckManager().createItem(path, 0);
     }
     
     public static String getStructureFromItem(ItemStack item) {
@@ -482,7 +485,12 @@ public class InventoryUtils {
             return null;
         }
         
-        DeckItem di = mwp.getDeck().getDeckItem(item);
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            return null;
+        }
+        
+        DeckItem di = deck.getDeckItem(item);
         if (di == null) {
             return null;
         }

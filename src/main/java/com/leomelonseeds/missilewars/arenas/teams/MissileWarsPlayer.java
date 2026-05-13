@@ -210,7 +210,7 @@ public class MissileWarsPlayer {
     }
     
     /**
-     * Initialize deck cooldowns and exp cooldown, start missile preview
+     * Initialize deck cooldowns and exp cooldown
      * 
      * @param joinedBefore
      */
@@ -248,6 +248,9 @@ public class MissileWarsPlayer {
         }
         
         cooldownPreview(arena);
+    }
+    
+    public void startMissilePreview(boolean isRed) {
         missilePreview = new MissilePreview(player, isRed);
     }
  
@@ -305,7 +308,7 @@ public class MissileWarsPlayer {
      * Stops all deck and tasks associated with this player. Run this when
      * the player should not be able play anymore
      */
-    public void stopDeck() {
+    public void stopTasks() {
         tasks.forEach(t -> t.cancel());
         if (player.isOnline()) {
             player.sendActionBar(ConfigUtils.toComponent(""));
@@ -329,15 +332,6 @@ public class MissileWarsPlayer {
     /** Set the join time of this {@link MissileWarsPlayer} */
     public void setJoinTime(LocalDateTime time) {
         joinTime = time;
-    }
-
-    /** Resets missile preview and deck actionbar for {@link MissileWarsPlayer} */
-    public void resetTasks() {
-        tasks.forEach(t -> t.cancel());
-        if (player.isOnline()) {
-            player.sendActionBar(ConfigUtils.toComponent(""));
-        }
-        tasks.clear();
     }
 
     /**

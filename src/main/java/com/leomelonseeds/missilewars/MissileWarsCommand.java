@@ -69,6 +69,18 @@ public class MissileWarsCommand implements CommandExecutor {
             sendSuccessMsg(sender, "Files reloaded.");
         }
         
+        // Print item stack
+        if (action.equalsIgnoreCase("printItemStack")) {
+            // Ensure player is allowed to reload
+            if (!sender.hasPermission("umw.admin")) {
+                sendErrorMsg(sender, "You do not have permission to do that!");
+                return true;
+            }
+            
+            Player player = (Player) sender;
+            Bukkit.getLogger().info(player.getInventory().getItemInMainHand().toString());
+        }
+        
         // Load and unload world
         if (action.equalsIgnoreCase("unload")) {
             if (!sender.hasPermission("umw.admin")) {
@@ -801,7 +813,7 @@ public class MissileWarsCommand implements CommandExecutor {
             try {
                 Player player = Bukkit.getPlayer(args[1]);
                 int level = Integer.parseInt(args[3]);
-                ItemStack item = plugin.getDeckManager().createItem(args[2], level, false);
+                ItemStack item = plugin.getDeckManager().createItem(args[2], level);
                 player.getInventory().addItem(item);
                 return true;
             } catch (Exception e) {

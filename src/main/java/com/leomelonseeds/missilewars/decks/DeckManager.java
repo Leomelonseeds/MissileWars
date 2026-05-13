@@ -103,8 +103,7 @@ public class DeckManager {
         for (String s : new String[] {"missiles", "utility"}) {
             for (String key : json.getJSONObject(s).keySet()) {
                 int level = json.getJSONObject(s).getInt(key);
-                boolean isMissile = s.equals("missiles");
-                ItemStack i = createItem(key, level, isMissile);
+                ItemStack i = createItem(key, level);
                 i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 
                 // Set item limit. When using Gunslinger, max arrows is reduced by 1
@@ -114,6 +113,7 @@ public class DeckManager {
                 }
                 
                 // Finalize item
+                boolean isMissile = s.equals("missiles");
                 int cd = (int) ((int) ConfigUtils.getItemValue(key, level, "cooldown") * (isMissile ? mmult : umult));
                 pool.set(itemsConfig.getInt(key + ".index"), new DeckItem(i, cd, max, mwp));
             }
@@ -121,7 +121,7 @@ public class DeckManager {
         
         // Create gear items
         DeckStorage ds = DeckStorage.fromString(deck);
-        ItemStack weapon = createItem(deck + ".weapon", 0, false);
+        ItemStack weapon = createItem(deck + ".weapon", 0);
         for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
             addEnch(weapon, e.getKey(), e.getValue(), deck, json);
         }
@@ -158,11 +158,7 @@ public class DeckManager {
     }
      
     /**
-     * Add enchantment to level, making sure to not add if level is 0
-     * 
-     * @param item
-     * @param ench
-     * @param lvl
+     * Add enchantment item for deck specific additions
      */
     private void addEnch(ItemStack item, String enchID, Enchantment ench, String deck, JSONObject json) {
         // Swift sneak is added later
@@ -176,16 +172,33 @@ public class DeckManager {
             return;
         }
         
-        // Add custom effects
-        String custom = null;
-        if (ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Ability.ROCKETEER) > 0) {
-            custom = "Blast Protection";
-        } else if (ench == Enchantment.SHARPNESS && (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW)) {
-            custom = "Sharpness";
-            
-            // Newer versions of MC have changed how bows works with sharpness, the arrow
-            // damage now scales according to the sharpness level of the bow. To combat this,
-            // add sharpness as a custom enchant and adjust the attributes ourselves
+        boolean custom = ench == Enchantment.BLAST_PROTECTION && plugin.getJSON().getLevel(json, Ability.ROCKETEER) > 0;
+        addEnch(item, ench, lvl, custom);
+    }
+
+    /**
+     * Add an enchantment to an item, with the specific case
+     * that adding sharpness to a bow will add a fake enchantment
+     * so the arrow doesn't do extra damage
+     * 
+     * @param item
+     * @param ench
+     * @param lvl
+     */
+    public void addEnch(ItemStack item, Enchantment ench, int lvl) {
+        addEnch(item, ench, lvl, false);
+    }
+    
+    private void addEnch(ItemStack item, Enchantment ench, int lvl, boolean custom) {
+        if (lvl <= 0) {
+            return;
+        }
+        
+        // Newer versions of MC have changed how bows works with sharpness, the arrow
+        // damage now scales according to the sharpness level of the bow. To combat this,
+        // add sharpness as a custom enchant and adjust the attributes ourselves
+        if (ench == Enchantment.SHARPNESS && (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW)) {
+            custom = true;
             ItemMeta meta = item.getItemMeta();
             double extraDmg = 0.5 * lvl + 0.5;
             NamespacedKey key = new NamespacedKey(MissileWarsPlugin.getPlugin(), "umw-sharpness");
@@ -194,10 +207,11 @@ public class DeckManager {
             item.setItemMeta(meta);
         }
         
-        if (custom != null) {
+        if (custom) {
+            String customString = ConfigUtils.getEnumDisplayString(ench.getKey().asMinimalString());
             ItemMeta meta = item.getItemMeta();
             List<Component> newLore = new ArrayList<>();
-            newLore.add(ConfigUtils.toComponent("&7" + custom + " " + roman(lvl)));
+            newLore.add(ConfigUtils.toComponent("&7" + customString + " " + roman(lvl)));
             if (meta.hasLore()) {
                 List<Component> loreLines = meta.lore();
                 for (Component c : loreLines) {
@@ -256,19 +270,34 @@ public class DeckManager {
      * @param missile
      * @return
      */
-    public ItemStack createItem(String name, int level, Boolean missile) {
-        return createItem(name, level, missile, null, null, false, null);
+    public ItemStack createItem(String name, int level) {
+        return createItem(name, level, null, null, false, null);
+    }
+    
+    /**
+     * Get item for random item distribution
+     * 
+     * @param name
+     * @param level
+     * @return
+     */
+    public ItemStack createRandomItem(String name, int level) {
+        return createItem(name, level, null, null, false, null, true);
+    }
+    
+    public ItemStack createItem(String name, int level, JSONObject playerjson, String deck, Boolean intangible, String preset) {
+        return createItem(name, level, playerjson, deck, intangible, preset, false);
     }
     
     /**
      * General purpose item creation function. Creates items for
-     * decks, as well as for the deck GUIs.
+     * decks, as well as for the deck GUIs. randomItem boolean
+     * flags item as for randomly given item, preventing it
+     * from getting sp or cooldown/limit stats
      *
-     * @param name
-     * @param level
      * @return an ItemStack
      */
-    public ItemStack createItem(String name, int level, Boolean missile, JSONObject playerjson, String deck, Boolean intangible, String preset) {
+    public ItemStack createItem(String name, int level, JSONObject playerjson, String deck, Boolean intangible, String preset, boolean randomItem) {
         String realname = name;
         // If the name is a config path, find its real name
         if (name.contains(".")) {
@@ -315,11 +344,11 @@ public class DeckManager {
             List<String> lore = new ArrayList<>((ArrayList<String>) templore);
             
             // Add missile stats for missiles, and max + cooldown
-            if (missile) {
+            if (ConfigUtils.getItemValue(name, level, "tnt") != null) {
                 lore.addAll(itemsConfig.getStringList("text.missilestats"));
             }
             
-            if (!intangible && level > 0) {
+            if (!randomItem && !intangible && level > 0) {
                 lore.addAll(itemsConfig.getStringList("text.itemstats"));
             }
             

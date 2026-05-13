@@ -152,7 +152,14 @@ public class ArenaInventoryListener implements Listener {
 
         // Handle dropping of deck items
         MissileWarsPlayer mwp = arena.getPlayerInArena(player.getUniqueId());
-        DeckItem di = mwp.getDeck().getMatchingDeckItem(dropped);
+        Deck deck = mwp.getDeck();
+        if (deck == null) {
+            // TEMP: if deck is null, we just don't allow any dropping for now frfr
+            event.setCancelled(true);
+            return;
+        }
+        
+        DeckItem di = deck.getMatchingDeckItem(dropped);
         if (di == null) {
             return;
         }
@@ -244,7 +251,6 @@ public class ArenaInventoryListener implements Listener {
         
         MissileWarsPlayer mwPlayer = arena.getPlayerInArena(player.getUniqueId());
         Deck deck = mwPlayer.getDeck();
-        
         if (deck == null) {
             return;
         }

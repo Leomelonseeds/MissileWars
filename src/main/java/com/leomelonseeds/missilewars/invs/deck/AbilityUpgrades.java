@@ -48,7 +48,7 @@ public class AbilityUpgrades extends DeckSubInventory {
                 level = typeJson.getInt("level");
             }
             ItemStack item = MissileWarsPlugin.getPlugin().getDeckManager().createItem(
-                    path + "." + key, level, false, playerJson, deck, true, preset);
+                    path + "." + key, level, playerJson, deck, true, preset);
             inv.setItem(initSlot + i, item);
         }
     }
