@@ -310,7 +310,8 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
         
         if (params.equals("seconds_until_start")) {
-            return arena.getSecondsUntilStart() + "";
+            // For some reason the placeholder is usually earlier than the message, so just add 1 lmao
+            return (arena.getSecondsUntilStart() + 1) + "";
         }
 
         if (params.equals("time_remaining")) {

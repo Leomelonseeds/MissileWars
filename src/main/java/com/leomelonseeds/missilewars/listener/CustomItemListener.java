@@ -182,9 +182,10 @@ public class CustomItemListener implements Listener {
                 break;
             case "deck":
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "bossshop open decks " + player.getName());
+                break;
             case "arena-settings":
             case "arena-settings-view-only":
-                new ArenaSettingsMainMenu(player, playerArena, held.contains("view-only"), null);
+                new ArenaSettingsMainMenu(player, playerArena, held.endsWith("view-only"), null);
             }
             return;
         }

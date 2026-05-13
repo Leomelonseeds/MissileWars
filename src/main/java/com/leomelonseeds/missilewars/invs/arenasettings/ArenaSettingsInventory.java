@@ -123,7 +123,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             String[] values = value.split("-");
             if (type.isRightClick()) {
                 if (values[0].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
+                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
@@ -131,7 +131,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
                 value = values[0];
             } else if (type.isLeftClick()) {
                 if (values[1].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
+                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
