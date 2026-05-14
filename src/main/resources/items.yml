@@ -1953,8 +1953,8 @@ text:
   - "&bBase Cooldown: %cooldown%&fs"
   - "&bLimit: %max% &fitems"
   itemstats-random:
-  - "&bAmount: %amount% &fitems"
-  - "&bLimit: %max% &fitems"
+  - "&bAmount: &f%amount% &fitems"
+  - "&bLimit: &f%max% &fitems"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
@@ -2198,6 +2198,17 @@ arena-settings:
         name: ""
         lore: []
   item-settings:
+    distribution-settings:
+      item: HOPPER
+      slot: 27
+      name: "&3Global Distribution Settings &f&l➡"
+      lore:
+        - "&7Applies to both deck items"
+        - "&7and random items."
+    usage-settings:
+      item: SHEARS
+      slot: 36
+      name: "&cItem Usage Settings &f&l➡"
     deck-item-distribution:
       item: BOOKSHELF
       slot: 11

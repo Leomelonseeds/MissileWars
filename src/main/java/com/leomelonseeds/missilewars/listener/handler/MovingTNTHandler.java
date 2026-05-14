@@ -7,22 +7,29 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 // ---------------------------------------------------------
 // This class ignites tnt if b36 hit with flaming projectile
+// Or if the TNT is within the vicinity of an explosion
 // ---------------------------------------------------------
 public class MovingTNTHandler implements Listener {
     
@@ -44,7 +51,7 @@ public class MovingTNTHandler implements Listener {
      * @return true if a TNT block was ignited for the specified block
      */
     public boolean igniteTNT(Block block, Player source) {
-        return igniteTNT(block, source, 0);
+        return igniteTNT(block, source, 0, 0);
     }
     
     /**
@@ -52,10 +59,11 @@ public class MovingTNTHandler implements Listener {
      * 
      * @param block
      * @param source
-     * @param maxFuseDeviation
+     * @param minFuseTicks set both min and max fuse ticks for a range
+     * @param maxFuseTicks
      * @return true if a TNT block was ignited for the specified block
      */
-    public boolean igniteTNT(Block block, Player source, int maxFuseDeviation) {
+    public boolean igniteTNT(Block block, Player source, int minFuseTicks, int maxFuseTicks) {
         Location spawnLoc;
         if (block.getType() == Material.TNT) {
             spawnLoc = block.getLocation().toCenterLocation().subtract(0, 0.49, 0);
@@ -73,10 +81,10 @@ public class MovingTNTHandler implements Listener {
         block.setType(Material.AIR);
         TNTPrimed primed = (TNTPrimed) block.getWorld().spawnEntity(spawnLoc, EntityType.TNT);
         int fuseTicks = 80;
-        if (maxFuseDeviation != 0) {
-            fuseTicks = random.nextInt(fuseTicks - maxFuseDeviation, fuseTicks + 1);
+        if (minFuseTicks != 0) {
+            fuseTicks = random.nextInt(minFuseTicks, maxFuseTicks + 1);
         }
-        primed.setFuseTicks(80);
+        primed.setFuseTicks(fuseTicks);
         
         // Set source if specified
         if (source != null) {
@@ -84,6 +92,33 @@ public class MovingTNTHandler implements Listener {
         }
         
         return true;
+    }
+    
+    @EventHandler
+    private void onExplode(EntityExplodeEvent e) {
+        Entity entity = e.getEntity();
+        Player source = null;
+        if (e.getEntityType() == EntityType.TNT_MINECART) {
+            Arena arena = MissileWarsPlugin.getPlugin().getArenaManager().getArena(e.getLocation().getWorld());
+            if (arena != null) {
+                source = arena.getTracker().getTNTMinecartSource((ExplosiveMinecart) entity);
+            }
+        } else if (e.getEntityType() == EntityType.TNT) {
+            Entity tntSource = ((TNTPrimed) entity).getSource();
+            if (tntSource instanceof Player) {
+                source = (Player) tntSource;
+            }
+        } else if (e.getEntityType() == EntityType.FIREBALL) {
+            ProjectileSource shooter = ((Fireball) entity).getShooter();
+            if (shooter instanceof Player) {
+                source = (Player) shooter;
+            }
+        } else {
+            return;
+        }
+        
+        Player finalSource = source;
+        e.blockList().forEach(b -> igniteTNT(b, finalSource, 10, 30));
     }
     
     @EventHandler

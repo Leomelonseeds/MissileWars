@@ -571,7 +571,6 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         Player player = (Player) event.getEntity();
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         Arena arena = ArenaUtils.getArena(player);
         if ((arena == null) || !arena.isRunning()) {
             return;
@@ -662,7 +661,6 @@ public class ArenaGameruleListener implements Listener {
     /** Handle friendly fire + other things */
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
         // Ensure we are handling a player in an arena
         if (event.getEntityType() != EntityType.PLAYER) {
             return;

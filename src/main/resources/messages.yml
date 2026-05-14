@@ -175,6 +175,8 @@ messages:
   only-join-queued-players: "&a&l[!] &7Only queued players will be joined to the game in this arena."
   random-item-global-limit: "&cYou didn't get %item% &csince you have too many items!"
   random-item-limit: "&cYou already have the maximum amount of %item%&c!"
+  must-place-fireball: "&cFireballs must be &dplaced &con a block in this arena."
+  cannot-change-setting-while-running: "&c&l[!] &7These settings can only be changed when the arena isn't running."
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"
@@ -738,3 +740,10 @@ settings:
         - "&7Adds a rudimentary check to prevent"
         - "&7players from spawning missiles in"
         - "&7their own base."
+    FIREBALLS_NEED_TO_BE_PLACED:
+      type: "boolean"
+      description:
+        - "&7Instead of right-clicking to fire,"
+        - "&7normal fireballs will be spawned by"
+        - "&7right-clicking a block, then punched"
+        - "&7to fire."

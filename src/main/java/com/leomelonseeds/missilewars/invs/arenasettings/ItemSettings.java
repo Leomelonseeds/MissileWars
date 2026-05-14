@@ -19,32 +19,37 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public class ItemSettings extends ArenaSettingsInventory {
     
+    private final static String sec = "arena-settings.item-settings";
+    
     private ConfigurationSection itemsSection;
 
     public ItemSettings(Player player, boolean viewOnly, Arena arena, MWInventory fromInv) {
         super(player, 54, "Item Settings", viewOnly, arena, fromInv);
-        this.itemsSection = ConfigUtils.getConfigFile("items.yml").getConfigurationSection("arena-settings.item-settings");
+        this.itemsSection = ConfigUtils.getConfigFile("items.yml").getConfigurationSection(sec);
     }
 
     @Override
     public Map<Integer, ArenaSetting> getSettingSlots() {
         return Map.of(
-            36, ArenaSetting.ENABLE_DECREASING_COOLDOWNS,
-            37, ArenaSetting.ENABLE_TEAM_BALANCING
+            // Distribution settings
+            28, ArenaSetting.ENABLE_DECREASING_COOLDOWNS,
+            29, ArenaSetting.ENABLE_TEAM_BALANCING,
+            
+            // Usage settings
+            37, ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED
         );
     }
 
     @Override
     public void updateSettingsInventory() {
-        // Extra row of glass panes
-        for (int i = 27; i < 36; i++) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-        }
-        
         // Deck vs random items
         boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         setSelectionItem("deck-item-distribution", !randomItems);
         setSelectionItem("random-item-distribution", randomItems);
+        
+        // Display
+        inv.setItem(27, InventoryUtils.createItem(sec + ".distribution-settings"));
+        inv.setItem(36, InventoryUtils.createItem(sec + ".usage-settings"));
     }
     
     private void setSelectionItem(String key, boolean enabled) {
@@ -78,6 +83,12 @@ public class ItemSettings extends ArenaSettingsInventory {
         if (key == null) {
             return;
         }
+        
+        if (arena.isRunning() || arena.isResetting()) {
+            ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
 
         boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         if (key.equals("deck-item-distribution")) {
@@ -92,7 +103,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             }
             
             if (type.isLeftClick()) {
-                arenaSettings.set(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, false);
+                arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, "false", "boolean");
                 ConfigUtils.sendConfigSound("use-skillpoint", player);
                 updateInventory();
             } else if (type.isRightClick()) {
@@ -119,7 +130,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             }
             
             if (type.isLeftClick()) {
-                arenaSettings.set(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, true);
+                arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, "true", "boolean");
                 if (arenaSettings.getRandomItemDistributor() == null) {
                     arenaSettings.setDefaultRandomItemDistributor();
                 }
@@ -132,5 +143,4 @@ public class ItemSettings extends ArenaSettingsInventory {
             return;
         }
     }
-
 }

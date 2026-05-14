@@ -21,11 +21,18 @@ public enum ArenaSetting {
     ENABLE_RANDOM_ITEM_DISTRIBUTION(false, "enable-random-item-distribution"),
     ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
+    ENABLE_DROPPING_ITEMS(true, "enable-dropping-items"), // TODO
+    FIREBALLS_NEED_TO_BE_PLACED(false, "fireballs-need-to-be-placed"),
+    FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"), // TODO
+    ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"), // TODO
+    ENABLE_AIR_PLACE(false, "enable-air-place"), // TODO
+    MISSILE_OFFSET_MODIFIER_Y(0, "missile-offset-modifier-y"), // TODO
+    MISSILE_OFFSET_MODIFIER_Z(0, "missile-offset-modifier-z"), // TODO
     
     // Deck
     DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(20, 200, 10)), // As a percentage
-    ENABLE_FORCE_DECK(false, "force-deck"),
-    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true),
+    ENABLE_FORCE_DECK(false, "force-deck"), // TODO
+    FORCED_DECK(DeckStorage.SENTINEL, "force-deck", false, true), // TODO
     
     // Random
     RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
@@ -47,13 +54,11 @@ public enum ArenaSetting {
     ENABLE_AFK_KICK(true, "enable-afk-kick"),
     
     // Game rules and modifiers
-    ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
-    ENABLE_AIR_PLACE(false, "enable-air-place"),
     ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),
     ENABLE_ALTITUDE_SICKNESS(true, "enable-altitude-sickness"),
-    ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"),
-    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
+    ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"), // TODO
     ENABLE_TEAMGRIEF_PREVENTION(true, "enable-teamgrief-prevention"),
+    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
     
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),

@@ -47,10 +47,10 @@ public class RandomItem implements ConfigurationSerializable {
         } else {
             this.item = item.clone();
         }
-        addInfoLore();
         this.weight = 1;
         this.max = 1;
         this.amount = 1;
+        addInfoLore();
     }
     
     public RandomItem(RandomItem other) {
@@ -97,10 +97,10 @@ public class RandomItem implements ConfigurationSerializable {
             }
         }
 
-        addInfoLore();
         this.weight = (int) settings.get("weight");
         this.max = (int) settings.get("max");
         this.amount = (int) settings.get("amount");
+        addInfoLore();
     }
     
     private ItemStack getItemFromID(String id) {

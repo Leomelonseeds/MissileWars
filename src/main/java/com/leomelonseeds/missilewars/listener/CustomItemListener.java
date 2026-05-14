@@ -207,11 +207,23 @@ public class CustomItemListener implements Listener {
         }
         
         // Check if player used a structure or utility
-        Block clicked = event.getClickedBlock();
         String structureName = InventoryUtils.getStructureFromItem(hand);
         String utility = InventoryUtils.getUtilityFromItem(hand);
         if (structureName == null && utility == null) {
             return;
+        }
+        
+        // Check for clicked block, and scan for a clicked b36 as well
+        Block clicked = event.getClickedBlock();
+        BlockFace clickedFace = event.getBlockFace();
+        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+            List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 4);
+            Block targetBlock = lastTwoTargetBlocks.get(1);
+            Material targetType = targetBlock.getType();
+            if (targetType == Material.MOVING_PISTON && lastTwoTargetBlocks.size() == 2) {
+                clickedFace = targetBlock.getFace(lastTwoTargetBlocks.get(0));
+                clicked = targetBlock;
+            }
         }
         
         // Spawn a structure item
@@ -225,17 +237,9 @@ public class CustomItemListener implements Listener {
             event.setCancelled(true);
             
             // We can handle canopies now!
-            if (structureName.contains("canopy")) {
+            if (structureName.startsWith("canopy")) {
                 canopies.initPlayer(player, hand, playerArena, (int) getItemStat(structureName, "distance"));
                 return;
-            }
-            
-            // Check if a block was clicked, including a moving block
-            if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-                Block temp = player.getTargetBlock(null, 4);
-                if (temp.getType() == Material.MOVING_PISTON) {
-                    clicked = temp;
-                }
             }
             
             if (clicked == null) {
@@ -287,20 +291,20 @@ public class CustomItemListener implements Listener {
         }
         
         // Spawn a utility item. At this point we know the item MUST have a utility tag
-        if (utility.contains("creeper") && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (utility.startsWith("creeper") && clicked != null) {
             event.setCancelled(true);
             // Can't place creepers on obsidian, otherwise broken game
             List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
             for (String s : cancel) {
-                if (event.getClickedBlock().getType() == Material.getMaterial(s)) {
+                if (clicked.getType() == Material.getMaterial(s)) {
                     ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
                     return;
                 }
             }
             
-            Location spawnLoc = event.getClickedBlock().getRelative(event.getBlockFace()).getLocation();
+            Location spawnLoc = clicked.getRelative(clickedFace).getLocation();
             Creeper creeper = (Creeper) spawnLoc.getWorld().spawnEntity(spawnLoc.toCenterLocation().add(0, -0.5, 0), EntityType.CREEPER);
-            if (utility.contains("2")) {
+            if (utility.endsWith("2")) {
                 creeper.setPowered(true);
             }
             creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
@@ -311,10 +315,27 @@ public class CustomItemListener implements Listener {
         }
 
         // Spawn a fireball/dragon fireball
-        if (utility.contains("fireball") || utility.contains("lingering")) {
+        if (utility.startsWith("fireball") || utility.startsWith("lingering")) {
             event.setCancelled(true);
+            boolean placeOnly = playerArena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED);
+            Location spawnLoc;
+            if (placeOnly) {
+                if (clicked == null) {
+                    String msg = ConfigUtils.getConfigText("messages.must-place-fireball");
+                    player.sendActionBar(ConfigUtils.toComponent(msg));
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                    return;
+                }
+                
+                spawnLoc = clicked.getLocation().toCenterLocation().add(0, 1.62, 0);
+                if (!spawnLoc.getBlock().getType().isAir()) {
+                    return;
+                }
+            } else {
+                spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
+            }
+            
             Fireball fireball;
-            Location spawnLoc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection());
             if (utility.contains("lingering")) {
                 fireball = (DragonFireball) player.getWorld().spawnEntity(spawnLoc, EntityType.DRAGON_FIREBALL);
                 int amplifier = (int) getItemStat(utility, "amplifier");
@@ -331,8 +352,14 @@ public class CustomItemListener implements Listener {
                 fireball.setYield(yield);
                 MiscListener.fireballs.put(fireball, null);
             }
-
-            fireball.setDirection(player.getEyeLocation().getDirection());
+            
+            // Only launch normal fireballs if placeOnly is set to false
+            if (!placeOnly || fireball.getType() != EntityType.FIREBALL) {
+                fireball.setDirection(player.getEyeLocation().getDirection());
+            } else {
+                fireball.setDirection(new Vector());
+            }
+            
             fireball.setShooter(player);
             InventoryUtils.consumeItem(player, playerArena, hand, -1);
             ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
@@ -998,14 +1025,14 @@ public class CustomItemListener implements Listener {
         boolean isLava = liquid == Material.LAVA;
         MovingTNTHandler tntHandler = MovingTNTHandler.getInstance();
         if (level > 5) {
-            if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
+            if (isLava && tntHandler.igniteTNT(spawnBlock, source, 70, 80)) {
                 return;
             }
             
             // Attempt to spawn the splash 1 block lower
             if (!isSplashReplaceable(spawnBlock) || !ArenaUtils.isBlockSupported(spawnBlock)) {
                 spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
-                if (isLava && tntHandler.igniteTNT(spawnBlock, source, 10)) {
+                if (isLava && tntHandler.igniteTNT(spawnBlock, source, 70, 80)) {
                     return;
                 }
                 
@@ -1023,7 +1050,7 @@ public class CustomItemListener implements Listener {
         levelled.setLevel(level);
         spawnBlock.setBlockData(levelled, blockUpdates);
         if (isLava) {
-            tntHandler.igniteTNT(spawnBlock.getRelative(BlockFace.DOWN), source, 10);
+            tntHandler.igniteTNT(spawnBlock.getRelative(BlockFace.DOWN), source, 70, 80);
             LavaHandler.getInstance().addLavaSource(center, source);
         }
         

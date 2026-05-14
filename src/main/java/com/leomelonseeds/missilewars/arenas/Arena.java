@@ -1179,7 +1179,7 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public boolean cancelStart() {
         // If the arena is already running, or no start time has been set, then do nothing
-        if (running || startTime == null) {
+        if (running || resetting || startTime == null) {
             return false;
         }
         

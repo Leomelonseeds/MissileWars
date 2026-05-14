@@ -311,6 +311,10 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         
         if (params.equals("seconds_until_start")) {
             // For some reason the placeholder is usually earlier than the message, so just add 1 lmao
+            if (!arena.isStarted() || arena.isRunning()) {
+                return "0";
+            }
+            
             return (arena.getSecondsUntilStart() + 1) + "";
         }
 
@@ -377,9 +381,5 @@ public class MissileWarsPlaceholder extends PlaceholderExpansion {
         }
 
         return null; // Placeholder is unknown by the Expansion
-    }
-    
-    private boolean isRandomItems(Arena arena) {
-        return arena != null && arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
     }
 }
