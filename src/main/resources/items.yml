@@ -1951,10 +1951,10 @@ text:
   - "&bTNT: %tnt%"
   itemstats:
   - "&bBase Cooldown: %cooldown%&fs"
-  - "&bLimit: %max% &fitems"
+  - "&bLimit: %max% &fitem(s)"
   itemstats-random:
-  - "&bAmount: &f%amount% &fitems"
-  - "&bLimit: &f%max% &fitems"
+  - "&bAmount: &f%amount% &fitem(s)"
+  - "&bLimit: &f%max% &fitem(s)"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
