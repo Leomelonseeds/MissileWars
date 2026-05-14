@@ -379,6 +379,13 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     /**
+     * @return if this distributor has at least one missile selected
+     */
+    public boolean containsMissile() {
+        return items.stream().anyMatch(ri -> ri.getModifiableItem().getType().toString().endsWith("SPAWN_EGG"));
+    }
+    
+    /**
      * If random item distribution is currently in progress, multiplies
      * the CURRENT timer by the given multiplier
      * 

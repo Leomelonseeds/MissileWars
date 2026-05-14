@@ -176,43 +176,6 @@ piranha:
     tnt: 23
     spcost: 2
 
-#supersonic:
-#  index: 3
-#  1:
-#    file: 'supersonic.nbt'
-#    item: TURTLE_SPAWN_EGG
-#    name: "&b☢ Supersonic ⚡"
-#    lore:
-#    - ""
-#    - "&74.4 meters per second is not, in technical"
-#    - "&7terms, supersonic. However, this thing is"
-#    - "&7still fast. Blazing fast. Don't even try to ride"
-#    - "&7it. Really, don't. We can't afford another"
-#    - "&7lawsuit."
-#    offset:
-#      x: -1
-#      y: -5
-#      z: 3
-#    speed: 4.4
-#    tnt: 4
-#  2:
-#    file: 'hypersonic.nbt'
-#    item: TURTLE_SPAWN_EGG
-#    name: "&b☢ &lHypersonic &b⚡"
-#    lore:
-#    - ""
-#    - "&7This missile is the older, spoiled brother"
-#    - "&7of the socially anxious Supersonic."
-#    - ""
-#    offset:
-#      x: -1
-#      y: -5
-#      z: 3
-#    speed: 4.4
-#    tnt: 6
-#    spcost: 1
-
-
 # Sentinel missiles
 
 
@@ -731,41 +694,6 @@ lifter:
     speed: 2.0
     tnt: 8
     spcost: 2
-    
-# shipper:
-#   index: 0
-#   1:
-#     file: 'shipper.nbt'
-#     item: HORSE_SPAWN_EGG
-#     name: "&e☢ Shipper ⚒"
-#     lore:
-#     - ""
-#     - "&7This missile sure carries its crew well."
-#     - "&7Unless, of course, it explodes, in which"
-#     - "&7case it doesn't."
-#     offset:
-#       x: -1
-#       y: -4
-#       z: 3
-#     speed: 2.0
-#     tnt: 5
-#   2:
-#     file: 'slasher.nbt'
-#     item: HORSE_SPAWN_EGG
-#     name: "&e☢ &lSlasher &e⚒"
-#     lore:
-#     - ""
-#     - "&7The TNT on this missile is tucked behind"
-#     - "&7a solid layer of glass. Much like its"
-#     - "&7emotions."
-#     offset:
-#       x: -1
-#       y: -5
-#       z: 3
-#     speed: 2.0
-#     tnt: 6
-#     spcost: 1
-
 
 # Utility items
 
@@ -797,15 +725,6 @@ splash:
     extend: 20
     max: 2
     spcost: 1
-
-novarocket:
-  name: "&1⚠ &lNova Rocket ☣"
-  lore:
-  - ""
-  - "&7Despite being banned from purchasing from"
-  - "&7military suppliers, we were able to source these"
-  - "&7handy crossbow-launched explosive fireworks"
-  - "&7from a trailer park in Florida."
 
 shield:
   index: 6
@@ -932,25 +851,6 @@ obsidianshield:
   3:
     duration: 15
     spcost: 1
-  
-obsidianshielddeplete1:
-  file: 'obsidian_shield_deplete_1.nbt'
-  offset:
-    x: -2
-    y: -2
-    z: 0
-obsidianshielddeplete2:
-  file: 'obsidian_shield_deplete_2.nbt'
-  offset:
-    x: -2
-    y: -2
-    z: 0
-obsidianshieldclear:
-  file: 'obsidian_shield_clear.nbt'
-  offset:
-    x: -2
-    y: -2
-    z: 0
 
 canopy:
   index: 7
@@ -1017,8 +917,8 @@ fireball:
   - "&7They died instantly and painlessly."
   - ""
   - "&dNote that fireballs do no explosion"
-  - "&ddamage to players and cannot break"
-  - "&dportals."
+  - "&ddamage to players (unless modified by"
+  - "&da custom arena) and can't break portals."
   - ""
   - "&bPower: %power%"
   1:
@@ -1107,7 +1007,122 @@ arrows:
     max: 3
     spcost: 1
     
+# UNUSED MISSILES AND UTILITIES
+# Available for random item mode
+    
+shipper:
+  index: 0
+  1:
+    file: 'shipper.nbt'
+    item: HORSE_SPAWN_EGG
+    name: "&e☢ Shipper"
+    lore:
+    - ""
+    - "&7This missile sure carries its crew well."
+    - "&7Unless, of course, it explodes, in which"
+    - "&7case it doesn't."
+    offset:
+      x: -1
+      y: -4
+      z: 3
+    speed: 2.0
+    tnt: 5
+  2:
+    file: 'slasher.nbt'
+    item: HORSE_SPAWN_EGG
+    name: "&e☢ &lSlasher"
+    lore:
+    - ""
+    - "&7The TNT on this missile is tucked behind"
+    - "&7a solid layer of glass. Much like its"
+    - "&7emotions."
+    offset:
+      x: -1
+      y: -5
+      z: 3
+    speed: 2.0
+    tnt: 6
+    spcost: 1
+
+supersonic:
+  index: 3
+  1:
+    file: 'supersonic.nbt'
+    item: TURTLE_SPAWN_EGG
+    name: "&b☢ Supersonic ⚡"
+    lore:
+    - ""
+    - "&74.4 meters per second is not, in technical"
+    - "&7terms, supersonic. However, this thing is"
+    - "&7still fast. Blazing fast. Don't even try to ride"
+    - "&7it. Really, don't. We can't afford another"
+    - "&7lawsuit."
+    offset:
+      x: -1
+      y: -5
+      z: 3
+    speed: 4.4
+    tnt: 4
+  2:
+    file: 'hypersonic.nbt'
+    item: TURTLE_SPAWN_EGG
+    name: "&b☢ &lHypersonic &b⚡"
+    lore:
+    - ""
+    - "&7This missile is the older, spoiled brother"
+    - "&7of the socially anxious Supersonic."
+    - ""
+    offset:
+      x: -1
+      y: -5
+      z: 3
+    speed: 4.4
+    tnt: 6
+    spcost: 1
+
+molotovsplash:
+  item: SPLASH_POTION
+  name: "&6★ Molotov Splash %level% ⚡"
+  lore:
+  - ""
+  - "&7Unleash firey death with an explosion"
+  - "&7of lava. Use it on TNT to ignite it,"
+  - "&7make TNT instantly explode if the TNT"
+  - "&7is already primed."
+  - ""
+  - "&bDuration: %duration%s"
+  - "&bRadius: %radius%"
+  1:
+    duration: 1
+    radius: 0
+  2:
+    duration: 1.5
+    radius: 1
+  3:
+    duration: 2
+    radius: 1.5
+  
+    
 # MISC ITEMS / SCHEMATICS
+
+obsidianshielddeplete1:
+  file: 'obsidian_shield_deplete_1.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
+obsidianshielddeplete2:
+  file: 'obsidian_shield_deplete_2.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
+obsidianshieldclear:
+  file: 'obsidian_shield_clear.nbt'
+  offset:
+    x: -2
+    y: -2
+    z: 0
     
 elytra:
   item: ELYTRA
@@ -1164,6 +1179,14 @@ turret_clear:
     y: 0
     z: 0
 
+novarocket:
+  name: "&1⚠ &lNova Rocket ☣"
+  lore:
+  - ""
+  - "&7Despite being banned from purchasing from"
+  - "&7military suppliers, we were able to source these"
+  - "&7handy crossbow-launched explosive fireworks"
+  - "&7from a trailer park in Florida."
 
 # Per-deck items/abilities
 
@@ -2195,8 +2218,46 @@ arena-settings:
       edit-items:
         item: CREEPER_SPAWN_EGG
         slot: 10
-        name: ""
-        lore: []
+        name: "&aEdit Items"
+        lore:
+         - ""
+         - "&7Add, remove, and configure limits"
+         - "&7and weights for random items. Some"
+         - "&7utilities and missiles are exclusive"
+         - "&7to random items mode!"
+         - ""
+         - "&cClick &7to edit"
+      edit-abilities:
+        item: BOOK
+        slot: 12
+        name: "&6Edit Abilities"
+        lore:
+          - ""
+          - "&7Choose any amount of abilities or"
+          - "&7passives from decks that will also"
+          - "&7be enabled in random items mode."
+          - ""
+          - "&d» &d&oWork in progress, coming soon!"
+      edit-weapon:
+        item: BOW
+        slot: 14
+        name: "&3Edit Weapons"
+        lore:
+         - ""
+         - "&7Choose and configure the weapon (or"
+         - "&7multiple weapons) that players will"
+         - "&7receive at the start of the game."
+         - ""
+         - "&d» &d&oWork in progress, coming soon!"
+      edit-armor:
+        item: LEATHER_CHESTPLATE
+        slot: 16
+        name: "&bEdit Armor"
+        lore:
+          - ""
+          - "&7Configure player armor."
+          - ""
+          - "&d» &d&oWork in progress, coming soon!"
   item-settings:
     distribution-settings:
       item: HOPPER
@@ -2390,7 +2451,7 @@ arena-settings:
         - "&cClick &7to edit."
     start-game:
       item: GOAT_HORN
-      name: "&bStart Game"
+      name: "&b&lStart Game"
       slot: 41
       lore:
         - ""
@@ -2399,7 +2460,7 @@ arena-settings:
         - "&7setting) to start a game."
     end-game:
       item: STONE_AXE
-      name: "&cEnd Game"
+      name: "&c&lEnd Game"
       slot: 42
       lore:
         - ""
@@ -2408,7 +2469,7 @@ arena-settings:
         - "&7this arena in a tie."
     creative-mode:
       item: FEATHER
-      name: "&fToggle Creative Mode &8(requires &6&lDIVINE&8)"
+      name: "&f&lToggle Creative Mode &8(requires &6&lDIVINE&8)"
       slot: 39
       lore:
         - ""
@@ -2418,10 +2479,107 @@ arena-settings:
         - "&d» &d&oWork in progress, coming soon!"
     kick-all:
       item: NETHERITE_BOOTS
-      name: "&4Kick All"
+      name: "&4&lKick All"
       slot: 38
       lore:
         - ""
         - "&cClick &7to kick all players from"
         - "&7your arena. To kick one player,"
         - "&7add them to the blacklist."
+
+# Items available for random items
+random-items:
+  - lightning-1
+  - lightning-2
+  - thunderbolt-1
+  - thunderbolt-2
+  - tomahawk-1
+  - tomahawk-2
+  - cronullifier-1
+  - cronullifier-2
+  - piranha-1
+  - piranha-2
+  - concorde-1
+  - concorde-2
+  - supporter-1
+  - supporter-2
+  - guardian-1
+  - guardian-2
+  - gemini-1
+  - gemini-2
+  - sword-1
+  - sword-2
+  - cuboid-1
+  - cuboid-2
+  - warhead-1
+  - warhead-2
+  - juggernaut-1
+  - juggernaut-2
+  - breaker-1
+  - breaker-2
+  - shieldbuster-1
+  - shieldbuster-2
+  - incisor-1
+  - incisor-2
+  - slingshot-1
+  - slingshot-2
+  - automaton-1
+  - automaton-2
+  - pisces-1
+  - pisces-2
+  - lifter-1
+  - lifter-2
+  - splash-1
+  - splash-2
+  - splash-3
+  - shield-1
+  - shield-2
+  - shield-3
+  - platform-1
+  - platform-2
+  - platform-3
+  - torpedo-1
+  - torpedo-2
+  - obsidianshield-1
+  - obsidianshield-2
+  - obsidianshield-3
+  - canopy-1
+  - canopy-2
+  - canopy-3
+  - creeper-1
+  - creeper-2
+  - fireball-1
+  - fireball-2
+  - fireball-3
+  - leaves-1
+  - lingering_harming-1
+  - lingering_harming-2
+  - lingering_harming-3
+  - arrows-1
+  - shipper-1
+  - shipper-2
+  - supersonic-1
+  - supersonic-2
+  
+# Abilities and passives available for random item mode
+random-item-abilities:
+  - Vanguard.ability.explosivecanopy
+  - Vanguard.passive.adrenaline
+  - Vanguard.passive.bunny
+  - Vanguard.passive.dwarfism
+  - Sentinel.ability.longshot
+  - Sentinel.ability.hitchhikersbow
+  - Sentinel.ability.astralturret
+  - Sentinel.passive.impacttigger
+  - Sentinel.passive.smokeshield
+  - Sentinel.passive.exoticarrows
+  - Berserker.ability.blazeballs
+  - Berserker.ability.compressedarrows
+  - Berserker.ability.creepershot
+  - Berserker.passive.spikedquiver
+  - Berserker.passive.rocketeer
+  - Architect.ability.poke
+  - Architect.ability.kingsmansbludgers
+  - Architect.passive.haste
+  - Architect.passive.naturesblessing
+  - Architect.passive.elastitect

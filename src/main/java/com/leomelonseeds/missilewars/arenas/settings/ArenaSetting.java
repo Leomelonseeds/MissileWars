@@ -38,12 +38,12 @@ public enum ArenaSetting {
     RANDOM_ITEM_DISTRIBUTION_TIMER(12, "random-item-distribution-timer", IntSettingModifier.create(5, 30, 1)),
     RANDOM_ITEM_BAG_DISTRIBUTION(true, "random-item-bag-distribution"),
     RANDOM_ITEM_XP_TIMER(true, "random-item-xp-timer"),
-    RANDOM_ITEM_INVENTORY_LIMIT(0, "random-item-inventory-limit", IntSettingModifier.create(0, 20, 1)),
+    RANDOM_ITEM_INVENTORY_LIMIT(0, "random-item-inventory-limit", IntSettingModifier.create(0, 32, 1)),
     
     // MISC SETTINGS:
     // Game management
     ENABLE_AUTO_START(true, "enable-auto-start"),
-    START_TIMER(30, "start-timer", IntSettingModifier.create(5, 30, 1)),
+    START_TIMER(30, "start-timer", IntSettingModifier.create(5, 30, 5)),
     TIE_TIMER(5, "tie-timer", IntSettingModifier.create(0, 10, 1)),
     IS_INFINITE_TIME(false, "is-infinite-time"),
     END_IF_NO_PLAYERS(true, "end-if-no-players"),
@@ -52,6 +52,7 @@ public enum ArenaSetting {
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     ENABLE_AFK_KICK(true, "enable-afk-kick"),
+    ALLOW_JOINING_ONGOING_GAMES(true, "allow-joining-ongoing-games"), // TODO
     
     // Game rules and modifiers
     ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),

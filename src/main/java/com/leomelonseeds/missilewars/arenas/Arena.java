@@ -410,7 +410,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return
      */
     public boolean setSetting(ArenaSetting setting, String value, String type) {
-        boolean queue = running;
+        boolean queue = running || resetting;
         String curValue = settings.get(setting) + "";
         if (!settings.set(setting, value, type, queue)) {
             return false;
@@ -1401,6 +1401,13 @@ public abstract class Arena implements ConfigurationSerializable {
         if (running) {
             return false;
         }
+        
+        // Make sure there is at least one missile if random items being used
+        if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+            if (!settings.getRandomItemDistributor().containsMissile()) {
+                return false;
+            }
+        }
 
         // Select Map
         mapName = voteManager.getVotedMap(map -> isCustom() || isAvailable(map));
@@ -1652,10 +1659,9 @@ public abstract class Arena implements ConfigurationSerializable {
      */
     public void addCallback(MissileWarsPlayer player) {
         // If game is running, no null/queuecount checks are needed
-        boolean randomItems = getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         if (running) {
             applyMultipliers();
-            if (!randomItems) {
+            if (!getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
                 UUID uuid = player.getMCPlayerId();
                 player.initDeck(leftPlayers.getOrDefault(uuid, 0) >= 3, this, redTeam.containsPlayer(uuid));
             }
@@ -1673,7 +1679,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         applyMultipliers();
-        if (randomItems) {
+        if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
             settings.getRandomItemDistributor().startDistribution(redTeam.getMembers(), blueTeam.getMembers());
         } else {
             for (MissileWarsPlayer mwp : getInGamePlayers()) {

@@ -868,13 +868,18 @@ public class CustomItemListener implements Listener {
         // Check the duration here
         double duration = getItemStat(utility, "duration");
         int extend = (int) getItemStat(utility, "extend");
-        int molotov = ArenaUtils.getAbility(thrower.getUniqueId(), Ability.MOLOTOV_SPLASH, arena);
         String name = "splash:" + duration + ":" + extend;
         
         // Handle molotov details
         if (ConfigUtils.toPlain(hand.displayName()).contains("Molotov")) {
             // Add radius stat
-            double radius = ConfigUtils.getAbilityStat(Ability.MOLOTOV_SPLASH, molotov, Stat.RADIUS);
+            double radius;
+            if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+                radius = getItemStat(utility, "radius");
+            } else {
+                int molotov = ArenaUtils.getAbility(thrower.getUniqueId(), Ability.MOLOTOV_SPLASH, arena);
+                radius = ConfigUtils.getAbilityStat(Ability.MOLOTOV_SPLASH, molotov, Stat.RADIUS);
+            }
             name = "molotov" + name + ":" + radius;
             ArenaUtils.spiralTrail(thrown, Particle.FLAME, null);
         }

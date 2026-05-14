@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.invs.arenasettings.randomitemdistribution.RandomItemDistributionSettings;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -120,7 +121,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             }
             
             if (randomItems) {
-                // TODO
+                new RandomItemDistributionSettings(player, viewOnly, arena, this);
                 return;
             }
             
@@ -129,15 +130,23 @@ public class ItemSettings extends ArenaSettingsInventory {
                 return;
             }
             
+            if (!type.isMouseClick()) {
+                return;
+            }
+            
+            // Past this point, we need to set a random item distributor for players
+            // to be able to select it or edit its settings
+            if (arenaSettings.getRandomItemDistributor() == null) {
+                arenaSettings.setDefaultRandomItemDistributor();
+            }
+            
             if (type.isLeftClick()) {
+                // Use arena setSetting so that players can 
                 arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, "true", "boolean");
-                if (arenaSettings.getRandomItemDistributor() == null) {
-                    arenaSettings.setDefaultRandomItemDistributor();
-                }
                 ConfigUtils.sendConfigSound("use-skillpoint", player);
                 updateInventory();
             } else if (type.isRightClick()) {
-                // TODO
+                new RandomItemDistributionSettings(player, viewOnly, arena, this);
             }
             
             return;

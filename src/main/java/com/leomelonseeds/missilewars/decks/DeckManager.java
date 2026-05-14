@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -428,12 +429,15 @@ public class DeckManager {
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             key = InventoryUtils.ITEM_UTILITY_KEY;
         }
-        InventoryUtils.setMetaString(itemMeta, key, name + "-" + level);
+        InventoryUtils.setMetaString(itemMeta, key, realname + "-" + level);
         
         // Setup extra item attributes for specific things
-        if (name.equals("splash")) {
+        if (name.contains("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.setBasePotionType(PotionType.WATER);
+            if (name.contains("molotov")) {
+                pmeta.setColor(Color.ORANGE);
+            }
         }
         item.setItemMeta(itemMeta);
         return item;
@@ -451,9 +455,7 @@ public class DeckManager {
         for (String key : keys) {
             try {
                 int i = Integer.parseInt(key);
-                if (i > result) {
-                    result = i;
-                }
+                result = Math.max(result, i);
             } catch (NumberFormatException e) {
                 continue;
             }

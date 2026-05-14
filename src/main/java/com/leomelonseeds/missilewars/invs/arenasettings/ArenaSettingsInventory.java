@@ -222,8 +222,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         List<String> res = new ArrayList<>();
         IntSettingModifier intModifier = setting.getIntModifier();
         int cur = (int) arenaSettings.getWithQueue(setting);
-        Integer left = cur <= intModifier.getMin() ? null : cur - intModifier.getChange();
-        Integer right = cur >= intModifier.getMax() ? null : cur + intModifier.getChange();
+        Integer left = cur <= intModifier.getMin() ? null : Math.max(cur - intModifier.getChange(), intModifier.getMin());
+        Integer right = cur >= intModifier.getMax() ? null : Math.min(cur + intModifier.getChange(), intModifier.getMax());
         String unit = settingConfig.getString("settings." + setting.toString() + ".unit");
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
