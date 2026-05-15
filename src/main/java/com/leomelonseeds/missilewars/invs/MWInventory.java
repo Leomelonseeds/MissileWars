@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -13,8 +13,12 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public abstract class MWInventory {
     
     protected static InventoryManager manager = MissileWarsPlugin.getPlugin().getInvs();
+    private BukkitTask autoRefresh;
     protected Inventory inv;
     protected Player player;
+    
+    /** Set to true in the constructor to make the first inventory update asynchronous */
+    protected boolean async;
 
     /**
      * Create a chest inventory
@@ -49,16 +53,8 @@ public abstract class MWInventory {
      */
     protected void autoRefresh(int ticks) {
         // Refresh inventory once in a while
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (manager.getInventory(player) != null) {
-                    updateInventory();
-                } else {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(MissileWarsPlugin.getPlugin(), ticks, ticks);
+        autoRefresh = Bukkit.getScheduler().runTaskTimerAsynchronously(
+            MissileWarsPlugin.getPlugin(), () -> updateInventory(), ticks, ticks);
     }
     
     /**
@@ -71,11 +67,23 @@ public abstract class MWInventory {
         player.getOpenInventory().setTitle(title);
     }
     
+    protected void updateInventoryAsync() {
+        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> updateInventory());
+    }
+    
     public abstract void updateInventory();
     
     public abstract void registerClick(int slot, ClickType type);
     
     public Inventory getInventory() {
         return inv;
+    }
+    
+    public BukkitTask getAutoRefreshTask() {
+        return autoRefresh;
+    }
+    
+    public boolean isUpdateAsync() {
+        return async;
     }
 }

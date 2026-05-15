@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 
 public class InventoryManager implements Listener {
     
@@ -22,17 +23,18 @@ public class InventoryManager implements Listener {
         inventoryCache = new HashMap<>();
     }
     
-    public MWInventory getInventory(Player player) {
-        return inventoryCache.get(player);
-    }
-    
     // Registers and opens an inventory
     public void registerInventory(Player player, MWInventory inv) {
         // Run on next tick to give time for constructors to assign values
         Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
+            unregister(player);
             player.openInventory(inv.getInventory());
             inventoryCache.put(player, inv);
-            inv.updateInventory();
+            if (inv.isUpdateAsync()) {
+                inv.updateInventoryAsync();
+            } else {
+                inv.updateInventory();
+            }
         });
     }
     
@@ -43,12 +45,12 @@ public class InventoryManager implements Listener {
      * @param player
      */
     public void unregister(Player player) {
-        MWInventory uinv = getInventory(player);
+        MWInventory uinv = inventoryCache.remove(player);
         if (uinv == null) {
             return;
         }
         
-        inventoryCache.remove(player);
+        ConfigUtils.cancelTask(uinv.getAutoRefreshTask());
     }
     
     /** Handle clicking of custom GUIs */
@@ -62,7 +64,7 @@ public class InventoryManager implements Listener {
         
         // Check if inventory is custom
         Player player = (Player) event.getWhoClicked();
-        MWInventory uinv = getInventory(player);
+        MWInventory uinv = inventoryCache.get(player);
         if (uinv == null) {
             return;
         }

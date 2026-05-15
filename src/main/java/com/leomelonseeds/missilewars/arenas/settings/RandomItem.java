@@ -24,7 +24,7 @@ import net.kyori.adventure.text.Component;
  */
 public class RandomItem implements ConfigurationSerializable {
     
-    private String id; // If null, save item directly, otherwise only save id
+    private String id;
     private ItemStack item;
     private int weight; 
     private int max;
@@ -32,21 +32,9 @@ public class RandomItem implements ConfigurationSerializable {
     private UUID uuid; // Use for checking equality
     
     public RandomItem(String id) {
-        this(id, null);
-    }
-    
-    public RandomItem(ItemStack item) {
-        this(null, item);
-    }
-    
-    private RandomItem(String id, ItemStack item) {
         this.id = id;
         this.uuid = UUID.randomUUID();
-        if (id != null) {
-            this.item = getItemFromID(id);
-        } else {
-            this.item = item.clone();
-        }
+        this.item = getItemFromID(id);
         this.weight = 1;
         this.max = 1;
         this.amount = 1;
@@ -66,12 +54,7 @@ public class RandomItem implements ConfigurationSerializable {
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> settings = new HashMap<>();
-        if (id == null) {
-            settings.put("item", item);
-        } else {
-            settings.put("id", id);
-        }
-        
+        settings.put("id", id);
         settings.put("weight", weight);
         settings.put("max", max);
         settings.put("amount", amount);
@@ -86,15 +69,11 @@ public class RandomItem implements ConfigurationSerializable {
     
     public RandomItem(Map<String, Object> settings) {
         this.uuid = UUID.randomUUID();
-        if (settings.containsKey("item")) {
-            this.item = (ItemStack) settings.get("item");
-        } else {
-            this.id = (String) settings.get("id");
-            this.item = getItemFromID(id);
-            
-            if (settings.containsKey("custom-offset")) {
-                InventoryUtils.setMetaString(item, InventoryUtils.CUSTOM_OFFSET_KEY, (String) settings.get("custom-offset"));
-            }
+        this.id = (String) settings.get("id");
+        this.item = getItemFromID(id);
+        
+        if (settings.containsKey("custom-offset")) {
+            InventoryUtils.setMetaString(item, InventoryUtils.CUSTOM_OFFSET_KEY, (String) settings.get("custom-offset"));
         }
 
         this.weight = (int) settings.get("weight");
@@ -184,8 +163,12 @@ public class RandomItem implements ConfigurationSerializable {
         updateInfoLore();
     }
     
-    public UUID getID() {
+    public UUID getUUID() {
         return uuid;
+    }
+    
+    public String getId() {
+        return id;
     }
 
     @Override

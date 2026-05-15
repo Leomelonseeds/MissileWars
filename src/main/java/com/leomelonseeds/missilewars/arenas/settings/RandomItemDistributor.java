@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -33,6 +35,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     // Unfortunately we do need to reference these settings
     private ArenaSettings settings;
     private Map<UUID, RandomItem> itemMap;
+    private Set<String> addedIds;
     private List<RandomItem> items;
     private List<RandomItem> curItems;
     private int totalWeight;
@@ -43,6 +46,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.items = new ArrayList<>();
         this.curItems = new ArrayList<>();
         this.itemMap = new HashMap<>();
+        this.addedIds = new HashSet<>();
     }
     
     public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
@@ -53,7 +57,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         other.items.forEach(ri -> {
             RandomItem randomItem = new RandomItem(ri);
             this.items.add(randomItem);
-            this.itemMap.put(randomItem.getID(), randomItem);
+            this.itemMap.put(randomItem.getUUID(), randomItem);
+            this.addedIds.add(randomItem.getId());
         });
     }
  
@@ -69,7 +74,10 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.items = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
         this.itemMap = new HashMap<>();
-        items.forEach(ri -> itemMap.put(ri.getID(), ri));
+        items.forEach(ri -> {
+            itemMap.put(ri.getUUID(), ri);
+            addedIds.add(ri.getId());
+        });
     }
     
     /**
@@ -89,6 +97,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     public void stopDistribution() {
         timerTicks = 0;
+        curItems.clear();
     }
     
     /**
@@ -244,8 +253,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         // 1. Item amount is less than max amount but more than max - give amount
         // 2. Inventory amount >= max amount && item amount % give amount > 0
         int itemAmount = 0;
-        if (amounts.containsKey(randomItem.getID())) {
-            itemAmount = amounts.get(randomItem.getID());
+        if (amounts.containsKey(randomItem.getUUID())) {
+            itemAmount = amounts.get(randomItem.getUUID());
         }
         
         // Check item limit first
@@ -386,6 +395,15 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     /**
+     * 
+     * @param id
+     * @return whether an item with this ID has already been added
+     */
+    public boolean isAdded(String id) {
+        return addedIds.contains(id);
+    }
+    
+    /**
      * If random item distribution is currently in progress, multiplies
      * the CURRENT timer by the given multiplier
      * 
@@ -399,12 +417,12 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     public void addItem(RandomItem item) {
         this.items.add(item);
-        this.itemMap.put(item.getID(), item);
+        this.itemMap.put(item.getUUID(), item);
     }
     
     public void removeItem(RandomItem item) {
         this.items.remove(item);
-        this.itemMap.remove(item.getID());
+        this.itemMap.remove(item.getUUID());
     }
     
     public void clearItems() {
