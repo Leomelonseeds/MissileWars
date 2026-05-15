@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,29 +35,26 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     // Unfortunately we do need to reference these settings
     private ArenaSettings settings;
-    private Map<UUID, RandomItem> itemMap;
+    private LinkedHashMap<UUID, RandomItem> itemMap;
     private Set<String> addedIds;
-    private List<RandomItem> items;
     private List<RandomItem> curItems;
     private int totalWeight;
     private int timerTicks; // IN TICKS!!! 0 means disabled
     
     public RandomItemDistributor(ArenaSettings settings) {
         this.settings = settings;
-        this.items = new ArrayList<>();
         this.curItems = new ArrayList<>();
-        this.itemMap = new HashMap<>();
+        this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
     }
     
     public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
         this.settings = settings;
         this.curItems = new ArrayList<>();
-        this.items = new ArrayList<>();
-        this.itemMap = new HashMap<>();
-        other.items.forEach(ri -> {
+        this.itemMap = new LinkedHashMap<>();
+        this.addedIds = new HashSet<>();
+        other.itemMap.forEach((uuid, ri) -> {
             RandomItem randomItem = new RandomItem(ri);
-            this.items.add(randomItem);
             this.itemMap.put(randomItem.getUUID(), randomItem);
             this.addedIds.add(randomItem.getId());
         });
@@ -65,16 +63,17 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> distributor = new HashMap<>();
-        distributor.put("items", items);
+        distributor.put("items", new ArrayList<>(itemMap.values()));
         return distributor;
     }
     
     @SuppressWarnings("unchecked")
     public RandomItemDistributor(Map<String, Object> distributor) {
-        this.items = (List<RandomItem>) distributor.get("items");
+        List<RandomItem> itemList = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
-        this.itemMap = new HashMap<>();
-        items.forEach(ri -> {
+        this.itemMap = new LinkedHashMap<>();
+        this.addedIds = new HashSet<>();
+        itemList.forEach(ri -> {
             itemMap.put(ri.getUUID(), ri);
             addedIds.add(ri.getId());
         });
@@ -232,6 +231,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             ItemStack item = randomItem.getItem();
             item.setAmount(giveAmount);
             player.give(item);
+            ConfigUtils.sendConfigSound("pickup", player);
         }
 
         // Compute amounts of each registered item
@@ -317,6 +317,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             ItemStack item = randomItem.getItem();
             item.setAmount(giveAmount);
             player.give(item);
+            ConfigUtils.sendConfigSound("pickup", player);
         }
     }
     
@@ -327,18 +328,23 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     private RandomItem getNextItem() {
         // Just in case
-        if (items.isEmpty()) {
+        if (itemMap.isEmpty()) {
             return null;
         }
         
+        // Readd all items to curItems if its empty (e.g. bag distribution or first time distributing)
         if (curItems.isEmpty()) {
-            curItems.addAll(items);
-            totalWeight = curItems.stream().mapToInt(ri -> ri.getWeight()).sum();
+            int weightSum = 0;
+            for (RandomItem ri : itemMap.values()) {
+                curItems.add(ri);
+                weightSum += ri.getWeight();
+            }
+            totalWeight = weightSum;
         }
         
         // Thanks https://stackoverflow.com/questions/6737283/weighted-randomness-in-java
         int i = 0;
-        for (double r = Math.random() * totalWeight; i < curItems.size() - 1; ++i) {
+        for (double r = Math.random() * totalWeight; i < curItems.size() - 1; i++) {
             r -= curItems.get(i).getWeight();
             if (r <= 0.0) {
                 break;
@@ -391,7 +397,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @return if this distributor has at least one missile selected
      */
     public boolean containsMissile() {
-        return items.stream().anyMatch(ri -> ri.getModifiableItem().getType().toString().endsWith("SPAWN_EGG"));
+        return itemMap.values().stream().anyMatch(ri -> ri.getModifiableItem().getType().toString().endsWith("SPAWN_EGG"));
     }
     
     /**
@@ -416,18 +422,18 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     public void addItem(RandomItem item) {
-        this.items.add(item);
         this.itemMap.put(item.getUUID(), item);
+        this.addedIds.add(item.getId());
     }
     
     public void removeItem(RandomItem item) {
-        this.items.remove(item);
         this.itemMap.remove(item.getUUID());
+        this.addedIds.remove(item.getId());
     }
     
     public void clearItems() {
-        this.items.clear();
         this.itemMap.clear();
+        this.addedIds.clear();
     }
     
     /**
