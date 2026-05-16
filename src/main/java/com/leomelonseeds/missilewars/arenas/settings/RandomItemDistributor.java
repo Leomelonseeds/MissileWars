@@ -410,6 +410,21 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     }
     
     /**
+     * @return an unmodifiable view of the items
+     */
+    public Collection<RandomItem> getRandomItems() {
+        return Collections.unmodifiableCollection(itemMap.values());
+    }
+    
+    /**
+     * @param uuid
+     * @return return random item from UUID
+     */
+    public RandomItem getRandomItem(UUID uuid) {
+        return itemMap.get(uuid);
+    }
+    
+    /**
      * If random item distribution is currently in progress, multiplies
      * the CURRENT timer by the given multiplier
      * 

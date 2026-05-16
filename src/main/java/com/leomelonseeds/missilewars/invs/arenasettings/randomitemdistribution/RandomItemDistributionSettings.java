@@ -62,7 +62,14 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
 
     @Override
     public void registerClick(int slot, ClickType type, ItemStack item) {
-        // TODO Auto-generated method stub
+        String key = InventoryUtils.getGUIFromItem(item);
+        if (key == null) {
+            return;
+        }
+        
+        if (key.equals("edit-items")) {
+            new RandomItemsList(player, arena.getArenaSettings().getRandomItemDistributor(), viewOnly, this);
+        }
     }
 
 }

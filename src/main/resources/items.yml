@@ -917,8 +917,9 @@ fireball:
   - "&7They died instantly and painlessly."
   - ""
   - "&dNote that fireballs do no explosion"
-  - "&ddamage to players (unless modified by"
-  - "&da custom arena) and can't break portals."
+  - "&ddamage to players (unless modified"
+  - "&dby a custom arena) and can't"
+  - "&dbreak portals."
   - ""
   - "&bPower: %power%"
   1:
@@ -1973,13 +1974,16 @@ text:
   - "&bSpeed: %speed%m/s"
   - "&bTNT: %tnt%"
   itemstats:
-  - "&bBase Cooldown: %cooldown%&fs"
-  - "&bLimit: %max% &fitem(s)"
+  - "&3Base Cooldown: %cooldown%&fs"
+  - "&3Limit: %max% &fitem(s)"
   itemstats-random:
-  - "&bAmount: &f%amount% &fitem(s)"
-  - "&bLimit: &f%max% &fitem(s)"
-  itemstats-random-weight:
-  - "&bWeight: &f%weight%"
+  - "&3Amount: &f%amount% &fitem(s)"
+  - "&3Limit: &f%max% &fitem(s)"
+  itemstats-random-weight: "&3Weight: &f%weight%"
+  itemstats-random-menu:
+  - ""
+  - "&cClick &7to modify"
+  - "&cShift-click &7to remove"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
