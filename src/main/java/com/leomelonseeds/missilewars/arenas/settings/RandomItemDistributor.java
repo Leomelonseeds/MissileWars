@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,6 +41,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     private List<RandomItem> curItems;
     private int totalWeight;
     private int timerTicks; // IN TICKS!!! 0 means disabled
+    private Random random;
     
     public RandomItemDistributor(ArenaSettings settings) {
         this.settings = settings;
@@ -88,6 +90,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     public void startDistribution(Collection<MissileWarsPlayer> redTeam, Collection<MissileWarsPlayer> blueTeam) {
         timerTicks = ((int) settings.get(ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER)) * 20;
+        random = new Random();
         giveNextItem(redTeam, blueTeam);
     }
     
@@ -344,7 +347,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         
         // Thanks https://stackoverflow.com/questions/6737283/weighted-randomness-in-java
         int i = 0;
-        for (double r = Math.random() * totalWeight; i < curItems.size() - 1; i++) {
+        for (double r = random.nextDouble() * totalWeight; i < curItems.size() - 1; i++) {
             r -= curItems.get(i).getWeight();
             if (r <= 0.0) {
                 break;

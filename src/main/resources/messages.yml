@@ -550,6 +550,47 @@ settings:
         - "&7&o(&7&oDefault: %default%)"
         - ""
         - "&cClick &7to change"
+  random-item-settings:
+    MAX:
+      type: "int"
+      item: CHEST
+      description:
+        - "&7The maximum amount of this item"
+        - "&7a player can have. The number is"
+        - "&7based on the amount of the random"
+        - "&7item given at once - for example,"
+        - "&7if Arrows are configured to give"
+        - "&73 at once, then having 12 arrows"
+        - "&7will count as having 4 'items'. Set to"
+        - "&f0 &7to disable."
+    AMOUNT:
+      type: "int"
+      item: BUNDLE
+      description:
+        - "&7The amount of this item to give"
+        - "&7at once."
+    WEIGHT:
+      type: "int"
+      item: ANVIL
+      description:
+        - "&7The weight of this item in the"
+        - "&7random item distributor. Items"
+        - "&7with a higher weight have a greater"
+        - "&7chance of being picked to give."
+    MISSILE_OFFSET_Z:
+      type: "int"
+      item: SPECTRAL_ARROW
+      description:
+        - "&7A custom Z offset for this missile."
+        - "&7Greater values means the missile will"
+        - "&7spawn further away from the player."
+    MISSILE_OFFSET_Y:
+      type: "int"
+      item: SPECTRAL_ARROW
+      description:
+        - "&7A custom Y offset for this missile."
+        - "&7Greater values means the missile will"
+        - "&7spawn more high up."
   settings:
     CAPACITY:
       type: "int"
@@ -590,8 +631,8 @@ settings:
       type: "int"
       unit: ""
       description:
-        - "&7The maximum amount of 'items' that"
-        - "&7a player can have. The number is"
+        - "&7The maximum amount of items players"
+        - "&7can have in total. The number is"
         - "&7based on the amount of the random"
         - "&7item given at once - for example,"
         - "&7if Arrows are configured to give"

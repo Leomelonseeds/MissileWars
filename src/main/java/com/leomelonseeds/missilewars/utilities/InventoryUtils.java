@@ -48,6 +48,7 @@ public class InventoryUtils {
     public static final NamespacedKey COSMETIC_KEY = new NamespacedKey(plugin, "name");
     public static final NamespacedKey PRESET_KEY = new NamespacedKey(plugin, "preset");
     public static final NamespacedKey UUID_KEY = new NamespacedKey(plugin, "random-item-uuid");
+    public static final NamespacedKey SETTING_VALUE_KEY = new NamespacedKey(plugin, "arena-setting");
     
     /**
      * @param i

@@ -6,14 +6,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
@@ -28,7 +26,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     // boolean: true/false
     // int: "l-r" split on "-"
     // enum: string value of the next enum to uppercase
-    private static NamespacedKey SETTING_VALUE;
+    // (This NamespacedKey is now located in InventoryUtils.SETTING_VALUE_KEY)
 
     private Map<Integer, ArenaSetting> settingSlots;
     protected boolean viewOnly;
@@ -56,9 +54,6 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         this.size = size;
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
         this.settingSlots = getSettingSlots();
-        if (SETTING_VALUE == null) {
-            SETTING_VALUE = new NamespacedKey(MissileWarsPlugin.getPlugin(), "arena-setting");
-        }
     }
     
     public abstract Map<Integer, ArenaSetting> getSettingSlots();
@@ -112,7 +107,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             return;
         }
         
-        String value = InventoryUtils.getStringFromItemKey(item, SETTING_VALUE);
+        String value = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
         if (value == null) {
             return;
         }
@@ -249,7 +244,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         }
         
         // This right here is bad coding practice in multiple ways
-        InventoryUtils.setMetaString(meta, SETTING_VALUE, left + "-" + right);
+        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "-" + right);
         return res;
     }
 
@@ -277,7 +272,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             i++;
         }
         
-        InventoryUtils.setMetaString(meta, SETTING_VALUE, vals[(i + 1) % vals.length].toString().toUpperCase());
+        String nextValue = vals[(i + 1) % vals.length].toString().toUpperCase();
+        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, nextValue);
         return res;
     }
 
@@ -294,7 +290,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
                         .replace("%default%", (boolean) setting.getDefaultValue() ? "True" : "False"));
         }
 
-        InventoryUtils.setMetaString(meta, SETTING_VALUE, enabled ? "false" : "true");
+        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, enabled ? "false" : "true");
         return res;
     }
     

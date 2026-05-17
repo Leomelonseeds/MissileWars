@@ -2220,6 +2220,8 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
+    edit-item: {}
+    item-list: {}
     main-menu:
       edit-items:
         item: CREEPER_SPAWN_EGG
