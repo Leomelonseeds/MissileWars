@@ -553,6 +553,7 @@ settings:
   random-item-settings:
     MAX:
       type: "int"
+      unit: "x"
       item: CHEST
       description:
         - "&7The maximum amount of this item"
@@ -565,12 +566,14 @@ settings:
         - "&f0 &7to disable."
     AMOUNT:
       type: "int"
+      unit: " item(s)"
       item: BUNDLE
       description:
         - "&7The amount of this item to give"
         - "&7at once."
     WEIGHT:
       type: "int"
+      unit: ""
       item: ANVIL
       description:
         - "&7The weight of this item in the"
@@ -579,6 +582,7 @@ settings:
         - "&7chance of being picked to give."
     MISSILE_OFFSET_Z:
       type: "int"
+      unit: "b"
       item: SPECTRAL_ARROW
       description:
         - "&7A custom Z offset for this missile."
@@ -586,6 +590,7 @@ settings:
         - "&7spawn further away from the player."
     MISSILE_OFFSET_Y:
       type: "int"
+      unit: "b"
       item: SPECTRAL_ARROW
       description:
         - "&7A custom Y offset for this missile."

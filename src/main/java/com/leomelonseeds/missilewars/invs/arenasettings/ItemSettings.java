@@ -92,64 +92,46 @@ public class ItemSettings extends ArenaSettingsInventory {
         }
 
         boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
-        if (key.equals("deck-item-distribution")) {
-            if (!randomItems) {
-                new DeckDistributionSettings(player, viewOnly, arena, this);
-                return;
+        boolean selectedRandomItems = false;
+        if (key.equals("random-item-distribution")) {
+            selectedRandomItems = true;
+            if (!viewOnly && arena.getArenaSettings().getRandomItemDistributor() == null) {
+                arena.getArenaSettings().setDefaultRandomItemDistributor();
             }
-            
-            if (viewOnly) {
-                viewOnlyDeny();
-                return;
-            }
-            
-            if (type.isLeftClick()) {
-                arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, "false", "boolean");
-                ConfigUtils.sendConfigSound("use-skillpoint", player);
-                updateInventory();
-            } else if (type.isRightClick()) {
-                new DeckDistributionSettings(player, viewOnly, arena, this);
-            }
-            
+        } else if (key.equals("deck-item-distribution")) {
             return;
         }
         
-        if (key.equals("random-item-distribution")) {
-            // TEMP
-            if (!player.hasPermission("umw.admin")) {
-                return;
-            }
-            
-            if (randomItems) {
+        if (randomItems == selectedRandomItems) {
+            if (selectedRandomItems) {
                 new RandomItemDistributionSettings(player, viewOnly, arena, this);
-                return;
+            } else {
+                new DeckDistributionSettings(player, viewOnly, arena, this);
             }
-            
-            if (viewOnly) {
-                viewOnlyDeny();
-                return;
-            }
-            
-            if (!type.isMouseClick()) {
-                return;
-            }
-            
-            // Past this point, we need to set a random item distributor for players
-            // to be able to select it or edit its settings
-            if (arenaSettings.getRandomItemDistributor() == null) {
-                arenaSettings.setDefaultRandomItemDistributor();
-            }
-            
-            if (type.isLeftClick()) {
-                // Use arena setSetting so that players can 
-                arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, "true", "boolean");
-                ConfigUtils.sendConfigSound("use-skillpoint", player);
-                updateInventory();
-            } else if (type.isRightClick()) {
-                new RandomItemDistributionSettings(player, viewOnly, arena, this);
-            }
-            
             return;
+        }
+        
+        if (viewOnly) {
+            viewOnlyDeny();
+            return;
+        }
+        
+        if (arena.isRunning() || arena.isResetting()) {
+            ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+
+        if (type.isLeftClick()) {
+            arena.setSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION, selectedRandomItems + "", "boolean");
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            updateInventory();
+        } else if (type.isRightClick()) {
+            if (selectedRandomItems) {
+                new RandomItemDistributionSettings(player, viewOnly, arena, this);
+            } else {
+                new DeckDistributionSettings(player, viewOnly, arena, this);
+            }
         }
     }
 }

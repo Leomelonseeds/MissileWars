@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,6 +18,7 @@ import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemSetting;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -74,7 +76,7 @@ public class RandomItemEditor extends MWInventory {
         
         // Blue glass panes
         for (int i : new int[] {1, 7, 9, 11, 15, 17, 19, 25, 27, 35, 37, 39, 41, 43}) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLUE_STAINED_GLASS_PANE));
+            inv.setItem(i, InventoryUtils.createBlankItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE));
         }
 
         // Last row as usual
@@ -104,25 +106,9 @@ public class RandomItemEditor extends MWInventory {
         }
         
         RandomItemSetting setting = settingSlots.get(slot);
-        String value = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
-        String[] values = value.split("-");
-        if (type.isRightClick()) {
-            if (values[0].equals("null")) {
-                ConfigUtils.sendConfigMessage("settings.int-minimum", player);
-                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                return;
-            }
-
-            value = values[0];
-        } else if (type.isLeftClick()) {
-            if (values[1].equals("null")) {
-                ConfigUtils.sendConfigMessage("settings.int-maximum", player);
-                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                return;
-            }
-            
-            value = values[1];
-        } else {
+        String valueString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
+        String value = ArenaUtils.parseIntSetting(valueString, type, player);
+        if (value == null) {
             return;
         }
         
@@ -139,13 +125,14 @@ public class RandomItemEditor extends MWInventory {
      * @param setting
      * @return
      */
+    @SuppressWarnings("deprecation")
     private ItemStack createSettingsItem(RandomItemSetting setting) {
         // Get section info
         String settingString = setting.toString();
         ConfigurationSection sec = settingConfig.getConfigurationSection("format.int");
         
         // Create item and set name
-        String material = settingConfig.getString("settings." + settingString + ".item");
+        String material = settingConfig.getString("random-item-settings." + settingString + ".item");
         ItemStack item = new ItemStack(Material.valueOf(material));
         ItemMeta meta = item.getItemMeta();
         String name = sec.getString("color") + ConfigUtils.getEnumDisplayString(settingString);
@@ -154,14 +141,14 @@ public class RandomItemEditor extends MWInventory {
         // Add int specific lore
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
+        lore.addAll(settingConfig.getStringList("random-item-settings." + settingString + ".description"));
         
         // Add specific lores and metadata for each item
         IntSettingModifier intModifier = setting.getModifier();
         int cur = setting.getCurrentValue(randomItem);
         Integer left = cur <= intModifier.getMin() ? null : Math.max(cur - intModifier.getChange(), intModifier.getMin());
         Integer right = cur >= intModifier.getMax() ? null : Math.min(cur + intModifier.getChange(), intModifier.getMax());
-        String unit = settingConfig.getString("settings." + settingString + ".unit");
+        String unit = settingConfig.getString("random-item-settings." + settingString + ".unit");
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
                 lore.add(line);
@@ -187,7 +174,10 @@ public class RandomItemEditor extends MWInventory {
         
         meta.lore(ConfigUtils.toComponent(lore));
         
-        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "-" + right);
+        // Flags
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        
+        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "," + right);
 
         item.setItemMeta(meta);
         

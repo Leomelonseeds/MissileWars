@@ -97,6 +97,7 @@ public class RandomItem implements ConfigurationSerializable {
         lore.remove(lore.size() - 1);
         lore.remove(lore.size() - 1);
         lore.addAll(getLoreLines());
+        meta.lore(lore);
         item.setItemMeta(meta);
     }
     

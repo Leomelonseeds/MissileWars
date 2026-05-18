@@ -11,7 +11,7 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public enum RandomItemSetting {
     
-    WEIGHT(1, IntSettingModifier.create(0, 100, 1), ri -> ri.getWeight(), (ri, val) -> ri.setWeight(val)),
+    WEIGHT(1, IntSettingModifier.create(1, 100, 1), ri -> ri.getWeight(), (ri, val) -> ri.setWeight(val)),
     MAX(1, IntSettingModifier.create(0, 10, 1), ri -> ri.getMax(), (ri, val) -> ri.setMax(val)),
     AMOUNT(1, IntSettingModifier.create(1, 64, 1), ri -> ri.getAmount(), (ri, val) -> ri.setAmount(val)),
     MISSILE_OFFSET_Z(0, IntSettingModifier.create(-4, 4, 1), ri -> getMissileOffset(ri, true), (ri, val) -> setMissileOffset(ri, val, true)),

@@ -17,6 +17,7 @@ import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -115,24 +116,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         // Parse value if int
         String settingType = settingConfig.getString("settings." + setting.toString() + ".type");
         if (settingType.equals("int")) {
-            String[] values = value.split("-");
-            if (type.isRightClick()) {
-                if (values[0].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-minimum", player);
-                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                    return;
-                }
-
-                value = values[0];
-            } else if (type.isLeftClick()) {
-                if (values[1].equals("null")) {
-                    ConfigUtils.sendConfigMessage("settings.int-maximum", player);
-                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-                    return;
-                }
-                
-                value = values[1];
-            } else {
+            value = ArenaUtils.parseIntSetting(value, type, player);
+            if (value == null) {
                 return;
             }
         }
@@ -244,7 +229,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         }
         
         // This right here is bad coding practice in multiple ways
-        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "-" + right);
+        InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "," + right);
         return res;
     }
 

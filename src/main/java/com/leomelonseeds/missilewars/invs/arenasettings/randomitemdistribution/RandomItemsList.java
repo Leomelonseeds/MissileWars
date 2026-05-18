@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.invs.arenasettings.randomitemdistribution;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
+import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.invs.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -74,6 +76,49 @@ public class RandomItemsList extends PaginatedInventory {
             manager.registerInventory(player, fromInv);
             return;
         }
+        
+        if (viewOnly) {
+            ConfigUtils.sendConfigMessage("settings.view-only", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+            return;
+        }
+        
+        // Add or create items
+        if (slot >= 27) {
+            String key = InventoryUtils.getGUIFromItem(item);
+            if (key == null) {
+                return;
+            }
+            
+            // TODO
+            return;
+        }
+        
+        String uuidString = InventoryUtils.getUUIDFromItem(item);
+        if (uuidString == null) {
+            return;
+        }
+        
+        UUID uuid = UUID.fromString(uuidString);
+        RandomItem ri = distributor.getRandomItem(uuid);
+        if (ri == null) {
+            // Perhaps the distribution has changed?
+            updateInventory();
+            return;
+        }
+        
+        if (type.isShiftClick()) {
+            String name = ConfigUtils.toPlain(ri.getModifiableItem().displayName());
+            new ConfirmAction("Remove " + name, player, this, res -> {
+                if (!res) {
+                    return;
+                }
+                
+                distributor.removeItem(ri);
+                updateInventory();
+            }); 
+        } else {
+            new RandomItemEditor(player, ri, this);
+        }
     }
-
 }

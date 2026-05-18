@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -434,5 +435,36 @@ public class ArenaUtils {
         }
         
         return faces.stream().anyMatch(bf -> block.getRelative(bf).isSolid());
+    }
+    
+    /**
+     * @param value
+     * @param type
+     * @return null if failed
+     */
+    public static String parseIntSetting(String value, ClickType type, Player player) {
+        String[] values = value.split(",");
+        String res = null;
+        if (type.isRightClick()) {
+            if (values[0].equals("null")) {
+                ConfigUtils.sendConfigMessage("settings.int-minimum", player);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                return null;
+            }
+
+            res = values[0];
+        } else if (type.isLeftClick()) {
+            if (values[1].equals("null")) {
+                ConfigUtils.sendConfigMessage("settings.int-maximum", player);
+                ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
+                return null;
+            }
+            
+            res = values[1];
+        } else {
+            return null;
+        }
+        
+        return res;
     }
 }
