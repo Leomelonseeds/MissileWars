@@ -408,7 +408,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @param id
      * @return whether an item with this ID has already been added
      */
-    public boolean isAdded(String id) {
+    public boolean contains(String id) {
         return addedIds.contains(id);
     }
     

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -23,10 +24,13 @@ import net.kyori.adventure.text.Component;
 
 public class RandomItemsList extends PaginatedInventory {
     
+    private final static String secString = "arena-settings.random-item-distribution.item-list";
+    
     private RandomItemDistributor distributor;
     private boolean viewOnly;
     private MWInventory fromInv;
     private List<String> addStr;
+    private ConfigurationSection itemsSection;
 
     public RandomItemsList(Player player, RandomItemDistributor distributor, boolean viewOnly, MWInventory fromInv) {
         super(player, 36, "Edit Random Items" + (viewOnly ? " (View Only)" : ""));
@@ -34,6 +38,7 @@ public class RandomItemsList extends PaginatedInventory {
         this.viewOnly = viewOnly;
         this.fromInv = fromInv;
         FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
+        this.itemsSection = itemConfig.getConfigurationSection(secString);
         this.addStr = new ArrayList<>();
         this.addStr.add(itemConfig.getString("text.itemstats-random-weight"));
         this.addStr.addAll(itemConfig.getStringList("text.itemstats-random-menu"));
@@ -67,7 +72,11 @@ public class RandomItemsList extends PaginatedInventory {
             }
         }
         
-        // TODO
+        for (String key : itemsSection.getKeys(false)) {
+            ItemStack item = InventoryUtils.createItem(secString + "." + key);
+            InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);
+            inv.setItem(itemsSection.getInt(key + ".slot"), item);
+        }
     }
 
     @Override
@@ -90,7 +99,16 @@ public class RandomItemsList extends PaginatedInventory {
                 return;
             }
             
-            // TODO
+            if (key.equals("add-item")) {
+                new AddableRandomItems(player, distributor, this);
+                return;
+            }
+            
+            if (key.equals("random-selection")) {
+                // TODO
+                return;
+            }
+            
             return;
         }
         
@@ -108,7 +126,7 @@ public class RandomItemsList extends PaginatedInventory {
         }
         
         if (type.isShiftClick()) {
-            String name = ConfigUtils.toPlain(ri.getModifiableItem().displayName());
+            String name = ConfigUtils.toPlain(ri.getModifiableItem().getItemMeta().displayName());
             new ConfirmAction("Remove " + name, player, this, res -> {
                 if (!res) {
                     return;

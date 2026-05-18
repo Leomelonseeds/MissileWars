@@ -118,7 +118,8 @@ public class RandomItem implements ConfigurationSerializable {
         FileConfiguration itemConfig = ConfigUtils.getConfigFile("items.yml");
         List<String> toAdd = itemConfig.getStringList("text.itemstats-random");
         for (String s : toAdd) {
-            s = s.replace("%amount%", amount + "").replace("%max%", max == 0 ? "∞" : max * amount + "");
+            String maxString = max == 0 ? "None" : ((max * amount) + " item(s)");
+            s = s.replace("%amount%", amount + "").replace("%max%", maxString);
             res.add(ConfigUtils.toComponent(s));
         }
         return res;

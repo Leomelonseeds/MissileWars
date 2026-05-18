@@ -1344,9 +1344,11 @@ public abstract class Arena implements ConfigurationSerializable {
             blueQueue.remove(player);
             Player mcPlayer = player.getMCPlayer();
             mcPlayer.setGameMode(GameMode.SPECTATOR);
-            voteManager.removePlayer(mcPlayer);
-            calculateRankMedian();
-            checkEmpty();
+            if (!running) {
+                voteManager.removePlayer(mcPlayer);
+                calculateRankMedian();
+                checkEmpty();
+            }
         } else {
             ConfigUtils.sendConfigMessage("messages.spectate-join-fail", player.getMCPlayer(), null, null);
         }
@@ -1756,6 +1758,11 @@ public abstract class Arena implements ConfigurationSerializable {
             p.setGameMode(GameMode.SPECTATOR);
             p.removePotionEffect(PotionEffectType.GLOWING);
             p.setWorldBorder(null);
+        }
+        
+        // Cancel random item distributor if any running
+        if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+            settings.getRandomItemDistributor().stopDistribution();
         }
         
         // Schedule tie wait. If endGame gets called from somewhere else,

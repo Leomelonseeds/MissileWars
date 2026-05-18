@@ -1978,12 +1978,15 @@ text:
   - "&3Limit: %max% &fitem(s)"
   itemstats-random:
   - "&3Amount: &f%amount% &fitem(s)"
-  - "&3Limit: &f%max% &fitem(s)"
+  - "&3Limit: &f%max%"
   itemstats-random-weight: "&3Weight: &f%weight%"
   itemstats-random-menu:
   - ""
   - "&cClick &7to modify"
   - "&cShift-click &7to remove"
+  addable-item:
+  - ""
+  - "&cClick &7to add"
   upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
@@ -2220,8 +2223,38 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
-    edit-item: {}
-    item-list: {}
+    edit-item:
+      confirm-add:
+        item: "EMERALD"
+        slot: 50
+        name: "&a&lAdd"
+      cancel-add:
+        item: "BARRIER"
+        slot: 48
+        name: "&c&lCancel"
+    item-list:
+      add-item:
+        item: "EMERALD"
+        slot: 32
+        name: "&aAdd Item"
+        lore:
+          - ""
+          - "&cClick &7to add a new item to this"
+          - "&7random item distribution."
+      random-selection:
+        item: "MAGENTA_GLAZED_TERRACOTTA"
+        slot: 30
+        name: "&dGet Random Selection"
+        lore:
+          - ""
+          - "&7Not sure what items to include?"
+          - "&7Use this button to get a random"
+          - "&7selection. Set how many missiles"
+          - "&7and utilities you want, and we"
+          - "&7will randomly pick from all of"
+          - "&7Ultima's items."
+          - ""
+          - "&d» &d&oWork in progress, coming soon!"
     main-menu:
       edit-items:
         item: CREEPER_SPAWN_EGG
@@ -2310,8 +2343,6 @@ arena-settings:
         - ""
         - "&7When enabled, all passives and"
         - "&7abilities will be disabled."
-        - ""
-        - "&d» &d&oWork in progress, coming soon!"
         - ""
       lore-enabled:
         - "&cClick &7to configure"

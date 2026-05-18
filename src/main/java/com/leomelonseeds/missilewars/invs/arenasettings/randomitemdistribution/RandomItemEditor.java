@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
+import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemSetting;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
@@ -28,15 +30,33 @@ public class RandomItemEditor extends MWInventory {
     
     private Map<Integer, RandomItemSetting> settingSlots;
     private RandomItem randomItem;
-    private MWInventory fromInv;
+    private RandomItemDistributor distributor;
+    private MWInventory listInv;
+    private MWInventory addableInv;
     private String weightStr;
+    private FileConfiguration itemConfig;
     private ConfigurationSection settingConfig;
 
-    public RandomItemEditor(Player player, RandomItem randomItem, MWInventory fromInv) {
-        super(player, 54, "Editing " + ConfigUtils.toPlain(randomItem.getModifiableItem().getItemMeta().displayName()));
+    /**
+     * Use this constructor for editing an existing random item
+     */
+    public RandomItemEditor(Player player, RandomItem randomItem, MWInventory listInv) {
+        this(player, randomItem, listInv, null, null);
+    }
+    
+    
+    /**
+     * Use ths constructor if adding an item from the addable random items menu
+     */
+    public RandomItemEditor(Player player, RandomItem randomItem, MWInventory listInv, RandomItemDistributor distributor, MWInventory addableInv) {
+        super(player, 54, (distributor == null ? "Editing " : "Adding ") + 
+            ConfigUtils.toPlain(randomItem.getModifiableItem().getItemMeta().displayName()));
         this.randomItem = randomItem;
-        this.fromInv = fromInv;
-        this.weightStr = ConfigUtils.getConfigFile("items.yml").getString("text.itemstats-random-weight");
+        this.distributor = distributor;
+        this.listInv = listInv;
+        this.addableInv = addableInv;
+        this.itemConfig = ConfigUtils.getConfigFile("items.yml");
+        this.weightStr = itemConfig.getString("text.itemstats-random-weight");
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
         this.settingSlots = new HashMap<>();
         
@@ -81,11 +101,20 @@ public class RandomItemEditor extends MWInventory {
 
         // Last row as usual
         for (int i = 45; i < 54; i++) {
-            if (i == 49) {
-                inv.setItem(i, InventoryUtils.getBackItem());
-            } else {
-                inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-            }
+            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
+        }
+        
+        // If distributor isn't null we are adding an item
+        if (distributor == null) {
+            inv.setItem(49, InventoryUtils.getBackItem());
+            return;
+        }
+        
+        String secString = "arena-settings.random-item-distribution.edit-item";
+        for (String key : itemConfig.getConfigurationSection(secString).getKeys(false)) {
+            ItemStack item = InventoryUtils.createItem(secString + "." + key);
+            InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);
+            inv.setItem(itemConfig.getInt(secString + "." + key + ".slot"), item);
         }
     }
 
@@ -97,24 +126,42 @@ public class RandomItemEditor extends MWInventory {
         }
         
         if (item.equals(InventoryUtils.getBackItem())) {
-            manager.registerInventory(player, fromInv);
+            manager.registerInventory(player, listInv);
             return;
         }
         
-        if (!settingSlots.containsKey(slot)) {
+        // Check if we changed a setting
+        if (settingSlots.containsKey(slot)) {
+            RandomItemSetting setting = settingSlots.get(slot);
+            String valueString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
+            String value = ArenaUtils.parseIntSetting(valueString, type, player);
+            if (value == null) {
+                return;
+            }
+            
+            setting.setValue(randomItem, Integer.parseInt(value));
+            updateInventory();
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
             return;
         }
         
-        RandomItemSetting setting = settingSlots.get(slot);
-        String valueString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
-        String value = ArenaUtils.parseIntSetting(valueString, type, player);
-        if (value == null) {
+        // Check if cancel or confirm
+        String action = InventoryUtils.getGUIFromItem(item);
+        if (action == null) {
             return;
         }
         
-        setting.setValue(randomItem, Integer.parseInt(value));
-        updateInventory();
-        ConfigUtils.sendConfigSound("use-skillpoint", player);
+        if (action.equals("confirm-add")) {
+            distributor.addItem(randomItem);
+            manager.registerInventory(player, listInv);
+            ConfigUtils.sendConfigSound("purchase-item", player);
+            return;
+        }
+        
+        if (action.equals("cancel-add")) {
+            manager.registerInventory(player, addableInv);
+            return;
+        }
     }
     
     /**

@@ -562,8 +562,9 @@ settings:
         - "&7item given at once - for example,"
         - "&7if Arrows are configured to give"
         - "&73 at once, then having 12 arrows"
-        - "&7will count as having 4 'items'. Set to"
-        - "&f0 &7to disable."
+        - "&7will count as having 4 'items'."
+        - ""
+        - "&7Set to &f0 &7for no limit."
     AMOUNT:
       type: "int"
       unit: " item(s)"
@@ -632,6 +633,10 @@ settings:
         - "&7which refills once empty. This"
         - "&7prevents receiving the same item"
         - "&7many times in a row."
+        - ""
+        - "&7Note that the &fweight &7for random"
+        - "&7items matters much less when this"
+        - "&7setting is enabled."
     RANDOM_ITEM_INVENTORY_LIMIT:
       type: "int"
       unit: ""
@@ -642,8 +647,9 @@ settings:
         - "&7item given at once - for example,"
         - "&7if Arrows are configured to give"
         - "&73 at once, then having 12 arrows"
-        - "&7will count as having 4 'items'. Set to"
-        - "&f0 &7to disable."
+        - "&7will count as having 4 'items'."
+        - ""
+        - "&7Set to &f0 &7for no limit."
     RANDOM_ITEM_XP_TIMER:
       type: "boolean"
       description:

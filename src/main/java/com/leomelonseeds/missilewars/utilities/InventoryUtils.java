@@ -430,7 +430,7 @@ public class InventoryUtils {
             return null;
         }
         
-        if ((item.getItemMeta() == null) || !item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
+        if (!item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return null;
         }
         
