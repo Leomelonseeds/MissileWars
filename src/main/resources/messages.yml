@@ -432,6 +432,30 @@ scoreboard:
 
 # For GUI inventory customization
 inventories:
+  pagination:
+    filter-item:
+      item: HOPPER
+      name: "&fFilters"
+      lore-none:
+        - "&8No filters selected"
+      lore-filter: "&a☑ &f%filter%"
+      lore-click:
+        - ""
+        - "&cClick &7to select filters"
+    sort-item:
+      item: COMPARATOR
+      name: "&fSort: "
+      lore-click:
+        - ""
+        - "&cClick &7to sort"
+    search:
+      item: NAME_TAG
+      name: "&fSearch: "
+      search-none: "&fNone"
+      search-term: "\"%search\""
+      lore-click:
+        - ""
+        - "&cClick &7to search"
   game-selector:
     title: "&c&lSelect a game!"
     game-item:

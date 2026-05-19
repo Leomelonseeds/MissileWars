@@ -2223,6 +2223,7 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
+    addable-items-list: {}
     edit-item:
       confirm-add:
         item: "EMERALD"

@@ -432,10 +432,10 @@ public class DeckManager {
         InventoryUtils.setMetaString(itemMeta, key, realname + "-" + level);
         
         // Setup extra item attributes for specific things
-        if (name.contains("splash")) {
+        if (!intangible && realname.contains("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
             pmeta.setBasePotionType(PotionType.WATER);
-            if (name.contains("molotov")) {
+            if (realname.startsWith("molotov")) {
                 pmeta.setColor(Color.ORANGE);
             }
         }

@@ -235,6 +235,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             item.setAmount(giveAmount);
             player.give(item);
             ConfigUtils.sendConfigSound("pickup", player);
+            return;
         }
 
         // Compute amounts of each registered item
