@@ -23,7 +23,7 @@ import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
-import com.leomelonseeds.missilewars.invs.PaginatedInventory;
+import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.listener.handler.ChatPrompt;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -89,12 +89,6 @@ public class PlayerlistInventory extends PaginatedInventory {
 
     @Override
     protected void updateNonPaginatedSlots() {
-        for (int i = 27; i < 36; i++) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-        }
-        
-        inv.setItem(31, InventoryUtils.getBackItem());
-        
         for (String key : itemSection.getKeys(false)) {
             if (key.equals("player")) {
                 continue;
@@ -184,7 +178,7 @@ public class PlayerlistInventory extends PaginatedInventory {
             player.closeInventory();
             ConfigUtils.sendConfigMessage("list-add-prompt", player, placeholders);
             new ChatPrompt(player, 60, res -> {
-                manager.registerInventory(player, this);
+                manager.registerInventory(player, this, false);
                 if (res == null || res.equals("")) {
                     player.sendMessage(ConfigUtils.toComponent("&cYou took too long to enter a name!"));
                     ConfigUtils.sendConfigSound("purchase-unsuccessful", player);

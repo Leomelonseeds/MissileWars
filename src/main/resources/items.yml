@@ -1,6 +1,6 @@
 # file, item, name, lore, offset (i think that's it?)
 # file and offset not exist for items without schematic
-# Unicode symbols: item ☢ ⚔ ★ ; kit ⚡ ✟ &l☣ ⚒
+# Unicode symbols: item 🚀 ⚔ ★ ; kit ⚡ ✟ &l☣ ⚒
 
 # IMPORTANT:
 # Each item has levels defined. Items in top level are present for all levels
@@ -13,7 +13,7 @@ lightning:
   1:
     file: 'lightning.nbt'
     item: OCELOT_SPAWN_EGG
-    name: "&e☢ Lightning ⚡"
+    name: "&e🚀 Lightning ⚡"
     lore:
     - ""
     - "&7The classic, reliable speedy missile."
@@ -27,7 +27,7 @@ lightning:
   2:
     file: 'hurricane.nbt'
     item: OCELOT_SPAWN_EGG
-    name: "&e☢ &lHurricane &e⚡"
+    name: "&e🚀 &lHurricane &e⚡"
     lore:
     - ""
     - "&7A newer iteration of the Lightning, with"
@@ -45,7 +45,7 @@ thunderbolt:
   1: 
     file: 'thunderbolt.nbt'
     item: VEX_SPAWN_EGG
-    name: "&b☢ Thunderbolt ⚡"
+    name: "&b🚀 Thunderbolt ⚡"
     lore:
     - ""
     - "&7'Let your plans be dark and inpenetrable"
@@ -61,7 +61,7 @@ thunderbolt:
   2:
     file: 'flash.nbt'
     item: VEX_SPAWN_EGG
-    name: "&b☢ &lFlash &b⚡"
+    name: "&b🚀 &lFlash &b⚡"
     lore:
     - ""
     - "&7Blink, and you'll miss it. And instantly die."
@@ -80,7 +80,7 @@ tomahawk:
   1:
     file: 'tomahawk.nbt'
     item: CREEPER_SPAWN_EGG
-    name: "&a☢ Tomahawk ⚡"
+    name: "&a🚀 Tomahawk ⚡"
     lore:
     - ""
     - "&7The first missile ever built. What's that?"
@@ -94,7 +94,7 @@ tomahawk:
   2:
     file: 'tomatwo.nbt'
     item: CREEPER_SPAWN_EGG
-    name: "&a☢ &lTomatwo &a⚡"
+    name: "&a🚀 &lTomatwo &a⚡"
     lore:
     - ""
     - "&7The second missile ever—nevermind, wrong"
@@ -112,7 +112,7 @@ cronullifier:
   1:
     file: 'chronullifier.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
-    name: "&e☢ Chronullifier ⚡"
+    name: "&e🚀 Chronullifier ⚡"
     lore:
     - ""
     - "&7Have you ever wanted an observer engine to be"
@@ -128,7 +128,7 @@ cronullifier:
   2:
     file: 'doubleought.nbt'
     item: MAGMA_CUBE_SPAWN_EGG
-    name: "&e☢ &lDouble-Ought &e⚡"
+    name: "&e🚀 &lDouble-Ought &e⚡"
     lore:
     - ""
     - "&7Named after the most famous shotgun ammo, this"
@@ -148,7 +148,7 @@ piranha:
   1:
     file: 'piranha.nbt'
     item: COD_SPAWN_EGG
-    name: "&7☢ Piranha ✟"
+    name: "&7🚀 Piranha ✟"
     lore:
     - ""
     - "&7Relatively simple, mostly reliable, and looks"
@@ -162,7 +162,7 @@ piranha:
   2:
     file: 'anglerfish.nbt'
     item: COD_SPAWN_EGG
-    name: "&7☢ &lAnglerfish &7✟"
+    name: "&7🚀 &lAnglerfish &7✟"
     lore:
     - ""
     - "&7The Piranha wishes it was this. Or maybe"
@@ -184,7 +184,7 @@ concorde:
   1:
     file: 'concorde.nbt'
     item: RAVAGER_SPAWN_EGG
-    name: "&8☢ Concorde ✟"
+    name: "&8🚀 Concorde ✟"
     lore:
     - ""
     - "&7This compact, speedy missile is"
@@ -199,7 +199,7 @@ concorde:
   2:
     file: 'valkyrie.nbt'
     item: RAVAGER_SPAWN_EGG
-    name: "&8☢ &lValkyrie &8✟"
+    name: "&8🚀 &lValkyrie &8✟"
     lore:
     - ""
     - "&7This one was renamed from the Broadsword"
@@ -218,7 +218,7 @@ supporter:
   1:
     file: 'supporter.nbt'
     item: BEE_SPAWN_EGG
-    name: "&e☢ Supporter ✟"
+    name: "&e🚀 Supporter ✟"
     lore:
     - ""
     - "&7This missile wants to buy your Patreon."
@@ -233,7 +233,7 @@ supporter:
   2:
     file: 'auxiliary.nbt'
     item: BEE_SPAWN_EGG
-    name: "&e☢ &lAuxiliary &e✟"
+    name: "&e🚀 &lAuxiliary &e✟"
     lore:
     - ""
     - "&7Why blow up things in front of you when"
@@ -251,7 +251,7 @@ guardian:
   1:
     file: 'guardian.nbt'
     item: GUARDIAN_SPAWN_EGG
-    name: "&3☢ Guardian ✟"
+    name: "&3🚀 Guardian ✟"
     lore:
     - ""
     - "&7A notoriously resilient missile, capable of"
@@ -265,7 +265,7 @@ guardian:
   2:
     file: 'elderguard.nbt'
     item: ELDER_GUARDIAN_SPAWN_EGG
-    name: "&f☢ &lElder Guardian &f✟"
+    name: "&f🚀 &lElder Guardian &f✟"
     lore:
     - ""
     - "&7Packed with more explosives than the Guardian,"
@@ -284,7 +284,7 @@ gemini:
   1:
     file: 'gemini.nbt'
     item: SLIME_SPAWN_EGG
-    name: "&a☢ Gemini ✟"
+    name: "&a🚀 Gemini ✟"
     lore:
     - ""
     - "&7Why launch one missile when you can launch"
@@ -299,7 +299,7 @@ gemini:
   2:
     file: 'gemini_warrior.nbt'
     item: SLIME_SPAWN_EGG
-    name: "&a☢ &lGemini Warrior &a✟"
+    name: "&a🚀 &lGemini Warrior &a✟"
     lore:
     - ""
     - "&7Why launch two weak missiles at once, when"
@@ -318,7 +318,7 @@ sword:
   1:
     file: 'sword.nbt'
     item: SKELETON_SPAWN_EGG
-    name: "&f☢ Sword ✟"
+    name: "&f🚀 Sword ✟"
     lore:
     - ""
     - "&7This thing might not have much TNT, but"
@@ -334,7 +334,7 @@ sword:
   2:
     file: 'blade.nbt'
     item: SKELETON_SPAWN_EGG
-    name: "&f☢ &lBlade &f✟"
+    name: "&f🚀 &lBlade &f✟"
     lore:
     - ""
     - "&7Tired of the Sword's drawbacks? So are we."
@@ -357,7 +357,7 @@ cuboid:
   1:
     file: 'cuboid.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ Cuboid &6&l☣"
+    name: "&6🚀 Cuboid &6&l☣"
     lore:
     - ""
     - "&7Small, fast, and dense with explosives."
@@ -372,7 +372,7 @@ cuboid:
   2:
     file: 'tesseract.nbt'
     item: TROPICAL_FISH_SPAWN_EGG
-    name: "&6☢ &lTesseract ☣"
+    name: "&6🚀 &lTesseract ☣"
     lore:
     - ""
     - "&7Unfortunately this missile isn't actually"
@@ -391,7 +391,7 @@ warhead:
   1:
     file: 'trifecta.nbt'
     item: CHICKEN_SPAWN_EGG
-    name: "&c☢ Trifecta &c&l☣"
+    name: "&c🚀 Trifecta &c&l☣"
     lore:
     - ""
     - "&7Apparently, trifecta means a type"
@@ -406,7 +406,7 @@ warhead:
   2:
     file: 'bullet.nbt'
     item: CHICKEN_SPAWN_EGG
-    name: "&c☢ &lBullet ☣"
+    name: "&c🚀 &lBullet ☣"
     lore:
     - ""
     - "&7This absolutely insane missile should"
@@ -425,7 +425,7 @@ juggernaut:
   1:
     file: 'juggernaut.nbt'
     item: GHAST_SPAWN_EGG
-    name: "&f☢ Juggernaut &f&l☣"
+    name: "&f🚀 Juggernaut &f&l☣"
     lore:
     - ""
     - "&7High-yield piston-propelled face removal."
@@ -439,7 +439,7 @@ juggernaut:
   2:
     file: 'meganaut.nbt'
     item: GHAST_SPAWN_EGG
-    name: "&f☢ &lMeganaut &f&l☣"
+    name: "&f🚀 &lMeganaut &f&l☣"
     lore:
     - ""
     - "&7This Juggernaut-derived behemoth will"
@@ -458,7 +458,7 @@ breaker:
   1:
     file: 'breaker.nbt'
     item: DOLPHIN_SPAWN_EGG
-    name: "&1☢ Breaker &1&l☣"
+    name: "&1🚀 Breaker &1&l☣"
     lore:
     - ""
     - "&7Like its name suggests, this missile breaks"
@@ -473,7 +473,7 @@ breaker:
   2:
     file: 'rifter.nbt'
     item: DOLPHIN_SPAWN_EGG
-    name: "&1☢ &lRifter &1&l☣"
+    name: "&1🚀 &lRifter &1&l☣"
     lore:
     - ""
     - "&7With almost double the amount of TNT compared"
@@ -492,7 +492,7 @@ shieldbuster:
   1:
     file: 'shieldbuster.nbt'
     item: WITCH_SPAWN_EGG
-    name: "&2☢ Shieldbuster &2&l☣"
+    name: "&2🚀 Shieldbuster &2&l☣"
     lore:
     - ""
     - "&7This missile exists to spite whatever god"
@@ -507,7 +507,7 @@ shieldbuster:
   2:
     file: 'excavator.nbt'
     item: WITCH_SPAWN_EGG
-    name: "&2☢ &lExcavator &2&l☣"
+    name: "&2🚀 &lExcavator &2&l☣"
     lore:
     - ""
     - "&7The Excavator is nearly unstoppable, assuming it"
@@ -529,7 +529,7 @@ incisor:
   1:
     file: 'incisor.nbt'
     item: BOGGED_SPAWN_EGG
-    name: "&2☢ Incisor ⚒"
+    name: "&2🚀 Incisor ⚒"
     lore:
     - ""
     - "&7The incisor is a narrow-edged tooth"
@@ -545,7 +545,7 @@ incisor:
   2:
     file: 'pincer.nbt'
     item: BOGGED_SPAWN_EGG
-    name: "&2☢ &lPincer &2⚒"
+    name: "&2🚀 &lPincer &2⚒"
     lore:
     - ""
     - "&7This missile is long, thin, and drops"
@@ -565,7 +565,7 @@ slingshot:
   1:
     file: 'slingshot.nbt'
     item: SHULKER_SPAWN_EGG
-    name: "&d☢ Slingshot ⚒"
+    name: "&d🚀 Slingshot ⚒"
     lore:
     - ""
     - "&7Break the slimeblock in the back to"
@@ -579,7 +579,7 @@ slingshot:
   2:
     file: 'catapult.nbt'
     item: SHULKER_SPAWN_EGG
-    name: "&d☢ &lCatapult &d⚒"
+    name: "&d🚀 &lCatapult &d⚒"
     lore:
     - ""
     - "&7Why launch one TNT when you can launch"
@@ -597,7 +597,7 @@ automaton:
   1:
     file: 'automaton.nbt'
     item: STRAY_SPAWN_EGG
-    name: "&7☢ Automaton ⚒"
+    name: "&7🚀 Automaton ⚒"
     lore:
     - ""
     - "&7This missile does not care. Provided you"
@@ -613,7 +613,7 @@ automaton:
   2:
     file: 'revenant.nbt'
     item: STRAY_SPAWN_EGG
-    name: "&7☢ &lRevenant &7⚒"
+    name: "&7🚀 &lRevenant &7⚒"
     lore:
     - ""
     - "&7Evtema3 called the engine for this missile"
@@ -632,7 +632,7 @@ pisces:
   1:
     file: 'pisces.nbt'
     item: PARROT_SPAWN_EGG
-    name: "&a☢ Pisces ⚒"
+    name: "&a🚀 Pisces ⚒"
     lore:
     - ""
     - "&7This wide missile could almost compete with"
@@ -646,7 +646,7 @@ pisces:
   2:
     file: 'aries.nbt'
     item: PARROT_SPAWN_EGG
-    name: "&a☢ &lAries &a⚒"
+    name: "&a🚀 &lAries &a⚒"
     lore:
     - ""
     - "&7This missile has three whole engines."
@@ -664,7 +664,7 @@ lifter:
   1:
     file: 'lifter.nbt'
     item: ENDERMITE_SPAWN_EGG
-    name: "&0☢ Lifter ⚒"
+    name: "&0🚀 Lifter ⚒"
     lore:
     - ""
     - "&7This missile lifts its TNT (and occupants)"
@@ -679,7 +679,7 @@ lifter:
   2:
     file: 'icarus.nbt'
     item: ENDERMITE_SPAWN_EGG
-    name: "&0☢ &lIcarus &0⚒"
+    name: "&0🚀 &lIcarus &0⚒"
     lore:
     - ""
     - "&7Break the TNT in front of the fence to lift"
@@ -1016,7 +1016,7 @@ shipper:
   1:
     file: 'shipper.nbt'
     item: HORSE_SPAWN_EGG
-    name: "&e☢ Shipper"
+    name: "&e🚀 Shipper"
     lore:
     - ""
     - "&7This missile sure carries its crew well."
@@ -1031,7 +1031,7 @@ shipper:
   2:
     file: 'slasher.nbt'
     item: HORSE_SPAWN_EGG
-    name: "&e☢ &lSlasher"
+    name: "&e🚀 &lSlasher"
     lore:
     - ""
     - "&7The TNT on this missile is tucked behind"
@@ -1050,7 +1050,7 @@ supersonic:
   1:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ Supersonic ⚡"
+    name: "&b🚀 Supersonic"
     lore:
     - ""
     - "&74.4 meters per second is not, in technical"
@@ -1067,7 +1067,7 @@ supersonic:
   2:
     file: 'hypersonic.nbt'
     item: TURTLE_SPAWN_EGG
-    name: "&b☢ &lHypersonic &b⚡"
+    name: "&b🚀 &lHypersonic"
     lore:
     - ""
     - "&7This missile is the older, spoiled brother"
@@ -1083,7 +1083,7 @@ supersonic:
 
 molotovsplash:
   item: SPLASH_POTION
-  name: "&6★ Molotov Splash %level% ⚡"
+  name: "&6★ Molotov Splash %level%"
   lore:
   - ""
   - "&7Unleash firey death with an explosion"

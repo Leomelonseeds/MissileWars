@@ -177,6 +177,9 @@ messages:
   random-item-limit: "&cYou already have the maximum amount of %item%&c!"
   must-place-fireball: "&cFireballs must be &dplaced &con a block in this arena."
   cannot-change-setting-while-running: "&c&l[!] &7These settings can only be changed when the arena isn't running."
+  search-query: "&eEnter in your search query, or type &6'cancel' &eto cancel."
+  search-query-searching: "&7Searching..."
+  search-query-failed: "&c&l[!] &7Your search was too short or took too long!"
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"
@@ -434,6 +437,22 @@ scoreboard:
 inventories:
   pagination:
     filter-item:
+      name: "%filter%"
+      lore-applied:
+        - "&a☑ &7Applied"
+        - ""
+        - "&cClick &7to remove"
+      lore:
+        - "&8☐ &7Not applied"
+        - ""
+        - "&aClick &7to apply"
+    sort-item:
+      name: "%sort%"
+      lore-applied:
+        - "&a✔ &7Applied"
+      lore:
+        - "&cClick &7to apply"
+    filter:
       item: HOPPER
       name: "&fFilters"
       lore-none:
@@ -442,7 +461,7 @@ inventories:
       lore-click:
         - ""
         - "&cClick &7to select filters"
-    sort-item:
+    sort:
       item: COMPARATOR
       name: "&fSort: "
       lore-click:
@@ -452,10 +471,16 @@ inventories:
       item: NAME_TAG
       name: "&fSearch: "
       search-none: "&fNone"
-      search-term: "\"%search\""
+      search-term: "\"%search%\""
       lore-click:
         - ""
         - "&cClick &7to search"
+    next-page:
+      item: ARROW
+      name: "&fNext Page"
+    last-page:
+      item: ARROW
+      name: "&fLast Page"
   game-selector:
     title: "&c&lSelect a game!"
     game-item:

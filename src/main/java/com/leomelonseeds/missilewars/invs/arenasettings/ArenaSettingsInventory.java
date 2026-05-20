@@ -61,11 +61,7 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     
     @Override
     public void updateInventory() {
-        for (int i = size - 9; i < size; i++) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-        }
-        
-        inv.setItem(size - 5, InventoryUtils.getBackItem());
+        fillBottomRow();
         
         for (Entry<Integer, ArenaSetting> s : settingSlots.entrySet()) {
             inv.setItem(s.getKey(), createSettingsItem(s.getValue()));

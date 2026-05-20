@@ -23,17 +23,19 @@ public class InventoryManager implements Listener {
         inventoryCache = new HashMap<>();
     }
     
-    // Registers and opens an inventory
     public void registerInventory(Player player, MWInventory inv) {
+        registerInventory(player, inv, true);
+    }
+    
+    // Registers and opens an inventory
+    public void registerInventory(Player player, MWInventory inv, boolean update) {
         // Run on next tick to give time for constructors to assign values
         Bukkit.getScheduler().runTask(MissileWarsPlugin.getPlugin(), () -> {
             unregister(player);
             player.openInventory(inv.getInventory());
             inventoryCache.put(player, inv);
-            if (inv.isUpdateAsync()) {
+            if (update) {
                 inv.updateInventoryAsync();
-            } else {
-                inv.updateInventory();
             }
         });
     }

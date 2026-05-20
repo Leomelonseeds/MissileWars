@@ -17,7 +17,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.invs.MWInventory;
-import com.leomelonseeds.missilewars.invs.PaginatedInventory;
+import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -74,10 +74,6 @@ public class MapSelector extends PaginatedInventory {
 
     @Override
     protected void updateNonPaginatedSlots() {
-        for (int i = 27; i < 36; i++) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-        }
-        
         for (String key : itemsSection.getKeys(false)) {
             if (key.equals("map")) {
                 continue;
@@ -87,8 +83,6 @@ public class MapSelector extends PaginatedInventory {
             InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);
             inv.setItem(itemsSection.getInt(key + ".slot"), item);
         }
-        
-        inv.setItem(31, InventoryUtils.getBackItem());
     }
 
     @Override

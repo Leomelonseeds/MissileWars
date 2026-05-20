@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.invs;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
@@ -9,6 +10,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 public abstract class MWInventory {
     
@@ -58,6 +60,22 @@ public abstract class MWInventory {
     }
     
     /**
+     * Fills the bottom row of this inventory with glass panes
+     * and a back button in the middle
+     */
+    protected void fillBottomRow() {
+        int size = inv.getSize();
+        for (int i = size - 9; i < size; i++) {
+            if (i == size - 5) {
+                inv.setItem(i, InventoryUtils.getBackItem());
+            } else {
+                inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
+            }
+        }
+        
+    }
+    
+    /**
      * Change the title of the inventory
      * 
      * @param title
@@ -67,8 +85,15 @@ public abstract class MWInventory {
         player.getOpenInventory().setTitle(title);
     }
     
+    /**
+     * Only updates inventory async if async is set to true!!
+     */
     protected void updateInventoryAsync() {
-        Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> updateInventory());
+        if (async) {
+            Bukkit.getScheduler().runTaskAsynchronously(MissileWarsPlugin.getPlugin(), () -> updateInventory());
+        } else {
+            updateInventory();
+        }
     }
     
     public abstract void updateInventory();
@@ -81,9 +106,5 @@ public abstract class MWInventory {
     
     public BukkitTask getAutoRefreshTask() {
         return autoRefresh;
-    }
-    
-    public boolean isUpdateAsync() {
-        return async;
     }
 }

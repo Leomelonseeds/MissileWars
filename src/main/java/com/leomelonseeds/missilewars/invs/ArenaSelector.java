@@ -23,13 +23,14 @@ import com.leomelonseeds.missilewars.arenas.CustomArenaCreationSession;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMainMenu;
+import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
 
 public class ArenaSelector extends PaginatedInventory {
     
-    private final static int SIZE = 36;
+    private static final int SIZE = 36;
 
     private final String itemConfig;
     private boolean isCustom;
@@ -107,12 +108,6 @@ public class ArenaSelector extends PaginatedInventory {
 
     @Override
     protected void updateNonPaginatedSlots() {
-        for (int i = SIZE - 9; i < SIZE; i++) {
-            inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-        }
-        
-        inv.setItem(SIZE - 5, InventoryUtils.getBackItem());
-        
         if (!isCustom) {
             return;
         }
@@ -162,7 +157,7 @@ public class ArenaSelector extends PaginatedInventory {
 
     @Override
     protected void registerPaginatedClick(int slot, ClickType type, ItemStack item) {
-        if (slot == SIZE - 5) {
+        if (item.equals(InventoryUtils.getBackItem())) {
             String command = "bossshop open menu " + player.getName();
             Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
             return;

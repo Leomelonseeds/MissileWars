@@ -14,13 +14,36 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.invs.MWInventory;
-import com.leomelonseeds.missilewars.invs.PaginatedInventory;
+import com.leomelonseeds.missilewars.invs.pagination.ItemFilter;
+import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
 public class AddableRandomItems extends PaginatedInventory {
+    
+    private enum ItemFilters {
+        
+        MISSILES(new ItemFilter("missiles", "&fMissiles &c🚀", Material.CREEPER_SPAWN_EGG, item -> 
+            item.getType().toString().endsWith("SPAWN_EGG")
+        )),
+        
+        UTILITIES(new ItemFilter("utilities", "&fUtilities &9★", Material.SNOWBALL, item -> 
+            item.getType().toString().endsWith("SPAWN_EGG")
+        )),
+        
+        DECK_ITEMS(new ItemFilter("deck", "&fDeck Items &b✟", Material.SNOWBALL, item -> {
+            // TODO
+            return false;
+        }));
+        
+        private ItemFilter filter;
+        
+        private ItemFilters(ItemFilter filter) {
+            this.filter = filter;
+        }
+    }
     
     private RandomItemDistributor distributor;
     private List<String> itemList;
@@ -59,19 +82,7 @@ public class AddableRandomItems extends PaginatedInventory {
     }
 
     @Override
-    protected void updateNonPaginatedSlots() {
-        // Last row as usual
-        for (int i = 45; i < 54; i++) {
-            if (i == 49) {
-                inv.setItem(i, InventoryUtils.getBackItem());
-            } else {
-                inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-            }
-        }
-        
-        // Filter and sort items
-        // TODO
-    }
+    protected void updateNonPaginatedSlots() {} // Nothing to put here tbh
 
     @Override
     protected void registerPaginatedClick(int slot, ClickType type, ItemStack item) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -16,7 +15,7 @@ import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
-import com.leomelonseeds.missilewars.invs.PaginatedInventory;
+import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
@@ -63,15 +62,6 @@ public class RandomItemsList extends PaginatedInventory {
 
     @Override
     protected void updateNonPaginatedSlots() {
-        // Last row as usual
-        for (int i = 27; i < 36; i++) {
-            if (i == 31) {
-                inv.setItem(i, InventoryUtils.getBackItem());
-            } else {
-                inv.setItem(i, InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE));
-            }
-        }
-        
         for (String key : itemsSection.getKeys(false)) {
             ItemStack item = InventoryUtils.createItem(secString + "." + key);
             InventoryUtils.setMetaString(item, InventoryUtils.ITEM_GUI_KEY, key);

@@ -126,11 +126,6 @@ public class DeckManager {
         for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
             addEnch(weapon, e.getKey(), e.getValue(), deck, json);
         }
-        
-        // For custom enchantments, remove unbreaking if the item has more than 2 enchantments
-        if (weapon.getEnchantments().size() >= 2) {
-            weapon.removeEnchantment(Enchantment.UNBREAKING);
-        }
         gear.add(weapon);
         
         ItemStack boots = ds.getBoots();
@@ -220,8 +215,8 @@ public class DeckManager {
                 }
             }
             meta.lore(newLore);
+            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
-            item.addUnsafeEnchantment(Enchantment.UNBREAKING, lvl); // To add glow
             return;
         }
         

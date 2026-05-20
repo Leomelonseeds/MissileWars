@@ -45,6 +45,9 @@ import net.kyori.adventure.title.Title;
 
 /** Utility Class for acquiring data from config files, and other useful functions. */
 public class ConfigUtils {
+    
+    private static Pattern stripColor = Pattern.compile("(?i)(§|&)[0-9A-FK-ORX]");
+    private static Pattern nonAlpha = Pattern.compile("[^A-Za-z0-9]");
 
     // Map of open cached config files
     private static Map<String, FileConfiguration> configCache = new HashMap<>();
@@ -486,8 +489,17 @@ public class ConfigUtils {
      * @return
      */
     public static String removeColors(String s) {
-        Pattern strip = Pattern.compile("(?i)(§|&)[0-9A-FK-ORX]");
-        return strip.matcher(s).replaceAll("");
+        return stripColor.matcher(s).replaceAll("");
+    }
+    
+    /**
+     * Remove all nonalphanumeric characters in s
+     * 
+     * @param s
+     * @return
+     */
+    public static String removeNonAlpha(String s) {
+        return nonAlpha.matcher(s).replaceAll("");
     }
     
     /**
@@ -571,5 +583,16 @@ public class ConfigUtils {
         if (task != null) {
             task.cancel();
         }
+    }
+    
+    /**
+     * Removes all non-alphanumeric characters (including spaces)
+     * and color codes, and turns s into lowercase
+     * 
+     * @param s
+     * @return
+     */
+    public static String stripString(String s) {
+        return ConfigUtils.removeNonAlpha(ConfigUtils.removeColors(s)).toLowerCase();
     }
 }
