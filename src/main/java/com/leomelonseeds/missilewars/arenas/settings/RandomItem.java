@@ -125,7 +125,7 @@ public class RandomItem implements ConfigurationSerializable {
     }
     
     private String getWithItemUnits(int amount) {
-        return amount + " item" + (amount == 1 ? "" : "s");
+        return amount == 0 ? "None" : amount + " item" + (amount == 1 ? "" : "s");
     }
 
     /**
