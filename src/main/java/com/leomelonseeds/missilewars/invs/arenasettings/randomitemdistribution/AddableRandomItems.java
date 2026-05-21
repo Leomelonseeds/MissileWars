@@ -70,7 +70,7 @@ public class AddableRandomItems extends PaginatedInventory {
             return amount == null ? 0 : Double.valueOf(amount + "");
         }), true),
         
-        new ItemSort("missile-speed", "&fMissile Speed", Material.DIAMOND_BOOTS, Comparator.comparingDouble(item -> {
+        new ItemSort("missile-speed", "&fMissile Speed", Material.FEATHER, Comparator.comparingDouble(item -> {
             String[] keyArgs = InventoryUtils.getUUIDFromItem(item).split("-");
             Object amount = ConfigUtils.getItemValue(keyArgs[0], Integer.parseInt(keyArgs[1]), "speed");
             return amount == null ? 0 : Double.valueOf(amount + "");

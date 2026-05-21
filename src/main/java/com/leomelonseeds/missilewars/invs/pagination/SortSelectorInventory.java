@@ -20,7 +20,7 @@ public class SortSelectorInventory extends MWInventory {
     private ConfigurationSection itemSection;
 
     public SortSelectorInventory(Player player, Map<String, ItemSort> sorts, String currentSort, PaginatedInventory fromInv) {
-        super(player, ((sorts.size() + 8) / 9) * 9, "Select Sorting Type");
+        super(player, ((sorts.size() + 17) / 9) * 9, "Select Sorting Type");
         this.sorts = sorts;
         this.currentSort = currentSort;
         this.fromInv = fromInv;

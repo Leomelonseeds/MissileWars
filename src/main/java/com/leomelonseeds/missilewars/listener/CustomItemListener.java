@@ -14,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Levelled;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
@@ -125,9 +126,8 @@ public class CustomItemListener implements Listener {
     /** Handle right clicking missiles and utility items */
     @EventHandler
     public void useItem(PlayerInteractEvent event) {
-        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
-        // Stop if not right-click
-        if (!event.getAction().isRightClick()) {
+        Action action = event.getAction();
+        if (action == Action.PHYSICAL) {
             return;
         }
         
@@ -149,12 +149,10 @@ public class CustomItemListener implements Listener {
             }
             
             // Must be holding main menu item
-            if (!held.equals("main-menu")) {
-                return;
+            if (held.equals("main-menu") && action.isRightClick()) {
+                event.setCancelled(true);
+                Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "genesis open menu " + player.getName());
             }
-            
-            event.setCancelled(true);
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "genesis open menu " + player.getName());
             return;
         }
         
@@ -191,8 +189,8 @@ public class CustomItemListener implements Listener {
             return;
         }
         
-        // Check if gamemode survival
-        if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.ADVENTURE) {
+        // Check if gamemode survival. Also no more left clicks from this point forward
+        if (action.isLeftClick() || player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.ADVENTURE) {
             return;
         }
         
@@ -217,7 +215,7 @@ public class CustomItemListener implements Listener {
         // Check for clicked block, and scan for a clicked b36 as well
         Block clicked = event.getClickedBlock();
         BlockFace clickedFace = event.getBlockFace();
-        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+        if (action == Action.RIGHT_CLICK_AIR) {
             List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 4);
             Block targetBlock = lastTwoTargetBlocks.get(1);
             Material targetType = targetBlock.getType();
@@ -228,6 +226,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Spawn a structure item
+        FileConfiguration config = MissileWarsPlugin.getPlugin().getConfig();
         MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
@@ -255,7 +254,7 @@ public class CustomItemListener implements Listener {
                         if (i == null) continue;
                         Material material = i.getType();
                         if (!player.hasCooldown(material) && material.toString().contains("SPAWN_EGG")) {
-                            int cooldown = plugin.getConfig().getInt("experimental.missile-cooldown");
+                            int cooldown = config.getInt("experimental.missile-cooldown");
                             player.setCooldown(material, cooldown);
                         }
                     }
@@ -295,7 +294,7 @@ public class CustomItemListener implements Listener {
         if (utility.startsWith("creeper") && clicked != null) {
             event.setCancelled(true);
             // Can't place creepers on obsidian, otherwise broken game
-            List<String> cancel = plugin.getConfig().getStringList("cancel-schematic");
+            List<String> cancel = config.getStringList("cancel-schematic");
             for (String s : cancel) {
                 if (clicked.getType() == Material.getMaterial(s)) {
                     ConfigUtils.sendConfigMessage("messages.cannot-place-structure", player, null, null);
