@@ -177,7 +177,7 @@ messages:
   random-item-limit: "&cYou already have the maximum amount of %item%&c!"
   must-place-fireball: "&cFireballs must be &dplaced &con a block in this arena."
   cannot-change-setting-while-running: "&c&l[!] &7These settings can only be changed when the arena isn't running."
-  search-query: "&eEnter in your search query, or type &6'cancel' &eto cancel."
+  search-query: "&eEnter in your search query, or type &6'cancel' &eto cancel. Use only alphanumeric characters."
   search-query-searching: "&7Searching..."
   search-query-failed: "&c&l[!] &7Your search was too short or took too long!"
   settings:
@@ -186,6 +186,10 @@ messages:
     int-maximum: "&cYou cannot increase this setting further!"
     error: "&cSomething went wrong changing this setting. Please contact an admin!"
     change: "&a&l[!] &r&7Setting &e%setting% &7was changed from %oldvalue% &7to %newvalue%"
+    int-manual: "&ePlease enter a value for setting &6%setting% &ebetween &6%min% &eand &6%max%&e, or type &6'cancel' &eto cancel."
+    int-manual-nan: "&cNot a number!"
+    int-manual-unacceptable: "&cEntered value is too large or too small!"
+    int-manual-game-started: "&cThe setting change prompt was cancelled because a game started."
     rank: "&cYou need to purchase server rank %rank% &cto use this setting!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
@@ -460,7 +464,8 @@ inventories:
       lore-filter: "&a☑ &f%filter%"
       lore-click:
         - ""
-        - "&cClick &7to select filters"
+        - "&cClick &7to edit filters"
+      lore-filtered: "&cShift-click &7to clear filters"
     sort:
       item: COMPARATOR
       name: "&fSort: "
@@ -475,6 +480,7 @@ inventories:
       lore-click:
         - ""
         - "&cClick &7to search"
+      lore-searched: "&cShift-click &7to clear search"
     next-page:
       item: ARROW
       name: "&fNext Page"
@@ -585,6 +591,7 @@ settings:
       right-arrow: "  > "
       lore-increasable: "&cLeft-click &7to increase &a▲"
       lore-decreasable: "&cRight-click &7to decrease &c▼"
+      lore-manual: "&cShift-click &7to type in a value"
       lore:
         - ""
         - "&8%left-value%&7%left-arrow%&b%value%%unit%&7%right-arrow%&8%right-value%"
@@ -800,11 +807,10 @@ settings:
       type: "boolean"
       rank: "&5&lROYAL"
       description:
-        - "&7Normally, the owner of an arena"
-        - "&7must be online for the arena to"
-        - "&7be joinable. Enable to keep the"
-        - "&7arena online even when the owner"
-        - "&7is offline."
+        - "&7When enabled, the arena may be"
+        - "&7joined by players when you are"
+        - "&7offline. Otherwise, the arena will"
+        - "&7go offline when you are offline."
     ENABLE_FORCE_DECK:
       type: "boolean"
       description:

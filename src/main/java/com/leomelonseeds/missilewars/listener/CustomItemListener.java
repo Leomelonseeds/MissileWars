@@ -86,7 +86,8 @@ public class CustomItemListener implements Listener {
      */
     private double getItemStat(String name, String stat) {
         String[] args = name.split("-");
-        return Double.valueOf(ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat) + "");
+        Object res = ConfigUtils.getItemValue(args[0], Integer.parseInt(args[1]), stat);
+        return res == null ? 0 : Double.valueOf(res + "");
     }
 
     /**

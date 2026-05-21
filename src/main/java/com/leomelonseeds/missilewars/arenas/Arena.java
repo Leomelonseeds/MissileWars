@@ -49,6 +49,7 @@ import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.arenas.votes.VoteManager;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
+import com.leomelonseeds.missilewars.listener.handler.ChatPrompt;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -1441,6 +1442,7 @@ public abstract class Arena implements ConfigurationSerializable {
                 Player mcPlayer = player.getMCPlayer();
                 mcPlayer.teleport(getPlayerSpawn(mcPlayer));
                 mcPlayer.closeInventory();
+                ChatPrompt.cancelOpenPrompt(mcPlayer, "settings.int-manual-game-started");
             }
             
             // Register teams and set running state to true

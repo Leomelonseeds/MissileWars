@@ -1012,7 +1012,6 @@ arrows:
 # Available for random item mode
     
 shipper:
-  index: 0
   1:
     file: 'shipper.nbt'
     item: HORSE_SPAWN_EGG
@@ -1046,7 +1045,6 @@ shipper:
     spcost: 1
 
 supersonic:
-  index: 3
   1:
     file: 'supersonic.nbt'
     item: TURTLE_SPAWN_EGG
@@ -1975,9 +1973,9 @@ text:
   - "&bTNT: %tnt%"
   itemstats:
   - "&3Base Cooldown: %cooldown%&fs"
-  - "&3Limit: %max% &fitem(s)"
+  - "&3Limit: &f%max%"
   itemstats-random:
-  - "&3Amount: &f%amount% &fitem(s)"
+  - "&3Amount: &f%amount%"
   - "&3Limit: &f%max%"
   itemstats-random-weight: "&3Weight: &f%weight%"
   itemstats-random-menu:
@@ -2600,6 +2598,9 @@ random-items:
   - shipper-2
   - supersonic-1
   - supersonic-2
+  - molotovsplash-1
+  - molotovsplash-2
+  - molotovsplash-3
   
 # Abilities and passives available for random item mode
 random-item-abilities:

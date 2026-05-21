@@ -12,10 +12,12 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
@@ -335,9 +337,8 @@ public class InventoryUtils {
      * @param item
      */
     public static void addGlow(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        addGlow(meta);
-        item.setItemMeta(meta);
+        item.addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
+        item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
     
     /**
@@ -346,7 +347,17 @@ public class InventoryUtils {
      * @param item
      */
     public static void addGlow(ItemMeta meta) {
-        meta.setEnchantmentGlintOverride(true);
+        meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+    
+    /**
+     * Remove a glow from addGlow
+     * 
+     * @param meta
+     */
+    public static void removeGlow(ItemMeta meta) {
+        meta.removeEnchant(Enchantment.UNBREAKING);
     }
     
     /**

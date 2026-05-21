@@ -20,6 +20,8 @@ import com.leomelonseeds.missilewars.listener.handler.ChatPrompt;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
+import net.kyori.adventure.text.Component;
+
 public abstract class PaginatedInventory extends MWInventory {
     
     private static ItemStack[] pageItems;
@@ -121,11 +123,13 @@ public abstract class PaginatedInventory extends MWInventory {
         
         // Sort
         if (currentSort != null) {
-            Collections.sort(items, sorts.get(currentSort).getComparator());
+            ItemSort sort = sorts.get(currentSort);
+            if (sort.isReverse()) {
+                Collections.sort(items, sort.getComparator().reversed());
+            } else {
+                Collections.sort(items, sort.getComparator());
+            }
         }
-        
-        // Now that all sorting and stuff is done we can add in the paginated items
-        updatePaginatedSlots();
         
         // Add black and red glass panes. Red glass pane behavior should be handled by the subclass
         fillBottomRow();
@@ -134,14 +138,8 @@ public abstract class PaginatedInventory extends MWInventory {
         // will override the subclass' items
         updateNonPaginatedSlots();
         
-        // Epic pagination
-        if (page > 0) {
-            inv.setItem(lastPageSlot, pageItems[0]);
-        }
-        
-        if (page < Math.ceil((double) items.size() / lastPageSlot) - 1) {
-            inv.setItem(nextPageSlot, pageItems[1]);
-        }
+        // Now that all sorting and stuff is done we can add in the paginated items
+        updatePaginatedSlots();
         
         // Add filter item
         if (!filters.isEmpty()) {
@@ -152,14 +150,16 @@ public abstract class PaginatedInventory extends MWInventory {
             List<String> lore = new ArrayList<>();
             if (currentFilters.isEmpty()) {
                 lore.addAll(sec.getStringList("lore-none"));
+                lore.addAll(sec.getStringList("lore-click"));
             } else {
                 InventoryUtils.addGlow(filterMeta);
                 for (String filter : currentFilters.keySet()) {
                     String displayName = filters.get(filter).getDisplayName();
                     lore.add(sec.getString("lore-filter").replace("%filter%", displayName));
                 }
+                lore.addAll(sec.getStringList("lore-click"));
+                lore.add(sec.getString("lore-filtered"));
             }
-            lore.addAll(sec.getStringList("lore-click"));
             filterMeta.lore(ConfigUtils.toComponent(lore));
             InventoryUtils.setMetaString(filterMeta, InventoryUtils.ITEM_GUI_KEY, "filter");
             filterItem.setItemMeta(filterMeta);
@@ -195,7 +195,11 @@ public abstract class PaginatedInventory extends MWInventory {
                 currentSearch = sec.getString("search-term").replace("%search%", searchTerm);
             }
             searchMeta.displayName(ConfigUtils.toComponent(sec.getString("name") + currentSearch));
-            searchMeta.lore(ConfigUtils.toComponent(sec.getStringList("lore-click")));
+            List<Component> lore = ConfigUtils.toComponent(sec.getStringList("lore-click"));
+            if (searchTerm != null) {
+                lore.add(ConfigUtils.toComponent(sec.getString("lore-searched")));
+            }
+            searchMeta.lore(lore);
             InventoryUtils.setMetaString(searchMeta, InventoryUtils.ITEM_GUI_KEY, "search");
             searchItem.setItemMeta(searchMeta);
             inv.setItem(lastPageSlot + 5, searchItem);
@@ -206,6 +210,9 @@ public abstract class PaginatedInventory extends MWInventory {
      * Only update the paginated slots, use for page changes
      */
     private void updatePaginatedSlots() {
+        int lastPage = (items.size() - 1) / lastPageSlot;
+        inv.setItem(lastPageSlot, page == 0 ? InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE) : pageItems[0]);
+        inv.setItem(nextPageSlot, page >= lastPage ? InventoryUtils.createBlankItem(Material.BLACK_STAINED_GLASS_PANE) : pageItems[1]);
         for (int i = page * lastPageSlot; i < page * lastPageSlot + lastPageSlot; i++) {
             inv.setItem(i % lastPageSlot, i < items.size() ? items.get(i) : null);
         }
@@ -237,15 +244,30 @@ public abstract class PaginatedInventory extends MWInventory {
         }
         
         if (guiItem.equals("filter")) {
-            new FilterSelectorInventory(player, filters, currentFilters, this);
+            if (type.isShiftClick() && !currentFilters.isEmpty()) {
+                currentFilters.clear();
+                resetPage();
+                updateInventoryAsync();
+            } else {
+                new FilterSelectorInventory(player, filters, currentFilters, this);
+            }
             return;
         }
         
         if (guiItem.equals("sort")) {
             new SortSelectorInventory(player, sorts, currentSort, this);
+            return;
         }
         
         if (guiItem.equals("search")) {
+            if (type.isShiftClick() && searchTerm != null) {
+                searchTerm = null;
+                resetPage();
+                updateInventoryAsync();
+                return;
+            }
+            
+            player.closeInventory();
             ConfigUtils.sendConfigMessage("search-query", player);
             new ChatPrompt(player, 60, res -> {
                 manager.registerInventory(player, this, false);
@@ -259,6 +281,7 @@ public abstract class PaginatedInventory extends MWInventory {
                 }
 
                 this.searchTerm = res;
+                resetPage();
                 updateInventoryAsync();
             });
             return;
@@ -302,6 +325,13 @@ public abstract class PaginatedInventory extends MWInventory {
      */
     protected void enableSearch() {
         this.enableSearch = true;
+    }
+    
+    /**
+     * Sets page to 0
+     */
+    protected void resetPage() {
+        page = 0;
     }
     
     /**

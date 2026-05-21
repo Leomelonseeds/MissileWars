@@ -247,7 +247,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             }
             
             UUID uuid = UUID.fromString(uuidString);
-            amounts.put(uuid, amounts.getOrDefault(amounts, 0) + item.getAmount());
+            amounts.put(uuid, amounts.getOrDefault(uuid, 0) + item.getAmount());
         }
         
         // If the item amount is less than the max amount but the next give

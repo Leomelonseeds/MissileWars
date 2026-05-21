@@ -34,7 +34,6 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     protected Arena arena;
     protected ArenaSettings arenaSettings;
     private MWInventory fromInv;
-    private int size;
     private ConfigurationSection settingConfig;
 
     /**
@@ -52,7 +51,6 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         this.arena = arena;
         this.arenaSettings = arena.getArenaSettings();
         this.fromInv = fromInv;
-        this.size = size;
         this.settingConfig = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection("settings");
         this.settingSlots = getSettingSlots();
     }
@@ -112,12 +110,22 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         // Parse value if int
         String settingType = settingConfig.getString("settings." + setting.toString() + ".type");
         if (settingType.equals("int")) {
+            if (type.isShiftClick()) {
+                ArenaUtils.manualIntSetting(setting, setting.getIntModifier(), player, this, val -> 
+                    applySetting(setting, val + "", settingType, slot));
+                return;
+            }
+            
             value = ArenaUtils.parseIntSetting(value, type, player);
             if (value == null) {
                 return;
             }
         }
         
+        applySetting(setting, value, settingType, slot);
+    }
+    
+    private void applySetting(ArenaSetting setting, String value, String settingType, int slot) {
         if (!arena.setSetting(setting, value, settingType)) {
             ConfigUtils.sendConfigMessage("settings.error", player);
             return;
@@ -224,6 +232,8 @@ public abstract class ArenaSettingsInventory extends MWInventory {
             res.add(sec.getString("lore-decreasable"));
         }
         
+        res.add(sec.getString("lore-manual"));
+        
         // This right here is bad coding practice in multiple ways
         InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "," + right);
         return res;
@@ -261,14 +271,19 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private List<String> getBooleanSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
         List<String> res = new ArrayList<>();
         boolean enabled = (boolean) arenaSettings.getWithQueue(setting);
+        String enabledString = enabled ? "&aTrue" : "&cFalse";
+        String defaultValue = (boolean) setting.getDefaultValue() ? "True" : "False";
+        if (setting == ArenaSetting.IS_ALWAYS_ONLINE) {
+            defaultValue = "False*";
+        }
+        
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
                 res.add(line);
                 continue;
             }
             
-            res.add(line.replace("%enabled%", enabled ? "&aTrue" : "&cFalse")
-                        .replace("%default%", (boolean) setting.getDefaultValue() ? "True" : "False"));
+            res.add(line.replace("%enabled%", enabledString).replace("%default%", defaultValue));
         }
 
         InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, enabled ? "false" : "true");

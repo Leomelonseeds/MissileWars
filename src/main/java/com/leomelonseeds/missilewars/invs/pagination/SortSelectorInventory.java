@@ -39,9 +39,11 @@ public class SortSelectorInventory extends MWInventory {
             ItemMeta meta = item.getItemMeta();
             meta.displayName(ConfigUtils.toComponent(itemSection.getString("name")
                 .replace("%sort%", sort.getDisplayName())));
-            meta.lore(ConfigUtils.toComponent(itemSection.getStringList(enabled ? "lore-appled" : "lore")));
+            meta.lore(ConfigUtils.toComponent(itemSection.getStringList(enabled ? "lore-applied" : "lore")));
+            if (enabled) {
+                InventoryUtils.addGlow(meta);
+            }
             InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, sort.getId());
-            meta.setEnchantmentGlintOverride(enabled);
             item.setItemMeta(meta);
             inv.setItem(i, item);
             i++;
@@ -66,6 +68,7 @@ public class SortSelectorInventory extends MWInventory {
         }
         
         fromInv.setSort(sortKey);
+        fromInv.resetPage();
         manager.registerInventory(player, fromInv);
     }
 

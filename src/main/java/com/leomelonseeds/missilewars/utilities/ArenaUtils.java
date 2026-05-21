@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.utilities;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,9 +32,12 @@ import org.json.JSONObject;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
+import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.listener.handler.ChatPrompt;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -466,5 +470,36 @@ public class ArenaUtils {
         }
         
         return res;
+    }
+    
+    public static void manualIntSetting(Enum<?> setting, IntSettingModifier modifier, Player player, MWInventory inv, Consumer<Integer> applySetting) {
+        player.closeInventory();
+        ConfigUtils.sendConfigMessage("settings.int-manual", player, Map.of(
+            "%setting%", ConfigUtils.getEnumDisplayString(setting.toString()),
+            "%min%", modifier.getMin() + "",
+            "%max%", modifier.getMax() + ""
+        ));
+
+        new ChatPrompt(player, 30, res -> {
+            MissileWarsPlugin.getPlugin().getInvs().registerInventory(player, inv, false);
+            if (res.equals("cancel")) {
+                return;
+            }
+            
+            int value;
+            try {
+                value = Integer.parseInt(res);
+            } catch (NumberFormatException e) {
+                ConfigUtils.sendConfigMessage("settings.int-manual-nan", player);
+                return;
+            }
+            
+            if (value < modifier.getMin() || value > modifier.getMax()) {
+                ConfigUtils.sendConfigMessage("settings.int-manual-unacceptable", player);
+                return;
+            }
+            
+            applySetting.accept(value);
+        });
     }
 }

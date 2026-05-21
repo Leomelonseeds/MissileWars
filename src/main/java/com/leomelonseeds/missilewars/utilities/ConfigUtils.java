@@ -437,7 +437,7 @@ public class ConfigUtils {
      * @return
      */
     public static Object getItemValue(String item, int level, String get) {
-        FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
+        FileConfiguration itemsConfig = getConfigFile("items.yml");
         
         if (itemsConfig.contains(item + "." + level + "." + get)) {
             return itemsConfig.get(item + "." + level + "." + get);

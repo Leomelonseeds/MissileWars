@@ -84,12 +84,6 @@ public class ItemSettings extends ArenaSettingsInventory {
         if (key == null) {
             return;
         }
-        
-        if (arena.isRunning() || arena.isResetting()) {
-            ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
-            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
-            return;
-        }
 
         boolean randomItems = arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION);
         boolean selectedRandomItems = false;
@@ -98,7 +92,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             if (!viewOnly && arena.getArenaSettings().getRandomItemDistributor() == null) {
                 arena.getArenaSettings().setDefaultRandomItemDistributor();
             }
-        } else if (key.equals("deck-item-distribution")) {
+        } else if (!key.equals("deck-item-distribution")) {
             return;
         }
         

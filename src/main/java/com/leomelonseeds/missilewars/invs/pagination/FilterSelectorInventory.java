@@ -22,7 +22,7 @@ public class FilterSelectorInventory extends MWInventory {
 
     public FilterSelectorInventory(Player player, Map<String, ItemFilter> filters, 
         Map<String, Predicate<ItemStack>> currentFilters, PaginatedInventory fromInv) {
-        super(player, ((filters.size() + 8) / 9) * 9, "Select Filters");
+        super(player, ((filters.size() + 17) / 9) * 9, "Select Filters");
         this.filters = filters;
         this.currentFilters = currentFilters;
         this.fromInv = fromInv;
@@ -41,9 +41,13 @@ public class FilterSelectorInventory extends MWInventory {
             ItemMeta meta = item.getItemMeta();
             meta.displayName(ConfigUtils.toComponent(itemSection.getString("name")
                 .replace("%filter%", filter.getDisplayName())));
-            meta.lore(ConfigUtils.toComponent(itemSection.getStringList(enabled ? "lore-appled" : "lore")));
+            meta.lore(ConfigUtils.toComponent(itemSection.getStringList(enabled ? "lore-applied" : "lore")));
+            if (enabled) {
+                InventoryUtils.addGlow(meta);
+            } else {
+                InventoryUtils.removeGlow(meta);
+            }
             InventoryUtils.setMetaString(meta, InventoryUtils.ITEM_GUI_KEY, filter.getId());
-            meta.setEnchantmentGlintOverride(enabled);
             item.setItemMeta(meta);
             inv.setItem(i, item);
             i++;
@@ -67,6 +71,9 @@ public class FilterSelectorInventory extends MWInventory {
             return;
         }
         
+        handleMutuallyExclusiveFilters(filterKey, "missiles", "utilities");
+        handleMutuallyExclusiveFilters(filterKey, "deck", "non-deck");
+        
         // If enabled disable it
         if (currentFilters.containsKey(filterKey)) {
             currentFilters.remove(filterKey);
@@ -74,7 +81,16 @@ public class FilterSelectorInventory extends MWInventory {
             currentFilters.put(filterKey, filters.get(filterKey).getPredicate());
         }
         
+        fromInv.resetPage();
         updateInventory();
+    }
+    
+    private void handleMutuallyExclusiveFilters(String key, String filter1, String filter2) {
+        if (key.equals(filter1)) {
+            currentFilters.remove(filter2);
+        } else if (key.equals(filter2)) {
+            currentFilters.remove(filter1);
+        }
     }
 
 }

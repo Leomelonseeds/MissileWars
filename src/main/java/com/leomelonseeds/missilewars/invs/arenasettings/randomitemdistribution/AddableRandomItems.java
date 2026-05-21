@@ -1,6 +1,7 @@
 package com.leomelonseeds.missilewars.invs.arenasettings.randomitemdistribution;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -15,6 +16,7 @@ import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.invs.pagination.ItemFilter;
+import com.leomelonseeds.missilewars.invs.pagination.ItemSort;
 import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -23,27 +25,57 @@ import net.kyori.adventure.text.Component;
 
 public class AddableRandomItems extends PaginatedInventory {
     
-    private enum ItemFilters {
+    private static final List<ItemFilter> FILTERS = List.of(
+            
+        new ItemFilter("missiles", "&fMissiles &c🚀", Material.CREEPER_SPAWN_EGG, item -> 
+            item.getType().toString().endsWith("SPAWN_EGG")),
         
-        MISSILES(new ItemFilter("missiles", "&fMissiles &c🚀", Material.CREEPER_SPAWN_EGG, item -> 
-            item.getType().toString().endsWith("SPAWN_EGG")
-        )),
+        new ItemFilter("utilities", "&fUtilities &9★", Material.SNOWBALL, item -> 
+            !item.getType().toString().endsWith("SPAWN_EGG")),
         
-        UTILITIES(new ItemFilter("utilities", "&fUtilities &9★", Material.SNOWBALL, item -> 
-            item.getType().toString().endsWith("SPAWN_EGG")
-        )),
+        new ItemFilter("deck", "&fDeck Items &b✟", Material.BOOKSHELF, item -> {
+            FileConfiguration items = ConfigUtils.getConfigFile("items.yml");
+            String key = InventoryUtils.getUUIDFromItem(item);
+            return items.getConfigurationSection(key.split("-")[0]).contains("index");
+        }),
         
-        DECK_ITEMS(new ItemFilter("deck", "&fDeck Items &b✟", Material.SNOWBALL, item -> {
-            // TODO
-            return false;
-        }));
+        new ItemFilter("non-deck", "&fNon-Deck Items &c🃟", Material.CHISELED_BOOKSHELF, item -> {
+            FileConfiguration items = ConfigUtils.getConfigFile("items.yml");
+            String key = InventoryUtils.getUUIDFromItem(item);
+            return !items.getConfigurationSection(key.split("-")[0]).contains("index");
+        })
+    );
+    
+    private static final List<ItemSort> SORTS = List.of(
+        new ItemSort("name-a-to-z", "&fName (A-Z)", Material.BOOK, (i1, i2) -> {
+            String s1 = ConfigUtils.stripString(ConfigUtils.toPlain(i1.effectiveName()));
+            String s2 = ConfigUtils.stripString(ConfigUtils.toPlain(i2.effectiveName()));
+            return s1.compareTo(s2);
+        }),
         
-        private ItemFilter filter;
+        new ItemSort("name-z-to-a", "&fName (Z-A)", Material.BOOK, (i1, i2) -> {
+            String s1 = ConfigUtils.stripString(ConfigUtils.toPlain(i1.effectiveName()));
+            String s2 = ConfigUtils.stripString(ConfigUtils.toPlain(i2.effectiveName()));
+            return s2.compareTo(s1);
+        }),
         
-        private ItemFilters(ItemFilter filter) {
-            this.filter = filter;
-        }
-    }
+        new ItemSort("tnt-amount", "&fTNT Amount", Material.TNT, Comparator.comparingDouble(item -> {
+            String key = InventoryUtils.getUUIDFromItem(item);
+            if (key.equals("thunderbolt-2")) {
+                return 13;
+            }
+            
+            String[] keyArgs = key.split("-");
+            Object amount = ConfigUtils.getItemValue(keyArgs[0], Integer.parseInt(keyArgs[1]), "tnt");
+            return amount == null ? 0 : Double.valueOf(amount + "");
+        }), true),
+        
+        new ItemSort("missile-speed", "&fMissile Speed", Material.DIAMOND_BOOTS, Comparator.comparingDouble(item -> {
+            String[] keyArgs = InventoryUtils.getUUIDFromItem(item).split("-");
+            Object amount = ConfigUtils.getItemValue(keyArgs[0], Integer.parseInt(keyArgs[1]), "speed");
+            return amount == null ? 0 : Double.valueOf(amount + "");
+        }), true)
+    );
     
     private RandomItemDistributor distributor;
     private List<String> itemList;
@@ -57,6 +89,10 @@ public class AddableRandomItems extends PaginatedInventory {
         this.itemConfig = ConfigUtils.getConfigFile("items.yml");
         this.itemList = itemConfig.getStringList("random-items");
         this.async = true;
+        
+        FILTERS.forEach(f -> addFilter(f));
+        SORTS.forEach(s -> addSort(s));
+        enableSearch();
     }
 
     @Override
@@ -88,13 +124,6 @@ public class AddableRandomItems extends PaginatedInventory {
     protected void registerPaginatedClick(int slot, ClickType type, ItemStack item) {
         if (item.equals(InventoryUtils.getBackItem())) {
             manager.registerInventory(player, fromInv);
-            return;
-        }
-        
-        // Filter and sort
-        String guiKey = InventoryUtils.getGUIFromItem(item);
-        if (guiKey != null) {
-            //  TODO
             return;
         }
         

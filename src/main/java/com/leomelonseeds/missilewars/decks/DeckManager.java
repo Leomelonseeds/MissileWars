@@ -126,6 +126,11 @@ public class DeckManager {
         for (Entry<String, Enchantment> e : ds.getWeaponEnchants().entrySet()) {
             addEnch(weapon, e.getKey(), e.getValue(), deck, json);
         }
+        
+        // For custom enchantments, remove unbreaking if the item has more than 2 enchantments
+        if (weapon.getEnchantments().size() >= 2) {
+            weapon.removeEnchantment(Enchantment.UNBREAKING);
+        }
         gear.add(weapon);
         
         ItemStack boots = ds.getBoots();
@@ -215,8 +220,8 @@ public class DeckManager {
                 }
             }
             meta.lore(newLore);
-            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
+            item.addUnsafeEnchantment(Enchantment.UNBREAKING, lvl); // To add glow
             return;
         }
         
@@ -293,6 +298,7 @@ public class DeckManager {
      *
      * @return an ItemStack
      */
+    @SuppressWarnings("deprecation")
     public ItemStack createItem(String name, int level, JSONObject playerjson, String deck, Boolean intangible, String preset, boolean randomItem) {
         String realname = name;
         // If the name is a config path, find its real name
@@ -340,12 +346,19 @@ public class DeckManager {
             List<String> lore = new ArrayList<>((ArrayList<String>) templore);
             
             // Add missile stats for missiles, and max + cooldown
-            if (ConfigUtils.getItemValue(name, level, "tnt") != null) {
+            if (ConfigUtils.getItemValue(name, level, "speed") != null) {
                 lore.addAll(itemsConfig.getStringList("text.missilestats"));
             }
             
             if (!randomItem && !intangible && level > 0) {
-                lore.addAll(itemsConfig.getStringList("text.itemstats"));
+                for (String s : itemsConfig.getStringList("text.itemstats")) {
+                    if (s.contains("%max%")) {
+                        String max = ConfigUtils.getItemValue(name, level, "max") + "";
+                        lore.add(s.replace("%max%", max + " item" + (max.equals("1") ? "" : "s")));
+                    } else {
+                        lore.add(s);
+                    }
+                }
             }
             
             // Compile lore into single line
@@ -429,6 +442,7 @@ public class DeckManager {
         // Setup extra item attributes for specific things
         if (!intangible && realname.contains("splash")) {
             PotionMeta pmeta = (PotionMeta) itemMeta;
+            pmeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
             pmeta.setBasePotionType(PotionType.WATER);
             if (realname.startsWith("molotov")) {
                 pmeta.setColor(Color.ORANGE);

@@ -133,15 +133,18 @@ public class RandomItemEditor extends MWInventory {
         // Check if we changed a setting
         if (settingSlots.containsKey(slot)) {
             RandomItemSetting setting = settingSlots.get(slot);
+            if (type.isShiftClick()) {
+                ArenaUtils.manualIntSetting(setting, setting.getModifier(), player, this, val -> applySetting(setting, val));
+                return;
+            }
+            
             String valueString = InventoryUtils.getStringFromItemKey(item, InventoryUtils.SETTING_VALUE_KEY);
             String value = ArenaUtils.parseIntSetting(valueString, type, player);
             if (value == null) {
                 return;
             }
             
-            setting.setValue(randomItem, Integer.parseInt(value));
-            updateInventory();
-            ConfigUtils.sendConfigSound("use-skillpoint", player);
+            applySetting(setting, Integer.parseInt(value));
             return;
         }
         
@@ -162,6 +165,12 @@ public class RandomItemEditor extends MWInventory {
             manager.registerInventory(player, addableInv);
             return;
         }
+    }
+    
+    private void applySetting(RandomItemSetting setting, int value) {
+        setting.setValue(randomItem, value);
+        updateInventory();
+        ConfigUtils.sendConfigSound("use-skillpoint", player);
     }
     
     /**
@@ -195,7 +204,7 @@ public class RandomItemEditor extends MWInventory {
         int cur = setting.getCurrentValue(randomItem);
         Integer left = cur <= intModifier.getMin() ? null : Math.max(cur - intModifier.getChange(), intModifier.getMin());
         Integer right = cur >= intModifier.getMax() ? null : Math.min(cur + intModifier.getChange(), intModifier.getMax());
-        String unit = settingConfig.getString("random-item-settings." + settingString + ".unit");
+        String unit = settingConfig.getString("random-item-settings." + settingString + ".unit").replace("(s)", cur == 1 ? "" : "s");
         for (String line : sec.getStringList("lore")) {
             if (line.isEmpty()) {
                 lore.add(line);
@@ -218,6 +227,8 @@ public class RandomItemEditor extends MWInventory {
         if (left != null) {
             lore.add(sec.getString("lore-decreasable"));
         }
+        
+        lore.add(sec.getString("lore-manual"));
         
         meta.lore(ConfigUtils.toComponent(lore));
         

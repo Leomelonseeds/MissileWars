@@ -11,12 +11,18 @@ public class ItemSort {
     private String displayName;
     private Material guiMaterial;
     private Comparator<ItemStack> comparator;
-    
+    private boolean reverse; // Descending order
+
     public ItemSort(String id, String displayName, Material guiMaterial, Comparator<ItemStack> comparator) {
+        this(id, displayName, guiMaterial, comparator, false);
+    }
+    
+    public ItemSort(String id, String displayName, Material guiMaterial, Comparator<ItemStack> comparator, boolean reverse) {
         this.id = id;
         this.displayName = displayName;
         this.guiMaterial = guiMaterial;
         this.comparator = comparator;
+        this.reverse = reverse;
     }
 
     public String getId() {
@@ -33,5 +39,9 @@ public class ItemSort {
     
     public Comparator<ItemStack> getComparator() {
         return comparator;
+    }
+    
+    public boolean isReverse() {
+        return reverse;
     }
 }

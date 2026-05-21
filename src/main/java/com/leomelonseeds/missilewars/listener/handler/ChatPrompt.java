@@ -72,4 +72,17 @@ public class ChatPrompt implements Listener {
         HandlerList.unregisterAll(this);
         instances.remove(player);
     }
+    
+    /**
+     * Cancel any ongoing prompt for the specified player
+     * 
+     * @param player
+     * @param cancelMessagePath the path in messages.yml (without "messages.") to send to cancelled players
+     */
+    public static void cancelOpenPrompt(Player player, String cancelMessagePath) {
+        if (instances.containsKey(player)) {
+            instances.remove(player).stop();
+            ConfigUtils.sendConfigMessage(cancelMessagePath, player);
+        }
+    }
 }

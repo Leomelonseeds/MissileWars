@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
-import com.leomelonseeds.missilewars.invs.ConfirmAction;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -116,15 +115,8 @@ public class RandomItemsList extends PaginatedInventory {
         }
         
         if (type.isShiftClick()) {
-            String name = ConfigUtils.toPlain(ri.getModifiableItem().getItemMeta().displayName());
-            new ConfirmAction("Remove " + name, player, this, res -> {
-                if (!res) {
-                    return;
-                }
-                
-                distributor.removeItem(ri);
-                updateInventory();
-            }); 
+            distributor.removeItem(ri);
+            updateInventory();
         } else {
             new RandomItemEditor(player, ri, this);
         }
