@@ -30,6 +30,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.TrainingArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.decks.Ability;
 import com.leomelonseeds.missilewars.decks.Ability.Stat;
 import com.leomelonseeds.missilewars.decks.Deck;
@@ -49,6 +50,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import net.kyori.adventure.text.Component;
 
 /** Represents a team of Missile Wars Players. */
 /**
@@ -212,7 +215,15 @@ public class MissileWarsTeam {
         
         // Setup based on item distribution type
         if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            arena.getArenaSettings().getRandomItemDistributor().equipGear(mcPlayer, name);
+            RandomItemDistributor distributor = arena.getArenaSettings().getRandomItemDistributor();
+            distributor.equipGear(mcPlayer, name);
+            Component abilitiesMessage = distributor.getAbilitiesMessage();
+            if (abilitiesMessage != null) {
+                ConfigUtils.schedule(20, () -> {
+                    mcPlayer.sendMessage(abilitiesMessage);
+                    ConfigUtils.sendConfigSound("info", mcPlayer);
+                });
+            }
         } else {
             ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);
             int swiftSneak = plugin.getJSON().getEnchantLevel(uuid, "swift_sneak");

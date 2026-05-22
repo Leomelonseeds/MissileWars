@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -32,6 +33,9 @@ import com.leomelonseeds.missilewars.decks.DeckManager;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+
 public class RandomItemDistributor implements ConfigurationSerializable {
     
     // Unfortunately we do need to reference these settings
@@ -43,6 +47,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     private int totalWeight;
     private int timerTicks; // IN TICKS!!! 0 means disabled
     private Random random;
+    private Component enabledAbilitiesMessage;
     
     public RandomItemDistributor(ArenaSettings settings) {
         this.settings = settings;
@@ -487,6 +492,55 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         } else {
             enabledAbilities.put(ability, level);
         }
+    }
+    
+    /**
+     * Generate a message using the currently enabled abilities.
+     * Fetch the message using {@link #getAbilitiesMessage()}
+     */
+    public void generateAbilitiesMessage() {
+        if (enabledAbilities.isEmpty()) {
+            enabledAbilitiesMessage = null;
+            return;
+        }
+        
+        MissileWarsPlugin plugin = MissileWarsPlugin.getPlugin();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            TextComponent.Builder message = Component.text()
+                .append(ConfigUtils.toComponent(ConfigUtils.getConfigText("messages.enabled-abilities")));
+            FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
+            boolean first = true;
+            for (String abilityPath : itemsConfig.getStringList("random-item-abilities")) {
+                String ability = abilityPath.split("\\.")[2];
+                int level = getAbilityLevel(ability);
+                if (level == 0) {
+                    continue;
+                }
+                
+                if (!first) {
+                    message.append(ConfigUtils.toComponent("&7, "));
+                }
+                
+                // Create item to extract lore from
+                ItemStack item = plugin.getDeckManager().createItem(ability, level, null, null, true, null, true);
+                String name = itemsConfig.getString(abilityPath + ".name") + " " + plugin.getDeckManager().roman(level);
+                TextComponent component = Component.text()
+                    .append(ConfigUtils.toComponent(name))
+                    .hoverEvent(item.asHoverEvent())
+                    .build();
+                message.append(component);
+                first = false;
+            }
+            
+            enabledAbilitiesMessage = message.build();
+        });
+    }
+    
+    /**
+     * @return the abilities messaage generated using {@link #generateAbilitiesMessage()}
+     */
+    public Component getAbilitiesMessage() {
+        return enabledAbilitiesMessage;
     }
     
     /**

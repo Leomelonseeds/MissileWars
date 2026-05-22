@@ -180,6 +180,7 @@ messages:
   search-query: "&eEnter in your search query, or type &6'cancel' &eto cancel. Use only alphanumeric characters."
   search-query-searching: "&7Searching..."
   search-query-failed: "&c&l[!] &7Your search was too short or took too long!"
+  enabled-abilities: "&a&l[!] &7Enabled abilities (hover for info): "
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"

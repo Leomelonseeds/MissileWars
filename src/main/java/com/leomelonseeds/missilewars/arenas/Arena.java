@@ -1410,6 +1410,8 @@ public abstract class Arena implements ConfigurationSerializable {
             if (!settings.getRandomItemDistributor().containsMissile()) {
                 return false;
             }
+            
+            settings.getRandomItemDistributor().generateAbilitiesMessage();
         }
 
         // Select Map
