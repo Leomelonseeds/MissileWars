@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
 import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsInventory;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -67,8 +68,15 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
             return;
         }
         
+        RandomItemDistributor distributor = arena.getArenaSettings().getRandomItemDistributor();
         if (key.equals("edit-items")) {
-            new RandomItemsList(player, arena.getArenaSettings().getRandomItemDistributor(), viewOnly, this);
+            new RandomItemsList(player, distributor, viewOnly, this);
+            return;
+        }
+        
+        if (key.equals("edit-abilities")) {
+            new EnabledAbilities(player, distributor, viewOnly, this);
+            return;
         }
     }
 

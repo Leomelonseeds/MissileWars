@@ -317,7 +317,7 @@ public class DeckManager {
         
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial(material));
-        if (deck != null) {
+        if (deck != null || intangible) {
             item.setAmount(Math.max(level, 1));  // Make item count reflect its level
         }
         
@@ -326,7 +326,7 @@ public class DeckManager {
         if (ConfigUtils.getItemValue(name, level, "name") != null || 
                 (name.contains("enchants") && !name.contains("indicator"))) {
             String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
-            if (deck != null) {
+            if (deck != null || intangible) {
                 if (name.contains("enchants")) {
                     displayName = itemsConfig.getString("enchants.name").replace("%enchant%", getEnchName(realname));
                 }
@@ -395,6 +395,12 @@ public class DeckManager {
                 lore.set(i, l);
             }
             
+            // For random items that are intangible
+            if (randomItem && intangible) {
+                lore.add("&f");
+                lore.addAll(getUpgradableLore(name, level, intangible, randomItem, itemMeta, null, null));
+            }
+            
             // Add extra lore for GUIs
             if (deck != null) {
                 lore.add("&f");
@@ -409,22 +415,7 @@ public class DeckManager {
                         item = item.withType(Material.getMaterial(itemsConfig.getString("intangibles.locked")));
                     }
                 } else {
-                    // Possibility of upgrading
-                    if (level < getMaxLevel(name)) {
-                        int spCost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
-                        lore.add(itemsConfig.getString("text.upgradable").replace("%spcost%", spCost + ""));
-                    }
-                    // Possibility of downgrading
-                    if (getMinLevel(name, deckjson) < level) {
-                        int spCost = (int) ConfigUtils.getItemValue(name, level, "spcost");
-                        lore.add(itemsConfig.getString("text.downgradable").replace("%spcost%", spCost + ""));
-                        if (intangible) {
-                            item = item.withType(Material.getMaterial(itemsConfig.getString("intangibles.selected")));
-                            InventoryUtils.addGlow(itemMeta);
-                        }
-                    }
-                    
-                    lore.add(itemsConfig.getString("text.currentsp").replace("%sp%", deckjson.getJSONObject(preset).getInt("skillpoints") + ""));
+                    lore.addAll(getUpgradableLore(name, level, intangible, randomItem, itemMeta, deckjson, preset));
                 }
             }
             itemMeta.lore(ConfigUtils.toComponent(lore));
@@ -450,6 +441,42 @@ public class DeckManager {
         }
         item.setItemMeta(itemMeta);
         return item;
+    }
+    
+    /**
+     * Hackneyed function to get upgradable lore that works on both random item enabled abilities and normal ones
+     */
+    private List<String> getUpgradableLore(String name, int level, boolean intangible, boolean randomItem, 
+        ItemMeta itemMeta, JSONObject deckjson, String preset) {
+        List<String> lore = new ArrayList<>();
+        
+        // Possibility of upgrading
+        if (level < getMaxLevel(name)) {
+            String upgradable = itemsConfig.getString("text.upgradable");
+            if (!randomItem) {
+                int spCost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
+                upgradable = upgradable + itemsConfig.getString("text.spcost").replace("%spcost%", "-" + spCost);
+            }
+            lore.add(upgradable);
+        }
+        
+        // Possibility of downgrading
+        if (getMinLevel(name, deckjson) < level) {
+            String downgradable = itemsConfig.getString("text.downgradable");
+            if (!randomItem) {
+                int spCost = (int) ConfigUtils.getItemValue(name, level, "spcost");
+                downgradable = downgradable + itemsConfig.getString("text.spcost").replace("%spcost%", "+" + spCost);
+            }
+            lore.add(downgradable);
+            if (intangible) {
+                InventoryUtils.addGlow(itemMeta);
+            }
+        }
+        
+        if (!randomItem) {
+            lore.add(itemsConfig.getString("text.currentsp").replace("%sp%", deckjson.getJSONObject(preset).getInt("skillpoints") + ""));
+        }
+        return lore;
     }
     
     /**
@@ -480,11 +507,16 @@ public class DeckManager {
      * @return
      */
     public int getMinLevel(String name, JSONObject deckjson) {
+        if (deckjson == null) {
+            return 0;
+        }
+        
         JSONObject pjson = deckjson.getJSONObject("A");
         if (pjson.getJSONObject("missiles").has(name) ||
             pjson.getJSONObject("utility").has(name)) {
             return 1;
         }
+        
         return 0;
     }
     

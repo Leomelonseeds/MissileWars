@@ -1985,8 +1985,9 @@ text:
   addable-item:
   - ""
   - "&cClick &7to add"
-  upgradable: "&cLeft-click &7to upgrade &a▲ &6(-%spcost%sp)"
-  downgradable: "&cRight-click &7to downgrade &c▼ &6(+%spcost%sp)"
+  upgradable: "&cLeft-click &7to upgrade &a▲"
+  spcost: " &6(%spcost%sp)"
+  downgradable: "&cRight-click &7to downgrade &c▼"
   currentsp: "&cAvailable &7Skillpoints: &f%sp%"
 
 preset:
@@ -2221,7 +2222,23 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
-    addable-items-list: {}
+    edit-abilities:
+      Vanguard:
+        item: "GOLDEN_SWORD"
+        slot: 0
+        name: "&6&lVanguard &r&6⚡ &f&l➡"
+      Sentinel:
+        item: "BOW"
+        slot: 9
+        name: "&b&lSentinel &r&b✟ &f&l➡"
+      Berserker:
+        item: "CROSSBOW"
+        slot: 18
+        name: "&c&lBerserker ☣ &f&l➡"
+      Architect:
+        item: "IRON_PICKAXE"
+        slot: 27
+        name: "&2&lArchitect &r&2⚒ &f&l➡"
     edit-item:
       confirm-add:
         item: "EMERALD"
@@ -2277,7 +2294,7 @@ arena-settings:
           - "&7passives from decks that will also"
           - "&7be enabled in random items mode."
           - ""
-          - "&d» &d&oWork in progress, coming soon!"
+          - "&cClick &7to edit"
       edit-weapon:
         item: BOW
         slot: 14

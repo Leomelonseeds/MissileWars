@@ -53,8 +53,7 @@ public class ArenaUtils {
      */
     public static int getAbility(UUID uuid, Ability ability, Arena arena) {
         if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            // TODO: replace after allowing abilities to be manually selected
-            return 0;
+            return arena.getArenaSettings().getRandomItemDistributor().getAbilityLevel(ability.toString());
         }
         
         return MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, ability);
@@ -495,7 +494,7 @@ public class ArenaUtils {
             }
             
             if (value < modifier.getMin() || value > modifier.getMax()) {
-                ConfigUtils.sendConfigMessage("settings.int-manual-unacceptable", player);
+                ConfigUtils.sendConfigMessage("int-manual-unacceptable", player);
                 return;
             }
             

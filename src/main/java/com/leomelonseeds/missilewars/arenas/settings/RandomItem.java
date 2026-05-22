@@ -19,9 +19,6 @@ import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
-/**
- * 
- */
 public class RandomItem implements ConfigurationSerializable {
     
     private String id;

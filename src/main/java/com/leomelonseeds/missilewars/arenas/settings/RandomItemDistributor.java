@@ -37,6 +37,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     // Unfortunately we do need to reference these settings
     private ArenaSettings settings;
     private LinkedHashMap<UUID, RandomItem> itemMap;
+    private Map<String, Integer> enabledAbilities;
     private Set<String> addedIds;
     private List<RandomItem> curItems;
     private int totalWeight;
@@ -48,6 +49,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
+        this.enabledAbilities = new HashMap<>();
     }
     
     public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
@@ -55,6 +57,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
+        this.enabledAbilities = new HashMap<>(other.enabledAbilities);
         other.itemMap.forEach((uuid, ri) -> {
             RandomItem randomItem = new RandomItem(ri);
             this.itemMap.put(randomItem.getUUID(), randomItem);
@@ -66,6 +69,16 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> distributor = new HashMap<>();
         distributor.put("items", new ArrayList<>(itemMap.values()));
+        
+        // Serialize abilities into a list of "string,value"
+        if (!enabledAbilities.isEmpty()) {
+            List<String> abilities = new ArrayList<>();
+            for (Entry<String, Integer> e : enabledAbilities.entrySet()) {
+                abilities.add(e.getKey() + "," + e.getValue());
+            }
+            distributor.put("enabled-abilities", abilities);
+        }
+        
         return distributor;
     }
     
@@ -75,10 +88,19 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
+        this.enabledAbilities = new HashMap<>();
         itemList.forEach(ri -> {
             itemMap.put(ri.getUUID(), ri);
             addedIds.add(ri.getId());
         });
+        
+        List<String> abilities = (List<String>) distributor.get("enabled-abilities");
+        if (abilities != null) {
+            for (String ability : abilities) {
+                String[] args = ability.split(",");
+                enabledAbilities.put(args[0], Integer.parseInt(args[1]));
+            }
+        }
     }
     
     /**
@@ -453,6 +475,18 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public void clearItems() {
         this.itemMap.clear();
         this.addedIds.clear();
+    }
+    
+    public int getAbilityLevel(String ability) {
+        return enabledAbilities.getOrDefault(ability, 0);
+    }
+    
+    public void setAbilityLevel(String ability, int level) {
+        if (level == 0) {
+            enabledAbilities.remove(ability);
+        } else {
+            enabledAbilities.put(ability, level);
+        }
     }
     
     /**
