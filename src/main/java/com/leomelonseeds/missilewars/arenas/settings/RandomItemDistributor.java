@@ -511,8 +511,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             FileConfiguration itemsConfig = ConfigUtils.getConfigFile("items.yml");
             boolean first = true;
             for (String abilityPath : itemsConfig.getStringList("random-item-abilities")) {
-                String ability = abilityPath.split("\\.")[2];
-                int level = getAbilityLevel(ability);
+                int level = getAbilityLevel(abilityPath.split("\\.")[2]);
                 if (level == 0) {
                     continue;
                 }
@@ -522,11 +521,12 @@ public class RandomItemDistributor implements ConfigurationSerializable {
                 }
                 
                 // Create item to extract lore from
-                ItemStack item = plugin.getDeckManager().createItem(ability, level, null, null, true, null, true);
+                // Set randomItem param to false to not show stuff about being upgradable
+                ItemStack item = plugin.getDeckManager().createItem(abilityPath, level, null, null, true, null, false);
                 String name = itemsConfig.getString(abilityPath + ".name") + " " + plugin.getDeckManager().roman(level);
                 TextComponent component = Component.text()
                     .append(ConfigUtils.toComponent(name))
-                    .hoverEvent(item.asHoverEvent())
+                    .hoverEvent(item)
                     .build();
                 message.append(component);
                 first = false;

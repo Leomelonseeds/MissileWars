@@ -315,9 +315,10 @@ public class CustomItemListener implements Listener {
         }
 
         // Spawn a fireball/dragon fireball
-        if (utility.startsWith("fireball") || utility.startsWith("lingering")) {
+        boolean isDragonFireball = utility.startsWith("lingering");
+        if (utility.startsWith("fireball") || isDragonFireball) {
             event.setCancelled(true);
-            boolean placeOnly = playerArena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED);
+            boolean placeOnly = playerArena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED) && !isDragonFireball;
             Location spawnLoc;
             if (placeOnly) {
                 if (clicked == null) {
@@ -354,7 +355,7 @@ public class CustomItemListener implements Listener {
             }
             
             // Only launch normal fireballs if placeOnly is set to false
-            if (!placeOnly || fireball.getType() != EntityType.FIREBALL) {
+            if (!placeOnly) {
                 fireball.setDirection(player.getEyeLocation().getDirection());
             } else {
                 fireball.setDirection(new Vector());

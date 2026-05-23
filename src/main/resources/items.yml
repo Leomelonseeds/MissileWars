@@ -1704,7 +1704,7 @@ Architect:
         spcost: 1
   ability:
     poke:
-      name: "&ePokémissiles"
+      name: "&6Pokémissiles"
       lore:
       - ""
       - "&7Hold a missile in your offhand and use a"
@@ -1717,7 +1717,7 @@ Architect:
       1: 
         spcost: 4
     kingsmansbludgers:
-      name: "&eKingsman's Bludgers"
+      name: "&6Kingsman's Bludgers"
       lore:
       - ""
       - "&fPerk 1: &7Projectile utilities now do"
@@ -1744,7 +1744,7 @@ Architect:
         spcost: 1
         duration: 2.0
     engineer:
-      name: "&eEngineer"
+      name: "&6Engineer"
       lore:
       - ""
       - "&fPerk 1: &7Breaking blocks from enemy"
@@ -2628,7 +2628,7 @@ random-item-abilities:
   - Sentinel.ability.longshot
   - Sentinel.ability.hitchhikersbow
   - Sentinel.ability.astralturret
-  - Sentinel.passive.impacttigger
+  - Sentinel.passive.impacttrigger
   - Sentinel.passive.smokeshield
   - Sentinel.passive.exoticarrows
   - Berserker.ability.blazeballs

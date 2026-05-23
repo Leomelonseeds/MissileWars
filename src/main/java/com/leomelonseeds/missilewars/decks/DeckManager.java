@@ -317,7 +317,8 @@ public class DeckManager {
         
         // Setup item
         ItemStack item = new ItemStack(Material.getMaterial(material));
-        if (deck != null || intangible) {
+        boolean shouldShowLevel = deck != null || intangible;
+        if (shouldShowLevel) {
             item.setAmount(Math.max(level, 1));  // Make item count reflect its level
         }
         
@@ -326,7 +327,7 @@ public class DeckManager {
         if (ConfigUtils.getItemValue(name, level, "name") != null || 
                 (name.contains("enchants") && !name.contains("indicator"))) {
             String displayName = (String) ConfigUtils.getItemValue(name, level, "name");
-            if (deck != null || intangible) {
+            if (shouldShowLevel) {
                 if (name.contains("enchants")) {
                     displayName = itemsConfig.getString("enchants.name").replace("%enchant%", getEnchName(realname));
                 }
@@ -384,7 +385,7 @@ public class DeckManager {
                     String get = m.replaceAll("%", "");
                     String got1 = ConfigUtils.getItemValue(name, Math.max(level, 1), get) + "";
                     String value = itemsConfig.getString("text.level").replace("%1%", got1);
-                    if (deck != null && level < getMaxLevel(name) && level > 0) {
+                    if (shouldShowLevel && level < getMaxLevel(name) && level > 0) {
                         String got2 = ConfigUtils.getItemValue(name, level + 1, get) + "";
                         if (!got1.equals(got2)) {
                             value = value + itemsConfig.getString("text.nextlevel").replace("%2%", got2);
@@ -428,7 +429,7 @@ public class DeckManager {
         } else if (ConfigUtils.getItemValue(name, level, "file") == null) {
             key = InventoryUtils.ITEM_UTILITY_KEY;
         }
-        InventoryUtils.setMetaString(itemMeta, key, realname + "-" + level);
+        InventoryUtils.setMetaString(itemMeta, key, name + "-" + level);
         
         // Setup extra item attributes for specific things
         if (!intangible && realname.contains("splash")) {

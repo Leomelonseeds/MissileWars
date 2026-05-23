@@ -83,7 +83,7 @@ public class AbilityUpgrades extends DeckSubInventory {
         if (typeJson.getString("selected").equals("None") && type == ClickType.LEFT) {
             int spcost = (int) ConfigUtils.getItemValue(name, 1, "spcost");
             if (sp < spcost) {
-                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+                ConfigUtils.sendConfigMessage("purchase-unsuccessful", player);
                 return false;
             }
             
@@ -96,7 +96,7 @@ public class AbilityUpgrades extends DeckSubInventory {
         
         // Otherwise make sure the one we clicked on is selected one
         if (!typeJson.getString("selected").equals(realname)) {
-            ConfigUtils.sendConfigMessage("messages.cannot-purchase", player, null, null);
+            ConfigUtils.sendConfigMessage("cannot-purchase", player);
             ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             return false;
         }
@@ -108,7 +108,7 @@ public class AbilityUpgrades extends DeckSubInventory {
             
             int spcost = (int) ConfigUtils.getItemValue(name, level + 1, "spcost");
             if (sp < spcost) {
-                ConfigUtils.sendConfigMessage("messages.purchase-unsuccessful", player, null, null);
+                ConfigUtils.sendConfigMessage("purchase-unsuccessful", player);
                 return false;
             }
             

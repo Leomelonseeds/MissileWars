@@ -799,7 +799,8 @@ public class ArenaGameruleListener implements Listener {
         } 
         
         // Check for prickly projectiles
-        if (type == EntityType.EGG ||  type == EntityType.SNOWBALL || type == EntityType.ENDER_PEARL) {
+        if (type == EntityType.EGG ||  type == EntityType.SNOWBALL || 
+            type == EntityType.ENDER_PEARL || type == EntityType.ENDER_PEARL) {
             // Cancel ender pearl damage (or something, idk oldcombatmechanics did this so)
             if (event.getDamage() != 0.0) {
                 return;

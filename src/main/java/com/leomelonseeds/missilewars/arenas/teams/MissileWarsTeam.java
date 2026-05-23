@@ -265,11 +265,7 @@ public class MissileWarsTeam {
             }
             
             int amp = (int) ConfigUtils.getAbilityStat(e.getKey(), level, Stat.AMPLIFIER);
-            if (amp == 0) {
-                continue;
-            }
-
-            mcPlayer.addPotionEffect(new PotionEffect(e.getValue(), 30 * 60 * 20, amp));
+            mcPlayer.addPotionEffect(new PotionEffect(e.getValue(), PotionEffect.INFINITE_DURATION, amp));
         }
         
         // Callback when all setup is done, so that added attributes are instantly available to other classes
@@ -285,14 +281,8 @@ public class MissileWarsTeam {
      * @param focus the key player that is the focus of the message
      */
     public void broadcastConfigMsg(String path, MissileWarsPlayer focus) {
-        if (focus != null) {
-            for (MissileWarsPlayer player : members.values()) {
-                ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus.getMCPlayer());
-            }
-        } else {
-            for (MissileWarsPlayer player : members.values()) {
-                ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, null);
-            }
+        for (MissileWarsPlayer player : members.values()) {
+            ConfigUtils.sendConfigMessage(path, player.getMCPlayer(), arena, focus == null ? null : focus.getMCPlayer());
         }
     }
 
