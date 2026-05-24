@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -72,7 +73,7 @@ import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 public class CustomItemListener implements Listener {
     
     private TritonHandler tritonHandler;
-    private Map<Player, ThrowableProjectile> bludgerStore;
+    private Map<Player, Pair<ThrowableProjectile, Integer>> bludgerStore; // slot that was thrown from
     
     public CustomItemListener() {
         this.tritonHandler = new TritonHandler();
@@ -455,7 +456,8 @@ public class CustomItemListener implements Listener {
         }
 
         // Add meta for structure identification + pokemissiles
-        ItemStack offhand = thrower.getInventory().getItemInOffHand();
+        PlayerInventory pinv = thrower.getInventory();
+        ItemStack offhand = pinv.getItemInOffHand();
         boolean hasOffhandCooldown = thrower.hasCooldown(offhand.getType());
         UUID uuid = thrower.getUniqueId();
         boolean poke = ArenaUtils.getAbility(uuid, Ability.POKEMISSILES, arena) > 0;
@@ -478,23 +480,19 @@ public class CustomItemListener implements Listener {
         }
         
         projectileConsume(hand, thrower, arena);
-        
-        // Add particle effects for prickly
-        if (ArenaUtils.getAbility(uuid, Ability.KINGSMANS_BLUDGERS, arena) > 0) {
-            ArenaUtils.spiralTrail(thrown, Particle.INSTANT_EFFECT, null);
-        }
 
         // More delay + particles for impact trigger
         if (ArenaUtils.getAbility(uuid, Ability.IMPACT_TRIGGER, arena) > 0) {
             ArenaUtils.spiralTrail(thrown, Particle.SMOKE, null);
         }
         
-        // Increase delay if using kingsmans bludgers
-        int delay = 20;
+        // Add particle effects for prickly
         int bludgers = ArenaUtils.getAbility(uuid, Ability.KINGSMANS_BLUDGERS, arena);
+        int delay = 20;
         if (bludgers > 0) {
+            ArenaUtils.spiralTrail(thrown, Particle.INSTANT_EFFECT, null);
             delay = (int) (ConfigUtils.getAbilityStat(Ability.KINGSMANS_BLUDGERS, bludgers, Stat.DURATION) * 20);
-            bludgerStore.put(thrower, thrown);
+            bludgerStore.put(thrower, Pair.of(thrown, pinv.getHeldItemSlot()));
         }
 
         // Schedule structure spawn after 1 second (or more, if impact trigger), if snowball is still alive
@@ -502,7 +500,7 @@ public class CustomItemListener implements Listener {
         ConfigUtils.schedule(delay, () -> {
             // Bludgers should be removed as they can no longer be spawned
             if (bludgers > 0 && bludgerStore.containsKey(thrower) && 
-                    bludgerStore.get(thrower).getUniqueId().equals(thrown.getUniqueId())) {
+                    bludgerStore.get(thrower).getLeft().getUniqueId().equals(thrown.getUniqueId())) {
                 bludgerStore.remove(thrower);
             }
             
@@ -524,15 +522,20 @@ public class CustomItemListener implements Listener {
         }
         
         Player player = event.getPlayer();
-        ThrowableProjectile bludger = bludgerStore.get(player);
-        if (bludger == null || bludger.isDead()) {
-            bludgerStore.remove(player);
+        Pair<ThrowableProjectile, Integer> playerRes = bludgerStore.get(player);
+        if (playerRes == null) {
+            return;
+        }
+
+        // Why the fuck do I need to do this? Why does the server think I left clicked
+        // when I throw the thing even though I clearly only right clicked?
+        ThrowableProjectile bludger = playerRes.getLeft();
+        if (bludger.getTicksLived() == 0) {
             return;
         }
         
-        // Why the fuck do I need to do this? Why does the server think I left clicked
-        // when I throw the thing even though I clearly only right clicked?
-        if (bludger.getTicksLived() == 0) {
+        if (bludger.isDead()) {
+            bludgerStore.remove(player);
             return;
         }
         
@@ -543,7 +546,8 @@ public class CustomItemListener implements Listener {
         
         ItemStack item = event.getItem();
         ItemStack bludgerItem = bludger.getItem();
-        if (item == null || item.getType() != bludgerItem.getType()) {
+        int slot = player.getInventory().getHeldItemSlot();
+        if (slot != playerRes.getRight() && (item == null || item.getType() != bludgerItem.getType())) {
             return;
         }
         

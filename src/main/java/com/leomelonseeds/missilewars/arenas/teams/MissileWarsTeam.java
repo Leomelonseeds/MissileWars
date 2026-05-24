@@ -219,10 +219,10 @@ public class MissileWarsTeam {
             distributor.equipGear(mcPlayer, name);
             Component abilitiesMessage = distributor.getAbilitiesMessage();
             if (abilitiesMessage != null) {
-                ConfigUtils.schedule(20, () -> {
+                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                     mcPlayer.sendMessage(abilitiesMessage);
                     ConfigUtils.sendConfigSound("info", mcPlayer);
-                });
+                }, 20);
             }
         } else {
             ItemStack leggings = createColoredArmor(Material.LEATHER_LEGGINGS);

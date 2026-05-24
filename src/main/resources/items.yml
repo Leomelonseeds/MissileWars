@@ -317,8 +317,8 @@ sword:
   index: 1
   1:
     file: 'sword.nbt'
-    item: SKELETON_SPAWN_EGG
-    name: "&f🚀 Sword ✟"
+    item: ENDERMAN_SPAWN_EGG
+    name: "&d🚀 Sword ✟"
     lore:
     - ""
     - "&7This thing might not have much TNT, but"
@@ -333,8 +333,8 @@ sword:
     tnt: 8
   2:
     file: 'blade.nbt'
-    item: SKELETON_SPAWN_EGG
-    name: "&f🚀 &lBlade &f✟"
+    item: ENDERMAN_SPAWN_EGG
+    name: "&d🚀 &lBlade &f✟"
     lore:
     - ""
     - "&7Tired of the Sword's drawbacks? So are we."

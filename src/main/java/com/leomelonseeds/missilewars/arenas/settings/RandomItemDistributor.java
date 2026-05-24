@@ -181,10 +181,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             int remainder = more.size() % less.size();
             Collections.shuffle(giveExtra);
             for (int i = 0; i < giveExtra.size(); i++) {
-                int amount = lessAmount;
-                if (i < remainder) {
-                    amount++;
-                }
+                int amount = lessAmount + (i < remainder ? 1 : 0);
                 giveItemToPlayer(giveExtra.get(i).getMCPlayer(), nextItem, amount, globalLimit, limitMultiplier);
             }
             
