@@ -440,6 +440,19 @@ public class DeckManager {
                 pmeta.setColor(Color.ORANGE);
             }
         }
+        
+        // Glow
+        if (itemsConfig.contains(name + ".glow")) {
+            InventoryUtils.addGlow(itemMeta);
+        }
+        
+        // Flags
+        if (itemsConfig.contains(name + ".item-flags")) {
+            for (String s : itemsConfig.getStringList(name + ".item-flags")) {
+                itemMeta.addItemFlags(ItemFlag.valueOf(s));
+            }
+        }
+        
         item.setItemMeta(itemMeta);
         return item;
     }

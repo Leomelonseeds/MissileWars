@@ -471,6 +471,18 @@ public class ArenaUtils {
         return res;
     }
     
+    /**
+     * Helper function to get an int setting typed by the player, which will
+     * re-open the supplied menu after the player types in a valid. The menu
+     * is not updated, so if the value is valid, the inventory should handle
+     * how the menu should be updated.
+     * 
+     * @param setting
+     * @param modifier
+     * @param player
+     * @param inv
+     * @param applySetting
+     */
     public static void manualIntSetting(Enum<?> setting, IntSettingModifier modifier, Player player, MWInventory inv, Consumer<Integer> applySetting) {
         player.closeInventory();
         ConfigUtils.sendConfigMessage("settings.int-manual", player, Map.of(

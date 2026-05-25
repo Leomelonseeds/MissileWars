@@ -1980,11 +1980,14 @@ text:
   itemstats-random-weight: "&3Weight: &f%weight%"
   itemstats-random-menu:
   - ""
-  - "&cClick &7to modify"
+  - "&cLeft-click &7to modify"
+  - "&cRight-click &7to %select%"
   - "&cShift-click &7to remove"
   addable-item:
   - ""
-  - "&cClick &7to add"
+  - "&cLeft-click &7to edit and add"
+  - "&cRight-click &7to %select%"
+  - "&cShift-click &7to quick add"
   upgradable: "&cLeft-click &7to upgrade &a▲"
   spcost: " &6(%spcost%sp)"
   downgradable: "&cRight-click &7to downgrade &c▼"
@@ -2224,33 +2227,48 @@ arena-settings:
   random-item-distribution:
     edit-abilities:
       Vanguard:
-        item: "GOLDEN_SWORD"
+        item: GOLDEN_SWORD
         slot: 0
         name: "&6&lVanguard &r&6⚡ &f&l➡"
       Sentinel:
-        item: "BOW"
+        item: BOW
         slot: 9
         name: "&b&lSentinel &r&b✟ &f&l➡"
       Berserker:
-        item: "CROSSBOW"
+        item: CROSSBOW
         slot: 18
         name: "&c&lBerserker ☣ &f&l➡"
       Architect:
-        item: "IRON_PICKAXE"
+        item: IRON_PICKAXE
         slot: 27
         name: "&2&lArchitect &r&2⚒ &f&l➡"
     edit-item:
       confirm-add:
-        item: "EMERALD"
+        item: EMERALD
         slot: 50
+        glow: true
         name: "&a&lAdd"
       cancel-add:
-        item: "BARRIER"
+        item: BARRIER
         slot: 48
         name: "&c&lCancel"
     item-list:
+      select-all:
+        item: GLOW_ITEM_FRAME
+        slot: 30
+        name: "&6Select All"
+        lore:
+          - ""
+          - "&cClick &7to select all items"
+      deselect-all:
+        item: ITEM_FRAME
+        slot: 29
+        name: "&eDeselect All"
+        lore:
+          - ""
+          - "&cClick &7to deselect all items"
       add-item:
-        item: "EMERALD"
+        item: EMERALD
         slot: 33
         name: "&aAdd Item"
         lore:
@@ -2258,7 +2276,7 @@ arena-settings:
           - "&cClick &7to add a new item to this"
           - "&7random item distribution."
       random-selection:
-        item: "MAGENTA_GLAZED_TERRACOTTA"
+        item: MAGENTA_GLAZED_TERRACOTTA
         slot: 32
         name: "&dGet Random Selection"
         lore:
@@ -2272,41 +2290,54 @@ arena-settings:
           - ""
           - "&d» &d&oWork in progress, coming soon!"
       edit-all-weights:
-        item: "ANVIL"
-        slot: 30
-        name: "&bEdit All Weights"
+        item: ANVIL
+        slot: 34
+        glow: true
+        name: "&bEdit Weights"
         lore:
           - ""
-          - "&7Adjust the weight of all items."
+          - "&7Adjust the weight of all selected items."
           - ""
           - "&cLeft-click &7to increase all by &f1 &a▲"
           - "&cRight-click &7to decrease all by &f1 &c▼"
-          - ""
-          - "&cShift+Left-click &7to increase all by &f10 &a▲"
-          - "&cShift+Right-click &7to decrease all by &f10 &c▼"
+          - "&cShift-click &7to type in a value"
       edit-all-maxes:
-        item: "CHEST"
-        slot: 29
-        name: "&bEdit All Maxes"
+        item: CHEST
+        slot: 33
+        glow: true
+        name: "&bEdit Maxes"
         lore:
           - ""
           - "&7Adjust the maximum amounts for all"
-          - "&7items. The actual limit for each"
-          - "&7item is multiplied by its amount."
+          - "&7selected items. The actual limit for"
+          - "&7each item is multiplied by its amount."
           - ""
           - "&cLeft-click &7to increase all by &f1 &a▲"
           - "&cRight-click &7to decrease all by &f1 &c▼"
+          - "&cShift-click &7to type in a value"
       edit-all-amounts:
-        item: "BUNDLE"
-        slot: 28
-        name: "&bEdit All Amounts"
+        item: BUNDLE
+        slot: 32
+        glow: true
+        item-flags:
+          - HIDE_ADDITIONAL_TOOLTIP
+        name: "&bEdit Amounts"
         lore:
           - ""
           - "&7Adjust the amount to give at once"
-          - "&7for all items."
+          - "&7for all selected items."
           - ""
           - "&cLeft-click &7to increase all by &f1 &a▲"
           - "&cRight-click &7to decrease all by &f1 &c▼"
+          - "&cShift-click &7to type in a value"
+      remove-all:
+        item: BARRIER
+        slot: 28
+        glow: true
+        name: "&cRemove Selected Items"
+        lore:
+          - ""
+          - "&cClick &7to remove selected items"
     main-menu:
       edit-items:
         item: CREEPER_SPAWN_EGG
@@ -2427,14 +2458,14 @@ arena-settings:
         - ""
         - "&cClick &7to enable."
     enable-all:
-      item: WATER_BUCKET
+      item: GLOW_ITEM_FRAME
       name: "&aEnable All"
       slot: 32
       lore:
         - ""
         - "&cClick &7to enable all maps."
     disable-all:
-      item: BUCKET
+      item: ITEM_FRAME
       name: "&cDisable All"
       slot: 30
       lore:
@@ -2450,7 +2481,7 @@ arena-settings:
       lore:
         - "&7%listtype-capital%listed"
         - ""
-        - "&cShift + Click &7to remove."
+        - "&cShift-click &7to remove."
     add:
       item: PLAYER_HEAD
       name: "%listtype-color%Add a player"
