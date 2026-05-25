@@ -282,3 +282,7 @@ info:
   sound: "ENTITY_CHICKEN_EGG"
   volume: 1.0
   pitch: 1.5
+bulk-edit:
+  sound: "UI_BUTTON_CLICK"
+  volume: 1.0
+  pitch: 1.2

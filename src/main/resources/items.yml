@@ -2251,7 +2251,7 @@ arena-settings:
     item-list:
       add-item:
         item: "EMERALD"
-        slot: 32
+        slot: 33
         name: "&aAdd Item"
         lore:
           - ""
@@ -2259,7 +2259,7 @@ arena-settings:
           - "&7random item distribution."
       random-selection:
         item: "MAGENTA_GLAZED_TERRACOTTA"
-        slot: 30
+        slot: 32
         name: "&dGet Random Selection"
         lore:
           - ""
@@ -2271,6 +2271,42 @@ arena-settings:
           - "&7Ultima's items."
           - ""
           - "&d» &d&oWork in progress, coming soon!"
+      edit-all-weights:
+        item: "ANVIL"
+        slot: 30
+        name: "&bEdit All Weights"
+        lore:
+          - ""
+          - "&7Adjust the weight of all items."
+          - ""
+          - "&cLeft-click &7to increase all by &f1 &a▲"
+          - "&cRight-click &7to decrease all by &f1 &c▼"
+          - ""
+          - "&cShift+Left-click &7to increase all by &f10 &a▲"
+          - "&cShift+Right-click &7to decrease all by &f10 &c▼"
+      edit-all-maxes:
+        item: "CHEST"
+        slot: 29
+        name: "&bEdit All Maxes"
+        lore:
+          - ""
+          - "&7Adjust the maximum amounts for all"
+          - "&7items. The actual limit for each"
+          - "&7item is multiplied by its amount."
+          - ""
+          - "&cLeft-click &7to increase all by &f1 &a▲"
+          - "&cRight-click &7to decrease all by &f1 &c▼"
+      edit-all-amounts:
+        item: "BUNDLE"
+        slot: 28
+        name: "&bEdit All Amounts"
+        lore:
+          - ""
+          - "&7Adjust the amount to give at once"
+          - "&7for all items."
+          - ""
+          - "&cLeft-click &7to increase all by &f1 &a▲"
+          - "&cRight-click &7to decrease all by &f1 &c▼"
     main-menu:
       edit-items:
         item: CREEPER_SPAWN_EGG
