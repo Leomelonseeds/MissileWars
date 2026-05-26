@@ -2252,6 +2252,28 @@ arena-settings:
         item: BARRIER
         slot: 48
         name: "&c&lCancel"
+    addable-items-list:
+      add-all:
+        item: EMERALD
+        slot: 52
+        glow: true
+        name: "&aAdd All"
+        lore:
+          - ""
+          - "&7Add all selected items to the"
+          - "&7random item distribution and"
+          - "&7return to the previous menu,"
+          - "&7keeping the items selected."
+          - ""
+          - "&cClick &7to add all"
+      deselect-all:
+        item: ITEM_FRAME
+        slot: 51
+        glow: true
+        name: "&eDeselect All"
+        lore:
+          - ""
+          - "&cClick &7to deselect all items"
     item-list:
       select-all:
         item: GLOW_ITEM_FRAME
@@ -2302,7 +2324,7 @@ arena-settings:
           - "&cRight-click &7to decrease all by &f1 &c▼"
           - "&cShift-click &7to type in a value"
       edit-all-maxes:
-        item: CHEST
+        item: BARREL
         slot: 33
         glow: true
         name: "&bEdit Maxes"
@@ -2316,7 +2338,7 @@ arena-settings:
           - "&cRight-click &7to decrease all by &f1 &c▼"
           - "&cShift-click &7to type in a value"
       edit-all-amounts:
-        item: BUNDLE
+        item: WRITABLE_BOOK
         slot: 32
         glow: true
         item-flags:
@@ -2447,7 +2469,7 @@ arena-settings:
       slot: 18
   map-selector:
     map:
-      item: PAPER
+      item: MAP
       name: "&f%umw_map%"
       lore-enabled:
         - "&a✔ &7Enabled"

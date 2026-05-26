@@ -82,6 +82,7 @@ public class FilterSelectorInventory extends MWInventory {
         }
         
         fromInv.resetPage();
+        fromInv.onFilterOrSearch();
         updateInventory();
     }
     

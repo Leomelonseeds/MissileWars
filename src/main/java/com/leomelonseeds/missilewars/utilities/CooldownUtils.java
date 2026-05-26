@@ -1,11 +1,15 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.UseCooldownComponent;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 
@@ -15,6 +19,8 @@ import com.leomelonseeds.missilewars.MissileWarsPlugin;
  * in the future...
  */
 public class CooldownUtils {
+    
+    public static final int MAX_COOLDOWN = 214748342;
     
     public static boolean hasCooldown(Player player, ItemStack item) {
         return getCooldown(player, item) > 0;
@@ -79,6 +85,24 @@ public class CooldownUtils {
         for (ItemStack item : player.getInventory().getContents()) {
             setCooldown(player, item, 0);
         }
+    }
+    
+    public static void addCustomCooldown(ItemMeta meta) {
+        NamespacedKey itemKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), UUID.randomUUID().toString());
+        addCustomCooldown(meta, itemKey);
+    }
+    
+    public static void addCustomCooldown(ItemMeta meta, NamespacedKey key) {
+        UseCooldownComponent cooldownComponent = generateCustomCooldownComponent(key);
+        meta.setUseCooldown(cooldownComponent);
+    }
+    
+    public static UseCooldownComponent generateCustomCooldownComponent(NamespacedKey key) {
+        ItemStack dummy = new ItemStack(Material.BARRIER);
+        UseCooldownComponent useCooldownComponent = dummy.getItemMeta().getUseCooldown();
+        useCooldownComponent.setCooldownGroup(key);
+        useCooldownComponent.setCooldownSeconds(0.0001F);
+        return useCooldownComponent;
     }
     
     /**

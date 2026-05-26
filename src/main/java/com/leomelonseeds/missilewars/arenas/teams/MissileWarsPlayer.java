@@ -11,12 +11,10 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.UseCooldownComponent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -185,22 +183,16 @@ public class MissileWarsPlayer {
             if (gearItem.getType() == Material.CROSSBOW && 
                     MissileWarsPlugin.getPlugin().getJSON().getLevel(playerId, Ability.GUNSLINGER) > 0) {
                 // Set meta for first crossbow
+                ItemStack extraCrossbow = gearItem.clone();
                 ItemMeta meta1 = gearItem.getItemMeta();
-                UseCooldownComponent cooldownComponent1 = meta1.getUseCooldown();
-                cooldownComponent1.setCooldownGroup(new NamespacedKey(MissileWarsPlugin.getPlugin(), "gunslinger-1"));
-                cooldownComponent1.setCooldownSeconds(0.0001F);
-                meta1.setUseCooldown(cooldownComponent1);
+                CooldownUtils.addCustomCooldown(meta1);
                 gearItem.setItemMeta(meta1);
                 
                 // Meta for second crossbow
-                ItemStack extraCrossbow = gearItem.clone();
                 ItemMeta meta2 = extraCrossbow.getItemMeta();
                 String customName = ConfigUtils.toPlain(meta2.customName());
                 meta2.customName(ConfigUtils.toComponent(customName.replace("Crossbow", "Crossbow 2")));
-                UseCooldownComponent cooldownComponent2 = meta2.getUseCooldown();
-                cooldownComponent2.setCooldownGroup(new NamespacedKey(MissileWarsPlugin.getPlugin(), "gunslinger-2"));
-                meta2.setUseCooldown(cooldownComponent2);
-                cooldownComponent1.setCooldownSeconds(0.0001F);
+                CooldownUtils.addCustomCooldown(meta2);
                 extraCrossbow.setItemMeta(meta2);
                 player.getInventory().setItem(27, extraCrossbow);
             }

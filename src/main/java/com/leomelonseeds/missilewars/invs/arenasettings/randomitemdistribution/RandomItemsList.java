@@ -10,13 +10,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.UseCooldownComponent;
 
+import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.IntSettingModifier;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItem;
 import com.leomelonseeds.missilewars.arenas.settings.RandomItemDistributor;
@@ -26,6 +29,7 @@ import com.leomelonseeds.missilewars.invs.MWInventory;
 import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
@@ -33,6 +37,9 @@ import net.kyori.adventure.text.Component;
 public class RandomItemsList extends PaginatedInventory {
     
     private final static String secString = "arena-settings.random-item-distribution.item-list";
+    private final static NamespacedKey cooldownKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "random-item-list");
+    private final static UseCooldownComponent COOLDOWN_COMPONENT = CooldownUtils.generateCustomCooldownComponent(cooldownKey);
+    
     
     private RandomItemDistributor distributor;
     private Set<RandomItem> selectedItems;
@@ -52,6 +59,7 @@ public class RandomItemsList extends PaginatedInventory {
         this.addStr = new ArrayList<>();
         this.addStr.add(itemConfig.getString("text.itemstats-random-weight"));
         this.addStr.addAll(itemConfig.getStringList("text.itemstats-random-menu"));
+        player.setCooldown(cooldownKey, CooldownUtils.MAX_COOLDOWN);
         this.async = true;
     }
 
@@ -89,6 +97,10 @@ public class RandomItemsList extends PaginatedInventory {
         meta.lore(lore);
         if (selected) {
             InventoryUtils.addGlow(meta);
+            meta.setUseCooldown(COOLDOWN_COMPONENT);
+        } else {
+            InventoryUtils.removeGlow(meta);
+            meta.setUseCooldown(null);
         }
         item.setItemMeta(meta);
         return item;
@@ -154,14 +166,14 @@ public class RandomItemsList extends PaginatedInventory {
             if (key.equals("select-all")) {
                 selectedItems.addAll(distributor.getRandomItems());
                 updateInventoryAsync();
-                ConfigUtils.sendConfigSound("use-skillpoint", player);
+                ConfigUtils.sendConfigSound("bulk-edit", player);
                 return;
             }
             
             if (key.equals("deselect-all")) {
                 selectedItems.clear();
                 updateInventoryAsync();
-                ConfigUtils.sendConfigSound("use-skillpoint", player);
+                ConfigUtils.sendConfigSound("bulk-edit", player);
                 return;
             }
             
@@ -231,6 +243,7 @@ public class RandomItemsList extends PaginatedInventory {
 
             inv.setItem(slot, getItemFromRandomItem(ri));
             updateNonPaginatedSlots();
+            ConfigUtils.sendConfigSound("use-skillpoint", player);
             return;
         }
     }
@@ -255,5 +268,10 @@ public class RandomItemsList extends PaginatedInventory {
         
         updateInventoryAsync();
         ConfigUtils.sendConfigSound("bulk-edit", player);
+    }
+    
+    public void setSelectedItems(Set<RandomItem> items) {
+        selectedItems.clear();
+        selectedItems.addAll(items);
     }
 }

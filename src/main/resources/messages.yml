@@ -542,7 +542,7 @@ inventories:
     name: "%umw_map%" # Unused, map name is taken directly from maps.yml
     req: "&7Requires: %rank%" # Inserted as the first lore line, if req level > 0
     item:
-      item: PAPER
+      item: MAP
       lore:
         - "&7Votes: &c%umw_map_votes%"
         - ""
@@ -611,7 +611,7 @@ settings:
     MAX:
       type: "int"
       unit: "x"
-      item: CHEST
+      item: BARREL
       description:
         - "&7The maximum amount of this item"
         - "&7a player can have. The number is"
@@ -625,7 +625,7 @@ settings:
     AMOUNT:
       type: "int"
       unit: " item(s)"
-      item: BUNDLE
+      item: WRITABLE_BOOK
       description:
         - "&7The amount of this item to give"
         - "&7at once."

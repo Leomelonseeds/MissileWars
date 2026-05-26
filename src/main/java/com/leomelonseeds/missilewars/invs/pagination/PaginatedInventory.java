@@ -282,6 +282,7 @@ public abstract class PaginatedInventory extends MWInventory {
 
                 this.searchTerm = res;
                 resetPage();
+                onFilterOrSearch();
                 updateInventoryAsync();
             });
             return;
@@ -360,4 +361,10 @@ public abstract class PaginatedInventory extends MWInventory {
      * @param item
      */
     protected abstract void registerPaginatedClick(int slot, ClickType type, ItemStack item);
+    
+    /**
+     * This function is called when the search or filter functions
+     * are used successfully to change the list of items
+     */
+    protected void onFilterOrSearch() {};
 }
