@@ -237,7 +237,11 @@ public class RandomItemEditor extends MWInventory {
         
         InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "," + right);
 
+        meta.setMaxStackSize(64);
+        
         item.setItemMeta(meta);
+        
+        item.setAmount(cur == 0 ? 64 : cur);
         
         return item;
     }
