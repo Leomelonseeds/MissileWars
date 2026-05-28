@@ -102,7 +102,9 @@ public class RandomItemsList extends PaginatedInventory {
             InventoryUtils.removeGlow(meta);
             meta.setUseCooldown(null);
         }
+        
         item.setItemMeta(meta);
+        
         item.setAmount(ri.getAmount());
         return item;
     }

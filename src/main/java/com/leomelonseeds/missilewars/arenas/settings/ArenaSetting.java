@@ -39,6 +39,7 @@ public enum ArenaSetting {
     RANDOM_ITEM_BAG_DISTRIBUTION(false, "random-item-bag-distribution"),
     RANDOM_ITEM_XP_TIMER(true, "random-item-xp-timer"),
     RANDOM_ITEM_INVENTORY_LIMIT(0, "random-item-inventory-limit", IntSettingModifier.create(0, 32, 1)),
+    START_WITH_MISSILE(true, "start-with-missile"), // TODO
     
     // MISC SETTINGS:
     // Game management
@@ -64,6 +65,7 @@ public enum ArenaSetting {
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", false, true),
+    DISTRIBUTOR_PRESET(1, "distributor-preset"), // TODO
     MAPS_EDITED(false, "maps-edited"), // If false, display every map available in the map selector
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     

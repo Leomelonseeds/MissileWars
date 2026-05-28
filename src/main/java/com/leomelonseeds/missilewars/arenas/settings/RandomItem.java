@@ -99,7 +99,8 @@ public class RandomItem implements ConfigurationSerializable {
     }
     
     /**
-     * Adds lore to item, setting max, amount, and UUID
+     * Adds lore to item, setting max, amount, and UUID, and
+     * sets max stack size to 64 so pots can (hopefully) stack
      */
     private void addInfoLore() {
         ItemMeta meta = item.getItemMeta();
@@ -107,6 +108,7 @@ public class RandomItem implements ConfigurationSerializable {
         lore.addAll(getLoreLines());
         meta.lore(lore);
         InventoryUtils.setMetaString(meta, InventoryUtils.UUID_KEY, uuid.toString());
+        meta.setMaxStackSize(64);
         item.setItemMeta(meta);
     }
     

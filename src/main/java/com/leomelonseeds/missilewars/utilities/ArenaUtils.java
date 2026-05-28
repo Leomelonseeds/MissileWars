@@ -506,7 +506,7 @@ public class ArenaUtils {
             }
             
             if (value < modifier.getMin() || value > modifier.getMax()) {
-                ConfigUtils.sendConfigMessage("int-manual-unacceptable", player);
+                ConfigUtils.sendConfigMessage("settings.int-manual-unacceptable", player);
                 return;
             }
             

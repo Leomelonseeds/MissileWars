@@ -432,6 +432,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param newValue
      */
     public void applySettingChange(ArenaSetting setting, String oldValue, String newValue) {
+        // No need to do anything if nothing changed (if setting was typed in)
+        if (oldValue.equals(newValue)) {
+            return;
+        }
+        
         // Actually change the difficulty if world difficulty changes
         if (setting == ArenaSetting.WORLD_DIFFICULTY) {
             world.setDifficulty(Difficulty.valueOf(newValue));
