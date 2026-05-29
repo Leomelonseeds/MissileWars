@@ -53,7 +53,8 @@ public class ArenaUtils {
      */
     public static int getAbility(UUID uuid, Ability ability, Arena arena) {
         if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            return arena.getArenaSettings().getRandomItemDistributor().getAbilityLevel(ability.toString());
+            return arena.getArenaSettings().getOrCreateRandomItemDistributor()
+                        .getAbilityLevel(ability.toString());
         }
         
         return MissileWarsPlugin.getPlugin().getJSON().getLevel(uuid, ability);

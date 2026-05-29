@@ -40,6 +40,9 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     // Unfortunately we do need to reference these settings
     private ArenaSettings settings;
+    
+    private int index;
+    private String name;
     private LinkedHashMap<UUID, RandomItem> itemMap;
     private Map<String, Integer> enabledAbilities;
     private Set<String> addedIds;
@@ -49,15 +52,19 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     private Random random;
     private Component enabledAbilitiesMessage;
     
-    public RandomItemDistributor(ArenaSettings settings) {
+    public RandomItemDistributor(ArenaSettings settings, int index) {
         this.settings = settings;
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
         this.enabledAbilities = new HashMap<>();
+        this.index = index;
+        this.name = "Preset " + (index + 1);
     }
     
     public RandomItemDistributor(RandomItemDistributor other, ArenaSettings settings) {
+        this.name = other.name;
+        this.index = other.index;
         this.settings = settings;
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
@@ -73,6 +80,10 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> distributor = new HashMap<>();
+        
+        distributor.put("name", name);
+        distributor.put("index", index);
+        
         distributor.put("items", new ArrayList<>(itemMap.values()));
         
         // Serialize abilities into a list of "string,value"
@@ -89,6 +100,14 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     @SuppressWarnings("unchecked")
     public RandomItemDistributor(Map<String, Object> distributor) {
+        if (distributor.containsKey("name")) {
+            this.name = (String) distributor.get("name");
+            this.index = (int) distributor.get("index");
+        } else {
+            this.name = "Preset 1";
+            this.index = 0;
+        }
+        
         List<RandomItem> itemList = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
@@ -540,35 +559,15 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         return enabledAbilitiesMessage;
     }
     
-    /**
-     * Sets the settings to use for the random item distributor.
-     * Do not use other than for copying/deserializing the distributor
-     * 
-     * @param settings
-     */
-    public void setArenaSettings(ArenaSettings settings) {
-        this.settings = settings;
+    public void setName(String name) {
+        this.name = name;
     }
     
-    /**
-     * Get a random item distributor that correponds to the
-     * classic Missile Wars items
-     * 
-     * @param settings
-     * @return
-     */
-    public static RandomItemDistributor getDefaultRandomItemDistributor(ArenaSettings settings) {
-        RandomItemDistributor dist = new RandomItemDistributor(settings);
-        dist.addItem(new RandomItem("tomahawk-1"));
-        dist.addItem(new RandomItem("shieldbuster-1"));
-        dist.addItem(new RandomItem("guardian-1"));
-        dist.addItem(new RandomItem("juggernaut-1"));
-        dist.addItem(new RandomItem("lightning-1"));
-        dist.addItem(new RandomItem("fireball-1"));
-        dist.addItem(new RandomItem("shield-2"));
-        RandomItem arrows = new RandomItem("arrows-1");
-        arrows.setAmount(3);
-        dist.addItem(arrows);
-        return dist;
+    public String getName() {
+        return name;
+    }
+    
+    public int getIndex() {
+        return index;
     }
 }

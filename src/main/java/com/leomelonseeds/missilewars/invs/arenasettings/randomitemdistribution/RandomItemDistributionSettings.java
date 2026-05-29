@@ -23,10 +23,12 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
     private final static String sec = "arena-settings.random-item-distribution.main-menu";
     
     private ConfigurationSection itemsSection;
+    private RandomItemDistributor distributor;
 
-    public RandomItemDistributionSettings(Player player, boolean viewOnly, Arena arena, MWInventory fromInv) {
+    public RandomItemDistributionSettings(Player player, boolean viewOnly, Arena arena, RandomItemDistributor distributor, MWInventory fromInv) {
         super(player, 54, "Random Item Settings", viewOnly, arena, fromInv);
         this.itemsSection = ConfigUtils.getConfigFile("items.yml").getConfigurationSection(sec);
+        this.distributor = distributor;
     }
 
     @Override
@@ -68,7 +70,6 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
             return;
         }
         
-        RandomItemDistributor distributor = arena.getArenaSettings().getRandomItemDistributor();
         if (key.equals("edit-items")) {
             new RandomItemsList(player, distributor, viewOnly, this);
             return;

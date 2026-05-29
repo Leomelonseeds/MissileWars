@@ -65,7 +65,7 @@ public enum ArenaSetting {
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),
     OWNER_UUID(MissileWarsPlugin.zeroUUID, "owner-uuid", false, true),
-    DISTRIBUTOR_PRESET(1, "distributor-preset"), // TODO
+    DISTRIBUTOR_PRESET(0, "distributor-preset"),
     MAPS_EDITED(false, "maps-edited"), // If false, display every map available in the map selector
     PRIORITY(1, "priority"); // Sorting priority - higher numbers sorted first
     

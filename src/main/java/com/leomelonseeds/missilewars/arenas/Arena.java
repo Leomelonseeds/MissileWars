@@ -1412,11 +1412,11 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Make sure there is at least one missile if random items being used
         if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            if (!settings.getRandomItemDistributor().containsMissile()) {
+            if (!settings.getOrCreateRandomItemDistributor().containsMissile()) {
                 return false;
             }
             
-            settings.getRandomItemDistributor().generateAbilitiesMessage();
+            settings.getOrCreateRandomItemDistributor().generateAbilitiesMessage();
         }
 
         // Select Map
@@ -1524,7 +1524,7 @@ public abstract class Arena implements ConfigurationSerializable {
             // Stage 1 chaos
             tasks.add(scheduler.runTaskLater(plugin, () -> {
                 if (randomItems) {
-                    settings.getRandomItemDistributor().setTimerMultiplier(0.75);
+                    settings.getOrCreateRandomItemDistributor().setTimerMultiplier(0.75);
                 } else {
                     blueTeam.setMultiplier(blueTeam.getMultiplier() * 0.75);
                     redTeam.setMultiplier(redTeam.getMultiplier() * 0.75);
@@ -1536,7 +1536,7 @@ public abstract class Arena implements ConfigurationSerializable {
             tasks.add(scheduler.runTaskLater(plugin, () -> {
                 double twothirds = 2.0 / 3.0;
                 if (randomItems) {
-                    settings.getRandomItemDistributor().setTimerMultiplier(twothirds);
+                    settings.getOrCreateRandomItemDistributor().setTimerMultiplier(twothirds);
                 } else {
                     blueTeam.setMultiplier(blueTeam.getMultiplier() * twothirds);
                     redTeam.setMultiplier(redTeam.getMultiplier() * twothirds);
@@ -1691,7 +1691,7 @@ public abstract class Arena implements ConfigurationSerializable {
         
         applyMultipliers();
         if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            settings.getRandomItemDistributor().startDistribution(redTeam.getMembers(), blueTeam.getMembers());
+            settings.getOrCreateRandomItemDistributor().startDistribution(redTeam.getMembers(), blueTeam.getMembers());
         } else {
             for (MissileWarsPlayer mwp : getInGamePlayers()) {
                 mwp.initDeck(false, this, redTeam.containsPlayer(mwp.getMCPlayerId()));
@@ -1771,7 +1771,7 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Cancel random item distributor if any running
         if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            settings.getRandomItemDistributor().stopDistribution();
+            settings.getOrCreateRandomItemDistributor().stopDistribution();
         }
         
         // Schedule tie wait. If endGame gets called from somewhere else,

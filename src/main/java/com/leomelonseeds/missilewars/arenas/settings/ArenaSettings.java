@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 
 public class ArenaSettings implements ConfigurationSerializable {
     
@@ -23,7 +24,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     
     private Map<ArenaSetting, Object> currentSettings;
     private Map<ArenaSetting, Object> queue;
-    private RandomItemDistributor randomItemDistributor;
+    private Map<Integer, RandomItemDistributor> randomItemDistributors;
     private Set<UUID> playerBlacklist;
     private Set<UUID> playerWhitelist;
     private Set<String> selectedMaps;
@@ -31,7 +32,7 @@ public class ArenaSettings implements ConfigurationSerializable {
     public ArenaSettings() {
         this.currentSettings = new HashMap<>();
         this.queue = new HashMap<>();
-        this.randomItemDistributor = new RandomItemDistributor(this);
+        this.randomItemDistributors = new HashMap<>();
         this.selectedMaps = new HashSet<>();
         this.playerBlacklist = new TreeSet<>(comp);
         this.playerWhitelist = new TreeSet<>(comp);
@@ -48,8 +49,9 @@ public class ArenaSettings implements ConfigurationSerializable {
         this.playerBlacklist = new TreeSet<>(other.playerBlacklist);
         this.playerWhitelist = new TreeSet<>(other.playerWhitelist);
         this.selectedMaps = new HashSet<>(other.selectedMaps);
-        if (other.randomItemDistributor != null) {
-            this.randomItemDistributor = new RandomItemDistributor(other.randomItemDistributor, this);
+        this.randomItemDistributors = new HashMap<>();
+        for (RandomItemDistributor rd : other.randomItemDistributors.values()) {
+            this.randomItemDistributors.put(rd.getIndex(), new RandomItemDistributor(rd, this));
         }
     }
     
@@ -78,10 +80,7 @@ public class ArenaSettings implements ConfigurationSerializable {
             settings.put("selected-maps", new ArrayList<>(selectedMaps));
         }
         
-        // Item distributor
-        if ((boolean) get(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            settings.put("random-item-distributor", randomItemDistributor);
-        }
+        settings.put("random-item-distributors", new ArrayList<>(randomItemDistributors.values()));
         
         return settings;
     }
@@ -114,9 +113,18 @@ public class ArenaSettings implements ConfigurationSerializable {
             selectedMaps = new HashSet<>();
         }
         
+        this.randomItemDistributors = new HashMap<>();
+        
+        // LEGACY
         if (settings.containsKey("random-item-distributor")) {
-            randomItemDistributor = (RandomItemDistributor) settings.get("random-item-distributor");
-            randomItemDistributor.setArenaSettings(this);
+            RandomItemDistributor oldDistributor = (RandomItemDistributor) settings.get("random-item-distributor");
+            randomItemDistributors.put(oldDistributor.getIndex(), oldDistributor);
+        }
+        
+        if (settings.containsKey("random-item-distributors")) {
+            for (RandomItemDistributor rd : (List<RandomItemDistributor>) settings.get("random-item-distributors")) {
+                this.randomItemDistributors.put(rd.getIndex(), rd);
+            }
         }
         
         this.queue = new HashMap<>();
@@ -256,11 +264,65 @@ public class ArenaSettings implements ConfigurationSerializable {
         selectedMaps.addAll(maps);
     }
     
-    public RandomItemDistributor getRandomItemDistributor() {
-        return randomItemDistributor;
+    /**
+     * @return the currently selected random item distributor. If there is
+     * none, the default one is created for that index. So make sure to check
+     * the rank requirement first using {@link #getMaximumRandomItemDistributors(Player)}
+     */
+    public RandomItemDistributor getOrCreateRandomItemDistributor() {
+        int index = (int) get(ArenaSetting.DISTRIBUTOR_PRESET);
+        RandomItemDistributor distributor = getRandomItemDistributor(index);
+        if (distributor == null) {
+            distributor = getDefaultRandomItemDistributor(index);
+            randomItemDistributors.put(index, distributor);
+        }
+        
+        return distributor;
     }
     
-    public void setDefaultRandomItemDistributor() {
-        randomItemDistributor = RandomItemDistributor.getDefaultRandomItemDistributor(this);
+    /**
+     * @return the distributor at the specified index
+     */
+    public RandomItemDistributor getRandomItemDistributor(int index) {
+        return randomItemDistributors.get(index);
+    }
+    
+    /**
+     * Gets the amount of random item distributors a player can have based
+     * on the permission "umw.customarena.maxdistributors.[amount]"
+     * 
+     * @param player
+     * @return
+     */
+    public int getMaximumRandomItemDistributors(Player player) {
+        for (int i = 5; i >= 1; i--) {
+            if (player.hasPermission("umw.customarena.maxdistributors" + i)) {
+                return i;
+            }
+        }
+        
+        return 1;
+    }
+    
+    /**
+     * Get a random item distributor that correponds to the
+     * classic Missile Wars items
+     * 
+     * @param settings
+     * @return
+     */
+    private RandomItemDistributor getDefaultRandomItemDistributor(int index) {
+        RandomItemDistributor dist = new RandomItemDistributor(this, index);
+        dist.addItem(new RandomItem("tomahawk-1"));
+        dist.addItem(new RandomItem("shieldbuster-1"));
+        dist.addItem(new RandomItem("guardian-1"));
+        dist.addItem(new RandomItem("juggernaut-1"));
+        dist.addItem(new RandomItem("lightning-1"));
+        dist.addItem(new RandomItem("fireball-1"));
+        dist.addItem(new RandomItem("shield-2"));
+        RandomItem arrows = new RandomItem("arrows-1");
+        arrows.setAmount(3);
+        dist.addItem(arrows);
+        return dist;
     }
 }

@@ -89,16 +89,13 @@ public class ItemSettings extends ArenaSettingsInventory {
         boolean selectedRandomItems = false;
         if (key.equals("random-item-distribution")) {
             selectedRandomItems = true;
-            if (!viewOnly && arena.getArenaSettings().getRandomItemDistributor() == null) {
-                arena.getArenaSettings().setDefaultRandomItemDistributor();
-            }
         } else if (!key.equals("deck-item-distribution")) {
             return;
         }
         
         if (randomItems == selectedRandomItems) {
             if (selectedRandomItems) {
-                new RandomItemDistributionSettings(player, viewOnly, arena, this);
+                new RandomItemDistributionSettings(player, viewOnly, arena, arenaSettings.getOrCreateRandomItemDistributor(), this);
             } else {
                 new DeckDistributionSettings(player, viewOnly, arena, this);
             }
@@ -122,7 +119,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             updateInventory();
         } else if (type.isRightClick()) {
             if (selectedRandomItems) {
-                new RandomItemDistributionSettings(player, viewOnly, arena, this);
+                new RandomItemDistributionSettings(player, viewOnly, arena, arenaSettings.getOrCreateRandomItemDistributor(), this);
             } else {
                 new DeckDistributionSettings(player, viewOnly, arena, this);
             }

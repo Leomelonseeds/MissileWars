@@ -215,7 +215,7 @@ public class MissileWarsTeam {
         
         // Setup based on item distribution type
         if (arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            RandomItemDistributor distributor = arena.getArenaSettings().getRandomItemDistributor();
+            RandomItemDistributor distributor = arena.getArenaSettings().getOrCreateRandomItemDistributor();
             distributor.equipGear(mcPlayer, name);
             Component abilitiesMessage = distributor.getAbilitiesMessage();
             if (abilitiesMessage != null) {
