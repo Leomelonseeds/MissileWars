@@ -95,7 +95,7 @@ public class ItemSettings extends ArenaSettingsInventory {
         
         if (randomItems == selectedRandomItems) {
             if (selectedRandomItems) {
-                new RandomItemDistributionSettings(player, viewOnly, arena, arenaSettings.getOrCreateRandomItemDistributor(), this);
+                new RandomItemDistributionSettings(player, viewOnly, arena, this);
             } else {
                 new DeckDistributionSettings(player, viewOnly, arena, this);
             }
@@ -119,7 +119,7 @@ public class ItemSettings extends ArenaSettingsInventory {
             updateInventory();
         } else if (type.isRightClick()) {
             if (selectedRandomItems) {
-                new RandomItemDistributionSettings(player, viewOnly, arena, arenaSettings.getOrCreateRandomItemDistributor(), this);
+                new RandomItemDistributionSettings(player, viewOnly, arena, this);
             } else {
                 new DeckDistributionSettings(player, viewOnly, arena, this);
             }

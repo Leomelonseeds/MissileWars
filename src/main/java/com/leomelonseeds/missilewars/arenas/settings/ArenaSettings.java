@@ -80,7 +80,9 @@ public class ArenaSettings implements ConfigurationSerializable {
             settings.put("selected-maps", new ArrayList<>(selectedMaps));
         }
         
-        settings.put("random-item-distributors", new ArrayList<>(randomItemDistributors.values()));
+        if (!randomItemDistributors.isEmpty()) {
+            settings.put("random-item-distributors", new ArrayList<>(randomItemDistributors.values()));
+        }
         
         return settings;
     }
@@ -114,12 +116,6 @@ public class ArenaSettings implements ConfigurationSerializable {
         }
         
         this.randomItemDistributors = new HashMap<>();
-        
-        // LEGACY
-        if (settings.containsKey("random-item-distributor")) {
-            RandomItemDistributor oldDistributor = (RandomItemDistributor) settings.get("random-item-distributor");
-            randomItemDistributors.put(oldDistributor.getIndex(), oldDistributor);
-        }
         
         if (settings.containsKey("random-item-distributors")) {
             for (RandomItemDistributor rd : (List<RandomItemDistributor>) settings.get("random-item-distributors")) {
@@ -270,7 +266,15 @@ public class ArenaSettings implements ConfigurationSerializable {
      * the rank requirement first using {@link #getMaximumRandomItemDistributors(Player)}
      */
     public RandomItemDistributor getOrCreateRandomItemDistributor() {
-        int index = (int) get(ArenaSetting.DISTRIBUTOR_PRESET);
+        return getOrCreateRandomItemDistributor((int) get(ArenaSetting.DISTRIBUTOR_PRESET));
+    }
+    
+    /**
+     * @return the currently selected random item distributor. If there is
+     * none, the default one is created for that index. So make sure to check
+     * the rank requirement first using {@link #getMaximumRandomItemDistributors(Player)}
+     */
+    public RandomItemDistributor getOrCreateRandomItemDistributor(int index) {
         RandomItemDistributor distributor = getRandomItemDistributor(index);
         if (distributor == null) {
             distributor = getDefaultRandomItemDistributor(index);
@@ -296,7 +300,7 @@ public class ArenaSettings implements ConfigurationSerializable {
      */
     public int getMaximumRandomItemDistributors(Player player) {
         for (int i = 5; i >= 1; i--) {
-            if (player.hasPermission("umw.customarena.maxdistributors" + i)) {
+            if (player.hasPermission("umw.customarena.maxdistributors." + i)) {
                 return i;
             }
         }

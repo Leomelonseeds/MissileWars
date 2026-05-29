@@ -192,6 +192,8 @@ messages:
     int-manual-unacceptable: "&cEntered value is too large or too small!"
     int-manual-game-started: "&cThe setting change prompt was cancelled because a game started."
     rank: "&cYou need to purchase server rank %rank% &cto use this setting!"
+    distributor-preset-rank: "&cYou need to purchase server rank %rank% &cto use this preset!"
+    preset-name: "&ePlease enter a new name for &f&l%preset%&r&e, or type &6'cancel' &eto cancel. Inappropriate names may be punishable!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."

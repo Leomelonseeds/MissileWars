@@ -100,19 +100,15 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     @SuppressWarnings("unchecked")
     public RandomItemDistributor(Map<String, Object> distributor) {
-        if (distributor.containsKey("name")) {
-            this.name = (String) distributor.get("name");
-            this.index = (int) distributor.get("index");
-        } else {
-            this.name = "Preset 1";
-            this.index = 0;
-        }
-        
-        List<RandomItem> itemList = (List<RandomItem>) distributor.get("items");
         this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
         this.enabledAbilities = new HashMap<>();
+        
+        this.name = (String) distributor.get("name");
+        this.index = (int) distributor.get("index");
+        
+        List<RandomItem> itemList = (List<RandomItem>) distributor.get("items");
         itemList.forEach(ri -> {
             itemMap.put(ri.getUUID(), ri);
             addedIds.add(ri.getId());
@@ -508,6 +504,13 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         } else {
             enabledAbilities.put(ability, level);
         }
+    }
+    
+    /**
+     * @return an UNMODIFIABLE map of the current abilities
+     */
+    public Map<String, Integer> getAbilities() {
+        return Collections.unmodifiableMap(enabledAbilities);
     }
     
     /**

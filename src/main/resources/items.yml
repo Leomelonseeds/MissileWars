@@ -2225,6 +2225,21 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
+    preset-selector-item:
+      item-selected: DROPPER
+      item-editing: HOPPER
+      item: CHEST
+      name: "&f&l%preset%"
+      lore:
+        - ""
+        - "&fAdded items: &a%items%"
+        - "&fEnabled abilities: &6%abilities%"
+        - ""
+      selected: "&aYou are using this preset"
+      notselected: "&cLeft-click &7to use this preset"
+      editing: "&2You are editing this preset"
+      notediting: "&cRight-click &7to edit this preset"
+      rename: "&cShift-click &7to rename this preset"
     edit-abilities:
       Vanguard:
         item: GOLDEN_SWORD
@@ -2361,6 +2376,21 @@ arena-settings:
           - ""
           - "&cClick &7to remove selected items"
     main-menu:
+      choose-preset:
+        item: CHEST
+        slot: 16
+        name: "&f&lChange Preset"
+        lore:
+          - ""
+          - "&eCurrently editing: &f%editing-preset%"
+          - "&6Currently using: &f%using-preset%"
+          - ""
+          - "&7Presets allow you to save multiple"
+          - "&7configurations of items, abilities,"
+          - "&7weapons, and armor for random item"
+          - "&7distribution."
+          - ""
+          - "&cClick &7to change preset"
       edit-items:
         item: CREEPER_SPAWN_EGG
         slot: 10
@@ -2375,7 +2405,7 @@ arena-settings:
          - "&cClick &7to edit"
       edit-abilities:
         item: BOOK
-        slot: 12
+        slot: 11
         name: "&6Edit Abilities"
         lore:
           - ""
@@ -2386,7 +2416,7 @@ arena-settings:
           - "&cClick &7to edit"
       edit-weapon:
         item: BOW
-        slot: 14
+        slot: 12
         name: "&3Edit Weapons"
         lore:
          - ""
@@ -2397,7 +2427,9 @@ arena-settings:
          - "&d» &d&oWork in progress, coming soon!"
       edit-armor:
         item: LEATHER_CHESTPLATE
-        slot: 16
+        slot: 13
+        item-flags:
+          - HIDE_ATTRIBUTES
         name: "&bEdit Armor"
         lore:
           - ""
