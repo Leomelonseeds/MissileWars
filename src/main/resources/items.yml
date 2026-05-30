@@ -2225,6 +2225,31 @@ gpassive:
       
 arena-settings:
   random-item-distribution:
+    random-selection:
+      set-items:
+        item: EMERALD
+        slot: 50
+        name: "&aConfirm Selection"
+        lore:
+          - ""
+          - "&7Sets the random item distributor"
+          - "&7to use these items."
+          - ""
+          - "&c&l[!] This will override all"
+          - "&c&lcurrently added items!"
+          - ""
+          - "&cClick &7to confirm selection"
+      reshuffle:
+        item: MAGENTA_GLAZED_TERRACOTTA
+        slot: 48
+        name: "&d🔁 Reshuffle"
+        lore:
+          - ""
+          - "&7Get a new list of items with"
+          - "&7the current missile and utility"
+          - "&7count settings."
+          - ""
+          - "&cClick &7to reshuffle"
     preset-selector-item:
       item-selected: DROPPER
       item-editing: HOPPER
@@ -2325,7 +2350,7 @@ arena-settings:
           - "&7will randomly pick from all of"
           - "&7Ultima's items."
           - ""
-          - "&d» &d&oWork in progress, coming soon!"
+          - "&cClick &7to get a random selection"
       edit-all-weights:
         item: ANVIL
         slot: 34

@@ -17,6 +17,11 @@ public enum RandomItemSetting {
     MISSILE_OFFSET_Z(0, IntSettingModifier.create(-4, 4, 1), ri -> getMissileOffset(ri, true), (ri, val) -> setMissileOffset(ri, val, true)),
     MISSILE_OFFSET_Y(0, IntSettingModifier.create(-3, 3, 1), ri -> getMissileOffset(ri, false), (ri, val) -> setMissileOffset(ri, val, false));
     
+    public enum RandomSelectionSetting {
+        SET_MISSILE_COUNT,
+        SET_UTILITY_COUNT
+    }
+    
     private int defaultValue;
     private IntSettingModifier modifier;
     private Function<RandomItem, Integer> getCurrentValue;

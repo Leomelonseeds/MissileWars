@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -181,7 +180,6 @@ public class RandomItemEditor extends MWInventory {
      * @param setting
      * @return
      */
-    @SuppressWarnings("deprecation")
     private ItemStack createSettingsItem(RandomItemSetting setting) {
         // Get section info
         String settingString = setting.toString();
@@ -231,9 +229,6 @@ public class RandomItemEditor extends MWInventory {
         lore.add(sec.getString("lore-manual"));
         
         meta.lore(ConfigUtils.toComponent(lore));
-        
-        // Flags
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         
         InventoryUtils.setMetaString(meta, InventoryUtils.SETTING_VALUE_KEY, left + "," + right);
 

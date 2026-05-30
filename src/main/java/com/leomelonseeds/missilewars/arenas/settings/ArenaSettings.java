@@ -119,6 +119,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         
         if (settings.containsKey("random-item-distributors")) {
             for (RandomItemDistributor rd : (List<RandomItemDistributor>) settings.get("random-item-distributors")) {
+                rd.setArenaSettings(this);
                 this.randomItemDistributors.put(rd.getIndex(), rd);
             }
         }

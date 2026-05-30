@@ -609,6 +609,24 @@ settings:
         - "&7&o(&7&oDefault: %default%)"
         - ""
         - "&cClick &7to change"
+  random-selection-settings:
+    SET_MISSILE_COUNT:
+      type: "int"
+      unit: " missile(s)"
+      item: CREEPER_SPAWN_EGG
+      description:
+        - "&7The amount of missiles to include"
+        - "&7into the random selection."
+    SET_UTILITY_COUNT:
+      type: "int"
+      unit: " utilities"
+      item: SNOWBALL
+      description:
+        - "&7The amount of utilities to include"
+        - "&7into the random selection."
+        - ""
+        - "&7Note that &fArrows &7will always be"
+        - "&7included in the selection."
   random-item-settings:
     MAX:
       type: "int"

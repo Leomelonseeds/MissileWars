@@ -573,4 +573,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public int getIndex() {
         return index;
     }
+    
+    protected void setArenaSettings(ArenaSettings settings) {
+        this.settings = settings;
+    }
 }

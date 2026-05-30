@@ -24,6 +24,9 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -415,7 +418,13 @@ public class ArenaUtils {
         }
         
         DeckStorage deck = DeckStorage.fromString(json.getString("Deck"));
-        player.getInventory().setBoots(deck.getBoots());
+        ItemStack boots = deck.getBoots();
+        ItemMeta meta = boots.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.setUnbreakable(true);
+        meta.displayName(ConfigUtils.toComponent(deck.getNPCName() + " Boots"));
+        boots.setItemMeta(meta);
+        player.getInventory().setBoots(boots);
     }
     
     private static List<BlockFace> faces;

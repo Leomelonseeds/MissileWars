@@ -103,6 +103,13 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
             return;
         }
         
+        // TODO: weapons and armor
+        
+        if (viewOnly) {
+            viewOnlyDeny();
+            return;
+        }
+        
         if (key.equals("choose-preset")) {
             new DistributorPresetSelector(player, arenaSettings, distributor, this);
             return;

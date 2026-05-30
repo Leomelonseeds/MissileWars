@@ -2,6 +2,7 @@ package com.leomelonseeds.missilewars.invs.arenasettings.randomitemdistribution;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +37,12 @@ import net.kyori.adventure.text.Component;
 
 public class RandomItemsList extends PaginatedInventory {
     
+    public final static Comparator<ItemStack> MISSILES_FIRST = Comparator.comparingInt(item -> 
+        item.getType().toString().endsWith("SPAWN_EGG") ? -1 : 1);
+    
     private final static String secString = "arena-settings.random-item-distribution.item-list";
     private final static NamespacedKey cooldownKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "random-item-list");
     private final static UseCooldownComponent COOLDOWN_COMPONENT = CooldownUtils.generateCustomCooldownComponent(cooldownKey);
-    
     
     private RandomItemDistributor distributor;
     private Set<RandomItem> selectedItems;
@@ -70,15 +73,7 @@ public class RandomItemsList extends PaginatedInventory {
             items.add(getItemFromRandomItem(ri));
         }
         
-        Collections.sort(items, (i1, i2) -> {
-           boolean isMissile1 = i1.getType().toString().endsWith("SPAWN_EGG");
-           boolean isMissile2 = i2.getType().toString().endsWith("SPAWN_EGG");
-           if (isMissile1 == isMissile2) {
-               return 0;
-           }
-           
-           return isMissile1 ? -1 : 1;
-        });
+        Collections.sort(items, MISSILES_FIRST);
         
         return items;
     }
@@ -162,7 +157,8 @@ public class RandomItemsList extends PaginatedInventory {
             }
             
             if (key.equals("random-selection")) {
-                // TODO
+                new RandomSelection(player, distributor, this);
+                ConfigUtils.sendConfigSound("shuffle", player);
                 return;
             }
             

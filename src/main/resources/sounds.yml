@@ -286,3 +286,7 @@ bulk-edit:
   sound: "UI_BUTTON_CLICK"
   volume: 1.0
   pitch: 1.2
+shuffle:
+  sound: "ITEM_BOOK_PAGE_TURN"
+  volume: 1.0
+  pitch: 1.0
