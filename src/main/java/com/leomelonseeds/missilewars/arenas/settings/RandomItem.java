@@ -21,6 +21,11 @@ import net.kyori.adventure.text.Component;
 
 public class RandomItem implements ConfigurationSerializable {
     
+    private static final Map<String, Integer> DEFAULT_AMOUNTS = Map.of(
+        "arrows-1", 3,
+        "leaves-1", 8
+    );
+    
     private String id;
     private ItemStack item;
     private int weight; 
@@ -34,7 +39,7 @@ public class RandomItem implements ConfigurationSerializable {
         this.item = getItemFromID(id);
         this.weight = 1;
         this.max = 1;
-        this.amount = id.startsWith("arrows") ? 3 : 1;
+        this.amount = DEFAULT_AMOUNTS.getOrDefault(id, 1);
         addInfoLore();
     }
     
