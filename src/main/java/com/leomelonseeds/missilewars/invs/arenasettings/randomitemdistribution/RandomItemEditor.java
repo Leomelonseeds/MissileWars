@@ -81,6 +81,7 @@ public class RandomItemEditor extends MWInventory {
         lore.add(ConfigUtils.toComponent(weightStr.replace("%weight%", randomItem.getWeight() + "")));
         displayMeta.lore(lore);
         displayItem.setItemMeta(displayMeta);
+        displayItem.setAmount(randomItem.getAmount());
         inv.setItem(13, displayItem);
         
         // Anciliary items

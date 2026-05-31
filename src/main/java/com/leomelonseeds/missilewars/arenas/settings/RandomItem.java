@@ -34,7 +34,7 @@ public class RandomItem implements ConfigurationSerializable {
         this.item = getItemFromID(id);
         this.weight = 1;
         this.max = 1;
-        this.amount = 1;
+        this.amount = id.startsWith("arrows") ? 3 : 1;
         addInfoLore();
     }
     

@@ -325,9 +325,7 @@ public class ArenaSettings implements ConfigurationSerializable {
         dist.addItem(new RandomItem("lightning-1"));
         dist.addItem(new RandomItem("fireball-1"));
         dist.addItem(new RandomItem("shield-2"));
-        RandomItem arrows = new RandomItem("arrows-1");
-        arrows.setAmount(3);
-        dist.addItem(arrows);
+        dist.addItem(new RandomItem("arrows-1"));
         return dist;
     }
 }
