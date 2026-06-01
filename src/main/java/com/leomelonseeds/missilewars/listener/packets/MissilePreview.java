@@ -236,9 +236,10 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         }
 
         // Player must be holding item
+        // Clone the item so it doesn't suddenly change types and throw NPE etc
         PlayerInventory inv = player.getInventory();
-        ItemStack mainhand = inv.getItem(EquipmentSlot.HAND);
-        ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND);
+        ItemStack mainhand = inv.getItem(EquipmentSlot.HAND).clone();
+        ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND).clone();
         ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
         if (hand == null || player.hasCooldown(hand.getType())) {
             removeEntities();
