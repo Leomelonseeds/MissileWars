@@ -3,13 +3,12 @@ package com.leomelonseeds.missilewars.listener.packets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,7 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
@@ -35,6 +33,12 @@ import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 public class DefuseHelper implements PacketListener, Listener {
     
     private static final int TICKS_BEFORE_REMOVAL = 7;
+    private static final Set<Material> INSTABREAK_MATERIALS = Set.of(
+        Material.SLIME_BLOCK,
+        Material.HONEY_BLOCK,
+        Material.TNT,
+        Material.END_ROD
+    );
     
     // Basically, if a slime/honey/tnt is broken that was recently pushed with a piston,
     // and the player mined the block on the client before that piston push was registered
@@ -75,7 +79,7 @@ public class DefuseHelper implements PacketListener, Listener {
     // through the list of blocks looking for a block that was moved less than player ping ago
     // that also has the same X and Y and has Z in the opposite direction of when it was last moved.
     
-    private Map<Location, Pair<DefuseBlock, BukkitTask>> blocks;
+    private Map<Location, DefuseBlock> blocks;
     private MissileWarsPlugin plugin;
 
     public DefuseHelper(MissileWarsPlugin plugin) {
@@ -96,42 +100,31 @@ public class DefuseHelper implements PacketListener, Listener {
             return;
         }
         
-        // Dumb way of waiting a bit for piston events to register
-        // Set iterations to 10k for 5-20ms of delay
-        // Since 1.21 and moving to PacketEvents, it doesn't seem needed anymore
-        // this.stupid = 0;
-        // Random rand = new Random(0);
-        // for (int i = 0; i < plugin.getConfig().getInt("experimental.dh-iterations"); i++) {
-        //     this.stupid += rand.nextInt(0, 10);
-        // }
-        
         Player player = event.getPlayer();
         World world = player.getWorld();
         Vector3i bp = digPacket.getBlockPosition();
         Location checkLoc = new Location(world, bp.getX(), bp.getY(), bp.getZ());
         for (int i = 0; i <= 1; i++) {
-            Pair<DefuseBlock, BukkitTask> pdb = blocks.get(checkLoc);
-            if (pdb == null) {
+            DefuseBlock db = blocks.get(checkLoc);
+            if (db == null) {
                 return;
             }
-            
                 
             // As mentioned above, only continue if piston was pushed less than player ping time ago
-            DefuseBlock db = pdb.getLeft();
             long aliveTime = db.aliveTime();
             long adjustedPing = player.getPing() + plugin.getConfig().getInt("experimental.dh-bias");
-            plugin.debug("Block found, alive time: " + aliveTime);
+            // plugin.debug("Block found, alive time: " + aliveTime);
             if (aliveTime > adjustedPing) {
-                plugin.debug("RIP, adjusted ping was " + adjustedPing);
+                // plugin.debug("RIP, adjusted ping was " + adjustedPing);
                 return;
             }
             
             // If we're handling a moving piston, rewrite packet for the smoothest experience.
             // If the location already contains air, then move the packet forward another block.
             // Then do the same checks again. If the checks happen to fail, then do nothing.
-            // Once all the checks pass, construct a new BlockPosition(x, y, z +/- 1) depending on missile direction
-            Vector3i newbp = new Vector3i(bp.getX(), bp.getY(), db.getZ());
-            Location bploc = new Location(world, bp.getX(), bp.getY(), db.getZ());
+            // Once all the checks pass, construct a new BlockPosition() depending on missile direction
+            Location bploc = db.getNextLoc();
+            Vector3i newbp = new Vector3i(bploc.getBlockX(), bploc.getBlockY(), bploc.getBlockZ());
             Block block = world.getBlockAt(bploc);
             if (block.getType() == Material.MOVING_PISTON) {
                 // Since must be 0 or 1 if its a moving piston
@@ -146,7 +139,7 @@ public class DefuseHelper implements PacketListener, Listener {
                     }
                     PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, digPacket);
                 });
-                plugin.debug("b36: Packet sent forward " + delay + "t");
+                // plugin.debug("b36: Packet sent forward " + delay + "t");
                 return;
             } else if (block.getType() == Material.AIR) {
                 if (i == 1) {
@@ -155,8 +148,8 @@ public class DefuseHelper implements PacketListener, Listener {
 
                 // If AIR, do the loop again to check if
                 // any block have moved 2 forward
-                plugin.debug("Found air, checking again...");
-                checkLoc.setZ(db.getZ());
+                // plugin.debug("Found air, checking again...");
+                checkLoc = bploc;
                 continue;
             }
 
@@ -179,28 +172,21 @@ public class DefuseHelper implements PacketListener, Listener {
     }
     
     private void addToList(List<Block> affectedBlocks, BlockPistonEvent e) {
-        // Only consider if piston is pushing north or south
-        BlockFace dir = e.getDirection();
-        if (!(dir == BlockFace.SOUTH || dir == BlockFace.NORTH)) {
-            return;
-        }
-        
         // Add all non-instabreak blocks to defuseblock list
         for (Block block : affectedBlocks) {
-            Material type = block.getType();
-            if (!(type == Material.SLIME_BLOCK || type == Material.TNT || type == Material.HONEY_BLOCK || type == Material.END_ROD)) {
+            if (!INSTABREAK_MATERIALS.contains(block.getType())) {
                 continue;
             }
             
             Location loc = block.getLocation();
-            Pair<DefuseBlock, BukkitTask> pdb = blocks.get(loc);
-            if (pdb != null) {
-                pdb.getRight().cancel();
+            DefuseBlock oldDb = blocks.remove(loc);
+            if (oldDb != null) {
+                oldDb.cancelRemovalTask();
             }
             
-            int nextZ = loc.getBlockZ() + (dir == BlockFace.SOUTH ? 1 : -1);
-            DefuseBlock db = new DefuseBlock(nextZ, dir);
-            blocks.put(loc, Pair.of(db, ConfigUtils.schedule(TICKS_BEFORE_REMOVAL, () -> blocks.remove(loc))));
+            Location nextLoc = block.getRelative(e.getDirection()).getLocation();
+            DefuseBlock newDb = new DefuseBlock(nextLoc, ConfigUtils.schedule(TICKS_BEFORE_REMOVAL, () -> blocks.remove(nextLoc)));
+            blocks.put(loc, newDb);
         }
     }
 }

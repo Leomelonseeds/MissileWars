@@ -1,23 +1,29 @@
 package com.leomelonseeds.missilewars.listener.packets;
 
-import org.bukkit.block.BlockFace;
+import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  * Represents a slime, honey, or TNT block which can be instantly mined and defuse a missile
  */
 public class DefuseBlock {
 
-    // Max ping to account for is 350, so 7 ticks before removal
-    private int nextZ;
+    private Location nextLoc;
     private long since;
+    private BukkitTask removalTask;
     
-    public DefuseBlock(int nextZ, BlockFace direction) {
-        this.nextZ = nextZ;
+    public DefuseBlock(Location nextLoc, BukkitTask removalTask) {
+        this.nextLoc = nextLoc;
+        this.removalTask = removalTask;
         this.since = System.currentTimeMillis();
     }
     
-    public int getZ() {
-        return nextZ;
+    public Location getNextLoc() {
+        return nextLoc;
+    }
+    
+    public void cancelRemovalTask() {
+        this.removalTask.cancel();
     }
     
     public long aliveTime() {
