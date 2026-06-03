@@ -24,10 +24,11 @@ public enum ArenaSetting {
     ENABLE_DROPPING_ITEMS(true, "enable-dropping-items"), // TODO
     FIREBALLS_NEED_TO_BE_PLACED(false, "fireballs-need-to-be-placed"),
     FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"), // TODO
-    ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"), // TODO
+    ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles", true), // TODO
     ENABLE_AIR_PLACE(false, "enable-air-place"), // TODO
-    MISSILE_OFFSET_MODIFIER_Y(0, "missile-offset-modifier-y"), // TODO
-    MISSILE_OFFSET_MODIFIER_Z(0, "missile-offset-modifier-z"), // TODO
+    MISSILE_OFFSET_MODIFIER_Z(0, "missile-offset-modifier-z", IntSettingModifier.create(-4, 4, 1)),
+    MISSILE_OFFSET_MODIFIER_Y(0, "missile-offset-modifier-y", IntSettingModifier.create(-3, 3, 1)),
+    ENABLE_CHIRAL_MISSILES(false, "enable-chiral-missiles"),
     
     // Deck
     DECK_ITEM_MULTIPLIER(100, "deck-item-multiplier", IntSettingModifier.create(20, 200, 10)), // As a percentage

@@ -270,7 +270,7 @@ public class MissileWarsTeam {
         
         // Callback when all setup is done, so that added attributes are instantly available to other classes
         // Start player missile preview
-        player.startMissilePreview(name == TeamName.RED);
+        player.startMissilePreview(name == TeamName.RED, arena);
         arena.addCallback(player);
     }
 

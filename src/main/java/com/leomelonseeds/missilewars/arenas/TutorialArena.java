@@ -30,6 +30,7 @@ import com.leomelonseeds.missilewars.decks.DeckStorage;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CosmeticUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
 
 import net.kyori.adventure.text.Component;
@@ -262,7 +263,7 @@ public class TutorialArena extends ClassicArena {
             if (playerDeck != null) {
                 playerDeck.enableAllItems();
                 playerDeck.disableItems(i -> 
-                    i.getType().toString().contains("SPAWN_EGG") || 
+                    InventoryUtils.isMissile(i) || 
                     i.getType().toString().contains("BOW") ||
                     i.getType() == Material.ARROW);
             }

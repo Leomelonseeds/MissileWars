@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -47,6 +48,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams.ScoreBoardTeamInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams.TeamMode;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicLoadResult;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicManager;
@@ -60,10 +64,13 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
     
     // Keeps track of preview specific variables
     private Player player;
+    private Arena arena;
     private User packetUser;
     private boolean isRed;
     private String lastName;
     private Location lastLoc;
+    private EquipmentSlot lastHand;
+    private StructureRotation lastRotation;
     private Random random;
     private Map<Integer, String> entities;
     private SchematicLoadResult curResult;
@@ -87,8 +94,9 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
      * @param player
      * @param isRed
      */
-    public MissilePreview(Player player, boolean isRed) {
+    public MissilePreview(Player player, boolean isRed, Arena arena) {
         this.player = player;
+        this.arena = arena;
         this.packetUser = PacketEvents.getAPI().getPlayerManager().getUser(player);
         this.isRed = isRed;
         this.lastName = "";
@@ -240,23 +248,33 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         PlayerInventory inv = player.getInventory();
         ItemStack mainhand = inv.getItem(EquipmentSlot.HAND).clone();
         ItemStack offhand = inv.getItem(EquipmentSlot.OFF_HAND).clone();
-        ItemStack hand = mainhand.getType() == Material.AIR ? offhand.getType() == Material.AIR ? null : offhand : mainhand;
-        if (hand == null || player.hasCooldown(hand.getType())) {
+        ItemStack curItem = null;
+        EquipmentSlot hand = null;
+        if (InventoryUtils.isMissile(mainhand)) {
+            curItem = mainhand;
+            hand = EquipmentSlot.HAND;
+        } else if (InventoryUtils.isMissile(offhand)) {
+            curItem = offhand;
+            hand = EquipmentSlot.OFF_HAND;
+        }
+        
+        if (hand == null || CooldownUtils.hasCooldown(player, curItem)) {
             removeEntities();
             return;
         }
 
         // Item must be a missile
-        String structureName = InventoryUtils.getStructureFromItem(hand);
+        String structureName = InventoryUtils.getStructureFromItem(curItem);
         if (!InventoryUtils.isMissile(structureName)) {
             removeEntities();
             return;
         }
         
-        // Computation reducer:
-        // If structure and location are the same, and we don't need to recheck collisions yet, then proceed
+        // Check if the preview needs to change. Otherwise, if preview is regenerated
+        // no change, it will flicker.
         Location loc = rayTrace.getHitBlock().getLocation();
-        if (structureName.equals(lastName) && loc.equals(lastLoc)) {
+        StructureRotation rotation = SchematicManager.getRotation(playerEyeDirection);
+        if (structureName.equals(lastName) && loc.equals(lastLoc) && hand == lastHand && rotation == lastRotation) {
             // If same missile in same location, we might still need to collision check
             boolean collisionChanged = false;
             if (System.currentTimeMillis() - lastCollisionCheckTime >= UPDATE_FREQUENCY) {
@@ -273,7 +291,10 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
                 return;
             }
         } else {
-            curResult = SchematicManager.loadNBTStructure(player, structureName, loc, isRed, true, true);
+            curResult = SchematicManager.loadNBTStructure(player, structureName, loc, isRed, true, true,
+                arena.getBooleanSetting(ArenaSetting.ENABLE_SIDEWAYS_MISSILES),
+                arena.getBooleanSetting(ArenaSetting.ENABLE_CHIRAL_MISSILES) && hand == EquipmentSlot.OFF_HAND,
+                SchematicManager.getOffsetModifier(curItem, arena));
             lastCollisionCheckTime = System.currentTimeMillis();
         }
         
@@ -294,6 +315,8 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         // Set previous variables to save on computations
         lastName = structureName;
         lastLoc = loc.clone();
+        lastHand = hand;
+        lastRotation = rotation;
     }
      
     // White-outlined display showing all the blocks of the missile

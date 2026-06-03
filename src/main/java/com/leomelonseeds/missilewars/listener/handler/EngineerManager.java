@@ -67,7 +67,7 @@ public class EngineerManager implements Listener {
             return;
         }
 
-        if (engineer <= 1 && !offhand.getType().toString().contains("SPAWN_EGG")) {
+        if (engineer <= 1 && !InventoryUtils.isMissile(offhand)) {
             return;
         }
         

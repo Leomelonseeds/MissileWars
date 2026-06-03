@@ -291,8 +291,7 @@ public class InventoryUtils {
             
             ItemStack off = pinv.getItem(EquipmentSlot.OFF_HAND);
             if (!arena.getBooleanSetting(ArenaSetting.ENABLE_MISSILE_COOLDOWN) && 
-                    item.getType().toString().endsWith("SPAWN_EGG") &&
-                    off.getType().toString().endsWith("SPAWN_EGG")) {
+                    InventoryUtils.isMissile(item) && InventoryUtils.isMissile(off)) {
                 break;
             }
 
@@ -462,6 +461,10 @@ public class InventoryUtils {
         }
         
         return true;
+    }
+    
+    public static boolean isMissile(ItemStack item) {
+        return item.getType().toString().endsWith("SPAWN_EGG");
     }
     
     /**

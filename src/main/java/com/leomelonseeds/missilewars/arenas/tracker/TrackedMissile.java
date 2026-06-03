@@ -79,19 +79,12 @@ public class TrackedMissile extends Tracked {
             return false;
         }
         
-        int x1 = Math.min(pos1.getBlockX(), pos2.getBlockX());
-        int x2 = Math.max(pos1.getBlockX(), pos2.getBlockX());
-        int y1 = Math.min(pos1.getBlockY(), pos2.getBlockY());
-        int y2 = Math.max(pos1.getBlockY(), pos2.getBlockY());
-        int z1 = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        int z2 = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        
         int stickyPistonCount = 0;
         int pistonCount = 0;
         int slimeCount = 0;
-        for (int x = x1; x <= x2; x++) {
-            for (int y = y1; y <= y2; y++) {
-                for (int z = z1; z <= z2; z++) {
+        for (int x = pos1.getBlockX(); x <= pos2.getBlockX(); x++) {
+            for (int y = pos1.getBlockY(); y <= pos2.getBlockY(); y++) {
+                for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
                     Location l = new Location(pos1.getWorld(), x, y, z);
                     Block b = l.getBlock();
                     if (b.getType() == Material.PISTON) {

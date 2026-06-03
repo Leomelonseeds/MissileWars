@@ -53,7 +53,7 @@ public class Deck {
     public List<ItemStack> getMissiles() {
         return pool.stream()
                 .map(di -> di.getInstanceItem())
-                .filter(i -> i.getType().toString().contains("SPAWN_EGG"))
+                .filter(i -> InventoryUtils.isMissile(i))
                 .toList();
     }
     

@@ -38,7 +38,7 @@ import net.kyori.adventure.text.Component;
 public class RandomItemsList extends PaginatedInventory {
     
     public final static Comparator<ItemStack> MISSILES_FIRST = Comparator.comparingInt(item -> 
-        item.getType().toString().endsWith("SPAWN_EGG") ? -1 : 1);
+        InventoryUtils.isMissile(item) ? -1 : 1);
     
     private final static String secString = "arena-settings.random-item-distribution.item-list";
     private final static NamespacedKey cooldownKey = new NamespacedKey(MissileWarsPlugin.getPlugin(), "random-item-list");

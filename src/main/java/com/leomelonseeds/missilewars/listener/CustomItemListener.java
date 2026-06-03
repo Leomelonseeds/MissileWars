@@ -141,9 +141,9 @@ public class CustomItemListener implements Listener {
         }
         
         // Check arena
-        Arena playerArena = ArenaUtils.getArena(player);
+        Arena arena = ArenaUtils.getArena(player);
         String held = InventoryUtils.getStringFromItemKey(hand, InventoryUtils.HELD_KEY);
-        if (playerArena == null) {
+        if (arena == null) {
             // Player is using a held item
             if (held == null) {
                 return;
@@ -163,21 +163,21 @@ public class CustomItemListener implements Listener {
             event.setCancelled(true);
             switch(held) {
             case "votemap":
-                new MapVoting(player, playerArena);
+                new MapVoting(player, arena);
                 break;
             case "to-lobby":
-                playerArena.removePlayer(uuid, true);
+                arena.removePlayer(uuid, true);
                 break;
             case "red":
             case "blue":
-                playerArena.enqueue(uuid, TeamName.valueOf(held.toUpperCase()));
+                arena.enqueue(uuid, TeamName.valueOf(held.toUpperCase()));
                 break;
             case "spectate":
-                MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
-                if (playerArena.isSpectating(mwp)) {
-                    playerArena.removeSpectator(mwp);
+                MissileWarsPlayer mwp = arena.getPlayerInArena(uuid);
+                if (arena.isSpectating(mwp)) {
+                    arena.removeSpectator(mwp);
                 } else {
-                    playerArena.addSpectator(uuid); 
+                    arena.addSpectator(uuid); 
                 }
                 break;
             case "deck":
@@ -185,7 +185,7 @@ public class CustomItemListener implements Listener {
                 break;
             case "arena-settings":
             case "arena-settings-view-only":
-                new ArenaSettingsMainMenu(player, playerArena, held.endsWith("view-only"), null);
+                new ArenaSettingsMainMenu(player, arena, held.endsWith("view-only"), null);
             }
             return;
         }
@@ -228,7 +228,7 @@ public class CustomItemListener implements Listener {
         
         // Spawn a structure item
         FileConfiguration config = MissileWarsPlugin.getPlugin().getConfig();
-        MissileWarsPlayer mwp = playerArena.getPlayerInArena(uuid);
+        MissileWarsPlayer mwp = arena.getPlayerInArena(uuid);
         if (structureName != null) {
             // Switch to throwing logic if using a throwable
             if (InventoryUtils.isThrowable(structureName)) {
@@ -239,7 +239,7 @@ public class CustomItemListener implements Listener {
             
             // We can handle canopies now!
             if (structureName.startsWith("canopy")) {
-                canopies.initPlayer(player, hand, playerArena, (int) getItemStat(structureName, "distance"));
+                canopies.initPlayer(player, hand, arena, (int) getItemStat(structureName, "distance"));
                 return;
             }
             
@@ -248,24 +248,28 @@ public class CustomItemListener implements Listener {
             }
 
             // Place structure
-            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), true, true)) {
+            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), true, true, 
+                arena.getBooleanSetting(ArenaSetting.ENABLE_SIDEWAYS_MISSILES),
+                arena.getBooleanSetting(ArenaSetting.ENABLE_CHIRAL_MISSILES) && event.getHand() == EquipmentSlot.OFF_HAND,
+                SchematicManager.getOffsetModifier(hand, arena))) {
+                
                 // Missile cooldown
-                if (playerArena.getBooleanSetting(ArenaSetting.ENABLE_MISSILE_COOLDOWN)) {
+                if (arena.getBooleanSetting(ArenaSetting.ENABLE_MISSILE_COOLDOWN)) {
                     for (ItemStack i : player.getInventory().getContents()) {
                         if (i == null) continue;
                         Material material = i.getType();
-                        if (!player.hasCooldown(material) && material.toString().contains("SPAWN_EGG")) {
+                        if (!player.hasCooldown(material) && InventoryUtils.isMissile(i)) {
                             int cooldown = config.getInt("experimental.missile-cooldown");
                             player.setCooldown(material, cooldown);
                         }
                     }
                 }
                 ConfigUtils.sendConfigSound("spawn-missile", player);
-                InventoryUtils.consumeItem(player, playerArena, hand, -1);
+                InventoryUtils.consumeItem(player, arena, hand, -1);
                 mwp.incrementStat(MissileWarsPlayer.Stat.MISSILES);
                 
                 // Tutorial arena things
-                if (playerArena instanceof TutorialArena tutorialArena) {
+                if (arena instanceof TutorialArena tutorialArena) {
                     tutorialArena.registerStageCompletion(player, 1);
                     if (structureName.equals("warhead-2")) {
                         tutorialArena.registerStageCompletion(player, 7);
@@ -310,7 +314,7 @@ public class CustomItemListener implements Listener {
             }
             creeper.customName(ConfigUtils.toComponent(ConfigUtils.getFocusName(player) + "'s &7Creeper"));
             creeper.setCustomNameVisible(true);
-            InventoryUtils.consumeItem(player, playerArena, hand, -1);
+            InventoryUtils.consumeItem(player, arena, hand, -1);
             mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
             return;
         }
@@ -319,7 +323,7 @@ public class CustomItemListener implements Listener {
         boolean isDragonFireball = utility.startsWith("lingering");
         if (utility.startsWith("fireball") || isDragonFireball) {
             event.setCancelled(true);
-            boolean placeOnly = playerArena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED) && !isDragonFireball;
+            boolean placeOnly = arena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED) && !isDragonFireball;
             Location spawnLoc;
             if (placeOnly) {
                 if (clicked == null) {
@@ -363,7 +367,7 @@ public class CustomItemListener implements Listener {
             }
             
             fireball.setShooter(player);
-            InventoryUtils.consumeItem(player, playerArena, hand, -1);
+            InventoryUtils.consumeItem(player, arena, hand, -1);
             ConfigUtils.sendConfigSound("spawn-fireball", player.getLocation());
             mwp.incrementStat(MissileWarsPlayer.Stat.UTILITY);
             Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(fireball));
@@ -463,7 +467,7 @@ public class CustomItemListener implements Listener {
         boolean poke = ArenaUtils.getAbility(uuid, Ability.POKEMISSILES, arena) > 0;
         if (poke) {
             String offName = InventoryUtils.getStructureFromItem(offhand);
-            if (offName != null && !hasOffhandCooldown && offhand.getType().toString().contains("SPAWN_EGG")) {
+            if (offName != null && !hasOffhandCooldown && InventoryUtils.isMissile(offhand)) {
                 thrown.setItem(offhand);
                 structureName = offName + "-p"; // Add extra dash to represent a pokemissile
                 InventoryUtils.consumeItem(thrower, arena, offhand, -1);

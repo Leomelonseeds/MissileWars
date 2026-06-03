@@ -28,16 +28,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.structure.Structure;
 import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -60,6 +63,20 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 /** A class to handle loading/placing of NBT and WorldEdit schematics */
 public class SchematicManager {
+    
+    private static final Map<StructureRotation, BlockFace> ROTATION_TO_BLOCKFACE = Map.of(
+        StructureRotation.NONE, BlockFace.SOUTH,
+        StructureRotation.CLOCKWISE_90, BlockFace.WEST,
+        StructureRotation.COUNTERCLOCKWISE_90, BlockFace.EAST,
+        StructureRotation.CLOCKWISE_180, BlockFace.NORTH
+    );
+    
+    private static final StructureRotation[] ROTATIONS = { 
+        StructureRotation.NONE,
+        StructureRotation.COUNTERCLOCKWISE_90,
+        StructureRotation.CLOCKWISE_180,
+        StructureRotation.CLOCKWISE_90
+    };
 
     /**
      * Get the vector for a given structure/schematic path in a given config.
@@ -95,6 +112,11 @@ public class SchematicManager {
     // Don't store a SchematicLoadResult, just store file and clipboard since the result is used in other stuff,
     // and has status/other variables that might screw things up if not changed
     public static Map<String, Pair<File, Clipboard>> structureCache = new HashMap<>();
+    
+
+    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, boolean isRed, Boolean isMissile, Boolean checkCollision) {
+        return loadNBTStructure(player, structureName, loc, isRed, isMissile, checkCollision, false, false, null);
+    }
 
     /**
      * Load an NBT structure and return the necessary parameters to spawn it
@@ -108,7 +130,8 @@ public class SchematicManager {
      * @param checkCollision
      * @return
      */
-    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, boolean isRed, Boolean isMissile, Boolean checkCollision) {
+    public static SchematicLoadResult loadNBTStructure(Player player, String structureName, Location loc, 
+            boolean isRed, Boolean isMissile, Boolean checkCollision, boolean allDirectional, boolean mirror, Vector offsetModifier) {
         SchematicLoadResult result = new SchematicLoadResult(isMissile, structureName);
         result.setStatus(SchematicLoadStatus.OUT_OF_BOUNDS);
         if (loc.getBlockY() > MissileWarsPlugin.getPlugin().getConfig().getInt("max-height")) {
@@ -167,12 +190,12 @@ public class SchematicManager {
             offset = getVector(structureConfig, args[0] + "." + level + ".offset");
         }
         
-        // If player is using old offsets, add 2 if missile is >=3.3 and 1 otherwise. Just parity things.
-        if (isMissile && player != null && player.hasPermission("umw.oldoffsets")) {
-            offset.setZ(offset.getZ() + (Double.valueOf(ConfigUtils.getItemValue(args[0], level, "speed") + "") > 3 ? 2 : 1));
+        // Check for custom offset modifier
+        if (offsetModifier != null) {
+            offset.add(offsetModifier);
         }
         
-        // Check for pokemissile
+        // Check for pokemissile to move offset to middle
         BlockVector3 size = structureInfo.getRight().getDimensions();
         if (args.length >= 3 && args[args.length - 1].equals("p")) {
             isMissile = true;
@@ -180,11 +203,14 @@ public class SchematicManager {
             offset.setY(-1 * size.getBlockY() / 2);
         }
         
-        if (isRed) {
-            offset.setZ(offset.getZ() * -1);
-            offset.setX(offset.getX() * -1);
-            result.setRotation(StructureRotation.CLOCKWISE_180);
-        }
+        // Figure out rotation and set offset based on rotation
+        Mirror mirrorType = mirror ? Mirror.FRONT_BACK : Mirror.NONE;
+        StructureRotation rotation = allDirectional ? getRotation(player) : isRed ? StructureRotation.CLOCKWISE_180 : StructureRotation.NONE;
+        result.setRotation(rotation);
+        result.setMirror(mirrorType);
+        
+        // Rotate offset and set
+        rotateOffset(offset, rotation, mirrorType);
         result.setSpawnPos(spawnLoc.add(offset));
        
         // Epic in-class collision check
@@ -195,6 +221,11 @@ public class SchematicManager {
         }
         
         return result;
+    }
+    
+
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, Boolean isMissile, Boolean checkCollision) {
+        return spawnNBTStructure(player, structureName, loc, redMissile, isMissile, checkCollision, false, false, null);
     }
 
     /**
@@ -209,8 +240,9 @@ public class SchematicManager {
      * @param checkCollision whether to check if hitboxes intersect with important blocks
      * @return true if the NBT structure was found and spawned, otherwise false
      */
-    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, boolean redMissile, Boolean isMissile, Boolean checkCollision) {
-        SchematicLoadResult loadResult = loadNBTStructure(player, structureName, loc, redMissile, isMissile, checkCollision);
+    public static boolean spawnNBTStructure(Player player, String structureName, Location loc, 
+            boolean isRed, Boolean isMissile, Boolean checkCollision, boolean allDirectional, boolean mirror, Vector offsetModifier) {
+        SchematicLoadResult loadResult = loadNBTStructure(player, structureName, loc, isRed, isMissile, checkCollision, allDirectional, mirror, offsetModifier);
         if (!loadResult.isAllowSpawn()) {
             sendError(player, loadResult.getStatus().getMessage());
             return false;
@@ -228,19 +260,19 @@ public class SchematicManager {
         }
         Location spawnPos = loadResult.getSpawnPos().clone();
         StructureRotation rotation = loadResult.getRotation();
-        structure.place(spawnPos, true, rotation, Mirror.NONE, 0, 1, new Random());
+        structure.place(spawnPos, true, rotation, loadResult.getMirror(), 0, 1, new Random());
         
         // Add structure to tracker list
         Location[] corners = loadResult.getCorners();
         Location c1 = corners[0].clone().add(-1, -1, -1);
         Location c2 = corners[1].clone().add(1, 1, 1);
-        BlockFace direction = loadResult.getRotation() == StructureRotation.NONE ? BlockFace.SOUTH : BlockFace.NORTH;
+        BlockFace direction = ROTATION_TO_BLOCKFACE.get(rotation);
         String[] args = structureName.split("-");
         int level = Integer.parseInt(args[1]);
         if (isMissile) {
-            new TrackedMissile(args[0], level, player, c1, c2, direction, redMissile);
+            new TrackedMissile(args[0], level, player, c1, c2, direction, isRed);
         } else {
-            new TrackedUtility(args[0], level, player, c1, c2, direction, redMissile);
+            new TrackedUtility(args[0], level, player, c1, c2, direction, isRed);
         }
         
         // Manually spawn TNT minecarts in torpedos
@@ -263,13 +295,12 @@ public class SchematicManager {
         // Manually spawn TNT minecarts in flash missile
         if (structureName.equals("thunderbolt-2")) {
             final int minecarts = 4;
-            Location minecartLoc = redMissile ? 
-                    corners[0].clone().add(1, 1, 3) :
-                    corners[1].clone().add(-1, 0, -3);
-            minecartLoc = minecartLoc.toCenterLocation().add(0, -0.5, 0);
+            Vector minecartOffset = new Vector(0, 1, 8);
+            rotateOffset(minecartOffset, rotation, loadResult.getMirror());
+            Location minecartLoc = loadResult.getSpawnPos().add(minecartOffset).toCenterLocation().add(0, 0.5, 0);
             
             // Also need to fix a rail bug
-            if (redMissile) {
+            if (rotation == StructureRotation.CLOCKWISE_180) {
                 fixRail(minecartLoc, Material.POWERED_RAIL, Shape.NORTH_SOUTH);
             }
 
@@ -278,11 +309,34 @@ public class SchematicManager {
         }
         
         // Temp hotfix for structure rail rotation bug
-        if (redMissile && structureName.equals("lifter-2")) {
+        if (rotation == StructureRotation.CLOCKWISE_180 && structureName.equals("lifter-2")) {
             fixRail(spawnPos.clone().add(-1, 2, -8), Material.DETECTOR_RAIL, Shape.EAST_WEST);
         }
         
         return true;
+    }
+    
+    private static void rotateOffset(Vector offset, StructureRotation rotation, Mirror mirror) {
+        double curX = offset.getX();
+        if (mirror != Mirror.NONE) {
+            curX *= -1;
+            offset.setX(curX);
+        }
+        
+        if (rotation == StructureRotation.NONE) {
+            return;
+        }
+        
+        if (rotation == StructureRotation.CLOCKWISE_180) {
+            offset.setX(offset.getX() * -1);
+            offset.setZ(offset.getZ() * -1);
+        } else if (rotation == StructureRotation.COUNTERCLOCKWISE_90) {
+            offset.setX(offset.getZ());
+            offset.setZ(curX * -1);
+        } else {
+            offset.setX(offset.getZ() * -1);
+            offset.setZ(curX);
+        }
     }
     
     /**
@@ -318,6 +372,37 @@ public class SchematicManager {
                 tracker.registerTNTMinecart(cart, player);
             }
         }
+    }
+    
+    /**
+     * Get offset modifier for an item for an arena. The item passed in
+     * should already be known to be a missile
+     * 
+     * @param item
+     * @param arena
+     * @return
+     */
+    public static Vector getOffsetModifier(ItemStack item, Arena arena) {
+        Vector res = new Vector();
+        String offset = InventoryUtils.getStringFromItemKey(item, InventoryUtils.CUSTOM_OFFSET_KEY);
+        if (offset != null) {
+            String[] args = offset.split(",");
+            res.setZ(Integer.parseInt(args[0]));
+            res.setY(Integer.parseInt(args[1]));
+        }
+        
+        res.setZ(res.getZ() + arena.getIntSetting(ArenaSetting.MISSILE_OFFSET_MODIFIER_Z));
+        res.setY(res.getY() + arena.getIntSetting(ArenaSetting.MISSILE_OFFSET_MODIFIER_Y));
+        return res;
+    }
+    
+    public static StructureRotation getRotation(Player player) {
+        return getRotation(player.getLocation().getDirection());
+    }
+    
+    public static StructureRotation getRotation(Vector direction) {
+        int compass = (((int) Math.round(Math.atan2(direction.getX(), direction.getZ()) / (2 * Math.PI / 4))) + 4) % 4;
+        return ROTATIONS[compass];
     }
     
     private static void sendError(Player player, String message) {

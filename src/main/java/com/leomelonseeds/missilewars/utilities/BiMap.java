@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.invs.deck;
+package com.leomelonseeds.missilewars.utilities;
 
 import java.util.HashMap;
 import java.util.Map;

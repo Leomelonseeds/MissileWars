@@ -27,6 +27,7 @@ import com.leomelonseeds.missilewars.listener.packets.MissilePreview;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
+import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 
 /** Represents a Missile Wars Player. */
 public class MissileWarsPlayer {
@@ -228,7 +229,7 @@ public class MissileWarsPlayer {
                 CooldownUtils.setCooldown(player, Material.CROSSBOW, maxcd * 20);
             }
             
-            if (name.contains("SPAWN_EGG") && !joinedBefore) {
+            if (InventoryUtils.isMissile(setItem) && !joinedBefore) {
                 di.initCooldown((int) (maxcd * ((double) cooldowns.remove(0) / 4) + 1));
             } else {
                 di.initCooldown(maxcd);
@@ -242,8 +243,8 @@ public class MissileWarsPlayer {
         cooldownPreview(arena);
     }
     
-    public void startMissilePreview(boolean isRed) {
-        missilePreview = new MissilePreview(player, isRed);
+    public void startMissilePreview(boolean isRed, Arena arena) {
+        missilePreview = new MissilePreview(player, isRed, arena);
     }
  
     /**

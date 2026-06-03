@@ -65,11 +65,10 @@ public class RandomItemEditor extends MWInventory {
         settingSlots.put(33, RandomItemSetting.WEIGHT);
         
         // If missile add custom offsets
-        // TODO when sideways missiles are added
-        // if (randomItem.getModifiableItem().getType().toString().endsWith("SPAWN_EGG")) {
-        //     settingSlots.put(10, RandomItemSetting.MISSILE_OFFSET_Z);
-        //     settingSlots.put(16, RandomItemSetting.MISSILE_OFFSET_Y);
-        // }
+        if (InventoryUtils.isMissile(randomItem.getModifiableItem())) {
+            settingSlots.put(10, RandomItemSetting.MISSILE_OFFSET_Z);
+            settingSlots.put(16, RandomItemSetting.MISSILE_OFFSET_Y);
+        }
     }
 
     @Override

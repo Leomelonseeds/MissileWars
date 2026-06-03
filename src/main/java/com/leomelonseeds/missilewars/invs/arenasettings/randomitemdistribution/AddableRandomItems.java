@@ -32,10 +32,10 @@ public class AddableRandomItems extends PaginatedInventory {
     private static final List<ItemFilter> FILTERS = List.of(
             
         new ItemFilter("missiles", "&fMissiles &c🚀", Material.CREEPER_SPAWN_EGG, item -> 
-            item.getType().toString().endsWith("SPAWN_EGG")),
+            InventoryUtils.isMissile(item)),
         
         new ItemFilter("utilities", "&fUtilities &9★", Material.SNOWBALL, item -> 
-            !item.getType().toString().endsWith("SPAWN_EGG")),
+            !InventoryUtils.isMissile(item)),
         
         new ItemFilter("deck", "&fDeck Items &b✟", Material.BOOKSHELF, item -> {
             FileConfiguration items = ConfigUtils.getConfigFile("items.yml");

@@ -660,20 +660,20 @@ settings:
         - "&7chance of being picked to give."
     MISSILE_OFFSET_Z:
       type: "int"
-      unit: "b"
+      unit: ""
       item: SPECTRAL_ARROW
       description:
         - "&7A custom Z offset for this missile."
-        - "&7Greater values means the missile will"
-        - "&7spawn further away from the player."
+        - "&7Positive values means the missile will"
+        - "&7spawn further away, and vice versa."
     MISSILE_OFFSET_Y:
       type: "int"
-      unit: "b"
+      unit: ""
       item: SPECTRAL_ARROW
       description:
         - "&7A custom Y offset for this missile."
-        - "&7Greater values means the missile will"
-        - "&7spawn more high up."
+        - "&7Positive values means the missile will"
+        - "&7spawn more high up, and vice versa."
   settings:
     CAPACITY:
       type: "int"
@@ -747,6 +747,7 @@ settings:
         - "&7placing 2 at the same time."
     ENABLE_SIDEWAYS_MISSILES:
       type: "boolean"
+      rank: "&4&lOWNER"
       description:
         - "&7Allows placing missiles sideways."
     ENABLE_AIR_PLACE:
@@ -876,3 +877,24 @@ settings:
         - "&7normal fireballs will be spawned by"
         - "&7right-clicking a block, then punched"
         - "&7to fire."
+    MISSILE_OFFSET_MODIFIER_Y:
+      type: "int"
+      unit: ""
+      description:
+        - "&7Modify the Y spawning offset of"
+        - "&7missiles in this arena. Positive"
+        - "&7values mean missiles will spawn"
+        - "&7higher up, and vice versa."
+    MISSILE_OFFSET_MODIFIER_Z:
+      type: "int"
+      unit: ""
+      description:
+        - "&7Modify the Z spawning offset of"
+        - "&7missiles in this arena. Positive"
+        - "&7values mean missiles will spawn"
+        - "&7further away, and vice versa."
+    ENABLE_CHIRAL_MISSILES:
+      type: "boolean"
+      description:
+        - "&7Missiles spawned from the offhand"
+        - "&7will be mirrored."

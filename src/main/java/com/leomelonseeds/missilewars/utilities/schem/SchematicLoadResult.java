@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -27,6 +28,7 @@ public class SchematicLoadResult {
     private Location spawnPos;
     private SchematicLoadStatus status;
     private StructureRotation rotation;
+    private Mirror mirror;
     private Clipboard clipboard;
     private List<Pair<Location, BlockData>> blockList;
     private File file;
@@ -42,6 +44,7 @@ public class SchematicLoadResult {
         this.structureName = structureName;
         this.status = SchematicLoadStatus.NONE;
         this.rotation = StructureRotation.NONE;
+        this.mirror = Mirror.NONE;
         this.blockList = new ArrayList<>();
     }
     
@@ -83,11 +86,26 @@ public class SchematicLoadResult {
             
             // Get the location where this block will be pasted
             Location l = BukkitAdapter.adapt(spawnPos.getWorld(), locVec);
-            if (rotation == StructureRotation.CLOCKWISE_180) {
+            if (mirror != Mirror.NONE) {
                 l.setX(-l.getBlockX());
-                l.setZ(-l.getBlockZ());
+                data.mirror(mirror);
+            }
+            
+            if (rotation != StructureRotation.NONE) {
+                int curX = l.getBlockX();
+                if (rotation == StructureRotation.CLOCKWISE_180) {
+                    l.setX(-l.getBlockX());
+                    l.setZ(-l.getBlockZ());
+                } else if (rotation == StructureRotation.COUNTERCLOCKWISE_90) {
+                    l.setX(l.getBlockZ());
+                    l.setZ(-curX);
+                } else {
+                    l.setX(-l.getBlockZ());
+                    l.setZ(curX);
+                }
                 data.rotate(rotation);
             }
+            
             l.add(spawnPos);
             
             // Cache this block data for if it needs to be used
@@ -205,5 +223,13 @@ public class SchematicLoadResult {
 
     public String getStructureName() {
         return structureName;
+    }
+    
+    public void setMirror(Mirror mirror) {
+        this.mirror = mirror;
+    }
+    
+    public Mirror getMirror() {
+        return mirror;
     }
 }

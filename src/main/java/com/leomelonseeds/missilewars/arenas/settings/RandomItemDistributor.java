@@ -440,7 +440,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      * @return if this distributor has at least one missile selected
      */
     public boolean containsMissile() {
-        return itemMap.values().stream().anyMatch(ri -> ri.getModifiableItem().getType().toString().endsWith("SPAWN_EGG"));
+        return itemMap.values().stream().anyMatch(ri -> InventoryUtils.isMissile(ri.getModifiableItem()));
     }
     
     /**

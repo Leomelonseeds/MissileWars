@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.invs.MWInventory;
+import com.leomelonseeds.missilewars.utilities.BiMap;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.JSONManager;

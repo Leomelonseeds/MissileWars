@@ -73,7 +73,7 @@ public class RandomSelection extends PaginatedInventory {
         Set<String> utility = new HashSet<>();
         for (RandomItem ri : distributor.getRandomItems()) {
             String name = ri.getId().split("-")[0];
-            if (ri.getModifiableItem().getType().toString().endsWith("SPAWN_EGG")) {
+            if (InventoryUtils.isMissile(ri.getModifiableItem())) {
                 missiles.add(name);
             } else {
                 utility.add(name);
