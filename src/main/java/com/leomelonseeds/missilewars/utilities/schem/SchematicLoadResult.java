@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
+import org.bukkit.util.Vector;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
@@ -166,14 +167,20 @@ public class SchematicLoadResult {
         // Basically an affine transformation but I can't be bothered to do the math
         Location[] res = new Location[2];
         BlockVector3 size = clipboard.getDimensions().subtract(1, 1, 1);
-        if (rotation == StructureRotation.CLOCKWISE_180) {
-            res[0] = spawnPos.clone().add(-size.getBlockX(), 0, -size.getBlockZ());
-            res[1] = spawnPos.clone().add(0, size.getBlockY(), 0);
-        } else {
-            res[0] = spawnPos.clone();
-            res[1] = spawnPos.clone().add(size.getBlockX(), size.getBlockY(), size.getBlockZ());
-        }
-        
+        Vector pos1 = new Vector();
+        Vector pos2 = new Vector(size.getBlockX(), size.getBlockY(), size.getBlockZ());
+        SchematicManager.rotateOffset(pos1, rotation, mirror);
+        SchematicManager.rotateOffset(pos2, rotation, mirror);
+        res[0] = new Location(spawnPos.getWorld(),
+            Math.min(pos1.getBlockX(), pos2.getBlockX()),
+            Math.min(pos1.getBlockY(), pos2.getBlockY()),
+            Math.min(pos1.getBlockZ(), pos2.getBlockZ())
+        );
+        res[1] = new Location(spawnPos.getWorld(),
+            Math.max(pos1.getBlockX(), pos2.getBlockX()),
+            Math.max(pos1.getBlockY(), pos2.getBlockY()),
+            Math.max(pos1.getBlockZ(), pos2.getBlockZ())
+        );
         return res;
     }
     

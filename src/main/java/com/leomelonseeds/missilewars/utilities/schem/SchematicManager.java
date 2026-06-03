@@ -38,6 +38,7 @@ import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
+import com.leomelonseeds.missilewars.listener.packets.MissilePreview;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
@@ -297,7 +298,7 @@ public class SchematicManager {
             final int minecarts = 4;
             Vector minecartOffset = new Vector(0, 1, 8);
             rotateOffset(minecartOffset, rotation, loadResult.getMirror());
-            Location minecartLoc = loadResult.getSpawnPos().add(minecartOffset).toCenterLocation().add(0, 0.5, 0);
+            Location minecartLoc = spawnPos.clone().add(minecartOffset).toCenterLocation();
             
             // Also need to fix a rail bug
             if (rotation == StructureRotation.CLOCKWISE_180) {
@@ -316,7 +317,7 @@ public class SchematicManager {
         return true;
     }
     
-    private static void rotateOffset(Vector offset, StructureRotation rotation, Mirror mirror) {
+    public static void rotateOffset(Vector offset, StructureRotation rotation, Mirror mirror) {
         double curX = offset.getX();
         if (mirror != Mirror.NONE) {
             curX *= -1;
@@ -396,10 +397,37 @@ public class SchematicManager {
         return res;
     }
     
+    /**
+     * Gets rotation using missile preview eye direction (faster than player yaw)
+     * If preview eye direction is unregistered, fall back to yaw
+     * 
+     * @param player
+     * @return
+     */
     public static StructureRotation getRotation(Player player) {
-        return getRotation(player.getLocation().getDirection());
+        Vector playerEyeDirection = MissilePreview.eyeDirectionMap.get(player);
+        if (playerEyeDirection != null) {
+            return getRotation(playerEyeDirection);
+        }
+        
+        float yaw = player.getLocation().getYaw();
+        if (yaw > 135 || yaw < -135) {
+            return StructureRotation.CLOCKWISE_180;
+        } else if (yaw < -45) {
+            return StructureRotation.COUNTERCLOCKWISE_90;
+        } else if (yaw > 45) {
+            return StructureRotation.CLOCKWISE_90;
+        } else {
+            return StructureRotation.NONE;
+        }
     }
     
+    /**
+     * Thanks https://stackoverflow.com/questions/1437790/how-to-snap-a-directional-2d-vector-to-a-compass-n-ne-e-se-s-sw-w-nw/1437934#1437934
+     * 
+     * @param direction
+     * @return
+     */
     public static StructureRotation getRotation(Vector direction) {
         int compass = (((int) Math.round(Math.atan2(direction.getX(), direction.getZ()) / (2 * Math.PI / 4))) + 4) % 4;
         return ROTATIONS[compass];

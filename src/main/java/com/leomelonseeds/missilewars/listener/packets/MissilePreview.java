@@ -20,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -59,6 +61,8 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 
 public class MissilePreview extends BukkitRunnable implements PacketListener {
     
+    public static Map<Player, Vector> eyeDirectionMap = new HashMap<>();
+    
     // In how many ms should we update after the user isn't moving
     private static final int UPDATE_FREQUENCY = 100;
     
@@ -80,7 +84,6 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
     // Packetlistener player position tracking
     private PacketListenerCommon listener;
     private Location playerEyeLocation;
-    private Vector playerEyeDirection;
     private boolean isShifted;
     
     // Update parameters
@@ -95,6 +98,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
      * @param isRed
      */
     public MissilePreview(Player player, boolean isRed, Arena arena) {
+        eyeDirectionMap.put(player, new Vector(0, 0, 1));
         this.player = player;
         this.arena = arena;
         this.packetUser = PacketEvents.getAPI().getPlayerManager().getUser(player);
@@ -105,7 +109,6 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         this.removalQueue = new HashSet<>();
         this.listener = PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.MONITOR);
         this.playerEyeLocation = player.getLocation();
-        this.playerEyeDirection = new Vector(0, 0, 1);
         this.range = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).getBaseValue();
         this.runTaskTimerAsynchronously(MissileWarsPlugin.getPlugin(), 20, 1);
     }
@@ -183,6 +186,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
     private void setPlayerRotation(double yaw, double pitch) {
         yaw = Math.toRadians(yaw);
         pitch = Math.toRadians(pitch);
+        Vector playerEyeDirection = eyeDirectionMap.get(player);
         playerEyeDirection.setX(-Math.cos(pitch) * Math.sin(yaw));
         playerEyeDirection.setY(-Math.sin(pitch));
         playerEyeDirection.setZ(Math.cos(pitch) * Math.cos(yaw));
@@ -206,6 +210,13 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
     }
     
     private void update() {
+        // We do not generate a missile preview if airplace is enabled,
+        // but we still need to run the preview to keep track of player
+        // eye directions
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+            return;
+        }
+        
         if (!removalQueue.isEmpty()) {
             removeEntities(removalQueue);
         }
@@ -221,6 +232,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         
         // Raytrace blocks from player direction
         // Moving pistons don't get detected by raytraces, so we need another check for those
+        Vector playerEyeDirection = eyeDirectionMap.get(player);
         RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, range);
         for (int i = 1; i <= 9; i++) {
             double dist = i * 0.5;
@@ -254,8 +266,47 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
             curItem = mainhand;
             hand = EquipmentSlot.HAND;
         } else if (InventoryUtils.isMissile(offhand)) {
-            curItem = offhand;
-            hand = EquipmentSlot.OFF_HAND;
+            // Need some checks before offhand can be determined as used
+            // By default assume it can be used
+            boolean success = true;
+            do {
+                if (mainhand.getType() == Material.AIR) {
+                    break;
+                }
+                
+                if (CooldownUtils.hasCooldown(player, mainhand)) {
+                    break;
+                }
+                
+                // If crossbow has arrows or bow + inventory arrows then no preview
+                // Otherwise gear items are ok
+                ItemMeta mainMeta = mainhand.getItemMeta();
+                if (mainMeta.isUnbreakable()) {
+                    if (mainhand.getType().toString().endsWith("BOW") && player.getInventory().contains(Material.ARROW)) {
+                        success = false;
+                        break;
+                    }
+                    
+                    if (mainhand.getType() == Material.CROSSBOW && ((CrossbowMeta) mainMeta).hasChargedProjectiles()) {
+                        success = false;
+                        break;
+                    }
+                    
+                    break;
+                }
+                
+                // Assume non-cooldown utilities can be right clicked and used (unless arrow)
+                if (mainhand.getType().toString().endsWith("ARROW")) {
+                    break;
+                }
+                
+                success = false;
+            } while (false);
+            
+            if (success) {
+                curItem = offhand;
+                hand = EquipmentSlot.OFF_HAND;
+            }
         }
         
         if (hand == null || CooldownUtils.hasCooldown(player, curItem)) {
@@ -270,8 +321,11 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
             return;
         }
         
-        // Check if the preview needs to change. Otherwise, if preview is regenerated
-        // no change, it will flicker.
+        // Check if the preview needs to change. If preview is regenerated with no change, it will flicker.
+        // Rotation could have been decided by the player's packet facing. However, this is not an accurate
+        // representation of where the missile will spawn - the packet gets to the server before player info
+        // is updated, so even though the preview might indicate the missile will spawn one way after a quick turn,
+        // the missile may still spawn in the original facing direction.
         Location loc = rayTrace.getHitBlock().getLocation();
         StructureRotation rotation = SchematicManager.getRotation(playerEyeDirection);
         if (structureName.equals(lastName) && loc.equals(lastLoc) && hand == lastHand && rotation == lastRotation) {
@@ -414,5 +468,6 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
             removeEntities(removalQueue);
         }
         removeEntities();
+        eyeDirectionMap.remove(player);
     }
 }
