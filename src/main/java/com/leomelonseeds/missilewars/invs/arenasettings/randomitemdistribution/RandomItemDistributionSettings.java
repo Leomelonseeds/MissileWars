@@ -93,20 +93,24 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
             return;
         }
         
+        // Make next inventory view only if game is running as well
+        boolean nextViewOnly = viewOnly || arena.isRunning() || arena.isResetting();
+        
         if (key.equals("edit-items")) {
-            new RandomItemsList(player, distributor, viewOnly, this);
+            new RandomItemsList(player, distributor, nextViewOnly, this);
             return;
         }
         
         if (key.equals("edit-abilities")) {
-            new EnabledAbilities(player, distributor, viewOnly, this);
+            new EnabledAbilities(player, distributor, nextViewOnly, this);
             return;
         }
         
         // TODO: weapons and armor
         
-        if (viewOnly) {
-            viewOnlyDeny();
+        if (nextViewOnly) {
+            ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
+            ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             return;
         }
         

@@ -176,6 +176,7 @@ messages:
   random-item-global-limit: "&cYou didn't get %item% &csince you have too many items!"
   random-item-limit: "&cYou already have the maximum amount of %item%&c!"
   must-place-fireball: "&cFireballs must be &dplaced &con a block in this arena."
+  fireball-obstructed: "&cThe placement location is obstructed!"
   cannot-change-setting-while-running: "&c&l[!] &7These settings can only be changed when the arena isn't running."
   search-query: "&eEnter in your search query, or type &6'cancel' &eto cancel. Use only alphanumeric characters."
   search-query-searching: "&7Searching..."
@@ -749,7 +750,8 @@ settings:
       type: "boolean"
       rank: "&4&lOWNER"
       description:
-        - "&7Allows placing missiles sideways."
+        - "&7Allows placing missiles sideways"
+        - "&7and backwards."
     ENABLE_AIR_PLACE:
       type: "boolean"
       description:
@@ -898,3 +900,9 @@ settings:
       description:
         - "&7Missiles spawned from the offhand"
         - "&7will be mirrored."
+    ENABLE_BLOCKFACE_PLACEMENT:
+      type: "boolean"
+      description:
+        - "&7Missile and fireball locations"
+        - "&7will change based on the blockface"
+        - "&7on which they are placed."

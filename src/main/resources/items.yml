@@ -801,7 +801,7 @@ platform:
 
 torpedo:
   index: 5
-  item: EGG
+  item: BROWN_EGG
   name: "&0★ Torpedo %level% ✟"
   lore:
   - ""

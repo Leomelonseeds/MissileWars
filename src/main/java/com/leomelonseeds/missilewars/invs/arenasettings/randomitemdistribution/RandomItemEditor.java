@@ -236,7 +236,9 @@ public class RandomItemEditor extends MWInventory {
         
         item.setItemMeta(meta);
         
-        item.setAmount(cur == 0 ? 64 : cur);
+        if (!setting.toString().startsWith("MISSILE")) {
+            item.setAmount(cur == 0 ? 64 : cur);
+        }
         
         return item;
     }

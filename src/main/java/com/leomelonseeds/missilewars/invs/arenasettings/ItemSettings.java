@@ -39,9 +39,10 @@ public class ItemSettings extends ArenaSettingsInventory {
             // Usage settings
             37, ArenaSetting.ENABLE_SIDEWAYS_MISSILES,
             38, ArenaSetting.ENABLE_CHIRAL_MISSILES,
-            39, ArenaSetting.MISSILE_OFFSET_MODIFIER_Z,
-            40, ArenaSetting.MISSILE_OFFSET_MODIFIER_Y,
-            41, ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED
+            39, ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT,
+            40, ArenaSetting.MISSILE_OFFSET_MODIFIER_Z,
+            41, ArenaSetting.MISSILE_OFFSET_MODIFIER_Y,
+            42, ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED
         );
     }
 

@@ -433,6 +433,14 @@ public class SchematicManager {
         return ROTATIONS[compass];
     }
     
+    public static void adjustLocationOnBlockface(Location loc, BlockFace face) {
+        if (face == null || face == BlockFace.UP) {
+            return;
+        }
+        
+        loc.add(face.getDirection()).subtract(0, 1, 0);
+    }
+    
     private static void sendError(Player player, String message) {
         if (player == null) {
             return;

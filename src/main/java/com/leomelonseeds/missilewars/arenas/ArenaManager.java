@@ -135,7 +135,7 @@ public class ArenaManager {
         World arenaWorld = arena.getWorld();
         Logger logger = Bukkit.getLogger();
         logger.info("Removing arena " + arena.getName() + "...");
-        if (!arenaWorld.getPlayers().isEmpty()) {
+        if (arenaWorld != null && !arenaWorld.getPlayers().isEmpty()) {
             logger.warning("An arena with players in it cannot be deleted");
             return false;
         }
@@ -346,12 +346,12 @@ public class ArenaManager {
             break;
         case TRAINING:
             arena = new TrainingArena();
-            arena.getVoteManager().addMap("default-map");
+            arena.getVoteManager().removeAll();
             arena.getArenaSettings().set(ArenaSetting.IS_INFINITE_TIME, true);
             break;
         case TUTORIAL:
             arena = new TutorialArena();
-            arena.getVoteManager().addMap("default-map");
+            arena.getVoteManager().removeAll();
             break;
         default:
             logger.warning("Arena type is null or not accounted for?");
@@ -380,6 +380,7 @@ public class ArenaManager {
         arenaWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
         arenaWorld.setGameRule(GameRule.RANDOM_TICK_SPEED, 20);
         arenaWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
+        arenaWorld.setGameRule(GameRule.WATER_SOURCE_CONVERSION, false);
         WorldBorder border = arenaWorld.getWorldBorder();
         border.setCenter(plugin.getConfig().getInt("worldborder.center.x"),
                 plugin.getConfig().getInt("worldborder.center.z"));
@@ -398,7 +399,7 @@ public class ArenaManager {
                 int length = settings.getInt("barrier.length");
                 int x = settings.getInt("barrier.center.x");
                 int zCenter = settings.getInt("barrier.center.z");
-                SchematicManager.setBlock(x, 0, zCenter - length / 2, x, 320, zCenter + length / 2, arenaWorld, BlockTypes.BARRIER, false);
+                SchematicManager.setBlock(x, -64, zCenter - length / 2, x, 320, zCenter + length / 2, arenaWorld, BlockTypes.BARRIER, false);
                 
                 // Setup regions
                 WorldGuard wg = WorldGuard.getInstance();
@@ -421,6 +422,7 @@ public class ArenaManager {
                 lobbyRegion.setFlag(Flags.TNT, StateFlag.State.DENY);
                 lobbyRegion.setFlag(Flags.HUNGER_DRAIN, StateFlag.State.DENY);
                 lobbyRegion.setFlag(Flags.ITEM_DROP, StateFlag.State.DENY);
+                lobbyRegion.setFlag(Flags.PISTONS, StateFlag.State.DENY);
                 lobbyRegion.setFlag(Flags.DENY_MESSAGE, "");
                 manager.addRegion(lobbyRegion);
                 createWaitingLobby("red", arena, lobbyRegion);

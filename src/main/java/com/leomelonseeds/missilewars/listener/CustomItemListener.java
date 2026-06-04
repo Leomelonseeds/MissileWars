@@ -246,9 +246,14 @@ public class CustomItemListener implements Listener {
             if (clicked == null) {
                 return;
             }
+            
+            Location spawnLoc = clicked.getLocation();
+            if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
+                SchematicManager.adjustLocationOnBlockface(spawnLoc, clickedFace);
+            }
 
             // Place structure
-            if (SchematicManager.spawnNBTStructure(player, structureName, clicked.getLocation(), isRedTeam(player), true, true, 
+            if (SchematicManager.spawnNBTStructure(player, structureName, spawnLoc, isRedTeam(player), true, true, 
                 arena.getBooleanSetting(ArenaSetting.ENABLE_SIDEWAYS_MISSILES),
                 arena.getBooleanSetting(ArenaSetting.ENABLE_CHIRAL_MISSILES) && event.getHand() == EquipmentSlot.OFF_HAND,
                 SchematicManager.getOffsetModifier(hand, arena))) {
@@ -333,8 +338,18 @@ public class CustomItemListener implements Listener {
                     return;
                 }
                 
-                spawnLoc = clicked.getLocation().toCenterLocation().add(0, 1.62, 0);
+                spawnLoc = clicked.getLocation();
+                if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT) && clickedFace != BlockFace.UP) {
+                    spawnLoc.add(clickedFace.getDirection());
+                    spawnLoc = spawnLoc.toCenterLocation().subtract(0, clickedFace == BlockFace.DOWN ? 0.62 : 0.4, 0);
+                } else {
+                    spawnLoc = clicked.getLocation().toCenterLocation().add(0, 1.62, 0);
+                }
+                
                 if (!spawnLoc.getBlock().getType().isAir()) {
+                    String msg = ConfigUtils.getConfigText("messages.fireball-obstructed");
+                    player.sendActionBar(ConfigUtils.toComponent(msg));
+                    ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
                     return;
                 }
             } else {

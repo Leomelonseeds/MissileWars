@@ -3,7 +3,10 @@ package com.leomelonseeds.missilewars.arenas.tracker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -63,6 +66,31 @@ public abstract class Tracked {
     }
     
     /**
+     * Debug method
+     */
+    protected void spawnParticles() {
+        double x1 = pos1.getX() + 1;
+        double x2 = pos2.getX();
+        double y1 = pos1.getY() + 1;
+        double y2 = pos2.getY();
+        double z1 = pos1.getZ() + 1;
+        double z2 = pos2.getZ();
+        DustOptions dustOptions = new DustOptions(Color.LIME, 1.0F);
+        for (double x = x1; x <= x2; x++) {
+            for (double y = y1; y <= y2; y++) {
+                for (double z = z1; z <= z2; z++) {
+                    boolean isX = x == x1 || x == x2;
+                    boolean isY = y == y1 || y == y2;
+                    boolean isZ = z == z1 || z == z2;
+                    if (isX ? (isY || isZ) : (isY && isZ)) {
+                        player.spawnParticle(Particle.DUST, x, y, z, 1, dustOptions);
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
      * Checks if the given location is contained within the tracked object
      * 
      * @param l
@@ -85,12 +113,12 @@ public abstract class Tracked {
         double y = l.getY();
         double z = l.getZ();
         
-        double x1 = Math.min(pos1.getX(), pos2.getX()) - bias;
-        double x2 = Math.max(pos1.getX(), pos2.getX()) + bias;
-        double y1 = Math.min(pos1.getY(), pos2.getY()) - bias;
-        double y2 = Math.max(pos1.getY(), pos2.getY()) + bias;
-        double z1 = Math.min(pos1.getZ(), pos2.getZ()) - bias;
-        double z2 = Math.max(pos1.getZ(), pos2.getZ()) + bias;
+        double x1 = pos1.getX() - bias;
+        double x2 = pos2.getX() + bias;
+        double y1 = pos1.getY() - bias;
+        double y2 = pos2.getY() + bias;
+        double z1 = pos1.getZ() - bias;
+        double z2 = pos2.getZ() + bias;
         
         if (x1 <= x && x <= x2 && y1 <= y && y <= y2 && z1 <= z && z <= z2) {
             return true;
@@ -108,17 +136,9 @@ public abstract class Tracked {
         Location tpos1 = t.getPos1();
         Location tpos2 = t.getPos2();
         World world = tpos1.getWorld();
-
-        int tx1 = Math.min(tpos1.getBlockX(), tpos2.getBlockX());
-        int tx2 = Math.max(tpos1.getBlockX(), tpos2.getBlockX());
-        int ty1 = Math.min(tpos1.getBlockY(), tpos2.getBlockY());
-        int ty2 = Math.max(tpos1.getBlockY(), tpos2.getBlockY());
-        int tz1 = Math.min(tpos1.getBlockZ(), tpos2.getBlockZ());
-        int tz2 = Math.max(tpos1.getBlockZ(), tpos2.getBlockZ());
-        
-        for (int x = tx1; x <= tx2; x++) {
-            for (int y = ty1; y <= ty2; y++) {
-                for (int z = tz1; z <= tz2; z++) {
+        for (int x = tpos1.getBlockX(); x <= tpos2.getBlockX(); x++) {
+            for (int y = tpos1.getBlockY(); y <= tpos2.getBlockY(); y++) {
+                for (int z = tpos1.getBlockZ(); z <= tpos2.getBlockZ(); z++) {
                     if (contains(new Location(world, x, y, z))) {
                         return true;
                     }

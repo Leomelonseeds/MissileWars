@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.entity.EntityType;
@@ -234,17 +235,20 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         // Moving pistons don't get detected by raytraces, so we need another check for those
         Vector playerEyeDirection = eyeDirectionMap.get(player);
         RayTraceResult rayTrace = player.getWorld().rayTraceBlocks(playerEyeLocation, playerEyeDirection, range);
+        Location lastCheck = playerEyeLocation;
         for (int i = 1; i <= 9; i++) {
             double dist = i * 0.5;
             Location check = playerEyeLocation.clone().add(playerEyeDirection.clone().multiply(dist));
             if (check.getBlock().getType() != Material.MOVING_PISTON) {
+                lastCheck = check;
                 continue;
             }
             
             // Check if the moving piston is closer to the player than the raytraced block
             // We don't break early if another block is detected since this check doesn't consider exact hitboxes
             if (rayTrace == null || dist * dist < rayTrace.getHitPosition().distanceSquared(playerEyeLocation.toVector())) {
-                rayTrace = new RayTraceResult(check.toVector(), check.getBlock(), null);
+                Block block = check.getBlock();
+                rayTrace = new RayTraceResult(check.toVector(), block, block.getFace(lastCheck.getBlock()));
             }
             
             break;
@@ -321,12 +325,13 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
             return;
         }
         
-        // Check if the preview needs to change. If preview is regenerated with no change, it will flicker.
-        // Rotation could have been decided by the player's packet facing. However, this is not an accurate
-        // representation of where the missile will spawn - the packet gets to the server before player info
-        // is updated, so even though the preview might indicate the missile will spawn one way after a quick turn,
-        // the missile may still spawn in the original facing direction.
+        // Get location to spawn the preview
         Location loc = rayTrace.getHitBlock().getLocation();
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
+            SchematicManager.adjustLocationOnBlockface(loc, rayTrace.getHitBlockFace());
+        }
+
+        // Check if the preview needs to change. If preview is regenerated with no change, it will flicker.
         StructureRotation rotation = SchematicManager.getRotation(playerEyeDirection);
         if (structureName.equals(lastName) && loc.equals(lastLoc) && hand == lastHand && rotation == lastRotation) {
             // If same missile in same location, we might still need to collision check

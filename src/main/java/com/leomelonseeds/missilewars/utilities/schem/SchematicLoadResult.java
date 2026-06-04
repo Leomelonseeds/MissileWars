@@ -171,12 +171,12 @@ public class SchematicLoadResult {
         Vector pos2 = new Vector(size.getBlockX(), size.getBlockY(), size.getBlockZ());
         SchematicManager.rotateOffset(pos1, rotation, mirror);
         SchematicManager.rotateOffset(pos2, rotation, mirror);
-        res[0] = new Location(spawnPos.getWorld(),
+        res[0] = spawnPos.clone().add(
             Math.min(pos1.getBlockX(), pos2.getBlockX()),
             Math.min(pos1.getBlockY(), pos2.getBlockY()),
             Math.min(pos1.getBlockZ(), pos2.getBlockZ())
         );
-        res[1] = new Location(spawnPos.getWorld(),
+        res[1] = spawnPos.clone().add(
             Math.max(pos1.getBlockX(), pos2.getBlockX()),
             Math.max(pos1.getBlockY(), pos2.getBlockY()),
             Math.max(pos1.getBlockZ(), pos2.getBlockZ())

@@ -39,6 +39,7 @@ public class TrackedMissile extends Tracked {
             @Override
             public void run() {
                updatePosition();
+               // spawnParticles();
             }
         }.runTaskTimer(MissileWarsPlugin.getPlugin(), timer, timer));
     }
