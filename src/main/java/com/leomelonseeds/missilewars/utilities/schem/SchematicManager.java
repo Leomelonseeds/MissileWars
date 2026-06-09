@@ -377,7 +377,7 @@ public class SchematicManager {
     
     /**
      * Get offset modifier for an item for an arena. The item passed in
-     * should already be known to be a missile
+     * should already be known to be a missile.
      * 
      * @param item
      * @param arena
@@ -392,8 +392,16 @@ public class SchematicManager {
             res.setY(Integer.parseInt(args[1]));
         }
         
+        // Everything here is additive so order shouldn't matter
         res.setZ(res.getZ() + arena.getIntSetting(ArenaSetting.MISSILE_OFFSET_MODIFIER_Z));
         res.setY(res.getY() + arena.getIntSetting(ArenaSetting.MISSILE_OFFSET_MODIFIER_Y));
+        
+        // Spawn missile closer to player on airplace
+        if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+            res.setZ(res.getZ() - 1);
+            res.setY(res.getY() - 1);
+        }
+        
         return res;
     }
     

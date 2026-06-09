@@ -128,7 +128,7 @@ public class CustomItemListener implements Listener {
     @EventHandler
     public void useItem(PlayerInteractEvent event) {
         Action action = event.getAction();
-        if (action == Action.PHYSICAL) {
+        if (!action.isRightClick()) {
             return;
         }
         
@@ -191,7 +191,7 @@ public class CustomItemListener implements Listener {
         }
         
         // Check if gamemode survival. Also no more left clicks from this point forward
-        if (action.isLeftClick() || player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.ADVENTURE) {
+        if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.ADVENTURE) {
             return;
         }
         
@@ -243,13 +243,17 @@ public class CustomItemListener implements Listener {
                 return;
             }
             
-            if (clicked == null) {
+            // From this point this is a missile!
+            Location spawnLoc;
+            if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+                spawnLoc = player.getLocation().toBlockLocation();
+            } else if (clicked != null) {
+                spawnLoc = clicked.getLocation();
+                if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
+                    SchematicManager.adjustLocationOnBlockface(spawnLoc, clickedFace);
+                }
+            } else {
                 return;
-            }
-            
-            Location spawnLoc = clicked.getLocation();
-            if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
-                SchematicManager.adjustLocationOnBlockface(spawnLoc, clickedFace);
             }
 
             // Place structure

@@ -25,7 +25,7 @@ public enum ArenaSetting {
     FIREBALLS_NEED_TO_BE_PLACED(false, "fireballs-need-to-be-placed"),
     FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"), // TODO
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles", true),
-    ENABLE_AIR_PLACE(false, "enable-air-place"), // TODO
+    ENABLE_AIR_PLACE(false, "enable-air-place"),
     MISSILE_OFFSET_MODIFIER_Z(0, "missile-offset-modifier-z", IntSettingModifier.create(-4, 4, 1)),
     MISSILE_OFFSET_MODIFIER_Y(0, "missile-offset-modifier-y", IntSettingModifier.create(-3, 3, 1)),
     ENABLE_CHIRAL_MISSILES(false, "enable-chiral-missiles"),

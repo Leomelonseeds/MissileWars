@@ -756,9 +756,13 @@ settings:
       type: "boolean"
       description:
         - "&7Allows placing missiles mid-air."
-        - "&7Missiles placed in mid-air spawn"
-        - "&7closer to players and do not have"
-        - "&7a preview."
+        - "&7Missile placement will now depend"
+        - "&7on player location instead of click"
+        - "&7location. Finally, missiles spawn"
+        - "&71 block closer to the player."
+        - ""
+        - "&7Missile previews are &cdisabled &7when"
+        - "&7Air Place is enabled."
     IS_INFINITE_TIME:
       type: "boolean"
       description:
@@ -904,5 +908,8 @@ settings:
       type: "boolean"
       description:
         - "&7Missile and fireball locations"
-        - "&7will change based on the blockface"
+        - "&7change based on the blockface"
         - "&7on which they are placed."
+        - ""
+        - "&7This setting does not affect"
+        - "&7missiles if &eAir Place &7is enabled."
