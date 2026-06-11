@@ -35,6 +35,7 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;
@@ -397,7 +398,7 @@ public class SchematicManager {
         res.setY(res.getY() + arena.getIntSetting(ArenaSetting.MISSILE_OFFSET_MODIFIER_Y));
         
         // Spawn missile closer to player on airplace
-        if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+        if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.AIR_PLACE) {
             res.setZ(res.getZ() - 1);
             res.setY(res.getY() - 1);
         }

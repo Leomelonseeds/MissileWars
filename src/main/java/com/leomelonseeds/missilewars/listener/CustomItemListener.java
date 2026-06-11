@@ -48,6 +48,7 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
@@ -245,11 +246,11 @@ public class CustomItemListener implements Listener {
             
             // From this point this is a missile!
             Location spawnLoc;
-            if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+            if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.AIR_PLACE) {
                 spawnLoc = player.getLocation().toBlockLocation();
             } else if (clicked != null) {
                 spawnLoc = clicked.getLocation();
-                if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
+                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE) {
                     SchematicManager.adjustLocationOnBlockface(spawnLoc, clickedFace);
                 }
             } else {
@@ -343,7 +344,8 @@ public class CustomItemListener implements Listener {
                 }
                 
                 spawnLoc = clicked.getLocation();
-                if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT) && clickedFace != BlockFace.UP) {
+                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE 
+                        && clickedFace != BlockFace.UP) {
                     spawnLoc.add(clickedFace.getDirection());
                     spawnLoc = spawnLoc.toCenterLocation().subtract(0, clickedFace == BlockFace.DOWN ? 0.62 : 0.4, 0);
                 } else {

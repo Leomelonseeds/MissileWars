@@ -37,10 +37,9 @@ public class ItemSettings extends ArenaSettingsInventory {
             29, ArenaSetting.ENABLE_TEAM_BALANCING,
             
             // Usage settings
-            37, ArenaSetting.ENABLE_SIDEWAYS_MISSILES,
-            38, ArenaSetting.ENABLE_AIR_PLACE,
+            37, ArenaSetting.MISSILE_PLACEMENT_MODE,
+            38, ArenaSetting.ENABLE_SIDEWAYS_MISSILES,
             39, ArenaSetting.ENABLE_CHIRAL_MISSILES,
-            40, ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT,
             41, ArenaSetting.MISSILE_OFFSET_MODIFIER_Z,
             42, ArenaSetting.MISSILE_OFFSET_MODIFIER_Y,
             43, ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED

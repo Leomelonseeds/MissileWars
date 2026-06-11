@@ -53,6 +53,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTe
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
+import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicLoadResult;
@@ -214,7 +215,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         // We do not generate a missile preview if airplace is enabled,
         // but we still need to run the preview to keep track of player
         // eye directions
-        if (arena.getBooleanSetting(ArenaSetting.ENABLE_AIR_PLACE)) {
+        if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.AIR_PLACE) {
             return;
         }
         
@@ -327,7 +328,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         
         // Get location to spawn the preview
         Location loc = rayTrace.getHitBlock().getLocation();
-        if (arena.getBooleanSetting(ArenaSetting.ENABLE_BLOCKFACE_PLACEMENT)) {
+        if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE) {
             SchematicManager.adjustLocationOnBlockface(loc, rayTrace.getHitBlockFace());
         }
 

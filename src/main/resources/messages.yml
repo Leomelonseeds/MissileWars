@@ -604,12 +604,18 @@ settings:
     enum:
       item: PINK_WOOL
       color: "&d"
-      lore:
+      lore-desc:
         - ""
-        - "&fCurrent: &d%value%"
-        - "&7&o(&7&oDefault: %default%)"
+        - "&fCurrent &d(%value%)&f:"
+      lore-list-top:
         - ""
-        - "&cClick &7to change"
+        - "&8--------------------"
+      lore-list-selected: "&d••➡ %value% ⬅••"
+      lore-list: "&5%option%"
+      lore-list-bottom:
+        - "&8--------------------"
+        - ""
+        - "&cClick &7to cycle"
   random-selection-settings:
     SET_MISSILE_COUNT:
       type: "int"
@@ -748,21 +754,9 @@ settings:
         - "&7placing 2 at the same time."
     ENABLE_SIDEWAYS_MISSILES:
       type: "boolean"
-      rank: "&4&lOWNER"
       description:
         - "&7Allows placing missiles sideways"
         - "&7and backwards."
-    ENABLE_AIR_PLACE:
-      type: "boolean"
-      description:
-        - "&7Allows placing missiles mid-air."
-        - "&7Missile placement will now depend"
-        - "&7on player location instead of click"
-        - "&7location. Finally, missiles spawn"
-        - "&71 block closer to the player."
-        - ""
-        - "&7Missile previews are &cdisabled &7when"
-        - "&7Air Place is enabled."
     IS_INFINITE_TIME:
       type: "boolean"
       description:
@@ -865,6 +859,15 @@ settings:
         - "&7Change the difficulty of the world."
         - "&7The greater the difficulty, the more"
         - "&7damage players take from explosions."
+      PEACEFUL:
+        - "&7Explosions do not deal damage."
+        - "&7Creepers will also fail to spawn."
+      EASY:
+        - "&7Explosions will deal &f29 &7damage."
+      NORMAL:
+        - "&7Explosions will deal &f56 &7damage."
+      HARD:
+        - "&7Explosions will deal &f84.5 &7damage."
     FORCED_DECK:
       type: "enum"
       description:         
@@ -904,12 +907,24 @@ settings:
       description:
         - "&7Missiles spawned from the offhand"
         - "&7will be mirrored."
-    ENABLE_BLOCKFACE_PLACEMENT:
-      type: "boolean"
+    MISSILE_PLACEMENT_MODE:
+      type: "enum"
       description:
-        - "&7Missile and fireball locations"
-        - "&7change based on the blockface"
-        - "&7on which they are placed."
+        - "&7Choose how and when missiles can."
+        - "&7be placed."
+      NORMAL:
+        - "&7Missile spawn positions change"
+        - "&7according to the block on which"
+        - "&7they are placed."
+      BLOCKFACE:
+        - "&7Missile spawn positions change"
+        - "&7according to the block and the"
+        - "&7blockface on which they are placed."
+      AIR_PLACE:
+        - "&7Missile spawn positions change"
+        - "&7according to the player's position."
+        - "&7They can be spawned in mid-air, and"
+        - "&7spawn 1 block closer to the player."
         - ""
-        - "&7This setting does not affect"
-        - "&7missiles if &eAir Place &7is enabled."
+        - "&7Missile previews are &cdisabled &7when"
+        - "&7Air Place mode is used."
