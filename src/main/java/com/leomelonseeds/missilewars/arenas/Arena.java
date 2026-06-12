@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
@@ -109,8 +110,8 @@ public abstract class Arena implements ConfigurationSerializable {
     protected BukkitTask autoUnload;
     protected Tracker tracker;
     protected VoteManager voteManager;
-    /** Set of players who have played but have since left */
-    protected HashMap<UUID, Integer> leftPlayers;
+    /** Set of players who have played but have since left. UUID -> prevteam, times left */
+    protected HashMap<UUID, Pair<TeamName, Integer>> leftPlayers;
     /** Helper variable to check when all queues are done */
     protected int queueCount;
     /** The rank level to evaluate map selection by */
@@ -499,11 +500,11 @@ public abstract class Arena implements ConfigurationSerializable {
      * 
      * @param uuid
      */
-    public void addLeft(UUID uuid) {
+    public void addLeft(UUID uuid, TeamName team) {
         if (leftPlayers.containsKey(uuid)) {
-            leftPlayers.put(uuid, leftPlayers.get(uuid) + 1);
+            leftPlayers.put(uuid, Pair.of(team, leftPlayers.get(uuid).getRight() + 1));
         } else {
-            leftPlayers.put(uuid, 1);
+            leftPlayers.put(uuid, Pair.of(team, 1));
         }
     }
     
@@ -978,10 +979,24 @@ public abstract class Arena implements ConfigurationSerializable {
         
         // Auto-join team if setting turned on
         if (running && !player.hasPermission("umw.disableautoteam")) {
+            UUID uuid = player.getUniqueId();
             int redSize = redTeam.getSize();
             int blueSize = blueTeam.getSize();
-            boolean red = redSize == blueSize ? Math.random() > 0.5 : blueSize > redSize;
-            enqueue(player.getUniqueId(), red ? TeamName.RED : TeamName.BLUE);
+            if (leftPlayers.containsKey(uuid)) {
+                // Try to join player to their previous team if possible
+                TeamName prevTeam = leftPlayers.get(uuid).getLeft();
+                if (getBooleanSetting(ArenaSetting.ENABLE_UNFAIR_TEAMS) ||
+                    (prevTeam == TeamName.RED && redSize <= blueSize) ||
+                    (prevTeam == TeamName.BLUE && blueSize <= redSize)) {
+                    enqueue(uuid, prevTeam);
+                } else {
+                    enqueue(uuid, prevTeam == TeamName.RED ? TeamName.BLUE : TeamName.RED);
+                }
+            } else {
+                boolean red = redSize == blueSize ? Math.random() > 0.5 : blueSize > redSize;
+                enqueue(player.getUniqueId(), red ? TeamName.RED : TeamName.BLUE);
+            }
+            
             return;
         }
        
@@ -1278,6 +1293,11 @@ public abstract class Arena implements ConfigurationSerializable {
         }
         
         if (!force) {
+            if (!getBooleanSetting(ArenaSetting.ALLOW_JOINING_ONGOING_GAMES) && !leftPlayers.containsKey(uuid)) {
+                ConfigUtils.sendConfigMessage("cannot-join-ongoing-game", mcPlayer);
+                return;
+            }
+            
             if (joinTeam.getSize() - otherTeam.getSize() >= 1 && !getBooleanSetting(ArenaSetting.ENABLE_UNFAIR_TEAMS)) {
                 ConfigUtils.sendConfigMessage("queue-join-error", mcPlayer);
                 return;
@@ -1675,7 +1695,8 @@ public abstract class Arena implements ConfigurationSerializable {
             applyMultipliers();
             if (!getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
                 UUID uuid = player.getMCPlayerId();
-                player.initDeck(leftPlayers.getOrDefault(uuid, 0) >= 3, this, redTeam.containsPlayer(uuid));
+                boolean joinedBefore = leftPlayers.containsKey(uuid) ? leftPlayers.get(uuid).getRight() >= 3 : false;
+                player.initDeck(joinedBefore, this, redTeam.containsPlayer(uuid));
             }
             return;
         }

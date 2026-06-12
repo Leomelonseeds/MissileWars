@@ -694,7 +694,7 @@ public class MissileWarsCommand implements CommandExecutor {
         }
         
         // Queue for a team
-        if (action.toLowerCase().contains("enqueue")) {
+        if (action.toLowerCase().startsWith("enqueue")) {
             String team = action.substring(7);
             if (!(team.equalsIgnoreCase("red") || team.equalsIgnoreCase("blue"))) {
                 sendErrorMsg(sender, "Please use enqueuered or enqueueblue!");

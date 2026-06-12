@@ -182,6 +182,7 @@ messages:
   search-query-searching: "&7Searching..."
   search-query-failed: "&c&l[!] &7Your search was too short or took too long!"
   enabled-abilities: "&a&l[!] &7Enabled abilities (hover for info): "
+  cannot-join-ongoing-game: "&cYou cannot join ongoing games in this arena!"
   settings:
     view-only: "&cYou are in view-only mode and cannot change these settings."
     int-minimum: "&cYou cannot decrease this setting further!"
@@ -949,3 +950,9 @@ settings:
       description:
         - "&7The first item players recieve"
         - "&7will always be a missile."
+    ALLOW_JOINING_ONGOING_GAMES:
+      type: "boolean"
+      description:
+        - "&7When turned off, players who were"
+        - "&7not previously in an ongoing game"
+        - "&7are not allowed to join."

@@ -333,7 +333,7 @@ public class MissileWarsTeam {
         }
         
         if (arena.isRunning()) {
-            arena.addLeft(uuid);
+            arena.addLeft(uuid, name);
             arena.applyMultipliers(); // Check for cooldowns
         }
     }

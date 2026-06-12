@@ -194,7 +194,7 @@ public class ConfigUtils {
     
     /**
      * Shorthand for sending a chat message without arena and focus context.
-     * The chat message does NOT need to include "messages."
+     * The chat message should NOT include "messages."
      *      
      * @param path
      * @param player

@@ -494,7 +494,7 @@ public class TutorialArena extends ClassicArena {
     
     // No need to track who left the arena here
     @Override
-    public void addLeft(UUID uuid) {}
+    public void addLeft(UUID uuid, TeamName team) {}
     
     @Override
     public void performTimeSetup() {}
