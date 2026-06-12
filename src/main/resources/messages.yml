@@ -944,3 +944,8 @@ settings:
       description:
         - "&7Explosions from normal fireballs"
         - "&7will deal damage to players."
+    START_WITH_MISSILE:
+      type: "boolean"
+      description:
+        - "&7The first item players recieve"
+        - "&7will always be a missile."

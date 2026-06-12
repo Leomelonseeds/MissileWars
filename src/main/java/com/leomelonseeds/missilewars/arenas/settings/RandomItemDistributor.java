@@ -46,7 +46,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     private LinkedHashMap<UUID, RandomItem> itemMap;
     private Map<String, Integer> enabledAbilities;
     private Set<String> addedIds;
-    private List<RandomItem> curItems;
+    private List<RandomItem> curItems; // null if first item
     private int totalWeight;
     private int timerTicks; // IN TICKS!!! 0 means disabled
     private Random random;
@@ -54,7 +54,6 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     public RandomItemDistributor(ArenaSettings settings, int index) {
         this.settings = settings;
-        this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
         this.enabledAbilities = new HashMap<>();
@@ -66,7 +65,6 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         this.name = other.name;
         this.index = other.index;
         this.settings = settings;
-        this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
         this.enabledAbilities = new HashMap<>(other.enabledAbilities);
@@ -100,7 +98,6 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     
     @SuppressWarnings("unchecked")
     public RandomItemDistributor(Map<String, Object> distributor) {
-        this.curItems = new ArrayList<>();
         this.itemMap = new LinkedHashMap<>();
         this.addedIds = new HashSet<>();
         this.enabledAbilities = new HashMap<>();
@@ -142,6 +139,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
     public void stopDistribution() {
         timerTicks = 0;
         curItems.clear();
+        curItems = null;
     }
     
     /**
@@ -375,14 +373,24 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             return null;
         }
         
+        // If curItems is unset then this is the first item in the game
+        boolean giveMissile = false;
+        if (curItems == null) {
+            curItems = new ArrayList<>();
+            giveMissile = (boolean) settings.get(ArenaSetting.START_WITH_MISSILE);
+        }
+        
         // Readd all items to curItems if its empty (e.g. bag distribution or first time distributing)
         if (curItems.isEmpty()) {
-            int weightSum = 0;
+            totalWeight = 0;
             for (RandomItem ri : itemMap.values()) {
+                if (giveMissile && !InventoryUtils.isMissile(ri.getModifiableItem())) {
+                    continue;
+                }
+                
                 curItems.add(ri);
-                weightSum += ri.getWeight();
+                totalWeight += ri.getWeight();
             }
-            totalWeight = weightSum;
         }
         
         // Thanks https://stackoverflow.com/questions/6737283/weighted-randomness-in-java
@@ -394,13 +402,29 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             }
         }
         
+        RandomItem toGive;
         if ((boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION)) {
-            RandomItem toGive = curItems.remove(i);
+            toGive = curItems.remove(i);
             totalWeight -= toGive.getWeight();
-            return toGive;
+        } else {
+            toGive = curItems.get(i);
+        }
+        
+        // Re-add items if missile given first
+        if (giveMissile) {
+            curItems.clear();
+            totalWeight = 0;
+            for (RandomItem ri : itemMap.values()) {
+                if (ri.equals(toGive)) {
+                    continue;
+                }
+                
+                curItems.add(ri);
+                totalWeight += ri.getWeight();
+            }
         }
             
-        return curItems.get(i);
+        return toGive;
     }
     
     /**

@@ -42,7 +42,7 @@ public enum ArenaSetting {
     RANDOM_ITEM_BAG_DISTRIBUTION(false, "random-item-bag-distribution"),
     RANDOM_ITEM_XP_TIMER(true, "random-item-xp-timer"),
     RANDOM_ITEM_INVENTORY_LIMIT(0, "random-item-inventory-limit", IntSettingModifier.create(0, 32, 1)),
-    START_WITH_MISSILE(true, "start-with-missile"), // TODO
+    START_WITH_MISSILE(true, "start-with-missile"),
     
     // MISC SETTINGS:
     // Game management
