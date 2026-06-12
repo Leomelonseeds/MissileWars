@@ -3,7 +3,6 @@ package com.leomelonseeds.missilewars.arenas.settings;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
@@ -61,7 +60,7 @@ public enum ArenaSetting {
     ENABLE_ALTITUDE_SICKNESS(true, "enable-altitude-sickness"),
     ENABLE_MULTIPLE_PORTALS(true, "enable-multiple-portals"), // TODO
     ENABLE_TEAMGRIEF_PREVENTION(true, "enable-teamgrief-prevention"),
-    WORLD_DIFFICULTY(Difficulty.EASY, "world-difficulty", false, true),
+    WORLD_DIFFICULTY(ArenaWorldDifficulty.EASY, "world-difficulty", false, true),
     
     // INTERNAL SETTINGS (not editable by players)
     OWNER_NAME("", "owner-name"),

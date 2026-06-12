@@ -328,7 +328,7 @@ public class MissilePreview extends BukkitRunnable implements PacketListener {
         
         // Get location to spawn the preview
         Location loc = rayTrace.getHitBlock().getLocation();
-        if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE) {
+        if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCKFACE) {
             SchematicManager.adjustLocationOnBlockface(loc, rayTrace.getHitBlockFace());
         }
 

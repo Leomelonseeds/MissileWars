@@ -604,9 +604,7 @@ settings:
     enum:
       item: PINK_WOOL
       color: "&d"
-      lore-desc:
-        - ""
-        - "&fCurrent &d(%value%)&f:"
+      lore-desc: "&fCurrent &d(%value%)&f:"
       lore-list-top:
         - ""
         - "&8--------------------"
@@ -614,6 +612,7 @@ settings:
       lore-list: "&5%option%"
       lore-list-bottom:
         - "&8--------------------"
+        - "&7&o(&7&oDefault: %default%)"
         - ""
         - "&cClick &7to cycle"
   random-selection-settings:
@@ -910,7 +909,7 @@ settings:
     MISSILE_PLACEMENT_MODE:
       type: "enum"
       description:
-        - "&7Choose how and when missiles can."
+        - "&7Choose how and when missiles can"
         - "&7be placed."
       NORMAL:
         - "&7Missile spawn positions change"

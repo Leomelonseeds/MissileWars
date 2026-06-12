@@ -250,7 +250,7 @@ public class CustomItemListener implements Listener {
                 spawnLoc = player.getLocation().toBlockLocation();
             } else if (clicked != null) {
                 spawnLoc = clicked.getLocation();
-                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE) {
+                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCKFACE) {
                     SchematicManager.adjustLocationOnBlockface(spawnLoc, clickedFace);
                 }
             } else {
@@ -344,7 +344,7 @@ public class CustomItemListener implements Listener {
                 }
                 
                 spawnLoc = clicked.getLocation();
-                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCK_FACE 
+                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCKFACE 
                         && clickedFace != BlockFace.UP) {
                     spawnLoc.add(clickedFace.getDirection());
                     spawnLoc = spawnLoc.toCenterLocation().subtract(0, clickedFace == BlockFace.DOWN ? 0.62 : 0.4, 0);

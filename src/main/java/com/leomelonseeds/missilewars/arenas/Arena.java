@@ -43,6 +43,7 @@ import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
+import com.leomelonseeds.missilewars.arenas.settings.ArenaWorldDifficulty;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
@@ -215,7 +216,7 @@ public abstract class Arena implements ConfigurationSerializable {
             Bukkit.getLogger().warning("Something went wrong loading " + name + "!");
             return null;
         }
-        nworld.setDifficulty((Difficulty) settings.get(ArenaSetting.WORLD_DIFFICULTY));
+        nworld.setDifficulty(((ArenaWorldDifficulty) settings.get(ArenaSetting.WORLD_DIFFICULTY)).getDifficulty());
         
         // Create all NPCs
         ConfigUtils.schedule(20, () -> createNPCs());

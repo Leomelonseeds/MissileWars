@@ -176,6 +176,16 @@ public abstract class ArenaSettingsInventory extends MWInventory {
         List<String> lore = new ArrayList<>();
         lore.add("");
         lore.addAll(settingConfig.getStringList("settings." + settingString + ".description"));
+        if (type.equals("enum")) {
+            String curValue = arenaSettings.getWithQueue(setting).toString();
+            List<String> curDesc = settingConfig.getStringList("settings." + settingString + "." + curValue);
+            if (!curDesc.isEmpty()) {
+                lore.add("");
+                lore.add(sec.getString("lore-desc").replace("%value%", curValue));
+                lore.addAll(curDesc);
+            }
+        }
+        
         if (arenaSettings.isQueued(setting)) {
             lore.addAll(settingConfig.getStringList("format.queued"));
         }
@@ -242,18 +252,22 @@ public abstract class ArenaSettingsInventory extends MWInventory {
     private List<String> getEnumSettingLore(ArenaSetting setting, ConfigurationSection sec, ItemMeta meta) {
         List<String> res = new ArrayList<>();
         Object val = arenaSettings.getWithQueue(setting);
-        for (String line : sec.getStringList("lore")) {
-            if (line.isEmpty()) {
-                res.add(line);
-                continue;
+        res.addAll(sec.getStringList("lore-list-top"));
+        
+        Object[] vals = val.getClass().getEnumConstants();
+        for (Object testVal : vals) {
+            if (testVal.equals(val)) {
+                res.add(sec.getString("lore-list-selected").replace("%value%", val.toString()));
+            } else {
+                res.add(sec.getString("lore-list").replace("%option%", testVal.toString()));
             }
-            
-            res.add(line.replace("%value%", val.toString())
-                        .replace("%default%", setting.getDefaultValue().toString()));
+        }
+
+        for (String line : sec.getStringList("lore-list-bottom")) {
+            res.add(line.replace("%default%", setting.getDefaultValue().toString()));
         }
         
         // Get the next in line
-        Object[] vals = val.getClass().getEnumConstants();
         int i = 0;
         while (i < vals.length) {
             if (vals[i].equals(val)) {
