@@ -48,7 +48,8 @@ import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ClassicArena;
 import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
-import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
+import com.leomelonseeds.missilewars.arenas.settings.enums.FireballPlacementMode;
+import com.leomelonseeds.missilewars.arenas.settings.enums.MissilePlacementMode;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracked;
@@ -333,8 +334,8 @@ public class CustomItemListener implements Listener {
         boolean isDragonFireball = utility.startsWith("lingering");
         if (utility.startsWith("fireball") || isDragonFireball) {
             event.setCancelled(true);
-            boolean placeOnly = arena.getBooleanSetting(ArenaSetting.FIREBALLS_NEED_TO_BE_PLACED) && !isDragonFireball;
             Location spawnLoc;
+            boolean placeOnly = arena.getArenaSettings().get(ArenaSetting.FIREBALL_USAGE_MODE) != FireballPlacementMode.POINT_AND_CLICK && !isDragonFireball;
             if (placeOnly) {
                 if (clicked == null) {
                     String msg = ConfigUtils.getConfigText("messages.must-place-fireball");
@@ -344,7 +345,7 @@ public class CustomItemListener implements Listener {
                 }
                 
                 spawnLoc = clicked.getLocation();
-                if (arena.getArenaSettings().get(ArenaSetting.MISSILE_PLACEMENT_MODE) == MissilePlacementMode.BLOCKFACE 
+                if (arena.getArenaSettings().get(ArenaSetting.FIREBALL_USAGE_MODE) == FireballPlacementMode.BLOCKFACE_PLACEMENT 
                         && clickedFace != BlockFace.UP) {
                     spawnLoc.add(clickedFace.getDirection());
                     spawnLoc = spawnLoc.toCenterLocation().subtract(0, clickedFace == BlockFace.DOWN ? 0.62 : 0.4, 0);

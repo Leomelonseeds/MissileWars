@@ -35,7 +35,7 @@ import org.bukkit.util.Vector;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
-import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
+import com.leomelonseeds.missilewars.arenas.settings.enums.MissilePlacementMode;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedMissile;
 import com.leomelonseeds.missilewars.arenas.tracker.TrackedUtility;
 import com.leomelonseeds.missilewars.arenas.tracker.Tracker;

@@ -608,8 +608,8 @@ settings:
       lore-list-top:
         - ""
         - "&8--------------------"
-      lore-list-selected: "&d••➡ %value% ⬅••"
-      lore-list: "&5%option%"
+      lore-list-selected: "&d%value% ⬅••"
+      lore-list: "&8%option%"
       lore-list-bottom:
         - "&8--------------------"
         - "&7&o(&7&oDefault: %default%)"
@@ -878,13 +878,25 @@ settings:
         - "&7Adds a rudimentary check to prevent"
         - "&7players from spawning missiles in"
         - "&7their own base."
-    FIREBALLS_NEED_TO_BE_PLACED:
-      type: "boolean"
+    FIREBALL_USAGE_MODE:
+      type: "enum"
       description:
-        - "&7Instead of right-clicking to fire,"
-        - "&7normal fireballs will be spawned by"
-        - "&7right-clicking a block, then punched"
-        - "&7to fire."
+        - "&7Change the way normal fireballs can"
+        - "&7be used. This setting does not affect"
+        - "&7Dragon Fireballs."
+      POINT_AND_CLICK:
+        - "&7Right-clicking a fireball will shoot"
+        - "&7it towards your cursor's target."
+      BLOCK_PLACEMENT:
+        - "&7Fireballs must be spawned by right-"
+        - "&7clicking a block, then punched to"
+        - "&7fire. Fireballs always spawn above"
+        - "&7the block they are placed on."
+      BLOCKFACE_PLACEMENT:
+        - "&7Fireballs must be spawned by right-"
+        - "&7clicking a block, then punched to"
+        - "&7fire. Fireballs will spawn next to"
+        - "&7the blockface they are placed on."
     MISSILE_OFFSET_MODIFIER_Y:
       type: "int"
       unit: ""

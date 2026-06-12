@@ -53,7 +53,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTe
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
-import com.leomelonseeds.missilewars.arenas.settings.MissilePlacementMode;
+import com.leomelonseeds.missilewars.arenas.settings.enums.MissilePlacementMode;
 import com.leomelonseeds.missilewars.utilities.CooldownUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.schem.SchematicLoadResult;

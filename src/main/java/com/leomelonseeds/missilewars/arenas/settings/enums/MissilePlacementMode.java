@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.arenas.settings;
+package com.leomelonseeds.missilewars.arenas.settings.enums;
 
 public enum MissilePlacementMode {
     NORMAL,

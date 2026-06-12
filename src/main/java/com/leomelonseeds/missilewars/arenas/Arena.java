@@ -43,7 +43,7 @@ import com.earth2me.essentials.Essentials;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
-import com.leomelonseeds.missilewars.arenas.settings.ArenaWorldDifficulty;
+import com.leomelonseeds.missilewars.arenas.settings.enums.ArenaWorldDifficulty;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsPlayer;
 import com.leomelonseeds.missilewars.arenas.teams.MissileWarsTeam;
 import com.leomelonseeds.missilewars.arenas.teams.TeamName;

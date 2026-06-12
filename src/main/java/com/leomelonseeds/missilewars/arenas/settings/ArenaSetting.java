@@ -6,6 +6,9 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
+import com.leomelonseeds.missilewars.arenas.settings.enums.ArenaWorldDifficulty;
+import com.leomelonseeds.missilewars.arenas.settings.enums.FireballPlacementMode;
+import com.leomelonseeds.missilewars.arenas.settings.enums.MissilePlacementMode;
 import com.leomelonseeds.missilewars.decks.DeckStorage;
 
 public enum ArenaSetting {
@@ -21,7 +24,7 @@ public enum ArenaSetting {
     ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     ENABLE_DROPPING_ITEMS(true, "enable-dropping-items"), // TODO
-    FIREBALLS_NEED_TO_BE_PLACED(false, "fireballs-need-to-be-placed"),
+    FIREBALL_USAGE_MODE(FireballPlacementMode.POINT_AND_CLICK, "fireballs-usage-mode"),
     FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"), // TODO
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
     MISSILE_PLACEMENT_MODE(MissilePlacementMode.NORMAL, "missile-placement-mode", false, true),

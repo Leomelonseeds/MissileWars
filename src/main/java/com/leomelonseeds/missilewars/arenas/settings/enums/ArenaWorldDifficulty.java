@@ -1,4 +1,4 @@
-package com.leomelonseeds.missilewars.arenas.settings;
+package com.leomelonseeds.missilewars.arenas.settings.enums;
 
 import org.bukkit.Difficulty;
 
