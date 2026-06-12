@@ -25,7 +25,7 @@ public enum ArenaSetting {
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     ENABLE_DROPPING_ITEMS(true, "enable-dropping-items"), // TODO
     FIREBALL_USAGE_MODE(FireballPlacementMode.POINT_AND_CLICK, "fireballs-usage-mode"),
-    FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"), // TODO
+    FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"),
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
     MISSILE_PLACEMENT_MODE(MissilePlacementMode.NORMAL, "missile-placement-mode", false, true),
     MISSILE_OFFSET_MODIFIER_Z(0, "missile-offset-modifier-z", IntSettingModifier.create(-4, 4, 1)),

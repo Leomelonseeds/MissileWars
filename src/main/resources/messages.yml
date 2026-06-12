@@ -862,11 +862,11 @@ settings:
         - "&7Explosions do not deal damage."
         - "&7Creepers will also fail to spawn."
       EASY:
-        - "&7Explosions will deal &f29 &7damage."
+        - "&7TNT explosions deal &f29 &7damage."
       NORMAL:
-        - "&7Explosions will deal &f56 &7damage."
+        - "&7TNT explosions deal &f56 &7damage."
       HARD:
-        - "&7Explosions will deal &f84.5 &7damage."
+        - "&7TNT explosions deal &f84.5 &7damage."
     FORCED_DECK:
       type: "enum"
       description:         
@@ -939,3 +939,8 @@ settings:
         - ""
         - "&7Missile previews are &cdisabled &7when"
         - "&7Air Place mode is used."
+    FIREBALL_EXPLOSION_DAMAGES_PLAYERS:
+      type: "boolean"
+      description:
+        - "&7Explosions from normal fireballs"
+        - "&7will deal damage to players."

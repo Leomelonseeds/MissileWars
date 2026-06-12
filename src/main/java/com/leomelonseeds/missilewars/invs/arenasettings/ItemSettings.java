@@ -42,7 +42,8 @@ public class ItemSettings extends ArenaSettingsInventory {
             39, ArenaSetting.ENABLE_CHIRAL_MISSILES,
             40, ArenaSetting.MISSILE_OFFSET_MODIFIER_Z,
             41, ArenaSetting.MISSILE_OFFSET_MODIFIER_Y,
-            42, ArenaSetting.FIREBALL_USAGE_MODE
+            42, ArenaSetting.FIREBALL_USAGE_MODE,
+            43, ArenaSetting.FIREBALL_EXPLOSION_DAMAGES_PLAYERS
         );
     }
 

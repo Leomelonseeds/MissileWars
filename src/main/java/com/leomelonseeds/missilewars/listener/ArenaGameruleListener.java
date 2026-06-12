@@ -700,7 +700,7 @@ public class ArenaGameruleListener implements Listener {
                 }
                 
                 // Big fireballs should not do dmg to players
-                if (eventDamager.getType() == EntityType.FIREBALL) {
+                if (eventDamager.getType() == EntityType.FIREBALL && !arena.getBooleanSetting(ArenaSetting.FIREBALL_EXPLOSION_DAMAGES_PLAYERS)) {
                     event.setDamage(0.0001);
                 }
                 
