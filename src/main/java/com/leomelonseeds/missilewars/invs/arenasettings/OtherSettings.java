@@ -39,6 +39,7 @@ public class OtherSettings extends ArenaSettingsInventory {
         settingSlots.put(10, ArenaSetting.ENABLE_UNFAIR_TEAMS);
         settingSlots.put(11, ArenaSetting.ONLY_JOIN_QUEUED_PLAYERS);
         settingSlots.put(12, ArenaSetting.ENABLE_AFK_KICK);
+        settingSlots.put(13, ArenaSetting.ALLOW_JOINING_ONGOING_GAMES);
         
         // Game rules
         settingSlots.put(19, ArenaSetting.ENABLE_MISSILE_COOLDOWN);

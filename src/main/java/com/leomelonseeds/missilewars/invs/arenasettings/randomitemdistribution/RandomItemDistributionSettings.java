@@ -40,7 +40,8 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
             36, ArenaSetting.RANDOM_ITEM_DISTRIBUTION_TIMER,
             37, ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION,
             38, ArenaSetting.RANDOM_ITEM_XP_TIMER,
-            39, ArenaSetting.RANDOM_ITEM_INVENTORY_LIMIT
+            39, ArenaSetting.RANDOM_ITEM_INVENTORY_LIMIT,
+            40, ArenaSetting.START_WITH_MISSILE
         );
     }
 

@@ -1270,7 +1270,7 @@ public abstract class Arena implements ConfigurationSerializable {
         }
 
         boolean isRed = team == TeamName.RED;
-        if (!running) {
+        if (!running || waitingForTie) {
             Queue<MissileWarsPlayer> queue = isRed ? redQueue : blueQueue;
             Queue<MissileWarsPlayer> otherQueue = isRed ? blueQueue : redQueue;
             if (!queue.contains(player)) {
@@ -1782,18 +1782,21 @@ public abstract class Arena implements ConfigurationSerializable {
             return;
         }
         
-        // Players shouldn't be able to play anymore
-        for (MissileWarsPlayer player : getInGamePlayers()) {
-            player.stopTasks();
-            Player p = player.getMCPlayer();
-            p.setGameMode(GameMode.SPECTATOR);
-            p.removePotionEffect(PotionEffectType.GLOWING);
-            p.setWorldBorder(null);
-        }
-        
-        // Cancel random item distributor if any running
-        if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
-            settings.getOrCreateRandomItemDistributor().stopDistribution();
+        // If we are already waiting for a tie then this has been done before
+        if (!waitingForTie) {
+            // Players shouldn't be able to play anymore
+            for (MissileWarsPlayer player : getInGamePlayers()) {
+                player.stopTasks();
+                Player p = player.getMCPlayer();
+                p.setGameMode(GameMode.SPECTATOR);
+                p.removePotionEffect(PotionEffectType.GLOWING);
+                p.setWorldBorder(null);
+            }
+            
+            // Cancel random item distributor if any running
+            if (getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION)) {
+                settings.getOrCreateRandomItemDistributor().stopDistribution();
+            }
         }
         
         // Schedule tie wait. If endGame gets called from somewhere else,
@@ -1807,9 +1810,7 @@ public abstract class Arena implements ConfigurationSerializable {
         // Cancel all tasks
         cancelGameTasks();
         leftPlayers.clear();
-        running = false;
         resetting = true;
-        waitingForTie = false;
         
         // Produce winner/discord messages
         TextChannel discordChannel = DiscordSRV.getPlugin().getMainTextChannel();

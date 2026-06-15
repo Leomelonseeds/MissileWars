@@ -24,7 +24,7 @@ public enum ArenaSetting {
     ENABLE_DECREASING_COOLDOWNS(true, "enable-decreasing-cooldowns"),
     ENABLE_TEAM_BALANCING(true, "enable-team-balancing"),
     ENABLE_DROPPING_ITEMS(true, "enable-dropping-items"), // TODO
-    FIREBALL_USAGE_MODE(FireballPlacementMode.POINT_AND_CLICK, "fireballs-usage-mode"),
+    FIREBALL_USAGE_MODE(FireballPlacementMode.POINT_AND_CLICK, "fireballs-usage-mode", false, true),
     FIREBALL_EXPLOSION_DAMAGES_PLAYERS(false, "fireball-explosion-damages-players"),
     ENABLE_SIDEWAYS_MISSILES(false, "enable-sideways-missiles"),
     MISSILE_PLACEMENT_MODE(MissilePlacementMode.NORMAL, "missile-placement-mode", false, true),
@@ -56,7 +56,7 @@ public enum ArenaSetting {
     ENABLE_UNFAIR_TEAMS(false, "enable-unfair-teams"),
     ONLY_JOIN_QUEUED_PLAYERS(false, "only-join-queued-players"),
     ENABLE_AFK_KICK(true, "enable-afk-kick"),
-    ALLOW_JOINING_ONGOING_GAMES(true, "allow-joining-ongoing-games"), // TODO
+    ALLOW_JOINING_ONGOING_GAMES(true, "allow-joining-ongoing-games"),
     
     // Game rules and modifiers
     ENABLE_MISSILE_COOLDOWN(true, "enable-missile-cooldown"),
