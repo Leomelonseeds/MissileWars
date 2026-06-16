@@ -403,7 +403,8 @@ public class RandomItemDistributor implements ConfigurationSerializable {
         }
         
         RandomItem toGive;
-        if ((boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION)) {
+        boolean bag = (boolean) settings.get(ArenaSetting.RANDOM_ITEM_BAG_DISTRIBUTION);
+        if (bag) {
             toGive = curItems.remove(i);
             totalWeight -= toGive.getWeight();
         } else {
@@ -415,7 +416,7 @@ public class RandomItemDistributor implements ConfigurationSerializable {
             curItems.clear();
             totalWeight = 0;
             for (RandomItem ri : itemMap.values()) {
-                if (ri.equals(toGive)) {
+                if (bag && ri.equals(toGive)) {
                     continue;
                 }
                 
