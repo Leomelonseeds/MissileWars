@@ -1,5 +1,6 @@
 package com.leomelonseeds.missilewars.utilities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -522,5 +524,49 @@ public class ArenaUtils {
             
             applySetting.accept(value);
         });
+    }
+    
+    /**
+     * Get the line-wrapped description for an arena.
+     * Thanks https://en.wikipedia.org/wiki/Wrapping_(text)
+     * 
+     * @param arena
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+    public static List<String> getWrappedArenaDescription(Arena arena) {
+        final int lineWidth = 36;
+        List<String> res = new ArrayList<>();
+        String curDesc = arena.getArenaSettings().get(ArenaSetting.ARENA_DESCRIPTION).toString();
+        if (curDesc.isBlank()) {
+            String owner = arena.getArenaSettings().get(ArenaSetting.OWNER_NAME).toString();
+            curDesc = owner + (owner.endsWith("s") || owner.endsWith("S") ? "'" : "'s") + " custom Missile Wars arena.";
+        }
+        
+        int spaceLeft = lineWidth;
+        String[] rawWords = curDesc.split(" ");
+        StringBuffer curLine = new StringBuffer("&f");
+        for (int i = 0; i < rawWords.length; i++) {
+            String rawWord = rawWords[i];
+            String word = ConfigUtils.removeColors(rawWord);
+            if (word.length() <= spaceLeft) {
+                if (spaceLeft < lineWidth) {
+                    curLine.append(" ");
+                    spaceLeft--;
+                }
+                
+                curLine.append(rawWord);
+                spaceLeft -= word.length();
+            } else {
+                String curString = curLine.toString();
+                res.add(curString);
+                spaceLeft = lineWidth;
+                curLine = new StringBuffer(ChatColor.getLastColors(ConfigUtils.convertAmps(curString)));
+                i--;
+            }
+        }
+        
+        res.add(curLine.toString());
+        return res;
     }
 }

@@ -112,7 +112,8 @@ public class ConfigUtils {
                      .replace("%umw_time_remaining%", "" + arena.getTimeRemaining())
                      .replace("%umw_arena_status%", arena.getStatus())
                      .replace("%umw_arena_visibility%", arena.getBooleanSetting(ArenaSetting.IS_PRIVATE) ? "&4Private" : "&2Public")
-                     .replace("%umw_arena_gamemode%", arena.getDisplayGamemode());
+                     .replace("%umw_arena_gamemode%", arena.getDisplayGamemode())
+                     .replace("%umw_arena_item_distribution%", arena.getBooleanSetting(ArenaSetting.ENABLE_RANDOM_ITEM_DISTRIBUTION) ? "&6Random" : "&fDecks");
             
             // Player specific arena placeholders
             if (player != null) {

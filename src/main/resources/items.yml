@@ -2531,11 +2531,11 @@ arena-settings:
       lore-enabled:
         - "&a✔ &7Enabled"
         - ""
-        - "&cClick &7to disable."
+        - "&cClick &7to disable"
       lore-disabled:
         - "&c❌ &7Disabled"
         - ""
-        - "&cClick &7to enable."
+        - "&cClick &7to enable"
     enable-all:
       item: GLOW_ITEM_FRAME
       name: "&aEnable All"
@@ -2560,7 +2560,7 @@ arena-settings:
       lore:
         - "&7%listtype-capital%listed"
         - ""
-        - "&cShift-click &7to remove."
+        - "&cShift-click &7to remove"
     add:
       item: PLAYER_HEAD
       name: "%listtype-color%Add a player"
@@ -2590,7 +2590,7 @@ arena-settings:
         - "&7access this arena, if the arena is"
         - "&7set to private."
         - ""
-        - "&cClick &7to edit the whitelist."
+        - "&cClick &7to edit the whitelist"
     blacklist:
       item: BARRIER
       name: "&cBlacklist"
@@ -2601,7 +2601,21 @@ arena-settings:
         - "&7listed and blacklisted, the blacklist"
         - "&7takes precedent (they can't join)."
         - ""
-        - "&cClick &7to edit the blacklist."
+        - "&cClick &7to edit the blacklist"
+    description:
+      item: "ORANGE_WOOL"
+      name: "&6Description"
+      slot: 12
+      lore-pre:
+        - ""
+        - "&7Set a description for your arena for"
+        - "&7players to see in the arena selector"
+        - "&7menu."
+        - ""
+        - "&6Current Description:"
+      lore-post:
+        - ""
+        - "&cClick &7to change"
   main-menu:
     visibility-settings:
       item: ENDER_EYE

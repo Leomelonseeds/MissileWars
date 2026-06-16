@@ -220,11 +220,13 @@ public class CustomItemListener implements Listener {
         BlockFace clickedFace = event.getBlockFace();
         if (action == Action.RIGHT_CLICK_AIR) {
             List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 4);
-            Block targetBlock = lastTwoTargetBlocks.get(1);
-            Material targetType = targetBlock.getType();
-            if (targetType == Material.MOVING_PISTON && lastTwoTargetBlocks.size() == 2) {
-                clickedFace = targetBlock.getFace(lastTwoTargetBlocks.get(0));
-                clicked = targetBlock;
+            if (lastTwoTargetBlocks.size() == 2) {
+                Block targetBlock = lastTwoTargetBlocks.get(1);
+                Material targetType = targetBlock.getType();
+                if (targetType == Material.MOVING_PISTON) {
+                    clickedFace = targetBlock.getFace(lastTwoTargetBlocks.get(0));
+                    clicked = targetBlock;
+                }
             }
         }
         

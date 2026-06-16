@@ -17,6 +17,7 @@ public enum ArenaSetting {
     CAPACITY(20, "capacity", IntSettingModifier.create(2, 20, 1)),
     IS_PRIVATE(false, "is-private"),
     IS_ALWAYS_ONLINE(true, "always-online", true),
+    ARENA_DESCRIPTION("", "description"),
     
     // ITEM SETTINGS
     // Global

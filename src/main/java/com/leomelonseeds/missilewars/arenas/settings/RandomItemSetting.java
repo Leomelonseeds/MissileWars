@@ -70,6 +70,7 @@ public enum RandomItemSetting {
                 (!z && currentOffsets[0] == 0)
         )) {
             meta.getPersistentDataContainer().remove(InventoryUtils.CUSTOM_OFFSET_KEY);
+            item.setItemMeta(meta);
             return;
         }
         

@@ -110,7 +110,11 @@ public class RandomItemDistributionSettings extends ArenaSettingsInventory {
         // TODO: weapons and armor
         
         if (nextViewOnly) {
-            ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
+            if (viewOnly) {
+                ConfigUtils.sendConfigMessage("settings.view-only", player);
+            } else {
+                ConfigUtils.sendConfigMessage("cannot-change-setting-while-running", player);
+            }
             ConfigUtils.sendConfigSound("purchase-unsuccessful", player);
             return;
         }

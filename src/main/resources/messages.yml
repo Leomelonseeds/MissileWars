@@ -196,6 +196,10 @@ messages:
     rank: "&cYou need to purchase server rank %rank% &cto use this setting!"
     distributor-preset-rank: "&cYou need to purchase server rank %rank% &cto use this preset!"
     preset-name: "&ePlease enter a new name for &f&l%preset%&r&e, or type &6'cancel' &eto cancel. Inappropriate names may be punishable!"
+    description-prompt: "&ePlease enter a new arena description, or type &6'cancel' &eto cancel. Color codes may be used, and inappropriate descriptions may be punishable. Excluding color codes, the description must be less than &6150 &echaracters, and each word cannot be more than &636 &echaractesr long."
+    description-set: "&a&l[!] &r&7Arena descripton set successfully."
+    description-too-long: "&cYour description is too long!"
+    description-word-too-long: "&cA word in your description is too long!"
   engineer:
     start: "&7Structure session started. &eLook &7to select, &cDrop &7your pickaxe to cancel, and &aCrouch+Drop &7your pickaxe to save."
     cancel: "&7Structure session cancelled without saving."
@@ -497,23 +501,32 @@ inventories:
     game-item:
       name: "&c%umw_arena%"
       lore:
-        - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
-        - "&7Status: %umw_arena_status%"
+        - ""
+        - "&bPlayers: &f%umw_arena_players%&8/&f%umw_arena_cap% (%umw_arena_active% playing)"
+        - "&bStatus: %umw_arena_status%"
+        - ""
         - "&aClick to join!"
   custom-game-selector:
     title: "&c&lCustom Areans"
     game-item:
       name: "&c%umw_arena%"
       name-own: "&aYour Arena &7(&c%umw_arena%&7)"
+      lore-desc:
+        - ""
+        - "&bDescription:"
       lore:
-        - "&7Visibility: %umw_arena_visibility%"
-        - "&7Gamemode: %umw_arena_gamemode%"
-        - "&7Players: %umw_arena_players%/%umw_arena_cap%, %umw_arena_active% playing"
-        - "&7Status: %umw_arena_status%"
-      join-public: "&aClick to join!"
-      join-not-whitelisted: "&cYou are not whitelisted."
-      join-blacklisted: "&cYou are blacklisted from this arena."
-      join-whitelisted: "&aYou are whitelisted. Click to join!"
+        - ""
+        - "&bVisibility: %umw_arena_visibility%"
+        - "&bGamemode: %umw_arena_gamemode%"
+        - "&bPlayers: &f%umw_arena_players%&8/&f%umw_arena_cap% (%umw_arena_active% playing)"
+        - "&bItem Distribution: &f%umw_arena_item_distribution%"
+        - "&bStatus: %umw_arena_status%"
+        - ""
+      joinable:
+        - "&cLeft-click &7to join"
+        - "&cRight-click &7to view settings"
+      join-not-whitelisted: "&cYou are not whitelisted"
+      join-blacklisted: "&cYou are blacklisted from this arena"
     create-item:
       item: EMERALD
       name: "&a&lCreate Custom Arena"

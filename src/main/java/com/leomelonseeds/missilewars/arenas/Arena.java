@@ -614,7 +614,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @return A color-coded message of the status of the arena
      */
     public String getStatus() {
-        String status = "&eIn Lobby";
+        String status = "&eWaiting for players...";
         if (world == null) {
             status = "&cOffline";
         } else if (running) {

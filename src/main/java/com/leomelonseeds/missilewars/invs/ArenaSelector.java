@@ -24,6 +24,7 @@ import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSettings;
 import com.leomelonseeds.missilewars.invs.arenasettings.ArenaSettingsMainMenu;
 import com.leomelonseeds.missilewars.invs.pagination.PaginatedInventory;
+import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
 import com.leomelonseeds.missilewars.utilities.InventoryUtils;
 import com.leomelonseeds.missilewars.utilities.RankUtils;
@@ -39,6 +40,7 @@ public class ArenaSelector extends PaginatedInventory {
     private ArenaManager arenaManager;
     private ArenaType type;
     private ItemStack ownedArena;
+    private ConfigurationSection sec;
 
     public ArenaSelector(Player player, ArenaType type) {
         super(player, SIZE, ConfigUtils.getConfigText("inventories." + (type == ArenaType.CUSTOM ? "custom-" : "") + "game-selector.title"));
@@ -48,6 +50,7 @@ public class ArenaSelector extends PaginatedInventory {
         this.isCustom = type == ArenaType.CUSTOM;
         this.itemConfig = "inventories." + (isCustom ? "custom-" : "") + "game-selector.game-item.";
         this.type = type;
+        this.sec = ConfigUtils.getConfigFile("messages.yml").getConfigurationSection(itemConfig);
         autoRefresh(20);
     }
 
@@ -67,22 +70,24 @@ public class ArenaSelector extends PaginatedInventory {
             arenaItemMeta.displayName(ConfigUtils.toComponent(display));
             
             // Lore, with the last line determined by whether the player is whitelisted + type of arena
-            List<String> lore = ConfigUtils.getConfigTextList(itemConfig + "lore", player, arena, null);
+            List<String> lore = new ArrayList<>();
             if (isCustom) {
-                if (arena.getBooleanSetting(ArenaSetting.IS_PRIVATE)) {
+                lore.addAll(sec.getStringList("lore-desc"));
+                lore.addAll(ArenaUtils.getWrappedArenaDescription(arena));
+            }
+            
+            lore.addAll(ConfigUtils.getConfigTextList(itemConfig + "lore", player, arena, null));
+            if (isCustom) {
+                if (isOwner || isJoinable(arena)) {
+                    List<String> viewableString = sec.getStringList("joinable");
                     if (isOwner) {
-                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-public"));
-                    } else if (arenaSettings.isWhitelisted(playerUUID)) {
-                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-whitelisted"));
-                    } else {
-                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-not-whitelisted"));
+                        viewableString.replaceAll(s -> s.replace("view", "edit"));
                     }
+                    lore.addAll(viewableString);
+                } else if (arenaSettings.isBlacklisted(playerUUID)) {
+                    lore.add(sec.getString("join-blacklisted"));
                 } else {
-                    if (arenaSettings.isBlacklisted(playerUUID)) {
-                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-blacklisted"));
-                    } else {
-                        lore.add(ConfigUtils.getConfigText(itemConfig + "join-public"));
-                    }
+                    lore.add(sec.getString("join-not-whitelisted"));
                 }
             }
             
@@ -104,6 +109,21 @@ public class ArenaSelector extends PaginatedInventory {
         }
         
         return items;
+    }
+    
+    /**
+     * DOES NOT CHECK FOR IS OWNER
+     * 
+     * @param arena
+     * @return
+     */
+    private boolean isJoinable(Arena arena) {
+        ArenaSettings settings = arena.getArenaSettings();
+        if (settings.isBlacklisted(playerUUID)) {
+            return false;
+        }
+        
+        return settings.isWhitelisted(playerUUID) || !arena.getBooleanSetting(ArenaSetting.IS_PRIVATE);
     }
 
     @Override
@@ -207,7 +227,15 @@ public class ArenaSelector extends PaginatedInventory {
             return;
         }
         
-        arena.joinPlayer(player);
-        player.closeInventory();
+        boolean isOwner = arena.getArenaSettings().get(ArenaSetting.OWNER_UUID).equals(playerUUID);
+        if (isCustom && type.isRightClick() && (isOwner || isJoinable(arena))) {
+            new ArenaSettingsMainMenu(player, arena, !isOwner, this);
+            return;
+        }
+        
+        if (arena.joinPlayer(player)) {
+            player.closeInventory();
+            return;
+        }
     }
 }
