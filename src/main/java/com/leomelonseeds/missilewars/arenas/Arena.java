@@ -1035,8 +1035,23 @@ public abstract class Arena implements ConfigurationSerializable {
      * Checks if the game is ready to auto-start
      */
     public void checkForStart() {
-        if (running || resetting || !getBooleanSetting(ArenaSetting.ENABLE_AUTO_START)) {
+        if (running || resetting) {
             return;
+        }
+        
+        // Auto start would only be disabled if the arena is public
+        if (!getBooleanSetting(ArenaSetting.ENABLE_AUTO_START)) {
+            // If auto start is disabled and arena is private, do not start it
+            if (getBooleanSetting(ArenaSetting.IS_PRIVATE)) {
+                return;
+            }
+            
+            // Otherwise it's a public arena. If the owner is in the arena we shouldn't start it
+            // Otherwise start the arena anyway because I said so
+            Object ownerUUID = getArenaSettings().get(ArenaSetting.OWNER_UUID);
+            if (players.values().stream().anyMatch(mwp -> ownerUUID.equals(mwp.getMCPlayerId()))) {
+                return;
+            }
         }
         
         int minPlayers = 2; // Maybe make this configurable?

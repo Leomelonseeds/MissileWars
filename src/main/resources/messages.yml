@@ -835,9 +835,10 @@ settings:
       description:
         - "&7If enabled, only players added to"
         - "&7the &aWhitelist &7can join the arena."
-        - "&7Otherwise, the &cBlacklist &7can be"
-        - "&7used to prevent certain players"
-        - "&7from joining."
+        - ""
+        - "&7If disabled, the arena will auto-start"
+        - "&7when the owner is not present even if"
+        - "&eEnable Auto Start &7is turned off."
     IS_ALWAYS_ONLINE:
       type: "boolean"
       rank: "&5&lROYAL"
