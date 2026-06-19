@@ -666,7 +666,12 @@ public class ArenaGameruleListener implements Listener {
             return;
         }
         
+        // is NPC
         Player player = (Player) event.getEntity();
+        if (player.hasMetadata("NPC")) {
+            return;
+        }
+        
         Arena arena = ArenaUtils.getArena(player);
         if (arena == null || !arena.isRunning()) {
             return;

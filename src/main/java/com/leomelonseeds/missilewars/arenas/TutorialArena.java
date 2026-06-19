@@ -310,6 +310,7 @@ public class TutorialArena extends ClassicArena {
             ConfigUtils.schedule(200, () -> stage4Disabled.remove(player));
         } else if (s == MAX_STAGES - 1) {
             stage.put(uuid, MAX_STAGES);
+            getPlayerInArena(uuid).getDeck().enableAllItems();
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ConfigUtils.sendConfigMessage("messages.tutorial-complete", player, null, null);
                 stage.remove(uuid);

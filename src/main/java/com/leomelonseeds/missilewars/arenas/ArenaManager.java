@@ -347,11 +347,13 @@ public class ArenaManager {
         case TRAINING:
             arena = new TrainingArena();
             arena.getVoteManager().removeAll();
+            arena.getVoteManager().addMap("default-map");
             arena.getArenaSettings().set(ArenaSetting.IS_INFINITE_TIME, true);
             break;
         case TUTORIAL:
             arena = new TutorialArena();
             arena.getVoteManager().removeAll();
+            arena.getVoteManager().addMap("default-map");
             break;
         default:
             logger.warning("Arena type is null or not accounted for?");

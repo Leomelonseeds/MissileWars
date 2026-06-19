@@ -186,7 +186,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * 
      * @return The world that was loaded
      */
-    public World loadWorld() {
+    public final World loadWorld() {
         if (world != null) {
             return world;
         }
@@ -242,7 +242,7 @@ public abstract class Arena implements ConfigurationSerializable {
      * @param resetSync whether to synchronously reset the arena for shutdown
      * @return whether the world was loaded successfully
      */
-    public boolean unloadWorld() {
+    public final boolean unloadWorld() {
         if (world == null) {
             return false;
         }
