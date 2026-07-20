@@ -347,14 +347,20 @@ public class CustomItemListener implements Listener {
                 }
                 
                 spawnLoc = clicked.getLocation();
-                if (arena.getArenaSettings().get(ArenaSetting.FIREBALL_USAGE_MODE) == FireballPlacementMode.BLOCKFACE_PLACEMENT 
-                        && clickedFace != BlockFace.UP) {
+                boolean blockFacePlacement = arena.getArenaSettings().get(ArenaSetting.FIREBALL_USAGE_MODE) == FireballPlacementMode.BLOCKFACE_PLACEMENT;
+                if (blockFacePlacement && clickedFace != BlockFace.UP) {
                     spawnLoc.add(clickedFace.getDirection());
                     spawnLoc = spawnLoc.toCenterLocation().subtract(0, clickedFace == BlockFace.DOWN ? 0.62 : 0.4, 0);
                 } else {
                     spawnLoc = clicked.getLocation().toCenterLocation().add(0, 1.62, 0);
                 }
                 
+                // Move spawn location up/down if down/up blockface placement and location obstructed
+                if (!spawnLoc.getBlock().getType().isAir() && (clickedFace == BlockFace.DOWN || clickedFace == BlockFace.UP)) {
+                    spawnLoc.add(0, blockFacePlacement && clickedFace == BlockFace.DOWN ? 0.22 : -1.22, 0);
+                }
+                
+                // If still obstructed then we must cancel
                 if (!spawnLoc.getBlock().getType().isAir()) {
                     String msg = ConfigUtils.getConfigText("messages.fireball-obstructed");
                     player.sendActionBar(ConfigUtils.toComponent(msg));

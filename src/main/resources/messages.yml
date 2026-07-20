@@ -406,6 +406,10 @@ titles:
     title: "&f"
     subtitle: "&f&lEach with unique &c&lmissiles &f&l+ &9&lutilities"
     length: 30
+  cinematic-12:
+    title: "&5&lUltima &d&lMissile &5&lWars"
+    subtitle: "&fAn introduction cinematic"
+    length: 80
     
 # Scoreboard goals (use with PAPI %umw_tutorial_#%)
 scoreboard:

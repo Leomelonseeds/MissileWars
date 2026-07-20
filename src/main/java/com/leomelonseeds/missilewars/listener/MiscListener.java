@@ -38,6 +38,7 @@ import org.mineacademy.chatcontrol.api.ChannelPreChatEvent;
 import com.leomelonseeds.missilewars.MissileWarsPlugin;
 import com.leomelonseeds.missilewars.arenas.Arena;
 import com.leomelonseeds.missilewars.arenas.ArenaManager;
+import com.leomelonseeds.missilewars.arenas.TutorialArena;
 import com.leomelonseeds.missilewars.arenas.settings.ArenaSetting;
 import com.leomelonseeds.missilewars.utilities.ArenaUtils;
 import com.leomelonseeds.missilewars.utilities.ConfigUtils;
@@ -170,9 +171,18 @@ public class MiscListener implements Listener {
         }
 
         // Let new players watch the cinematic
-        // Give players permission and then play the cinematic once they move
         if (!player.hasPlayedBefore()) {
-            Location initLoc = player.getLocation();
+            if (Bukkit.getWorld("mwarena_tutorial") == null) {
+                return;
+            }
+            
+            // Teleport players to the tutorial arena
+            TutorialArena tutorialArena = (TutorialArena) plugin.getArenaManager().getArena("tutorial");
+            Location initLoc = tutorialArena.getPlayerSpawn(player);
+            player.teleport(initLoc);
+            tutorialArena.softJoin(player);
+            
+            // Give players permission and then play the cinematic once they move
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
                     "lp user " + player.getName() + " permission set umw.new");
             new BukkitRunnable() {
@@ -183,7 +193,7 @@ public class MiscListener implements Listener {
                         return;
                     }
                     
-                    if (player.getLocation().distanceSquared(initLoc) > 1) {
+                    if (player.getLocation().distanceSquared(initLoc) > 0.5) {
                         plugin.getCinematicManager().play(player);
                         this.cancel();
                     }

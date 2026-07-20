@@ -53,7 +53,7 @@ public abstract class TutorialReplay {
         "Keller",
         "Einstein",
         "Churchill",
-        "Chen"
+        "Daidai"
     };
     protected static final String NPCName = names[new Random().nextInt(names.length)];
     protected static final double RUN_SPEED = 0.286;

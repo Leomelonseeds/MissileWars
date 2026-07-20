@@ -115,7 +115,7 @@ public class TutorialArena extends ClassicArena {
      * @return
      */
     public Integer getStage(UUID uuid) {
-        return stage.getOrDefault(uuid, -1);
+        return stage.getOrDefault(uuid, 0);
     }
 
     @Override

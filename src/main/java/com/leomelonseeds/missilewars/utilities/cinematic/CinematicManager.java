@@ -81,84 +81,87 @@ public class CinematicManager implements Listener {
         // Initiate spectator armorstand keyframes
         List<Pair<Integer, Location>> keyframes = new ArrayList<>();
         
-        // Scene 1 - missile silo
-        keyframes.add(Pair.of(0,   new Location(world, 170.5, 71, 113.5, 0f, 0f)));
-        keyframes.add(Pair.of(88,  new Location(world, 170.5, 71, 180.5, 0f, 0f)));
-        
-        // Scene 2 - new map work area
-        keyframes.add(Pair.of(89,  new Location(world, 50.5, 158, -113.5, -90f, 0f)));
-        keyframes.add(Pair.of(160, new Location(world, 100.5, 158, -113.5, -90f, 0f)));
-        
-        // Scene 3 - Lobby decks
-        keyframes.add(Pair.of(161, new Location(world, 174.5, 66, 70.5, -180f, 0f)));
-        keyframes.add(Pair.of(201, new Location(world, 190.5, 66, 70.5, -180f, 0f)));
-        
-        // Scene 4 - Lobby play NPCs
-        keyframes.add(Pair.of(202, new Location(world, 166.5, 62, 94.5, -90f, 0f)));
-        keyframes.add(Pair.of(248, new Location(world, 166.5, 62, 84.5, -90f, 0f)));
-        
-        // Scene 5 - Zoom into to lobby missile wars logo
-        keyframes.add(Pair.of(249, new Location(world, 192.5, 76, 89.5, 90f, 0f)));
-        keyframes.add(Pair.of(340, new Location(world, 112.5, 76, 89.5, 90f, 0f)));
+        // // Scene 1 - missile silo
+        // keyframes.add(Pair.of(0,   new Location(world, 170.5, 71, 113.5, 0f, 0f)));
+        // keyframes.add(Pair.of(88,  new Location(world, 170.5, 71, 180.5, 0f, 0f)));
+        // 
+        // // Scene 2 - new map work area
+        // keyframes.add(Pair.of(89,  new Location(world, 50.5, 158, -113.5, -90f, 0f)));
+        // keyframes.add(Pair.of(160, new Location(world, 100.5, 158, -113.5, -90f, 0f)));
+        // 
+        // // Scene 3 - Lobby decks
+        // keyframes.add(Pair.of(161, new Location(world, 174.5, 66, 70.5, -180f, 0f)));
+        // keyframes.add(Pair.of(201, new Location(world, 190.5, 66, 70.5, -180f, 0f)));
+        // 
+        // // Scene 4 - Lobby play NPCs
+        // keyframes.add(Pair.of(202, new Location(world, 166.5, 62, 94.5, -90f, 0f)));
+        // keyframes.add(Pair.of(248, new Location(world, 166.5, 62, 84.5, -90f, 0f)));
+        // 
+        // // Scene 5 - Zoom into to lobby missile wars logo
+        // keyframes.add(Pair.of(249, new Location(world, 192.5, 76, 89.5, 90f, 0f)));
+        // keyframes.add(Pair.of(340, new Location(world, 112.5, 76, 89.5, 90f, 0f)));
         
         // Scene 6 - Zoom out from tutorial world missile wars logo
-        keyframes.add(Pair.of(341, new Location(tutorial, 55, 0.7, 0.5, -90f, 0f)));
-        keyframes.add(Pair.of(390, new Location(tutorial, 1, 0.7, 0.5, -90f, 0f)));
-        keyframes.add(Pair.of(452, new Location(tutorial, -88, 0.7, 0.5, -90f, 0f)));
+        // Subtract 341 from every keyframe
+        keyframes.add(Pair.of(0, new Location(tutorial, 55, 0.7, 0.5, -90f, 0f)));
+        keyframes.add(Pair.of(49, new Location(tutorial, 1, 0.7, 0.5, -90f, 0f)));
+        keyframes.add(Pair.of(111, new Location(tutorial, -88, 0.7, 0.5, -90f, 0f)));
         
         // Scene 7 - Replay 1 - riding missiles
-        keyframes.add(Pair.of(453, new Location(tutorial, 163, 17, -64.5, -37f, 9f)));
-        keyframes.add(Pair.of(501, new Location(tutorial, 163, 17, -55.5, -37f, 9f)));
-        keyframes.add(Pair.of(541, new Location(tutorial, 166.5, 16, -47.5, 0f, 14f)));
+        keyframes.add(Pair.of(112, new Location(tutorial, 163, 17, -64.5, -37f, 9f)));
+        keyframes.add(Pair.of(160, new Location(tutorial, 163, 17, -55.5, -37f, 9f)));
+        keyframes.add(Pair.of(200, new Location(tutorial, 166.5, 16, -47.5, 0f, 14f)));
         
         // Scene 8 - Replay 2 - blowing up portals
-        keyframes.add(Pair.of(565, new Location(tutorial, 172.5, 14.5, 50, 130f, 8f)));
-        keyframes.add(Pair.of(620, new Location(tutorial, 172.5, 14.5, 50, 80f, 8f)));
-        keyframes.add(Pair.of(650, new Location(tutorial, 172.5, 14.5, 50, 80f, 8f)));
-        keyframes.add(Pair.of(700, new Location(tutorial, 170, 10, 88, 163f, 16f)));
-        keyframes.add(Pair.of(780, new Location(tutorial, 170, 10, 88, 163f, 16f)));
+        keyframes.add(Pair.of(224, new Location(tutorial, 172.5, 14.5, 50, 130f, 8f)));
+        keyframes.add(Pair.of(279, new Location(tutorial, 172.5, 14.5, 50, 80f, 8f)));
+        keyframes.add(Pair.of(309, new Location(tutorial, 172.5, 14.5, 50, 80f, 8f)));
+        keyframes.add(Pair.of(359, new Location(tutorial, 170, 10, 88, 163f, 16f)));
+        keyframes.add(Pair.of(439, new Location(tutorial, 170, 10, 88, 163f, 16f)));
         
         // Scene 9 - Replay 3 - Defending
-        keyframes.add(Pair.of(790, new Location(tutorial, 133.5, 17, 55.5, 160f, 12f)));
-        keyframes.add(Pair.of(820, new Location(tutorial, 134, 17, 53, 138f, 12.5f)));
-        keyframes.add(Pair.of(840, new Location(tutorial, 141.5, 11.5, 19.5, 65f, 19f)));
-        keyframes.add(Pair.of(880, new Location(tutorial, 138, 11.5, 13, 32f, 21f)));
+        keyframes.add(Pair.of(449, new Location(tutorial, 133.5, 17, 55.5, 160f, 12f)));
+        keyframes.add(Pair.of(479, new Location(tutorial, 134, 17, 53, 138f, 12.5f)));
+        keyframes.add(Pair.of(499, new Location(tutorial, 141.5, 11.5, 19.5, 65f, 19f)));
+        keyframes.add(Pair.of(539, new Location(tutorial, 138, 11.5, 13, 32f, 21f)));
         
         // Scene 10 - Replay 4 - Abilities
-        keyframes.add(Pair.of(900, new Location(tutorial, 131, 17, -55, -21f, 4f)));
-        keyframes.add(Pair.of(960, new Location(tutorial, 134, 17, -54.5, -2f, 4f)));
-        keyframes.add(Pair.of(1020, new Location(tutorial, 134, 17, -54.5, -2f, 4f)));
+        keyframes.add(Pair.of(559, new Location(tutorial, 131, 17, -55, -21f, 4f)));
+        keyframes.add(Pair.of(619, new Location(tutorial, 134, 17, -54.5, -2f, 4f)));
+        keyframes.add(Pair.of(679, new Location(tutorial, 134, 17, -54.5, -2f, 4f)));
         
         // Scene 11 - Decks
-        keyframes.add(Pair.of(1021, new Location(tutorial, 74, -3.5, 7.5, 90f, -5f)));
-        keyframes.add(Pair.of(1100, new Location(tutorial, 74, -3.5, -6.5, 90f, -5f)));
+        keyframes.add(Pair.of(680, new Location(tutorial, 74, -3.5, 7.5, 90f, -5f)));
+        keyframes.add(Pair.of(759, new Location(tutorial, 74, -3.5, -6.5, 90f, -5f)));
         generateFrames(keyframes);
         
         // Initiate replay tasks
+        // This section is shortened to make tutorial better, 341 ticks subtracted from each task
+        // replayTasks.put(1, p -> {
+        //     ConfigUtils.sendTitle("cinematic-1", p);
+        //     ConfigUtils.sendConfigSound("intro-1", p, true);
+        // });
+        // replayTasks.put(90, p -> ConfigUtils.sendTitle("cinematic-2", p));
+        // replayTasks.put(162, p -> ConfigUtils.sendTitle("cinematic-3", p));
+        // replayTasks.put(203, p -> ConfigUtils.sendTitle("cinematic-4", p));
         replayTasks.put(1, p -> {
-            ConfigUtils.sendTitle("cinematic-1", p);
-            ConfigUtils.sendConfigSound("intro-1", p, true);
-        });
-        replayTasks.put(90, p -> ConfigUtils.sendTitle("cinematic-2", p));
-        replayTasks.put(162, p -> ConfigUtils.sendTitle("cinematic-3", p));
-        replayTasks.put(203, p -> ConfigUtils.sendTitle("cinematic-4", p));
-        replayTasks.put(342, p -> {
             tutorialArena.softJoin(p);
             ConfigUtils.sendConfigSound("intro-2", p, true);
+            ConfigUtils.sendTitle("cinematic-12", p);
         });
-        replayTasks.put(454, p -> {
+        replayTasks.put(113, p -> {
             ConfigUtils.sendTitle("cinematic-5", p);
             replays.get(Type.RIDING).startReplay();
         });
-        replayTasks.put(566, p -> replays.get(Type.PORTAL_BREAKING).startReplay());
-        replayTasks.put(580, p -> ConfigUtils.sendTitle("cinematic-6", p));
-        replayTasks.put(670, p -> ConfigUtils.sendTitle("cinematic-7", p));
-        replayTasks.put(785, p -> replays.get(Type.DEFENDING).startReplay());
-        replayTasks.put(790, p -> ConfigUtils.sendTitle("cinematic-8", p));
-        replayTasks.put(900, p -> replays.get(Type.ABILITIES).startReplay());
-        replayTasks.put(970, p -> ConfigUtils.sendTitle("cinematic-9", p));
-        replayTasks.put(1022, p -> ConfigUtils.sendTitle("cinematic-10", p));
-        replayTasks.put(1060, p -> ConfigUtils.sendTitle("cinematic-11", p));
+        replayTasks.put(225, p -> replays.get(Type.PORTAL_BREAKING).startReplay());
+        replayTasks.put(239, p -> ConfigUtils.sendTitle("cinematic-6", p));
+        replayTasks.put(329, p -> ConfigUtils.sendTitle("cinematic-7", p));
+        replayTasks.put(444, p -> replays.get(Type.DEFENDING).startReplay());
+        replayTasks.put(449, p -> ConfigUtils.sendTitle("cinematic-8", p));
+        replayTasks.put(559, p -> replays.get(Type.ABILITIES).startReplay());
+        replayTasks.put(629, p -> ConfigUtils.sendTitle("cinematic-9", p));
+        replayTasks.put(681, p -> ConfigUtils.sendTitle("cinematic-10", p));
+        replayTasks.put(719, p -> ConfigUtils.sendTitle("cinematic-11", p));
     }
     
     /**
