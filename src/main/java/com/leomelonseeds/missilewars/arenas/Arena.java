@@ -933,6 +933,7 @@ public abstract class Arena implements ConfigurationSerializable {
         player.setFoodLevel(20);
         player.setRespawnLocation(getPlayerSpawn(player), true);
         player.setGameMode(GameMode.ADVENTURE);
+        player.setExperienceLevelAndProgress(0);
         players.put(uuid, new MissileWarsPlayer(player));
         giveHeldItems(player);
 
@@ -1218,6 +1219,10 @@ public abstract class Arena implements ConfigurationSerializable {
         // If the arena is already running, or no start time has been set, then do nothing
         if (running || resetting || startTime == null) {
             return false;
+        }
+        
+        for (MissileWarsPlayer mwp : players.values()) {
+            mwp.getMCPlayer().setExperienceLevelAndProgress(0);
         }
         
         cancelGameTasks();

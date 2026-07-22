@@ -317,8 +317,7 @@ public class MissileWarsTeam {
         InventoryUtils.clearInventory(mcPlayer);
         player.stopTasks();
         player.resetPlayer();
-        mcPlayer.setLevel(0);
-        mcPlayer.setExp(0F);
+        mcPlayer.setExperienceLevelAndProgress(0);
         mcPlayer.setGlowing(false);
         mcPlayer.setWorldBorder(null);
         mcPlayer.getAttribute(Attribute.SCALE).setBaseValue(1.0);
