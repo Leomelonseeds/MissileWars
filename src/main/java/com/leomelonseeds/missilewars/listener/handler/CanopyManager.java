@@ -323,6 +323,13 @@ public class CanopyManager {
     private void despawnCanopy(Location loc, int duration) {
         ConfigUtils.schedule(duration * 20, () -> {
             Location wood = loc.clone().add(0, -1, 0).getBlock().getLocation();
+            
+            // There may be a cobweb - set that to air even if wood is already gone
+            Location cobweb = wood.clone().add(0, 1, 0);
+            if (cobweb.getBlock().getType() == Material.COBWEB) {
+                cobweb.getBlock().setType(Material.AIR);
+            }
+            
             if (wood.getBlock().getType() != Material.OAK_WOOD) {
                 return;
             }
@@ -334,12 +341,6 @@ public class CanopyManager {
             }
             
             wood.getBlock().setType(Material.AIR);
-            
-            // There may be a cobweb - set that to air too
-            Location cobweb = wood.clone().add(0, 1, 0);
-            if (cobweb.getBlock().getType() == Material.COBWEB) {
-                cobweb.getBlock().setType(Material.AIR);
-            }
         });
     }
 }
