@@ -188,7 +188,7 @@ public class TrainingArena extends ClassicArena {
         // Equation: training missiles * blue shield health
         String earnMessage = ConfigUtils.getConfigText("messages.earn-currency", null, null, null);
         String timeMessage = ConfigUtils.getConfigText("messages.training-time", null, null, null);
-        int portal_reward = 20;
+        int portal_reward = 10;
         int shield_health_reward = ((int) ((100 - redTeam.getShieldHealth())) / 10) * 2;
         int defense_reward = (int) (missiles * blueTeam.getShieldHealth() / 100);
         this.missiles = 0;
@@ -200,7 +200,7 @@ public class TrainingArena extends ClassicArena {
             
             // Exp calculation
             Player mcplayer = player.getMCPlayer();
-            int amountEarned = portal_reward * player.getStat(Stat.MISSILES) + shield_health_reward + defense_reward;
+            int amountEarned = portal_reward * player.getStat(Stat.PORTALS) + shield_health_reward + defense_reward;
             RankUtils.addExp(player.getMCPlayer(), amountEarned);
             String earnMessagePlayer = earnMessage.replaceAll("%umw_amount_earned%", Integer.toString(amountEarned));
             mcplayer.sendMessage(ConfigUtils.toComponent(earnMessagePlayer));
