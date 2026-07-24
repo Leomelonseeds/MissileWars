@@ -138,8 +138,10 @@ public class RandomItemDistributor implements ConfigurationSerializable {
      */
     public void stopDistribution() {
         timerTicks = 0;
-        curItems.clear();
-        curItems = null;
+        if (curItems != null) {
+            curItems.clear();
+            curItems = null;
+        }
     }
     
     /**
