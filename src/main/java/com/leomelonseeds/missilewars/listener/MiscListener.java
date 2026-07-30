@@ -262,12 +262,12 @@ public class MiscListener implements Listener {
             }
             
             Location fbLoc = fb.getLocation();
-            if (fbLoc.distanceSquared(eyeLoc) > 3 * 3) {
+            if (fbLoc.distanceSquared(eyeLoc) > 4 * 4) {
                 continue;
             }
 
             Vector fbDir = fb.getVelocity();
-            double maxDist = fbDir.length() * delay + 3;
+            double maxDist = fbDir.length() * delay + 4;
             Vector screenFbCenter = fb.getBoundingBox().getCenter().subtract(fbDir.multiply(delay));
             BoundingBox screenFbBox = BoundingBox.of(screenFbCenter, 0.5, 0.5, 0.5);
             boolean success = false;
@@ -306,6 +306,7 @@ public class MiscListener implements Listener {
         // Thank you so much mister CAG2 for suggesting Player#attack, absolute genius if you ask me
         if (target instanceof Fireball) {
             player.attack(target);
+            ((Fireball) target).setShooter(player);
         }
     }
 }
